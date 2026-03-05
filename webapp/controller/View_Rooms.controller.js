@@ -20,6 +20,12 @@ sap.ui.define([
             }
             // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
+            // Clear the HostelModel when returning to this view
+            const oHostelModel = this.getView().getModel("HostelModel");
+            if (oHostelModel) {
+                oHostelModel.setData({});
+            }
+
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
                 BedTypes: [],
@@ -545,7 +551,10 @@ sap.ui.define([
             }
 
             this._clearRoomDetailDialog();
-
+             const oHostelModel = this.getView().getModel("HostelModel");
+            if (!oHostelModel) {
+                oHostelModel.setData({});
+            }
             const oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBookRoom");
         },

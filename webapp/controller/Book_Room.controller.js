@@ -165,7 +165,7 @@ sap.ui.define([
                 PERVIOUSVIS: false,
                 Month: false,
                 Year: false,
-              
+
             })
             this.getView().setModel(oBTn, "OBTNModel")
             var oEndDatePicker = this.getView().byId("idEndDate1")
@@ -189,17 +189,17 @@ sap.ui.define([
             setTimeout(() => {
                 this.Roomdetails();
             }, 100);
-//           const aDate = this.getView().getModel("HostelModel");
-// const sAvailableDate = aDate.getProperty("/AvailableDate"); // "20-02-2026"
+            //           const aDate = this.getView().getModel("HostelModel");
+            // const sAvailableDate = aDate.getProperty("/AvailableDate"); // "20-02-2026"
 
-// if (sAvailableDate) {
-//     const oToday = this._parseDate(sAvailableDate);
-//     if (oToday) {
-//         oToday.setHours(0, 0, 0, 0);
-//         oHostelModel.setProperty("/TodayDate", oToday);
-//     }
-// }else{
-    const oToday = new Date();
+            // if (sAvailableDate) {
+            //     const oToday = this._parseDate(sAvailableDate);
+            //     if (oToday) {
+            //         oToday.setHours(0, 0, 0, 0);
+            //         oHostelModel.setProperty("/TodayDate", oToday);
+            //     }
+            // }else{
+            const oToday = new Date();
             // Strip time (set hours to 0) to avoid timezone offset issues
             oToday.setHours(0, 0, 0, 0);
             oHostelModel.setProperty("/TodayDate", oToday);
@@ -231,7 +231,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             this._perDayInfoShown = false;
             oHostelModel.setProperty("/IsGeneralInfoValid", true);  //wizard step validation
-this._bBlockMessagePopover = false;
+            this._bBlockMessagePopover = false;
         },
 
         Roomdetails: async function () {
@@ -252,85 +252,85 @@ this._bBlockMessagePopover = false;
             }
         },
 
-     _LoadFacilities: async function () {
-    const oView = this.getView();
+        _LoadFacilities: async function () {
+            const oView = this.getView();
 
-    try {
-        const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
-        const oBranch = oHostelModel.BranchCode;
-        const oExtraBed = oHostelModel.ExtraBed;
+            try {
+                const oHostelModel = sap.ui.getCore().getModel("HostelModel").getData();
+                const oBranch = oHostelModel.BranchCode;
+                const oExtraBed = oHostelModel.ExtraBed;
 
-        const Response = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: oBranch });
-        const aFacilities = Response?.data || [];
+                const Response = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: oBranch });
+                const aFacilities = Response?.data || [];
 
-        //  FILTER LOGIC ADDED HERE
-        const aFilteredFacilities = aFacilities.filter(f => {
-            if ((f.Type || "").toLowerCase().trim() === "extra bed") {
-                return oExtraBed > 0; // include only if ExtraBed > 1
-            }
-            return true; // include all other facilities
-        });
-
-        // Default images ONLY by Type
-        const defaultTypeImages = {
-            "high-speed wi-fi": "./image/High-Speed Wi-Fi.jpg",
-            "laundry service": "./image/Laundry Service.jpg",
-            "ironing service": "./image/Ironing Service.jpg",
-            "housekeeping": "./image/Housekeeping.jpg",
-            "meals / food subscription": "./image/Meals.jpg",
-            "gym membership": "./image/gym.jpg",
-            "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
-            "four-wheeler parking": "./image/Four Wheeler Parking.jpg",
-            "locker / storage facility": "./image/locker.jpg",
-            "power backup": "./image/Power Backup.jpeg",
-            "air conditioner": "./image/Air Conditioner.jpeg",
-            "room heater": "./image/Room Heater.jpeg",
-            "study room access": "./image/Study Room.png",
-            "extra bed": "./image/ExtraBed.jpg"
-        };
-
-        const convertBase64ToImage = (base64String, fileType, type) => {
-            const typeKey = (type || "").toLowerCase().trim();
-            const fallback = defaultTypeImages[typeKey] || "./image/Fallback.png";
-
-            if (base64String && base64String.trim()) {
-                let sBase64 = base64String.replace(/\s/g, "");
-                try {
-                    if (!sBase64.startsWith("data:image")) {
-                        atob(sBase64.substring(0, 40));
+                //  FILTER LOGIC ADDED HERE
+                const aFilteredFacilities = aFacilities.filter(f => {
+                    if ((f.Type || "").toLowerCase().trim() === "extra bed") {
+                        return oExtraBed > 0; // include only if ExtraBed > 1
                     }
-                } catch (e) {
+                    return true; // include all other facilities
+                });
+
+                // Default images ONLY by Type
+                const defaultTypeImages = {
+                    "high-speed wi-fi": "./image/High-Speed Wi-Fi.jpg",
+                    "laundry service": "./image/Laundry Service.jpg",
+                    "ironing service": "./image/Ironing Service.jpg",
+                    "housekeeping": "./image/Housekeeping.jpg",
+                    "meals / food subscription": "./image/Meals.jpg",
+                    "gym membership": "./image/gym.jpg",
+                    "two-wheeler parking": "./image/Two-Wheeler Parking.webp",
+                    "four-wheeler parking": "./image/Four Wheeler Parking.jpg",
+                    "locker / storage facility": "./image/locker.jpg",
+                    "power backup": "./image/Power Backup.jpeg",
+                    "air conditioner": "./image/Air Conditioner.jpeg",
+                    "room heater": "./image/Room Heater.jpeg",
+                    "study room access": "./image/Study Room.png",
+                    "extra bed": "./image/ExtraBed.jpg"
+                };
+
+                const convertBase64ToImage = (base64String, fileType, type) => {
+                    const typeKey = (type || "").toLowerCase().trim();
+                    const fallback = defaultTypeImages[typeKey] || "./image/Fallback.png";
+
+                    if (base64String && base64String.trim()) {
+                        let sBase64 = base64String.replace(/\s/g, "");
+                        try {
+                            if (!sBase64.startsWith("data:image")) {
+                                atob(sBase64.substring(0, 40));
+                            }
+                        } catch (e) {
+                            return fallback;
+                        }
+                        return `data:${fileType || "image/jpeg"};base64,${sBase64}`;
+                    }
                     return fallback;
-                }
-                return `data:${fileType || "image/jpeg"};base64,${sBase64}`;
+                };
+
+                // Map Facilities
+                const aFinalFacilities = aFilteredFacilities.map(f => ({
+                    FacilityID: f.ID,
+                    FacilityName: f.FacilityName,
+                    Type: f.Type,
+                    Image: convertBase64ToImage(f.Photo1, f.Photo1Type, f.Type),
+                    PricePerHour: f.PerHourPrice,
+                    PricePerDay: f.PerDayPrice,
+                    PricePerMonth: f.PerMonthPrice,
+                    PricePerYear: f.PerYearPrice,
+                    UnitText: f.UnitText,
+                    Currency: f.Currency,
+                    BranchCode: f.BranchCode
+                }));
+
+                this._aAllFacilities = aFinalFacilities;
+                oView.setModel(new sap.ui.model.json.JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
+                this._applyFacilityPriceFilter();
+
+            } catch (err) {
+                console.error("Facility Load Error", err);
+                sap.m.MessageBox.error("Unable to load facilities.");
             }
-            return fallback;
-        };
-
-        // Map Facilities
-        const aFinalFacilities = aFilteredFacilities.map(f => ({
-            FacilityID: f.ID,
-            FacilityName: f.FacilityName,
-            Type: f.Type,
-            Image: convertBase64ToImage(f.Photo1, f.Photo1Type, f.Type),
-            PricePerHour: f.PerHourPrice,
-            PricePerDay: f.PerDayPrice,
-            PricePerMonth: f.PerMonthPrice,
-            PricePerYear: f.PerYearPrice,
-            UnitText: f.UnitText,
-            Currency: f.Currency,
-            BranchCode: f.BranchCode
-        }));
-
-        this._aAllFacilities = aFinalFacilities;
-        oView.setModel(new sap.ui.model.json.JSONModel({ Facilities: aFinalFacilities }), "FacilityModel");
-        this._applyFacilityPriceFilter();
-
-    } catch (err) {
-        console.error("Facility Load Error", err);
-        sap.m.MessageBox.error("Unable to load facilities.");
-    }
-},
+        },
         _applyFacilityPriceFilter: function () {
             const oView = this.getView();
             const oHostelModel = oView.getModel("HostelModel");
@@ -927,27 +927,27 @@ this._bBlockMessagePopover = false;
                             width: "100%",
                             value: "{HostelModel>/Persons/" + i + "/FullName}",
                             maxLength: 40,
-                         liveChange: function (oEvent) {
-    const oInput = oEvent.getSource();
-    let sValue = oEvent.getParameter("value");
+                            liveChange: function (oEvent) {
+                                const oInput = oEvent.getSource();
+                                let sValue = oEvent.getParameter("value");
 
-    // Allow only alphabets and spaces
-    const sFilteredValue = sValue.replace(/[^a-zA-Z\s]/g, "");
+                                // Allow only alphabets and spaces
+                                const sFilteredValue = sValue.replace(/[^a-zA-Z\s]/g, "");
 
-    // Replace invalid characters immediately
-    if (sValue !== sFilteredValue) {
-        oInput.setValue(sFilteredValue);
-    }
+                                // Replace invalid characters immediately
+                                if (sValue !== sFilteredValue) {
+                                    oInput.setValue(sFilteredValue);
+                                }
 
-    // Empty is allowed (no error while typing)
-    if (!sFilteredValue) {
-        oInput.setValueState(sap.ui.core.ValueState.None);
-        return;
-    }
+                                // Empty is allowed (no error while typing)
+                                if (!sFilteredValue) {
+                                    oInput.setValueState(sap.ui.core.ValueState.None);
+                                    return;
+                                }
 
-    //  Valid input → clear error
-    oInput.setValueState(sap.ui.core.ValueState.None);
-}
+                                //  Valid input → clear error
+                                oInput.setValueState(sap.ui.core.ValueState.None);
+                            }
 
 
 
@@ -974,8 +974,8 @@ this._bBlockMessagePopover = false;
                             valueFormat: "dd/MM/yyyy",
                             displayFormat: "dd/MM/yyyy",
                             //   minDate: new Date(2000, 0, 1),
-                              maxDate: new Date(),
-                              initialFocusedDateValue: new Date(2000, 0, 1),
+                            maxDate: new Date(),
+                            initialFocusedDateValue: new Date(2000, 0, 1),
                             placeholder: "Select date of birth",
                             change: function (oEvent) {
                                 const oDate = oEvent.getSource().getDateValue();
@@ -1485,7 +1485,7 @@ this._bBlockMessagePopover = false;
                                 // 3 Refresh model
                                 oModel.refresh(true);
                             }
-                        })).addStyleClass("myUnifiedBtn"),
+                        })).addStyleClass("myUnifiedBtnBooking"),
 
                     ]
                 });
@@ -1642,7 +1642,7 @@ this._bBlockMessagePopover = false;
                                                     // class: "serviceImage",
                                                     densityAware: false,
                                                     wrap: true,
-                                                  press: function (oEvent) {
+                                                    press: function (oEvent) {
                                                         const oCtx = oEvent.getSource().getBindingContext("FacilityModel");
                                                         const facility = oCtx.getObject();
                                                         const oCard = oEvent.getSource().getParent().getParent();
@@ -1837,11 +1837,11 @@ this._bBlockMessagePopover = false;
                 aPersons[iPersonIndex].Facilities.SelectedFacilities;
 
             const idx = aSelected.findIndex(
-    f => f.FacilityID === facility.FacilityID
-);
+                f => f.FacilityID === facility.FacilityID
+            );
 
             const oNew = {
-                 FacilityID: facility.FacilityID, 
+                FacilityID: facility.FacilityID,
                 FacilityName: facility.FacilityName,
                 BranchCode: facility.BranchCode,
                 Currency: facility.Currency,
@@ -2038,9 +2038,9 @@ this._bBlockMessagePopover = false;
         },
         _openMessagePopover: function (oSource) {
 
-             if (this._iSelectedStepIndex === 0) {
-        return;
-    }
+            if (this._iSelectedStepIndex === 0) {
+                return;
+            }
             if (!this._oMessagePopover) {
                 this._oMessagePopover = sap.ui.xmlfragment(
                     this.getView().getId(),
@@ -2084,30 +2084,30 @@ this._bBlockMessagePopover = false;
         },
 
         onDialogBackButton: function () {
-       
+
             this._iSelectedStepIndex = this._oWizard.getSteps().indexOf(this._oSelectedStep);
             var oPreviousStep = this._oWizard.getSteps()[this._iSelectedStepIndex - 1];
-               
+
             if (this._oSelectedStep) {
                 this._oWizard.goToStep(oPreviousStep, true);
             } else {
                 this._oWizard.previousStep();
             }
-         
+
             this._iSelectedStepIndex--;
             this._oSelectedStep = oPreviousStep;
 
- if (this._iSelectedStepIndex === 0) {
+            if (this._iSelectedStepIndex === 0) {
 
-        this._bBlockMessagePopover = true;
+                this._bBlockMessagePopover = true;
 
-        if (this._oMessagePopover) {
-            this._oMessagePopover.close();
-        }
-    } else {
-        this._bBlockMessagePopover = false;
-    }
-             this.handleButtonsVisibility();
+                if (this._oMessagePopover) {
+                    this._oMessagePopover.close();
+                }
+            } else {
+                this._bBlockMessagePopover = false;
+            }
+            this.handleButtonsVisibility();
         },
 
         handleNavigationChange: function (oEvent) {
@@ -2213,7 +2213,7 @@ this._bBlockMessagePopover = false;
                 case 0:
                     oModel.setProperty("/NXTVis", true);
                     oModel.setProperty("/PERVIOUSVIS", false);
-                  
+
                     break;
                 case 1:
                     oModel.setProperty("/PERVIOUSVIS", true);
@@ -2359,7 +2359,7 @@ this._bBlockMessagePopover = false;
 
             // ---------- DAYS ----------
             let iDays =
-                Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24)) + 1;
+                Math.floor((oEndDate - oStartDate) / (1000 * 3600 * 24));
             const diffHours = 1;
 
             if (iDays <= 0 && diffHours <= 0) {
@@ -2488,26 +2488,26 @@ this._bBlockMessagePopover = false;
                         oPerson.SubTotal + oPerson.CGST + oPerson.SGST + oPerson.IGST).toFixed(2));
 
 
-               if (paymentType === "Per Day") {
+                if (paymentType === "Per Day") {
 
-    // Per Day → full amount (already includes total days)
-    oPerson.MonthlyCostPerPerson =
-        Number(oPerson.FinalTotalCost.toFixed(2));
+                    // Per Day → full amount (already includes total days)
+                    oPerson.MonthlyCostPerPerson =
+                        Number(oPerson.FinalTotalCost.toFixed(2));
 
-    oPerson.MonthlyCostPerson =
-        Number(oPerson.FinalTotalCost.toFixed(2));
+                    oPerson.MonthlyCostPerson =
+                        Number(oPerson.FinalTotalCost.toFixed(2));
 
-} else {
+                } else {
 
-    // Per Month / Per Year → divide by booking months
-    const divisor = selectedMonths > 0 ? selectedMonths : 1;
+                    // Per Month / Per Year → divide by booking months
+                    const divisor = selectedMonths > 0 ? selectedMonths : 1;
 
-    oPerson.MonthlyCostPerPerson =
-        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
+                    oPerson.MonthlyCostPerPerson =
+                        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
 
-    oPerson.MonthlyCostPerson =
-        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
-}
+                    oPerson.MonthlyCostPerson =
+                        Number((oPerson.FinalTotalCost / divisor).toFixed(2));
+                }
 
                 oPerson.MonthlyCostPerson =
                     oPerson.FinalTotalCost / selectedMonths;
@@ -2567,45 +2567,45 @@ this._bBlockMessagePopover = false;
             const oEndDatePicker = oView.byId("idEndDate1");
 
             const sStartDate = oStartDatePicker?.getValue() || "";
-    // =========================================================
-// HARD ENFORCEMENT: StartDate >= TodayDate
-// =========================================================
-const oTodayDate = oHostelModel.getProperty("/TodayDate");
+            // =========================================================
+            // HARD ENFORCEMENT: StartDate >= TodayDate
+            // =========================================================
+            const oTodayDate = oHostelModel.getProperty("/TodayDate");
 
-if (
-    oEvent.getSource().getId().includes("idStartDate1") &&
-    sStartDate &&
-    oTodayDate instanceof Date
-) {
-    const oSelectedStart = this._parseDate(sStartDate);
+            if (
+                oEvent.getSource().getId().includes("idStartDate1") &&
+                sStartDate &&
+                oTodayDate instanceof Date
+            ) {
+                const oSelectedStart = this._parseDate(sStartDate);
 
-    if (oSelectedStart instanceof Date) {
+                if (oSelectedStart instanceof Date) {
 
-        oSelectedStart.setHours(0, 0, 0, 0);
-        oTodayDate.setHours(0, 0, 0, 0);
+                    oSelectedStart.setHours(0, 0, 0, 0);
+                    oTodayDate.setHours(0, 0, 0, 0);
 
-        if (oSelectedStart < oTodayDate) {
+                    if (oSelectedStart < oTodayDate) {
 
-            // force reset
-            const d = String(oTodayDate.getDate()).padStart(2, "0");
-            const m = String(oTodayDate.getMonth() + 1).padStart(2, "0");
-            const y = oTodayDate.getFullYear();
+                        // force reset
+                        const d = String(oTodayDate.getDate()).padStart(2, "0");
+                        const m = String(oTodayDate.getMonth()).padStart(2, "0");
+                        const y = oTodayDate.getFullYear();
 
-            const sCorrectedDate = `${d}/${m}/${y}`;
+                        const sCorrectedDate = `${d}/${m}/${y}`;
 
-            oHostelModel.setProperty("/StartDate", sCorrectedDate);
-            oStartDatePicker.setValue(sCorrectedDate);
+                        oHostelModel.setProperty("/StartDate", sCorrectedDate);
+                        oStartDatePicker.setValue(sCorrectedDate);
 
-            oStartDatePicker.setValueState("Error");
-            oStartDatePicker.setValueStateText(
-                this.i18nModel.getText("enterStartDate")
-            );
+                        oStartDatePicker.setValueState("Error");
+                        oStartDatePicker.setValueStateText(
+                            this.i18nModel.getText("enterStartDate")
+                        );
 
-            oBtnModel.setProperty("/Next", false);
-            return; // ⛔ STOP ALL FURTHER LOGIC
-        }
-    }
-}
+                        oBtnModel.setProperty("/Next", false);
+                        return; // ⛔ STOP ALL FURTHER LOGIC
+                    }
+                }
+            }
 
             const sEndDate = oEndDatePicker?.getValue() || "";
             const sPaymentType = oData.SelectedPriceType || oView.byId("idPaymentMethod1")?.getValue() || "";
@@ -2633,14 +2633,16 @@ if (
 
                 if (oStart instanceof Date && !isNaN(oStart)) {
 
-                    // For Per Day → same day allowed
+                    // For Per Day → next day minimum (disable start date day)
                     if (sPaymentType === "Per Day") {
-                        oEndDatePicker.setMinDate(oStart);
+                        const oMinEndDate = new Date(oStart);
+                        oMinEndDate.setDate(oMinEndDate.getDate() + 1);
+                        oEndDatePicker.setMinDate(oMinEndDate);
                     }
                     // For Per Month / Year → next day minimum
                     else {
                         const oMinEnd = new Date(oStart);
-                        oMinEnd.setDate(oMinEnd.getDate() + 1);
+                        oMinEnd.setDate(oMinEnd.getDate());
                         oEndDatePicker.setMinDate(oMinEnd);
                     }
                 }
@@ -2701,7 +2703,7 @@ if (
                 const oEnd = this._parseDate(sEndDate);
 
                 // inclusive day count
-                let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+                let diffDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
 
                 if (diffDays <= 0) {
                     oEndDatePicker.setValueState("Error");
@@ -2898,35 +2900,72 @@ if (
         _formatDateToDDMMYYYY: function (oDate) {
             if (!(oDate instanceof Date)) return "";
             const dd = String(oDate.getDate()).padStart(2, "0");
-            const mm = String(oDate.getMonth() + 1).padStart(2, "0");
+            const mm = String(oDate.getMonth()).padStart(2, "0");
             const yyyy = oDate.getFullYear();
             return `${dd}/${mm}/${yyyy}`;
         },
 
         onNavBack: function () {
-            const oUser = this._oLoggedInUser;
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const that = this;
+            MessageBox.confirm(
+                this.i18nModel ? this.i18nModel.getText("confirmNavBack") : "Are you sure you want to go back?", {
+                icon: MessageBox.Icon.QUESTION,
+                title: this.i18nModel ? this.i18nModel.getText("confirmation") : "Confirm",
+                actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                onClose: function (oAction) {
+                    if (oAction === MessageBox.Action.OK) {
+                        // Clear all data before navigating back
+                        const oHostelModel = that.getView().getModel("HostelModel");
+                        if (oHostelModel) {
+                            const oData = oHostelModel.getData();
 
-            if (oUser && oUser.UserID) {
-                oUIModel.setProperty("/isLoggedIn", true);
-            } else {
-                oUIModel.setProperty("/isLoggedIn", false);
+                            // Reset Person data
+                            oData.Persons = [];
+                            oData.ForBothSelected = false;
+
+                            // Reset Facility data
+                            oData.AllSelectedFacilities = [];
+                            oData.HasFacilitySelection = false;
+                            oData.TotalFacilityPrice = 0;
+
+                            // Reset pricing
+                            oData.GrandTotal = 0;
+                            oData.RoomPrice = 0;
+                            oData.SelectedPerson = 1;
+
+                            // Reset form fields
+                            oData.StartDate = "";
+                            oData.EndDate = "";
+                            oData.TotalDays = 0;
+
+                            oHostelModel.setData(oData);
+                            oHostelModel.refresh(true);
+                        }
+
+                        // Reset internal tracking variables
+                        that._lastPersonCount = 1;
+                        that._isPersonUIInitialized = false;
+                        that._mustRecreatePersonUI = false;
+
+                        const oUser = that._oLoggedInUser;
+                        const oUIModel = that.getOwnerComponent().getModel("UIModel");
+
+                        if (oUser && oUser.UserID) {
+                            oUIModel.setProperty("/isLoggedIn", true);
+                        } else {
+                            oUIModel.setProperty("/isLoggedIn", false);
+                        }
+
+                        const oBookingID = that.getView().getModel("HostelModel").getProperty("/BranchCode");
+                        that.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
+                            sPath: oBookingID
+                        });
+                    }
+                }
             }
-
-            const oBookingID = this.getView().getModel("HostelModel").getProperty("/BranchCode");
-            // const aDate = this.getView().getModel("HostelModel").getProperty("/AvailableDate");
-
-
-            this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
-                sPath: oBookingID
-            }
-            )
-            //  this.getView().setModel(new JSONModel({
-            //     Date: aDate
-            // }), "ViewDateModel");
-
-
+            );
         },
+
 
         onRoomDurationChange: function (oEvent) {
             this._bPricingDirty = true;
@@ -3382,6 +3421,17 @@ if (
                 oLoginModel.setProperty("/STDCode", oMatchedUser.STDCode);
                 oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
 
+                if (oMatchedUser.FileContent) {
+
+                    oLoginModel.setProperty("/Photo", "data:image/png;base64," + oMatchedUser.FileContent);
+
+                } else {
+
+                    oLoginModel.setProperty("/Photo", "");
+
+                }
+                oLoginModel.setProperty("/Photo", oMatchedUser.FileContent || "");
+
 
                 this.getOwnerComponent()
                     .getModel("UserModel")
@@ -3427,7 +3477,6 @@ if (
                         p.Gender = "";
                     }
                 });
-
 
                 // Auto-check the "Fill Yourself" checkbox
                 const oCheck = sap.ui.getCore().byId(this.createId("IDSelfCheck_0"));
@@ -3816,6 +3865,16 @@ if (
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateofBirth || "");
 
+
+            if (user.FileContent) {
+
+                oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
+
+            } else {
+
+                oLoginModel.setProperty("/Photo", "");
+
+            }
             this._oLoggedInUser = user;
 
             if (user.Role === "Customer") {
@@ -4553,7 +4612,7 @@ if (
                 oDOBpicker.setMaxDate(oMaxDate);
 
                 // Min date: 100 years ago from today
-                const oMinDate = new Date(2000, 0, 1); 
+                const oMinDate = new Date(2000, 0, 1);
                 oDOBpicker.setMinDate(oMinDate);
             }
             this._resetOtpState();
@@ -4571,7 +4630,7 @@ if (
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-       
+
         // Robust helper to find control inside your Login fragment
         _getLoginFragmentControl: function (localId) {
             // 1) If you stored the fragment instance (best practice), use it

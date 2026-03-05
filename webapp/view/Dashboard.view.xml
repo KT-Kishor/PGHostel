@@ -145,60 +145,43 @@
                     level="H3"
                 />
                 <VBox class="sapUiSmallMarginTop" />
-                <Carousel
-                    height="auto"
-                    showPageIndicator="true"
-                    class="sapUiSmallMarginTop"
-                    pages="{todayModel>/pages}"
+             <Carousel
+    height="auto"
+    showPageIndicator="true"
+    class="sapUiSmallMarginTop"
+    pages="{todayModel>/pages}">
+    <VBox class="todayPage" width="100%">
+        <layout:Grid
+            defaultSpan="XL3 L4 M6 S12"
+            class="sapUiResponsiveMargin sapUiSmallMarginTop"
+            content="{path: 'todayModel>'}">
+            <layout:content>
+                <Panel
+                    class="todayCard"
+                    expandable="false"
                 >
-                    <VBox
-                        class="todayPage"
-                        width="100%"
-                    >
-                        <FlexBox
-                            items="{path: 'todayModel>' , templateShareable: false}"
-                            direction="Row"
-                            wrap="Wrap"
-                            justifyContent="Start"
-                            class="todayCardsRow"
-                        >
-                            <Panel
-                                class="todayCard"
-                                expandable="false"
-                            >
-                                <VBox>
-                                    <Title
-                                        text="{i18n>bookingID}: {todayModel>BookingID}"
-                                        level="H4"
-                                        wrapping="true"
-                                    />
-                                    <Text
-                                        text="{i18n>bookingDate}: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
-                                    />
-                                    <Text
-                                        text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
-                                        wrapping="true"
-                                    />
-                                    <Text
-                                        text="{i18n>dashStay}: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
-                        to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
-                                    />
-
-                                    <HBox
-                                        justifyContent="End"
-                                        class="sapUiSmallMarginTop"
-                                    >
-                                        <Button
-                                            text="{i18n>dashViewBooking}"
-                                            type="Emphasized"
-                                            press="onBookingCardPress"
-                                        />
-                                    </HBox>
-                                </VBox>
-                            </Panel>
-                        </FlexBox>
+                    <VBox>
+                        <Title text="{i18n>bookingID}: {todayModel>BookingID}"
+                               level="H4" wrapping="true"/>
+                        <Text  text="{i18n>bookingDate}: {path:'todayModel>BookingDate',
+                                  formatter:'.Formatter.formatDate'}"/>
+                        <Text  text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                               wrapping="true"/>
+                        <Text  text="{i18n>dashStay}: {path:'todayModel>StartDate',
+                                  formatter:'.Formatter.formatDate'} to
+                                  {path:'todayModel>EndDate',
+                                  formatter:'.Formatter.formatDate'}"/>
+                        <HBox justifyContent="End" class="sapUiSmallMarginTop">
+                            <Button text="{i18n>dashViewBooking}"
+                                    type="Emphasized"
+                                    press="onBookingCardPress"/>
+                        </HBox>
                     </VBox>
-                </Carousel>
+                </Panel>
+            </layout:content>
+        </layout:Grid>
+    </VBox>
+</Carousel>
 
                 <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"

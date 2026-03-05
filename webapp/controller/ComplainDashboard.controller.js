@@ -8,7 +8,7 @@ sap.ui.define([
     "use strict";
     const INITIAL_CHART_TYPES = {
         statusType: "donut",
-        DailyType: "line",
+        DailyType: "column",
         monthlyType: "bar",
         yearlyType: "bar"
 
@@ -24,6 +24,7 @@ sap.ui.define([
                 monthlyValue: [],
                 yearlyTrend: [],
                 paymentBreakdown: [],
+                dailyValue: []
             };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "ComplaintChartModel");
@@ -314,62 +315,58 @@ sap.ui.define([
 
         _prepareDailyStatusData: function (aFilteredData) {
             const oDateRange = this.byId("CD_complain_Date");
-            // determine start and end of range (fallback to current month)
             let dStart = oDateRange.getDateValue();
             let dEnd = oDateRange.getSecondDateValue();
+
             if (!dStart || !dEnd) {
                 const today = new Date();
                 dStart = new Date(today.getFullYear(), today.getMonth(), 1);
                 dEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             }
-            // normalize times
-            dStart = new Date(dStart);
-            dStart.setHours(0, 0, 0, 0);
-            dEnd = new Date(dEnd);
-            dEnd.setHours(23, 59, 59, 999);
 
-            // Collect all statuses dynamically
+            dStart = new Date(dStart); dStart.setHours(0, 0, 0, 0);
+            dEnd = new Date(dEnd); dEnd.setHours(23, 59, 59, 999);
+
             const aStatuses = [...new Set(aFilteredData.map(i => i.Status || "Unknown"))];
-
-            // Build daily rows for every date in the selected range
             const aDailyData = [];
+
             for (let d = new Date(dStart); d <= dEnd; d.setDate(d.getDate() + 1)) {
-                // display string includes day and month so multiple months show up distinctly
-                const display = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
-                // Format date as yyyy-mm-dd using local date components (not UTC) to match timezone
-                const dateStr = String(d.getFullYear()).padStart(4, "0") + "-" +
+                const day = String(d.getDate());  // "1", "2", "3"
+                const dateStr = String(d.getFullYear()) + "-" +
                     String(d.getMonth() + 1).padStart(2, "0") + "-" +
                     String(d.getDate()).padStart(2, "0");
-                const oRow = {
-                    day: display,
-                    // keep full yyyy-mm-dd key using local date components
-                    date: dateStr
-                };
+
+                const oRow = { day: day, date: dateStr };
                 aStatuses.forEach(status => (oRow[status] = 0));
                 aDailyData.push(oRow);
             }
 
-            // Aggregate counts within the selected range
+            // Aggregate counts - Use ComplaintRaisedDate or InvoiceDate (matching the filter logic)
             aFilteredData.forEach(item => {
-                if (!item.ComplaintRaisedDate) return;
+                const dItemDate = new Date(item.ComplaintRaisedDate || item.InvoiceDate);
+                if (!isNaN(dItemDate)) {
+                    dItemDate.setHours(0, 0, 0, 0);
+                    const dateStr = String(dItemDate.getFullYear()) + "-" +
+                        String(dItemDate.getMonth() + 1).padStart(2, "0") + "-" +
+                        String(dItemDate.getDate()).padStart(2, "0");
 
-                const d = new Date(item.ComplaintRaisedDate);
-                if (isNaN(d)) return;
-                if (d < dStart || d > dEnd) return;
-
-                const status = item.Status || "Unknown";
-                const display = String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0");
-                const oRow = aDailyData.find(r => r.day === display);
-                if (oRow) {
-                    oRow[status] = (oRow[status] || 0) + 1;
+                    const rowIndex = aDailyData.findIndex(row => row.date === dateStr);
+                    if (rowIndex !== -1) {
+                        const status = item.Status || "Unknown";
+                        aDailyData[rowIndex][status] = (aDailyData[rowIndex][status] || 0) + 1;
+                    }
                 }
             });
 
-            return {
-                dailyValue: aDailyData,
-                statuses: aStatuses
-            };
-        },
+            // CRITICAL: Set data to model directly
+            const oChartModel = this.getView().getModel("chartData");
+            if (oChartModel) {
+                oChartModel.setProperty("/dailyValue", aDailyData);
+            }
+
+            return { dailyValue: aDailyData, statuses: aStatuses };
+        }   
+        ,
         _prepareMonthlyStatusData: function (aFilteredData) {
 
             const oMonthMap = {};
@@ -465,7 +462,7 @@ sap.ui.define([
             );
 
             // 🔹 SORT status distribution in consistent order for color mapping
-            const statusOrder = ['Pending', 'In Progress', 'Resolved'];
+            const statusOrder = ['Open', 'In Progress', 'Resolved'];
             aStatusDistribution.sort((a, b) => {
                 return statusOrder.indexOf(a.Status) - statusOrder.indexOf(b.Status);
             });
@@ -487,8 +484,6 @@ sap.ui.define([
             });
         },
 
-
-
         onCloseDialog: function (oEvent) {
             oEvent.getSource().getParent().getParent().close();
         },
@@ -496,7 +491,6 @@ sap.ui.define([
         IN_onPressStatusPie: function () { this.getView().getModel("ComplaintChartModel").setProperty("/statusType", "pie"); },
         // IN_onPressStatusBar: function () { this.getView().getModel("ComplaintChartModel").setProperty("/statusType", "bar"); },
         IN_onPressStatusDonut: function () { this.getView().getModel("ComplaintChartModel").setProperty("/statusType", "donut"); },
-        // IN_onPressDailyPie: function () { this.getView().getModel("ComplaintChartModel").setProperty("/DailyType", "waterfall"); },
         IN_onPressDailyBar: function () { this.getView().getModel("ComplaintChartModel").setProperty("/DailyType", "bar"); },
         IN_onPressDailyLine: function () { this.getView().getModel("ComplaintChartModel").setProperty("/DailyType", "line"); },
         IN_onPressMonthlyPie: function () { this.getView().getModel("ComplaintChartModel").setProperty("/monthlyType", "waterfall"); },

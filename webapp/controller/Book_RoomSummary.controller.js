@@ -178,14 +178,14 @@ sap.ui.define([
 
 
 
-          const bookingMonths =
-    Number(oModel.getProperty("/SelectedMonths")) || 1;
+            const bookingMonths =
+                Number(oModel.getProperty("/SelectedMonths")) || 1;
 
             const bookingYears =
                 Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
 
             const bookingDays =
-                Math.floor((oEnd - oStart) / 86400000) + 1;
+                Math.floor((oEnd - oStart) / 86400000);
 
             /* ---- Facility totals (per facility units) ---- */
             oPerson.Facilities.SelectedFacilities.forEach(f => {
@@ -312,17 +312,17 @@ sap.ui.define([
             //         Number(oPerson.FinalTotalCost.toFixed(2));
             // }
             /* ---- Monthly cost (correct & consistent) ---- */
-let divisor = 1;
+            let divisor = 1;
 
 
-if (paymentType === "Per Month" || paymentType === "Per Year") {
-    divisor = bookingMonths > 0 ? bookingMonths : 1;
-}
+            if (paymentType === "Per Month" || paymentType === "Per Year") {
+                divisor = bookingMonths > 0 ? bookingMonths : 1;
+            }
 
-const monthlyCost = oPerson.FinalTotalCost / divisor;
+            const monthlyCost = oPerson.FinalTotalCost / divisor;
 
-oPerson.MonthlyCostPerPerson = Number(monthlyCost.toFixed(2));
-oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
+            oPerson.MonthlyCostPerPerson = Number(monthlyCost.toFixed(2));
+            oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
 
             /* ==================================
             GRAND TOTAL (ONCE)
@@ -409,7 +409,7 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
                 MessageToast.show(this.i18nModel.getText("pleaseSelectRowEdit"));
                 return;
             }
-            
+
             // -----------------------------
             // SAFE COPY OF SELECTED FACILITY
             // -----------------------------
@@ -421,42 +421,42 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
             // =================================================
             // DERIVE TOTAL MONTHS / YEARS FOR DROPDOWN
             // =================================================
-           if (oSafeCopy.StartDate && oSafeCopy.EndDate) {
+            if (oSafeCopy.StartDate && oSafeCopy.EndDate) {
 
-    const parseDate = (s) => {
-        if (typeof s === "string" && s.includes("/")) {
-            const [d, m, y] = s.split("/");
-            return new Date(+y, +m - 1, +d);
-        }
-        return new Date(s);
-    };
+                const parseDate = (s) => {
+                    if (typeof s === "string" && s.includes("/")) {
+                        const [d, m, y] = s.split("/");
+                        return new Date(+y, +m - 1, +d);
+                    }
+                    return new Date(s);
+                };
 
-    const oStart = parseDate(oSafeCopy.StartDate);
-    const oEnd = parseDate(oSafeCopy.EndDate);
+                const oStart = parseDate(oSafeCopy.StartDate);
+                const oEnd = parseDate(oSafeCopy.EndDate);
 
-    const iMonths =
-        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-        (oEnd.getMonth() - oStart.getMonth()) || 1;
+                const iMonths =
+                    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+                    (oEnd.getMonth() - oStart.getMonth()) || 1;
 
-    const iYears =
-        Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
+                const iYears =
+                    Math.max(1, oEnd.getFullYear() - oStart.getFullYear());
 
-    if (oSafeCopy.UnitText === "Per Month") {
-        oSafeCopy.SelectedMonths = String(
-            oSafeCopy.TotalMonths || iMonths
-        );
-        oSafeCopy.TotalMonths = Number(oSafeCopy.SelectedMonths);
-        oSafeCopy.TotalYears = 0;
-    }
+                if (oSafeCopy.UnitText === "Per Month") {
+                    oSafeCopy.SelectedMonths = String(
+                        oSafeCopy.TotalMonths || iMonths
+                    );
+                    oSafeCopy.TotalMonths = Number(oSafeCopy.SelectedMonths);
+                    oSafeCopy.TotalYears = 0;
+                }
 
-    if (oSafeCopy.UnitText === "Per Year") {
-        oSafeCopy.SelectedMonths = String(
-            oSafeCopy.TotalYears || iYears
-        );
-        oSafeCopy.TotalYears = Number(oSafeCopy.SelectedMonths);
-        oSafeCopy.TotalMonths = 0;
-    }
-}
+                if (oSafeCopy.UnitText === "Per Year") {
+                    oSafeCopy.SelectedMonths = String(
+                        oSafeCopy.TotalYears || iYears
+                    );
+                    oSafeCopy.TotalYears = Number(oSafeCopy.SelectedMonths);
+                    oSafeCopy.TotalMonths = 0;
+                }
+            }
 
 
             this._oEditModel = new JSONModel(oSafeCopy);
@@ -480,13 +480,13 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
                     this
                 );
                 this.getView().addDependent(this._oEditDialog);
-               
+
             }
 
             // Assign model
             this._oEditDialog.setModel(this._oEditModel, "edit");
-             this._sPrevEditStartDate =
-                         this._oEditModel.getProperty("/StartDate");
+            this._sPrevEditStartDate =
+                this._oEditModel.getProperty("/StartDate");
 
             // Filter rate types
             this._filterRateTypesForEdit(this._oSelectedFacility);
@@ -627,12 +627,12 @@ oPerson.MonthlyCostPerson = Number(monthlyCost.toFixed(2));
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUnit = oEditModel.getProperty("/UnitText");
             const sStartDate = oEditModel.getProperty("/StartDate");
-// Store previous values for rollback
-this._iPrevSelectedMonths =
-    oEditModel.getProperty("/SelectedMonths");
+            // Store previous values for rollback
+            this._iPrevSelectedMonths =
+                oEditModel.getProperty("/SelectedMonths");
 
-this._sPrevEditEndDate =
-    oEditModel.getProperty("/EndDate");
+            this._sPrevEditEndDate =
+                oEditModel.getProperty("/EndDate");
 
             if (!sStartDate) {
                 MessageToast.show(this.i18nModel.getText("pleaseSelectStartDateFirst"));
@@ -695,7 +695,7 @@ this._sPrevEditEndDate =
             }
 
             const iTotalDays =
-                Math.floor((oEnd - oStart) / 86400000) + 1;
+                Math.floor((oEnd - oStart) / 86400000);
 
             // ------------------------------------------------
             //  UPDATE BOTH MODELS (UI + DATA)
@@ -704,43 +704,43 @@ this._sPrevEditEndDate =
             /* ===============================
    VALIDATE AGAINST BOOKING END DATE
 =============================== */
-const sBookingEnd = oHostelModel.getProperty("/EndDate");
+            const sBookingEnd = oHostelModel.getProperty("/EndDate");
 
-if (sBookingEnd && oEnd) {
-    const oBookingEnd = this._parseDate(sBookingEnd);
+            if (sBookingEnd && oEnd) {
+                const oBookingEnd = this._parseDate(sBookingEnd);
 
-    if (oBookingEnd && oEnd > oBookingEnd) {
-        MessageBox.error(
-            this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
-        );
+                if (oBookingEnd && oEnd > oBookingEnd) {
+                    MessageBox.error(
+                        this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
+                    );
 
-        // -------------------------------
-        // ROLLBACK SELECTED MONTHS
-        // -------------------------------
-        oEditModel.setProperty(
-            "/SelectedMonths",
-            this._iPrevSelectedMonths || 1
-        );
+                    // -------------------------------
+                    // ROLLBACK SELECTED MONTHS
+                    // -------------------------------
+                    oEditModel.setProperty(
+                        "/SelectedMonths",
+                        this._iPrevSelectedMonths || 1
+                    );
 
-        // -------------------------------
-        // ROLLBACK END DATE
-        // -------------------------------
-        oEditModel.setProperty(
-            "/EndDate",
-            this._sPrevEditEndDate
-        );
+                    // -------------------------------
+                    // ROLLBACK END DATE
+                    // -------------------------------
+                    oEditModel.setProperty(
+                        "/EndDate",
+                        this._sPrevEditEndDate
+                    );
 
-        // Reset DatePicker UI
-        const oDatePicker = this.byId("endDatePicker"); // ensure correct ID
-        if (oDatePicker && this._sPrevEditEndDate) {
-            oDatePicker.setDateValue(
-                this._parseDate(this._sPrevEditEndDate)
-            );
-        }
+                    // Reset DatePicker UI
+                    const oDatePicker = this.byId("endDatePicker"); // ensure correct ID
+                    if (oDatePicker && this._sPrevEditEndDate) {
+                        oDatePicker.setDateValue(
+                            this._parseDate(this._sPrevEditEndDate)
+                        );
+                    }
 
-        return;
-    }
-}
+                    return;
+                }
+            }
 
 
             oEditModel.setProperty("/EndDate", this._formatDateToDDMMYYYY(oEnd));
@@ -778,7 +778,7 @@ if (sBookingEnd && oEnd) {
                 oEnd.setMonth(oEnd.getMonth() + iMonths);
                 oEnd.setDate(oEnd.getDate() - 1);
 
-                iDays = Math.floor((oEnd - oStart) / 86400000) + 1;
+                iDays = Math.floor((oEnd - oStart) / 86400000);
                 bAutoEndDate = true;
             }
 
@@ -793,7 +793,7 @@ if (sBookingEnd && oEnd) {
                 oEnd.setFullYear(oEnd.getFullYear() + iYears);
                 oEnd.setDate(oEnd.getDate() - 1);
 
-                iDays = Math.floor((oEnd - oStart) / 86400000) + 1;
+                iDays = Math.floor((oEnd - oStart) / 86400000);
                 bAutoEndDate = true;
             }
 
@@ -804,8 +804,16 @@ if (sBookingEnd && oEnd) {
 
                 oEnd = sEnd ? this._parseDate(sEnd) : new Date(oStart);
 
+                // Ensure end date is at least the next day after start date
+                const oNextDay = new Date(oStart);
+                oNextDay.setDate(oNextDay.getDate() + 1);
+
+                if (oEnd < oNextDay) {
+                    oEnd = oNextDay;
+                }
+
                 const diffMs = oEnd - oStart;
-                iDays = Math.floor(diffMs / 86400000) + 1;
+                iDays = Math.floor(diffMs / 86400000);
 
                 if (iDays < 1) iDays = 1;
             }
@@ -817,34 +825,42 @@ if (sBookingEnd && oEnd) {
 
                 oEnd = sEnd ? this._parseDate(sEnd) : new Date(oStart);
 
+                // Ensure end date is at least the next day after start date
+                const oNextDay = new Date(oStart);
+                oNextDay.setDate(oNextDay.getDate() + 1);
+
+                if (oEnd < oNextDay) {
+                    oEnd = oNextDay;
+                }
+
                 const diffMs = oEnd - oStart;
-                iDays = Math.floor(diffMs / 86400000) + 1;
+                iDays = Math.floor(diffMs / 86400000);
 
                 if (iDays < 1) iDays = 1;
             }
             /* ===============================
    VALIDATE AGAINST BOOKING END DATE
 =============================== */
-const oHostelModel = this.getView().getModel("HostelModel");
-const sBookingEnd = oHostelModel.getProperty("/EndDate");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sBookingEnd = oHostelModel.getProperty("/EndDate");
 
-if (sBookingEnd && oEnd) {
-    const oBookingEnd = this._parseDate(sBookingEnd);
+            if (sBookingEnd && oEnd) {
+                const oBookingEnd = this._parseDate(sBookingEnd);
 
-    if (oBookingEnd && oEnd > oBookingEnd) {
-        MessageBox.error(
-            this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
-        );
-  //  ROLLBACK START DATE
-        oModel.setProperty("/StartDate", this._sPrevEditStartDate);
+                if (oBookingEnd && oEnd > oBookingEnd) {
+                    MessageBox.error(
+                        this.i18nModel.getText("facilityEndDateCannotExceedBookingEndDate")
+                    );
+                    //  ROLLBACK START DATE
+                    oModel.setProperty("/StartDate", this._sPrevEditStartDate);
 
-        //  Reset DatePicker UI
-        oEvent.getSource().setDateValue(
-            this._parseDate(this._sPrevEditStartDate)
-        );
-        return;
-    }
-}
+                    //  Reset DatePicker UI
+                    oEvent.getSource().setDateValue(
+                        this._parseDate(this._sPrevEditStartDate)
+                    );
+                    return;
+                }
+            }
 
             /* ===============================
                UPDATE MODEL
@@ -871,7 +887,7 @@ if (sBookingEnd && oEnd) {
         // Utility function to format date
         _formatDateToDDMMYYYY: function (oDate) {
             const dd = String(oDate.getDate()).padStart(2, '0');
-            const mm = String(oDate.getMonth() + 1).padStart(2, '0'); // Months start at 0
+            const mm = String(oDate.getMonth()).padStart(2, '0'); // Months start at 0
             const yyyy = oDate.getFullYear();
             return dd + "/" + mm + "/" + yyyy;
         },
@@ -930,38 +946,38 @@ if (sBookingEnd && oEnd) {
                     return;
                 }
             }
-           if (sUnitText === "Per Month") {
+            if (sUnitText === "Per Month") {
 
-    const iFacilityMonths =
-        Number(oEditModel.getProperty("/SelectedMonths")) || 0;
+                const iFacilityMonths =
+                    Number(oEditModel.getProperty("/SelectedMonths")) || 0;
 
-    const iBookingMonths =
-        Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
-       
+                const iBookingMonths =
+                    Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
 
-    if (iFacilityMonths > iBookingMonths) {
-        MessageBox.error(
-            this.i18nModel.getText("facilityMonthsCannotExceedBookingMonths")
-        );
-        return;
-    }
-}
 
-if (sUnitText === "Per Year") {
+                if (iFacilityMonths > iBookingMonths) {
+                    MessageBox.error(
+                        this.i18nModel.getText("facilityMonthsCannotExceedBookingMonths")
+                    );
+                    return;
+                }
+            }
 
-    const iFacilityYears =
-        Number(oEditModel.getProperty("/SelectedMonths")) || 0;
+            if (sUnitText === "Per Year") {
 
-    const iBookingYears =
-       Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+                const iFacilityYears =
+                    Number(oEditModel.getProperty("/SelectedMonths")) || 0;
 
-    if (iFacilityYears > iBookingYears) {
-        MessageBox.error(
-            this.i18nModel.getText("facilityYearsCannotExceedBookingYears")
-        );
-        return;
-    }
-}
+                const iBookingYears =
+                    Number(oHostelModel.getProperty("/SelectedMonths")) || 0;
+
+                if (iFacilityYears > iBookingYears) {
+                    MessageBox.error(
+                        this.i18nModel.getText("facilityYearsCannotExceedBookingYears")
+                    );
+                    return;
+                }
+            }
 
             /* =========================
                LOCATE PERSON & FACILITY
@@ -1008,26 +1024,26 @@ if (sUnitText === "Per Year") {
             //  USE FACILITY-LEVEL DAYS (ALREADY CORRECT)
             const iDays = Number(oEditModel.getProperty("/TotalDays") || 1);
             //  TAKE FROM EDIT MODEL IF PRESENT
-           let iMonths = 0;
-let iYears = 0;
+            let iMonths = 0;
+            let iYears = 0;
 
-if (sUnitText === "Per Month") {
-    iMonths =
-        Number(oEditModel.getProperty("/SelectedMonths")) ||
-        Number(oEditModel.getProperty("/TotalMonths")) || 1;
+            if (sUnitText === "Per Month") {
+                iMonths =
+                    Number(oEditModel.getProperty("/SelectedMonths")) ||
+                    Number(oEditModel.getProperty("/TotalMonths")) || 1;
 
-    oFacility.TotalMonths = iMonths;
-    oFacility.TotalYears = 0;
-}
+                oFacility.TotalMonths = iMonths;
+                oFacility.TotalYears = 0;
+            }
 
-if (sUnitText === "Per Year") {
-    iYears =
-        Number(oEditModel.getProperty("/SelectedMonths")) ||
-        Number(oEditModel.getProperty("/TotalYears")) || 1;
+            if (sUnitText === "Per Year") {
+                iYears =
+                    Number(oEditModel.getProperty("/SelectedMonths")) ||
+                    Number(oEditModel.getProperty("/TotalYears")) || 1;
 
-    oFacility.TotalYears = iYears;
-    oFacility.TotalMonths = 0;
-}
+                oFacility.TotalYears = iYears;
+                oFacility.TotalMonths = 0;
+            }
 
 
             /* =========================
@@ -1059,10 +1075,10 @@ if (sUnitText === "Per Year") {
                 Number(oHostelModel.getProperty("/TotalDays")) ||
                 Number(oHostelModel.getProperty("/NoOfDays")) ||
                 iDays;
-                const bookingMonths =
-    Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
-                 const bookingYears =
-    Math.max(1, Math.ceil(bookingMonths / 12));
+            const bookingMonths =
+                Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+            const bookingYears =
+                Math.max(1, Math.ceil(bookingMonths / 12));
 
             // let roomRent = 0;
             // switch (paymentType) {
@@ -1076,12 +1092,12 @@ if (sUnitText === "Per Year") {
             //         roomRent = baseRoomRent * bookingYears;
             //         break;
             // }
-const roomRentSafe = Number(oPerson.RoomRentPerPerson) || 0;
-const facilityTotalSafe = Number(oPerson.TotalFacilityPrice) || 0;
+            const roomRentSafe = Number(oPerson.RoomRentPerPerson) || 0;
+            const facilityTotalSafe = Number(oPerson.TotalFacilityPrice) || 0;
 
-// ✅ Correct subtotal
-oPerson.SubTotal = roomRentSafe + facilityTotalSafe;
-           
+            // ✅ Correct subtotal
+            oPerson.SubTotal = roomRentSafe + facilityTotalSafe;
+
 
 
             // ------------------
@@ -1118,20 +1134,20 @@ oPerson.SubTotal = roomRentSafe + facilityTotalSafe;
                 oPerson.SGST +
                 oPerson.IGST
             ).toFixed(2));
-let divisor = 1;
+            let divisor = 1;
 
-if (paymentType === "Per Month") {
-    divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
-}
+            if (paymentType === "Per Month") {
+                divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+            }
 
-if (paymentType === "Per Year") {
-    divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
-}
+            if (paymentType === "Per Year") {
+                divisor = Number(oHostelModel.getProperty("/SelectedMonths")) || 1;
+            }
 
-const monthly = oPerson.FinalTotalCost / divisor;
+            const monthly = oPerson.FinalTotalCost / divisor;
 
-oPerson.MonthlyCostPerPerson = Number(monthly.toFixed(2));
-oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
+            oPerson.MonthlyCostPerPerson = Number(monthly.toFixed(2));
+            oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
 
 
 
@@ -1221,7 +1237,7 @@ oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
         _formatDateToDDMMYYYY: function (dt) {
             if (!dt || !(dt instanceof Date)) return "";
             const dd = String(dt.getDate()).padStart(2, "0");
-            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const mm = String(dt.getMonth()).padStart(2, "0");
             const yyyy = dt.getFullYear();
             return `${dd}/${mm}/${yyyy}`;
         },
@@ -1757,7 +1773,7 @@ oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
 
             /* DAYS (INCLUSIVE) */
             let iDays =
-                Math.floor((oEnd - oStart) / 86400000) + 1;
+                Math.floor((oEnd - oStart) / 86400000);
 
             if (iDays < 1) iDays = 1;
 
@@ -1853,10 +1869,15 @@ oPerson.MonthlyCostPerson = Number(monthly.toFixed(2));
                    EXPIRY CHECK
                 ============================== */
                 const couponEndISO = new Date(oMatched.EndDate).toISOString().split("T")[0];
+                const couponStartISO = new Date(oMatched.StartDate).toISOString().split("T")[0];
                 const todayISO = new Date().toISOString().split("T")[0];
 
                 if (couponEndISO < todayISO) {
                     MessageToast.show(this.i18nModel.getText("couponisExpired"));
+                    return;
+                }
+                if (couponStartISO > todayISO) {
+                    MessageToast.show(this.i18nModel.getText("couponNotYetValid"));
                     return;
                 }
 

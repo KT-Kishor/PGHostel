@@ -46,7 +46,7 @@
 							<fb:control>
 								<ComboBox id="CD_statusFilter" width="400px" placeholder="Select Status" >
 									<items>
-										<core:Item key="Pending" text="Pending" />
+										<core:Item key="Open" text="Open" />
 										<core:Item key="In Progress" text="In Progress" />
 										<core:Item key="Resolved" text="Resolved" />
 									</items>
@@ -104,48 +104,7 @@
 								</com:ChartContainer>
 							</f:content>
 						</f:Card>
-						<!-- 2. Daily Trend Chart -->
-						<f:Card class="sapUiTinyMargin">
-							<f:header>
-								<Toolbar class="customdashboard">
-									<Title text="Daily Complain Trend" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
-									<ToolbarSpacer />
-									<!-- <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressDailyPie" tooltip="Vertical Chart" /> -->
-									<Button icon="sap-icon://bar-chart" press="IN_onPressDailyBar" tooltip="Bar Chart" />
-									<Button icon="sap-icon://line-chart" press="IN_onPressDailyLine" tooltip="Line Chart" />
-								</Toolbar>
-							</f:header>
-							<f:content>
-								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false" class="monthly-trend-chart">
-									<com:content>
-										<com:ChartContainerContent>
-											<com:content>
-												<viz:VizFrame id="DailyChartMonthly" vizType="{ComplaintChartModel>/DailyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                   colorPalette: ['#ec3b14','#0b8400','#e2f026'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onDailyComplainSelect">
-													<viz:dataset>
-														<vizData:FlattenedDataset data="{chartData>/dailyValue}">
-															<vizData:dimensions>
-																<vizData:DimensionDefinition name="Day" value="{chartData>date}" />
-															</vizData:dimensions>
-															<vizData:measures>
-																  <vizData:MeasureDefinition name="Pending" value="{chartData>Pending}" />
-        <vizData:MeasureDefinition name="Resolved" value="{chartData>Resolved}" />
-        <vizData:MeasureDefinition name="In Progress" value="{chartData>In Progress}" />
-															</vizData:measures>
-														</vizData:FlattenedDataset>
-													</viz:dataset>
-													<viz:feeds>
-														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Pending,Resolved,In Progress" />
-<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Day" />
-<vizFeeds:FeedItem uid="color" type="Measure" values="Pending,Resolved,In Progress" />
-													</viz:feeds>
-												</viz:VizFrame>
-											</com:content>
-										</com:ChartContainerContent>
-									</com:content>
-								</com:ChartContainer>
-							</f:content>
-						</f:Card>
-						<!-- 3.Monthly  Chart -->
+						<!-- 2.Monthly  Chart -->
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
@@ -162,7 +121,26 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="CD_Monthlyid" vizType="{ComplaintChartModel>/monthlyType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#e2f026','#0b8400','#ec3b14'],                                                               dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" selectData="onTotalInvoiceValueSelect">
+												<viz:VizFrame id="CD_Monthlyid" vizType="{ComplaintChartModel>/monthlyType}" width="100%" vizProperties="{
+  title: { visible: false },
+  plotArea: {
+    colorPalette: ['#e2f026','#0b8400','#ec3b14'],
+    dataLabel: {
+      visible: false,
+      formatString: '#'
+    }
+  },
+  valueAxis: {
+    label: {
+      formatString: '#',
+      unitFormatType: 'NoUnits'
+    }
+  },
+  interaction: {
+    selectability: { mode: 'SINGLE' }
+  }
+}"
+selectData="onTotalInvoiceValueSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/monthlyValue}">
 															<vizData:dimensions>
@@ -171,7 +149,7 @@
 															<vizData:measures>
 																 <vizData:MeasureDefinition name="In Progress" value="{chartData>In Progress}" />
         <vizData:MeasureDefinition name="Resolved" value="{chartData>Resolved}" />
-        <vizData:MeasureDefinition name="Pending" value="{chartData>Pending}" />
+        <vizData:MeasureDefinition name="Open" value="{chartData>Open}" />
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
@@ -179,7 +157,7 @@
 														 <vizFeeds:FeedItem
         uid="valueAxis"
         type="Measure"
-        values="In Progress,Resolved,Pending" />
+        values="In Progress,Resolved,Open" />
 
     <vizFeeds:FeedItem
         uid="categoryAxis"
@@ -189,7 +167,7 @@
     <vizFeeds:FeedItem
         uid="color"
         type="Measure"
-        values="In Progress,Resolved,Pending" />
+        values="In Progress,Resolved,Open" />
 													</viz:feeds>
 												</viz:VizFrame>
 											</com:content>
@@ -198,7 +176,67 @@
 								</com:ChartContainer>
 							</f:content>
 						</f:Card>
-						<!-- 4. Yearly Trend Chart -->
+						<!-- 3. Daily Trend Chart -->
+						<f:Card class="sapUiTinyMargin">
+							<f:header>
+								<Toolbar class="customdashboard">
+									<Title text="Daily Complain Trend" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<ToolbarSpacer />
+									<!-- <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressDailyPie" tooltip="Vertical Chart" /> -->
+									<Button icon="sap-icon://bar-chart" press="IN_onPressDailyBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressDailyLine" tooltip="Line Chart" />
+								</Toolbar>
+							</f:header>
+							<f:content>
+								<com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false" class="monthly-trend-chart">
+									<com:content>
+										<com:ChartContainerContent>
+											<com:content>
+												<viz:VizFrame id="DailyChartMonthly" vizType="{ComplaintChartModel>/DailyType}" width="100%" vizProperties="{
+  title: { visible: false },
+  plotArea: {
+    colorPalette: ['#ec3b14','#0b8400','#e2f026'],
+    dataLabel: {
+      visible: false,
+      formatString: '#'
+    }
+  },
+  valueAxis: {
+    label: {
+      formatString: '#',
+      unitFormatType: 'NoUnits'
+    }
+  },
+  interaction: {
+    selectability: { mode: 'SINGLE' }
+  }
+}"
+selectData="onDailyComplainSelect">
+													<viz:dataset>
+														<vizData:FlattenedDataset data="{chartData>/dailyValue}">
+															<vizData:dimensions>
+																<vizData:DimensionDefinition name="Day" value="{day}" />
+															</vizData:dimensions>
+															<vizData:measures>
+																  <vizData:MeasureDefinition name="Open" value="{Open}" />
+        <vizData:MeasureDefinition name="Resolved" value="{Resolved}" />
+        <vizData:MeasureDefinition name="In Progress" value="{In Progress}" />
+															</vizData:measures>
+														</vizData:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Open,Resolved,In Progress" />
+<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Day" />
+<vizFeeds:FeedItem uid="color" type="Measure" values="Open,Resolved,In Progress" />
+													</viz:feeds>
+												</viz:VizFrame>
+											</com:content>
+										</com:ChartContainerContent>
+									</com:content>
+								</com:ChartContainer>
+							</f:content>
+						</f:Card>
+						<!-- 4. Total Trend Chart -->
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
@@ -214,7 +252,26 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="CD_lineChartYearly" vizType="{ComplaintChartModel>/yearlyType}" width="100%" vizProperties="{                                                                title: { visible: false },                                                                plotArea: {                                                                    colorPalette: ['#e2f026','#0b8400','#ec3b14'],                                                                  dataLabel: {                                                                        visible: false,                                                                        formatString: '#'                                                                    }                                                                },                                                                interaction: {                                                                   selectability: { mode: 'SINGLE' }                                                                }                                                                                                                    }" selectData="onYearlyInvoiceSelect">
+												<viz:VizFrame id="CD_lineChartYearly" vizType="{ComplaintChartModel>/yearlyType}" width="100%" vizProperties="{
+    title: { visible: false },
+    plotArea: {
+        colorPalette: ['#e2f026','#0b8400','#ec3b14'],
+        dataLabel: {
+            visible: true,
+            formatString: '#'
+        }
+    },
+    valueAxis: {
+        label: {
+            formatString: '#',
+            unitFormatType: 'NoUnits'
+        }
+    },
+    interaction: {
+        selectability: { mode: 'SINGLE' }
+    }
+}"
+ selectData="onYearlyInvoiceSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/yearlyValue}">
 															<vizData:dimensions>
@@ -223,7 +280,7 @@
 															<vizData:measures>
 															 <vizData:MeasureDefinition name="In Progress" value="{chartData>In Progress}" />
         <vizData:MeasureDefinition name="Resolved" value="{chartData>Resolved}" />
-        <vizData:MeasureDefinition name="Pending" value="{chartData>Pending}" />
+        <vizData:MeasureDefinition name="Open" value="{chartData>Open}" />
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
@@ -231,7 +288,7 @@
     <vizFeeds:FeedItem
         uid="valueAxis"
         type="Measure"
-        values="In Progress,Resolved,Pending" />
+        values="In Progress,Resolved,Open" />
 
     <vizFeeds:FeedItem
         uid="categoryAxis"
@@ -241,7 +298,7 @@
     <vizFeeds:FeedItem
         uid="color"
         type="Measure"
-        values="In Progress,Resolved,Pending" />
+        values="In Progress,Resolved,Open" />
 </viz:feeds>
 												</viz:VizFrame>
 											</com:content>

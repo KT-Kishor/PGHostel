@@ -1511,6 +1511,10 @@ span.sapMBtnInner.sapMBtnEmphasized {
 
   transform: scale(1.1);
 }
+.myUnifiedBtnBooking .sapMBtnInner{
+background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
+  color: white !important;
+}
 
 /* Active */
 .myUnifiedBtn.sapMBtnActive .sapMBtnInner {
