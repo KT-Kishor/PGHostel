@@ -39,6 +39,7 @@
                     id="idCustomerNameText"
                     text="{HostelModel>/CustomerName}"
                 />
+                
               
                    <Label
                     text="Deposit Amount"
@@ -53,8 +54,15 @@
                     valueStateText="Enter deposit amount"
                     editable="false"
                 />
+                  <RadioButtonGroup id="roomTypeGroup1" columns="2" select=".onDepositTypeSelect">
+                                <buttons>
+                                    <RadioButton text="Yes" />
+                                    <RadioButton text="No" />
+                                </buttons>
+                            </RadioButtonGroup> 
 
                  <Label
+                 id="id_DepositTypeLabel"
                     text="Actual Amount"
                     required="true"
                 />
@@ -69,6 +77,7 @@
                 />
 
                    <Label
+                   id="id_PaymentModeLabel"
                     text="Payment Mode"
                     required="true"
                 />
@@ -96,7 +105,9 @@
                 </ComboBox>
 
                   <Label
+                  id="id_TransactionIDLabel"
                     text="Transaction / Person Name"
+                     required="true"
                 />
                 <Input
                     id="id_TransactionID"
@@ -110,6 +121,7 @@
                 />
 
                   <Label
+                   id="id_RoomNumberLabel"
                     text="{i18n>roomNo}"
                     required="true"
                 />

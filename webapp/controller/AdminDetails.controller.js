@@ -29,7 +29,7 @@ sap.ui.define([
             } else {
                 this._oLoggedInUser = {}; // fallback
             }
-       
+
             this.Code = ""
             var model = new JSONModel({
                 FacilityName: "",
@@ -68,29 +68,29 @@ sap.ui.define([
                 editable: true,
             }), "visiablityPlay");
 
-            var sPath = oEvent.getParameter("arguments").sPath; 
-              this.decodedPath = atob(decodeURIComponent(sPath));
+            var sPath = oEvent.getParameter("arguments").sPath;
+            this.decodedPath = atob(decodeURIComponent(sPath));
             this.valuestate()
             sap.ui.core.BusyIndicator.show(0);
 
             await this.OnRoom();
 
-           await this.AD_onSearch()
-           var oCustomerData= this.getView().getModel("CustomerData").getData();
-          var VisibleModel= this.getView().getModel("VisibleModel")
-                 if(this._oLoggedInUser.Role==="Customer"){
-                   const bookingDate = new Date(oCustomerData.BookingDate);
-                    const now = new Date();
+            await this.AD_onSearch()
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
+            var VisibleModel = this.getView().getModel("VisibleModel")
+            if (this._oLoggedInUser.Role === "Customer") {
+                const bookingDate = new Date(oCustomerData.BookingDate);
+                const now = new Date();
 
-    let diffHours = (now - bookingDate) / (1000 * 60 * 60);
+                let diffHours = (now - bookingDate) / (1000 * 60 * 60);
 
-    if (diffHours > 24) {
-        // hide cancel button
-        VisibleModel.setProperty("/showCancelButton", true);
-    } else {
-        // show cancel button
-        VisibleModel.setProperty("/showCancelButton", false);
-    }
+                if (diffHours > 24) {
+                    // hide cancel button
+                    VisibleModel.setProperty("/showCancelButton", true);
+                } else {
+                    // show cancel button
+                    VisibleModel.setProperty("/showCancelButton", false);
+                }
             }
         },
 
@@ -177,9 +177,9 @@ sap.ui.define([
                     "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
                     "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
                     "Status": "Completed",
-                    "CustomerName" : oCustomerModel.CustomerName,
-                    "CustomerEmail" : oCustomerModel.CustomerEmail,
-                    "BookingID" : oCustomerModel.BookingID,
+                    "CustomerName": oCustomerModel.CustomerName,
+                    "CustomerEmail": oCustomerModel.CustomerEmail,
+                    "BookingID": oCustomerModel.BookingID,
                     "RoomNo": oCustomerModel.RoomNo
                 }]
             };
@@ -242,52 +242,52 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-     Facilitysearch: async function (sBranchCode, Deposit) {
+        Facilitysearch: async function (sBranchCode, Deposit) {
 
-    const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
-        BranchCode: sBranchCode
-    });
+            const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
+                BranchCode: sBranchCode
+            });
 
-    const aFacilities = Array.isArray(oData.data.data)
-        ? oData.data.data
-        : [oData.data.data];
+            const aFacilities = Array.isArray(oData.data.data)
+                ? oData.data.data
+                : [oData.data.data];
 
-    let aFilteredFacilities = aFacilities;
+            let aFilteredFacilities = aFacilities;
 
-    // 🚀 If extrabed <= 0 → remove Extra Bed
-    if (Deposit && Deposit.ExtraBed <= 0) {
-        aFilteredFacilities = aFacilities.filter(function (oItem) {
-            return oItem.Type !== "Extra Bed";  
-        });
-    }
+            // 🚀 If extrabed <= 0 → remove Extra Bed
+            if (Deposit && Deposit.ExtraBed <= 0) {
+                aFilteredFacilities = aFacilities.filter(function (oItem) {
+                    return oItem.Type !== "Extra Bed";
+                });
+            }
 
-    const oModel = new sap.ui.model.json.JSONModel(aFilteredFacilities);
-    this.getView().setModel(oModel, "Facilities");
+            const oModel = new sap.ui.model.json.JSONModel(aFilteredFacilities);
+            this.getView().setModel(oModel, "Facilities");
 
-    return aFilteredFacilities;
-},
+            return aFilteredFacilities;
+        },
 
         onNavBack: function () {
-            if( this._fromRoute==="Dashboard"){
+            if (this._fromRoute === "Dashboard") {
                 this.getOwnerComponent().getRouter().navTo("RouteDashboard");
-            }else{
-                
-            const oLoginModel = this.getView().getModel("LoginModel");
-            const sRole = oLoginModel?.getProperty("/Role") || "";
-            const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-            if (sRole === "Customer") {
-                this._sLoggedUserID = sEmpID;
-                const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                oUIModel.setProperty("/isLoggedIn", true);
-                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-            } else if(sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee"){
-                this.getOwnerComponent().getRouter().navTo("RouteAdmin");
-            }else{
-                this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            } else {
+
+                const oLoginModel = this.getView().getModel("LoginModel");
+                const sRole = oLoginModel?.getProperty("/Role") || "";
+                const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+                if (sRole === "Customer") {
+                    this._sLoggedUserID = sEmpID;
+                    const oUIModel = this.getOwnerComponent().getModel("UIModel");
+                    oUIModel.setProperty("/isLoggedIn", true);
+                    this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee") {
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+                } else {
+                    this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                }
+
+                this.getView().getModel("CustomerData").setData({});
             }
-        
-            this.getView().getModel("CustomerData").setData({});
-        }
         },
 
         onHome: function () {
@@ -323,11 +323,11 @@ sap.ui.define([
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
 
                 var Paymentpaid = aPayment
-                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used!=="Y")
+                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used !== "Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
                 var RefundPaymentpaid = aPayment
-                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used==="Y")
+                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used === "Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
 
@@ -382,11 +382,11 @@ sap.ui.define([
                     RefundPaymentpaid: RefundPaymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
-                    GSTType: oCustomer.Bookings?.[0]?.GSTType|| "",
+                    GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
                     GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
-                    GSTNumber:oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
+                    GSTNumber: oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -409,7 +409,7 @@ sap.ui.define([
                         SelectedFacilities: oCustomer.FaciltyItems || []
                     }
                 }];
-              
+
                 // Calculate totals
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 var BedType = oCustomer.Bookings?.[0]?.BedType
@@ -493,8 +493,8 @@ sap.ui.define([
                     const diffMs = end - start;
 
                     if (paymentType === "per day") {
-                        Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24)) + 1;
-                          DurationUnit = Duration === 1 ? "Day" : "Days";
+                        Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                        DurationUnit = Duration === 1 ? "Day" : "Days";
 
 
                     } else if (paymentType === "per month") {
@@ -508,7 +508,7 @@ sap.ui.define([
                         }
 
                         Duration = totalMonths;
-                      DurationUnit = Duration === 1 ? "Month" : "Months";
+                        DurationUnit = Duration === 1 ? "Month" : "Months";
 
 
                     }
@@ -524,7 +524,7 @@ sap.ui.define([
                         }
 
                         Duration = years;
-                     DurationUnit = Duration === 1 ? "Year" : "Years";  
+                        DurationUnit = Duration === 1 ? "Year" : "Years";
 
                     }
                 }
@@ -535,8 +535,8 @@ sap.ui.define([
                 oCustomerData.Duration = Duration;
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
-                await this.Facilitysearch(sBranchCode,Deposit)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount,oCustomer);
+                await this.Facilitysearch(sBranchCode, Deposit)
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -554,7 +554,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount,oCustomer) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -606,9 +606,9 @@ sap.ui.define([
                     const dayDiff = facEnd - facStart;
                     let days = 0;
                     if (unit === "Per Day" || unit === "Per Hour") {
-                        days = dayDiff / (1000 * 60 * 60 * 24) + 1; // inclusive
+                        days = dayDiff / (1000 * 60 * 60 * 24); // inclusive
                     } else {
-                        days = dayDiff / (1000 * 60 * 60 * 24) + 1; // for months/years we don't use days
+                        days = dayDiff / (1000 * 60 * 60 * 24); // for months/years we don't use days
                     }
 
 
@@ -981,6 +981,22 @@ sap.ui.define([
 
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
+            //   var oEndDatePicker = sap.ui.getCore().byId("editEndDate");
+
+
+
+            // if (oEndDatePicker) {
+            //     var oDate = new Date(sStartDate);
+            //      oDate.setDate(oDate.getDate() + 1);
+            //       oEndDatePicker.setMinDate(oDate);
+            // }
+            //     if (oEnd <= oStart) {
+            //         // Clear EndDate
+            //         oModel.setProperty("/EndDate", "");
+            //         if (oEndDatePicker) oEndDatePicker.setValue("");
+
+            //         return;
+            //     }
             let iDays = 0;
 
 
@@ -989,7 +1005,7 @@ sap.ui.define([
                 oEnd.setMonth(oEnd.getMonth() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
             } else if (sUnit === "Per Year" || sUnit === "yearly") {
-                
+
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
                 oEnd.setDate(oEnd.getDate() - 1)
@@ -997,15 +1013,25 @@ sap.ui.define([
             } else if (sUnit === "Per Day" || sUnit === "daily" || sUnit === "Per Hour") {
                 if (!oEnd) {
                     iDays = 1;
-                } else if (oStart <= oEnd) {
-                    iDays = Math.ceil((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+                }
+                else if (oEnd && oEnd.getTime() <= oStart.getTime()) {
+                    oModel.setProperty("/EndDate", "");
+                    
+                    iDays = 1;
+                      oModel.setProperty("/TotalDays", iDays);
+
+                    return;
+                }
+
+                else if (oStart <= oEnd) {
+                    iDays = Math.ceil((oEnd - oStart) / (1000 * 60 * 60 * 24));
                 } else {
                     oEnd = null;
                     iDays = 0;
                 }
             }
             if (oEnd && iDays === 0) {
-                iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+                iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
             }
 
             // Update model
@@ -1069,7 +1095,7 @@ sap.ui.define([
             var oCustomerData = oCustomerModel.getData();
             var oPayload = this.getView().getModel("edit").getData();
 
-            oPayload.CouponCode= oPayload.CouponCode ?  oPayload.CouponCode :sap.ui.getCore().byId("ID_editCouponCode").getValue() || "" ;
+            oPayload.CouponCode = oPayload.CouponCode ? oPayload.CouponCode : sap.ui.getCore().byId("ID_editCouponCode").getValue() || "";
 
             if (oPayload.UnitText === "Per Month") {
                 var Month = sap.ui.getCore().byId("idMonthYearSelectFragment").getSelectedKey();
@@ -1147,7 +1173,7 @@ sap.ui.define([
                     return;
                 }
 
-                if(oPayload.CouponDiscount==="" && oPayload.CouponCode){
+                if (oPayload.CouponDiscount === "" && oPayload.CouponCode) {
                     sap.m.MessageToast.show(this.i18nModel.getText("pleaseapplycouponcode"));
                     return;
                 }
@@ -1189,8 +1215,8 @@ sap.ui.define([
                     finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
                 }
                 oPayload.TotalAmount = finalPrice;
-                oPayload.TotalMonths=oPayload.TotalUnits || "1"
-                oPayload.TotalYears=oPayload.TotalUnits || "1"
+                oPayload.TotalMonths = oPayload.TotalUnits || "1"
+                oPayload.TotalYears = oPayload.TotalUnits || "1"
 
 
                 // Remove unwanted fields
@@ -1421,9 +1447,11 @@ sap.ui.define([
             // Set MinDate on EndDate picker
             var oEndDatePicker = this.byId("editEndDate");
             if (oEndDatePicker) {
-                oEndDatePicker.setMinDate(oStart);
+                var oDate = new Date(sStart);
+                oDate.setDate(oDate.getDate() + 1);
+                oEndDatePicker.setMinDate(oDate);
             }
-             var CustData = oCustomerModel.getData();
+            var CustData = oCustomerModel.getData();
             // DAILY CALCULATION
             if (sUnit === "daily" || sUnit === "Per Day") {
 
@@ -1433,7 +1461,7 @@ sap.ui.define([
                 }
 
                 // Validate EndDate >= StartDate
-                if (oEnd < oStart) {
+                if (oEnd <= oStart) {
                     // Clear EndDate
                     oBookingModel.setProperty("/EndDate", "");
                     if (oEndDatePicker) oEndDatePicker.setValue("");
@@ -1449,7 +1477,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
                 oCustomerModel.setProperty("/Duration", diffDays);
 
-               
+
                 var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
                 // if (CustData.CouponCode || this.Code) {
                 //     var oCouponData = this.getView().getModel("CouponModel").getData();
@@ -1526,12 +1554,12 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                 
+
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                
+
                 }
 
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
@@ -1554,10 +1582,10 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1);
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
-           
+
                 var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
 
-                  var CGST = SubTotal * CustData.GSTValue / 100
+                var CGST = SubTotal * CustData.GSTValue / 100
                 let TotalAmount;
 
                 if (CustData.GSTType === "IGST") {
@@ -1568,14 +1596,14 @@ sap.ui.define([
                     TotalAmount = SubTotal
                 }
 
-                      if (CustData.GSTType === "IGST") {
+                if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                 
+
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                
+
                 }
 
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
@@ -1596,7 +1624,7 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1);
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
-          
+
                 var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
 
                 var CGST = SubTotal * CustData.GSTValue / 100
@@ -1610,14 +1638,14 @@ sap.ui.define([
                     TotalAmount = SubTotal
                 }
 
-                      if (CustData.GSTType === "IGST") {
+                if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                  
+
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-              
+
                 }
 
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
@@ -1761,12 +1789,12 @@ sap.ui.define([
 
             if (CustData.GSTType === "IGST") {
                 oCustomerData.setProperty("/IGST", CGST)
-             
+
 
             } else {
                 oCustomerData.setProperty("/SGST", CGST)
                 oCustomerData.setProperty("/CGST", CGST)
-             
+
             }
 
             oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
@@ -1836,22 +1864,22 @@ sap.ui.define([
                 var oEnd = new Date(sEndDate);
 
 
-                if(oSelectedData.UnitText==="Per Month"){
-                var iMonths =
-                    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-                    (oEnd.getMonth() - oStart.getMonth());
+                if (oSelectedData.UnitText === "Per Month") {
+                    var iMonths =
+                        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+                        (oEnd.getMonth() - oStart.getMonth());
 
-                // Optional: include partial month logic
-                if (oEnd.getDate() >= oStart.getDate()) {
-                    iMonths += 1;
+                    // Optional: include partial month logic
+                    if (oEnd.getDate() >= oStart.getDate()) {
+                        iMonths += 1;
+                    }
+                } else if (oSelectedData.UnitText === "Per Year") {
+                    var iMonths =
+                        (oEnd.getFullYear() - oStart.getFullYear());
+
+
                 }
-            }else if(oSelectedData.UnitText==="Per Year"){
-                var iMonths =
-                    (oEnd.getFullYear() - oStart.getFullYear());
-                    
 
-            }
-            
             }
 
             // 👉 STORE INDEX for update later
@@ -2208,12 +2236,12 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                 
+
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                  
+
                 }
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
                 oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
@@ -2397,12 +2425,12 @@ sap.ui.define([
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
-                
+
 
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-                  
+
                 }
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
                 oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
@@ -2590,7 +2618,7 @@ sap.ui.define([
 
         onSaveBooking: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
-            var CustomerData = this.getView().getModel("CustomerData").getData();   
+            var CustomerData = this.getView().getModel("CustomerData").getData();
             const oInput = this.byId("CD_ID_idPhone")
 
             // Mandatory validation
@@ -2642,7 +2670,7 @@ sap.ui.define([
                 );
                 return; // ⛔ stop save
             }
-              
+
 
             if (Bookingdata.STDCode === "+91") {
                 if (Bookingdata.MobileNo.length === 10) {
@@ -2740,43 +2768,43 @@ sap.ui.define([
                     };
                 })
             };
-           
 
-              const customerEndDate =  this._parseDate(CustomerData.EndDate);
-    const bookingEndDate  = this._parseDate(Bookingdata.EndDate);
 
- let isAnyFacilityMatchingBookingEnd = true;
+            const customerEndDate = this._parseDate(CustomerData.EndDate);
+            const bookingEndDate = this._parseDate(Bookingdata.EndDate);
 
-for (let i = 0; i < facilityItems.length; i++) {
-    const facilityEnd = this._parseDate(facilityItems[i].EndDate);
+            let isAnyFacilityMatchingBookingEnd = true;
 
-    if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
-        isAnyFacilityMatchingBookingEnd = false;
-        break;
-    }
-}
-if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
+            for (let i = 0; i < facilityItems.length; i++) {
+                const facilityEnd = this._parseDate(facilityItems[i].EndDate);
 
-    var that = this;
-
-    sap.m.MessageBox.confirm(
-    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",     
-        {
-            title: "Upgrade Required",
-            actions: ["Extend Now","Maybe Later"],
-            emphasizedAction: sap.m.MessageBox.Action.OK,
-
-            onClose: function (sAction) {
-                if (sAction === "Maybe Later") {
-                    that.oneditsavebooking(Payload);
+                if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
+                    isAnyFacilityMatchingBookingEnd = false;
+                    break;
                 }
-              
             }
-        }
-    );
+            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
 
-    return; 
-}
+                var that = this;
+
+                sap.m.MessageBox.confirm(
+                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",
+                    {
+                        title: "Upgrade Required",
+                        actions: ["Extend Now", "Maybe Later"],
+                        emphasizedAction: sap.m.MessageBox.Action.OK,
+
+                        onClose: function (sAction) {
+                            if (sAction === "Maybe Later") {
+                                that.oneditsavebooking(Payload);
+                            }
+
+                        }
+                    }
+                );
+
+                return;
+            }
             // Send payload
             sap.ui.core.BusyIndicator.show(0);
             this.ajaxUpdateWithJQuery("HM_Customer", {
@@ -3031,173 +3059,173 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             }
         },
 
-   onFileNameLinkPress: function (oEvent) {
+        onFileNameLinkPress: function (oEvent) {
 
-    function autoDecodeBase64(b64) {
-        if (!b64) return "";
-        b64 = b64.replace(/\s/g, "");
-        let last = b64;
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
 
-        for (let i = 0; i < 5; i++) {
-            try {
-                if (
-                    last.startsWith("iVB") ||    // PNG
-                    last.startsWith("/9j") ||    // JPG
-                    last.startsWith("JVBER")     // PDF
-                ) {
-                    return last;
-                }
-                last = atob(last);
-            } catch (e) {
-                break;
-            }
-        }
-        return last;
-    }
-
-    const oDoc = oEvent.getSource()
-        .getBindingContext("CustomerData")
-        ?.getObject();
-
-    if (!oDoc || !(oDoc.FileContent || oDoc.File)) {
-        sap.m.MessageToast.show("No document found");
-        return;
-    }
-
-    const sBase64 = autoDecodeBase64(oDoc.FileContent || oDoc.File);
-
-    let sMimeType = "application/octet-stream";
-    let isPDF = false;
-
-    if (sBase64.startsWith("iVB") || sBase64.includes("image/png")) {
-        sMimeType = "image/png";
-    } else if (sBase64.startsWith("/9j") || sBase64.includes("image/jpeg")) {
-        sMimeType = "image/jpeg";
-    } else if (sBase64.startsWith("JVBER") || sBase64.includes("application/pdf")) {
-        sMimeType = "application/pdf";
-        isPDF = true;
-    }   
-
-    /* ================= IMAGE PREVIEW ================= */
-    if (sMimeType.startsWith("image/")) {
-
-        const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${sMimeType};base64,${sBase64}`;
-
-        if (!this._oDocPreviewDialog) {
-
-            const oFlex = new sap.m.FlexBox({
-                width: "100%",
-                height: "100%",
-                justifyContent: "Center",
-                alignItems: "Center",
-                items: [
-                    new sap.m.Image({
-                        id: this.createId("docPreviewImage"),
-                        densityAware: false,
-                        width: "100%",
-                        height: "100%"
-                    })
-                ]
-            });
-
-            this._oDocPreviewDialog = new sap.m.Dialog({
-                title: oDoc.FileName || "Document Preview",
-                contentWidth: "50%",
-                contentHeight: "60%",
-                draggable: true,
-                resizable: true,
-                contentPadding: "0rem",
-                content: [oFlex],
-                beginButton: new sap.m.Button({
-                    text: "Close",
-                    press: () => this._oDocPreviewDialog.close()
-                }),
-                afterClose: () => {
-                    this._oDocPreviewDialog.destroy();
-                    this._oDocPreviewDialog = null;
-                }
-            });
-
-            this.getView().addDependent(this._oDocPreviewDialog);
-        }
-
-        this.byId("docPreviewImage").setSrc(sImageSrc);
-        this._oDocPreviewDialog.open();
-        return;
-    }
-
-    /* ================= PDF PREVIEW ================= */
-    if (isPDF) {
-
-        if (!this._oDocPreviewDialog) {
-            this._oDocPreviewDialog = new sap.m.Dialog({
-                title: oDoc.FileName || "Document Preview",
-                stretch: true,
-                draggable: true,
-                resizable: true,
-                contentPadding: "0rem",
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: () => {
-                        if (this._previewUrl) {
-                            URL.revokeObjectURL(this._previewUrl);
-                            this._previewUrl = null;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") ||    // PNG
+                            last.startsWith("/9j") ||    // JPG
+                            last.startsWith("JVBER")     // PDF
+                        ) {
+                            return last;
                         }
-                        this._oDocPreviewDialog.close();
+                        last = atob(last);
+                    } catch (e) {
+                        break;
                     }
-                }),
-                afterClose: () => {
-                    this._oDocPreviewDialog.destroy();
-                    this._oDocPreviewDialog = null;
                 }
-            });
-
-            this.getView().addDependent(this._oDocPreviewDialog);
-        }
-
-        this._oDocPreviewDialog.removeAllContent();
-     let sPdfBase64 = sBase64;
-        if (sPdfBase64.includes("base64,")) {
-            sPdfBase64 = sPdfBase64.split("base64,").pop();
-        }
-
-        const byteCharacters = atob(sPdfBase64);
-        const byteArrays = [];
-
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
+                return last;
             }
-            byteArrays.push(new Uint8Array(byteNumbers));
-        }
 
-        const blob = new Blob(byteArrays, { type: sMimeType });
+            const oDoc = oEvent.getSource()
+                .getBindingContext("CustomerData")
+                ?.getObject();
 
-        if (this._previewUrl) {
-            URL.revokeObjectURL(this._previewUrl);
-        }
-        this._previewUrl = URL.createObjectURL(blob);
+            if (!oDoc || !(oDoc.FileContent || oDoc.File)) {
+                sap.m.MessageToast.show("No document found");
+                return;
+            }
 
-        this._oDocPreviewDialog.addContent(
-            new sap.ui.core.HTML({
-                sanitizeContent: false,
-                content: `
+            const sBase64 = autoDecodeBase64(oDoc.FileContent || oDoc.File);
+
+            let sMimeType = "application/octet-stream";
+            let isPDF = false;
+
+            if (sBase64.startsWith("iVB") || sBase64.includes("image/png")) {
+                sMimeType = "image/png";
+            } else if (sBase64.startsWith("/9j") || sBase64.includes("image/jpeg")) {
+                sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("JVBER") || sBase64.includes("application/pdf")) {
+                sMimeType = "application/pdf";
+                isPDF = true;
+            }
+
+            /* ================= IMAGE PREVIEW ================= */
+            if (sMimeType.startsWith("image/")) {
+
+                const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${sMimeType};base64,${sBase64}`;
+
+                if (!this._oDocPreviewDialog) {
+
+                    const oFlex = new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [
+                            new sap.m.Image({
+                                id: this.createId("docPreviewImage"),
+                                densityAware: false,
+                                width: "100%",
+                                height: "100%"
+                            })
+                        ]
+                    });
+
+                    this._oDocPreviewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Preview",
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        content: [oFlex],
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => this._oDocPreviewDialog.close()
+                        }),
+                        afterClose: () => {
+                            this._oDocPreviewDialog.destroy();
+                            this._oDocPreviewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._oDocPreviewDialog);
+                }
+
+                this.byId("docPreviewImage").setSrc(sImageSrc);
+                this._oDocPreviewDialog.open();
+                return;
+            }
+
+            /* ================= PDF PREVIEW ================= */
+            if (isPDF) {
+
+                if (!this._oDocPreviewDialog) {
+                    this._oDocPreviewDialog = new sap.m.Dialog({
+                        title: oDoc.FileName || "Document Preview",
+                        stretch: true,
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => {
+                                if (this._previewUrl) {
+                                    URL.revokeObjectURL(this._previewUrl);
+                                    this._previewUrl = null;
+                                }
+                                this._oDocPreviewDialog.close();
+                            }
+                        }),
+                        afterClose: () => {
+                            this._oDocPreviewDialog.destroy();
+                            this._oDocPreviewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._oDocPreviewDialog);
+                }
+
+                this._oDocPreviewDialog.removeAllContent();
+                let sPdfBase64 = sBase64;
+                if (sPdfBase64.includes("base64,")) {
+                    sPdfBase64 = sPdfBase64.split("base64,").pop();
+                }
+
+                const byteCharacters = atob(sPdfBase64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: sMimeType });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._oDocPreviewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
                     <iframe
                         src="${this._previewUrl}"
                         style="width:100%; height:600px; border:none;">
                     </iframe>
                 `
-            })
-        );
+                    })
+                );
 
-        this._oDocPreviewDialog.open();
-        return;
-    }
+                this._oDocPreviewDialog.open();
+                return;
+            }
 
-    sap.m.MessageToast.show("Preview not supported");
-},
+            sap.m.MessageToast.show("Preview not supported");
+        },
         onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
@@ -3306,7 +3334,7 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var edit = this.getView().getModel("edit").getData();
 
- 
+
 
 
             var sEnteredCode = edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode").getValue();
@@ -3337,41 +3365,41 @@ if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
             }
             var bCouponLimitReached = false;
 
-  if (oCouponData) {
-    for (let i = 0; i < oCustomerData.AllSelectedFacilities.length; i++) {
-        let item = oCustomerData.AllSelectedFacilities[i];
+            if (oCouponData) {
+                for (let i = 0; i < oCustomerData.AllSelectedFacilities.length; i++) {
+                    let item = oCustomerData.AllSelectedFacilities[i];
 
-        if (item.CouponCode) {
+                    if (item.CouponCode) {
 
-            var oCoupon = oCouponData.find(c => c.CouponCode === item.CouponCode);
-            if (!oCoupon) {
-                continue;
+                        var oCoupon = oCouponData.find(c => c.CouponCode === item.CouponCode);
+                        if (!oCoupon) {
+                            continue;
+                        }
+
+                        // Count coupon usage in AllSelectedFacilities
+                        var iUsedCount = oCustomerData.AllSelectedFacilities.filter(f =>
+                            f.CouponCode === item.CouponCode
+                        ).length;
+
+                        if (iUsedCount === Number(oCoupon.MaxUses)) {
+                            sap.m.MessageToast.show(
+                                this.i18nModel.getText(
+                                    "couponUsageLimitReached",
+                                    [oCoupon.MaxUses]
+                                )
+                            );
+
+                            bCouponLimitReached = true;
+                            break;
+                        }
+                    }
+                }
             }
 
-            // Count coupon usage in AllSelectedFacilities
-            var iUsedCount = oCustomerData.AllSelectedFacilities.filter(f =>
-                f.CouponCode === item.CouponCode
-            ).length;
-
-            if (iUsedCount === Number(oCoupon.MaxUses)) {
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText(
-                        "couponUsageLimitReached",  
-                        [oCoupon.MaxUses]
-                    )
-                );
-
-                bCouponLimitReached = true;
-                break; 
+            if (bCouponLimitReached) {
+                return;
             }
-        }
-    }
-}
-
-if (bCouponLimitReached) {
-    return;
-}
-            if(Number(oCoupon.MaxUses)===oCoupon.couponUsedCount){
+            if (Number(oCoupon.MaxUses) === oCoupon.couponUsedCount) {
                 sap.m.MessageToast.show(this.i18nModel.getText("couponUsageLimitReached"));
                 return;
             }
@@ -3523,9 +3551,9 @@ if (bCouponLimitReached) {
             this.getView().getModel("edit").setProperty("/CouponDiscount", "");
         },
         onGSTBooking: function () {
-              
-              var oCustomerModel = this.getView().getModel("CustomerData")
-              const CustData = this.getView().getModel("CustomerData").getData();
+
+            var oCustomerModel = this.getView().getModel("CustomerData")
+            const CustData = this.getView().getModel("CustomerData").getData();
 
             if (!this.GST_Dialog) {
                 var oView = this.getView();
@@ -3538,9 +3566,9 @@ if (bCouponLimitReached) {
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
             sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
 
-            if(sap.ui.getCore().byId("idBranchGSTNumber").getValue()===""){
+            if (sap.ui.getCore().byId("idBranchGSTNumber").getValue() === "") {
                 sap.ui.getCore().byId("idBranchGSTNumber").setVisible(false);
-            }else{
+            } else {
                 sap.ui.getCore().byId("idBranchGSTNumber").setVisible(true);
             }
 
@@ -3587,7 +3615,7 @@ if (bCouponLimitReached) {
                 var oCustomerModel = this.getView().getModel("CustomerData")
                 const CustData = this.getView().getModel("CustomerData").getData();
                 const oInput = sap.ui.getCore().byId("idGSTNumber").getValue() || "";
-              
+
                 var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
                 var oRadioGroup = sap.ui.getCore().byId("idGSTType");
 
@@ -3663,11 +3691,11 @@ if (bCouponLimitReached) {
 
                 //             oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var Payload =
-                    {
-                        "GSTType": sValue,
-                        "GSTValue": Percentage,
-                        "CustomerGSTIN": oInput?oInput.trim().toUpperCase() : CustData.GSTNumber || ""
-                    }
+                {
+                    "GSTType": sValue,
+                    "GSTValue": Percentage,
+                    "CustomerGSTIN": oInput ? oInput.trim().toUpperCase() : CustData.GSTNumber || ""
+                }
 
                 sap.ui.core.BusyIndicator.show(0);
                 this.ajaxUpdateWithJQuery("HM_Booking", {

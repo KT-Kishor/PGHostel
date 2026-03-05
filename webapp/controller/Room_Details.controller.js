@@ -688,8 +688,8 @@ sap.ui.define([
                     }.bind(this),
                     error: function (err) {
                         sap.m.MessageBox.error(this.i18nModel.getText("errorSavingRoomData"));
-                        console.error(err);
-                    }
+                         sap.ui.core.BusyIndicator.hide()
+                    }.bind(this)
                 });
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving"));
