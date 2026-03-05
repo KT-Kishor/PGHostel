@@ -119,8 +119,8 @@
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="{i18n>MVstaffName}"
-                            tooltip="{i18n>MVstaffName}"
+                            text="{i18n>MVVendorName}"
+                            tooltip="{i18n>MVVendorName}"
                         />
                     </Column>
                     <Column demandPopin="true">

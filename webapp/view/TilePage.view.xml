@@ -217,7 +217,7 @@
                    <GenericTile
                     id="id12roomTile"
                     class="sapUiMediumMargin glassTile"
-                    visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
                     header="{i18n>Complaintdetails}"
                     press="TileV_onpressComplaintdetails"
                 >
