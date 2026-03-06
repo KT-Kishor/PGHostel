@@ -27,9 +27,9 @@
                 icon="sap-icon://log"
             />
         </headerContent>
-        <VBox class="categoryBlock">
+        <VBox class="categoryBlock sapUiMediumMarginTop">
             <Title
-                text="Category 1"
+                text="{i18n>tileHome}"
                 level="H2"
                 class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
             />
@@ -140,7 +140,7 @@
 
         <VBox class="categoryBlock">
             <Title
-                text="Category 2"
+                text="{i18n>tileActions}"
                 level="H2"
                 class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
             />
@@ -176,6 +176,18 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id8roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageSecurityDeposit}!== 0?true:false }"
+                    header="{i18n>returnDeposit}"
+                    press="TileV_onpressDeposit"
+                >
+                    <TileContent unit="{i18n>ManageDeposit}">
+                        <ImageContent src="sap-icon://batch-payments" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
                     id="id7roomTile"
                     visible="{= ${TileVisibility>/ManagePaymentHistory}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
@@ -184,6 +196,29 @@
                 >
                     <TileContent unit="{i18n>paymentHistory}">
                         <ImageContent src="sap-icon://monitor-payments" />
+                    </TileContent>
+                </GenericTile>
+                 <GenericTile
+                    id="TP_DamageTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>damageTracking}"
+                    visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
+                    press="TileV_onpressdamage"
+                >
+                    <TileContent unit="{i18n>damageDetails}">
+                        <ImageContent src="sap-icon://clinical-task-tracker" />
+                    </TileContent>
+                </GenericTile>
+                
+                <GenericTile
+                    id="id12roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
+                    header="{i18n>Complaintdetails}"
+                    press="TileV_onpressComplaintdetails"
+                >
+                    <TileContent unit="{i18n>Complaintdetails}">
+                        <ImageContent src="sap-icon://discussion" />
                     </TileContent>
                 </GenericTile>
                 <GenericTile
@@ -197,46 +232,12 @@
                         <ImageContent src="sap-icon://crm-sales" />
                     </TileContent>
                 </GenericTile>
-                <GenericTile
-                    id="id12roomTile"
-                    class="sapUiMediumMargin glassTile"
-                    visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
-                    header="{i18n>Complaintdetails}"
-                    press="TileV_onpressComplaintdetails"
-                >
-                    <TileContent unit="{i18n>Complaintdetails}">
-                        <ImageContent src="sap-icon://discussion" />
-                    </TileContent>
-                </GenericTile>
-                <GenericTile
-                    id="id8roomTile"
-                    class="sapUiMediumMargin glassTile"
-                    visible="{= ${TileVisibility>/ManageSecurityDeposit}!== 0?true:false }"
-                    header="{i18n>returnDeposit}"
-                    press="TileV_onpressDeposit"
-                >
-                    <TileContent unit="{i18n>ManageDeposit}">
-                        <ImageContent src="sap-icon://batch-payments" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
-                    id="TP_DamageTile"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>damageTracking}"
-                    visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
-                    press="TileV_onpressdamage"
-                >
-                    <TileContent unit="{i18n>damageDetails}">
-                        <ImageContent src="sap-icon://clinical-task-tracker" />
-                    </TileContent>
-                </GenericTile>
             </FlexBox>
         </VBox>
 
         <VBox class="categoryBlock">
             <Title
-                text="Dashboards"
+                text="{i18n>tileDashboards}"
                 level="H2"
                 class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
             />

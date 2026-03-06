@@ -186,7 +186,7 @@
                     visible="{visiblePlay>/CC_id_CustInput}"
                     id="CC_id_custValue"
                     value="{MDmodel>/Value}"
-                    maxLength="5"
+                    maxLength="2"
                     liveChange="onTaxPercentageChange"
                 />
                 <Label text="" />
