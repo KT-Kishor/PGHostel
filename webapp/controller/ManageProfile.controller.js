@@ -716,7 +716,7 @@ sap.ui.define([
             };
 
             // Set model for next screen
-            var oHostelModel = new sap.ui.model.json.JSONModel(oFullCustomerData);
+            var oHostelModel = new JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
 
             // Navigate
@@ -740,10 +740,10 @@ sap.ui.define([
             const diffTime = oEndDate - oStartDate;
             const iDays = Math.ceil(diffTime / (1000 * 3600 * 24));
 
-            if (iDays <= 0) {
-                MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
-                return null;
-            }
+            // if (iDays <= 0) {
+            //     MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
+            //     return null;
+            // }
 
             let totalFacilityPricePerDay = 0;
             let aAllFacilities = [];
