@@ -27,12 +27,18 @@
                 icon="sap-icon://log"
             />
         </headerContent>
-        <layout:VerticalLayout>
+        <VBox class="categoryBlock">
+            <Title
+                text="Category 1"
+                level="H2"
+                class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
+            />
             <FlexBox
                 wrap="Wrap"
-                alignItems="Center"
-                justifyContent="Center"
-                class="tileContainer"
+                alignItems="Start"
+                justifyContent="Start"
+                width="100%"
+                class="tileContainer1"
             >
                 <GenericTile
                     id="branchTile"
@@ -107,6 +113,45 @@
                 </GenericTile>
 
                 <GenericTile
+                    id="id5roomTile"
+                    visible="{= ${TileVisibility>/ManageStaff}!== 0?true:false }"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>manageStaff}"
+                    press="TileV_onpressManageStaff"
+                >
+                    <TileContent unit="{i18n>staffDirectory}">
+                        <ImageContent src="sap-icon://employee" />
+                    </TileContent>
+                </GenericTile>
+
+                <GenericTile
+                    id="id6roomTile"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>manageVendors}"
+                    press="TileV_onpressManageVendor"
+                >
+                    <TileContent unit="{i18n>vendorDirectory}">
+                        <ImageContent src="sap-icon://employee" />
+                    </TileContent>
+                </GenericTile>
+            </FlexBox>
+        </VBox>
+
+        <VBox class="categoryBlock">
+            <Title
+                text="Category 2"
+                level="H2"
+                class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
+            />
+            <FlexBox
+                wrap="Wrap"
+                alignItems="Start"
+                width="100%"
+                justifyContent="Start"
+                class="tileContainer1"
+            >
+                <GenericTile
                     id="id3roomTile"
                     visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
@@ -131,30 +176,6 @@
                 </GenericTile>
 
                 <GenericTile
-                    id="id5roomTile"
-                    visible="{= ${TileVisibility>/ManageStaff}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>manageStaff}"
-                    press="TileV_onpressManageStaff"
-                >
-                    <TileContent unit="{i18n>staffDirectory}">
-                        <ImageContent src="sap-icon://employee" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
-                    id="id6roomTile"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>manageVendors}"
-                    press="TileV_onpressManageVendor"
-                >
-                    <TileContent unit="{i18n>vendorDirectory}">
-                        <ImageContent src="sap-icon://employee" />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
                     id="id7roomTile"
                     visible="{= ${TileVisibility>/ManagePaymentHistory}!== 0?true:false }"
                     class="sapUiMediumMargin glassTile"
@@ -163,6 +184,28 @@
                 >
                     <TileContent unit="{i18n>paymentHistory}">
                         <ImageContent src="sap-icon://monitor-payments" />
+                    </TileContent>
+                </GenericTile>
+                <GenericTile
+                    id="id11roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
+                    header="{i18n>customerReview}"
+                    press="TileV_onpresscustomerreview"
+                >
+                    <TileContent unit="{i18n>customerReview}">
+                        <ImageContent src="sap-icon://crm-sales" />
+                    </TileContent>
+                </GenericTile>
+                <GenericTile
+                    id="id12roomTile"
+                    class="sapUiMediumMargin glassTile"
+                    visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
+                    header="{i18n>Complaintdetails}"
+                    press="TileV_onpressComplaintdetails"
+                >
+                    <TileContent unit="{i18n>Complaintdetails}">
+                        <ImageContent src="sap-icon://discussion" />
                     </TileContent>
                 </GenericTile>
                 <GenericTile
@@ -177,6 +220,33 @@
                     </TileContent>
                 </GenericTile>
 
+                <GenericTile
+                    id="TP_DamageTile"
+                    class="sapUiMediumMargin glassTile"
+                    header="{i18n>damageTracking}"
+                    visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
+                    press="TileV_onpressdamage"
+                >
+                    <TileContent unit="{i18n>damageDetails}">
+                        <ImageContent src="sap-icon://clinical-task-tracker" />
+                    </TileContent>
+                </GenericTile>
+            </FlexBox>
+        </VBox>
+
+        <VBox class="categoryBlock">
+            <Title
+                text="Dashboards"
+                level="H2"
+                class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
+            />
+            <FlexBox
+                wrap="Wrap"
+                alignItems="Start"
+                width="100%"
+                justifyContent="Start"
+                class="tileContainer1"
+            >
                 <GenericTile
                     id="id9roomTile"
                     visible="{= ${TileVisibility>/ManageBookingDashboard}!== 0?true:false }"
@@ -202,74 +272,29 @@
                     </TileContent>
                 </GenericTile>
                 <GenericTile
-                    id="id11roomTile"
-                    class="sapUiMediumMargin glassTile"
-                    visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
-                    header="{i18n>customerReview}"
-                    press="TileV_onpresscustomerreview"
-                >
-                    <TileContent unit="{i18n>customerReview}">
-                        <ImageContent
-                            src="sap-icon://crm-sales"
-                        />
-                    </TileContent>
-                </GenericTile>
-                   <GenericTile
-                    id="id12roomTile"
-                    class="sapUiMediumMargin glassTile"
-                    visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
-                    header="{i18n>Complaintdetails}"
-                    press="TileV_onpressComplaintdetails"
-                >
-                    <TileContent unit="{i18n>Complaintdetails}">
-                        <ImageContent
-                            src="sap-icon://discussion"
-                        />
-                    </TileContent>
-                </GenericTile>
-
-                <GenericTile
                     id="TP_ComplaintDashBoardTile"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>complainDashboard}"
                     press="TileV_onpresscomplaintdashboard"
-                     visible="{= ${TileVisibility>/ManageComplaintDashboard}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/ManageComplaintDashboard}!== 0?true:false }"
                 >
                     <TileContent unit="{i18n>complaingraph}">
-                        <ImageContent
-                            src="sap-icon://bbyd-dashboard"
-                        />
+                        <ImageContent src="sap-icon://bbyd-dashboard" />
                     </TileContent>
                 </GenericTile>
-
                 <GenericTile
-                    id="TP_DamageTile"
-                    class="sapUiMediumMargin glassTile"
-                    header="{i18n>damageTracking}"
-                     visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
-                    press="TileV_onpressdamage"
-                >
-                    <TileContent unit="{i18n>damageDetails}">
-                        <ImageContent
-                            src="sap-icon://clinical-task-tracker"
-                        />
-                    </TileContent>
-                </GenericTile>
-                 <GenericTile
                     id="TP_DamageDashboard"
                     class="sapUiMediumMargin glassTile"
                     header="{i18n>damageDashboard}"
-                     visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
+                    visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
                     press="TileV_onpressdamagedashboard"
                 >
                     <TileContent unit="{i18n>damageGraph}">
-                        <ImageContent
-                            src="sap-icon://bbyd-dashboard"
-                        />
+                        <ImageContent src="sap-icon://bbyd-dashboard" />
                     </TileContent>
                 </GenericTile>
             </FlexBox>
-        </layout:VerticalLayout>
+        </VBox>
         <Button
             text="Steps Guide"
             icon="sap-icon://learning-assistant"

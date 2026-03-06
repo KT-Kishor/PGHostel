@@ -4539,3 +4539,27 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 height: 44px !important;
 width: 44px !important;
 }
+
+.categoryBlock{
+    width:100%;
+    margin-bottom:2rem;
+}
+
+.tileContainer1{
+    width:100%;
+    gap:1rem;
+}
+
+.roomHeaderTitle1{
+  font-size:1.6rem;
+  font-family:'Franklin Gothic Medium','Arial Narrow',Arial,sans-serif;
+  font-weight:700;
+  color:#00b7c7 !important;
+  letter-spacing:0.5px;
+  padding:0.6rem 1rem;
+  border-left:5px solid #00b7c7;
+  background:linear-gradient(to right,#e8f4ff,transparent);
+  border-radius:6px;
+  margin-bottom:1rem;
+  text-transform:uppercase;
+}
