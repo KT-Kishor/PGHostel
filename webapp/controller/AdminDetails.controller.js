@@ -1321,25 +1321,6 @@ sap.ui.define([
         onEditBooking: async function () {
             this.applyCountryStateCityFilters()
             const oMobile = this.byId("CD_ID_idPhone");
-              const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            const oUser = oLoginModel ? oLoginModel.getData() : null;
-
-            //  User is NOT logged in → Open login dialog
-            if (!oUser || !oUser.UserID) {
-
-                if (!this._oLoginAlertDialog) {
-                    this._oLoginAlertDialog = sap.ui.xmlfragment(
-                        this.createId("LoginAlertDialog"),
-                        "sap.ui.com.project1.fragment.SignInSignup",
-                        this
-                    );
-                    oView.addDependent(this._oLoginAlertDialog);
-                }
-                this._oLoginAlertDialog.open();
-                return;
-            }
-
-
             this.getBusyDialog()
             const response = await this.ajaxReadWithJQuery("HM_Customer", "");
             this.closeBusyDialog()
