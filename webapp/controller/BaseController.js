@@ -6,7 +6,7 @@ sap.ui.define([
   "sap/ui/unified/CalendarLegend",
   "sap/ui/unified/CalendarLegendItem",
   "sap/ui/unified/DateTypeRange"
-], function (Controller, JSONModel, jsPDF, Formatter, 
+], function (Controller, JSONModel, jsPDF, Formatter,
   BusyIndicator, CalendarLegend, CalendarLegendItem, DateTypeRange) {
   "use strict";
 
@@ -823,6 +823,237 @@ sap.ui.define([
       });
 
       return btoa(resultBinary);
-    }
+    },
+    // @BaseController.js
+
+    // ─── TOUR: Public API ──────────────────────────────────────────────────────
+
+    initUniversalTour: function (aSteps) {
+      this._aTourSteps = (aSteps || []).slice();
+      this._iTourIndex = 0;
+      this._showTourStep(0);
+    },
+
+    // ─── TOUR: Core step renderer ─────────────────────────────────────────────
+
+    _showTourStep: function (iIndex) {
+      var that = this;
+      var aSteps = this._aTourSteps;
+
+      if (!aSteps || iIndex >= aSteps.length) {
+        this._cleanupTour();
+        return;
+      }
+
+      var oStepData = aSteps[iIndex];
+      var oComponent = this.getOwnerComponent();
+
+      if (!this._oGuideModel) {
+        this._oGuideModel = oComponent.getModel("guideModel");
+        if (!this._oGuideModel) {
+          this._oGuideModel = new sap.ui.model.json.JSONModel();
+          oComponent.setModel(this._oGuideModel, "guideModel");
+        }
+      }
+
+      this._oGuideModel.setData({
+        currentStep: {
+          title: oStepData.title || "",
+          description: oStepData.description || "",
+          media: oStepData.media || "",
+          stepText: "Step " + (iIndex + 1) + " of " + aSteps.length
+        },
+        isLast: iIndex === aSteps.length - 1
+      });
+
+      var oAnchor = this.getView().byId(oStepData.ui5Id);
+      if (!oAnchor) {
+        this.onNextTourStep();
+        return;
+      }
+
+      var fnOpen = function () {
+        if (!that._oGuidePopover) {
+          that.loadFragment({
+            name: "sap.ui.com.project1.fragment.GuidePopover"
+          }).then(function (oPopover) {
+            that._oGuidePopover = oPopover;
+
+            // ✅ Escape key fix: Popover has no setEscapeHandler.
+            // Intercept keydown on the popover's DOM instead.
+            oPopover.addEventDelegate({
+              onkeydown: function (oEvent) {
+                if (oEvent.key === "Escape" || oEvent.keyCode === 27) {
+                  oEvent.preventDefault();
+                  oEvent.stopPropagation();
+                  that._cleanupTour();  // cleans CSS + closes popover
+                }
+              }
+            });
+
+            that.getView().addDependent(oPopover);
+            that._openStep(oPopover, oAnchor);
+          });
+        } else {
+          that._openStep(that._oGuidePopover, oAnchor);
+        }
+      };
+
+      if (!oAnchor.getDomRef()) {
+        var oDelegate = {
+          onAfterRendering: function () {
+            oAnchor.removeEventDelegate(oDelegate);
+            fnOpen();
+          }
+        };
+        oAnchor.addEventDelegate(oDelegate);
+      } else {
+        fnOpen();
+      }
+    },
+
+    // ─── TOUR: Open + position a step ────────────────────────────────────────
+
+    _openStep: function (oPopover, oAnchor) {
+      oPopover.setModel(this._oGuideModel, "guideModel");
+      this._highlightElement(oAnchor);
+
+      var oDomRef = oAnchor.getDomRef();
+      if (oDomRef) {
+        var oScrollNode = oDomRef.closest(".sapMPageScrollCont") || oDomRef.closest(".sapMScrollCont") || oDomRef.closest(".sapUiScrollDelegate");
+        if (oScrollNode) {
+          var nodeRect = oDomRef.getBoundingClientRect();
+          var scrollRect = oScrollNode.getBoundingClientRect();
+          // Scroll enough so the element is nicely visible without throwing the page off
+          if (nodeRect.top < scrollRect.top || nodeRect.bottom > scrollRect.bottom) {
+            var centerOffset = nodeRect.top - scrollRect.top - (scrollRect.height / 2) + (nodeRect.height / 2);
+            oScrollNode.scrollBy({ top: centerOffset, behavior: "smooth" });
+          }
+        } else {
+          oDomRef.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+        }
+      }
+
+      var vw = window.innerWidth || document.documentElement.clientWidth;
+
+      if (vw < 600) {
+        oPopover.setContentWidth("92%");
+        oPopover.setPlacement(sap.m.PlacementType.Bottom);
+        oPopover.setOffsetX(0);
+        oPopover.setOffsetY(12);
+        oPopover.openBy(oAnchor);
+        return;
+      }
+
+      oPopover.setContentWidth("360px");
+      oPopover.setPlacement(sap.m.PlacementType.Auto);
+      oPopover.setOffsetX(0);
+      oPopover.setOffsetY(0);
+      oPopover.openBy(oAnchor);
+
+      requestAnimationFrame(function () {
+        var popDom = oPopover.getDomRef();
+        var ph = popDom ? popDom.offsetHeight : 220;
+        var sBest = this._getBestPlacement(oAnchor, 360, ph);
+        var GAP = 10;
+
+        oPopover.setPlacement(sBest);
+
+        // Valid PlacementType values: Right, Left, Top, Bottom, Auto
+        if (sBest === sap.m.PlacementType.Right) { oPopover.setOffsetX(GAP); oPopover.setOffsetY(0); }
+        else if (sBest === sap.m.PlacementType.Left) { oPopover.setOffsetX(-GAP); oPopover.setOffsetY(0); }
+        else if (sBest === sap.m.PlacementType.Bottom) { oPopover.setOffsetX(0); oPopover.setOffsetY(GAP); }
+        else if (sBest === sap.m.PlacementType.Top) { oPopover.setOffsetX(0); oPopover.setOffsetY(-GAP); }
+        else { oPopover.setOffsetX(0); oPopover.setOffsetY(0); }
+
+        oPopover.openBy(oAnchor);
+      }.bind(this));
+    },
+
+    // ─── TOUR: Placement algorithm ────────────────────────────────────────────
+
+    _getBestPlacement: function (oAnchor, pw, ph) {
+      var oDom = oAnchor && oAnchor.getDomRef && oAnchor.getDomRef();
+      if (!oDom) return sap.m.PlacementType.Auto;
+
+      var vw = window.innerWidth || document.documentElement.clientWidth;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+
+      if (vw < 600) return sap.m.PlacementType.Bottom;
+
+      var r = oDom.getBoundingClientRect();
+      var margin = 16;
+
+      var spaceRight = vw - r.right;
+      var spaceLeft = r.left;
+      var spaceBottom = vh - r.bottom;
+      var spaceTop = r.top;
+
+      if (spaceRight >= pw + margin) return sap.m.PlacementType.Right;
+      if (spaceLeft >= pw + margin) return sap.m.PlacementType.Left;
+      if (spaceBottom >= ph + margin) return sap.m.PlacementType.Bottom;
+      if (spaceTop >= ph + margin) return sap.m.PlacementType.Top;
+
+      return sap.m.PlacementType.Auto;
+    },
+
+    // ─── TOUR: Highlight ──────────────────────────────────────────────────────
+
+    _highlightElement: function (oControl) {
+      // Clear previous highlight (vanilla, no jQuery dependency)
+      document.querySelectorAll(".sapUiTourHighlight").forEach(function (el) {
+        el.classList.remove("sapUiTourHighlight");
+      });
+
+      var oDomRef = oControl.getDomRef();
+      if (oDomRef) {
+        document.body.classList.add("sapUiTourOverlayActive");
+        oDomRef.classList.add("sapUiTourHighlight");
+      }
+    },
+
+    // ─── TOUR: Cleanup ────────────────────────────────────────────────────────
+
+    _cleanupTour: function () {
+      document.body.classList.remove("sapUiTourOverlayActive");
+      document.querySelectorAll(".sapUiTourHighlight").forEach(function (el) {
+        el.classList.remove("sapUiTourHighlight");
+      });
+
+      this._iTourIndex = 0;
+      this._aTourSteps = [];
+
+      if (this._oGuidePopover && this._oGuidePopover.isOpen()) {
+        this._oGuidePopover.close();
+      }
+    },
+
+    // ─── TOUR: Button handlers ────────────────────────────────────────────────
+
+    onNextTourStep: function () {
+      this._iTourIndex = (this._iTourIndex || 0) + 1;
+
+      if (this._iTourIndex >= this._aTourSteps.length) {
+        this._cleanupTour();
+        return;
+      }
+
+      this._showTourStep(this._iTourIndex);
+    },
+
+    onSkipTour: function () {
+      this._cleanupTour();
+    },
+
+    // Prevents backdrop-tap / outside-click from silently closing the popover
+    // without cleaning up CSS. Escape is handled via setEscapeHandler above.
+    onBeforePopoverClose: function (oEvent) {
+      var sReason = oEvent.getParameter("reason");
+
+      // Allow close only when WE triggered it (ClosedByAPI = our _cleanupTour call)
+      if (sReason !== "ClosedByAPI" && this._aTourSteps && this._aTourSteps.length > 0) {
+        oEvent.preventDefault();
+      }
+    },
   })
 });

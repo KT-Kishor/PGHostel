@@ -4563,3 +4563,47 @@ width: 44px !important;
   margin-bottom:1rem;
   text-transform:uppercase;
 }
+
+/* Responsive popover sizing */
+.tourGuidePopover {
+    max-height: 80vh !important;
+}
+
+.tourGuidePopover .sapMPopoverCont {
+    max-height: calc(80vh - 100px) !important; /* Account for header/footer */
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .tourGuidePopover {
+        max-width: 92vw !important;
+    }
+}
+
+/* Keep your existing highlight styles */
+.sapUiTourHighlight {
+    position: relative !important;
+    z-index: 1000 !important;
+    outline-offset: 15px !important;
+    outline: 2000px solid rgba(0,0,0,0.75) !important;
+    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.8), 
+                0 0 0 12px rgba(0, 162, 255, 0.4) !important;
+    border-radius: 12px !important;
+}
+/* Target all popovers EXCEPT the tour guide */
+/* .sapMPopover:not(.tourGuidePopover) .sapMIBar {
+  background: linear-gradient(135deg, #00b7c7, #007984) !important;
+  color: white !important;
+} */
+ /* Role Guide Dialog */
+.roleGuideDialog .sapMDialogScrollCont {
+    padding: 0 !important;
+}
+
+/* Responsive: full-width on mobile */
+@media (max-width: 600px) {
+    .roleGuideDialog {
+        width: 95vw !important;
+        min-width: unset !important;
+    }
+}

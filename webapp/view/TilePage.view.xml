@@ -297,6 +297,7 @@
             </FlexBox>
         </VBox>
         <Button
+            id="TP_StepsGuideBtn"
             text="Steps Guide"
             icon="sap-icon://learning-assistant"
             press="onStartGuide"

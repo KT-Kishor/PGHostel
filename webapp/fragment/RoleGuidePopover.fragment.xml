@@ -1,0 +1,86 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <Dialog
+        id="roleGuideDialog"
+        title="Your Role &amp; Access"
+        contentWidth="420px"
+        resizable="false"
+        draggable="false"
+        class="roleGuideDialog">
+
+        <customHeader>
+            <Bar>
+                <contentLeft>
+                    <core:Icon
+                        src="{roleGuideModel>/accessIcon}"
+                        size="1.2rem"
+                        color="#0070f2"
+                        class="sapUiSmallMarginEnd"/>
+                    <Title text="{roleGuideModel>/roleLabel}" level="H3"/>
+                </contentLeft>
+                <contentRight>
+                    <ObjectStatus
+                        text="{roleGuideModel>/accessLevel}"
+                        state="{roleGuideModel>/accessState}"
+                        icon="{roleGuideModel>/accessIcon}"
+                        inverted="true"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <!-- Summary -->
+        <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
+            <MessageStrip
+                text="{roleGuideModel>/summary}"
+                type="Information"
+                showIcon="true"
+                showCloseButton="false"
+                class="sapUiSmallMarginBottom"/>
+
+            <!-- Access breakdown -->
+            <Title text="What you can do:" level="H6" class="sapUiTinyMarginBottom"/>
+            <List
+                items="{roleGuideModel>/accessItems}"
+                showSeparators="None"
+                backgroundDesign="Transparent">
+                <CustomListItem>
+                    <HBox alignItems="Center" class="sapUiTinyMarginTop sapUiTinyMarginBottom">
+                        <core:Icon
+                            src="{roleGuideModel>icon}"
+                            color="{roleGuideModel>color}"
+                            size="1rem"
+                            class="sapUiSmallMarginEnd"/>
+                        <VBox>
+                            <Text
+                                text="{roleGuideModel>label}"
+                                class="sapUiNoMargin"
+                                renderWhitespace="false"/>
+                            <Text
+                                text="{roleGuideModel>detail}"
+                                class="sapUiTinyMarginTop"
+                                wrapping="true"
+                                style="font-size:0.75rem; color:#6a6d70;"/>
+                        </VBox>
+                    </HBox>
+                </CustomListItem>
+            </List>
+        </VBox>
+
+        <beginButton>
+            <Button
+                text="Skip Tour"
+                type="Transparent"
+                press="onSkipRoleGuide"/>
+        </beginButton>
+        <endButton>
+            <Button
+                text="Start Tile Tour →"
+                type="Emphasized"
+                press="onStartTileGuide"
+                class="myUnifiedBtn"
+                icon="sap-icon://play"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

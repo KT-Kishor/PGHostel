@@ -1,0 +1,55 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Popover
+        title="{guideModel>/currentStep/title}"
+        placement="Auto"
+        class="sapUiContentPadding tourGuidePopover"
+        showHeader="true"
+        modal="true"
+        contentHeight="auto"
+        contentWidth="auto"
+        contentMinWidth="280px"
+     
+        beforeClose="onBeforePopoverClose">  
+         <!-- initialFocus="nextButtonId" -->
+
+        <customHeader>
+            <Bar>
+                <contentLeft>
+                    <Title text="{guideModel>/currentStep/title}" level="H3" />
+                </contentLeft>
+                <contentRight>
+                    <Text text="{guideModel>/currentStep/stepText}" class="sapUiTinyMarginEnd" />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <VBox class="sapUiSmallMargin">
+            <Image
+                src="{guideModel>/currentStep/media}"
+                width="100%"
+                densityAware="false"
+                visible="{= !!${guideModel>/currentStep/media} }"
+                class="sapUiSmallMarginBottom"/>
+            <Text text="{guideModel>/currentStep/description}" wrapping="true" />
+        </VBox>
+
+        <footer  >
+            <Bar>
+                <contentLeft>
+                    <Button text="Skip Tour" type="Transparent" press="onSkipTour" class=""/>
+                </contentLeft>
+                <contentRight>
+                    <Button
+                        id="nextButtonId"
+                        text="{= ${guideModel>/isLast} ? 'Finish' : 'Next' }"
+                        type="Emphasized"
+                        press="onNextTourStep"
+                        class="myUnifiedBtn"
+                        icon="{= ${guideModel>/isLast} ? 'sap-icon://accept' : 'sap-icon://navigation-right-arrow' }"/>
+                </contentRight>
+            </Bar>
+        </footer>
+    </Popover>
+</core:FragmentDefinition>
