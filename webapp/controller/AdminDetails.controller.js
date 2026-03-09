@@ -4654,6 +4654,7 @@ model.setProperty("/Address", data.Address);
 
         onPressOTP: async function () {
             const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
 
             const sUserId = oEmailIDCtrl.getValue().trim();
             // const sUserName = oUserNameCtrl.getValue().trim();
@@ -4665,14 +4666,15 @@ model.setProperty("/Address", data.Address);
             }
 
             const payload = {
-                EmailID: sUserId,
+                CustomerID: oCustomerData.CustomerID,
+                CustomerEmail: sUserId,
                 Type: "OTP"
             };
 
             BusyIndicator.show(0);
 
             try {
-                const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
+                const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
 
                 if (oResp?.success) {
 
@@ -4934,7 +4936,7 @@ model.setProperty("/Address", data.Address);
                     State: data.State,
                     City: data.City,
                     Address: data.Address.trim(),
-                    CustomerId:oCustomerData.CustomerId
+                   
                 }
             };
 
