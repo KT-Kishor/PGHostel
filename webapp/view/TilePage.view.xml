@@ -27,7 +27,8 @@
                 icon="sap-icon://log"
             />
         </headerContent>
-        <VBox class="categoryBlock sapUiMediumMarginTop">
+        <VBox class="categoryBlock sapUiMediumMarginTop"
+              visible="{= ${TileVisibility>/ManageBranch} !== 0 || ${TileVisibility>/ManageVendor} !== 0 || ${TileVisibility>/ManageBedType} !== 0 }">
             <Title
                 text="{i18n>tileHome}"
                 level="H2"
@@ -138,7 +139,8 @@
             </FlexBox>
         </VBox>
 
-        <VBox class="categoryBlock">
+        <VBox class="categoryBlock"  visible="{= ${TileVisibility>/ManageComplainTracking} !== 0 || ${TileVisibility>/ManageCustomer} !== 0 || ${TileVisibility>/ManageInvoice} !== 0 }"
+        >
             <Title
                 text="{i18n>tileActions}"
                 level="H2"
@@ -235,7 +237,8 @@
             </FlexBox>
         </VBox>
 
-        <VBox class="categoryBlock">
+        <VBox class="categoryBlock"  visible="{= ${TileVisibility>/ManageBookingDashboard} !== 0 || ${TileVisibility>/ManagePaymentDashboard} !== 0 || ${TileVisibility>/ManageComplaintDashboard} !== 0 || ${TileVisibility>/DamageDashboard} !== 0 }"
+        >
             <Title
                 text="{i18n>tileDashboards}"
                 level="H2"

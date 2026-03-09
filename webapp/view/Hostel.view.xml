@@ -16,7 +16,7 @@
         <tnt:header>
             <tnt:ToolHeader>
                 <Image
-                    src="./image/LOGO.png"
+                    src="./image/3 log 1.0.png"
                     height="120px"
                     tooltip="{i18n>companyLogo}"
                     class="sapUiSmallMarginTop"

@@ -1826,7 +1826,7 @@ sap.ui.define([
                     content: "",
                     isFileUploaded: false,
                     button: true,
-                    Subject: `SHAH HOSTEL - INVOICE PAYMENT REMINDER`,
+                    Subject: `STAYVRIKSHA - INVOICE PAYMENT REMINDER`,
                     htmlbody: `
                         <p>Dear ${modelData.CustomerName},</p>
 
@@ -1849,10 +1849,9 @@ sap.ui.define([
                         <br>
                         <p style="margin:0;">Warm Regards,</p>
                         <p style="margin:0;">Accounts & Finance Team</p>
-                        <p style="margin:0;">Shah Hostel</p>
+                        <p style="margin:0;">StayVriksha</p>
                     `
                 });
-
                 this.getView().setModel(oUploaderDataModel, "UploaderData");
                 this.EOD_commonOpenDialog("sap.ui.com.project1.fragment.CommonMail", true);
             },
