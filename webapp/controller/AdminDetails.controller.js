@@ -4,8 +4,12 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "../utils/validation",
-     "sap/ui/core/BusyIndicator"
-], function (BaseController, Formatter, JSONModel, MessageBox, utils,BusyIndicator) {
+     "sap/ui/core/BusyIndicator",
+     "sap/m/MessageToast",
+     "sap/ui/model/FilterOperator",
+      "sap/ui/model/Filter",
+
+], function (BaseController, Formatter, JSONModel, MessageBox, utils,BusyIndicator, MessageToast,FilterOperator,Filter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.AdminDetails", {
         Formatter: Formatter,
@@ -129,7 +133,8 @@ sap.ui.define([
                 Email: "",
                 Mobileno: "",
                 password: "",
-                comfirmpass: ""
+                comfirmpass: "",
+                minDate: new Date(2000, 0, 1)
             }), "LoginMode");
          
         },
@@ -1369,11 +1374,11 @@ sap.ui.define([
     const oMobile = this.byId("CD_ID_idPhone");
     const oView = this.getView();
 
-    const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+    const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
     const oUser = oLoginModel ? oLoginModel.getData() : null;
 
     // ❗ User NOT logged in
-    if (!oUser?.UserID) {
+     if (!(oUser?.UserID || oUser?.EmployeeID)) {
 
         // remember action to resume after login
         this._pendingAction = "EditBooking";
@@ -3086,11 +3091,7 @@ sap.ui.define([
                         EndTime: item.EndTime,
                         BasicFacilityPrice: item.Price,
                         CouponCode: item.CouponCode || "",
-                        CouponDiscount: item.CouponDiscount || "0.00"
-
-
-
-
+                        CouponDiscount: item.CouponDiscount || "0.00" 
                     };
                 }),
                 "Documents": CustomerData.Documents.map(item => {
@@ -4880,6 +4881,7 @@ model.setProperty("/Address", data.Address);
         onSignUp: async function () {
             const fragId = this.createId("LoginAlertDialog");
             const C = (id) => sap.ui.core.Fragment.byId(fragId, id);
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
 
             const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
@@ -4927,7 +4929,8 @@ model.setProperty("/Address", data.Address);
                     Country: data.Country,
                     State: data.State,
                     City: data.City,
-                    Address: data.Address.trim()
+                    Address: data.Address.trim(),
+                    CustomerId:oCustomerData.CustomerId
                 }
             };
 
