@@ -2,7 +2,7 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core">
     <Popover
-        title="{guideModel>/currentStep/title}"
+        
         placement="Auto"
         class="sapUiContentPadding tourGuidePopover"
         showHeader="true"
@@ -10,9 +10,12 @@
         contentHeight="auto"
         contentWidth="auto"
         contentMinWidth="280px"
+        initialFocus="nextButtonId"
      
         beforeClose="onBeforePopoverClose">  
-         <!-- initialFocus="nextButtonId" -->
+         <!-- 
+         title="{guideModel>/currentStep/title}"
+         initialFocus="nextButtonId" -->
 
         <customHeader>
             <Bar>

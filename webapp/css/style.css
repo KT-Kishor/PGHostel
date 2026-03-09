@@ -4563,47 +4563,53 @@ width: 44px !important;
   margin-bottom:1rem;
   text-transform:uppercase;
 }
+/* ─── Tour Guide Popover ─────────────────────────────────────────────────── */
 
-/* Responsive popover sizing */
 .tourGuidePopover {
+    z-index: 2000 !important;
     max-height: 80vh !important;
 }
 
-.tourGuidePopover .sapMPopoverCont {
-    max-height: calc(80vh - 100px) !important; /* Account for header/footer */
+.tourGuidePopover.sapMPopoverCont {
+    max-height: calc(80vh - 100px) !important;
 }
 
-/* Mobile adjustments */
+.tourGuidePopover .sapMBar {
+    z-index: auto !important;
+}
+
 @media (max-width: 600px) {
-    .tourGuidePopover {
-        max-width: 92vw !important;
-    }
+    .tourGuidePopover { max-width: 92vw !important; }
 }
 
-/* Keep your existing highlight styles */
+/* ─── Hide class: applied BEFORE openBy(), removed in afterOpen ──────────
+   - opacity:0 + pointer-events:none so nothing is clickable while hidden
+   - NO transition on this class — we want instant hide, smooth show
+   - The smooth fade-in happens when the class is REMOVED (transition below) */
+.tourPopoverHidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: none !important;
+}
+
+/* Fade-in when tourPopoverHidden is removed — popover appears smoothly */
+.sapMPopover.tourGuidePopover {
+    transition: opacity 0.18s ease !important;
+}
+
+/* ─── Highlight ──────────────────────────────────────────────────────────── */
 .sapUiTourHighlight {
     position: relative !important;
     z-index: 1000 !important;
+    outline: 2000px solid rgba(0, 0, 0, 0.75) !important;
     outline-offset: 15px !important;
-    outline: 2000px solid rgba(0,0,0,0.75) !important;
-    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.8), 
-                0 0 0 12px rgba(0, 162, 255, 0.4) !important;
+    box-shadow:
+        0 0 15px 5px  rgba(255, 255, 255, 0.8),
+        0 0 0    12px rgba(0, 162, 255, 0.4) !important;
     border-radius: 12px !important;
-}
-/* Target all popovers EXCEPT the tour guide */
-/* .sapMPopover:not(.tourGuidePopover) .sapMIBar {
-  background: linear-gradient(135deg, #00b7c7, #007984) !important;
-  color: white !important;
-} */
- /* Role Guide Dialog */
-.roleGuideDialog .sapMDialogScrollCont {
-    padding: 0 !important;
+    transition: outline-offset 0.25s ease, box-shadow 0.25s ease !important;
 }
 
-/* Responsive: full-width on mobile */
-@media (max-width: 600px) {
-    .roleGuideDialog {
-        width: 95vw !important;
-        min-width: unset !important;
-    }
+.sapUiTourOverlayActive {
+    overflow: hidden !important;
 }
