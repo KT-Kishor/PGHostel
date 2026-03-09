@@ -2699,11 +2699,11 @@ sap.ui.define([
         },
         onPaymentTypeSelect: function (oEvent) {
 
-            const index = oEvent.getSource().getSelectedIndex();
+          this.index = oEvent.getSource().getSelectedIndex();
 
-            const isPayOnCheckIn = index === 0;
-            const isUPI = index === 1;
-            const isCard = index === 2;
+            const isPayOnCheckIn =  this.index === 0;
+            const isUPI =  this.index === 1;
+            const isCard =  this.index === 2;
 
             this._togglePaymentSections(isUPI, isCard, isPayOnCheckIn);
 
@@ -2798,7 +2798,7 @@ sap.ui.define([
                 }
 
                 let Gst = CGST + SGST + IGST;
-                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst +baseAmount - Number(CustomerData.PaymentPaid || 0) : Gst + baseAmount  || 0 
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst +baseAmount - Number(CustomerData.PaymentPaid || 0)  - Number(CustomerData.Discount) : Gst + baseAmount  - Number(CustomerData.Discount)  || 0 
                 
             }
 
@@ -2813,6 +2813,7 @@ sap.ui.define([
                 oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
                 oPaymentModel.setProperty("/Amount", "0");
                 oPaymentModel.setProperty("/PaymentDate", "");
+
 
                 oHostelModel.setProperty(
                     "/PayableAmountPerMonth",
@@ -2984,11 +2985,12 @@ sap.ui.define([
             }
             if(LoginModel.Role === "Customer"){
             if (paymentMap[unit] === "Per Day"
-                && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) && this.flag!==true) {
+                && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
+                && this.flag!==true && CustomerData.DueAmount > 0) {
                 if (!this.PP_Dialog) {
                     var oView = this.getView();
                     this.PP_Dialog = sap.ui.xmlfragment(
-                        "sap.ui.com.project1.fragment.PaymentPage",
+                        "sap.ui.com.project1.fragment.Payment_Edit",
                         this
                     );
                     oView.addDependent(this.PP_Dialog);
@@ -3013,12 +3015,13 @@ sap.ui.define([
                 }, 100);
                 return;
             } else if (
-                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.OrginalRentPrice) > this.RentPrice)  && this.flag!==true
+                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.OrginalRentPrice) > this.RentPrice)  
+                && this.flag!==true && CustomerData.DueAmount > 0
             ) {
                 if (!this.PP_Dialog) {
                     var oView = this.getView();
                     this.PP_Dialog = sap.ui.xmlfragment(
-                        "sap.ui.com.project1.fragment.PaymentPage",
+                        "sap.ui.com.project1.fragment.Payment_Edit",
                         this
                     );
                     oView.addDependent(this.PP_Dialog);
@@ -3143,7 +3146,7 @@ sap.ui.define([
 
                 return;
             }
-            if(this.flag===true){
+            if(this.flag===true && this.index !== 0){
             var PaymentPayload = {
                 "BookingID": CustomerData.BookingID,
                 "CustomerName": Bookingdata.CustomerName,
@@ -3178,8 +3181,9 @@ sap.ui.define([
                     // Refresh models
                     this.AD_onSearch();
                      if (this.PP_Dialog) {
-                this.PP_Dialog.close();
-            }
+                       this.PP_Dialog.close();
+                           }
+                           this.flag=false
                     
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
