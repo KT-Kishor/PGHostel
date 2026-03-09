@@ -2588,7 +2588,7 @@ sap.ui.define([
 
                         // force reset
                         const d = String(oTodayDate.getDate()).padStart(2, "0");
-                        const m = String(oTodayDate.getMonth() +1).padStart(2, "0");
+                        const m = String(oTodayDate.getMonth() + 1).padStart(2, "0");
                         const y = oTodayDate.getFullYear();
 
                         const sCorrectedDate = `${d}/${m}/${y}`;
@@ -2636,7 +2636,7 @@ sap.ui.define([
                     // For Per Day → next day minimum (disable start date day)
                     if (sPaymentType === "Per Day") {
                         const oMinEndDate = new Date(oStart);
-                        oMinEndDate.setDate(oMinEndDate.getDate() +1);
+                        oMinEndDate.setDate(oMinEndDate.getDate() + 1);
                         oEndDatePicker.setMinDate(oMinEndDate);
                     }
                     // For Per Month / Year → next day minimum
@@ -2649,30 +2649,31 @@ sap.ui.define([
             }
 
             // MONTHLY PLAN — TRUE CALENDAR MONTH ADDITION
-         if (
-    sStartDate &&
-    sPaymentType === "Per Month"
-) {
-    const oStart = this._parseDate(sStartDate);
+            if (sStartDate && sPaymentType === "Per Month") {
 
-    if (oStart instanceof Date && !isNaN(oStart)) {
+                const oStart = this._parseDate(sStartDate);
 
-        let oNewEnd = new Date(oStart);
+                if (oStart instanceof Date && !isNaN(oStart)) {
 
-        // add months correctly
-        oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
+                    let oNewEnd = new Date(oStart);
 
-        // subtract 1 day for inclusive month logic
-        oNewEnd.setDate(oNewEnd.getDate() -1);
+                    // add months correctly
+                    oNewEnd.setMonth(oNewEnd.getMonth() + iSelectedMonths);
 
-        const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
+                    // subtract 1 day for inclusive logic
+                    oNewEnd.setDate(oNewEnd.getDate() - 1);
 
-        oHostelModel.setProperty("/EndDate", sNewEndDate);
-        oEndDatePicker.setValue(sNewEndDate);
+                    const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
 
-        oBtnModel.setProperty("/Next", true);
-    }
-}
+                    oHostelModel.setProperty("/EndDate", sNewEndDate);
+                    oEndDatePicker.setValue(sNewEndDate);
+
+                    //  recalc fields
+                    const bAllFilled = sPaymentType && sPerson && sStartDate && sNewEndDate;
+
+                    oBtnModel.setProperty("/Next", !!bAllFilled);
+                }
+            }
 
             if (
                 oEvent.getSource().getId().includes("idStartDate1") &&
@@ -2685,7 +2686,7 @@ sap.ui.define([
                 if (oStart instanceof Date && !isNaN(oStart)) {
                     let oNewEnd = new Date(oStart);
                     oNewEnd.setFullYear(oNewEnd.getFullYear() + iSelectedMonths);
-                    oNewEnd.setDate(oNewEnd.getDate() -1);
+                    oNewEnd.setDate(oNewEnd.getDate() - 1);
 
                     const sNewEndDate = this._formatDateToDDMMYYYY(oNewEnd);
 
@@ -2731,10 +2732,21 @@ sap.ui.define([
             }
 
             // =========================================================
-            // CONTROL “Next” BUTTON
+            // CONTROL “Next” BUTTON (FINAL STATE)
             // =========================================================
-            const bEndDateValid = !!(sEndDate && sEndDate.trim() !== "");
-            oBtnModel.setProperty("/Next", !!(bAllFilled && bEndDateValid));
+
+            const sFinalStartDate = oHostelModel.getProperty("/StartDate");
+            const sFinalEndDate = oHostelModel.getProperty("/EndDate");
+            const sFinalPaymentType = oHostelModel.getProperty("/SelectedPriceType") || sPaymentType;
+            const sFinalPerson = oHostelModel.getProperty("/Person") || sPerson;
+
+            const bNextEnabled =
+                sFinalPaymentType &&
+                sFinalPerson &&
+                sFinalStartDate &&
+                sFinalEndDate;
+
+            oBtnModel.setProperty("/Next", !!bNextEnabled);
         },
 
         SM_onGeneratePassword: function () {
@@ -2902,7 +2914,7 @@ sap.ui.define([
         _formatDateToDDMMYYYY: function (oDate) {
             if (!(oDate instanceof Date)) return "";
             const dd = String(oDate.getDate()).padStart(2, "0");
-            const mm = String(oDate.getMonth() +1).padStart(2, "0");
+            const mm = String(oDate.getMonth() + 1).padStart(2, "0");
             const yyyy = oDate.getFullYear();
             return `${dd}/${mm}/${yyyy}`;
         },
