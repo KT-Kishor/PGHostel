@@ -180,63 +180,7 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
-        // onStartGuide: function () {
-        //     var oVisibilityModel = this.getOwnerComponent().getModel("TileVisibility");
-        //     if (!oVisibilityModel || !oVisibilityModel.getData()) {
-        //         sap.m.MessageToast.show("Please wait, checking permissions...");
-        //         return;
-        //     }
-
-        //     // All possible guide steps
-        //     var aAllSteps = [
-        //         {
-        //             ui5Id: "branchTile",
-        //             title: "Branch Setup",
-        //             description: "Start here: add and manage hostel branches.",
-        //             media: "image/Mail.png"
-        //         },
-        //         {
-        //             ui5Id: "bedTile",
-        //             title: "Bed Types",
-        //             description: "Define bed types available across your branches.",
-        //             media: "image/LOGO.png"
-        //         },
-        //         {
-        //             ui5Id: "roomTile",
-        //             title: "Room Details",
-        //             description: "Create and manage rooms assigned to each branch.",
-        //             media: ""
-        //         },
-        //         {
-        //             ui5Id: "id3roomTile",
-        //             title: "Manage Customers",
-        //             description: "Assign rooms, manage bookings and customer details.",
-        //             media: ""
-        //         },
-        //         {
-        //             ui5Id: "id4roomTile",
-        //             title: "Invoices",
-        //             description: "Generate and track invoices for your customers.",
-        //             media: ""
-        //         }
-        //     ];
-
-        //     // Pre-filter: only include tiles that are currently visible AND rendered in DOM
-        //     var oView = this.getView();
-        //     var aSteps = aAllSteps.filter(function (step) {
-        //         var oControl = oView.byId(step.ui5Id);
-        //         return oControl
-        //             && oControl.getVisible && oControl.getVisible()
-        //             && !!oControl.getDomRef();
-        //     });
-
-        //     if (!aSteps.length) {
-        //         sap.m.MessageToast.show("No tiles available for the guide.");
-        //         return;
-        //     }
-
-        //     this.initUniversalTour(aSteps);
-        // },
+     
 // ─── ROLE ACCESS CONFIG ────────────────────────────────────────────────────
 // Maps each role to its guide metadata
 _getRoleGuideConfig: function (sRole) {
@@ -397,58 +341,6 @@ onStartTileGuide: function () {
     }
 },
 
-// _buildTileSteps: function () {
-//     var oView      = this.getView();
-//     var oComponent = this.getOwnerComponent();
-//     var oI18nModel = oComponent.getModel("i18n");
-//     var oBundle    = oI18nModel ? oI18nModel.getResourceBundle() : null;
-
-// // ── Category 1: Setup & Configuration ──────────────────────────────────────
-// var aTileConfig = [
-//     { id: "branchTile",    headerKey: "manageBranchDetails",   descKey: "branchDetails" },
-//     { id: "bedTile",       headerKey: "manageBedDetails",       descKey: "tileBedDetails" },
-//     { id: "roomTile",      headerKey: "tileManageRoomDetails",  descKey: "tileRoomDetails" },
-//     { id: "customerTile",  headerKey: "manageExtraFacilities",  descKey: "extraFacilities" },
-//     { id: "id1roomTile",   headerKey: "maintainHostelFeatures", descKey: "TileHostelFeatures" },
-//     { id: "id2roomTile",   headerKey: "manageCouponDetails",    descKey: "couponDetails" },
-//     { id: "id5roomTile",   headerKey: "manageStaff",            descKey: "staffDirectory" },
-//     { id: "id6roomTile",   headerKey: "manageVendors",          descKey: "vendorDirectory" },
-
-//     // ── Category 2: Operations ──────────────────────────────────────────────
-//     { id: "id3roomTile",   headerKey: "manageCustomerDetails",  descKey: "assignRooms" },
-//     { id: "id4roomTile",   headerKey: "invoiceDetails",         descKey: "TileinvoiceDetails" },
-//     { id: "id7roomTile",   headerKey: "payment",                descKey: "paymentHistory" },
-//     { id: "id11roomTile",  headerKey: "customerReview",         descKey: "customerReview" },
-//     { id: "id12roomTile",  headerKey: "Complaintdetails",       descKey: "Complaintdetails" },
-//     { id: "id8roomTile",   headerKey: "returnDeposit",          descKey: "ManageDeposit" },
-//     { id: "TP_DamageTile", headerKey: "damageTracking",         descKey: "damageDetails" },
-
-//     // ── Dashboards ──────────────────────────────────────────────────────────
-//     { id: "id9roomTile",              headerKey: "bookingDashboard",  descKey: "viewDashboard" },
-//     { id: "id10roomTile",             headerKey: "paymentdashboard",  descKey: "paymentGraph" },
-//     { id: "TP_ComplaintDashBoardTile",headerKey: "complainDashboard", descKey: "complaingraph" },
-//     { id: "TP_DamageDashboard",       headerKey: "damageDashboard",   descKey: "damageGraph" }
-// ];
-
-//     var aAllSteps = aTileConfig.map(function (config) {
-//         return {
-//             ui5Id:       config.id,
-//             title:       oBundle ? oBundle.getText(config.headerKey) : config.headerKey,
-//             description: oBundle ? oBundle.getText(config.descKey)   : config.descKey,
-//             media:       ""
-//         };
-//     });
-
-//     // Only include tiles that are visible AND rendered
-//     this._aPendingTileSteps = aAllSteps.filter(function (step) {
-//         var oControl = oView.byId(step.ui5Id);
-//         return oControl &&
-//                oControl.getVisible &&
-//                oControl.getVisible() &&
-//                !!oControl.getDomRef();
-//     });
-// },
-
 _buildTileSteps: function () {
     var oView      = this.getView();
     var oComponent = this.getOwnerComponent();
@@ -531,16 +423,19 @@ _buildTileSteps: function () {
             descKey: "tour_desc_invoice"
         },
         {
+            id: "id8roomTile",
+            headerKey: "returnDeposit",
+            descKey: "tour_desc_deposit"
+        },
+        {
             id: "id7roomTile",
             headerKey: "payment",
             descKey: "tour_desc_payment"
         },
         {
-            id: "id11roomTile",
-            headerKey: "customerReview",
-            descKey: "tour_desc_customerReview",
-            descKey_view: "tour_desc_customerReview_view",
-            viewOnlyRoles: ["Housekeeping"]
+            id: "TP_DamageTile",
+            headerKey: "damageTracking",
+            descKey: "tour_desc_damage"
         },
         {
             id: "id12roomTile",
@@ -550,15 +445,14 @@ _buildTileSteps: function () {
             viewOnlyRoles: ["Housekeeping"]
         },
         {
-            id: "id8roomTile",
-            headerKey: "returnDeposit",
-            descKey: "tour_desc_deposit"
+            id: "id11roomTile",
+            headerKey: "customerReview",
+            descKey: "tour_desc_customerReview",
+            descKey_view: "tour_desc_customerReview_view",
+            viewOnlyRoles: ["Housekeeping"]
         },
-        {
-            id: "TP_DamageTile",
-            headerKey: "damageTracking",
-            descKey: "tour_desc_damage"
-        },
+
+
 
         // ── Dashboards ────────────────────────────────────────────────────
         {
