@@ -111,7 +111,7 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
-              oView.setModel(new JSONModel({
+              this.getView().setModel(new JSONModel({
                 fullname: "",
                 Email: "",
                 Mobileno: "",
@@ -1345,115 +1345,127 @@ sap.ui.define([
             }
         },
 
-        onEditBooking: async function () {
-            this.applyCountryStateCityFilters()
-            const oMobile = this.byId("CD_ID_idPhone");
-            var oView = this.getView();
-              const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            const oUser = oLoginModel ? oLoginModel.getData() : null;
+       onEditBooking: async function () {
 
-            // ❗ User is NOT logged in → Open login dialog
-            if (oUser || oUser.UserID) {
+    this.applyCountryStateCityFilters();
 
-                if (!this._oLoginAlertDialog) {
-                    this._oLoginAlertDialog = sap.ui.xmlfragment(
-                        this.createId("LoginAlertDialog"),
-                        "sap.ui.com.project1.fragment.SignInSignup",
-                        this
-                    );
-                    oView.addDependent(this._oLoginAlertDialog);
-                }
-                this._oLoginAlertDialog.open();
-                return;
-            }
+    const oMobile = this.byId("CD_ID_idPhone");
+    const oView = this.getView();
 
-            this.getBusyDialog()
-            const response = await this.ajaxReadWithJQuery("HM_Customer", "");
-            this.closeBusyDialog()
-            const oCustomer = response?.Customers || response?.value?.[0] || {};
+    const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+    const oUser = oLoginModel ? oLoginModel.getData() : null;
 
-            this.getView().getModel("VisibleModel").setProperty("/visible", true)
-            var data = this.getView().getModel("CustomerData").getData()
-            var model = this.getView().getModel("Bookingmodel")
-            var aAvailableBeds = this.getView().getModel("Availablebeds").getData()
-            if (data.STDCode === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
+    // ❗ User NOT logged in
+    if (!oUser?.UserID) {
 
-            var filteredBeds = aAvailableBeds.filter(function (bed) {
+        // remember action to resume after login
+        this._pendingAction = "EditBooking";
 
-                // 1) Count assigned customers for this bed
-                var assignedCount = oCustomer.filter(function (cust) {
-                    return cust.BranchCode === bed.BranchCode &&
-                        cust.BedType === bed.BedTypeName &&
-                        cust.Status === "Assigned"
-                }).length;
+        if (!this._oLoginAlertDialog) {
+            this._oLoginAlertDialog = sap.ui.xmlfragment(
+                this.createId("LoginAlertDialog"),
+                "sap.ui.com.project1.fragment.SignInSignup",
+                this
+            );
+            oView.addDependent(this._oLoginAlertDialog);
+        }
 
-                var customerHasThisBed = oCustomer.some(function (cust) {
-                    return cust.CustomerID === data.CustomerID && // replace with your customer identifier
-                        cust.BedType === bed.BedTypeName &&
-                        (cust.Status === "Assigned" || cust.Status === "New")
-                });
+        this._oLoginAlertDialog.open();
+        return;
+    }
 
-                // 2) If assignedCount reaches bed capacity → remove bed from available list
-                if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
-                    return false; // remove bed
-                }
+    // ------------------------------
+    // USER IS LOGGED IN → CONTINUE
+    // ------------------------------
 
-                return true; // keep bed
-            });
+    this.getBusyDialog();
 
-            this.getView().getModel("Availablebeds").setData(filteredBeds);
-            if (data.CouponCode) {
-                this.Coupon()
-            } else {
-                this.getView().byId("couponInput").setShowValueHelp(false);
-            }
+    const response = await this.ajaxReadWithJQuery("HM_Customer", "");
+    this.closeBusyDialog();
 
-            model.setProperty("/BedTypeName", data.BedType)
-            model.setProperty("/CouponCode", data.CouponCode)
-            model.setProperty("/UnitText", data.PaymentType)
-            model.setProperty("/StartDate", data.StartDate)
-            model.setProperty("/EndDate", data.EndDate)
-            model.setProperty("/CustomerName", data.CustomerName)
-            model.setProperty("/DateOfBirth", data.DateOfBirth)
-            model.setProperty("/Gender", data.Gender)
-            model.setProperty("/CustomerEmail", data.CustomerEmail)
-            model.setProperty("/Country", data.Country)
-            model.setProperty("/State", data.State)
-            model.setProperty("/City", data.City)
-            model.setProperty("/STDCode", data.STDCode)
-            model.setProperty("/MobileNo", data.MobileNo)
-            model.setProperty("/Salutation", data.Salutation)
-            model.setProperty("/Address", data.Address)
+    const oCustomer = response?.Customers || response?.value?.[0] || [];
 
-            if (data.PaymentType === "Per Month") {
-                model.setProperty("/UnitText", "monthly")
-            } else if (data.PaymentType === "Per Day") {
-                model.setProperty("/UnitText", "daily")
-            } else if (data.PaymentType === "Per Year") {
-                model.setProperty("/UnitText", "yearly")
-            }
+    this.getView().getModel("VisibleModel").setProperty("/visible", true);
 
-            if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
-                this.byId("idMonthYearSelect").setVisible(false)
-            }
+    var data = this.getView().getModel("CustomerData").getData();
+    var model = this.getView().getModel("Bookingmodel");
+    var aAvailableBeds = this.getView().getModel("Availablebeds").getData();
 
-            // Set Duration for XML binding
-            if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
-                model.setProperty("/DurationUnit", data.Duration);
-                this.byId("idMonthYearSelect").setVisible(true)
+    if (data.STDCode === "+91") {
+        oMobile.setMaxLength(10);
+    } else {
+        oMobile.setMaxLength(18);
+    }
 
-            } else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
-                model.setProperty("/DurationUnit", data.Duration);
-                this.byId("idMonthYearSelect").setVisible(true)
+    var filteredBeds = aAvailableBeds.filter(function (bed) {
 
-            }
-            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+        var assignedCount = oCustomer.filter(function (cust) {
+            return cust.BranchCode === bed.BranchCode &&
+                cust.BedType === bed.BedTypeName &&
+                cust.Status === "Assigned";
+        }).length;
 
-        },
+        var customerHasThisBed = oCustomer.some(function (cust) {
+            return cust.CustomerID === data.CustomerID &&
+                cust.BedType === bed.BedTypeName &&
+                (cust.Status === "Assigned" || cust.Status === "New");
+        });
+
+        if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
+            return false;
+        }
+
+        return true;
+    });
+
+    this.getView().getModel("Availablebeds").setData(filteredBeds);
+
+    if (data.CouponCode) {
+        this.Coupon();
+    } else {
+        this.getView().byId("couponInput").setShowValueHelp(false);
+    }
+
+    model.setProperty("/BedTypeName", data.BedType);
+    model.setProperty("/CouponCode", data.CouponCode);
+    model.setProperty("/UnitText", data.PaymentType);
+    model.setProperty("/StartDate", data.StartDate);
+    model.setProperty("/EndDate", data.EndDate);
+    model.setProperty("/CustomerName", data.CustomerName);
+    model.setProperty("/DateOfBirth", data.DateOfBirth);
+    model.setProperty("/Gender", data.Gender);
+    model.setProperty("/CustomerEmail", data.CustomerEmail);
+    model.setProperty("/Country", data.Country);
+    model.setProperty("/State", data.State);
+    model.setProperty("/City", data.City);
+    model.setProperty("/STDCode", data.STDCode);
+    model.setProperty("/MobileNo", data.MobileNo);
+    model.setProperty("/Salutation", data.Salutation);
+    model.setProperty("/Address", data.Address);
+
+    if (data.PaymentType === "Per Month") {
+        model.setProperty("/UnitText", "monthly");
+    } else if (data.PaymentType === "Per Day") {
+        model.setProperty("/UnitText", "daily");
+    } else if (data.PaymentType === "Per Year") {
+        model.setProperty("/UnitText", "yearly");
+    }
+
+    if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
+        this.byId("idMonthYearSelect").setVisible(false);
+    }
+
+    if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
+        model.setProperty("/DurationUnit", data.Duration);
+        this.byId("idMonthYearSelect").setVisible(true);
+    } 
+    else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
+        model.setProperty("/DurationUnit", data.Duration);
+        this.byId("idMonthYearSelect").setVisible(true);
+    }
+
+    this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+},
 
         onBookingEditDateChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -3907,6 +3919,56 @@ sap.ui.define([
 
                 const oMatchedUser = oResponse?.data?.[0];
 
+               // Get models first
+var oView = this.getView();
+var model = oView.getModel("Bookingmodel");
+var data = oView.getModel("CustomerData").getData();
+
+// Show booking UI
+oView.getModel("VisibleModel").setProperty("/visible", true);
+
+// Restore booking values
+model.setProperty("/BedTypeName", data.BedType);
+model.setProperty("/CouponCode", data.CouponCode);
+model.setProperty("/UnitText", data.PaymentType);
+model.setProperty("/StartDate", data.StartDate);
+model.setProperty("/EndDate", data.EndDate);
+model.setProperty("/CustomerName", data.CustomerName);
+model.setProperty("/DateOfBirth", data.DateOfBirth);
+model.setProperty("/Gender", data.Gender);
+model.setProperty("/CustomerEmail", data.CustomerEmail);
+model.setProperty("/Country", data.Country);
+model.setProperty("/State", data.State);
+model.setProperty("/City", data.City);
+model.setProperty("/STDCode", data.STDCode);
+model.setProperty("/MobileNo", data.MobileNo);
+model.setProperty("/Salutation", data.Salutation);
+model.setProperty("/Address", data.Address);
+            if (data.PaymentType === "Per Month") {
+                model.setProperty("/UnitText", "monthly")
+            } else if (data.PaymentType === "Per Day") {
+                model.setProperty("/UnitText", "daily")
+            } else if (data.PaymentType === "Per Year") {
+                model.setProperty("/UnitText", "yearly")
+            }
+
+            if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
+                this.byId("idMonthYearSelect").setVisible(false)
+            }
+
+            // Set Duration for XML binding
+            if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
+                model.setProperty("/DurationUnit", data.Duration);
+                this.byId("idMonthYearSelect").setVisible(true)
+
+            } else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
+                model.setProperty("/DurationUnit", data.Duration);
+                this.byId("idMonthYearSelect").setVisible(true)
+
+            }
+            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+
+
                 if (!oMatchedUser || !oMatchedUser.EmailID) {
                     MessageToast.show(this.i18nModel.getText("invalidCredentials"));
                     return;
@@ -3965,7 +4027,13 @@ sap.ui.define([
                 if (ctrlPassword) ctrlPassword.setValue("");
 
                 // Close dialog
-                if (oFragment) oFragment.close();
+               if (oFragment) oFragment.close();
+
+// // Resume pending action after login
+// if (this._pendingAction === "EditBooking") {
+//     this._pendingAction = null;
+//     this.onEditBooking();
+// }
 
                 // Fill Persons array and other UI updates (keep your logic)
                 const oHostelModel = this.getView().getModel("HostelModel");
@@ -4476,7 +4544,7 @@ sap.ui.define([
             const fragId = this.createId("LoginAlertDialog");
             const C = (id) => sap.ui.core.Fragment.byId(fragId, id);
 
-            const oModel = sap.ui.getCore().getModel("LoginMode");
+            const oModel = this.getView().getModel("LoginMode");
             const data = oModel.getData();
             const std = (C("signUpSTD").getValue() || "").trim();
 
