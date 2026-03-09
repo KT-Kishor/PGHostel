@@ -231,6 +231,7 @@
                                 visible="{VisibleModel>/visible}"
                                 valueStateText="{i18n>selectPaymentType}"
                                 change="onChange"
+                                editable="{= ${LoginModel>/Role} !== 'Customer' }"
                             >
                                 <core:ListItem
                                     key="daily"

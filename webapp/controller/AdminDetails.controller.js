@@ -46,6 +46,18 @@ sap.ui.define([
             });
             this.getView().setModel(model, "edit")
 
+            var model1 = new JSONModel({
+
+
+            });
+            this.getView().setModel(model1, "HostelModel")
+
+            this.getView().setModel(new JSONModel({
+                Amount: "",
+                PaymentType: "UPI",
+                PaymentDate: new Date()
+            }), "PaymentModel");
+
             var model = new JSONModel({
                 StartDate: "",
                 EndDate: "",
@@ -55,6 +67,7 @@ sap.ui.define([
                 BedTypeName: ""
             });
             this.getView().setModel(model, "Bookingmodel");
+             this.flag=false
 
             var model = new JSONModel({
                 visible: false,
@@ -374,7 +387,6 @@ sap.ui.define([
 
                 })
 
-
                 const oCustomerData = {
                     CustomerName: oCustomer.CustomerName,
                     CustomerID: oCustomer.CustomerID,
@@ -556,6 +568,8 @@ sap.ui.define([
                     }
                 }
                 oCustomerData.RentPrice = Duration * roomRentPrice;
+                this.RentPrice = Duration * roomRentPrice;
+
                 oCustomerData.Discount = oCustomer.Bookings?.[0]?.Discount || "0.00";
 
                 // Add duration to model
@@ -735,6 +749,8 @@ sap.ui.define([
 
             // }
             const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
+            this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
+
             let DiscountAmount = Discount || 0;
             const SubTotal = FacilityPrice + roomRentPrice;
 
@@ -752,6 +768,7 @@ sap.ui.define([
                 grandTotal = SubTotal + SGST + CGST - DiscountAmount;
 
             }
+            this.grandTotal = grandTotal;
 
             // Attach facility price to each entry
             aAllFacilities = aAllFacilities.map(item => ({
@@ -1043,9 +1060,9 @@ sap.ui.define([
                 }
                 else if (oEnd && oEnd.getTime() <= oStart.getTime()) {
                     oModel.setProperty("/EndDate", "");
-                    
+
                     iDays = 1;
-                      oModel.setProperty("/TotalDays", iDays);
+                    oModel.setProperty("/TotalDays", iDays);
 
                     return;
                 }
@@ -1104,7 +1121,7 @@ sap.ui.define([
                 oEnd.setDate(oEnd.getDate() - 1)
             }
             if (oEnd && iDays === 0) {
-                iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24)) + 1;
+                iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
             }
 
             // Format yyyy-MM-dd for DatePicker
@@ -1530,7 +1547,7 @@ sap.ui.define([
 
                 // Calculate day difference
                 var diffTime = oEnd - oStart;
-                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1 || 1;
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
                 oCustomerModel.setProperty("/Duration", diffDays);
@@ -1859,6 +1876,8 @@ sap.ui.define([
             oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
+            oCustomerData.setProperty("/Duration", iCount)
+
 
 
         },
@@ -2371,7 +2390,7 @@ sap.ui.define([
                         var dStart = new Date(sStart);
                         var dEnd = new Date(sEnd);
                         // +1 to include start and end day
-                        iDuration = Math.ceil((dEnd - dStart) / (1000 * 60 * 60 * 24)) + 1;
+                        iDuration = Math.ceil((dEnd - dStart) / (1000 * 60 * 60 * 24));
                     }
                 } else if (sUnit === "monthly" || sUnit === "Per Month") {
                     fPrice = parseFloat(oSelectedBed.MonthPrice || 0);
@@ -2673,10 +2692,207 @@ sap.ui.define([
             utils._LCvalidateDate(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
+        onPaymentTypeSelect: function (oEvent) {
+
+            const index = oEvent.getSource().getSelectedIndex();
+
+            const isPayOnCheckIn = index === 0;
+            const isUPI = index === 1;
+            const isCard = index === 2;
+
+            this._togglePaymentSections(isUPI, isCard, isPayOnCheckIn);
+
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            var CustomerData = this.getView().getModel("CustomerData").getData();
+
+            var Bookingdata = this.getView().getModel("Bookingmodel").getData();
+
+            var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
+            var paymentMap = {
+                "monthly": "Per Month",
+                "yearly": "Per Year",
+                "daily": "Per Day"
+            };
+
+            // Normalize UnitText: trim and lowercase
+            var normalizedUnit = paymentMap[unit] || unit;
+
+            const paymentType = normalizedUnit
+
+            let totalPersonsMonthly = 0;
+
+            if (paymentType === "Per Day") {
+
+                totalPersonsMonthly = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal || 0;
+
+            } else {
+                let facilityAmount = 0;
+
+                const facilities = CustomerData.AllSelectedFacilities || [];
+
+                const bookingStart = this._parseDate(Bookingdata.StartDate);
+                const bookingEnd = this._parseDate(Bookingdata.EndDate);
+
+                facilityAmount = facilities.reduce((sum, item) => {
+
+                    const facilityStart = this._parseDate(item.StartDate);
+                    const facilityEnd = this._parseDate(item.EndDate);
+// && !item.FacilityID
+                    // check facility inside booking range
+                    if (facilityStart <= bookingEnd && facilityEnd >= bookingStart ) {
+
+                        let totalAmount = Number(item.TotalAmount) || 0;
+
+                        // calculate facility months
+                        let months = (facilityEnd.getFullYear() - facilityStart.getFullYear()) * 12 +
+                            (facilityEnd.getMonth() - facilityStart.getMonth());
+
+                        if (months <= 0) {
+                            months = 1;
+                        }
+                         let years = Math.ceil(months / 12);
+                         let firstMonthAmount = 0;
+                         if (paymentType === "Per Year") {
+
+                           firstMonthAmount = totalAmount / years;
+
+                             } else if(paymentType === "Per Month") {
+
+                               firstMonthAmount = totalAmount / months;
+                             }
+
+                        return sum + firstMonthAmount;
+                    }
+
+                    return sum;
+
+                }, 0);
+                let baseAmount;
+                // if(CustomerData.PaymentPaid ==="0.00"){
+                  baseAmount =  Number(CustomerData.PaymentPaid || 0)==="0.00" ?
+                   (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration)) - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount) :
+                      (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration))
+                // }else{
+                //   baseAmount = facilityAmount;
+                // }
+
+                let CGST = 0;
+                let SGST = 0;
+                let IGST = 0;
+
+                if (CustomerData.GSTType === "CGST/SGST") {
+
+                    CGST = baseAmount * Number(CustomerData.GSTValue) / 100;
+                    SGST = baseAmount * Number(CustomerData.GSTValue) / 100;
+
+                } else if (CustomerData.GSTType === "IGST") {
+
+                    IGST = baseAmount * Number(CustomerData.GSTValue) / 100;
+
+                }
+
+                let Gst = CGST + SGST + IGST;
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst +baseAmount - Number(CustomerData.PaymentPaid || 0) : Gst + baseAmount  || 0 
+                
+            }
+
+            oHostelModel.setProperty(
+                "/PerMonthNoPerson",
+                Number(totalPersonsMonthly.toFixed(2))
+            );
+
+            // PAY ON CHECKIN
+            if (isPayOnCheckIn) {
+
+                oPaymentModel.setProperty("/PaymentType", "PayOnCheckIn");
+                oPaymentModel.setProperty("/Amount", "0");
+                oPaymentModel.setProperty("/PaymentDate", "");
+
+                oHostelModel.setProperty(
+                    "/PayableAmountPerMonth",
+                    totalPersonsMonthly
+                );
+
+                return;
+            }
+
+            // UPI OR CARD
+            oPaymentModel.setProperty(
+                "/PaymentType",
+                isUPI ? "UPI" : "CARD"
+            );
+              oHostelModel.setProperty(
+                "/PaymentType",
+                isUPI ? "UPI" : "CARD"
+            );
+
+            oPaymentModel.setProperty(
+                "/PaymentDate",
+                this.Formatter.formatDate(new Date())
+            );
+
+            oPaymentModel.setProperty(
+                "/Amount",
+                totalPersonsMonthly
+            );
+
+            oHostelModel.setProperty(
+                "/PayableAmountPerMonth",
+                totalPersonsMonthly
+            );
+        },
+        _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
+
+            const oUPI = sap.ui.getCore().byId("idUPISection");
+            const oCard = sap.ui.getCore().byId("idCardSection");
+            const oRightPanel = sap.ui.getCore().byId("idRightPanel");
+
+            if (isPayOnCheckIn) {
+
+                if (oUPI) oUPI.setVisible(false);
+                if (oCard) oCard.setVisible(false);
+                if (oRightPanel) oRightPanel.setVisible(false);
+
+            } else {
+
+                if (oUPI) oUPI.setVisible(isUPI);
+                if (oCard) oCard.setVisible(isCard);
+                if (oRightPanel) oRightPanel.setVisible(true);
+            }
+
+            // clear all fields
+            const aFields = [
+                "idAmount",
+                "idPaymentTypeField",
+                "idTransactionID",
+                "idPaymentDate",
+                "idCardNumber",
+                "idCardExpiry",
+                "idCardCVV"
+            ];
+
+            aFields.forEach(function (sId) {
+
+                const oControl = sap.ui.getCore().byId(sId);
+
+                if (oControl) {
+
+                    oControl.setValue("");
+                    oControl.setValueState("None");
+                    oControl.setValueStateText("");
+                }
+
+            });
+        },
 
         onSaveBooking: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
+            var LoginModel = this.getView().getModel("LoginModel").getData();
+
+            const oHostelModel = this.getView().getModel("HostelModel");
+
             const oInput = this.byId("CD_ID_idPhone")
 
             // Mandatory validation
@@ -2761,6 +2977,69 @@ sap.ui.define([
                 sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
                 return;
             }
+            if(LoginModel.Role === "Customer"){
+            if (paymentMap[unit] === "Per Day"
+                && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) && this.flag!==true) {
+                if (!this.PP_Dialog) {
+                    var oView = this.getView();
+                    this.PP_Dialog = sap.ui.xmlfragment(
+                        "sap.ui.com.project1.fragment.PaymentPage",
+                        this
+                    );
+                    oView.addDependent(this.PP_Dialog);
+                }
+
+                this.PP_Dialog.open();
+
+                // set grand total
+                oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
+
+                // default payment UI state
+                setTimeout(() => {
+                    const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+                    if (oGroup) {
+                        oGroup.setSelectedIndex(0); // Pay On CheckIn
+
+                        this.onPaymentTypeSelect({
+                            getSource: () => oGroup
+                        });
+                    }
+                }, 100);
+                return;
+            } else if (
+                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.OrginalRentPrice) > this.RentPrice)  && this.flag!==true
+            ) {
+                if (!this.PP_Dialog) {
+                    var oView = this.getView();
+                    this.PP_Dialog = sap.ui.xmlfragment(
+                        "sap.ui.com.project1.fragment.PaymentPage",
+                        this
+                    );
+                    oView.addDependent(this.PP_Dialog);
+                }
+
+                this.PP_Dialog.open();
+
+                // set grand total
+                oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
+
+                // default payment UI state
+                setTimeout(() => {
+                    const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+                    if (oGroup) {
+                        oGroup.setSelectedIndex(0); // Pay On CheckIn
+
+                        this.onPaymentTypeSelect({
+                            getSource: () => oGroup
+                        });
+                    }
+                }, 100);
+                return;
+            }
+        }
+
             var Payload = {
                 "CustomerName": Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
@@ -2863,8 +3142,30 @@ sap.ui.define([
 
                 return;
             }
+            if(this.flag===true){
+            var PaymentPayload = {
+                "BookingID": CustomerData.BookingID,
+                "CustomerName": Bookingdata.CustomerName,
+                "Date": new Date().toISOString().split('T')[0],
+                "Amount":oHostelModel.getProperty("/PerMonthNoPerson"),
+                "PaymentType": oHostelModel.getProperty("/PaymentType"), // fallback to original if mapping not found
+                "BankTransactionID": sap.ui.getCore().byId("idTransactionID").getValue() || "",
+                "CustomerID": CustomerData.CustomerID,
+                "Currency": CustomerData.Currency || "INR",
+                "BranchCode": CustomerData.BranchCode || "",
+                "BranchName": CustomerData.BranchName || "",
+
+            }
+            this.getBusyDialog()
+
+             this.ajaxCreateWithJQuery("HM_PaymentDetail", {
+                data: PaymentPayload,
+               
+            })
+        }
             // Send payload
             this.getBusyDialog()
+
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
@@ -2875,15 +3176,51 @@ sap.ui.define([
 
                     // Refresh models
                     this.AD_onSearch();
+                     if (this.PP_Dialog) {
+                this.PP_Dialog.close();
+            }
+                    
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
                     this.byId("idMonthYearSelect").setVisible(false);
-                })
-                .catch(err => {
+                }).catch(err => {
                     sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
                     console.error(err);
                 });
+             
+        },
+           onTransactionIDChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+        onSubmitPress:function(){
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+            const paymentType = oPaymentModel.getProperty("/PaymentType");
+            const isPayOnCheckIn = paymentType === "PayOnCheckIn";
+
+            if (!isPayOnCheckIn) {
+                const isMandatoryValid = (
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("idPaymentDate"), "ID")
+                );
+
+                if (!isMandatoryValid) {
+                    MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                    return;
+                }
+            }
+            this.flag=true
+             this.onSaveBooking();
+
+        },
+        onPaymentClose: function () {
+                this.flag=false
+
+             if (this.PP_Dialog) {
+                this.PP_Dialog.close();
+             }
         },
         oneditsavebooking: function (Payload) {
             var CustomerData = this.getView().getModel("CustomerData").getData();
