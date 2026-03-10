@@ -181,7 +181,7 @@
                     id="id8roomTile"
                     class="sapUiMediumMargin glassTile"
                     visible="{= ${TileVisibility>/ManageSecurityDeposit}!== 0?true:false }"
-                    header="{i18n>returnDeposit}"
+                    header="{i18n>DepositHeader}"
                     press="TileV_onpressDeposit"
                 >
                     <TileContent unit="{i18n>ManageDeposit}">
@@ -219,7 +219,7 @@
                     header="{i18n>Complaintdetails}"
                     press="TileV_onpressComplaintdetails"
                 >
-                    <TileContent unit="{i18n>Complaintdetails}">
+                    <TileContent unit="{i18n>Managecomplain}">
                         <ImageContent src="sap-icon://discussion" />
                     </TileContent>
                 </GenericTile>
@@ -230,7 +230,7 @@
                     header="{i18n>customerReview}"
                     press="TileV_onpresscustomerreview"
                 >
-                    <TileContent unit="{i18n>customerReview}">
+                    <TileContent unit="{i18n>view}">
                         <ImageContent src="sap-icon://crm-sales" />
                     </TileContent>
                 </GenericTile>
@@ -269,7 +269,7 @@
                     header="{i18n>paymentdashboard}"
                     press="TileV_onpresshosteldashboard"
                 >
-                    <TileContent unit="{i18n>paymentGraph}">
+                    <TileContent unit="{i18n>viewDashboard}">
                         <ImageContent
                             src="sap-icon://business-objects-experience"
                         />
@@ -282,7 +282,7 @@
                     press="TileV_onpresscomplaintdashboard"
                     visible="{= ${TileVisibility>/ManageComplaintDashboard}!== 0?true:false }"
                 >
-                    <TileContent unit="{i18n>complaingraph}">
+                    <TileContent unit="{i18n>viewDashboard}">
                         <ImageContent src="sap-icon://bbyd-dashboard" />
                     </TileContent>
                 </GenericTile>
@@ -293,7 +293,7 @@
                     visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
                     press="TileV_onpressdamagedashboard"
                 >
-                    <TileContent unit="{i18n>damageGraph}">
+                    <TileContent unit="{i18n>viewDashboard}">
                         <ImageContent src="sap-icon://bbyd-dashboard" />
                     </TileContent>
                 </GenericTile>
