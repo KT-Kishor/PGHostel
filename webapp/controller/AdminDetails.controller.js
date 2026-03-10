@@ -2779,8 +2779,11 @@ sap.ui.define([
                             if(item.UnitText === "Per Month") {
                             let monthlyAmount = totalAmount;
                             firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
-                            }else{
+                            }else if(item.UnitText === "Per Day"){
                                 firstMonthAmount = Number(item.Price) * overlapDays;
+                            } else{
+                                firstMonthAmount = Number(item.Price) * overlapDays * item.TotalHour;
+
                             }
                         }else if(paymentType === "Per Day") {
                             firstMonthAmount = (totalAmount / totalCycleDays) * overlapDays;
