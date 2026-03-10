@@ -147,6 +147,7 @@ sap.ui.define([
                 isOtpBoxVisible: false,
                 otpExpiryTs: null,
                 otpValidityText: "",
+                isOTPAllowed:true
 
             }), "LoginViewModel");
 

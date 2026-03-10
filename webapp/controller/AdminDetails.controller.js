@@ -114,13 +114,14 @@ sap.ui.define([
                 isOtpSelected: false,
                 isPasswordSelected: true,
                 authFlow: "signin",  // [signin, forgot, otp, reset]
-                isOtpBoxVisible: false
+                isOtpBoxVisible: false,
+                isOTPAllowed:false
             }), "LoginViewModel");
 
             const vm = this.getView().getModel("LoginViewModel");
 
             // Add only your required properties (safe, isolated)
-            vm.setProperty("/loginMode", "password");   // "password" or "otp"
+            // vm.setProperty("/loginMode", "password");   // "password" or "otp"
             vm.setProperty("/showOTPField", false);     // show OTP input box only after Send OTP success
             vm.setProperty("/isOtpEntered", false);
             this.getView().setModel(new JSONModel({ isEditMode: false }), "saveModel");
@@ -4224,52 +4225,13 @@ sap.ui.define([
 
                     // 5️⃣ Construct payload and continue login
                     payload = { EmailID: sUserid, OTP: sOTP };
-                    oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
-                } else {
-                    // -------------------------- PASSWORD MODE -------------------------
-                    const passCtrl = ctrlPassword;
-
-                    // Required (this was already validated above, but keep a runtime guard)
-                    if (!sPassword) {
-                        if (passCtrl) {
-                            passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
-                        }
-                        MessageToast.show(this.i18nModel.getText("passwordRequired"));
-                        return;
-                    }
-
-                    // Format validation (already done above, but keep guard)
-                    if (!utils._LCvalidatePassword(passCtrl)) {
-                        if (passCtrl) {
-                            passCtrl.setValueState("Error");
-                            passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
-                        }
-                        MessageToast.show(this.i18nModel.getText("enterValidPassword"));
-                        return;
-                    }
-
-                    if (passCtrl) passCtrl.setValueState("None");
-
-                    payload = {
-                        EmailID: sUserid,
-                        Password: btoa(sPassword)
-                    };
-
-                    oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
-                }
-
-                const oMatchedUser = oResponse?.data?.[0];
-
-               // Get models first
-var oView = this.getView();
+                    oResponse = await this.ajaxReadWithJQuery("HM_Customer", payload);
+                    var oView = this.getView();
 var model = oView.getModel("Bookingmodel");
 var data = oView.getModel("CustomerData").getData();
 
 // Show booking UI
 oView.getModel("VisibleModel").setProperty("/visible", true);
-
-// Restore booking values
 model.setProperty("/BedTypeName", data.BedType);
 model.setProperty("/CouponCode", data.CouponCode);
 model.setProperty("/UnitText", data.PaymentType);
@@ -4308,118 +4270,11 @@ model.setProperty("/Address", data.Address);
                 this.byId("idMonthYearSelect").setVisible(true)
 
             }
-            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
-
-
-                if (!oMatchedUser || !oMatchedUser.EmailID) {
-                    MessageToast.show(this.i18nModel.getText("invalidCredentials"));
-                    return;
-                }
-                oLoginModel.setProperty("/isLoggedIn", true);
-                this.getOwnerComponent()
-                    .getRootControl()
-                    .getController()
-                    ._startSessionTracking();
-                //BLOCK ADMIN LOGIN
-                if (oMatchedUser.Role !== "Customer") {
-                    MessageToast.show(this.i18nModel.getText("adminLoginNotAllowed"));
-                    // Optional: clear sensitive inputs
-                    if (ctrlPassword) ctrlPassword.setValue("");
-                    if (ctrlOTP) ctrlOTP.setValue("");
-
-                    return;
-                }
-
-                this._oLoggedInUser = oMatchedUser;
-                // ---------- rest of your existing success logic (unchanged) ----------
-                oLoginModel.setProperty("/EmployeeID", oMatchedUser.UserID);
-                oLoginModel.setProperty("/UserID", oMatchedUser.UserID);
-                oLoginModel.setProperty("/UserName", oMatchedUser.UserName);
-                oLoginModel.setProperty("/EmailID", oMatchedUser.EmailID);
-                oLoginModel.setProperty("/MobileNo", oMatchedUser.MobileNo);
-                oLoginModel.setProperty("/Status", oMatchedUser.Status);
-                oLoginModel.setProperty("/Role", oMatchedUser.Role);
-                oLoginModel.setProperty("/DateOfBirth", oMatchedUser.DateOfBirth);
-                oLoginModel.setProperty("/Gender", oMatchedUser.Gender);
-                oLoginModel.setProperty("/Country", oMatchedUser.Country);
-                oLoginModel.setProperty("/State", oMatchedUser.State);
-                oLoginModel.setProperty("/City", oMatchedUser.City);
-                oLoginModel.setProperty("/Address", oMatchedUser.Address);
-                oLoginModel.setProperty("/STDCode", oMatchedUser.STDCode);
-                oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
-
-                if (oMatchedUser.FileContent) {
-
-                    oLoginModel.setProperty("/Photo", "data:image/png;base64," + oMatchedUser.FileContent);
-
+  if (oFragment) oFragment.close();
+  
                 } else {
-
-                    oLoginModel.setProperty("/Photo", "");
-
-                }
-                oLoginModel.setProperty("/Photo", oMatchedUser.FileContent || "");
-
-
-                this.getOwnerComponent()
-                    .getModel("UserModel")
-                    ?.setData(oMatchedUser);
-
-                // Clear input fields
-                if (ctrlEmailId) ctrlEmailId.setValue("");
-                if (ctrlPassword) ctrlPassword.setValue("");
-
-                // Close dialog
-               if (oFragment) oFragment.close();
-
-// // Resume pending action after login
-// if (this._pendingAction === "EditBooking") {
-//     this._pendingAction = null;
-//     this.onEditBooking();
-// }
-
-                // Fill Persons array and other UI updates (keep your logic)
-                const oHostelModel = this.getView().getModel("HostelModel");
-                const aPersons = oHostelModel.getProperty("/Persons") || [];
-
-                const DOB = this.Formatter.DateFormat(oMatchedUser.DateOfBirth);
-
-                aPersons.forEach((p, index) => {
-
-                    // ---------- COMMON FIELDS (ALL PERSONS) ----------
-                    p.CustomerEmail = oMatchedUser.EmailID || "";
-                    p.MobileNo = oMatchedUser.MobileNo || "";
-                    p.UserID = oMatchedUser.UserID || "";
-                    p.Country = oMatchedUser.Country || "";
-                    p.State = oMatchedUser.State || "";
-                    p.City = oMatchedUser.City || "";
-                    p.Address = oMatchedUser.Address || "";
-                    p.STDCode = oMatchedUser.STDCode || "";
-
-                    // ---------- FIRST PERSON ONLY ----------
-                    if (index === 0) {
-                        p.Salutation = oMatchedUser.Salutation || "";
-                        p.FullName = oMatchedUser.EmployeeName || oMatchedUser.UserName || "";
-                        p.DateOfBirth = DOB || "";
-                        p.Gender = oMatchedUser.Gender || "";
-                    }
-                    // ---------- REST PERSONS ----------
-                    else {
-                        p.Salutation = "";
-                        p.FullName = "";
-                        p.DateOfBirth = "";
-                        p.Gender = "";
-                    }
-                });
-
-                // Auto-check the "Fill Yourself" checkbox
-                const oCheck = sap.ui.getCore().byId(this.createId("IDSelfCheck_0"));
-                const oUserModel = new JSONModel(oMatchedUser);
-                sap.ui.getCore().setModel(oUserModel, "LoginModel");
-                if (oCheck) {
-                    oCheck.setSelected(true);
-                    this._applyCountryStateCityForPersons();
-                }
                 oHostelModel.refresh(true);
+                }
 
             } catch (err) {
                 MessageToast.show(err.message || "Invalid Credentials, Please try again");
@@ -4639,7 +4494,7 @@ model.setProperty("/Address", data.Address);
                 };
 
                 // Call the BaseController Generic Read method
-                const oResp = await this.ajaxReadWithJQuery("HM_Login", oPayload);
+                const oResp = await this.ajaxReadWithJQuery("HM_Customer", oPayload);
 
                 return oResp?.success === true;
 
@@ -4884,163 +4739,163 @@ model.setProperty("/Address", data.Address);
         },
 
         //onsignup
-        onSignUp: async function () {
-            const fragId = this.createId("LoginAlertDialog");
-            const C = (id) => sap.ui.core.Fragment.byId(fragId, id);
-            var oCustomerData = this.getView().getModel("CustomerData").getData();
+        // onSignUp: async function () {
+        //     const fragId = this.createId("LoginAlertDialog");
+        //     const C = (id) => sap.ui.core.Fragment.byId(fragId, id);
+        //     var oCustomerData = this.getView().getModel("CustomerData").getData();
 
-            const oModel = this.getView().getModel("LoginMode");
-            const data = oModel.getData();
-            const std = (C("signUpSTD").getValue() || "").trim();
+        //     const oModel = this.getView().getModel("LoginMode");
+        //     const data = oModel.getData();
+        //     const std = (C("signUpSTD").getValue() || "").trim();
 
-            // ---- VALIDATION GATE ----
-            const isValid = (
-                utils._LCstrictValidationSelect(C("signUpSalutation")) &&
-                utils._LCvalidateName(C("signUpName"), "ID") &&
-                this.onChangeDOB(C("signUpDOB")) &&
-                utils._LCstrictValidationSelect(C("signUpGender")) &&
-                utils._LCvalidateEmail(C("signUpEmail"), "ID") &&
-                utils._LCvalidateMandatoryField(C("signUpCountry"), "ID") &&
-                utils._LCvalidateMandatoryField(C("signUpState"), "ID") &&
-                utils._LCvalidateMandatoryField(C("signUpCity"), "ID") &&
-                utils._LCvalidateMandatoryField(C("signUpSTD"), "ID") &&
-                utils._LCvalidateISDmobile(C("signUpPhone"), std) &&
-                utils._LCvalidateAddress(C("signUpAddress")) &&
-                utils._LCvalidatePassword(C("signUpPassword")) &&
-                this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") })
-            );
+        //     // ---- VALIDATION GATE ----
+        //     const isValid = (
+        //         utils._LCstrictValidationSelect(C("signUpSalutation")) &&
+        //         utils._LCvalidateName(C("signUpName"), "ID") &&
+        //         this.onChangeDOB(C("signUpDOB")) &&
+        //         utils._LCstrictValidationSelect(C("signUpGender")) &&
+        //         utils._LCvalidateEmail(C("signUpEmail"), "ID") &&
+        //         utils._LCvalidateMandatoryField(C("signUpCountry"), "ID") &&
+        //         utils._LCvalidateMandatoryField(C("signUpState"), "ID") &&
+        //         utils._LCvalidateMandatoryField(C("signUpCity"), "ID") &&
+        //         utils._LCvalidateMandatoryField(C("signUpSTD"), "ID") &&
+        //         utils._LCvalidateISDmobile(C("signUpPhone"), std) &&
+        //         utils._LCvalidateAddress(C("signUpAddress")) &&
+        //         utils._LCvalidatePassword(C("signUpPassword")) &&
+        //         this.FSM_onConfirm({ getSource: () => C("signUpConfirmPassword") })
+        //     );
 
-            if (!isValid) {
-                MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                return;
-            }
-            // ---- PAYLOAD BUILD ----
-            // Server timestamp in required format
-            const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
-            const payload = {
-                data: {
-                    Salutation: C("signUpSalutation").getSelectedKey(),
-                    UserName: data.fullname.trim(),
-                    Role: "Customer",
-                    Type: "Customer",
-                    EmailID: data.Email.trim(),
-                    Password: btoa(data.password),
-                    STDCode: data.STDCode || std,
-                    MobileNo: data.Mobileno,
-                    Status: "Active",
-                    TimeDate,
-                    DateOfBirth: data.DateOfBirth || "",
-                    Gender: C("signUpGender").getSelectedKey(),
+        //     if (!isValid) {
+        //         MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+        //         return;
+        //     }
+        //     // ---- PAYLOAD BUILD ----
+        //     // Server timestamp in required format
+        //     const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
+        //     const payload = {
+        //         data: {
+        //             Salutation: C("signUpSalutation").getSelectedKey(),
+        //             UserName: data.fullname.trim(),
+        //             Role: "Customer",
+        //             Type: "Customer",
+        //             EmailID: data.Email.trim(),
+        //             Password: btoa(data.password),
+        //             STDCode: data.STDCode || std,
+        //             MobileNo: data.Mobileno,
+        //             Status: "Active",
+        //             TimeDate,
+        //             DateOfBirth: data.DateOfBirth || "",
+        //             Gender: C("signUpGender").getSelectedKey(),
 
-                    Country: data.Country,
-                    State: data.State,
-                    City: data.City,
-                    Address: data.Address.trim(),
+        //             Country: data.Country,
+        //             State: data.State,
+        //             City: data.City,
+        //             Address: data.Address.trim(),
                    
-                }
-            };
+        //         }
+        //     };
 
-            BusyIndicator.show(0);
-            try {
-                const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
+        //     BusyIndicator.show(0);
+        //     try {
+        //         const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
-                if (!oResp || oResp.success !== true) {
-                    const sFailMsg =
-                        oResp?.message ||
-                        this.i18nModel.getText("registrationFailedPleasetryagain");
+        //         if (!oResp || oResp.success !== true) {
+        //             const sFailMsg =
+        //                 oResp?.message ||
+        //                 this.i18nModel.getText("registrationFailedPleasetryagain");
 
-                    sap.m.MessageBox.error(sFailMsg, {
-                        title: "Registration Failed"
-                    });
-                    return;
-                }
-                const sUsername = data.fullname.trim();
-                const Salutation = C("signUpSalutation").getSelectedItem().getText();
-                const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
-                    "Your account has been created successfully. You will receive an email shortly with your login credentials.";
+        //             sap.m.MessageBox.error(sFailMsg, {
+        //                 title: "Registration Failed"
+        //             });
+        //             return;
+        //         }
+        //         const sUsername = data.fullname.trim();
+        //         const Salutation = C("signUpSalutation").getSelectedItem().getText();
+        //         const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
+        //             "Your account has been created successfully. You will receive an email shortly with your login credentials.";
 
 
-                MessageBox.success(sSuccessMsg, {
-                    title: "Success",
-                    onClose: () => {
+        //         MessageBox.success(sSuccessMsg, {
+        //             title: "Success",
+        //             onClose: () => {
 
-                        // Reset login flow
-                        const vm = this.getView().getModel("LoginViewModel");
-                        vm.setProperty("/authFlow", "signin");
-                        vm.setProperty("/loginMode", "password");
-                        vm.setProperty("/showOTPField", false);
-                        vm.setProperty("/isOtpEntered", false);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
-                        vm.setProperty("/forgotStep", 1);
+        //                 // Reset login flow
+        //                 const vm = this.getView().getModel("LoginViewModel");
+        //                 vm.setProperty("/authFlow", "signin");
+        //                 vm.setProperty("/loginMode", "password");
+        //                 vm.setProperty("/showOTPField", false);
+        //                 vm.setProperty("/isOtpEntered", false);
+        //                 vm.setProperty("/dialogTitle", "Hostel Access Portal");
+        //                 vm.setProperty("/forgotStep", 1);
 
-                        // Clear form fields + ui states
-                        this._resetAllAuthFields?.();
-                        this._clearAllAuthFields?.();
+        //                 // Clear form fields + ui states
+        //                 this._resetAllAuthFields?.();
+        //                 this._clearAllAuthFields?.();
 
-                        // Reset Sign-Up model
-                        oModel.setData({
-                            fullname: "",
-                            Email: "",
-                            Mobileno: "",
-                            password: "",
-                            comfirmpass: "",
-                            STDCode: "",
-                            Address: "",
-                            Country: "",
-                            State: "",
-                            City: "",
-                            Gender: "",
-                            DateOfBirth: ""
-                        });
+        //                 // Reset Sign-Up model
+        //                 oModel.setData({
+        //                     fullname: "",
+        //                     Email: "",
+        //                     Mobileno: "",
+        //                     password: "",
+        //                     comfirmpass: "",
+        //                     STDCode: "",
+        //                     Address: "",
+        //                     Country: "",
+        //                     State: "",
+        //                     City: "",
+        //                     Gender: "",
+        //                     DateOfBirth: ""
+        //                 });
 
-                        // Switch UI back to Sign-In
-                        sap.ui.getCore().byId("signInPanel")?.setVisible(true);
-                        sap.ui.getCore().byId("signUpPanel")?.setVisible(false);
+        //                 // Switch UI back to Sign-In
+        //                 sap.ui.getCore().byId("signInPanel")?.setVisible(true);
+        //                 sap.ui.getCore().byId("signUpPanel")?.setVisible(false);
 
-                        // Reset login fields
-                        sap.ui.getCore().byId("signinPassword")?.setEnabled(true).setValue("");
-                        sap.ui.getCore().byId("signInOTP")?.setEnabled(false).setValue("");
-                        sap.ui.getCore().byId("btnSignInSendOTP")?.setVisible(false);
-                        sap.ui.getCore().byId("signInuserid")?.setValue("");
-                        sap.ui.getCore().byId("signInusername")?.setValue("");
+        //                 // Reset login fields
+        //                 sap.ui.getCore().byId("signinPassword")?.setEnabled(true).setValue("");
+        //                 sap.ui.getCore().byId("signInOTP")?.setEnabled(false).setValue("");
+        //                 sap.ui.getCore().byId("btnSignInSendOTP")?.setVisible(false);
+        //                 sap.ui.getCore().byId("signInuserid")?.setValue("");
+        //                 sap.ui.getCore().byId("signInusername")?.setValue("");
 
-                        this._oSignDialog?.close();
+        //                 this._oSignDialog?.close();
 
-                        setTimeout(() => {
-                            this._oSignDialog?.open();
-                        }, 200);
-                    }
-                });
+        //                 setTimeout(() => {
+        //                     this._oSignDialog?.open();
+        //                 }, 200);
+        //             }
+        //         });
 
-            } catch (err) {
+        //     } catch (err) {
 
-                let sMsg = "Registration failed! Please try again.";
+        //         let sMsg = "Registration failed! Please try again.";
 
-                // ---- Extract backend error message safely ----
-                if (err?.responseJSON?.message) {
-                    sMsg = err.responseJSON.message;
-                }
-                else if (typeof err?.responseText === "string") {
-                    try {
-                        const oErr = JSON.parse(err.responseText);
-                        if (oErr?.message) {
-                            sMsg = oErr.message;
-                        }
-                    } catch (e) {
-                        // ignore JSON parse errors
-                    }
-                }
+        //         // ---- Extract backend error message safely ----
+        //         if (err?.responseJSON?.message) {
+        //             sMsg = err.responseJSON.message;
+        //         }
+        //         else if (typeof err?.responseText === "string") {
+        //             try {
+        //                 const oErr = JSON.parse(err.responseText);
+        //                 if (oErr?.message) {
+        //                     sMsg = oErr.message;
+        //                 }
+        //             } catch (e) {
+        //                 // ignore JSON parse errors
+        //             }
+        //         }
 
-                MessageBox.error(sMsg, {
-                    title: "Registration Failed"
-                });
+        //         MessageBox.error(sMsg, {
+        //             title: "Registration Failed"
+        //         });
 
-                console.error("SignUp Error:", err);
+        //         console.error("SignUp Error:", err);
 
-            } finally {
-                BusyIndicator.hide();
-            }
-        },
+        //     } finally {
+        //         BusyIndicator.hide();
+        //     }
+        // },
          onChangeState: function (oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");

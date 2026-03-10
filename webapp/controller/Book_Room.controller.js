@@ -215,7 +215,8 @@ sap.ui.define([
                 isOtpSelected: false,
                 isPasswordSelected: true,
                 authFlow: "signin",  // [signin, forgot, otp, reset]
-                isOtpBoxVisible: false
+                isOtpBoxVisible: false,
+                isOTPAllowed:true
             }), "LoginViewModel");
 
             const vm = this.getView().getModel("LoginViewModel");

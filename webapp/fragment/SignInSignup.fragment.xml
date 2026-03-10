@@ -99,6 +99,7 @@
                             groupName="loginType"
                             selected="{= ${LoginViewModel>/loginMode} === 'password' }"
                             select="onSelectLoginMode"
+                            visible="{= ${LoginViewModel>/isOTPAllowed} }"
                         />
                         <RadioButton
                             text="{i18n>otp}"
@@ -161,6 +162,7 @@
 						tooltip="{i18n>setForgotPassword}"
                         type="Transparent"
                         press="onForgotPassword"
+                        visible="{= ${LoginViewModel>/isOTPAllowed} }"
                     />
                     <Button
                         class="myUnifiedBtn"
