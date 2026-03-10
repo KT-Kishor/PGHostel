@@ -711,6 +711,8 @@ sap.ui.define([
 
             var aAssignedRooms = [];
             var aDeletableRooms = [];
+            var aAssignedBedsdisplay = [];
+
 
             // Split assigned & non-assigned rooms
             aSelectedItems.forEach(item => {
@@ -723,7 +725,7 @@ sap.ui.define([
                     cust.BedType === oRoom.BedTypeName &&
                     cust.Status === "Assigned"
                 );
-
+  
                 if (bAssigned) {
                     aAssignedRooms.push(oRoom.RoomNo);
                 } else {
@@ -754,9 +756,11 @@ sap.ui.define([
             var sRoomNos = aDeletableRooms
                 .map(room => room.roomNo)
                 .join(", ");
+                var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the following room(s): ${sRoomNos}?`,
+                `Are you sure you want to delete the following room(s): ${sRoomNos}? 
+                 They cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`,
                 {
                     title: "Confirm Deletion",
                     icon: sap.m.MessageBox.Icon.WARNING,

@@ -185,7 +185,7 @@
                                         </m:headerToolbar>
                                         <m:columns>
                                             <m:Column
-                                                width="3rem"
+                                                width="4rem"
                                                 minScreenWidth="Tablet"
                                             >
                                                 <m:Text
@@ -200,6 +200,8 @@
                                                 />
                                             </m:Column>
                                             <m:Column
+                                                width="15rem"
+
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
@@ -209,6 +211,7 @@
                                                 />
                                             </m:Column>
                                             <m:Column
+
                                                 id="idGSTCalculation"
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -219,6 +222,7 @@
                                                 />
                                             </m:Column>
                                             <m:Column
+                                            
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
@@ -272,6 +276,8 @@
                                                 </m:cells>
                                                 <m:cells>
                                                     <m:TextArea
+                                                        width="15rem"
+
                                                         value="{DamageModel>Description}"
                                                         rows="2"
                                                         maxLength="120"

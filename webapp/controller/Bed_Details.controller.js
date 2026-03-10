@@ -629,6 +629,7 @@ sap.ui.define([
     var aAssignedBeds = [];
     var aDeletableBeds = [];
 
+
     // Split assigned & non-assigned beds
     aSelectedItems.forEach(item => {
         var oBed = item.getBindingContext("BedDetails").getObject();
@@ -669,9 +670,12 @@ sap.ui.define([
     var sBedNames = aDeletableBeds
         .map(bed => bed.name)
         .join(", ");
+           var sBedNamesA = aAssignedBeds.map(bed => bed).join(", ");
+       
 
     sap.m.MessageBox.confirm(
-        `Are you sure you want to delete the following bed(s): ${sBedNames}?`,
+      `Are you sure you want to delete the following bed(s): ${sBedNames}? 
+         They cannot be deleted because they are currently assigned to: ${sBedNamesA}.`,
         {
             title: "Confirm Deletion",
             icon: sap.m.MessageBox.Icon.WARNING,

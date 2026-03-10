@@ -132,12 +132,12 @@
                             tooltip="{i18n>bedType}"
                         />
                     </Column>
-                    <Column demandPopin="true">
+                    <!-- <Column demandPopin="true">
                         <Text
                             text="{i18n>extraBed}"
                             tooltip="{i18n>extraBed}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
@@ -171,7 +171,7 @@
                         <cells>
                             <Text text="{RoomDetailsModel>RoomNo}" />
                             <Text text="{RoomDetailsModel>BedTypeName}" />
-                            <Text text="{RoomDetailsModel>ExtraBed}" />
+                            <!-- <Text text="{RoomDetailsModel>ExtraBed}" /> -->
                             <Text
                                 text="{parts: ['RoomDetailsModel>Price','RoomDetailsModel>Currency'],
 									formatter: '.Formatter.formatPrice'}"
