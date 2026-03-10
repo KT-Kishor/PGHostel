@@ -4292,10 +4292,7 @@ model.setProperty("/Address", data.Address);
             }
  
             vm.setProperty("/showOTPField", false);  // Hide OTP field
-vm.setProperty("/isOtpEntered", false);
-
-  
-    vm.setProperty("/otpButtonText", "Send OTP");
+ vm.setProperty("/otpButtonText", "Send OTP");
 
 
 // Clear fields
