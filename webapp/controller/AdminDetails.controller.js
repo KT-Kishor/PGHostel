@@ -4270,8 +4270,27 @@ model.setProperty("/Address", data.Address);
                 this.byId("idMonthYearSelect").setVisible(true)
 
             }
-  if (oFragment) oFragment.close();
+ 
+            vm.setProperty("/showOTPField", false);  // Hide OTP field
+vm.setProperty("/isOtpEntered", false);
+
   
+    vm.setProperty("/otpButtonText", "Send OTP");
+
+
+// Clear fields
+const oEmail = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
+const oOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
+oEmail?.setValue("");
+oOTP?.setValue("");
+
+// Clear value states
+oEmail?.setValueState("None");
+oOTP?.setValueState("None");
+
+if (oFragment) {
+    oFragment.close();
+}
                 } else {
                 oHostelModel.refresh(true);
                 }
@@ -5290,33 +5309,33 @@ model.setProperty("/Address", data.Address);
                 ?.setText("Hostel Access Portal");
         },
 
-        onSwitchToSignUp: function () {
-            const vm = this.getView().getModel("LoginViewModel");
+        // onSwitchToSignUp: function () {
+        //     const vm = this.getView().getModel("LoginViewModel");
 
-            const oSignInPanel = sap.ui.getCore().byId("signInPanel");
-            const oSignUpPanel = sap.ui.getCore().byId("signUpPanel");
+        //     const oSignInPanel = sap.ui.getCore().byId("signInPanel");
+        //     const oSignUpPanel = sap.ui.getCore().byId("signUpPanel");
 
-            oSignInPanel?.setVisible(false);
-            oSignUpPanel?.setVisible(true);
+        //     oSignInPanel?.setVisible(false);
+        //     oSignUpPanel?.setVisible(true);
 
-            vm.setProperty("/authFlow", "signup");
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
-            // Set min and max dates for the Date of Birth picker
-            const oDOBpicker = sap.ui.getCore().byId("signUpDOB");
-            if (oDOBpicker) {
-                const oToday = new Date();
+        //     vm.setProperty("/authFlow", "signup");
+        //     vm.setProperty("/dialogTitle", "Hostel Access Portal");
+        //     // Set min and max dates for the Date of Birth picker
+        //     const oDOBpicker = sap.ui.getCore().byId("signUpDOB");
+        //     if (oDOBpicker) {
+        //         const oToday = new Date();
 
-                // Max date: 10 years ago from today
-                const oMaxDate = new Date(oToday);
-                oDOBpicker.setMaxDate(oMaxDate);
+        //         // Max date: 10 years ago from today
+        //         const oMaxDate = new Date(oToday);
+        //         oDOBpicker.setMaxDate(oMaxDate);
 
-                // Min date: 100 years ago from today
-                const oMinDate = new Date(2000, 0, 1);
-                oDOBpicker.setMinDate(oMinDate);
-            }
-            this._resetOtpState();
-            this._addPasswordGenerateIcon();
-        },
+        //         // Min date: 100 years ago from today
+        //         const oMinDate = new Date(2000, 0, 1);
+        //         oDOBpicker.setMinDate(oMinDate);
+        //     }
+        //     this._resetOtpState();
+        //     this._addPasswordGenerateIcon();
+        // },
 
         onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
