@@ -615,7 +615,7 @@ sap.ui.define([
                 const start = new Date(sStartDate);
                 const end = new Date(sEndDate);
                 const diffTime = end - start;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                 if (sUnit === "Per Day") {
                     return diffDays + (diffDays === 1 ? " Day" : " Days");
@@ -645,8 +645,9 @@ sap.ui.define([
                 }
 
                 if (sUnit === "Per Hour") {
-                    const hours = Number(totalHour) || 1;
-                    return hours + (hours === 1 ? " Hour" : " Hours");
+                    const hoursPerDay = Number(totalHour) || 1;
+                    const totalHours = hoursPerDay * diffDays;
+                    return totalHours + (totalHours === 1 ? " Hour" : " Hours");
                 }
 
                 if (sUnit === "Fix") {
