@@ -667,32 +667,35 @@ sap.ui.define([
             // ------------------------------------------------
             //  CALCULATE END DATE
             // ------------------------------------------------
-            if (sUnit === "Per Month") {
-                oEnd.setMonth(oEnd.getMonth() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1);
+  // ------------------------------------------------
+// CALCULATE END DATE
+// ------------------------------------------------
+const iOriginalDay = oStart.getDate();  // ✅ CRITICAL: Store start day
 
-                oFacility.TotalMonths = iCount;
-                oFacility.TotalYears = 0;
-                oFacility.SelectedMonths = iCount;
-                oFacility.IsDurationEdited = true;
-                const aPersons = oHostelModel.getProperty("/Persons");
-                aPersons[iPersonIndex].SelectedMonths = iCount;
-                // oHostelModel.setProperty("/TotalMonths", iCount);
+if (sUnit === "Per Month") {
+    oEnd.setMonth(oEnd.getMonth() + iCount);
+    oEnd.setDate(iOriginalDay - 1);  // 10th → 9th of next month
+    
+    oFacility.TotalMonths = iCount;
+    oFacility.TotalYears = 0;
+    oFacility.SelectedMonths = iCount;
+    oFacility.IsDurationEdited = true;
+    const aPersons = oHostelModel.getProperty("/Persons");
+    aPersons[iPersonIndex].SelectedMonths = iCount;
+} 
+else if (sUnit === "Per Year") {  // ✅ Use else if
+    oEnd.setFullYear(oEnd.getFullYear() + iCount);
+    oEnd.setDate(iOriginalDay - 1);
+    
+    oFacility.TotalYears = iCount;
+    oFacility.TotalMonths = 0;
+    oFacility.IsDurationEdited = true;
+    const aPersons = oHostelModel.getProperty("/Persons");
+    aPersons[iPersonIndex].SelectedYears = iCount;
+}
 
-            }
 
-            if (sUnit === "Per Year") {
-                oEnd.setFullYear(oEnd.getFullYear() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1);
 
-                oFacility.TotalYears = iCount;
-                oFacility.TotalMonths = 0;
-                oFacility.IsDurationEdited = true;
-                const aPersons = oHostelModel.getProperty("/Persons");
-                aPersons[iPersonIndex].SelectedYears = iCount;
-                // oHostelModel.setProperty("/TotalYears", iCount);
-
-            }
 
             const iTotalDays =
                 Math.floor((oEnd - oStart) / 86400000);
@@ -887,7 +890,7 @@ sap.ui.define([
         // Utility function to format date
         _formatDateToDDMMYYYY: function (oDate) {
             const dd = String(oDate.getDate()).padStart(2, '0');
-            const mm = String(oDate.getMonth()).padStart(2, '0'); // Months start at 0
+            const mm = String(oDate.getMonth() + 1).padStart(2, '0'); // Months start at 0
             const yyyy = oDate.getFullYear();
             return dd + "/" + mm + "/" + yyyy;
         },
@@ -1237,7 +1240,7 @@ sap.ui.define([
         _formatDateToDDMMYYYY: function (dt) {
             if (!dt || !(dt instanceof Date)) return "";
             const dd = String(dt.getDate()).padStart(2, "0");
-            const mm = String(dt.getMonth()).padStart(2, "0");
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
             const yyyy = dt.getFullYear();
             return `${dd}/${mm}/${yyyy}`;
         },
