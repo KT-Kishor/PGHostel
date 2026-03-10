@@ -2738,35 +2738,53 @@ sap.ui.define([
                 const facilities = CustomerData.AllSelectedFacilities || [];
 
                 const bookingStart = this._parseDate(Bookingdata.StartDate);
-                const bookingEnd = this._parseDate(Bookingdata.EndDate);
+
+                // First billing month
+                const firstMonthStart = new Date(bookingStart);
+
+                const firstMonthEnd = new Date(bookingStart);
+                firstMonthEnd.setMonth(firstMonthEnd.getMonth() + 1);
+                firstMonthEnd.setDate(firstMonthEnd.getDate() - 1);
 
                 facilityAmount = facilities.reduce((sum, item) => {
 
                     const facilityStart = this._parseDate(item.StartDate);
                     const facilityEnd = this._parseDate(item.EndDate);
-// && !item.FacilityID
-                    // check facility inside booking range
-                    if (facilityStart <= bookingEnd && facilityEnd >= bookingStart ) {
+
+                    // overlap with first billing month
+                    if (facilityStart <= firstMonthEnd && facilityEnd >= firstMonthStart) {
 
                         let totalAmount = Number(item.TotalAmount) || 0;
 
-                        // calculate facility months
-                        let months = (facilityEnd.getFullYear() - facilityStart.getFullYear()) * 12 +
-                            (facilityEnd.getMonth() - facilityStart.getMonth());
+                        // calculate overlap period
+                        const overlapStart = facilityStart > firstMonthStart ? facilityStart : firstMonthStart;
+                        const overlapEnd = facilityEnd < firstMonthEnd ? facilityEnd : firstMonthEnd;
 
-                        if (months <= 0) {
-                            months = 1;
+                        // total days in billing cycle
+                        const totalCycleDays =
+                            (firstMonthEnd - firstMonthStart) / (1000 * 60 * 60 * 24);
+
+                        // overlap days
+                        const overlapDays =
+                            (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24);
+
+                        let firstMonthAmount = 0;
+
+                        if (paymentType === "Per Year") {
+
+                            let monthlyAmount = totalAmount / 12;
+                            firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
+
+                        } else if (paymentType === "Per Month") {
+                            if(item.UnitText === "Per Month") {
+                            let monthlyAmount = totalAmount;
+                            firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
+                            }else{
+                                firstMonthAmount = Number(item.Price) * overlapDays;
+                            }
+                        }else if(paymentType === "Per Day") {
+                            firstMonthAmount = (totalAmount / totalCycleDays) * overlapDays;
                         }
-                         let years = Math.ceil(months / 12);
-                         let firstMonthAmount = 0;
-                         if (paymentType === "Per Year") {
-
-                           firstMonthAmount = totalAmount / years;
-
-                             } else if(paymentType === "Per Month") {
-
-                               firstMonthAmount = totalAmount / months;
-                             }
 
                         return sum + firstMonthAmount;
                     }
