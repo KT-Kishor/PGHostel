@@ -4,12 +4,11 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "../utils/validation",
-     "sap/ui/core/BusyIndicator",
      "sap/m/MessageToast",
      "sap/ui/model/FilterOperator",
       "sap/ui/model/Filter",
 
-], function (BaseController, Formatter, JSONModel, MessageBox, utils,BusyIndicator, MessageToast,FilterOperator,Filter) {
+], function (BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast,FilterOperator,Filter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.AdminDetails", {
         Formatter: Formatter,
@@ -4206,7 +4205,7 @@ sap.ui.define([
             }
 
             try {
-                BusyIndicator.show(0);
+                this.getBusyDialog()
                 let payload, oResponse;
 
                 if (isOTP) {
@@ -4318,7 +4317,7 @@ if (oFragment) {
             } catch (err) {
                 MessageToast.show(err.message || "Invalid Credentials, Please try again");
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
          onSubmitNewPassword: async function () {
@@ -4365,7 +4364,7 @@ if (oFragment) {
             //  PASSED ALL VALIDATIONS → SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
-            BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oFilters = this._oResetUser?.UserID
                     ? { UserID: this._oResetUser.UserID }
@@ -4402,7 +4401,7 @@ if (oFragment) {
                 MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
-                BusyIndicator.hide();  // ALWAYS stop
+                this.closeBusyDialog()  // ALWAYS stop
                 this._resetOtpState();
             }
         },
@@ -4484,7 +4483,7 @@ if (oFragment) {
 
             const sEmail = oEmailCtrl.getValue().trim();
 
-            BusyIndicator.show(0);
+            this.getBusyDialog()
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
@@ -4514,12 +4513,12 @@ if (oFragment) {
                     this.i18nModel.getText("forgotOtpSendFailed");
                 sap.m.MessageToast.show(sMsg);
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
         _verifyOTPWithBackend: async function (otp) {
-            BusyIndicator.show(0);
+            this.getBusyDialog()
             try {
                 const oPayload = {
                     ...(this._oResetUser?.EmailID
@@ -4541,7 +4540,7 @@ if (oFragment) {
                 return false;
 
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -4564,7 +4563,7 @@ if (oFragment) {
                 Type: "OTP"
             };
 
-            BusyIndicator.show(0);
+            this.getBusyDialog()
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
@@ -4599,7 +4598,7 @@ if (oFragment) {
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 
@@ -4833,7 +4832,7 @@ if (oFragment) {
         //         }
         //     };
 
-        //     BusyIndicator.show(0);
+        //     this.getBusyDialog()
         //     try {
         //         const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
@@ -4931,7 +4930,7 @@ if (oFragment) {
         //         console.error("SignUp Error:", err);
 
         //     } finally {
-        //         BusyIndicator.hide();
+        //         this.closeBusyDialog()
         //     }
         // },
          onChangeState: function (oEvent) {
