@@ -1,0 +1,47 @@
+{
+  "sap.app": {
+    "id": "today.booking.card",
+    "type": "card"
+  },
+  "sap.card": {
+    "type": "Object",
+    "data": {
+      "path": "data>/"
+    },
+    "header": {
+      "title": "Booking ID: {data>BookingID}",
+      "subTitle": "Customer Name: {data>CustomerName} ({data>CustomerID})"
+    },
+    "content": {
+      "groups": [
+        {
+          "items": [
+            {
+              "value": "Booking Date: {data>BookingDate}"
+            },
+            {
+              "value": "Status: {data>Status}"
+            },
+            {
+              "value": "Stay: {data>StartDate} to {data>EndDate}"
+            }
+          ]
+        }
+      ],
+      "actionsStrip": [
+        {
+          "text": "View Booking",
+          "buttonType": "Emphasized",
+          "actions": [
+            {
+              "type": "Navigation",
+              "parameters": {
+                "CustomerID": "{data>CustomerID}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

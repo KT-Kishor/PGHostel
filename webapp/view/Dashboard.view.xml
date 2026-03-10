@@ -9,6 +9,7 @@
     xmlns:layout="sap.ui.layout"
     xmlns:core="sap.ui.core"
     xmlns:f="sap.f"
+    xmlns:integration="sap.ui.integration.widgets"
     xmlns:com="sap.suite.ui.commons"
     displayBlock="true"
 >
@@ -20,39 +21,85 @@
             />
         </headerContent>
         <content>
+            <VBox class=" todaySection">
+                <Title
+                    text="{i18n>dashTodayBookings}"
+                    class="sapUiSmallMarginBottom"
+                    level="H3"
+                />
+                <!-- <VBox class="sapUiSmallMarginTop" />
+                <Carousel
+                 id="todayCarousel"
+    height="auto"
+    showPageIndicator="true"
+>
+</Carousel> -->
+                <ScrollContainer
+                    horizontal="true"
+                    vertical="false"
+                >
+                    <FlexBox
+                        id="todayCarousel"
+                        direction="Row"
+                        width="auto"
+                        justifyContent="Start"
+                        alignItems="Start"
+                    />
+                </ScrollContainer>
+
+                <HBox
+                    justifyContent="SpaceBetween"
+                    alignItems="Center"
+                    class="sapUiSmallMarginTop"
+                >
+                    <Title
+                        text="Booking Dashboard"
+                        level="H3"
+                    />
+
+                    <Button
+                        text="Filters"
+                        class="myUnifiedBtn"
+                        icon="sap-icon://filter"
+                        press="onClickFilterBar"
+                    />
+                </HBox>
+
                 <fb:FilterBar
                     id="D_id_FilterbarEmployee"
                     useToolbar="false"
+                    class="sapUiSmallMarginTop"
                     clear="D_onPressClear"
                     showClearOnFB="true"
                     search="D_search"
+                    visible="false"
                     filterChange="onFilterChange"
                     showFilterConfiguration="false"
                 >
-                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="Name"
-                        label="Branch Name"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <MultiComboBox
-                                id="D_id_BranchCode"
-                                items="{branchModel>/}"
-                                placeholder="select branch"
-                                showSecondaryValues="true"
-                                width="100%"
-                            >
-                                <core:ListItem
-                                    key="{branchModel>BranchID}"
-                                    text="{branchModel>Name} - {branchModel>BranchID}"
-                                    additionalText="{branchModel>City}"
-                                />
-                            </MultiComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
+                            name="Name"
+                            label="Branch Name"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <MultiComboBox
+                                    id="D_id_BranchCode"
+                                    items="{branchModel>/}"
+                                    placeholder="select branch"
+                                    showSecondaryValues="true"
+                                    width="100%"
+                                >
+                                    <core:ListItem
+                                        key="{branchModel>BranchID}"
+                                        text="{branchModel>Name} - {branchModel>BranchID}"
+                                        additionalText="{branchModel>City}"
+                                    />
+                                </MultiComboBox>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="year"
@@ -139,49 +186,39 @@
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>
                 </fb:FilterBar>
-                 <VBox class=" todaySection sapUiSmallMargin">
-                <Title
-                    text="{i18n>dashTodayBookings}"
-                    level="H3"
-                />
-                <VBox class="sapUiSmallMarginTop" />
-             <Carousel
-    height="auto"
-    showPageIndicator="true"
-    class="sapUiSmallMarginTop"
-    pages="{todayModel>/pages}">
-    <VBox class="todayPage" width="100%">
-        <layout:Grid
-            defaultSpan="XL3 L4 M6 S12"
-            class="sapUiResponsiveMargin sapUiSmallMarginTop"
-            content="{path: 'todayModel>'}">
-            <layout:content>
-                <Panel
-                    class="todayCard"
-                    expandable="false"
-                >
-                    <VBox>
-                        <Title text="{i18n>bookingID}: {todayModel>BookingID}"
-                               level="H4" wrapping="true"/>
-                        <Text  text="{i18n>bookingDate}: {path:'todayModel>BookingDate',
-                                  formatter:'.Formatter.formatDate'}"/>
-                        <Text  text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
-                               wrapping="true"/>
-                        <Text  text="{i18n>dashStay}: {path:'todayModel>StartDate',
-                                  formatter:'.Formatter.formatDate'} to
-                                  {path:'todayModel>EndDate',
-                                  formatter:'.Formatter.formatDate'}"/>
-                        <HBox justifyContent="End" class="sapUiSmallMarginTop">
-                            <Button text="{i18n>dashViewBooking}"
-                                    type="Emphasized"
-                                    press="onBookingCardPress"/>
-                        </HBox>
+                <!-- <VBox>
+                                    <Title
+                                        text="{i18n>bookingID}: {todayModel>BookingID}"
+                                        level="H4"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{i18n>bookingDate}: {path:'todayModel>BookingDate', formatter: '.Formatter.formatDate'}"
+                                    />
+                                    <Text
+                                        text="{i18n>customerName}: {todayModel>CustomerName} ({todayModel>CustomerID})"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{i18n>dashStay}: { path: 'todayModel>StartDate', formatter: '.Formatter.formatDate' } 
+                        to { path: 'todayModel>EndDate', formatter: '.Formatter.formatDate' }"
+                                    />
+
+                                    <HBox
+                                        justifyContent="End"
+                                        class="sapUiSmallMarginTop"
+                                    >
+                                        <Button
+                                            text="{i18n>dashViewBooking}"
+                                            type="Emphasized"
+                                            press="onBookingCardPress"
+                                        />
+                                    </HBox>
+                                </VBox>
+                            </Panel>
+                        </FlexBox>
                     </VBox>
-                </Panel>
-            </layout:content>
-        </layout:Grid>
-    </VBox>
-</Carousel>
+                </Carousel> -->
 
                 <layout:Grid
                     defaultSpan="XL6 L6 M12 S12"
@@ -420,7 +457,7 @@
             </VBox>
         </content>
         <footer>
-         <core:Fragment
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />

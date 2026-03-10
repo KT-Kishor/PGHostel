@@ -15,10 +15,9 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            this.getBusyDialog()
+            sap.ui.core.BusyIndicator.show(0);
             try {
-                var LoginFUnction = await this.commonLoginFunction("ManageBookingDashboard");
-                if (!LoginFUnction) return;
+                this.commonLoginFunction();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._ViewDatePickersReadOnly(["D_id_year"], this.getView());
                 const oNow = new Date();
@@ -36,12 +35,12 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Something went wrong");
             } finally {
-                this.closeBusyDialog()
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
         loadDashboardData: async function () {
-            // this.getBusyDialog()
+            // sap.ui.core.BusyIndicator.show(0);
             try {
                 if (!this._aUserBranches || this._aUserBranches.length === 0) {
                     return;
@@ -54,55 +53,68 @@ sap.ui.define([
                 var aData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 this._aAllBookings = aData;
                 this.dashboardSetDate(aData, this._aUserBranches);
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("Failed to load dashboard data"));
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
             }
         },
 
         dashboardSetDate: function (aData, aBranchesToUse) {
             const aAllowedBranches = aBranchesToUse;
             const aCards = [];
+            const today = new Date();
+            const todayFormatted =
+                today.getFullYear() + "-" +
+                String(today.getMonth() + 1).padStart(2, "0") + "-" +
+                String(today.getDate()).padStart(2, "0");
             aData.forEach((oBooking) => {
-                if (!["New"].includes(oBooking.Status)) return;
+                if (!["New", "Assigned", "Completed", "Cancelled"].includes(oBooking.Status)) return;
                 if (!aAllowedBranches.includes(oBooking.BranchCode)) return;
+                const d = new Date(oBooking.BookingDate);
+                const bookingDate =
+                    d.getFullYear() + "-" +
+                    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(d.getDate()).padStart(2, "0");
+
+                if (bookingDate !== todayFormatted) return;
                 aCards.push({
                     BookingID: oBooking.BookingID,
-                    BookingDate: oBooking.BookingDate,
+                    BookingDate: this.Formatter.formatDate(oBooking.BookingDate),
                     CustomerName: this._mCustomerMap[oBooking.CustomerID],
                     CustomerID: oBooking.CustomerID,
                     RoomNo: oBooking.RoomNo,
-                    StartDate: oBooking.StartDate,
-                    EndDate: oBooking.EndDate
+                    Status: oBooking.Status,
+                    StartDate: this.Formatter.formatDate(oBooking.StartDate),
+                    EndDate: this.Formatter.formatDate(oBooking.EndDate)
                 });
             });
             this.dashboardModels(aCards);
         },
 
-        _groupCardsForCarousel: function (aCards, iPerPage) {
-            const aPages = [];
-            for (let i = 0; i < aCards.length; i += iPerPage) {
-                aPages.push(aCards.slice(i, iPerPage + i));
-            }
-            return aPages;
-        },
+        // _groupCardsForCarousel: function (aCards, iPerPage) {
+        //     const aPages = [];
+        //     for (let i = 0; i < aCards.length; i += iPerPage) {
+        //         aPages.push(aCards.slice(i, iPerPage + i));
+        //     }
+        //     return aPages;
+        // },
 
-        _getCardsPerPage: function () {
-            const w = window.innerWidth;
-            if (w < 600) return 1;
-            if (w < 900) return 2;
-            if (w < 1200) return 3;
-            if (w < 1600) return 4;
-            return 5;
-        },
+        // _getCardsPerPage: function () {
+        //     const container = this.byId("todayCarousel").getDomRef()?.clientWidth;
+        //     const cardMinWidth = 300;
+        //     const gap = 16;
+
+        //     if (!container) return 1;
+
+        //     return Math.floor(container / (cardMinWidth + gap)) || 1;
+        // },
 
         dashboardModels: function (aCards) {
             this._aTodayCards = aCards;
-            const iPerPage = this._getCardsPerPage();
-            const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
-            this.getView().setModel(new JSONModel({ pages: aPages }), "todayModel");
-
+            // const iPerPage = this._getCardsPerPage();
+            // const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
+            this._renderIntegrationCards(aCards);
             // const aMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             // const oChartData = Object.keys(oMonthMap).map((sKey) => {
             //     const [year, month] = sKey.split("-");
@@ -113,6 +125,73 @@ sap.ui.define([
             // });
             // this.getView().setModel(new JSONModel({ data: oChartData }), "chartModel");
             this._bindMonthlyChart();
+        },
+
+        // _renderIntegrationCards: function (aPages) {
+        //     const oCarousel = this.byId("todayCarousel");
+        //     oCarousel.removeAllItems();
+        //     aPages.forEach((aPageCards) => {
+        //         const oVBox = new sap.m.VBox();
+        //         const oFlex = new sap.m.FlexBox({
+        //             direction: "Row",
+        //             wrap: "Wrap",
+        //             justifyContent: "Start",
+        //         });
+        //         oFlex.addStyleClass("todayCardsRow");
+        //         aPageCards.forEach((oBooking) => {
+        //             // inject booking as default model
+        //             const oCard = new sap.ui.integration.widgets.Card({
+        //                 manifest: "cards/BookingDashboard.json",
+        //                 // parameters: {
+        //                 //     BookingID: oBooking.BookingID,
+        //                 //     BookingDate: oBooking.BookingDate,
+        //                 //     CustomerName: oBooking.CustomerName,
+        //                 //     CustomerID: oBooking.CustomerID,
+        //                 //     StartDate: oBooking.StartDate,
+        //                 //     EndDate: oBooking.EndDate
+        //                 // }
+        //             });
+        //             oCard.setModel(new sap.ui.model.json.JSONModel(oBooking), "data");
+        //             oCard.addStyleClass("dynamicCard");
+        //             oCard.attachAction(this.onCardAction.bind(this));
+        //             oFlex.addItem(oCard);
+        //         });
+
+        //         oVBox.addItem(oFlex);
+        //         oCarousel.addItem(oVBox);
+        //     });
+        // },
+
+        // onAfterRendering: function () {
+        //     window.addEventListener("resize", this._handleResize.bind(this));
+        // },
+
+        // _handleResize: function () {
+        //     if (!this._aTodayCards) return;
+
+        //     const iPerPage = this._getCardsPerPage();
+        //     const aPages = this._groupCardsForCarousel(this._aTodayCards, iPerPage);
+        //     this._renderIntegrationCards(aPages);
+        // },
+
+        _renderIntegrationCards: function (aCards) {
+            const oContainer = this.byId("todayCarousel");
+            oContainer.removeAllItems();
+
+            if (!aCards || aCards.length === 0) {
+                return;
+            }
+            aCards.forEach((oBooking) => {
+                const oCard = new sap.ui.integration.widgets.Card({
+                    manifest: "cards/BookingDashboard.json",
+                    width: "380px"
+                });
+
+                oCard.setModel(new JSONModel(oBooking), "data");
+                oCard.addStyleClass("dynamicCard");
+                oCard.attachAction(this.onCardAction.bind(this));
+                oContainer.addItem(oCard);
+            });
         },
 
         getBranch: async function () {
@@ -187,7 +266,7 @@ sap.ui.define([
 
         _loadMonthChart: async function (oPayload) {
             try {
-                // this.getBusyDialog()
+                // sap.ui.core.BusyIndicator.show(0);
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearBarChart", oPayload)
                 console.log("month wise response:", oData);
                 let aData = Array.isArray(oData) ? oData : oData.data;
@@ -196,17 +275,17 @@ sap.ui.define([
                 }
                 this.getView().setModel(new JSONModel({ data: aData }), "monthlyChartModel");
                 this._bindMonthlyChart();
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
 
             } catch (err) {
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
                 MessageToast.show("Failed to load monthly chart");
             }
         },
 
         _loadDayChart: async function (oPayload) {
             try {
-                // this.getBusyDialog()
+                // sap.ui.core.BusyIndicator.show(0);
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentMonthBarChart", oPayload)
                 console.log("daily wise response:", oData);
                 let aData = oData.results || [];
@@ -215,9 +294,9 @@ sap.ui.define([
                 }
                 this.getView().setModel(new JSONModel({ data: aData }), "dailyChartModel");
                 this._bindDailyChart();
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
             } catch (err) {
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
                 MessageToast.show("Failed to load daily chart");
             };
         },
@@ -258,7 +337,7 @@ sap.ui.define([
 
         _loadStatusChart: async function (oPayload) {
             try {
-                // this.getBusyDialog()
+                // sap.ui.core.BusyIndicator.show(0);
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearStatusBarChart", oPayload);
                 console.log("status wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : (oData.results || oData.data || []);
@@ -267,9 +346,9 @@ sap.ui.define([
                 }
                 this.getView().setModel(new JSONModel({ data: aData }), "statusChartModel");
                 this._bindStatusChart();
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
             } catch (err) {
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
                 MessageToast.show("Failed to load status chart");
             }
         },
@@ -312,7 +391,7 @@ sap.ui.define([
 
         _loadPaymentTypeChart: async function (oPayload) {
             try {
-                // this.getBusyDialog()
+                // sap.ui.core.BusyIndicator.show(0);
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearPaymentTypeBarChart", oPayload)
                 console.log("payment wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.results || [];
@@ -321,9 +400,9 @@ sap.ui.define([
                 // }
                 this.getView().setModel(new JSONModel({ data: aData }), "paymentTypeChartModel");
                 this._bindPaymentTypeChart();
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
             } catch (err) {
-                // this.closeBusyDialog()
+                // sap.ui.core.BusyIndicator.hide();
                 MessageToast.show("Failed to load payment type chart");
             };
         },
@@ -467,7 +546,7 @@ sap.ui.define([
         },
 
         D_search: async function () {
-            this.getBusyDialog()
+            sap.ui.core.BusyIndicator.show(0);
             try {
 
                 const aSelectedBranches = this.byId("D_id_BranchCode").getSelectedKeys();
@@ -560,7 +639,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Failed to load charts");
             } finally {
-                this.closeBusyDialog()
+                sap.ui.core.BusyIndicator.hide();
             }
         },
 
@@ -619,7 +698,24 @@ sap.ui.define([
             this.byId("D_id_BranchCode").setSelectedKeys([]);
             this.byId("D_id_year").setValue(iYear);
             this.byId("D_id_month").setSelectedKey(iMonth);
+        },
 
+        onCardAction: function (oEvent) {
+            const oParams = oEvent.getParameter("parameters");
+            const sCustomerID = oParams.CustomerID;
+
+            var sEncodedID = btoa(sCustomerID.toString());
+
+            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
+                sPath: encodeURIComponent(sEncodedID),
+                from: "Dashboard"
+            });
+        },
+
+        onClickFilterBar: function () {
+            const oFilterBar = this.byId("D_id_FilterbarEmployee");
+            const bVisible = oFilterBar.getVisible();
+            oFilterBar.setVisible(!bVisible);
         }
     })
 })

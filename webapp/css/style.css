@@ -3873,14 +3873,11 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .todayCardsRow {
-  display: flex;
-  gap: 16px;
-  width: 100%;
+  gap: 1rem;
 }
 
 .dynamicCard {
-  flex: 1 1 300px;
-  min-width: 300px;
+  margin-right:1rem;
 }
 
 /* Base card style */

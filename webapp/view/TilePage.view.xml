@@ -139,7 +139,7 @@
             </FlexBox>
         </VBox>
 
-        <VBox class="categoryBlock"  visible="{= ${TileVisibility>/ManageComplainTracking} !== 0 || ${TileVisibility>/ManageCustomer} !== 0 || ${TileVisibility>/ManageInvoice} !== 0 }"
+        <VBox class="categoryBlock sapUiMediumMarginTop"  visible="{= ${TileVisibility>/ManageComplainTracking} !== 0 || ${TileVisibility>/ManageCustomer} !== 0 || ${TileVisibility>/ManageInvoice} !== 0 }"
         >
             <Title
                 text="{i18n>tileActions}"
@@ -237,7 +237,7 @@
             </FlexBox>
         </VBox>
 
-        <VBox class="categoryBlock"  visible="{= ${TileVisibility>/ManageBookingDashboard} !== 0 || ${TileVisibility>/ManagePaymentDashboard} !== 0 || ${TileVisibility>/ManageComplaintDashboard} !== 0 || ${TileVisibility>/DamageDashboard} !== 0 }"
+        <VBox class="categoryBlock sapUiMediumMarginTop"  visible="{= ${TileVisibility>/ManageBookingDashboard} !== 0 || ${TileVisibility>/ManagePaymentDashboard} !== 0 || ${TileVisibility>/ManageComplaintDashboard} !== 0 || ${TileVisibility>/DamageDashboard} !== 0 }"
         >
             <Title
                 text="{i18n>tileDashboards}"
