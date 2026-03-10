@@ -3036,12 +3036,18 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .myUnifiedBtn:hover .sapMBtnInner,
-.myUnifiedBtn.sapMBtnHover .sapMBtnInner,
-.guideButtonLarge:hover .sapMBtnInner,
-.guideButtonLarge.sapMBtnHover .sapMBtnInner {
+.guideButtonLarge:hover .sapMBtnInner {
   background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   color: white !important;
-  transform: scale(1.1);
+}
+
+/* Remove SAPUI5 outer button background */
+.myUnifiedBtn.sapMBtn,
+.guideButtonLarge.sapMBtn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .myUnifiedBtn.sapMBtnActive .sapMBtnInner,
@@ -3075,10 +3081,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   color: #e7eaed;
   vertical-align: middle;
 }
-
-
-
-
 
 .Homepage {
   background-image: url("../image/BedHostel.png");
