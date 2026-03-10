@@ -4164,6 +4164,8 @@ sap.ui.define([
             onSignIn: async function () {
             var oLoginModel = this.getView().getModel("LoginModel");
             var vm = this.getView().getModel("LoginViewModel");
+            
+             var oCustomerData = this.getView().getModel("CustomerData").getData();
             const isOTP = vm.getProperty("/loginMode") === "otp";
             var oFragment = this._oLoginAlertDialog; // Correct reference to fragment dialog
 
@@ -4242,7 +4244,7 @@ sap.ui.define([
                     }
 
                     // 5️⃣ Construct payload and continue login
-                    payload = { EmailID: sUserid, OTP: sOTP };
+                    payload = { CustomerID: oCustomerData.CustomerID, OTP: sOTP };
                     oResponse = await this.ajaxReadWithJQuery("HM_Customer", payload);
                     var oView = this.getView();
 var model = oView.getModel("Bookingmodel");
@@ -4518,7 +4520,6 @@ if (oFragment) {
 
         _verifyOTPWithBackend: async function (otp) {
             BusyIndicator.show(0);
-
             try {
                 const oPayload = {
                     ...(this._oResetUser?.EmailID
