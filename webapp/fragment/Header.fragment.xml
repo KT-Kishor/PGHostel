@@ -8,9 +8,10 @@
                 icon="sap-icon://nav-back"
                 press="onNavBack"
             />
-            <Title
-                text="{i18n>companynameKT}"
-                class="customPageTitle"
+            <Image
+                src="./image/tagline remove 100.png"
+                height="3rem"
+                class="logoFix"
             />
         </contentLeft>
         <contentRight>

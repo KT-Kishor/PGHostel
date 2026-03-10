@@ -44,7 +44,7 @@
                 <GenericTile
                     id="branchTile"
                     visible="{= ${TileVisibility>/ManageBranch}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageBranchDetails}"
                     press="TileV_onpressBranchdata"
                 >
@@ -56,7 +56,7 @@
                 <GenericTile
                     id="bedTile"
                     visible="{= ${TileVisibility>/ManageBedType}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageBedDetails}"
                     press="TileV_onpressbeddetails"
                 >
@@ -68,7 +68,7 @@
                 <GenericTile
                     id="roomTile"
                     visible="{= ${TileVisibility>/ManageRooms}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>tileManageRoomDetails}"
                     press="TileV_onpressroomdetails"
                 >
@@ -80,7 +80,7 @@
                 <GenericTile
                     id="customerTile"
                     visible="{= ${TileVisibility>/ManageFacility}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageExtraFacilities}"
                     press="TileV_onpressextrafacilities"
                 >
@@ -92,7 +92,7 @@
                 <GenericTile
                     id="id1roomTile"
                     visible="{= ${TileVisibility>/ManageAmenities}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>maintainHostelFeatures}"
                     press="TileV_onpresshostelfeatures"
                 >
@@ -104,7 +104,7 @@
                 <GenericTile
                     id="id2roomTile"
                     visible="{= ${TileVisibility>/ManageCoupon}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageCouponDetails}"
                     press="TileV_onpressCouponDetails"
                 >
@@ -116,7 +116,7 @@
                 <GenericTile
                     id="id5roomTile"
                     visible="{= ${TileVisibility>/ManageStaff}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageStaff}"
                     press="TileV_onpressManageStaff"
                 >
@@ -128,7 +128,7 @@
                 <GenericTile
                     id="id6roomTile"
                     visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageVendors}"
                     press="TileV_onpressManageVendor"
                 >
@@ -156,7 +156,7 @@
                 <GenericTile
                     id="id3roomTile"
                     visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>manageCustomerDetails}"
                     press="TileV_onpressInbox"
                 >
@@ -168,7 +168,7 @@
                 <GenericTile
                     id="id4roomTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>invoiceDetails}"
                     press="TileV_onpressManageInvoice"
                 >
@@ -179,7 +179,7 @@
 
                 <GenericTile
                     id="id8roomTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     visible="{= ${TileVisibility>/ManageSecurityDeposit}!== 0?true:false }"
                     header="{i18n>DepositHeader}"
                     press="TileV_onpressDeposit"
@@ -192,7 +192,7 @@
                 <GenericTile
                     id="id7roomTile"
                     visible="{= ${TileVisibility>/ManagePaymentHistory}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>payment}"
                     press="TileV_onpressPayment"
                 >
@@ -202,7 +202,7 @@
                 </GenericTile>
                  <GenericTile
                     id="TP_DamageTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>damageTracking}"
                     visible="{= ${TileVisibility>/ManageDamage}!== 0?true:false }"
                     press="TileV_onpressdamage"
@@ -214,7 +214,7 @@
                 
                 <GenericTile
                     id="id12roomTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     visible="{= ${TileVisibility>/ManageComplainTracking}!== 0?true:false }"
                     header="{i18n>Complaintdetails}"
                     press="TileV_onpressComplaintdetails"
@@ -225,7 +225,7 @@
                 </GenericTile>
                 <GenericTile
                     id="id11roomTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     visible="{= ${TileVisibility>/ManageCustomerReview}!== 0?true:false }"
                     header="{i18n>customerReview}"
                     press="TileV_onpresscustomerreview"
@@ -254,7 +254,7 @@
                 <GenericTile
                     id="id9roomTile"
                     visible="{= ${TileVisibility>/ManageBookingDashboard}!== 0?true:false }"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>bookingDashboard}"
                     press="TileV_onpressdashboard"
                 >
@@ -264,7 +264,7 @@
                 </GenericTile>
                 <GenericTile
                     id="id10roomTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     visible="{= ${TileVisibility>/ManagePaymentDashboard}!== 0?true:false }"
                     header="{i18n>paymentdashboard}"
                     press="TileV_onpresshosteldashboard"
@@ -277,7 +277,7 @@
                 </GenericTile>
                 <GenericTile
                     id="TP_ComplaintDashBoardTile"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>complainDashboard}"
                     press="TileV_onpresscomplaintdashboard"
                     visible="{= ${TileVisibility>/ManageComplaintDashboard}!== 0?true:false }"
@@ -288,7 +288,7 @@
                 </GenericTile>
                 <GenericTile
                     id="TP_DamageDashboard"
-                    class="sapUiMediumMargin glassTile"
+                    class="sapUiTinyMargin glassTile"
                     header="{i18n>damageDashboard}"
                     visible="{= ${TileVisibility>/DamageDashboard}!== 0?true:false }"
                     press="TileV_onpressdamagedashboard"

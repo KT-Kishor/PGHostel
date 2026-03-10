@@ -2122,7 +2122,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   transform-style: preserve-3d;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s ease;
+  /* transition: all 0.25s ease; */
 }
 
 /* Remove default white tile background */
@@ -2131,10 +2131,19 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .glassTile:active {
-  transform: translateY(-2px) scale(0.99);
+  /* transform: translateY(-2px) scale(0.99); */
   box-shadow:
     0 12px 20px rgba(0, 0, 0, 0.25),
     inset 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Remove SAPUI5 tile hover movement */
+.glassTile:hover {
+  transform: none !important;
+  box-shadow:
+    0 18px 35px rgba(0, 0, 0, 0.25),
+    0 6px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45) !important;
 }
 
 /* Header text color */
@@ -2182,10 +2191,8 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
   transform: translateX(-120%);
   /* animation: glassShimmer 3.8s ease-in-out infinite; */
-
   pointer-events: none;
-  z-index: 2;
-  /* above glass, below content */
+  /* z-index: 2; */
 }
 
 .glassTile .sapMGTSubHdrTxt,
@@ -2206,7 +2213,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 .glassTile .sapMTileCntFtrTxt {
   margin-bottom: 16px !important;
 }
-
 
 .glassTile .sapUiIcon,
 .glassTile .sapMImg {
@@ -2970,7 +2976,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .guideButtonLarge:hover {
-  transform: translateY(-2px) scale(1.02);
+  /* transform: translateY(-2px) scale(0.9); */
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
@@ -4545,6 +4551,7 @@ width: 44px !important;
 .tileContainer1{
     width:100%;
     gap:1rem;
+    padding-left: 2rem;
 }
 
 .roomHeaderTitle1{
@@ -4609,4 +4616,10 @@ width: 44px !important;
 
 .sapUiTourOverlayActive {
     overflow: hidden !important;
+}
+
+.logoFix {
+  height: 3rem;
+  display: block;
+  transform: translateY(-5px);
 }

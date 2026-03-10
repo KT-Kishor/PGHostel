@@ -27,21 +27,18 @@
             }
           ]
         }
-      ],
-      "actionsStrip": [
-        {
-          "text": "View Booking",
-          "buttonType": "Emphasized",
+      ]
+    },
+    "footer": {
           "actions": [
             {
               "type": "Navigation",
+              "text": "View Booking",
               "parameters": {
                 "CustomerID": "{data>CustomerID}"
               }
             }
           ]
-        }
-      ]
     }
   }
 }
