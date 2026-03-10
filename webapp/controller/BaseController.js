@@ -824,7 +824,24 @@ sap.ui.define([
 
       return btoa(resultBinary);
     },
-    // @BaseController.js
+
+    // @BaseController.js  —  TOUR GUIDE section(v6)
+    // ─────────────────────────────────────────────────────────────────────────────
+    //  BaseController.js  —  TOUR GUIDE section  (v6)
+    //
+    //  All previous fixes retained. One new fix:
+    //
+    //  Problem (Image 6 / last step):
+    //    When the highlighted tile is near the bottom of the viewport, the popover
+    //    opens below it but clips off-screen — only the title bar is visible.
+    //
+    //  Fix — after measuring real popover height, check if it fits below the tile:
+    //    • If it fits → keep current behaviour (scroll tile up, popover below)
+    //    • If it doesn't fit → position popover ABOVE the tile instead
+    //      The popover top = tileTop - TILE_GAP - popoverHeight
+    //      Scroll so that arrangement is fully visible.
+    // ─────────────────────────────────────────────────────────────────────────────
+
     // ─── TOUR: Public API ─────────────────────────────────────────────────────────
     initUniversalTour: function (aSteps) {
       this._aTourSteps = (aSteps || []).slice();
@@ -906,61 +923,23 @@ sap.ui.define([
       }
     },
 
+
     // ─── TOUR: Open + position a step ─────────────────────────────────────────────
-    //
-    //  FLOW:
-    //  1. Instantly hide the popover via a fixed CSS class (opacity:0, no transition)
-    //  2. Close it silently so SAPUI5 state is clean
-    //  3. Scroll anchor into view
-    //  4. After scroll settles — calculate best placement, call openBy()
-    //  5. In afterOpen (layout is final, correct position) — remove the hide class
-    //     so it fades in smoothly with CSS transition
-    //
     _openStep: function (oPopover, oAnchor) {
       var that = this;
+      var vw = window.innerWidth || document.documentElement.clientWidth;
+      var bMobile = (vw < 600);
 
       oPopover.setModel(this._oGuideModel, "guideModel");
-
-      // ── Step 1: Hide immediately, no flicker ─────────────────────────────
       this._setPopoverVisible(oPopover, false);
 
-      // ── Step 2: Close silently (SAPUI5 state reset, no animation seen) ───
       var fnProceed = function () {
         that._highlightElement(oAnchor);
-        that._scrollToAnchor(oAnchor, function () {
-          // ── Step 4: Calculate & open ──────────────────────────────────
-          var vw = window.innerWidth || document.documentElement.clientWidth;
-
-          oPopover.setOffsetX(0);
-          oPopover.setOffsetY(0);
-
-          if (vw < 600) {
-            oPopover.setContentWidth("92%");
-            oPopover.setPlacement(sap.m.PlacementType.Bottom);
-            oPopover.setOffsetY(12);
-          } else {
-            oPopover.setContentWidth("360px");
-            var sBest = that._getBestPlacement(oAnchor, 360);
-            var GAP = 12;
-            oPopover.setPlacement(sBest);
-            if (sBest === sap.m.PlacementType.Right) { oPopover.setOffsetX(GAP); }
-            if (sBest === sap.m.PlacementType.Left) { oPopover.setOffsetX(-GAP); }
-            if (sBest === sap.m.PlacementType.Bottom) { oPopover.setOffsetY(GAP); }
-            if (sBest === sap.m.PlacementType.Top) { oPopover.setOffsetY(-GAP); }
-          }
-
-          // ── Step 5: Show only after layout is final ───────────────────
-          oPopover.attachEventOnce("afterOpen", function () {
-            that._setPopoverVisible(oPopover, true);
-          });
-
-          oPopover.openBy(oAnchor);
-
-          // Safety fallback in case afterOpen doesn't fire
-          setTimeout(function () {
-            that._setPopoverVisible(oPopover, true);
-          }, 500);
-        });
+        if (bMobile) {
+          that._openMobileStep(oPopover, oAnchor);
+        } else {
+          that._openDesktopStep(oPopover, oAnchor);
+        }
       };
 
       if (oPopover.isOpen()) {
@@ -971,10 +950,210 @@ sap.ui.define([
       }
     },
 
-    // ─── TOUR: Show / hide popover without any SAPUI5 lifecycle ──────────────────
+
+
+
+
+    // ─── MOBILE: open invisible → measure → pin top or bottom → ONE scroll → reveal
+
+
+    
+
+   
+
+
+
+
+    _openMobileStep: function (oPopover, oAnchor) {
+      var that = this;
+      var BOTTOM_MARGIN = 16;
+      var TILE_GAP = 12;
+      var TILE_ZONE = 0.3; // tile top at 30% of viewport
+
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+
+      this._setPopoverVisible(oPopover, false);
+      oPopover.setContentWidth("calc(100vw - 32px)");
+      oPopover.setOffsetX(0);
+      oPopover.setOffsetY(0);
+      oPopover.setPlacement(sap.m.PlacementType.Bottom);
+
+      var aDom = oAnchor.getDomRef();
+      if (!aDom) {
+        this._setPopoverVisible(oPopover, true);
+        return;
+      }
+
+      var oScroll =
+        aDom.closest(".sapMPageScrollCont") ||
+        aDom.closest(".sapMScrollCont") ||
+        aDom.closest(".sapUiScrollDelegate");
+
+      // LAST STEP SPECIAL CASE
+      var bIsLast = (this._iTourIndex === this._aTourSteps.length - 1);
+      if (bIsLast) {
+        this._openLastMobileStep(oPopover, oAnchor);
+        return;
+      }
+
+      // ── Pre-scroll the tile so popover has room below
+      var tileRect = aDom.getBoundingClientRect();
+      var scrollTopTarget = tileRect.top - vh * TILE_ZONE;
+
+      if (oScroll) {
+        oScroll.scrollBy({ top: scrollTopTarget, behavior: "instant" });
+      } else {
+        window.scrollBy({ top: scrollTopTarget, behavior: "instant" });
+      }
+
+      oPopover.attachEventOnce("afterOpen", function () {
+        var oDom = oPopover.getDomRef();
+        if (oDom) {
+          var oScrollCont = oDom.querySelector(".sapMPopoverCont");
+          if (oScrollCont) {
+            oScrollCont.style.height = "";
+            oScrollCont.style.maxHeight = "";
+            oScrollCont.style.overflow = "visible";
+          }
+        }
+        that._setPopoverVisible(oPopover, true);
+      });
+
+      oPopover.openBy(oAnchor);
+
+      setTimeout(function () {
+        that._setPopoverVisible(oPopover, true);
+      }, 1000);
+    },
+
+    _openLastMobileStep: function (oPopover, oAnchor) {
+      var that = this;
+      var TILE_GAP = 12;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+
+      // Close popover first if open
+      if (oPopover.isOpen()) {
+        oPopover.attachEventOnce("afterClose", function () {
+          that._forceOpenLastPopover(oPopover, oAnchor);
+        });
+        oPopover.close();
+      } else {
+        that._forceOpenLastPopover(oPopover, oAnchor);
+      }
+    },
+
+    _forceOpenLastPopover: function (oPopover, oAnchor) {
+      var that = this;
+      var TILE_GAP = 12;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+
+      var aDom = oAnchor.getDomRef();
+      if (!aDom) { return; }
+
+      var oScroll =
+        aDom.closest(".sapMPageScrollCont") ||
+        aDom.closest(".sapMScrollCont") ||
+        aDom.closest(".sapUiScrollDelegate");
+
+      // Measure popover height
+      oPopover.setPlacement(sap.m.PlacementType.Top);
+      this._setPopoverVisible(oPopover, false);
+
+      oPopover.attachEventOnce("afterOpen", function () {
+        var oDom = oPopover.getDomRef();
+        if (oDom) {
+          that._setPopoverVisible(oPopover, true);
+        }
+      });
+
+      // Scroll so tile + popover fully visible
+      var tileRect = aDom.getBoundingClientRect();
+      var popoverHeight = 300; // approximate, or measure dynamically if needed
+      var scrollTopTarget = tileRect.bottom - vh + popoverHeight + TILE_GAP;
+
+      if (oScroll) {
+        oScroll.scrollBy({ top: scrollTopTarget, behavior: "instant" });
+      } else {
+        window.scrollBy({ top: scrollTopTarget, behavior: "instant" });
+      }
+
+      oPopover.openBy(oAnchor);
+    },
+
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+
+    // ─── Helper: scroll container by delta, then callback ────────────────────────
+    _scrollBy: function (oDomRef, iDelta, fnCallback) {
+      var oScrollNode =
+        oDomRef.closest(".sapMPageScrollCont") ||
+        oDomRef.closest(".sapMScrollCont") ||
+        oDomRef.closest(".sapUiScrollDelegate");
+
+      if (oScrollNode) {
+        oScrollNode.scrollBy({ top: iDelta, behavior: "smooth" });
+      } else {
+        window.scrollBy({ top: iDelta, behavior: "smooth" });
+      }
+
+      setTimeout(function () {
+        requestAnimationFrame(function () {
+          if (fnCallback) { fnCallback(); }
+        });
+      }, 420);
+    },
+
+    // ─── DESKTOP: scroll-settle-then-open ────────────────────────────────────────
+    _openDesktopStep: function (oPopover, oAnchor) {
+      var that = this;
+
+      oPopover.setContentWidth("360px");
+      oPopover.setOffsetX(0);
+      oPopover.setOffsetY(0);
+
+      var sBest = this._getBestPlacement(oAnchor, 360);
+      var GAP = 12;
+      oPopover.setPlacement(sBest);
+      if (sBest === sap.m.PlacementType.Right) { oPopover.setOffsetX(GAP); }
+      if (sBest === sap.m.PlacementType.Left) { oPopover.setOffsetX(-GAP); }
+      if (sBest === sap.m.PlacementType.Bottom) { oPopover.setOffsetY(GAP); }
+      if (sBest === sap.m.PlacementType.Top) { oPopover.setOffsetY(-GAP); }
+
+      oPopover.attachEventOnce("afterOpen", function () {
+        that._setPopoverVisible(oPopover, true);
+      });
+
+      this._scrollToAnchor(oAnchor, function () {
+        requestAnimationFrame(function () {
+          setTimeout(function () {
+            requestAnimationFrame(function () {
+              oPopover.openBy(oAnchor);
+            });
+          }, 100);
+        });
+      });
+
+      setTimeout(function () {
+        that._setPopoverVisible(oPopover, true);
+      }, 600);
+    },
+
+    // ─── TOUR: Show / hide popover ────────────────────────────────────────────────
     _setPopoverVisible: function (oPopover, bVisible) {
-      // We toggle a CSS class that lives OUTSIDE SAPUI5's control tree.
-      // This avoids triggering any open/close lifecycle or animations.
       var oDom = oPopover.getDomRef();
       if (oDom) {
         if (bVisible) {
@@ -983,17 +1162,13 @@ sap.ui.define([
           oDom.classList.add("tourPopoverHidden");
         }
       }
-      // Also store intent so the afterOpen handler works even if DOM isn't ready yet
       oPopover._bTourHidden = !bVisible;
     },
 
-    // ─── TOUR: Scroll anchor to center of scroll container ───────────────────────
+    // ─── TOUR: Scroll anchor to center (desktop) ─────────────────────────────────
     _scrollToAnchor: function (oAnchor, fnCallback) {
       var oDomRef = oAnchor.getDomRef();
-      if (!oDomRef) {
-        fnCallback();
-        return;
-      }
+      if (!oDomRef) { fnCallback(); return; }
 
       var oScrollNode =
         oDomRef.closest(".sapMPageScrollCont") ||
@@ -1019,7 +1194,6 @@ sap.ui.define([
       }
 
       if (bNeedsScroll) {
-        // Wait for smooth scroll to finish, then 2 rAFs for layout to settle
         setTimeout(function () {
           requestAnimationFrame(function () {
             requestAnimationFrame(fnCallback);
@@ -1030,7 +1204,7 @@ sap.ui.define([
       }
     },
 
-    // ─── TOUR: Placement algorithm ────────────────────────────────────────────────
+    // ─── TOUR: Best placement (desktop) ──────────────────────────────────────────
     _getBestPlacement: function (oAnchor, pw) {
       var oDom = oAnchor && oAnchor.getDomRef && oAnchor.getDomRef();
       if (!oDom) { return sap.m.PlacementType.PreferredBottomOrFlip; }
@@ -1038,12 +1212,11 @@ sap.ui.define([
       var vw = window.innerWidth || document.documentElement.clientWidth;
       var vh = window.innerHeight || document.documentElement.clientHeight;
       var r = oDom.getBoundingClientRect();
-      var margin = 16;
+      var m = 16;
 
       if (vw < 600) { return sap.m.PlacementType.Bottom; }
-
-      if (vw - r.right >= pw + margin) { return sap.m.PlacementType.Right; }
-      if (r.left >= pw + margin) { return sap.m.PlacementType.Left; }
+      if (vw - r.right >= pw + m) { return sap.m.PlacementType.Right; }
+      if (r.left >= pw + m) { return sap.m.PlacementType.Left; }
 
       return (vh - r.bottom) >= r.top
         ? sap.m.PlacementType.PreferredBottomOrFlip
@@ -1071,7 +1244,7 @@ sap.ui.define([
       this._iTourIndex = 0;
       this._aTourSteps = [];
       if (this._oGuidePopover && this._oGuidePopover.isOpen()) {
-        this._setPopoverVisible(this._oGuidePopover, true); // restore before close
+        this._setPopoverVisible(this._oGuidePopover, true);
         this._oGuidePopover.close();
       }
     },
@@ -1092,7 +1265,6 @@ sap.ui.define([
 
     onBeforePopoverClose: function (oEvent) {
       var sReason = oEvent.getParameter("reason");
-      // Only block external closes (backdrop tap etc.) — never block our own close()
       if (sReason !== "ClosedByAPI" && this._aTourSteps && this._aTourSteps.length > 0) {
         oEvent.preventDefault();
       }

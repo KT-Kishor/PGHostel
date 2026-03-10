@@ -4619,6 +4619,9 @@ width: 44px !important;
 .sapUiTourOverlayActive {
     overflow: hidden !important;
 }
+/* .sapMPopover {
+    box-shadow: 0 8px 24px rgba(236, 230, 230, 0.432);
+} */
 
 .logoFix {
   height: 3rem;

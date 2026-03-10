@@ -484,13 +484,6 @@ var fnResolveDesc = function (config) {
     var bIsViewOnly = config.viewOnlyRoles &&
                       config.viewOnlyRoles.indexOf(sRole) !== -1;
 
-    // ── DEBUG: remove after confirming ──
-    console.log(
-        "Tile:", config.id,
-        "| Role:", sRole,
-        "| isViewOnly:", bIsViewOnly,
-        "| key chosen:", (bIsViewOnly && config.descKey_view) ? config.descKey_view : config.descKey
-    );
 
     var sKey = (bIsViewOnly && config.descKey_view)
                 ? config.descKey_view
