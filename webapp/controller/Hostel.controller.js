@@ -2590,8 +2590,10 @@ sap.ui.define([
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
-
-                var city = data[0].City
+           var FCity= data.find((item)=>{
+                   return item.City==="Kalaburagi"
+                })
+                var city = FCity? FCity.City : data[0].City;
                 var fCity = this.City ? this.City : city;
 
                 var filter = {
@@ -2604,7 +2606,9 @@ sap.ui.define([
                 this.isInitialLoad = true;
                 this._populateUniqueFilterValues(data)
 
-                const sCity = this.City ? this.City : data[0].City;
+             
+
+                const sCity = this.City ? this.City : FCity? FCity.City : data[0].City;
 
                 const aFiltered = oModelData.filter(item => item.City === sCity);
 

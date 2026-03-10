@@ -3039,6 +3039,9 @@ sap.ui.define([
                 (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.OrginalRentPrice) > this.RentPrice)  
                 && this.flag!==true && CustomerData.DueAmount > 0
             ) {
+                 if(Number(CustomerData.RentPrice) > this.RentPrice && CustomerData.TotalFacilityPrice === this.FacilityPrice && CustomerData.PaymentPaid !== "0.00"){
+
+                }else{
                 if (!this.PP_Dialog) {
                     var oView = this.getView();
                     this.PP_Dialog = sap.ui.xmlfragment(
@@ -3067,6 +3070,7 @@ sap.ui.define([
                 }, 100);
                 return;
             }
+        }
         }
 
             var Payload = {
