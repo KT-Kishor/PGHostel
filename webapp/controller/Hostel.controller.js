@@ -4828,9 +4828,60 @@ sap.ui.define([
             }
 
         },
-        HF_onCancelButtonPress: function () {
-            this._supportRequestDialog.close()
-        },
+       HF_onCancelButtonPress: function () {
+
+    const oView = this.getView();
+
+    // 1️⃣ Clear model data
+    const oSupportModel = oView.getModel("SupportModel");
+    if (oSupportModel) {
+        oSupportModel.setData({
+            IssueName: "",
+            IssueType: "",
+            IssueDescription: "",
+            RaisedBy: "",
+            Email: ""
+        });
+    }
+
+    // 2️⃣ Clear uploaded images
+    const oUploaderData = oView.getModel("UploaderData");
+    if (oUploaderData) {
+        oUploaderData.setProperty("/attachments", []);
+    }
+
+    // 3️⃣ Clear tokens
+    const oTokenModel = oView.getModel("tokenModel");
+    if (oTokenModel) {
+        oTokenModel.setProperty("/tokens", []);
+    }
+
+    // 4️⃣ Reset ValueState
+    const aFields = [
+        "SR_id_IssueName",
+        "SR_id_IssueType",
+        "SR_id_IssueDescription",
+        "SR_id_RaisedBy",
+        "SR_id_Email"
+    ];
+
+    aFields.forEach(id => {
+        const oControl = sap.ui.getCore().byId(oView.createId(id));
+        if (oControl) {
+            oControl.setValueState("None");
+        }
+    });
+
+    // 5️⃣ Clear file uploader
+    const oUploader = sap.ui.getCore().byId(oView.createId("HFF_id_FileUploader1"));
+    if (oUploader) {
+        oUploader.clear();
+    }
+
+    // 6️⃣ Close dialog
+    this._supportRequestDialog.close();
+
+},
         onIssuenamechanges: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
