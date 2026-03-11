@@ -207,7 +207,7 @@ sap.ui.define([
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -593,9 +593,9 @@ sap.ui.define([
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
 
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
 
                 return;
             }
@@ -633,7 +633,7 @@ sap.ui.define([
             };
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
@@ -643,7 +643,7 @@ sap.ui.define([
                 console.error(err);
                 MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
                 oModel.setProperty("/isEditMode", false);
                 oModel.refresh(true);
 
@@ -842,7 +842,7 @@ sap.ui.define([
             // When Payment tab selected, fetch invoices and bind to Payments
             if (sKey === "Payment") {
                 try {
-                    sap.ui.core.BusyIndicator.show(0);
+                    this.getBusyDialog();
                     const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
                     if (!sUserID) {
                         MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
@@ -867,7 +867,7 @@ sap.ui.define([
                 } catch (err) {
                     sap.m.MessageToast.show(err.message || err.responseText || "Error loading payments");
                 } finally {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                     // Update counts for table
                     this._updateRowCount();
                 }
@@ -895,7 +895,7 @@ sap.ui.define([
             }
 
             try {
-                if (!bSilent) sap.ui.core.BusyIndicator.show(0);
+                if (!bSilent) this.getBusyDialog();
 
                 const resp = await this.ajaxReadWithJQuery("HM_Complaint", { UserID: sUserID });
 
@@ -940,7 +940,7 @@ sap.ui.define([
                 }
             } finally {
                 if (!bSilent) {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                     this._updateRowCount();
                 }
             }
@@ -958,7 +958,7 @@ sap.ui.define([
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 // Backend returns: { success:true, data:{ HM_Damage:[...], HM_DamageItem:[...] } }
                 const resp = await this.ajaxReadWithJQuery("getHM_DamageBoth", { UserID: sUserID });
@@ -1075,7 +1075,7 @@ sap.ui.define([
                     MessageToast.show(err?.message || err?.responseText || "Error loading damage");
                 }
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
                 this._updateRowCount();
             }
         },
@@ -1949,7 +1949,7 @@ sap.ui.define([
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 let response;
                 if (oData.ComplaintID) {
@@ -1967,7 +1967,7 @@ sap.ui.define([
                 this.byId("id_tabBar1")?.setSelectedKey("Complaints");
                 await this._refreshComplaints();
 
-                sap.ui.core.BusyIndicator.hide();   
+                this.closeBusyDialog();   
 
             } catch (err) {
                 console.error("AJAX error:", err);
@@ -1976,7 +1976,7 @@ sap.ui.define([
                 }
                 MessageToast.show(this.i18nModel.getText("errorSavingComplaint") || "Error saving complaint.");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
         // Helper to refresh complaints table after save

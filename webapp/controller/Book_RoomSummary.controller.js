@@ -1831,7 +1831,7 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
             }
 
             try {
-                BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 const filter = {
                     CouponCode: sEnteredCode,
@@ -2055,7 +2055,7 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
                 console.error(err);
                 MessageToast.show(this.i18nModel.getText("errorApplyingCoupon"));
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
     });

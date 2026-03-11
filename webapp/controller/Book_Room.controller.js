@@ -1760,7 +1760,7 @@ sap.ui.define([
             }
             if (oFacilityModel) oFacilityModel.refresh(true);
             setTimeout(() => {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }, 2000);
 
             if (oModel) oModel.refresh(true);
@@ -3320,7 +3320,7 @@ sap.ui.define([
             }
 
             try {
-                BusyIndicator.show(0);
+                this.getBusyDialog();
                 let payload, oResponse;
 
                 if (isOTP) {
@@ -3506,7 +3506,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || "Invalid Credentials, Please try again");
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -3554,7 +3554,7 @@ sap.ui.define([
             //  PASSED ALL VALIDATIONS → SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oFilters = this._oResetUser?.UserID
                     ? { UserID: this._oResetUser.UserID }
@@ -3591,7 +3591,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             }
             finally {
-                BusyIndicator.hide();  // ALWAYS stop
+                this.closeBusyDialog();  // ALWAYS stop
                 this._resetOtpState();
             }
         },
@@ -3673,7 +3673,7 @@ sap.ui.define([
 
             const sEmail = oEmailCtrl.getValue().trim();
 
-            BusyIndicator.show(0);
+            this.getBusyDialog();
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
@@ -3703,12 +3703,12 @@ sap.ui.define([
                     this.i18nModel.getText("forgotOtpSendFailed");
                 sap.m.MessageToast.show(sMsg);
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
         _verifyOTPWithBackend: async function (otp) {
-            BusyIndicator.show(0);
+            this.getBusyDialog();
 
             try {
                 const oPayload = {
@@ -3731,7 +3731,7 @@ sap.ui.define([
                 return false;
 
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -3752,7 +3752,7 @@ sap.ui.define([
                 Type: "OTP"
             };
 
-            BusyIndicator.show(0);
+            this.getBusyDialog();
 
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
@@ -3787,7 +3787,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -4047,7 +4047,7 @@ sap.ui.define([
                 }
             };
 
-            BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
 
@@ -4145,7 +4145,7 @@ sap.ui.define([
                 console.error("SignUp Error:", err);
 
             } finally {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -5124,14 +5124,14 @@ sap.ui.define([
                     data: formattedPayload
                 };
 
-                BusyIndicator.show(0)
+                this.getBusyDialog()
                 // AJAX call
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
 
                 // Extract BookingDetails array
                 const aBookingDetails = oResponse.BookingDetails || [];
                 this._oPaymentDialog.close()
-                BusyIndicator.hide()
+                this.closeBusyDialog()
 
                 let sMessage = "Booking Successful!\n\n";
 
@@ -5166,7 +5166,7 @@ sap.ui.define([
                 });
 
             } catch (e) {
-                BusyIndicator.hide();
+                this.closeBusyDialog();
                 let errorMsg = "Unknown error";
 
                 // jQuery AJAX always returns responseJSON inside e.responseJSON
