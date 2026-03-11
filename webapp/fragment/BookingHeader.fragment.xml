@@ -2,15 +2,16 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <Bar design="Header">
+    <Bar design="Header" class="removeHeaderBorder">
         <contentLeft>
             <Button
                 icon="sap-icon://nav-back"
                 press="onNavBack"
             />
-            <Title
-                text="{i18n>companynameKT}"
-                class="customPageTitle"
+            <Image
+                src="./image/SVLogo.png"
+                height="2.5rem"
+                class="logoFix"
             />
         </contentLeft>
         <contentRight>
