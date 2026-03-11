@@ -207,14 +207,22 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <VBox>
-                                <Text
-                                    text="{mainModel>BranchID}"
-                                    class="sapUiTinyMarginBottom"
+                            <HBox alignItems="Center">
+                                <Avatar
+                                    src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
+                                    displayShape="Circle"
+                                    displaySize="S"
+                                    class="sapUiTinyMarginEnd"
                                 />
-                                <Text text="{mainModel>Name}" />
-                            </VBox>
-                            
+                                <VBox>
+                                    <Text
+                                        text="{mainModel>BranchID}"
+                                        class="sapUiTinyMarginBottom"
+                                    />
+                                    <Text text="{mainModel>Name}" />
+                                </VBox>
+                            </HBox>
+
                             <VBox>
                                 <Text text="{mainModel>GSTIN}" />
                                 <Text
@@ -226,7 +234,7 @@
                                     visible="{= !!${mainModel>Value} }"
                                 /> -->
                             </VBox>
-                            
+
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />

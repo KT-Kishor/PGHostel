@@ -2,15 +2,15 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <Bar design="Header">
+    <Bar design="Header" class="removeHeaderBorder">
         <contentLeft>
             <Button
                 icon="sap-icon://nav-back"
                 press="onNavBack"
             />
             <Image
-                src="./image/tagline remove 100.png"
-                height="3rem"
+                src="./image/KTL0.png"
+                height="4rem"
                 class="logoFix"
             />
         </contentLeft>

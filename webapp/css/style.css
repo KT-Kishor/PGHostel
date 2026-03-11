@@ -4623,8 +4623,34 @@ width: 44px !important;
     box-shadow: 0 8px 24px rgba(236, 230, 230, 0.432);
 } */
 
+.removeHeaderBorder .sapMBarLeft,
+.removeHeaderBorder .sapMBarMiddle,
+.removeHeaderBorder .sapMBarRight {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 .logoFix {
-  height: 3rem;
-  display: block;
-  transform: translateY(-5px);
+    display: block;
+}
+
+.BDcard .sapFCard .sapMBtnInner {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border: none;
+}
+
+.BDcard .sapFCard .sapMBtnInner .sapMBtnContent {
+    color: #ffffff !important;
+}
+
+.BDcard .sapFCard .sapMBtnInner:hover {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+}
+
+/* .BDcard .sapFCard .sapMBtnInner:hover {
+    background-color: #0854a0;
+} */
+
+.removeHeaderBorder {
+    border-bottom: none !important;
 }

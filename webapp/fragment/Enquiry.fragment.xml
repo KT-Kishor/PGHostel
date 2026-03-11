@@ -85,7 +85,7 @@
                             placeholder="{i18n>enteryourname}"
                             liveChange="onAdminLiveValidate"
                             valueStateText="{i18n>MSenterValidName}"
-                            maxLength="25"
+                            maxLength="40"
                         />
                     </VBox>
                 </HBox>

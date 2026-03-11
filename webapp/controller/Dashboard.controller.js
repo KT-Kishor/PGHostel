@@ -184,7 +184,7 @@ sap.ui.define([
             aCards.forEach((oBooking) => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/BookingDashboard.json",
-                    width: "380px"
+                    width: "320px"
                 });
 
                 oCard.setModel(new JSONModel(oBooking), "data");
@@ -703,13 +703,13 @@ sap.ui.define([
         onCardAction: function (oEvent) {
             const oParams = oEvent.getParameter("parameters");
             const sCustomerID = oParams.CustomerID;
-
-            var sEncodedID = btoa(sCustomerID.toString());
+            const sEncodedID = btoa(String(sCustomerID));
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
                 from: "Dashboard"
             });
+
         },
 
         onClickFilterBar: function () {

@@ -5,40 +5,44 @@
   },
   "sap.card": {
     "type": "Object",
-    "data": {
-      "path": "data>/"
-    },
+
     "header": {
-      "title": "Booking ID: {data>BookingID}",
-      "subTitle": "Customer Name: {data>CustomerName} ({data>CustomerID})"
+      "title": "Booking ID: {data>/BookingID}",
+      "subTitle": "Customer Name: {data>/CustomerName} ({data>/CustomerID})"
     },
+
     "content": {
       "groups": [
         {
           "items": [
             {
-              "value": "Booking Date: {data>BookingDate}"
+              "value": "Booking Date: {data>/BookingDate}"
             },
             {
-              "value": "Status: {data>Status}"
+              "value": "Status: {data>/Status}"
             },
             {
-              "value": "Stay: {data>StartDate} to {data>EndDate}"
+              "value": "Stay: {data>/StartDate} to {data>/EndDate}"
             }
           ]
         }
       ]
     },
+
     "footer": {
+      "actionsStrip": [
+        {
+          "text": "View Booking",
           "actions": [
             {
-              "type": "Navigation",
-              "text": "View Booking",
+              "type": "Custom",
               "parameters": {
-                "CustomerID": "{data>CustomerID}"
+                "CustomerID": "{data>/CustomerID}"
               }
             }
           ]
+        }
+      ]
     }
   }
 }

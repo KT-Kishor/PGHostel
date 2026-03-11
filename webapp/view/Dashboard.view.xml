@@ -42,6 +42,7 @@
                         id="todayCarousel"
                         direction="Row"
                         width="auto"
+                        class=" sapUiSmallMarginBottom BDcard"
                         justifyContent="Start"
                         alignItems="Start"
                     />
