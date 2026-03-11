@@ -945,7 +945,7 @@ sap.ui.define([
                         aData = response?.data || [];
                         oModel.setData(aData);
                     } finally {
-                        sap.ui.core.BusyIndicator.hide();
+                       this.closeBusyDialog();
                     }
                 }
                 await this._loadRoomsPageData();
@@ -1440,7 +1440,7 @@ sap.ui.define([
                     Address: (data.Address || "").trim()
                 }
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
                 if (!oResp || oResp.success !== true) {
@@ -1522,7 +1522,7 @@ sap.ui.define([
                     title: "Registration Failed"
                 });
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
@@ -2050,7 +2050,7 @@ sap.ui.define([
             };
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
@@ -2058,7 +2058,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
                 oModel.setProperty("/isEditMode", false);
             }
         },
@@ -3022,7 +3022,7 @@ sap.ui.define([
             // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oFilters = this._oResetUser?.UserID ? {
                     UserID: this._oResetUser.UserID
@@ -3058,7 +3058,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             } finally {
-                sap.ui.core.BusyIndicator.hide(); // ALWAYS stop
+               this.closeBusyDialog(); // ALWAYS stop
                 this._resetOtpState();
             }
         },
@@ -3072,7 +3072,7 @@ sap.ui.define([
         },
 
         _verifyOTPWithBackend: async function (otp) {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oPayload = {
                     ...(this._oResetUser?.EmailID ? {
@@ -3089,7 +3089,7 @@ sap.ui.define([
             } catch (err) {
                 return false;
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
@@ -3125,7 +3125,7 @@ sap.ui.define([
                 EmailID: sEmail,
                 Type: "OTP"
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
                 if (oResp?.success) {
@@ -3152,7 +3152,7 @@ sap.ui.define([
                     this.i18nModel.getText("invalidCredentialsPleasetryagain");
                 sap.m.MessageToast.show(sMsg);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
@@ -3534,7 +3534,7 @@ sap.ui.define([
             }
 
             try {
-                sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
 
                 let payload, oResponse;
                 // ----------------------------- OTP MODE -----------------------------
@@ -3640,7 +3640,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
@@ -3793,7 +3793,7 @@ sap.ui.define([
             if (!isValid) return MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
 
             const sEmail = oEmailCtrl.getValue().trim();
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", {
                     EmailID: sEmail,
@@ -3818,7 +3818,7 @@ sap.ui.define([
                 const sMsg = err?.responseJSON?.message || this.i18nModel.getText("forgotOtpSendFailed");
                 MessageToast.show(sMsg);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
@@ -4287,7 +4287,7 @@ sap.ui.define([
                     }))
                 }
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
 
@@ -4331,7 +4331,7 @@ sap.ui.define([
                 });
 
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+               this.closeBusyDialog();
             }
         },
 
