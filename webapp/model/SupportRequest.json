@@ -1,0 +1,39 @@
+
+  [
+    {
+      "ID": 1,
+      "IssueType": "Login Issue"
+    },
+    {
+      "ID": 2,
+      "IssueType": "Application Error"
+    },
+    {
+      "ID": 3,
+      "IssueType": "Performance Issue"
+    },
+    {
+      "ID": 4,
+      "IssueType": "Data Mismatch"
+    },
+    {
+      "ID": 5,
+      "IssueType": "Access Permission Issue"
+    },
+    {
+      "ID": 6,
+      "IssueType": "UI Display Issue"
+    },
+    {
+      "ID": 7,
+      "IssueType": "Payment / Billing Issue"
+    },
+    {
+      "ID": 8,
+      "IssueType": "Invoice/Report Generation Issue"
+    },
+    {
+      "ID": 9,
+      "IssueType": "Other"
+    }
+  ]

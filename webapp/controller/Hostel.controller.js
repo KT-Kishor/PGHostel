@@ -204,6 +204,24 @@ sap.ui.define([
 
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
+              var model = new JSONModel({
+              IssueName:"",
+IssueDescription:"",
+RaisedBy:"",
+Email:""
+            });
+            this.getView().setModel(model, "SupportModel")
+
+              const oUploaderData = new JSONModel({
+                attachments: []
+            });
+             this.getView().setModel(oUploaderData, "UploaderData");
+              this.getView().setModel(
+        new JSONModel({
+            tokens: []
+        }),
+        "tokenModel"
+    );
 
         },
         _clearOtpValidityTimer: function () {
@@ -4787,30 +4805,200 @@ sap.ui.define([
                 MessageToast.show("Error opening maps.");
             }
         },
-        //      onAfterRendering: function() {
-        //     // 1. Get the reference to your input control
-        //     var oInput = sap.ui.getCore().byId("adminMobileNo");     
-        //     if (oInput) {
-        //         // 3. Add a delegate to wait until the HTML is actually rendered
-        //         oInput.addEventDelegate({h,
-        //             onAfterRendering: function() {
-        //                 var $input = oInput.$().find("input");
+       
+ onSupportRequest: function () {
 
-        //                 // 4. Listen for the 'change' event (which Autofill triggers)
-        //                 $input.on("change", function(oEvent) {
-        //                     var sNewValue = oEvent.target.value;
+    if (!this._supportRequestDialog) {
 
-        //                     // Manually sync the value to the UI5 Control and Model
-        //                     oInput.setValue(sNewValue);
+        sap.ui.core.Fragment.load({
+            id: this.getView().getId(),
+            name: "sap.ui.com.project1.fragment.SupportRequest",
+            controller: this
+        }).then(function (oDialog) {
 
-        //                     // Clear the error state
-        //                     oInput.setValueState("None");
-        //                     oInput.setValueStateText("");
-        //                 });
-        //             }
-        //         }, this);
-        //     }
+            this._supportRequestDialog = oDialog;
+            this.getView().addDependent(oDialog);
+            oDialog.open();
+
+        }.bind(this));
+
+    } else {
+        this._supportRequestDialog.open();
+    }
+
+},
+HF_onCancelButtonPress:function(){
+    this._supportRequestDialog.close()
+},
+ onIssuenamechanges: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+        onSupportrequestChange: function (oEvent) {
+
+    const oFiles = oEvent.getParameter("files");
+    if (!oFiles || oFiles.length === 0) return;
+
+    const oView = this.getView();
+    const oUploaderData = oView.getModel("UploaderData");
+    const oTokenModel = oView.getModel("tokenModel");
+
+    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+    let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+    Array.from(oFiles).forEach((oFile) => {
+
+        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+            MessageToast.show("Only JPG, JPEG, PNG allowed");
+            return;
+        }
+
+        const oReader = new FileReader();
+
+        oReader.onload = (e) => {
+
+            const sBase64 = e.target.result.split(",")[1];
+
+            aAttachments.push({
+                filename: oFile.name,
+                fileType: oFile.type,
+                content: sBase64
+            });
+
+            aTokens.push({
+                key: oFile.name,
+                text: oFile.name
+            });
+
+            oUploaderData.setProperty("/attachments", aAttachments);
+            oTokenModel.setProperty("/tokens", aTokens);
+
+        };
+
+        oReader.readAsDataURL(oFile);
+
+    });
+
+    oEvent.getSource().clear();
+
+},
+onTokenDelete: function (oEvent) {
+
+    const aDeletedTokens = oEvent.getParameter("tokens");
+
+    if (!aDeletedTokens || aDeletedTokens.length === 0) return;
+
+    const oView = this.getView();
+    const oUploaderData = oView.getModel("UploaderData");
+    const oTokenModel = oView.getModel("tokenModel");
+
+    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+    let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+    aDeletedTokens.forEach((oToken) => {
+
+        const sKey = oToken.getKey();
+
+        aAttachments = aAttachments.filter(file => file.filename !== sKey);
+        aTokens = aTokens.filter(token => token.key !== sKey);
+
+    });
+
+    oUploaderData.setProperty("/attachments", aAttachments);
+    oTokenModel.setProperty("/tokens", aTokens);
+
+},
+ onSupportSubmit: async function () {
+
+    const oView = this.getView();
+    const oSupportModel = oView.getModel("SupportModel").getData();
+    const oUploaderData = oView.getModel("UploaderData");
+
+const aAttachments = this.getView()
+    .getModel("UploaderData")
+    .getProperty("/attachments") || [];
+
+let photoPayload = {
+    Photo1: "",
+    Photo1Name: "",
+    Photo1Type: "",
+    Photo2: "",
+    Photo2Name: "",
+    Photo2Type: "",
+    Photo3: "",
+    Photo3Name: "",
+    Photo3Type: ""
+};
+
+aAttachments.forEach((file, index) => {
+
+    const i = index + 1;
+
+    if (i <= 3) {
+        photoPayload[`Photo${i}`] = file.content;
+        photoPayload[`Photo${i}Name`] = file.filename;
+        photoPayload[`Photo${i}Type`] = file.fileType;
+    }
+
+});
+    var isMandatoryValid = (
+        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueName")), "ID") &&
+        utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("SR_id_IssueType")), "ID") &&
+        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueDescription")), "ID") &&
+        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_RaisedBy")), "ID") &&
+        utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("SR_id_Email")), "ID")
+    );
+
+    if (!isMandatoryValid) {
+        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        return;
+    }
+
+    // IMAGE VALIDATION
+    if (!aAttachments || aAttachments.length === 0) {
+        MessageToast.show("Please upload at least one image.");
+        return;
+    }
+
+    if (aAttachments.length > 3) {
+        MessageToast.show("You can upload maximum 3 images only.");
+        return;
+    }
+
+    const todayDate = new Date().toISOString().split("T")[0];
+
+    const payload = {
+        IssueName: oSupportModel.IssueName,
+        IssueType: oSupportModel.IssueType,
+        IssueDescription: oSupportModel.IssueDescription,
+        RaisedBy: oSupportModel.RaisedBy,
+        Email: oSupportModel.Email,
+         
+        CreatedDate: todayDate,
+        Status: "Open",
+         ...photoPayload
+    };
+
+    await this.ajaxCreateWithJQuery("HM_Support", payload);
+
+    MessageToast.show("Support request submitted successfully");
+
+    this._supportRequestDialog.close();
+},
+        
+        // onIssuenamechanges:function(oEvent){
+        //    utils._LCvalidateMandatoryField(oEvent)
         // },
-
+        onissuetypechanges:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent)
+        },
+        ondescriptionchnages:function(oEvent){
+             utils._LCvalidateMandatoryField(oEvent)
+        },
+        onchangesRaisedby:function(oEvent){
+              utils._LCvalidateMandatoryField(oEvent)
+        },
+        onEmailchange:function(oEvent){
+            utils._LCvalidateEmail(oEvent)
+        }
     });
 });

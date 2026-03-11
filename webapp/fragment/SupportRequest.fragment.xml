@@ -1,0 +1,146 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+
+	<Dialog id="HF_id_HostelFeaturesDialog1"
+		type="Message"
+		class="sapUiContentPadding"
+		contentWidth="28rem"
+		resizable="true"
+		draggable="true">
+
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="Support Request"/>
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+
+		<f:SimpleForm
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			columnsXL="2"
+			columnsL="2"
+			columnsM="1">
+
+			<f:content>
+
+				<!-- Issue Name -->
+				<Label text="Issue Name" required="true"/>
+				<Input
+					id="SR_id_IssueName"
+					placeholder="Enter Issue Name"
+                    valueStateText="Enter Issue Name"
+					value="{SupportModel>/IssueName}"
+                    liveChange="onIssuenamechanges"
+					maxLength="100"/>
+
+				<!-- Issue Type -->
+				<Label text="Issue Type" required="true"/>
+				<ComboBox
+					id="SR_id_IssueType"
+                    valueStateText="Enter Issue Type"
+					placeholder="Select Issue Type"
+                    value="{SupportModel>/IssueType}"
+                    change="onissuetypechanges"
+                     items="{SupportRequest>/}">
+					<core:Item key="{SupportRequest>ID}" text="{SupportRequest>IssueType}"/>
+					
+				</ComboBox>
+
+				<!-- Issue Description -->
+				<Label text="Issue Description" required="true"/>
+				<TextArea
+					id="SR_id_IssueDescription"
+					rows="4"
+                    liveChange="ondescriptionchnages"
+                    valueStateText="Enter Description"
+					placeholder="Enter Issue Description"
+					value="{SupportModel>/IssueDescription}"
+					maxLength="500"/>
+
+				<!-- Raised By -->
+				<Label text="Raised By" required="true"/>
+				<Input
+					id="SR_id_RaisedBy"
+                    liveChange="onchangesRaisedby"
+                    valueStateText="Enter your name"
+					value="{SupportModel>/RaisedBy}"
+					placeholder="Enter Name"/>
+
+				<!-- Email -->
+				<Label text="Email" required="true"/>
+				<Input
+					id="SR_id_Email"
+                    liveChange="onEmailchange"
+					type="Email"
+                    valueStateText="Enter a valid mail"
+					value="{SupportModel>/Email}"
+					placeholder="Enter Email"/>
+
+				<!-- Upload Image (UNCHANGED) -->
+				<Label text="Add Image"/>
+
+				<VBox alignItems="Start" width="100%" renderType="Bare">
+
+					<HBox width="25%">
+						<u:FileUploader
+							id="HFF_id_FileUploader1"
+							fileSizeExceed="onFileSizeExceeds"
+							maximumFileSize="2MB"
+							typeMissmatch="onFileTypeMissmatch"
+							fileType="jpg,jpeg,png"
+							change="onSupportrequestChange"
+							buttonOnly="true"
+							sameFilenameAllowed="true"
+							iconFirst="true"
+							buttonText="Upload Images"
+							multiple="true"
+							uploadOnChange="false"/>
+					</HBox>
+
+					<HBox width="75%">
+						<ScrollContainer height="60px" width="100%" horizontal="false" vertical="true">
+							<Tokenizer
+            id="HFF_id_TokenList1"
+            tokens="{tokenModel>/tokens}"
+            tokenDelete="onTokenDelete">
+
+            <Token
+                key="{tokenModel>key}"
+                text="{tokenModel>text}" />
+
+        </Tokenizer>
+						</ScrollContainer>
+					</HBox>
+
+				</VBox>
+
+			</f:content>
+		</f:SimpleForm>
+
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button
+					text="Submit"
+					press="onSupportSubmit"
+					class="marginRight myUnifiedBtn"/>
+				<Button
+					text="Cancel"
+					press="HF_onCancelButtonPress"
+					class="marginRight myUnifiedBtn"/>
+			</Toolbar>
+		</footer>
+
+	</Dialog>
+
+</c:FragmentDefinition>

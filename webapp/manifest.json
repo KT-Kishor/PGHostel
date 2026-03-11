@@ -92,6 +92,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/Role.json",
         "preload": true
+      },
+      "SupportRequest": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/SupportRequest.json",
+        "preload": true
       }
     },
     "resources": {

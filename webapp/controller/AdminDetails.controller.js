@@ -4476,7 +4476,6 @@ if (oFragment) {
             const isValid =
                 utils._LCvalidateEmail(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId"), "ID")
 
-
             if (!isValid) {
                 MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
@@ -4519,15 +4518,11 @@ if (oFragment) {
         },
 
         _verifyOTPWithBackend: async function (otp) {
+             var oCustomerData = this.getView().getModel("CustomerData").getData();
             this.getBusyDialog()
             try {
                 const oPayload = {
-                    ...(this._oResetUser?.EmailID
-                        ? { EmailID: this._oResetUser.EmailID }
-                        : {
-                            UserID: this._oResetUser?.UserID,
-                            UserName: this._oResetUser?.UserName
-                        }),
+                    CustomerID:oCustomerData.CustomerID,
                     OTP: otp.trim()
                 };
 
