@@ -76,7 +76,7 @@
         </beginButton>
         <endButton>
             <Button
-                text="Start Tile Tour →"
+                text="Start Tile Tour"
                 type="Emphasized"
                 press="onStartTileGuide"
                 class="myUnifiedBtn"
