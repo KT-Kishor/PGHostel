@@ -9,8 +9,8 @@
                 press="onNavBack"
             />
             <Image
-                src="./image/KTL0.png"
-                height="4rem"
+                src="./image/SVLogo.png"
+                height="2.5rem"
                 class="logoFix"
             />
         </contentLeft>
