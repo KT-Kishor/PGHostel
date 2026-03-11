@@ -10,17 +10,17 @@
         contentHeight="auto"
         contentWidth="auto"
         contentMinWidth="280px"
-        initialFocus="nextButtonId"
      
         beforeClose="onBeforePopoverClose">  
          <!-- 
          title="{guideModel>/currentStep/title}"
-         initialFocus="nextButtonId" -->
+        initialFocus="nextButtonId"
+         -->
 
         <customHeader>
-            <Bar>
+            <Bar  class="barheader">
                 <contentLeft>
-                    <Title text="{guideModel>/currentStep/title}" level="H3" />
+                    <Title class="Dashboardtitle" text="{guideModel>/currentStep/title}" level="H3" />
                 </contentLeft>
                 <contentRight>
                     <Text text="{guideModel>/currentStep/stepText}" class="sapUiTinyMarginEnd" />
@@ -41,7 +41,11 @@
         <footer  >
             <Bar>
                 <contentLeft>
-                    <Button text="Skip Tour" type="Transparent" press="onSkipTour" class=""/>
+                    <Button
+                        text="Skip Tour"
+                        class="btnGradientHoverOnly"
+                        press="onSkipTour"
+                        visible="{= !${guideModel>/isLast} }" />
                 </contentLeft>
                 <contentRight>
                     <Button

@@ -826,21 +826,6 @@ sap.ui.define([
     },
 
     // @BaseController.js  —  TOUR GUIDE section(v6)
-    // ─────────────────────────────────────────────────────────────────────────────
-    //  BaseController.js  —  TOUR GUIDE section  (v6)
-    //
-    //  All previous fixes retained. One new fix:
-    //
-    //  Problem (Image 6 / last step):
-    //    When the highlighted tile is near the bottom of the viewport, the popover
-    //    opens below it but clips off-screen — only the title bar is visible.
-    //
-    //  Fix — after measuring real popover height, check if it fits below the tile:
-    //    • If it fits → keep current behaviour (scroll tile up, popover below)
-    //    • If it doesn't fit → position popover ABOVE the tile instead
-    //      The popover top = tileTop - TILE_GAP - popoverHeight
-    //      Scroll so that arrangement is fully visible.
-    // ─────────────────────────────────────────────────────────────────────────────
 
     // ─── TOUR: Public API ─────────────────────────────────────────────────────────
     initUniversalTour: function (aSteps) {

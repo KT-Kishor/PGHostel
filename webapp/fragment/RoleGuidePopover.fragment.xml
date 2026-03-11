@@ -70,7 +70,7 @@
 
         <beginButton>
             <Button
-                text="Skip Tour"
+                text="Cancel"
                 type="Transparent"
                 press="onSkipRoleGuide"/>
         </beginButton>
