@@ -35,21 +35,21 @@ sap.ui.define([
             });
             this.getView().setModel(model, "VisibilityModel")
 
-    //           if (!this._oBookingDateDialog) {
-    //     this._oBookingDateDialog = await sap.ui.core.Fragment.load({
-    //         name: "sap.ui.com.project1.fragment.BookingDate",
-    //         controller: this
-    //     });
-    //     this.getView().addDependent(this._oBookingDateDialog);
-    // } 
-    //           sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date()).setValueState("None")
-    //           this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
+            //           if (!this._oBookingDateDialog) {
+            //     this._oBookingDateDialog = await sap.ui.core.Fragment.load({
+            //         name: "sap.ui.com.project1.fragment.BookingDate",
+            //         controller: this
+            //     });
+            //     this.getView().addDependent(this._oBookingDateDialog);
+            // } 
+            //           sap.ui.getCore().byId("idBookingDate").setValue("").setMinDate(new Date()).setValueState("None")
+            //           this.getView().byId("VR_id_JoiningDate").setValue("").setMinDate(new Date())
 
-    //        this.getView().addStyleClass("blurView")
-    //        this._oBookingDateDialog.open();
+            //        this.getView().addStyleClass("blurView")
+            //        this._oBookingDateDialog.open();
 
             this.sPath = oEvent.getParameter("arguments").sPath;
-      
+
             await this._loadFilteredData()
 
         },
@@ -64,27 +64,27 @@ sap.ui.define([
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
 
-        Bookingdatepress:async function(){
-              
-            if(utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idBookingDate"), "ID")){
-              await this._loadFilteredData()
-              this.getView().removeStyleClass("blurView")
-              this._oBookingDateDialog.close();
-              this.getView().byId("VR_id_JoiningDate").setValue(sap.ui.getCore().byId("idBookingDate").getValue())
-            }else{
+        Bookingdatepress: async function () {
+
+            if (utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idBookingDate"), "ID")) {
+                await this._loadFilteredData()
+                this.getView().removeStyleClass("blurView")
+                this._oBookingDateDialog.close();
+                this.getView().byId("VR_id_JoiningDate").setValue(sap.ui.getCore().byId("idBookingDate").getValue())
+            } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"))
 
             }
         },
-        Viewroom_onPressClear:function(){
-         this.getView().byId("VR_id_JoiningDate").setValue("")
+        Viewroom_onPressClear: function () {
+            this.getView().byId("VR_id_JoiningDate").setValue("")
         },
-        onBookingDateCancel:function(){
+        onBookingDateCancel: function () {
             this._oBookingDateDialog.close();
             this.getView().removeStyleClass("blurView")
 
         },
-        onDatePickerChange:function(oEvent){
+        onDatePickerChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
 
         },
@@ -93,12 +93,12 @@ sap.ui.define([
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel")
 
-                var sBranchCode= this.sPath
-          
+            var sBranchCode = this.sPath
+
             // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
                 this.getView().setBusy(true);
-                     oVisibilityModel.setProperty("/isDataLoaded", false);
+                oVisibilityModel.setProperty("/isDataLoaded", false);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
                     // JoiningDate:Date,
@@ -223,16 +223,16 @@ sap.ui.define([
                         TotalFeedbacks: TotalFeedbacks,
                         GeoLocation: oBranchInfo?.GeoLocation || "",
                         EmailID: oBranchInfo?.EmailID || "",
-                        AvailableDate:Date,
-                        ExtraBed:room.ExtraBed
+                        AvailableDate: Date,
+                        ExtraBed: room.ExtraBed
                     };
                 });
 
                 const aExisting = oVisibilityModel.getProperty("/BedTypes") || [];
                 let aFinal;
 
-                    aFinal = aBedTypes;
-              
+                aFinal = aBedTypes;
+
 
 
                 aFinal = aFinal.filter(b => b.PriceVisible !== false);
@@ -252,7 +252,7 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
             } catch (err) {
                 console.log(err);
-                 oVisibilityModel.setProperty("/isDataLoaded", false);
+                oVisibilityModel.setProperty("/isDataLoaded", false);
             }
         },
         viewDetails: function (oEvent) {
@@ -287,7 +287,7 @@ sap.ui.define([
                     GSTValue: oSelected.GSTValue,
                     GSTIN: oSelected.GSTIN || "",
                     GeoLocation: oSelected.GeoLocation,
-                    AvailableDate:oSelected.AvailableDate,
+                    AvailableDate: oSelected.AvailableDate,
                     ExtraBed: oSelected.ExtraBed || 0
 
                 };
@@ -508,7 +508,7 @@ sap.ui.define([
                 GSTValue: oData.GSTValue,
                 GSTType: oData.GSTType,
                 GSTIN: oData.GSTIN || "",
-                AvailableDate:oData.AvailableDate,
+                AvailableDate: oData.AvailableDate,
                 ExtraBed: oData.ExtraBed || 0
 
             };
@@ -551,7 +551,7 @@ sap.ui.define([
             }
 
             this._clearRoomDetailDialog();
-             const oHostelModel = this.getView().getModel("HostelModel");
+            const oHostelModel = this.getView().getModel("HostelModel");
             if (!oHostelModel) {
                 oHostelModel.setData({});
             }
@@ -728,9 +728,9 @@ sap.ui.define([
                 .filter(Boolean); // remove null
         },
         _LoadFacilities: async function (sBranchCode) {
-              
-               const oModel = this.getView().getModel("HostelModel").getData();
-               const oExtraBed = oModel.ExtraBed || 0;
+
+            const oModel = this.getView().getModel("HostelModel").getData();
+            const oExtraBed = oModel.ExtraBed || 0;
             if (!this._oRoomDetailFragment || !sBranchCode) return;
 
             const oFacilityModel = new JSONModel({
@@ -742,7 +742,7 @@ sap.ui.define([
 
             try {
                 let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
-                let allFacilities = resp?.data || [];   
+                let allFacilities = resp?.data || [];
 
                 // Get static types
                 const oStaticModel = this.getView().getModel("FacilityType");
@@ -750,21 +750,21 @@ sap.ui.define([
                 const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
 
                 // Case-insensitive filter
-               const branchFacilities = allFacilities.filter(f => {
-    const fBranch = (f.BranchCode || "").trim();
-    const fType = (f.Type || "").trim().toLowerCase();
+                const branchFacilities = allFacilities.filter(f => {
+                    const fBranch = (f.BranchCode || "").trim();
+                    const fType = (f.Type || "").trim().toLowerCase();
 
-    const branchMatch = fBranch === sBranchCode.trim();
-    const typeMatch = validTypesLower.includes(f.Type || "");
+                    const branchMatch = fBranch === sBranchCode.trim();
+                    const typeMatch = validTypesLower.includes(f.Type || "");
 
-    // ✅ Extra Bed condition
-    if (fType === "extra bed") {
-        return branchMatch && typeMatch && oExtraBed > 0;
-    }
+                    // ✅ Extra Bed condition
+                    if (fType === "extra bed") {
+                        return branchMatch && typeMatch && oExtraBed > 0;
+                    }
 
-    // ✅ All other facilities
-    return branchMatch && typeMatch;
-});
+                    // ✅ All other facilities
+                    return branchMatch && typeMatch;
+                });
 
                 if (branchFacilities.length > 0) {
                     oFacilityModel.setProperty("/Facilities", this._convertFacilities(branchFacilities));
@@ -814,8 +814,8 @@ sap.ui.define([
         },
         _convertAmenities: function (list) {
             const defaultImages = {
-                 "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
-                "CCTV Surveillance":"../image/CCTV Surveillance.jpeg",
+                "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
+                "CCTV Surveillance": "../image/CCTV Surveillance.jpeg",
                 "Drinking Water": "../image/Drinking Water.jpg",
                 "Geyser": "../image/Geyser.jpeg",
                 "Ceiling Fan": "../image/Ceiling Fan.jpg",
@@ -824,11 +824,11 @@ sap.ui.define([
                 "Study Table": "../image/Study Table.jpg",
                 "Refrigerator": "../image/Refrigerator.png",
                 "Attached Bathroom": "../image/Attached Bathroom.jpg",
-                "Parking":"../image/Parking1.jpeg",
+                "Parking": "../image/Parking1.jpeg",
                 "Lift": "../image/Lift.jpg",
-                "Room Cleaning":"../image/Room Cleaning.jpg",
-                "Mess Facility":"../image/Mess Facility.jpeg",
-                "Kitchen Access":"../image/Kitchen Access.png",
+                "Room Cleaning": "../image/Room Cleaning.jpg",
+                "Mess Facility": "../image/Mess Facility.jpeg",
+                "Kitchen Access": "../image/Kitchen Access.png",
                 "Personal Lockers": "../image/locker.jpg",
                 "Communal Spaces": "../image/CommonSpace.jpg",
                 "Lounge Areas": "../image/LoungeArea.jpg"
@@ -936,10 +936,9 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            const oMobile = sap.ui.getCore().byId(oView.createId("id_enq_MobileNo"));
-            if (!oMobile.getValue()) {
-                oMobile.setValueState("Error");
-                oMobile.setValueStateText("Enter valid mobile number");
+            const isMobileValid = this._validateMobileNumber();
+            if (!isMobileValid) {
+                sap.m.MessageToast.show("Enter valid mobile number");
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -992,7 +991,7 @@ sap.ui.define([
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        ADMIN_onMobileLiveChange: function (oEvent) {
+        _validateMobileNumber: function () {
             const oMobile = this.byId("id_enq_MobileNo");
             const oSTD = this.byId("id_enq_STD");
 
@@ -1001,17 +1000,23 @@ sap.ui.define([
 
             oMobile.setValue(sValue);
 
+            // ISD mandatory
+            if (!sSTD) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("Select ISD code");
+                return false;
+            } else {
+                oSTD.setValueState("None");
+            }
+
+            // Mobile mandatory
             if (!sValue) {
                 oMobile.setValueState("Error");
                 oMobile.setValueStateText("Mobile number is required");
                 return false;
             }
 
-            if (!sSTD) {
-                oMobile.setValueState("Error");
-                oMobile.setValueStateText("Select ISD code first");
-                return false;
-            }
+            // INDIA VALIDATION
             if (sSTD === "+91") {
 
                 if (sValue.length !== 10) {
@@ -1019,26 +1024,30 @@ sap.ui.define([
                     oMobile.setValueStateText("Indian mobile number must be exactly 10 digits");
                     return false;
                 }
-
                 if (sValue.startsWith("0")) {
                     oMobile.setValueState("Error");
                     oMobile.setValueStateText("Indian mobile number cannot start with 0");
                     return false;
                 }
 
-                oMobile.setValueState("None");
-                oMobile.setValueStateText("");
-                return true;
             }
-            if (sValue.length < 4 || sValue.length > 14) {
-                oMobile.setValueState("Error");
-                oMobile.setValueStateText("Mobile number must be between 4 and 14 digits");
-                return false;
-            }
+            // OTHER COUNTRIES
+            else {
 
+                if (sValue.length < 4 || sValue.length > 18) {
+                    oMobile.setValueState("Error");
+                    oMobile.setValueStateText("Mobile number must be between 4 and 18 digits");
+                    return false;
+                }
+
+            }
             oMobile.setValueState("None");
             oMobile.setValueStateText("");
             return true;
+        },
+
+        ADMIN_onMobileLiveChange: function () {
+            this._validateMobileNumber();
         },
 
         ADMIN_onChangeSTD: function (oEvent) {
@@ -1052,6 +1061,7 @@ sap.ui.define([
                 oSTD.setValueStateText("Please select ISD code");
                 return;
             }
+
             oSTD.setValueState("None");
             oSTD.setValueStateText("");
 
@@ -1059,6 +1069,14 @@ sap.ui.define([
                 oMobile.setMaxLength(10);
             } else {
                 oMobile.setMaxLength(18);
+            }
+
+            // Only validate if mobile already has value
+            if (sMobileValue) {
+                this._validateMobileNumber();
+            } else {
+                oMobile.setValueState("None");
+                oMobile.setValueStateText("");
             }
         },
 
