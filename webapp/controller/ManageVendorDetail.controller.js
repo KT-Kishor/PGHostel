@@ -991,7 +991,7 @@ sap.ui.define([
                         }
                     };
 
-                    this.getBusyDialog()
+                    that.getBusyDialog()
 
                     await that.ajaxCreateWithJQuery(
                         "HM_CustomerDocument",
@@ -1012,11 +1012,10 @@ sap.ui.define([
                     oFileUploader.clear();
 
                 } catch (err) {
-                    MessageToast.show(
-                        that.i18nModel.getText("docUploadError")
-                    );
+                    that.closeBusyDialog()
+                    MessageToast.show(that.i18nModel.getText("docUploadError"));
                 } finally {
-                    this.closeBusyDialog()
+                    that.closeBusyDialog()
                 }
             };
 
