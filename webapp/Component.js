@@ -54,7 +54,6 @@ sap.ui.define([
                 this._fetchCommonData("City", "CityModel");
                 this._fetchCommonData("State", "StateModel");
                 this._fetchCommonData("Country", "CountryModel");
-                this._fetchCommonData("BaseLocation", "BaseLocationModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
                 await this._fetchCommonData("HM_BranchData", "sBRModel");
                 this.getRootControl().setBusy(false);
