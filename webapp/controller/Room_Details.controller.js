@@ -62,8 +62,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchCode = "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
@@ -525,8 +525,8 @@ sap.ui.define([
             var oRoomDetailsModel = oView.getModel("RoomDetailsModel");
             var oBedTypeModel = oView.getModel("BedTypeModel");
 
-         
-           var BranchCode = oRoomModel.getProperty("/BranchCode");
+
+            var BranchCode = oRoomModel.getProperty("/BranchCode");
             var Payload = oRoomModel.getData();
 
             // Remove unnecessary fields
@@ -598,35 +598,35 @@ sap.ui.define([
 
                 if (aFiltered.length === 0 && !Payload._isEditing) {
                     sap.m.MessageToast.show(this.i18nModel.getText("allRoomsforthisBedTypeAlreadyCreated"));
-                       var oMatch = aRoomDetails.find(item =>
-                item.BedTypeName === Payload.BedTypeName &&
-                item.BranchCode === BranchCode
-            );
+                    var oMatch = aRoomDetails.find(item =>
+                        item.BedTypeName === Payload.BedTypeName &&
+                        item.BranchCode === BranchCode
+                    );
 
-            if (oMatch) {
-             
-                oRoomModel.setProperty("/editable", false);
-            } else {
-              
-                oRoomModel.setProperty("/editable", true);
-            }
+                    if (oMatch) {
+
+                        oRoomModel.setProperty("/editable", false);
+                    } else {
+
+                        oRoomModel.setProperty("/editable", true);
+                    }
                     return;
                 }
 
                 if (oExistingRoom && !Payload._isEditing && oExistingRoom.RoomNo === Payload.RoomNo) {
                     sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
-                       var oMatch = aRoomDetails.find(item =>
-                item.BedTypeName === Payload.BedTypeName &&
-                item.BranchCode === BranchCode
-            );
+                    var oMatch = aRoomDetails.find(item =>
+                        item.BedTypeName === Payload.BedTypeName &&
+                        item.BranchCode === BranchCode
+                    );
 
-            if (oMatch) {
-             
-                oRoomModel.setProperty("/editable", false);
-            } else {
-              
-                oRoomModel.setProperty("/editable", true);
-            }
+                    if (oMatch) {
+
+                        oRoomModel.setProperty("/editable", false);
+                    } else {
+
+                        oRoomModel.setProperty("/editable", true);
+                    }
                     return;
                 }
                 if (Payload._isEditing) {
@@ -646,7 +646,7 @@ sap.ui.define([
                     return;
                 }
 
-         
+
 
                 var sUrl = "https://rest.kalpavrikshatechnologies.com/HM_Rooms";
                 var sMethod = "POST";
@@ -664,7 +664,7 @@ sap.ui.define([
                 }
 
                 delete Payload._isEditing;
-              this.getBusyDialog()
+                this.getBusyDialog()
 
                 $.ajax({
                     url: sUrl,
@@ -688,7 +688,7 @@ sap.ui.define([
                     }.bind(this),
                     error: function (err) {
                         sap.m.MessageBox.error(this.i18nModel.getText("errorSavingRoomData"));
-                         sap.ui.core.BusyIndicator.hide()
+                        sap.ui.core.BusyIndicator.hide()
                     }.bind(this)
                 });
             } else {
@@ -725,7 +725,7 @@ sap.ui.define([
                     cust.BedType === oRoom.BedTypeName &&
                     cust.Status === "Assigned"
                 );
-  
+
                 if (bAssigned) {
                     aAssignedRooms.push(oRoom.RoomNo);
                 } else {
@@ -756,11 +756,17 @@ sap.ui.define([
             var sRoomNos = aDeletableRooms
                 .map(room => room.roomNo)
                 .join(", ");
-                var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
+            var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
+
+            let sMessage = `Are you sure you want to delete the following room(s): ${sRoomNos}?`;
+
+
+            if (sRoomNos && sRoomNos.length > 0) {
+                sMessage += `\nThese rooms cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`;
+            }
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the following room(s): ${sRoomNos}? 
-                 They cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`,
+                sMessage,
                 {
                     title: "Confirm Deletion",
                     icon: sap.m.MessageBox.Icon.WARNING,

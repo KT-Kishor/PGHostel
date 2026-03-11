@@ -93,19 +93,19 @@
 					<OverflowToolbar>
 						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>
 						<ToolbarSpacer />
-					
+						<Button
+                            text="Create Damage"
+                            tooltip="Create Damage"
+                            press="HM_GenearteDamage"
+                            class="myUnifiedBtn"
+                             />
 						<Button
                             text="{i18n>ReturnDamage}"
                             tooltip="{i18n>ReturnDamage}"
                             press="HM_ReturnDamage"
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
-							<Button
-                            text="Create Damage"
-                            tooltip="Create Damage"
-                            press="HM_GenearteDamage"
-                            class="myUnifiedBtn"
-                             />
+						
 						<Button
                             text="{i18n>download}"
 							icon="sap-icon://excel-attachment"

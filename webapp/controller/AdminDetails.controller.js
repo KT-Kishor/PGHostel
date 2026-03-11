@@ -3004,7 +3004,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
                 return;
             }
-            if(LoginModel.Role === "Customer"){
+            if(LoginModel.Role === "Customer" || this._fromRoute==="ManageProfile"){
             if (paymentMap[unit] === "Per Day"
                 && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
                 && this.flag!==true && CustomerData.DueAmount > 0) {

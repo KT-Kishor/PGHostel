@@ -3,12 +3,12 @@ sap.ui.define([
     "../utils/validation",
     "sap/m/MessageToast",
     "sap/ui/export/Spreadsheet",
-      "../model/formatter"
+    "../model/formatter"
 ], function (BaseController, utils, MessageToast,
-    Spreadsheet,Formatter) {
+    Spreadsheet, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Bed_Details", {
-          Formatter: Formatter,
+        Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
@@ -18,7 +18,7 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
 
-                   var oView = this.getView();
+                var oView = this.getView();
                 var oModel = oView.getModel("BedDetails");
 
                 if (!oModel) {
@@ -27,7 +27,7 @@ sap.ui.define([
                 } else {
                     oModel.setData({});
                 }
-                
+
                 var model = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",
@@ -56,8 +56,8 @@ sap.ui.define([
                 this.closeBusyDialog()
             }
         },
-        Customerdata:function(){
-             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+        Customerdata: function () {
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
@@ -72,17 +72,17 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchCode = aBranchCodes;
-                filters.Role ="Admin";
-            }else{
+                filters.Role = "Admin";
+            } else {
                 filters.BranchCode = "";
             }
             this.ajaxReadWithJQuery("HM_Customer", filters).then((response) => {
-                    
-                        const oModel = new sap.ui.model.json.JSONModel(response.Customers);
-                        this.getView().setModel(oModel, "HostelModel");
 
-                        this.closeBusyDialog()
-                    }).catch(() => sap.ui.core.BusyIndicator.hide());
+                const oModel = new sap.ui.model.json.JSONModel(response.Customers);
+                this.getView().setModel(oModel, "HostelModel");
+
+                this.closeBusyDialog()
+            }).catch(() => sap.ui.core.BusyIndicator.hide());
         },
 
         _loadBranchCode: async function () {
@@ -101,10 +101,10 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-                filters.Role ="Admin";
-            }else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            } else{
+                filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
             this.getBusyDialog()
@@ -125,7 +125,7 @@ sap.ui.define([
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
-          onPriceInputLiveChange: function (oEvent) {
+        onPriceInputLiveChange: function (oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
 
@@ -208,7 +208,7 @@ sap.ui.define([
                 utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
                 utils.onNumber(oView.byId("BD_id_DepositAmount"), "ID") &&
-                utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID")&&
+                utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
             ) {
                 var Attachment = oView.getModel("tokenModel").getData();
@@ -252,7 +252,7 @@ sap.ui.define([
                         BranchCode: Payload.BranchCode.split('-')[0],
                         ACType: Payload.ACType,
                         NoOfPerson: Payload.NoOfPerson.trim(),
-                        ExtraBed:Payload.ExtraBed,
+                        ExtraBed: Payload.ExtraBed,
                         MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
                         DepositCurrency: Payload.DepositCurrency,
@@ -331,7 +331,7 @@ sap.ui.define([
         },
 
         onFacilityFileChange: function (oEvent) {
-             var oUploader = oEvent.getSource();
+            var oUploader = oEvent.getSource();
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -455,9 +455,9 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-          if (Array.isArray(omainModel) && omainModel.length) {
+            if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
-            }else   if (oExistingModel.BranchCode) {
+            } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode
                     .split(",")
                     .map(code => code.trim());
@@ -467,10 +467,10 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin") {
                 filters = { BranchCode: aBranchCodes };
-                filters.Role ="Admin";
-            }else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchCode = "";
-            } else{
+                filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
+            } else {
                 filters = { BranchCode: oExistingModel.BranchCode };
             }
 
@@ -484,16 +484,16 @@ sap.ui.define([
 
                     let response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                     const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+                    const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
-        // Map BranchCode to BranchName directly in response
-        response = response.map(bed => {
-            const branch = branchData.find(br => br.BranchID === bed.BranchCode);
-            return {
-                ...bed,
-                BranchName: branch ? branch.Name : bed.BranchID 
-            };
-        });
+                    // Map BranchCode to BranchName directly in response
+                    response = response.map(bed => {
+                        const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+                        return {
+                            ...bed,
+                            BranchName: branch ? branch.Name : bed.BranchID
+                        };
+                    });
 
                     if (!response || response.length === 0) {
                         this._originalBedData = [];
@@ -587,7 +587,7 @@ sap.ui.define([
         onbranchChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             const sBranchCode = oEvent.getSource().getSelectedKey();
-              var oCurrencyModel = this.getView().getModel("BranchModel").getData();
+            var oCurrencyModel = this.getView().getModel("BranchModel").getData();
 
             var oCountryModel = this.getView().getModel("CountryModel").getData();
 
@@ -613,120 +613,123 @@ sap.ui.define([
             })
         },
 
-       HM_DeleteDetails: function () {
-    var CustData = this.getView().getModel("HostelModel").getData();
-    var table = this.byId("id_BedTable");
-    var aSelectedItems = table.getSelectedItems();
+        HM_DeleteDetails: function () {
+            var CustData = this.getView().getModel("HostelModel").getData();
+            var table = this.byId("id_BedTable");
+            var aSelectedItems = table.getSelectedItems();
 
-    // No selection
-    if (aSelectedItems.length === 0) {
-        sap.m.MessageToast.show(
-            this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
-        );
-        return;
-    }
+            // No selection
+            if (aSelectedItems.length === 0) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete")
+                );
+                return;
+            }
 
-    var aAssignedBeds = [];
-    var aDeletableBeds = [];
+            var aAssignedBeds = [];
+            var aDeletableBeds = [];
 
 
-    // Split assigned & non-assigned beds
-    aSelectedItems.forEach(item => {
-        var oBed = item.getBindingContext("BedDetails").getObject();
+            // Split assigned & non-assigned beds
+            aSelectedItems.forEach(item => {
+                var oBed = item.getBindingContext("BedDetails").getObject();
 
-        var bAssigned = CustData.some(cust =>
-            cust.BranchCode === oBed.BranchCode &&
-            cust.BedType === (oBed.Name + " - " + oBed.ACType) &&
-            cust.Status === "Assigned"
-        );
+                var bAssigned = CustData.some(cust =>
+                    cust.BranchCode === oBed.BranchCode &&
+                    cust.BedType === (oBed.Name + " - " + oBed.ACType) &&
+                    cust.Status === "Assigned"
+                );
 
-        if (bAssigned) {
-            aAssignedBeds.push(oBed.Name);
-        } else {
-            aDeletableBeds.push({
-                name: oBed.Name,
-                item: item
-            });
-        }
-    });
-
-    // Single selection & assigned → stop
-    if (aSelectedItems.length === 1 && aAssignedBeds.length === 1) {
-        sap.m.MessageBox.warning(
-            "Cannot delete! Selected bed is already assigned."
-        );
-        return;
-    }
-
-    // All selected beds are assigned
-    if (aDeletableBeds.length === 0) {
-        sap.m.MessageBox.warning(
-            "All selected beds are already assigned and cannot be deleted."
-        );
-        return;
-    }
-
-    // Show only non-assigned bed names in confirm dialog
-    var sBedNames = aDeletableBeds
-        .map(bed => bed.name)
-        .join(", ");
-           var sBedNamesA = aAssignedBeds.map(bed => bed).join(", ");
-       
-
-    sap.m.MessageBox.confirm(
-      `Are you sure you want to delete the following bed(s): ${sBedNames}? 
-         They cannot be deleted because they are currently assigned to: ${sBedNamesA}.`,
-        {
-            title: "Confirm Deletion",
-            icon: sap.m.MessageBox.Icon.WARNING,
-            actions: [
-                sap.m.MessageBox.Action.OK,
-                sap.m.MessageBox.Action.CANCEL
-            ],
-            onClose: async function (sAction) {
-                if (sAction === sap.m.MessageBox.Action.OK) {
-                    this.getBusyDialog()
-                    try {
-                        const deletePromises = aDeletableBeds.map(bedObj => {
-                            const data = bedObj.item
-                                .getBindingContext("BedDetails")
-                                .getObject();
-
-                            return $.ajax({
-                                url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
-                                method: "DELETE",
-                                contentType: "application/json",
-                                data: JSON.stringify({
-                                    filters: { ID: data.ID }
-                                }),
-                                headers: {
-                                    name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                                    password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-                                }
-                            });
-                        });
-
-                        await Promise.all(deletePromises);
-                        await this.Onsearch("true");
-
-                        sap.m.MessageToast.show(
-                            this.i18nModel.getText("selectedBedDeletedSuccessfully")
-                        );
-                    } catch (error) {
-                        console.error("Delete failed:", error);
-                        sap.m.MessageBox.error(
-                            this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain")
-                        );
-                    } finally {
-                        this.closeBusyDialog()
-                        table.removeSelections(true);
-                    }
+                if (bAssigned) {
+                    aAssignedBeds.push(oBed.Name);
+                } else {
+                    aDeletableBeds.push({
+                        name: oBed.Name,
+                        item: item
+                    });
                 }
-            }.bind(this)
-        }
-    );
-},
-  onDepositCurrency: function (oEvent) {
+            });
+
+            // Single selection & assigned → stop
+            if (aSelectedItems.length === 1 && aAssignedBeds.length === 1) {
+                sap.m.MessageBox.warning(
+                    "Cannot delete! Selected bed is already assigned."
+                );
+                return;
+            }
+
+            // All selected beds are assigned
+            if (aDeletableBeds.length === 0) {
+                sap.m.MessageBox.warning(
+                    "All selected beds are already assigned and cannot be deleted."
+                );
+                return;
+            }
+
+            // Show only non-assigned bed names in confirm dialog
+            var sBedNames = aDeletableBeds
+                .map(bed => bed.name)
+                .join(", ");
+            var sBedNamesA = aAssignedBeds.map(bed => bed).join(", ");
+
+            let sMessage = `Are you sure you want to delete the following bed(s): ${sBedNames}?`;
+
+            if (sBedNamesA && sBedNamesA.length > 0) {
+                sMessage += `\nThese beds cannot be deleted because they are currently assigned to: ${sBedNamesA}.`;
+            }
+            sap.m.MessageBox.confirm(
+                sMessage,
+                {
+                    title: "Confirm Deletion",
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    actions: [
+                        sap.m.MessageBox.Action.OK,
+                        sap.m.MessageBox.Action.CANCEL
+                    ],
+                    onClose: async function (sAction) {
+                        if (sAction === sap.m.MessageBox.Action.OK) {
+                            this.getBusyDialog()
+                            try {
+                                const deletePromises = aDeletableBeds.map(bedObj => {
+                                    const data = bedObj.item
+                                        .getBindingContext("BedDetails")
+                                        .getObject();
+
+                                    return $.ajax({
+                                        url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+                                        method: "DELETE",
+                                        contentType: "application/json",
+                                        data: JSON.stringify({
+                                            filters: { ID: data.ID }
+                                        }),
+                                        headers: {
+                                            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                                            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
+                                        }
+                                    });
+                                });
+
+                                await Promise.all(deletePromises);
+                                await this.Onsearch("true");
+
+                                sap.m.MessageToast.show(
+                                    this.i18nModel.getText("selectedBedDeletedSuccessfully")
+                                );
+                            } catch (error) {
+                                console.error("Delete failed:", error);
+                                sap.m.MessageBox.error(
+                                    this.i18nModel.getText("errorwhileDeletingBedPleaseTryAgain")
+                                );
+                            } finally {
+                                this.closeBusyDialog()
+                                table.removeSelections(true);
+                            }
+                        }
+                    }.bind(this)
+                }
+            );
+        },
+        onDepositCurrency: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
@@ -784,7 +787,7 @@ sap.ui.define([
                 property: "NoOfPerson",
                 type: "string"
             },
-                {
+            {
                 label: "Deposit Amount",
                 property: "Deposit",
                 type: "string"

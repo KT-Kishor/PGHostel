@@ -191,7 +191,8 @@ sap.ui.define([
 
             var fnDelete = async function () {
 
-                that.getBusyDialog()
+                // that.getBusyDialog()
+                sap.ui.core.BusyIndicator.show(0);
 
                 try {
 
@@ -229,6 +230,7 @@ sap.ui.define([
                     oTable.removeSelections();
 
                     sap.m.MessageToast.show("Selected Item(s) Deleted");
+                    
 
                 } catch (err) {
                     that.closeBusyDialog()
@@ -236,7 +238,9 @@ sap.ui.define([
                     sap.m.MessageToast.show("Error while deleting");
                 }
 
-                that.closeBusyDialog()
+                // that.closeBusyDialog()
+                sap.ui.core.BusyIndicator.hide();
+
             };
 
             if (hasSavedItem) {
@@ -252,10 +256,11 @@ sap.ui.define([
                         }
                     }
                 );
-
+                
             } else {
                 fnDelete();
             }
+
         },
         onNavBack: function () {
             this.getOwnerComponent().getRouter().navTo("RouteDamage");
@@ -607,11 +612,7 @@ sap.ui.define([
                     {
                         label: "Room No :",
                         value: oModel.RoomNo || "N/A"
-                    },
-                    {
-                        label: "Status :",
-                        value: oModel.Status || "N/A"
-                    }
+                    }                   
                 ];
 
                 // Print right-aligned structured block
