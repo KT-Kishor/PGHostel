@@ -4168,7 +4168,7 @@ sap.ui.define([
         // Signin section
 
             onSignIn: async function () {
-            var oLoginModel = this.getView().getModel("LoginModel");
+     
             var vm = this.getView().getModel("LoginViewModel");
             
              var oCustomerData = this.getView().getModel("CustomerData").getData();
@@ -4180,9 +4180,6 @@ sap.ui.define([
             const ctrlPassword = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signinPassword");
             const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
 
-            var sUserid = ctrlEmailId && ctrlEmailId.getValue ? ctrlEmailId.getValue().trim() : "";
-
-            var sPassword = ctrlPassword && ctrlPassword.getValue ? ctrlPassword.getValue() : "";
             const sOTP = ctrlOTP && ctrlOTP.getValue ? ctrlOTP.getValue().trim() : "";
 
             // --- VALIDATION ---
@@ -4310,7 +4307,7 @@ oOTP?.setValue("");
 // Clear value states
 oEmail?.setValueState("None");
 oOTP?.setValueState("None");
-
+MessageToast.show("Login Successful");
 if (oFragment) {
     oFragment.close();
 }
