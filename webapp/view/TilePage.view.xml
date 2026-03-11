@@ -301,6 +301,7 @@
         </VBox>
         <Button
             id="TP_StepsGuideBtn"
+            visible="{tilePageView>/isStepsGuideVisible}"
             text="Steps Guide"
             icon="sap-icon://learning-assistant"
             press="onStartGuide"

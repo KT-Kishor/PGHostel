@@ -6,7 +6,32 @@ sap.ui.define([
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.TilePage", {
         onInit: function () {
+            this._initGuideStateModel();
             this.getOwnerComponent().getRouter().getRoute("TilePage").attachMatched(this._onRouteMatched, this);
+        },
+
+        _initGuideStateModel: function () {
+            if (!this.getView().getModel("tilePageView")) {
+                this.getView().setModel(new JSONModel({
+                    isStepsGuideVisible: true
+                }), "tilePageView");
+            }
+            this._bStartingTileGuide = false;
+        },
+
+        _setStepsGuideButtonVisible: function (bVisible) {
+            var oModel = this.getView().getModel("tilePageView");
+            if (oModel) {
+                oModel.setProperty("/isStepsGuideVisible", bVisible);
+            }
+        },
+
+        _handleRoleGuideAfterClose: function () {
+            if (this._bStartingTileGuide) {
+                this._bStartingTileGuide = false;
+                return;
+            }
+            this._setStepsGuideButtonVisible(true);
         },
 
         _onRouteMatched: function () {
@@ -366,6 +391,8 @@ sap.ui.define([
 
             var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
             var oConfig = this._getRoleGuideConfig(sRole);
+            this._setStepsGuideButtonVisible(false);
+            this._bStartingTileGuide = false;
 
             if (!this._oRoleGuideModel) {
                 this._oRoleGuideModel = new sap.ui.model.json.JSONModel();
@@ -383,6 +410,7 @@ sap.ui.define([
                 }).then(function (oDialog) {
                     that._oRoleGuideDialog = oDialog;
                     oDialog.setModel(that._oRoleGuideModel, "roleGuideModel");
+                    oDialog.attachAfterClose(that._handleRoleGuideAfterClose, that);
                     oView.addDependent(oDialog);
                     oDialog.open();
                 });
@@ -400,12 +428,15 @@ sap.ui.define([
         onSkipRoleGuide: function () {
             if (this._oRoleGuideDialog && this._oRoleGuideDialog.isOpen()) {
                 this._oRoleGuideDialog.close();
+            } else {
+                this._setStepsGuideButtonVisible(true);
             }
         },
 
         // ─── STEP 2: "Start Tour" pressed — close role popover, begin tile tour ───
         onStartTileGuide: function () {
             var that = this;
+            this._bStartingTileGuide = true;
             if (this._oRoleGuideDialog && this._oRoleGuideDialog.isOpen()) {
                 this._oRoleGuideDialog.attachEventOnce("afterClose", function () {
                     that._launchTileSteps();
@@ -587,10 +618,16 @@ sap.ui.define([
         },
         _launchTileSteps: function () {
             if (!this._aPendingTileSteps || !this._aPendingTileSteps.length) {
+                this._setStepsGuideButtonVisible(true);
                 sap.m.MessageToast.show("No tiles available for the guide.");
                 return;
             }
             this.initUniversalTour(this._aPendingTileSteps);
+        },
+
+        _cleanupTour: function () {
+            BaseController.prototype._cleanupTour.apply(this, arguments);
+            this._setStepsGuideButtonVisible(true);
         },
 
     })
