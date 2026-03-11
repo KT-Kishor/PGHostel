@@ -89,40 +89,40 @@
 				<!-- Upload Image (UNCHANGED) -->
 				<Label text="{i18n>addImage}" required="true"/>
 
-				<VBox alignItems="Start" width="100%" renderType="Bare">
+			<VBox alignItems="Start" width="100%" renderType="Bare">
 
-					<HBox width="25%">
-						<u:FileUploader
-							id="HFF_id_FileUploader1"
-							fileSizeExceed="onFileSizeExceeds"
-							maximumFileSize="2MB"
-							typeMissmatch="onFileTypeMissmatch"
-							fileType="jpg,jpeg,png"
-							change="onSupportrequestChange"
-							buttonOnly="true"
-							sameFilenameAllowed="true"
-							iconFirst="true"
-							buttonText="Upload Images"
-							multiple="true"
-							uploadOnChange="false"/>
-					</HBox>
+    <!-- Upload Button -->
+    <HBox width="100%">
+        <u:FileUploader
+            id="HFF_id_FileUploader1"
+            fileSizeExceed="onFileSizeExceeds"
+            maximumFileSize="2"
+            typeMissmatch="onFileTypeMissmatch"
+            fileType="jpg,jpeg,png"
+            change="onSupportrequestChange"
+            buttonOnly="true"
+            sameFilenameAllowed="true"
+            iconFirst="true"
+            buttonText="Upload Images"
+            multiple="true"
+            uploadOnChange="false"/>
+    </HBox>
 
-					<HBox width="75%">
-						<ScrollContainer height="60px" width="100%" horizontal="false" vertical="true">
-							<Tokenizer
-            id="HFF_id_TokenList1"
-            tokens="{tokenModel>/tokens}"
-            tokenDelete="onTokenDelete">
+    <!-- Tokens -->
+    <Tokenizer
+        id="HFF_id_TokenList1"
+        width="100%"
+        class="sapUiSmallMarginTop"
+        tokens="{tokenModel>/tokens}"
+        tokenDelete="onTokenDelete">
 
-            <Token
-                key="{tokenModel>key}"
-                text="{tokenModel>text}" />
+        <Token
+            key="{tokenModel>key}"
+            text="{tokenModel>text}" />
 
-        </Tokenizer>
-						</ScrollContainer>
-					</HBox>
+    </Tokenizer>
 
-				</VBox>
+</VBox>
 
 			</f:content>
 		</f:SimpleForm>
