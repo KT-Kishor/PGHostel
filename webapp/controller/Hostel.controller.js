@@ -147,7 +147,7 @@ sap.ui.define([
                 isOtpBoxVisible: false,
                 otpExpiryTs: null,
                 otpValidityText: "",
-                isOTPAllowed:true
+                isOTPAllowed: true
 
             }), "LoginViewModel");
 
@@ -204,24 +204,25 @@ sap.ui.define([
 
             const oNav = this.byId("pageContainer");
             oNav.setDefaultTransitionName("None");
-              var model = new JSONModel({
-              IssueName:"",
-IssueDescription:"",
-RaisedBy:"",
-Email:""
+            var model = new JSONModel({
+                IssueName: "",
+                IssueDescription: "",
+                RaisedBy: "",
+                Email: ""
             });
             this.getView().setModel(model, "SupportModel")
 
-              const oUploaderData = new JSONModel({
+            const oUploaderData = new JSONModel({
                 attachments: []
             });
-             this.getView().setModel(oUploaderData, "UploaderData");
-              this.getView().setModel(
-        new JSONModel({
-            tokens: []
-        }),
-        "tokenModel"
-    );
+            this.getView().setModel(oUploaderData, "UploaderData");
+            this.getView().setModel(
+                new JSONModel({
+                    tokens: []
+                }),
+                "tokenModel"
+            );
+         
 
         },
         _clearOtpValidityTimer: function () {
@@ -847,7 +848,7 @@ Email:""
         _convertAmenities: function (list) {
             const defaultImages = {
                 "Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
-                "CCTV Surveillance":"../image/CCTV Surveillance.jpeg",
+                "CCTV Surveillance": "../image/CCTV Surveillance.jpeg",
                 "Drinking Water": "../image/Drinking Water.jpg",
                 "Geyser": "../image/Geyser.jpeg",
                 "Ceiling Fan": "../image/Ceiling Fan.jpg",
@@ -856,11 +857,11 @@ Email:""
                 "Study Table": "../image/Study Table.jpg",
                 "Refrigerator": "../image/Refrigerator.png",
                 "Attached Bathroom": "../image/Attached Bathroom.jpg",
-                "Parking":"../image/Parking1.jpeg",
+                "Parking": "../image/Parking1.jpeg",
                 "Lift": "../image/Lift.jpg",
-                "Room Cleaning":"../image/Room Cleaning.jpg",
-                "Mess Facility":"../image/Mess Facility.jpeg",
-                "Kitchen Access":"../image/Kitchen Access.png",
+                "Room Cleaning": "../image/Room Cleaning.jpg",
+                "Mess Facility": "../image/Mess Facility.jpeg",
+                "Kitchen Access": "../image/Kitchen Access.png",
                 "Personal Lockers": "../image/locker.jpg",
                 "Communal Spaces": "../image/CommonSpace.jpg",
                 "Lounge Areas": "../image/LoungeArea.jpg"
@@ -963,7 +964,7 @@ Email:""
                         aData = response?.data || [];
                         oModel.setData(aData);
                     } finally {
-                       this.closeBusyDialog();
+                        this.closeBusyDialog();
                     }
                 }
                 await this._loadRoomsPageData();
@@ -1540,7 +1541,7 @@ Email:""
                     title: "Registration Failed"
                 });
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -2076,7 +2077,7 @@ Email:""
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
                 oModel.setProperty("/isEditMode", false);
             }
         },
@@ -2608,10 +2609,10 @@ Email:""
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
-           var FCity= data.find((item)=>{
-                   return item.City==="Kalaburagi"
+                var FCity = data.find((item) => {
+                    return item.City === "Kalaburagi"
                 })
-                var city = FCity? FCity.City : data[0].City;
+                var city = FCity ? FCity.City : data[0].City;
                 var fCity = this.City ? this.City : city;
 
                 var filter = {
@@ -2624,9 +2625,9 @@ Email:""
                 this.isInitialLoad = true;
                 this._populateUniqueFilterValues(data)
 
-             
 
-                const sCity = this.City ? this.City : FCity? FCity.City : data[0].City;
+
+                const sCity = this.City ? this.City : FCity ? FCity.City : data[0].City;
 
                 const aFiltered = oModelData.filter(item => item.City === sCity);
 
@@ -2695,7 +2696,7 @@ Email:""
 
                     let aUpdatedData = [...aExistingData, ...aFilteredData];
 
-                this.getView().getModel("AreaModel").setData(aUpdatedData);
+                    this.getView().getModel("AreaModel").setData(aUpdatedData);
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
@@ -3076,7 +3077,7 @@ Email:""
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("passwordResetFailed"));
             } finally {
-               this.closeBusyDialog(); // ALWAYS stop
+                this.closeBusyDialog(); // ALWAYS stop
                 this._resetOtpState();
             }
         },
@@ -3107,7 +3108,7 @@ Email:""
             } catch (err) {
                 return false;
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -3170,7 +3171,7 @@ Email:""
                     this.i18nModel.getText("invalidCredentialsPleasetryagain");
                 sap.m.MessageToast.show(sMsg);
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -3658,7 +3659,7 @@ Email:""
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -3836,7 +3837,7 @@ Email:""
                 const sMsg = err?.responseJSON?.message || this.i18nModel.getText("forgotOtpSendFailed");
                 MessageToast.show(sMsg);
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -4349,7 +4350,7 @@ Email:""
                 });
 
             } finally {
-               this.closeBusyDialog();
+                this.closeBusyDialog();
             }
         },
 
@@ -4805,35 +4806,35 @@ Email:""
                 MessageToast.show("Error opening maps.");
             }
         },
-       
- onSupportRequest: function () {
 
-    if (!this._supportRequestDialog) {
+        onSupportRequest: function () {
 
-        sap.ui.core.Fragment.load({
-            id: this.getView().getId(),
-            name: "sap.ui.com.project1.fragment.SupportRequest",
-            controller: this
-        }).then(function (oDialog) {
+            if (!this._supportRequestDialog) {
 
-            this._supportRequestDialog = oDialog;
-            this.getView().addDependent(oDialog);
-            oDialog.open();
+                sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.SupportRequest",
+                    controller: this
+                }).then(function (oDialog) {
 
-        }.bind(this));
+                    this._supportRequestDialog = oDialog;
+                    this.getView().addDependent(oDialog);
+                    oDialog.open();
 
-    } else {
-        this._supportRequestDialog.open();
-    }
+                }.bind(this));
 
-},
-HF_onCancelButtonPress:function(){
-    this._supportRequestDialog.close()
-},
- onIssuenamechanges: function (oEvent) {
+            } else {
+                this._supportRequestDialog.open();
+            }
+
+        },
+        HF_onCancelButtonPress: function () {
+            this._supportRequestDialog.close()
+        },
+        onIssuenamechanges: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-        onSupportrequestChange: function (oEvent) {
+       onSupportrequestChange: function (oEvent) {
 
     const oFiles = oEvent.getParameter("files");
     if (!oFiles || oFiles.length === 0) return;
@@ -4847,6 +4848,14 @@ HF_onCancelButtonPress:function(){
 
     Array.from(oFiles).forEach((oFile) => {
 
+        // Check duplicate file name
+        const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
+        if (bDuplicate) {
+            MessageToast.show(`"${oFile.name}" is already uploaded.`);
+            return;
+        }
+
+        // File type validation
         if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
             MessageToast.show("Only JPG, JPEG, PNG allowed");
             return;
@@ -4881,123 +4890,122 @@ HF_onCancelButtonPress:function(){
     oEvent.getSource().clear();
 
 },
-onTokenDelete: function (oEvent) {
+        onTokenDelete: function (oEvent) {
 
-    const aDeletedTokens = oEvent.getParameter("tokens");
+            const aDeletedTokens = oEvent.getParameter("tokens");
 
-    if (!aDeletedTokens || aDeletedTokens.length === 0) return;
+            if (!aDeletedTokens || aDeletedTokens.length === 0) return;
 
-    const oView = this.getView();
-    const oUploaderData = oView.getModel("UploaderData");
-    const oTokenModel = oView.getModel("tokenModel");
+            const oView = this.getView();
+            const oUploaderData = oView.getModel("UploaderData");
+            const oTokenModel = oView.getModel("tokenModel");
 
-    let aAttachments = oUploaderData.getProperty("/attachments") || [];
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-    aDeletedTokens.forEach((oToken) => {
+            aDeletedTokens.forEach((oToken) => {
 
-        const sKey = oToken.getKey();
+                const sKey = oToken.getKey();
 
-        aAttachments = aAttachments.filter(file => file.filename !== sKey);
-        aTokens = aTokens.filter(token => token.key !== sKey);
+                aAttachments = aAttachments.filter(file => file.filename !== sKey);
+                aTokens = aTokens.filter(token => token.key !== sKey);
 
-    });
+            });
 
-    oUploaderData.setProperty("/attachments", aAttachments);
-    oTokenModel.setProperty("/tokens", aTokens);
+            oUploaderData.setProperty("/attachments", aAttachments);
+            oTokenModel.setProperty("/tokens", aTokens);
 
-},
- onSupportSubmit: async function () {
+        },
+        onSupportSubmit: async function () {
 
-    const oView = this.getView();
-    const oSupportModel = oView.getModel("SupportModel").getData();
-    const oUploaderData = oView.getModel("UploaderData");
+            const oView = this.getView();
+            const oSupportModel = oView.getModel("SupportModel").getData();
+            const oUploaderData = oView.getModel("UploaderData");
 
-const aAttachments = this.getView()
-    .getModel("UploaderData")
-    .getProperty("/attachments") || [];
+            const aAttachments = this.getView()
+                .getModel("UploaderData")
+                .getProperty("/attachments") || [];
 
-let photoPayload = {
-    Photo1: "",
-    Photo1Name: "",
-    Photo1Type: "",
-    Photo2: "",
-    Photo2Name: "",
-    Photo2Type: "",
-    Photo3: "",
-    Photo3Name: "",
-    Photo3Type: ""
-};
+            let photoPayload = {
+                Photo1: "",
+                Photo1Name: "",
+                Photo1Type: "",
+                Photo2: "",
+                Photo2Name: "",
+                Photo2Type: "",
+                Photo3: "",
+                Photo3Name: "",
+                Photo3Type: ""
+            };
 
-aAttachments.forEach((file, index) => {
+            aAttachments.forEach((file, index) => {
 
-    const i = index + 1;
+                const i = index + 1;
 
-    if (i <= 3) {
-        photoPayload[`Photo${i}`] = file.content;
-        photoPayload[`Photo${i}Name`] = file.filename;
-        photoPayload[`Photo${i}Type`] = file.fileType;
-    }
+                if (i <= 3) {
+                    photoPayload[`Photo${i}`] = file.content;
+                    photoPayload[`Photo${i}Name`] = file.filename;
+                    photoPayload[`Photo${i}Type`] = file.fileType;
+                }
 
-});
-    var isMandatoryValid = (
-        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueName")), "ID") &&
-        utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("SR_id_IssueType")), "ID") &&
-        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueDescription")), "ID") &&
-        utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_RaisedBy")), "ID") &&
-        utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("SR_id_Email")), "ID")
-    );
+            });
+            var isMandatoryValid = (
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueName")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("SR_id_IssueType")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_IssueDescription")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("SR_id_RaisedBy")), "ID") &&
+                utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("SR_id_Email")), "ID")
+            );
 
-    if (!isMandatoryValid) {
-        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-        return;
-    }
+            if (!isMandatoryValid) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
 
-    // IMAGE VALIDATION
-    if (!aAttachments || aAttachments.length === 0) {
-        MessageToast.show("Please upload at least one image.");
-        return;
-    }
+            // IMAGE VALIDATION
+            if (!aAttachments || aAttachments.length === 0) {
+                MessageToast.show("Please upload at least one image.");
+                return;
+            }
 
-    if (aAttachments.length > 3) {
-        MessageToast.show("You can upload maximum 3 images only.");
-        return;
-    }
+            if (aAttachments.length > 3) {
+                MessageToast.show("You can upload maximum 3 images only.");
+                return;
+            }
 
-    const todayDate = new Date().toISOString().split("T")[0];
+            const todayDate = new Date().toISOString().split("T")[0];
 
-    const payload = {
-        IssueName: oSupportModel.IssueName,
-        IssueType: oSupportModel.IssueType,
-        IssueDescription: oSupportModel.IssueDescription,
-        RaisedBy: oSupportModel.RaisedBy,
-        Email: oSupportModel.Email,
-         
-        CreatedDate: todayDate,
-        Status: "Open",
-         ...photoPayload
-    };
+            const data = {
+                IssueName: oSupportModel.IssueName,
+                IssueType: oSupportModel.IssueType,
+                IssueDescription: oSupportModel.IssueDescription,
+                RaisedBy: oSupportModel.RaisedBy,
+                Email: oSupportModel.Email,
+                CreatedDate: todayDate,
+                Status: "Open",
+                ...photoPayload
+            };
+            const payload = {
+                data: data
+            };
+            this.getBusyDialog();
+            await this.ajaxCreateWithJQuery("HM_Support", payload);
+            this.closeBusyDialog()
+            MessageToast.show("Support request submitted successfully");
 
-    await this.ajaxCreateWithJQuery("HM_Support", payload);
+            this._supportRequestDialog.close();
+        },
 
-    MessageToast.show("Support request submitted successfully");
-
-    this._supportRequestDialog.close();
-},
-        
-        // onIssuenamechanges:function(oEvent){
-        //    utils._LCvalidateMandatoryField(oEvent)
-        // },
-        onissuetypechanges:function(oEvent){
+        onissuetypechanges: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent)
         },
-        ondescriptionchnages:function(oEvent){
-             utils._LCvalidateMandatoryField(oEvent)
+        ondescriptionchnages: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         },
-        onchangesRaisedby:function(oEvent){
-              utils._LCvalidateMandatoryField(oEvent)
+        onchangesRaisedby: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         },
-        onEmailchange:function(oEvent){
+        onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
         }
     });

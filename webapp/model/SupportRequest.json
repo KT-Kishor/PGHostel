@@ -10,30 +10,26 @@
     },
     {
       "ID": 3,
-      "IssueType": "Performance Issue"
-    },
-    {
-      "ID": 4,
       "IssueType": "Data Mismatch"
     },
     {
-      "ID": 5,
+      "ID": 4,
       "IssueType": "Access Permission Issue"
     },
     {
-      "ID": 6,
+      "ID": 5,
       "IssueType": "UI Display Issue"
     },
     {
-      "ID": 7,
+      "ID": 6,
       "IssueType": "Payment / Billing Issue"
     },
     {
-      "ID": 8,
+      "ID": 7,
       "IssueType": "Invoice/Report Generation Issue"
     },
     {
-      "ID": 9,
+      "ID": 8,
       "IssueType": "Other"
     }
   ]

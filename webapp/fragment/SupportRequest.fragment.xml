@@ -34,20 +34,20 @@
 			<f:content>
 
 				<!-- Issue Name -->
-				<Label text="Issue Name" required="true"/>
+				<Label text="{i18n>issuename}" required="true"/>
 				<Input
 					id="SR_id_IssueName"
-					placeholder="Enter Issue Name"
+					placeholder="{i18n>enterissuename}"
                     valueStateText="Enter Issue Name"
 					value="{SupportModel>/IssueName}"
                     liveChange="onIssuenamechanges"
 					maxLength="100"/>
 
 				<!-- Issue Type -->
-				<Label text="Issue Type" required="true"/>
+				<Label text="{i18n>issuecategory}" required="true"/>
 				<ComboBox
 					id="SR_id_IssueType"
-                    valueStateText="Enter Issue Type"
+                    valueStateText="{i18n>enterissuetype}"
 					placeholder="Select Issue Type"
                     value="{SupportModel>/IssueType}"
                     change="onissuetypechanges"
@@ -57,37 +57,37 @@
 				</ComboBox>
 
 				<!-- Issue Description -->
-				<Label text="Issue Description" required="true"/>
+				<Label text="{i18n>issuedetails}" required="true"/>
 				<TextArea
 					id="SR_id_IssueDescription"
 					rows="4"
                     liveChange="ondescriptionchnages"
-                    valueStateText="Enter Description"
+                    valueStateText="{i18n>enterdetails}"
 					placeholder="Enter Issue Description"
 					value="{SupportModel>/IssueDescription}"
 					maxLength="500"/>
 
 				<!-- Raised By -->
-				<Label text="Raised By" required="true"/>
+				<Label text="{i18n>raisedby}" required="true"/>
 				<Input
 					id="SR_id_RaisedBy"
                     liveChange="onchangesRaisedby"
-                    valueStateText="Enter your name"
+                    valueStateText="{i18n>enteryourname}"
 					value="{SupportModel>/RaisedBy}"
 					placeholder="Enter Name"/>
 
 				<!-- Email -->
-				<Label text="Email" required="true"/>
+				<Label text="{i18n>contactemail}" required="true"/>
 				<Input
 					id="SR_id_Email"
                     liveChange="onEmailchange"
 					type="Email"
-                    valueStateText="Enter a valid mail"
+                    valueStateText="{i18n>enteremailis}"
 					value="{SupportModel>/Email}"
 					placeholder="Enter Email"/>
 
 				<!-- Upload Image (UNCHANGED) -->
-				<Label text="Add Image"/>
+				<Label text="{i18n>addImage}" required="true"/>
 
 				<VBox alignItems="Start" width="100%" renderType="Bare">
 
