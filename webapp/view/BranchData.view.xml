@@ -124,6 +124,25 @@
                             tooltip="{i18n>MSbranchCode}"
                         />
                     </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="GSTIN"
+                            tooltip="GSTIN"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>penalty}"
+                            tooltip="{i18n>penalty}"
+                        />
+                    </Column>
                     <!-- <Column demandPopin="true">
                         <Text
                             text="{i18n>branchName}"
@@ -133,10 +152,14 @@
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
+                        width="28rem"
+                        hAlign="Center"
                     >
                         <Text
                             text="{i18n>address}"
                             tooltip="{i18n>address}"
+                            textAlign="Center"
+                            width="100%"
                         />
                     </Column>
                     <!-- <Column
@@ -167,24 +190,7 @@
                             tooltip="{i18n>contactNumber}"
                         />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="GSTIN"
-                            tooltip="GSTIN"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>penalty}"
-                            tooltip="{i18n>penalty}"
-                        />
-                    </Column>
+
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>logo}"
@@ -208,16 +214,11 @@
                                 />
                                 <Text text="{mainModel>Name}" />
                             </VBox>
-                            <ExpandableText
-                                text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
-                                maxCharacters="20"
-                            />
-                            <Text text="{mainModel>Pincode}" />
-                            <Text text="{mainModel>STD} {mainModel>Contact}" />
+                            
                             <VBox>
                                 <Text text="{mainModel>GSTIN}" />
-                               <Text
-                                    text="{= ${mainModel>Type} + ':' + ${mainModel>Value} }"
+                                <Text
+                                    text="{= ${mainModel>Type} + ' : ' + ${mainModel>Value} }"
                                     visible="{= !!${mainModel>Value} }"
                                 />
                                 <!-- <Text
@@ -225,9 +226,16 @@
                                     visible="{= !!${mainModel>Value} }"
                                 /> -->
                             </VBox>
+                            
                             <Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
+                            <Text
+                                text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
+                                wrapping="true"
+                            />
+                            <Text text="{mainModel>Pincode}" />
+                            <Text text="{mainModel>STD} {mainModel>Contact}" />
                             <Link
                                 text="{i18n>view}"
                                 press="HF_viewroom"

@@ -230,15 +230,36 @@ sap.ui.define([
                 property: "Name",
                 type: "string"
             },
+
+            {
+                label: "GSTIN",
+                property: "GSTIN",
+                type: "string"
+            },
+            {
+                label: "Type",
+                property: "Type",
+                type: "string"
+            },
+            {
+                label: "Tax Percentage",
+                property: "Value",
+                type: "string"
+            },
+            
+            {
+                label: "Late Penalty Amount",
+                property: "Penalty",
+                type: "string"
+            },
+            {
+                label: "Currency",
+                property: "Currency",
+                type: "string"
+            },
             {
                 label: "Address",
                 property: "Address",
-                type: "string"
-            },
-
-            {
-                label: "LandMark",
-                property: "LandMark",
                 type: "string"
             },
             {
@@ -254,26 +275,6 @@ sap.ui.define([
             {
                 label: "Contact Number",
                 property: "Contact",
-                type: "string"
-            },
-            {
-                label: "Country",
-                property: "Country",
-                type: "string"
-            },
-            {
-                label: "State",
-                property: "State",
-                type: "string"
-            },
-            {
-                label: "City",
-                property: "City",
-                type: "string"
-            },
-            {
-                label: "Penalty",
-                property: "Penalty",
                 type: "string"
             },
             ]
