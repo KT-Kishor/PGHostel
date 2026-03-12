@@ -325,7 +325,7 @@ sap.ui.define([
                     const oUIModel = this.getOwnerComponent().getModel("UIModel");
                     oUIModel.setProperty("/isLoggedIn", true);
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-                } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee") {
+                } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
                     this.getOwnerComponent().getRouter().navTo("RouteAdmin");
                 } else {
                     this.getOwnerComponent().getRouter().navTo("RouteHostel");
@@ -3009,6 +3009,10 @@ sap.ui.define([
                 && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
                 && this.flag!==true && CustomerData.DueAmount > 0) {
                 if (!this.PP_Dialog) {
+                    if (this.PP_Dialog) {
+                        this.PP_Dialog.destroy();
+                        this.PP_Dialog = null;
+                    }
                     var oView = this.getView();
                     this.PP_Dialog = sap.ui.xmlfragment(
                         "sap.ui.com.project1.fragment.Payment_Edit",
