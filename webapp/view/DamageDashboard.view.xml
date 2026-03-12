@@ -27,6 +27,7 @@
                 search="DD_search"
                 filterChange="onFilterChange"
                 showFilterConfiguration="false"
+                class="filterBarTheme"
             >
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem

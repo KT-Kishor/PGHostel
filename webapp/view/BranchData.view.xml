@@ -24,6 +24,7 @@
                 search="MD_onSearch"
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
+                class="filterBarTheme"
             >
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem

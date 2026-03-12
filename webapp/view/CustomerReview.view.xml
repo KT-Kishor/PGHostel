@@ -31,6 +31,7 @@
                     showClearOnFB="true"
                     search="_loadCustomerReviews"
                     showFilterConfiguration="false"
+                    class="filterBarTheme"
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem

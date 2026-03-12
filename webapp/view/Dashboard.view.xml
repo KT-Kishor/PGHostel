@@ -76,6 +76,7 @@
                     visible="false"
                     filterChange="onFilterChange"
                     showFilterConfiguration="false"
+                    class="filterBarTheme"
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem

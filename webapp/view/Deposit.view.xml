@@ -27,6 +27,7 @@
                 clear="onClearDeposits"
                 showClearOnFB="true"
                 search="onDepositSearch"
+                class="filterBarTheme"
             >
                 <fb:filterGroupItems>
                     <!-- BRANCH FILTER -->

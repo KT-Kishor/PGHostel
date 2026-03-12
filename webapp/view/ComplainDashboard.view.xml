@@ -17,7 +17,7 @@
 			<!-- <VBox class="sapUiSmallMargin"> -->
 			<VBox class="sapUiSmallMargin paymentDashboardTheme">
 				<!-- Filter Bar -->
-				<fb:FilterBar id="CD_FilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange"   showFilterConfiguration="false">
+				<fb:FilterBar id="CD_FilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange"   showFilterConfiguration="false" class="filterBarTheme">
 					<fb:filterGroupItems>
 						<fb:FilterGroupItem name="Branch" label="Branch" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>

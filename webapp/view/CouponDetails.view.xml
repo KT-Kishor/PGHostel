@@ -25,6 +25,7 @@
                 clear="onClearCoupons"
                 showClearOnFB="true"
                 search="onCouponSearch"
+                class="filterBarTheme"
             >
                 <fb:filterGroupItems>
                     <!-- BRANCH -->

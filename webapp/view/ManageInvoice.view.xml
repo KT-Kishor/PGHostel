@@ -20,6 +20,7 @@
                 clear="onPressClear"
                 showClearOnFB="true"
                 search="ManageInvoice_onSearch"
+                class="filterBarTheme"
             >
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
