@@ -237,7 +237,7 @@ sap.ui.define([
                             icon: "sap-icon://group",
                             color: "#0070f2",
                             label: "User Management",
-                            detail: "Administer Staff members and Vendors"
+                            detail: "Administer Staff members, Vendors and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
@@ -276,7 +276,7 @@ sap.ui.define([
                             icon: "sap-icon://group",
                             color: "#0070f2",
                             label: "User Management",
-                            detail: "Administer Staff members"
+                            detail: "Administer Staff members and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
@@ -315,7 +315,7 @@ sap.ui.define([
                             icon: "sap-icon://group",
                             color: "#0070f2",
                             label: "User Management",
-                            detail: "Administer Staff members"
+                            detail: "Administer Staff members and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
@@ -361,9 +361,10 @@ sap.ui.define([
                     accessLevel: "Vendor-Only Access",
                     accessState: "Success",
                     accessIcon: "sap-icon://supplier",
-                    summary: "As a Vendor Manager, you have access exclusively to the vendor management module. All hostel operations, customer data, and dashboards are outside your scope.",
+                    summary: "As a Vendor Manager, you have access to vendor management and customer support requests. All hostel operations, customer data, and dashboards are outside your scope.",
                     accessItems: [
                         { icon: "sap-icon://supplier", color: "#0070f2", label: "Vendor Management", detail: "Full access to create and manage  vendors" },
+                        { icon: "sap-icon://customer", color: "#0070f2", label: "Customer Support", detail: "Review and manage customer support requests." },
                
                     ]
                 }
@@ -520,6 +521,11 @@ sap.ui.define([
                     // ManageVendor role sees only this tile — full access
                 },
 
+                {
+                    id: "idSupportTile",
+                    headerKey: "supportVendor",
+                    descKey: "tour_desc_support"
+                },
                 // ── Category 2: Operations ────────────────────────────────────────
                 {
                     id: "id3roomTile",
