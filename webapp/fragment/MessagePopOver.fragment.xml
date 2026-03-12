@@ -4,11 +4,13 @@
 	<MessagePopover
         id="idMessagePopover"
 		items="{message>/}"
-		initiallyExpanded="true" >
+		initiallyExpanded="true"  
+        class="bookingPOP">
          <headerButton>
            <Button text="Error Messages" 
                     type="Emphasized" 
-                    class="popoverHeaderBtn">
+                    class="myUnifiedBtn popoverHeaderBtn"
+            >
                 <layoutData>
                     <OverflowToolbarLayoutData 
                         priority="NeverOverflow"

@@ -1300,15 +1300,12 @@
   color: #ffffff !important;
 }
 
-/* span.sapMBtnInner.sapMBtnEmphasized {
-  background-color: #00acc1 !important;
-  color: #ffffff !important;
+span.sapMBtnInner.sapMBtnEmphasized {
   border-radius: 8px !important;
   border: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  text-shadow: none !important;
-} */
-.bookingPOP .sapMPopover .sapMIBar {
+}
+.sapMPopover.bookingPOP .sapMIBar {
   background: linear-gradient(135deg, #00b7c7, #007984) !important;
   color: white !important;
 } 

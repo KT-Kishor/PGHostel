@@ -86,7 +86,7 @@
                                     text="{i18n>login}"
                                     type="Emphasized"
                                     tooltip="{i18n>clickLogin}"
-                                    class="loginBannerButton"
+                                    class="myUnifiedBtn"
                                     press="onPressLoginBanner"
                                 />
                             </HBox>
@@ -113,13 +113,13 @@
         <footer>
             <OverflowToolbar>
             
-                <Button
+    <Button
     id="messagePopoverBtn"
     icon="sap-icon://alert"
     text="{= ${message>/}.length }"
     visible="{=${message>/}.length > 0}"
     type="Emphasized"
-    press="onMessagePopoverPress"/>
+    press="onMessagePopoverPress" class="myUnifiedBtn" />
                  <ToolbarSpacer />
                 <Button
                     text="{i18n>proceedToPay}"
