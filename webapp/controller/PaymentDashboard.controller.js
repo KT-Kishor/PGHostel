@@ -31,8 +31,8 @@ sap.ui.define([
                 yearlyTrend: [],
                 paymentBreakdown: [],
                 pendingByCustomer: [],
-                statusDistributionCreditNote: [],
-                monthlyValueCreditNote: []
+                // statusDistributionCreditNote: [],
+                // monthlyValueCreditNote: []
             };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel([]), "customers");
@@ -119,9 +119,9 @@ sap.ui.define([
                 this._pPopover.then(oPopover => oPopover.close());
             }
 
-            if (this._pPopoverCreditNote) {
-                this._pPopoverCreditNote.then(oPopover => oPopover.close());
-            }
+            // if (this._pPopoverCreditNote) {
+            //     this._pPopoverCreditNote.then(oPopover => oPopover.close());
+            // }
 
             var legendPosition = sap.ui.Device.system.phone ? "left" : "right";
             oVizFrame.setVizProperties({
@@ -140,50 +140,57 @@ sap.ui.define([
 
                 // Prepare filters based on role
                 let invoiceFilters = {};
-                let creditNoteFilters = {};
+                // let creditNoteFilters = {};
 
                 // If user is not SuperAdmin, filter by allowed branches
                 if (this._oLoggedInUser?.Role !== "SuperAdmin" && this._allowedBranches) {
                     invoiceFilters.BranchCode = this._allowedBranches;
-                    creditNoteFilters.BranchCode = this._allowedBranches;
+                    // creditNoteFilters.BranchCode = this._allowedBranches;
 
                     // If user is Admin with specific role
                     if (this._oLoggedInUser?.Role === "Admin") {
                         invoiceFilters.Role = "Admin";
-                        creditNoteFilters.Role = "Admin";
+                        // creditNoteFilters.Role = "Admin";
                     }
                 }
 
                 const oData = await this.ajaxReadWithJQuery("HM_ManageInvoice", invoiceFilters);
-                const CreditNote = await this.ajaxReadWithJQuery("CreditNote", creditNoteFilters);
+                // const CreditNote = await this.ajaxReadWithJQuery("CreditNote", creditNoteFilters);
 
                 this.rawInvoiceData = Array.isArray(oData.data) ? oData.data : [oData.data];
-                this.creditNotesData = Array.isArray(CreditNote.data) ? CreditNote.data : [CreditNote.data];
+                // this.creditNotesData = Array.isArray(CreditNote.data) ? CreditNote.data : [CreditNote.data];
+                // this.creditNotesData = [];
 
-                // Merge logic for Hostel Invoices
-                this.rawInvoiceData = this.rawInvoiceData.map(invoice => {
-                    const matchedNotes = this.creditNotesData.filter(cn => cn.InvNo === invoice.InvNo);
-                    invoice.CCInvNo = matchedNotes[0]?.CCInvNo || "";
+                // // Merge logic for Hostel Invoices
+                // this.rawInvoiceData = this.rawInvoiceData.map(invoice => {
+                //     const matchedNotes = this.creditNotesData.filter(cn => cn.InvNo === invoice.InvNo);
+                //     invoice.CCInvNo = matchedNotes[0]?.CCInvNo || "";
 
-                    if (invoice.Currency === "INR") {
-                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
-                    } else {
-                        var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
-                    }
+                //     if (invoice.Currency === "INR") {
+                //         var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
+                //     } else {
+                //         var matchedNotesTotal = matchedNotes.reduce((sum, cn) => sum + Number(cn.TotalAmount || 0), 0);
+                //     }
 
-                    const creditNotesInINR = invoice.Currency === "INR" ?
-                        matchedNotesTotal :
-                        matchedNotes.reduce((sum, cn) => sum + Number(cn.AmountInINR || 0), 0);
+                //     const creditNotesInINR = invoice.Currency === "INR" ?
+                //         matchedNotesTotal :
+                //         matchedNotes.reduce((sum, cn) => sum + Number(cn.AmountInINR || 0), 0);
 
-                    return {
-                        ...invoice,
-                        CreditNotes: matchedNotes,
-                        CreditNotesTotal: matchedNotesTotal,
-                        TotalAmount: Number(invoice.TotalAmount || 0),
-                        AmountInINR: Number(invoice.AmountInINR || 0) - creditNotesInINR,
-                        CreditNotesTotalInINR: creditNotesInINR || 0
-                    };
-                });
+                //     return {
+                //         ...invoice,
+                //         CreditNotes: matchedNotes,
+                //         CreditNotesTotal: matchedNotesTotal,
+                //         TotalAmount: Number(invoice.TotalAmount || 0),
+                //         AmountInINR: Number(invoice.AmountInINR || 0) - creditNotesInINR,
+                //         CreditNotesTotalInINR: creditNotesInINR || 0
+                //     };
+                // });
+                this.rawInvoiceData = this.rawInvoiceData.map(invoice => ({
+                    ...invoice,
+                    TotalAmount: Number(invoice.TotalAmount || 0),
+                    AmountInINR: Number(invoice.AmountInINR || 0)
+                }));
+
 
                 const uniqueCustomers = [...new Set(this.rawInvoiceData.map(item => item.CustomerName))];
                 this.getView().getModel("customers").setData(uniqueCustomers.map(c => ({ key: c, text: c })));
@@ -249,7 +256,7 @@ sap.ui.define([
             setTimeout(() => {
                 try {
                     const invoiceDataCopy = JSON.parse(JSON.stringify(this.rawInvoiceData));
-                    const creditNotesCopy = JSON.parse(JSON.stringify(this.creditNotesData));
+                    // const creditNotesCopy = JSON.parse(JSON.stringify(this.creditNotesData));
 
                     const oCustomerFilter = this.byId("customerFilter");
                     const oYearFilter = this.byId("yearFilter");
@@ -294,12 +301,12 @@ sap.ui.define([
 
                     this._aCurrentFilteredData = aFilteredData;
 
-                    const creditInvNos = aFilteredData.map(cn => cn.InvNo);
-                    const aFilterDataCreditNote = creditNotesCopy.filter(inv =>
-                        creditInvNos.includes(inv.InvNo)
-                    );
+                    // const creditInvNos = aFilteredData.map(cn => cn.InvNo);
+                    // const aFilterDataCreditNote = creditNotesCopy.filter(inv =>
+                    //     creditInvNos.includes(inv.InvNo)
+                    // );
 
-                    this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
+                    // this._aCurrentFilteredDataCreditNote = aFilterDataCreditNote;
 
                     // 3. Updated Yearly Trend Logic (Adding Branch Filter here too)
                     let aYearlyTrendData = invoiceDataCopy.filter(invoice => {
@@ -347,7 +354,9 @@ sap.ui.define([
                     // 🔥 Step 3: Direct pure object ko model mein set karein
                     this.getView().getModel("headerModel").setData(oHeaderData);
 
-                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, aFilterDataCreditNote);
+                    // this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, []);  
+                    this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData);
+
 
                 } catch (error) {
                     MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
@@ -412,7 +421,9 @@ sap.ui.define([
             return numValue * conversionRate;
         },
 
-        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData, aFilterDataCreditNote) {
+        // _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData, aFilterDataCreditNote) {
+        _aggregateAndSetAllChartData: function (aFilteredData, aYearlyTrendData) {
+
             const AllFilteredData = aFilteredData || [];
 
             //---------------------------------------------------------------------
@@ -424,7 +435,7 @@ sap.ui.define([
 
                 const month = d.getMonth();
                 if (item.Currency === "INR") {
-                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                    var TotalAmount = parseFloat(item.TotalAmount || 0)// - parseFloat(item.CreditNotesTotal || 0);
                 } else {
                     var TotalAmount = parseFloat(item.AmountInINR || 0);
                 }
@@ -437,7 +448,7 @@ sap.ui.define([
             //---------------------------------------------------------------------
             const customerTotals = aFilteredData.reduce((acc, item) => {
                 if (item.Currency === "INR") {
-                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                    var TotalAmount = parseFloat(item.TotalAmount || 0) //- parseFloat(item.CreditNotesTotal || 0);
                 } else {
                     var TotalAmount = parseFloat(item.AmountInINR || 0);
                 }
@@ -460,7 +471,7 @@ sap.ui.define([
                 }
 
                 if (item.Currency === "INR") {
-                    var TotalAmount = parseFloat(item.TotalAmount || 0) - parseFloat(item.CreditNotesTotal || 0);
+                    var TotalAmount = parseFloat(item.TotalAmount || 0) //- parseFloat(item.CreditNotesTotal || 0);
                 } else {
                     var TotalAmount = parseFloat(item.AmountInINR || 0);
                 }
@@ -478,9 +489,12 @@ sap.ui.define([
             const pendingByCustomer = aFilteredData
                 .filter(item => pendingStatuses.includes(item.Status))
                 .reduce((acc, item) => {
+                    // const due = parseFloat(item.DueAmount || item.TotalAmount || 0);
+                    // const cn = parseFloat(item.CreditNotesTotal || 0);
+                    // let amount = due - cn;
                     const due = parseFloat(item.DueAmount || item.TotalAmount || 0);
-                    const cn = parseFloat(item.CreditNotesTotal || 0);
-                    let amount = due - cn;
+                    let amount = due;
+
 
                     // Convert to INR
                     if (item.Currency !== "INR") {
@@ -501,11 +515,23 @@ sap.ui.define([
                 if (!this._oGroupedInvoices[status]) this._oGroupedInvoices[status] = [];
 
                 // Calculate final amount after credit note
-                const originalAmount = parseFloat(item.TotalAmount || 0);
-                const creditNote = parseFloat(item.CreditNotesTotal || 0);
-                const net = originalAmount - creditNote;
+                // const originalAmount = parseFloat(item.TotalAmount || 0);
+                // const creditNote = parseFloat(item.CreditNotesTotal || 0);
+                // const net = originalAmount - creditNote;
 
-                let inrValue = net;
+                // let inrValue = net;
+                const originalAmount = parseFloat(item.TotalAmount || 0);
+
+                let inrValue = originalAmount;
+                item.OldTotalAmount = item.TotalAmount;
+
+                if (item.Currency !== "INR") {
+                    inrValue = parseFloat(item.AmountInINR || 0) || (originalAmount * parseFloat(item.ConversionRate || 1));
+                    item.AmountInINR = inrValue;
+                } else {
+                    item.TotalAmount = inrValue;
+                }
+
                 item.OldTotalAmount = item.TotalAmount;
 
                 if (item.Currency !== "INR") {
@@ -527,15 +553,29 @@ sap.ui.define([
             const paymentBreakdown = aFilteredData.reduce((acc, item) => {
                 const customer = item.CustomerName;
 
-                if (!acc[customer]) {
-                    acc[customer] = {
-                        taxableAmount: 0,
-                        gstAmount: 0,
-                        tdsAmount: 0,
-                        CreditNotesTotalAmount: 0,
-                        invoices: []
-                    };
-                }
+                // if (!acc[customer]) {
+                //     acc[customer] = {
+                //         taxableAmount: 0,
+                //         gstAmount: 0,
+                //         tdsAmount: 0,
+                //         // CreditNotesTotalAmount: 0,       
+                //         invoices: []
+                //     };
+                // }
+                acc[customer] = {
+                    taxableAmount: 0,
+                    gstAmount: 0,
+                    tdsAmount: 0,
+                    invoices: []
+                };
+
+
+                this.rawInvoiceData = this.rawInvoiceData.map(invoice => ({
+                    ...invoice,
+                    TotalAmount: Number(invoice.TotalAmount || 0),
+                    AmountInINR: Number(invoice.AmountInINR || 0)
+                }));
+
 
                 const gst = this._convertToInr(item.CGST, item) +
                     this._convertToInr(item.SGST, item) +
@@ -546,22 +586,21 @@ sap.ui.define([
                 acc[customer].tdsAmount += this._convertToInr(item.IncomeTax, item);
 
                 // Credit Notes INR
-                const cnInr = item.Currency === "INR"
-                    ? Number(item.CreditNotesTotal || 0)
-                    : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate || 1));
+                // const cnInr = item.Currency === "INR"
+                //     ? Number(item.CreditNotesTotal || 0)
+                //     : Number(item.CreditNotesTotal * parseFloat(item.ConversionRate || 1));
 
-                acc[customer].CreditNotesTotalAmount += cnInr;
+                // acc[customer].CreditNotesTotalAmount += cnInr;
 
                 acc[customer].invoices.push({
                     InvNo: item.InvNo,
-                    CCInvNo: item.CCInvNo,
                     SubTotalInGST: this._convertToInr(item.SubTotalInGST, item),
                     gstAmount: gst,
                     IncomeTax: this._convertToInr(item.IncomeTax, item),
                     totalAmountInINR: this._getInrValue(item),
-                    CreditNotesTotal: cnInr, 
                     CustomerID: item.CustomerID,
                 });
+
 
                 return acc;
             }, {});
@@ -634,60 +673,60 @@ sap.ui.define([
                 taxableAmount: values.taxableAmount || values.invoices.reduce((s, i) => s + i.totalAmountInINR, 0),
                 gstAmount: values.gstAmount,
                 tdsAmount: values.tdsAmount,
-                CreditNotesTotalAmount: values.CreditNotesTotalAmount,
                 invoices: values.invoices
             }));
+
 
             //---------------------------------------------------------------------
             // 1️⃣4️⃣ Credit Note Aggregation (Status + Monthly)
             //---------------------------------------------------------------------
-            const statusAmountsCreditNote = {};
-            this._oGroupedInvoicesCreditNote = {};
+            // const statusAmountsCreditNote = {};
+            // this._oGroupedInvoicesCreditNote = {};
 
-            aFilterDataCreditNote.forEach(item => {
-                const status = item.Status || "Unknown";
+            // aFilterDataCreditNote.forEach(item => {
+            //     const status = item.Status || "Unknown";
 
-                if (!this._oGroupedInvoicesCreditNote[status]) {
-                    this._oGroupedInvoicesCreditNote[status] = [];
-                }
+            //     if (!this._oGroupedInvoicesCreditNote[status]) {
+            //         this._oGroupedInvoicesCreditNote[status] = [];
+            //     }
 
-                let totalAmountInINR = item.Currency === "INR"
-                    ? Number(item.TotalAmount || 0)
-                    : Number(item.AmountInINR || item.TotalAmount || 0);
+            //     let totalAmountInINR = item.Currency === "INR"
+            //         ? Number(item.TotalAmount || 0)
+            //         : Number(item.AmountInINR || item.TotalAmount || 0);
 
-                this._oGroupedInvoicesCreditNote[status].push({
-                    InvNo: item.InvNo,
-                    TotalAmountINR: totalAmountInINR,
-                    OriginalItem: item
-                });
+            //     this._oGroupedInvoicesCreditNote[status].push({
+            //         InvNo: item.InvNo,
+            //         TotalAmountINR: totalAmountInINR,
+            //         OriginalItem: item
+            //     });
 
-                statusAmountsCreditNote[status] = (statusAmountsCreditNote[status] || 0) + totalAmountInINR;
-            });
+            //     statusAmountsCreditNote[status] = (statusAmountsCreditNote[status] || 0) + totalAmountInINR;
+            // });
 
-            const formattedStatusCreditNote = Object.entries(statusAmountsCreditNote)
-                .map(([st, amt]) => ({ status: st, totalAmountInINR: amt }));
+            // const formattedStatusCreditNote = Object.entries(statusAmountsCreditNote)
+            //     .map(([st, amt]) => ({ status: st, totalAmountInINR: amt }));
 
-            //-----------------------------------------------------------
-            // Monthly Credit Note
-            //-----------------------------------------------------------
-            const monthlyValueCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d)) return acc;
+            // //-----------------------------------------------------------
+            // // Monthly Credit Note
+            // //-----------------------------------------------------------
+            // const monthlyValueCreditNote = aFilterDataCreditNote.reduce((acc, item) => {
+            //     const d = new Date(item.InvoiceDate);
+            //     if (isNaN(d)) return acc;
 
-                const month = d.getMonth();
-                acc[month] = (acc[month] || 0) + this._getInrValue(item);
-                return acc;
-            }, {});
+            //     const month = d.getMonth();
+            //     acc[month] = (acc[month] || 0) + this._getInrValue(item);
+            //     return acc;
+            // }, {});
 
-            const formattedMonthlyCreditNote = monthNames.map((name, idx) => {
-                const realMonth = (idx + 3) % 12;
-                const year = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
+            // const formattedMonthlyCreditNote = monthNames.map((name, idx) => {
+            //     const realMonth = (idx + 3) % 12;
+            //     const year = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
 
-                return {
-                    month: `${name}-${year}`,
-                    totalAmountInINR: monthlyValueCreditNote[realMonth] || 0
-                };
-            });
+            //     return {
+            //         month: `${name}-${year}`,
+            //         totalAmountInINR: monthlyValueCreditNote[realMonth] || 0
+            //     };
+            // });
 
             //---------------------------------------------------------------------
             // 1️⃣5️⃣ SET FINAL MODEL DATA
@@ -699,8 +738,8 @@ sap.ui.define([
                 yearlyTrend: formattedYearlyTrend,
                 paymentBreakdown: formattedPaymentBreakdown,
                 pendingByCustomer: formattedPending,
-                statusDistributionCreditNote: formattedStatusCreditNote,
-                monthlyValueCreditNote: formattedMonthlyCreditNote
+                // statusDistributionCreditNote: formattedStatusCreditNote,
+                // monthlyValueCreditNote: formattedMonthlyCreditNote
             });
 
             this._formattedPaymentBreakdown = formattedPaymentBreakdown;
@@ -755,7 +794,7 @@ sap.ui.define([
             });
         },
 
-        onStatusChartSelectCreditNote: function (oEvent) {
+        /* onStatusChartSelectCreditNote: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
             if (!oSelectedData || !oSelectedData.Status) return;
 
@@ -803,9 +842,9 @@ sap.ui.define([
                 // Open popover near the clicked element
                 oPopover.open(oEvent.getParameter("data")[0].target);
             });
-        },
+        }, */
 
-        onPressCreditNoteInvoice: function (oEvent) {
+       /*  onPressCreditNoteInvoice: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("popoverData");
             if (!oContext) return MessageToast.show("No data found for this row.");
 
@@ -816,7 +855,7 @@ sap.ui.define([
                 sPath: encodeURIComponent(oRowData.CCInvNo),
                 dash: "PaymentDashboard"
             });
-        },
+        }, */
 
         onPaymentBreakdownSelect: function (oEvent) {
             const oSelectedData = oEvent.getParameter("data")[0].data;
@@ -959,7 +998,7 @@ sap.ui.define([
             });
         },
 
-        onInvoiceCreditNotesPress: function (oEvent) {
+       /*  onInvoiceCreditNotesPress: function (oEvent) {
             // Try to get context from multiple possible sources
             let oContext = oEvent.getSource().getBindingContext("popoverData");
             if (!oContext) {
@@ -981,7 +1020,7 @@ sap.ui.define([
                 sPath: encodeURIComponent(oRowData.CCInvNo),
                 dash: "PaymentDashboard"
             });
-        },
+        }, */
 
         onPaymentBreakdownPress: function (oEvent) {
             this.getRouter().navTo("RouteManageInvoiceDetails", {
@@ -1183,7 +1222,7 @@ sap.ui.define([
             });
         },
 
-        onMonthlyInvoiceSelectCreditNote: function (oEvent) {
+       /*  onMonthlyInvoiceSelectCreditNote: function (oEvent) {
             const aData = oEvent.getParameter("data");
             if (!aData || !aData[0] || !aData[0].data) return;
 
@@ -1254,7 +1293,7 @@ sap.ui.define([
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
-        },
+        }, */
 
         onYearlyInvoiceSelect: function (oEvent) {
             const aData = oEvent.getParameter("data");
