@@ -144,7 +144,7 @@
                     press="TileV_onpressSupportVendor"
                 >
                     <TileContent unit="{i18n>managesupport}">
-                        <ImageContent src="sap-icon://employee" />
+                        <ImageContent src="sap-icon://customer"/>
                     </TileContent>
                 </GenericTile>
             </FlexBox>

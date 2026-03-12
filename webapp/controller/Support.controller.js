@@ -20,6 +20,10 @@ sap.ui.define([
             var LoginFUnction = await this.commonLoginFunction("ManageVendor");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+            this.getView().byId("SP_id_RaisedBy").setSelectedKey("")
+            this.getView().byId("SP_id_Status").setSelectedKey("")
+            this._ViewDatePickersReadOnly(["SP_id_ResolutionDate"], this.getView());
+
       
             this.CD_read()
 
@@ -120,7 +124,7 @@ sap.ui.define([
             }
             this.SP_Dialog.open();
             sap.ui.getCore().byId("SP_id_Description").setValue("").setValueState("None");
-            sap.ui.getCore().byId("SP_id_ResolutionDate").setValue("").setValueState("None");
+            sap.ui.getCore().byId("SP_id_ResolutionDate").setValue(this.Formatter.formatDate(new Date())).setValueState("None");
 
         },
 
