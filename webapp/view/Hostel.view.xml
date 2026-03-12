@@ -205,7 +205,7 @@
                                                         afterVariantLoad="IA_.onAfterVariantLoad"
                                                         showFilterConfiguration="false"
                                                         filterContainerWidth="auto"
-                                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
+                                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin filterBarTheme" 
                                                         busyIndicatorDelay="0"
                                                     >
                                                         <fb:filterGroupItems>

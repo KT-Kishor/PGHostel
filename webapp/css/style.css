@@ -1300,7 +1300,20 @@
   color: #ffffff !important;
 }
 
-span.sapMBtnInner.sapMBtnEmphasized {
+/* span.sapMBtnInner.sapMBtnEmphasized {
+  background-color: #00acc1 !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: none !important;
+} */
+.bookingPOP .sapMPopover .sapMIBar {
+  background: linear-gradient(135deg, #00b7c7, #007984) !important;
+  color: white !important;
+} 
+
+.filterBarTheme span.sapMBtnInner.sapMBtnEmphasized {
   background-color: #00acc1 !important;
   color: #ffffff !important;
   border-radius: 8px !important;
@@ -1308,7 +1321,6 @@ span.sapMBtnInner.sapMBtnEmphasized {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   text-shadow: none !important;
 }
-
 .sapMBtnEmphasized:hover>.sapMBtnHoverable {
   background-color: #008b96 !important;
 }
@@ -3032,10 +3044,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   background-repeat: no-repeat;
 }
 
-.sapMPopover .sapMIBar {
+/* .sapMPopover .sapMIBar {
   background: linear-gradient(135deg, #00b7c7, #007984) !important;
   color: white !important;
-}
+} */
 
 /* .sapMBtnIcon{
   color: white !important;

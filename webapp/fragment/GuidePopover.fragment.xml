@@ -43,7 +43,7 @@
                 <contentLeft>
                     <Button
                         text="Skip Tour"
-                        class="btnGradientHoverOnly"
+                        class="myUnifiedBtn"
                         press="onSkipTour"
                         visible="{= !${guideModel>/isLast} }" />
                 </contentLeft>
@@ -51,7 +51,6 @@
                     <Button
                         id="nextButtonId"
                         text="{= ${guideModel>/isLast} ? 'Finish' : 'Next' }"
-                        type="Emphasized"
                         press="onNextTourStep"
                         class="myUnifiedBtn"
                         icon="{= ${guideModel>/isLast} ? 'sap-icon://accept' : 'sap-icon://navigation-right-arrow' }"/>
