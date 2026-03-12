@@ -17,6 +17,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.call=false
             this._fromRoute = oEvent.getParameter("arguments").from;
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -3004,6 +3005,46 @@ sap.ui.define([
                 sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
                 return;
             }
+               const customerEndDate = this._parseDate(CustomerData.EndDate);
+            const bookingEndDate = this._parseDate(Bookingdata.EndDate);
+
+            let isAnyFacilityMatchingBookingEnd = true;
+
+            for (let i = 0; i < facilityItems.length; i++) {
+                const facilityEnd = this._parseDate(facilityItems[i].EndDate);
+
+                if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
+                    isAnyFacilityMatchingBookingEnd = false;
+                    break;
+                }
+            }
+            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd && this.call===false) {
+
+                var that = this;
+
+                sap.m.MessageBox.confirm(
+                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",
+                    {
+                        title: "Upgrade Required",
+                        actions: ["Extend Now", "Maybe Later"],
+                        emphasizedAction: sap.m.MessageBox.Action.OK,
+
+                        onClose: function (sAction) {
+                            if (sAction === "Maybe Later") {
+                                that.call=true
+                                that.onSaveBooking()
+                            }else{
+                                that.call=false
+                                 that.PP_Dialog.close();
+
+                            }
+
+                        }
+                    }
+                );
+
+                return;
+            }
             if(LoginModel.Role === "Customer" || this._fromRoute==="ManageProfile"){
             if (paymentMap[unit] === "Per Day"
                 && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
@@ -3140,41 +3181,7 @@ sap.ui.define([
             };
 
 
-            const customerEndDate = this._parseDate(CustomerData.EndDate);
-            const bookingEndDate = this._parseDate(Bookingdata.EndDate);
-
-            let isAnyFacilityMatchingBookingEnd = true;
-
-            for (let i = 0; i < facilityItems.length; i++) {
-                const facilityEnd = this._parseDate(facilityItems[i].EndDate);
-
-                if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
-                    isAnyFacilityMatchingBookingEnd = false;
-                    break;
-                }
-            }
-            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd) {
-
-                var that = this;
-
-                sap.m.MessageBox.confirm(
-                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.",
-                    {
-                        title: "Upgrade Required",
-                        actions: ["Extend Now", "Maybe Later"],
-                        emphasizedAction: sap.m.MessageBox.Action.OK,
-
-                        onClose: function (sAction) {
-                            if (sAction === "Maybe Later") {
-                                that.oneditsavebooking(Payload);
-                            }
-
-                        }
-                    }
-                );
-
-                return;
-            }
+         
             if(this.flag===true && this.index !== 0){
             var PaymentPayload = {
                 "BookingID": CustomerData.BookingID,
@@ -3251,7 +3258,7 @@ sap.ui.define([
         },
         onPaymentClose: function () {
                 this.flag=false
-
+                this.call=false
              if (this.PP_Dialog) {
                 this.PP_Dialog.close();
              }

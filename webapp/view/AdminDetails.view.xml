@@ -9,7 +9,7 @@
     xmlns:u="sap.ui.unified"
 >
     <Page
-        showHeader="false"
+        showHeader="true"
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >

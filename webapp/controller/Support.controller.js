@@ -20,7 +20,7 @@ sap.ui.define([
             var LoginFUnction = await this.commonLoginFunction("ManageVendor");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this._ViewDatePickersReadOnly(["SP_id_ResolutionDate"], this.getView());
+      
             this.CD_read()
 
         },
@@ -31,8 +31,15 @@ sap.ui.define([
         },
 
         CD_read: async function () {
-            const SRaisedBy = this.byId("SP_id_RaisedBy").getSelectedKey() || this.byId("SP_id_RaisedBy").getValue();
-            const SStatus = this.byId("SP_id_Status").getSelectedKey() || this.byId("SP_id_Status").getValue();
+
+            const SRaisedBy = this.byId("SP_id_RaisedBy").getSelectedKey()
+                || this.byId("SP_id_RaisedBy").getValue();
+
+            const SStatus = this.byId("SP_id_Status").getSelectedKey()
+                || this.byId("SP_id_Status").getValue();
+
+
+
             let filters = {};
 
             if (SRaisedBy) filters.RaisedBy = SRaisedBy;
@@ -112,8 +119,8 @@ sap.ui.define([
                 this.getView().addDependent(this.SP_Dialog);
             }
             this.SP_Dialog.open();
-            sap.ui.getCore().byId("SP_id_Description").setValue("")
-            sap.ui.getCore().byId("SP_id_ResolutionDate").setValue("")
+            sap.ui.getCore().byId("SP_id_Description").setValue("").setValueState("None");
+            sap.ui.getCore().byId("SP_id_ResolutionDate").setValue("").setValueState("None");
 
         },
 
@@ -157,9 +164,9 @@ sap.ui.define([
                     filters: {
                         TicketID: SPData.TicketID
                     },
-                }).then((oData) => {
+                }).then(async (oData) => {
                     MessageToast.show("Support Request Updated Successfully");
-                    this.CD_read();
+                  await  this.CD_read();
                     this.SP_Dialog.close();
                 }).catch((oError) => {
                     MessageToast.show("Error while updating support request");

@@ -33,7 +33,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Room No"
-                        label="{i18n>roomNo}"
+                        label="{i18n>raisedby}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
