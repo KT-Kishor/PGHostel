@@ -383,6 +383,13 @@
           "target": [
             "targetDamageDetails"
           ]
+        },
+         {
+          "name": "RouteSupportDetails",
+          "pattern": "SupportDetails",
+          "target": [
+            "targetSupportDetails"
+          ]
         }
       ],
       "targets": {
@@ -588,6 +595,13 @@
           "clearControlAggregation": false,
           "viewId": "PaymentDashboard",
           "viewName": "PaymentDashboard"
+        },
+         "targetSupportDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Support",
+          "viewName": "Support"
         },
         "TargetManageProfile": {
           "viewType": "XML",

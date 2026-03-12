@@ -169,6 +169,10 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteDamageDashboard");
         },
+          TileV_onpressSupportVendor: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteSupportDetails");
+        },
 
         // onStartGuide: function () {
         //     if (!this._oGuideDialog) {

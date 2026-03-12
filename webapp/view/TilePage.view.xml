@@ -136,6 +136,17 @@
                         <ImageContent src="sap-icon://employee" />
                     </TileContent>
                 </GenericTile>
+                   <GenericTile
+                    id="idSupportTile"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>supportVendor}"
+                    press="TileV_onpressSupportVendor"
+                >
+                    <TileContent unit="{i18n>managesupport}">
+                        <ImageContent src="sap-icon://employee" />
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </VBox>
 

@@ -1,0 +1,217 @@
+<mvc:View
+	controllerName="sap.ui.com.project1.controller.Support"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+>
+  <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <content>
+            <fb:FilterBar
+                id="CD_id_Filterbar"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="SP_onPressClear"
+                showClearOnFB="true"
+                search="CD_read"
+                filterChange="IA_.onFilterChange"
+                afterVariantLoad="IA_.onAfterVariantLoad"
+                showFilterConfiguration="false"
+                filterContainerWidth="auto"
+            >
+            
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="Room No"
+                        label="{i18n>roomNo}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="SP_id_RaisedBy"
+                                items="{SupportModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{SupportModel>RoomNo}"
+                                    text="{SupportModel>RoomNo}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="Status"
+                        label="{i18n>status}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="SP_id_Status"
+                                items="{SupportModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{SupportModel>Status}"
+                                    text="{SupportModel>Status}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+            <Table
+                id="idSupportTable"
+                sticky="ColumnHeaders,HeaderToolbar"
+                mode="SingleSelectLeft"
+                width="auto"
+                busyIndicatorDelay="0"
+                class="sapUiResponsiveMargin"
+                items="{path: 'SupportModel>/'}" 
+                 
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="{i18n>Support}({= ${SupportModel>/}.length})"
+                        />
+                        <ToolbarSpacer />
+                     
+                        <Button
+                            text="{i18n>Resolve}"
+                            tooltip="{i18n>resolve}"
+                            press="SP_resolve"
+                            class="myUnifiedBtn"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column demandPopin="true">
+                        <Text
+                            text="{i18n>Issuename}"
+                            tooltip="{i18n>Issuename}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>IssueType}"
+                            tooltip="{i18n>IssueType}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>IssueDescription}"
+                            tooltip="{i18n>IssueDescription}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>RaisedBy}"
+                            tooltip="{i18n>RaisedBy}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>Email}"
+                            tooltip="{i18n>Email}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>Createddate}"
+                            tooltip="{i18n>Createddate}"
+                        />
+                    </Column>
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>Status}"
+                            tooltip="{i18n>Status}"
+                        />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>Resolvedate}"
+                            tooltip="{i18n>Resolvedate}"
+                        />
+                    </Column>
+                  
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{SupportModel>IssueName}" />
+                            <Text text="{SupportModel>IssueType}" />
+                            <ExpandableText
+                                maxCharacters="20"
+                                text="{SupportModel>IssueDescription}"
+                            />
+                              <Text text="{SupportModel>RaisedBy}" />
+                               <Text text="{SupportModel>Email}" />
+                            <Text
+                                text="{path:'SupportModel>CreatedDate',formatter: '.Formatter.formatDate'}"
+                            />
+
+                              <ObjectStatus
+                                inverted="false"
+                                text="{SupportModel>Status}"
+                                state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}"
+                                class="sapUiTinyMarginBottom"
+                            />
+
+                            <Text
+                                text="{= ${SupportModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${SupportModel>ResolvedDate} === null ? '' : ${
+                                path: 'SupportModel>ResolvedDate',
+                                formatter: '.Formatter.formatDate'
+                            }}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.AppFooter"
+                type="XML"
+            />
+        </footer>
+    </Page>
+</mvc:View>
