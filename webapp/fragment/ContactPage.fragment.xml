@@ -30,20 +30,33 @@
             />
         </VBox>
         <!-- Left: Address -->
-        <VBox class="contact-address-box">
-            <Text
-                text="{i18n>companynameKT}"
-                class="sapUiSmallMarginBottom compName"
-            />
-            <Text text="{i18n>addressLine1}" />
-            <Text text="{i18n>addressLine2}" />
-            <Text text="{i18n>addressLine3}" />
-            <Text text="{i18n>mobile}" />
-            <Link
-                text="{i18n>compemail}"
-                href="mailto:accounts@kalpavrikshatechnologies.com"
-                class="sapUiLargeMarginBottom underlineLink"
-                wrapping="true"
+        <VBox
+            class="contact-address-box"
+            justifyContent="SpaceBetween"
+        >
+            <VBox>
+                <Text
+                    text="{i18n>companynameKT}"
+                    class="sapUiSmallMarginBottom compName"
+                />
+                <Text text="{i18n>addressLine1}" />
+                <Text text="{i18n>addressLine2}" />
+                <Text text="{i18n>addressLine3}" />
+                <Text text="{i18n>mobile}" />
+                <Link
+                    text="{i18n>compemail}"
+                    href="mailto:accounts@kalpavrikshatechnologies.com"
+                    class="sapUiLargeMarginBottom underlineLink"
+                    wrapping="true"
+                />
+            </VBox>
+            <Button
+                press="onSupportRequest"
+                tooltip="{i18n>requestSupport}"
+                type="Emphasized"
+                icon="sap-icon://headset"
+                text="Request Support"
+                class="contact-support-btn contact-support-btn-style"
             />
         </VBox>
         <!-- Right: Google Map -->

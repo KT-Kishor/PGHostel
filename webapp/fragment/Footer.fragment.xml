@@ -23,14 +23,6 @@
                     justifyContent="End"
                 >
                     <Button
-                        press="onSupportRequest"
-                        tooltip="{i18n>requestSupport}"
-                        type="Transparent"
-                        icon=""
-                        text="Request Support"
-                        class="fa-admin-btn"
-                    />
-                    <Button
                         press="onAdminSIGNUP"
                         tooltip="{i18n>adminVendorRegistration}"
                         type="Transparent"
