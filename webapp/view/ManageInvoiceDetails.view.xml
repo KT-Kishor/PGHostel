@@ -917,7 +917,7 @@
                             &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )
@@ -934,7 +934,7 @@
                         visible="{= ${visiablityPlay>/createVisi}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )
@@ -949,7 +949,7 @@
                          visible="{= ${visiablityPlay>/Edit}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )
@@ -965,7 +965,7 @@
                         visible="{= ${visiablityPlay>/Edit}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )
@@ -980,7 +980,7 @@
                         visible="{= ${visiablityPlay>/MultiEmail}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )
@@ -996,7 +996,7 @@
                         visible="{= ${visiablityPlay>/merge}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'Super Admin'
+                                || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
                             )

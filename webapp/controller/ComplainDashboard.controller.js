@@ -177,8 +177,8 @@ onMonthChange: function (oEvent) {
                 // Prepare filters based on role
                 let ComplaintFilters = {};
 
-                // If user is not Super Admin, filter by allowed branches
-                if (this._oLoggedInUser?.Role !== "Super Admin" && this._allowedBranches) {
+                // If user is not SuperAdmin, filter by allowed branches
+                if (this._oLoggedInUser?.Role !== "SuperAdmin" && this._allowedBranches) {
                     ComplaintFilters.BranchCode = this._allowedBranches;
 
 

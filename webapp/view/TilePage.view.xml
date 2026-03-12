@@ -17,7 +17,7 @@
             <ToolbarSpacer />
             <!-- <Button
                 press="Tile_onHomePress"
-                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Super Admin' }"
+                visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'SuperAdmin' }"
                 tooltip="{i18n>homeTooltip}"
                 icon="sap-icon://home"
             /> -->

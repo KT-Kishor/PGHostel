@@ -1044,7 +1044,7 @@ sap.ui.define([
 
                 // Decide filter STRICTLY by role
                 const oFilter =
-                    sRole === "Super Admin"
+                    sRole === "SuperAdmin"
                         ? {} // backend returns everything
                         : { BranchCode: this._allowedBranches };
 

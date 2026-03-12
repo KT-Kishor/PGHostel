@@ -23,7 +23,7 @@ sap.ui.define([
                 this.isFirstLoad = true;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
-                this.getView().setModel(new JSONModel({ isSuperAdmin: oLogin.Role === "Super Admin" }), "RoleModel");
+                this.getView().setModel(new JSONModel({ isSuperAdmin: oLogin.Role === "SuperAdmin" }), "RoleModel");
                 this.commonLoginFunction();
                 const oData = await this.ajaxReadWithJQuery("HM_Branch", "");
                 const aBranchData = Array.isArray(oData?.commentData) ? oData.commentData : [];
@@ -134,7 +134,7 @@ sap.ui.define([
                     filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
             }
 
-            if (oLogin.Role === "Super Admin" && !filters.StartDate) filters.GetAll = true;
+            if (oLogin.Role === "SuperAdmin" && !filters.StartDate) filters.GetAll = true;
 
             function formatLocalDate(d) {
                 return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(d);

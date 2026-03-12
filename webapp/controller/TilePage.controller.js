@@ -211,7 +211,7 @@ sap.ui.define([
         _getRoleGuideConfig: function (sRole) {
             var oRoleMap = {
                 "SuperAdmin": {
-                    roleLabel: "Super Admin",
+                    roleLabel: "SuperAdmin",
                     accessLevel: "Full Access",
                     accessState: "Success",
                     accessIcon: "sap-icon://shield",
@@ -372,7 +372,7 @@ sap.ui.define([
                 accessIcon: "sap-icon://person-placeholder",
                 summary: "Your access is configured by your system administrator. Use the tour below to explore available modules.",
                 accessItems: [
-                    { icon: "sap-icon://information", color: "#0070f2", label: "Contact Admin", detail: "Reach out to your Super Admin for access queries." }
+                    { icon: "sap-icon://information", color: "#0070f2", label: "Contact Admin", detail: "Reach out to your SuperAdmin for access queries." }
                 ]
             };
         },

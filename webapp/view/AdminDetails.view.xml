@@ -80,7 +80,7 @@
                                 id="idGST"
                                 tooltip="GST Setup"
                                 press="onGSTBooking"
-                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin') 
+                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
@@ -96,7 +96,7 @@
                                      &amp;&amp;
                                     (
                                         ${CustomerData>/Status} === 'New' ||
-                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'Super Admin')
+                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin')
                                     )
                                     &amp;&amp; !${VisibleModel>/visible}
                                 }"
@@ -119,7 +119,7 @@
                                 press="onChekout"
                                 visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible}
-                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'Super Admin') }"
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }"
                             />
 
                             <Button

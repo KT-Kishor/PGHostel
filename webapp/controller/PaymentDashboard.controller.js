@@ -142,8 +142,8 @@ sap.ui.define([
                 let invoiceFilters = {};
                 let creditNoteFilters = {};
 
-                // If user is not Super Admin, filter by allowed branches
-                if (this._oLoggedInUser?.Role !== "Super Admin" && this._allowedBranches) {
+                // If user is not SuperAdmin, filter by allowed branches
+                if (this._oLoggedInUser?.Role !== "SuperAdmin" && this._allowedBranches) {
                     invoiceFilters.BranchCode = this._allowedBranches;
                     creditNoteFilters.BranchCode = this._allowedBranches;
 
