@@ -13,11 +13,13 @@
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >
-        <ScrollContainer id="idMainScroll">
+    <headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
             />
+        </headerContent>
+        <ScrollContainer id="idMainScroll">
             <content>
                 <VBox class="sapUiSmallMargin">
                     <Title

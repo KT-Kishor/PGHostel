@@ -1525,10 +1525,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 /* Space between siblings */
-.myUnifiedBtn {
+/* .myUnifiedBtn {
   margin-right: 0.5rem !important;
   ;
-}
+} */
 
 /* Remove trailing gap on last button */
 .myUnifiedBtn:last-child {
