@@ -100,6 +100,14 @@
                             press="SP_resolve"
                             class="myUnifiedBtn"
                         />
+                        <Button
+                            text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
+                            tooltip="{i18n>downloadBranchData}"
+                            press="S_onDownload"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>

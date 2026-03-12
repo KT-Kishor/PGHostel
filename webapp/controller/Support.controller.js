@@ -22,11 +22,7 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().byId("SP_id_RaisedBy").setSelectedKey("")
             this.getView().byId("SP_id_Status").setSelectedKey("")
-            this._ViewDatePickersReadOnly(["SP_id_ResolutionDate"], this.getView());
-
-      
             this.CD_read()
-
         },
 
         SP_onPressClear: function () {
@@ -35,7 +31,6 @@ sap.ui.define([
         },
 
         CD_read: async function () {
-
             const SRaisedBy = this.byId("SP_id_RaisedBy").getSelectedKey()
                 || this.byId("SP_id_RaisedBy").getValue();
 
@@ -123,6 +118,7 @@ sap.ui.define([
                 this.getView().addDependent(this.SP_Dialog);
             }
             this.SP_Dialog.open();
+            this._FragmentDatePickersReadOnly(["SP_id_ResolutionDate"])
             sap.ui.getCore().byId("SP_id_Description").setValue("").setValueState("None");
             sap.ui.getCore().byId("SP_id_ResolutionDate").setValue(this.Formatter.formatDate(new Date())).setValueState("None");
 
@@ -170,7 +166,7 @@ sap.ui.define([
                     },
                 }).then(async (oData) => {
                     MessageToast.show("Support Request Updated Successfully");
-                  await  this.CD_read();
+                    await this.CD_read();
                     this.SP_Dialog.close();
                 }).catch((oError) => {
                     MessageToast.show("Error while updating support request");
@@ -180,6 +176,103 @@ sap.ui.define([
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
             }
-        }
+        },
+
+        createTableSheet: function () {
+            return [
+                {
+                    label: "Issue Name",
+                    property: "IssueName",
+                    type: "string"
+                },
+                {
+                    label: "Issue Type",
+                    property: "IssueType",
+                    type: "string"
+                },
+
+                {
+                    label: "Issue Description",
+                    property: "IssueDescription",
+                    type: "string"
+                },
+                {
+                    label: "Raised By",
+                    property: "RaisedBy",
+                    type: "string"
+                },
+                {
+                    label: "Email",
+                    property: "Email",
+                    type: "string"
+                },
+                {
+                    label: "Created Date",
+                    property: "CreatedDate",
+                    type: "string"
+                },
+                {
+                    label: "Status",
+                    property: "Status",
+                    type: "string"
+                },
+                {
+                    label: "Resolved Date",
+                    property: "ResolvedDate",
+                    type: "string"
+                },
+            ]
+        },
+
+        S_onDownload: function () {
+            const oModel = this.byId("idSupportTable").getModel("SupportModel").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+            const adjustedData = oModel.map(item => {
+
+                let resolvedDate = "";
+                let createdDate = "";
+
+                if (item.ResolvedDate && item.ResolvedDate !== "null" && item.ResolvedDate !== "1899-11-30") {
+                    const d = new Date(item.ResolvedDate);
+                    if (d.getFullYear() > 1900) {
+                        resolvedDate = Formatter.formatDate(item.ResolvedDate);
+                    }
+                }
+
+                if (item.CreatedDate) {
+                    const d2 = new Date(item.CreatedDate);
+                    if (d2.getFullYear() > 1900) {
+                        createdDate = Formatter.formatDate(item.CreatedDate);
+                    }
+                }
+
+                return {
+                    ...item,
+                    ResolvedDate: resolvedDate,
+                    CreatedDate: createdDate
+                };
+            });
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level"
+                },
+                dataSource: adjustedData,
+                fileName: "Support_Details.xlsx",
+                worker: false
+            };
+            MessageToast.show(this.i18nModel.getText("downloadingSupport"));
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
+        },
     });
 });
