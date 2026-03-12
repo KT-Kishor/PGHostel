@@ -6,15 +6,7 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../utils/validation",
     "sap/ui/export/Spreadsheet",
-], function (
-    BaseController,
-    Formatter,
-    JSONModel,
-    BusyIndicator,
-    MessageToast,
-    utils,
-    Spreadsheet
-) {
+], function (BaseController, Formatter, JSONModel, BusyIndicator, MessageToast, utils, Spreadsheet) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.Support", {
@@ -23,31 +15,28 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteSupportDetails").attachMatched(this._onRouteMatched, this);
 
         },
-          _onRouteMatched: function (oEvent) {
+
+        _onRouteMatched: async function (oEvent) {
+            var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+            if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-      
+            this._ViewDatePickersReadOnly(["SP_id_ResolutionDate"], this.getView());
             this.CD_read()
 
         },
+
         SP_onPressClear: function () {
             this.getView().byId("SP_id_RaisedBy").setSelectedKey("")
             this.getView().byId("SP_id_Status").setSelectedKey("")
         },
+
         CD_read: async function () {
-
-            const SRaisedBy = this.byId("SP_id_RaisedBy").getSelectedKey()
-                || this.byId("SP_id_RaisedBy").getValue();
-
-            const SStatus = this.byId("SP_id_Status").getSelectedKey()
-                || this.byId("SP_id_Status").getValue();
-
-
-
+            const SRaisedBy = this.byId("SP_id_RaisedBy").getSelectedKey() || this.byId("SP_id_RaisedBy").getValue();
+            const SStatus = this.byId("SP_id_Status").getSelectedKey() || this.byId("SP_id_Status").getValue();
             let filters = {};
 
             if (SRaisedBy) filters.RaisedBy = SRaisedBy;
             if (SStatus) filters.Status = SStatus;
-
             this.getBusyDialog()
             await this.ajaxReadWithJQuery("HM_Support", filters).then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -57,19 +46,17 @@ sap.ui.define([
                 }
                 var model = new JSONModel(oFCIAerData);
                 this.getView().setModel(model, "SupportModel");
-
                 this._populateUniqueFilterValues(this._originalRoomdata);
 
             })
             this.closeBusyDialog()
-
         },
+
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 SP_id_RaisedBy: new Set(),
                 SP_id_Status: new Set()
             };
-
             data.forEach(item => {
 
                 if (item.RaisedBy && item.RaisedBy.trim()) {
@@ -78,15 +65,12 @@ sap.ui.define([
                 if (item.Status) {
                     uniqueValues.SP_id_Status.add(item.Status.trim());
                 }
-
             });
-
             let oView = this.getView();
 
             ["SP_id_RaisedBy", "SP_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
-
                 oComboBox.destroyItems();
                 Array.from(uniqueValues[field]).sort().forEach(value => {
                     oComboBox.addItem(
@@ -98,6 +82,7 @@ sap.ui.define([
                 });
             });
         },
+
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
@@ -106,6 +91,7 @@ sap.ui.define([
         onHome: function () {
             this.CommonLogoutFunction();
         },
+
         SP_resolve: function () {
             var table = this.byId("idSupportTable");
             var selected = table.getSelectedItem();
@@ -114,19 +100,15 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoresolve"));
                 return;
             }
-               var oContext = selected.getBindingContext("SupportModel");
-                var Data = oContext.getObject();
+            var oContext = selected.getBindingContext("SupportModel");
+            var Data = oContext.getObject();
 
-                if(Data.Status === "Resolved"){
-                    MessageToast.show(this.i18nModel.getText("alreadyResolved"));
-                    return;
-                }
-
+            if (Data.Status === "Resolved") {
+                MessageToast.show(this.i18nModel.getText("alreadyResolved"));
+                return;
+            }
             if (!this.SP_Dialog) {
-                this.SP_Dialog = sap.ui.xmlfragment(
-                    "sap.ui.com.project1.fragment.Support",
-                    this
-                );
+                this.SP_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Support", this);
                 this.getView().addDependent(this.SP_Dialog);
             }
             this.SP_Dialog.open();
@@ -134,13 +116,16 @@ sap.ui.define([
             sap.ui.getCore().byId("SP_id_ResolutionDate").setValue("")
 
         },
+
         supportCancel: function () {
             this.byId("idSupportTable").removeSelections();
             this.SP_Dialog.close();
         },
+
         onDescInputLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
+
         supportSave: function () {
             if (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SP_id_Description"), "ID") &&
@@ -150,12 +135,9 @@ sap.ui.define([
                 var selected = table.getSelectedItem();
 
                 if (!selected) {
-                    sap.m.MessageToast.show(
-                        this.i18nModel.getText("pleaseSelectRecordtoresolve")
-                    );
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoresolve"));
                     return;
                 }
-
                 var oContext = selected.getBindingContext("SupportModel");
                 var SPData = oContext.getObject();
                 var Payload = {
@@ -168,9 +150,7 @@ sap.ui.define([
                     "ResolvedDescription": sap.ui.getCore().byId("SP_id_Description").getValue(),
                     "Status": "Resolved",
                     "ResolvedDate": sap.ui.getCore().byId("SP_id_ResolutionDate").getValue()
-
                 }
-
                 this.getBusyDialog()
                 this.ajaxUpdateWithJQuery("HM_Support", {
                     data: Payload,

@@ -89,7 +89,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <Title
-                            text="{i18n>Support}({= ${SupportModel>/}.length})"
+                            text="{i18n>Support} ({= ${SupportModel>/}.length})"
                         />
                         <ToolbarSpacer />
                      
