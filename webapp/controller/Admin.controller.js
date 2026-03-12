@@ -378,6 +378,7 @@ sap.ui.define([
         // },
 
         HM_AssignRoom: function (oEvent) {
+            this.selectedIndex=0
 
             var Beddata = this.getView().getModel("BedTypeModel").getData()
 
