@@ -16,11 +16,11 @@ sap.ui.define([
         Formatter: Formatter,
         onInit() {
             this.i18nModel = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            var oBtn = this.byId("couponApplyBtn");
-            oBtn.setText("Apply Now")
+            // var oBtn = this.byId("couponApplyBtn");
+            // oBtn.setText("Apply Now")
             // oBtn.setVisible(true);
-            var inputID = this.getView().byId("BookingcouponInput")
-            inputID.setShowValueHelp(false)
+            // var inputID = this.getView().byId("BookingcouponInput")
+            // inputID.setShowValueHelp(false)
 
             var DateModel = new JSONModel({
                 minstartDate: "",
@@ -277,41 +277,7 @@ sap.ui.define([
                     oPerson.IGST
                 ).toFixed(2));
 
-            /* ---- Monthly cost ---- */
-            // const months =
-            //     Number(bookingMonths && bookingMonths > 0 ? bookingMonths : 1);
-            // if (paymentType === "Per Month") {
-
-            //     const monthly =
-            //         oPerson.FinalTotalCost / months;
-
-            //     oPerson.MonthlyCostPerPerson =
-            //         Number(monthly.toFixed(2));
-
-            //     oPerson.MonthlyCostPerson =
-            //         Number(monthly.toFixed(2));
-
-            // } else if (paymentType === "Per Year") {
-
-            //     const monthly =
-            //         oPerson.FinalTotalCost / bookingMonths;
-
-            //     oPerson.MonthlyCostPerPerson =
-            //         Number(monthly.toFixed(2));
-
-            //     oPerson.MonthlyCostPerson =
-            //         Number(monthly.toFixed(2));
-
-            // } else {
-
-            //     // Per Day / Per Hour
-            //     oPerson.MonthlyCostPerPerson =
-            //         Number(oPerson.FinalTotalCost.toFixed(2));
-
-            //     oPerson.MonthlyCostPerson =
-            //         Number(oPerson.FinalTotalCost.toFixed(2));
-            // }
-            /* ---- Monthly cost (correct & consistent) ---- */
+        
             let divisor = 1;
 
 
@@ -462,14 +428,6 @@ sap.ui.define([
             this._oEditModel = new JSONModel(oSafeCopy);
             this.getView().setModel(this._oEditModel, "edit");
 
-
-            // if (oSafeCopy.TotalMonths) {
-            //     this._oEditModel.setProperty("/TotalMonths", String(oSafeCopy.TotalMonths));
-            // }
-
-            // if (oSafeCopy.TotalYears) {
-            //     this._oEditModel.setProperty("/TotalYears", String(oSafeCopy.TotalYears));
-            // }
             // =================================================
             // LOAD DIALOG IF NEEDED
             // =================================================
@@ -664,9 +622,6 @@ sap.ui.define([
                 return;
             }
 
-            // ------------------------------------------------
-            //  CALCULATE END DATE
-            // ------------------------------------------------
   // ------------------------------------------------
 // CALCULATE END DATE
 // ------------------------------------------------
@@ -1228,11 +1183,6 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
                 inputID.setShowValueHelp(false);
             }
 
-            const oBtn = this.byId("couponApplyBtn");
-            if (oBtn) {
-                oBtn.setVisible(true);
-            }
-
 
             MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
         },
@@ -1551,15 +1501,7 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
             if (inputID) {
                 inputID.setShowValueHelp(false);
             }
-
-            const oBtn = this.byId("couponApplyBtn");
-            if (oBtn) {
-                oBtn.setVisible(true);
-            }
-
-            // MessageToast.show(
-            //     this.i18nModel.getText("couponRemovedSuccessfully")
-            // );
+           
         }
         ,
         /* =========================================================== */
@@ -1798,22 +1740,20 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
                 iMonths: iMonths,
                 iYears: iYears
             };
-        }
-
-        ,
+        }        ,
 
         onCouponLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oInput.getValue();
-            var oBtn = this.byId("couponApplyBtn");
+            // var oBtn = this.byId("couponApplyBtn");
 
             // Show icon only if there is value
             oInput.setShowValueHelp(!!sValue);
 
             if (sValue && sValue.trim().length > 0) {
-                oBtn.setVisible(true);
+                // oBtn.setVisible(true);
             } else {
-                oBtn.setVisible(true); // Always show when blank
+                // oBtn.setVisible(true); // Always show when blank
             }
         },
 
@@ -2050,6 +1990,8 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
                 MessageToast.show(
                     this.i18nModel.getText("couponAppliedSuccessfully")
                 );
+                 oHostelModel.setProperty("/CouponCode", "");
+                this._oAddDialog.close()
 
             } catch (err) {
                 console.error(err);
@@ -2058,5 +2000,25 @@ else if (sUnit === "Per Year") {  // ✅ Use else if
                 this.closeBusyDialog();
             }
         },
+
+       onclickaddBTN: function () {
+
+    if (!this._oAddDialog) {
+        this._oAddDialog = sap.ui.xmlfragment(
+            this.getView().getId(),
+            "sap.ui.com.project1.fragment.AddCoupon", // change to your fragment path
+            this
+        );
+        this.getView().addDependent(this._oAddDialog);
+    }
+
+    this._oAddDialog.open();
+
+},
+onCloseApplyNow:function(){
+      const oHostelModel = this.getView().getModel("HostelModel");
+     oHostelModel.setProperty("/CouponCode", "");
+        this._oAddDialog.close()
+}
     });
 });

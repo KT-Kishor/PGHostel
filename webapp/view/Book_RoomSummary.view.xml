@@ -91,7 +91,16 @@
         <items>
             <ColumnListItem>
                 <cells>
-                    <Text text="{HostelModel>FullName}" />
+                 <!-- <ObjectIdentifier
+                            title="{HostelModel>FullName}"
+                            text="{
+                   parts: [
+        'HostelModel>TotalFacilityPrice',
+        'HostelModel>/Currency'
+    ], formatter: '.Formatter.formatCurrency'
+                }"/> -->
+                <Text  text="{HostelModel>FullName}"/>
+                  
                     <Text
                          text="{
         parts: [                                                                          
@@ -134,21 +143,15 @@
     >
         <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
         <VBox class="sapUiSmallMarginTop custom-vbox">
-            <HBox
-                id="SummaryCouponid"
-                width="100%"
-                justifyContent="End"
-                alignItems="Center"
-                class="sapUiSmallMarginBottom couponContainer"
-            >
+           
                 <!-- Coupon Label -->
-                <Label
+                <!-- <Label
                     text="{i18n>couponCode}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                     width="120px"
                 />
 
-                <!-- Coupon Input -->
+              
                 <Input
                     value="{HostelModel>/CouponCode}"
                     placeholder="{i18n>enterCoupon}"
@@ -159,10 +162,10 @@
                     valueHelpIconSrc="sap-icon://decline"
                     valueHelpRequest="oncancelCoupon"
                     change="onCouponLiveChange"
-                />
+                /> -->
 
                 <!-- Apply Now Button -->
-                <Button
+                <!-- <Button
                     text="{i18n>applyNow}"
                     type="Emphasized"
                     tooltip="{i18n>applyCoupon}"
@@ -170,10 +173,31 @@
                     class="sapUiTinyMarginEnd myUnifiedBtn"
                     id="couponApplyBtn"
                     visible="{HostelModel>/CouponButtonVisible}"
-                />
-            </HBox>
-   
-
+                /> -->
+                 <HBox
+                id="SummaryCouponid"
+                width="100%"
+                justifyContent="SpaceBetween"
+                alignItems="Center"
+                class="sapUiSmallMarginBottom couponContainer"
+            >
+              <MessageStrip
+        text="{= 'Secuerity Deposit' +' ' +${HostelModel>/Deposit} +' '+ ${HostelModel>/DepositCurrency}}"
+        type="Information"
+        showIcon="true"
+        class="sapUiTinyMarginEnd"
+    />
+ 
+                <Button
+                    text="Add Coupon"
+                    type="Emphasized"
+                    tooltip="{i18n>}"
+                    press="onclickaddBTN"
+                    class="sapUiTinyMarginEnd"
+                    id="addcouponBtn"
+                                    />
+                                    </HBox>
+          
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"

@@ -902,22 +902,22 @@ sap.ui.define([
                                 new sap.ui.core.ListItem({
                                     key: "",
                                     text: ""
-                                }),
+                                }),     
                                 new sap.ui.core.ListItem({
                                     key: "Mr.",
-                                    text: "Mr"
+                                    text: "Mr."
                                 }),
                                 new sap.ui.core.ListItem({
                                     key: "Mrs.",
-                                    text: "Mrs"
+                                    text: "Mrs."
                                 }),
                                 new sap.ui.core.ListItem({
                                     key: "Ms.",
-                                    text: "Ms"
+                                    text: "Ms."
                                 }),
                                 new sap.ui.core.ListItem({
                                     key: "Dr.",
-                                    text: "Dr"
+                                    text: "Dr."
                                 }),
                             ]
                         }),
@@ -1986,7 +1986,6 @@ sap.ui.define([
                 this._lastRenderedBranch = sCurrentBranch;
             }
 
-
             // STEP 1: validations
             if (this._iSelectedStepIndex === 1) {
                 const aMissing = this._checkMandatoryFields();
@@ -2006,9 +2005,6 @@ sap.ui.define([
                     return;
                 }
             }
-
-
-
             if (!this._oSelectedStep) {
                 this._oSelectedStep = this._oWizard.getCurrentStep();
             }
@@ -2306,10 +2302,11 @@ sap.ui.define([
             const oView = this.getView();
             const oModel = oView.getModel("HostelModel");
             oModel.setProperty("/CouponCode", "");
-            const oBtn = this.byId("couponApplyBtn");
-            if (oBtn) {
-                oBtn.setVisible(true);
-            }
+            
+            // const oBtn = this.byId("couponApplyBtn");
+            // if (oBtn) {
+            //     oBtn.setVisible(true);
+            // }
 
             const aPersons = oModel.getProperty("/Persons") || [];
 
@@ -4050,7 +4047,7 @@ sap.ui.define([
             this.getBusyDialog();
             try {
                 const oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
-
+                  
                 if (!oResp || oResp.success !== true) {
                     const sFailMsg =
                         oResp?.message ||
@@ -4062,6 +4059,7 @@ sap.ui.define([
                     });
                     return;
                 }
+                 this._oLoginAlertDialog.close()
                 const sUsername = data.fullname.trim();
                 const Salutation = C("signUpSalutation").getSelectedItem().getText();
                 const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
@@ -4113,10 +4111,10 @@ sap.ui.define([
                         sap.ui.getCore().byId("signInuserid")?.setValue("");
                         sap.ui.getCore().byId("signInusername")?.setValue("");
 
-                        this._oSignDialog?.close();
+                        ;
 
                         setTimeout(() => {
-                            this._oSignDialog?.open();
+                             this._oLoginAlertDialog.open();
                         }, 200);
                     }
                 });
@@ -4129,6 +4127,7 @@ sap.ui.define([
                 if (err?.responseJSON?.message) {
                     sMsg = err.responseJSON.message;
                 }
+
                 else if (typeof err?.responseText === "string") {
                     try {
                         const oErr = JSON.parse(err.responseText);
@@ -4139,6 +4138,7 @@ sap.ui.define([
                         // ignore JSON parse errors
                     }
                 }
+                 this.closeBusyDialog();
 
                 MessageBox.error(sMsg, {
                     title: "Registration Failed"

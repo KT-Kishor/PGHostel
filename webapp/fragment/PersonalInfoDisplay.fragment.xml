@@ -406,14 +406,15 @@
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
             >
-                <Label
+                <!-- <Label
                     text="{i18n>securitydeposit}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
+                    visible="{= ${HostelModel>/Deposit} > 0 }"
                 />
                 <Text
                     text="{parts:['HostelModel>/Deposit','HostelModel>/DepositCurrency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
-                />
+                /> -->
             </HBox>
         
     </Panel>
