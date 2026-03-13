@@ -301,7 +301,8 @@ sap.ui.define([
                 sap.m.MessageBox.information(
                     "No Image is uploaded.",
                     {
-                        title: "Information"
+                        title: "Information",
+                        styleClass: "myUnifiedBtn"
                     }
                 );
                 return;

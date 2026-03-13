@@ -402,6 +402,7 @@ sap.ui.define([
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
                     onClose: async function (sAction) {
 
                         // ✅ ALWAYS clear selection (YES or NO)

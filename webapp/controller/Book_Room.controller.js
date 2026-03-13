@@ -3564,6 +3564,7 @@ sap.ui.define([
                 });
                 MessageBox.success("Password Updated Successfully", {
                     title: "Success",
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
 
                         // fully clean values
@@ -4056,7 +4057,8 @@ sap.ui.define([
                         this.i18nModel.getText("registrationFailedPleasetryagain");
 
                     sap.m.MessageBox.error(sFailMsg, {
-                        title: "Registration Failed"
+                        title: "Registration Failed",
+                        styleClass: "myUnifiedBtn",
                     });
                     return;
                 }
@@ -4068,6 +4070,7 @@ sap.ui.define([
 
                 MessageBox.success(sSuccessMsg, {
                     title: "Success",
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
 
                         // Reset login flow
@@ -5142,6 +5145,7 @@ sap.ui.define([
                 MessageBox.success(sMessage, {
                     title: "Success",
                     actions: [MessageBox.Action.OK],
+                    styleClass: "myUnifiedBtn",
                     onClose: function () {
                         // Check login status
                         const oLoginModel = sap.ui.getCore().getModel("LoginModel");

@@ -774,6 +774,7 @@ sap.ui.define([
                         sap.m.MessageBox.Action.OK,
                         sap.m.MessageBox.Action.CANCEL
                     ],
+                    styleClass: "myUnifiedBtn",
                     onClose: async function (sAction) {
                         if (sAction === sap.m.MessageBox.Action.OK) {
                             this.getBusyDialog()

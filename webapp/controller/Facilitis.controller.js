@@ -551,6 +551,7 @@ sap.ui.define([
                 title: "Confirm Deletion",
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 emphasizedAction: sap.m.MessageBox.Action.NO,
+                styleClass: "myUnifiedBtn",
                 onClose: async function (sAction) {
                     if (sAction === sap.m.MessageBox.Action.YES) {
                         try {

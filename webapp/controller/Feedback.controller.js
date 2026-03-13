@@ -262,6 +262,7 @@ sap.ui.define([
 
                 MessageBox.success("Thank you for your feedback!", {
                     title: "Feedback Submitted",
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
                         this.getOwnerComponent().getRouter().navTo("RouteHostel");
                     }

@@ -84,6 +84,7 @@ sap.ui.define([
                         sap.m.MessageBox.Action.CANCEL
                     ],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
                     onClose: function (sAction) {
                         var Table = this._oSelectedTable || oView.byId("idFacilitySummaryTable");
                         if (Table) {

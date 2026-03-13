@@ -164,6 +164,7 @@ sap.ui.define([
                 title: "Confirm Cancellation",
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                styleClass: "myUnifiedBtn",
                 onClose: async function (oAction) {
                     if (oAction !== sap.m.MessageBox.Action.YES) {
                         return; // Stop if user presses NO

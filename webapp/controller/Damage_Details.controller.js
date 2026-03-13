@@ -248,6 +248,7 @@ sap.ui.define([
                     "Are you sure you want to delete selected item(s)?",
                     {
                         title: "Confirm Deletion",
+                        styleClass: "myUnifiedBtn",
                         onClose: function (sAction) {
                             if (sAction === "OK") {
                                 fnDelete();
@@ -477,6 +478,7 @@ sap.ui.define([
                                     "GeneratePDF"
                                 ],
                                 // emphasizedAction: sap.m.MessageBox.Action.OK,
+                                styleClass: "myUnifiedBtn",
                                 onClose: async (oAction) => {
                                     if (oAction === sap.m.MessageBox.Action.OK) {
                                         this.getOwnerComponent()

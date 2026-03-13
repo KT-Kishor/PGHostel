@@ -1465,7 +1465,8 @@ sap.ui.define([
                 if (!oResp || oResp.success !== true) {
                     const sFailMsg = oResp?.message || this.i18nModel.getText("registrationFailedPleasetryagain");
                     return MessageBox.error(sFailMsg, {
-                        title: "Registration Failed"
+                        title: "Registration Failed",
+                        styleClass: "myUnifiedBtn",
                     });
                 }
 
@@ -1479,6 +1480,7 @@ sap.ui.define([
                 MessageBox.success(sSuccessMsg, {
                     title: "Success",
                     contentWidth: "500px",
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
                         // ✅ Credentials trigger FIRST
                         oCtrl._triggerBrowserSaveCredentials(sUsername, sPassword);
@@ -3058,6 +3060,7 @@ sap.ui.define([
 
                 MessageBox.success("Password updated successfully", {
                     title: "Success",
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
                         // fully clean values
                         this._clearAllAuthFields?.();
@@ -4318,6 +4321,7 @@ sap.ui.define([
                     contentWidth: "500px", // Try adding this directly here
                     // styleClass: "myCustomMessageBoxSize",
                     emphasizedAction: MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
                     onClose: () => {
                         this._oAdminSignup.close();
                     }

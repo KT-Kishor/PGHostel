@@ -964,6 +964,7 @@ sap.ui.define([
                         title: "Request Submitted",
                         actions: [sap.m.MessageBox.Action.OK],
                         emphasizedAction: sap.m.MessageBox.Action.OK,
+                        styleClass: "myUnifiedBtn",
                         onClose: function () {
                             if (this._oEnquiry && this._oEnquiry.isOpen()) {
                                 this._oEnquiry.close();
