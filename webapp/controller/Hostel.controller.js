@@ -5052,7 +5052,7 @@ sap.ui.define([
             this.closeBusyDialog()
             MessageToast.show("Support request submitted successfully");
 
-            this._supportRequestDialog.close();
+          this.HF_onCancelButtonPress()
         },
 
         onissuetypechanges: function (oEvent) {
