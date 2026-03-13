@@ -71,6 +71,7 @@ sap.ui.define([
           title: "Session Expired",
           actions: [MessageBox.Action.OK],
           emphasizedAction: MessageBox.Action.OK,
+          styleClass: "myUnifiedBtn",
           dependentOn: this.getView(),
           onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
@@ -81,6 +82,5 @@ sap.ui.define([
         }
       );
     }
-
   });
 });
