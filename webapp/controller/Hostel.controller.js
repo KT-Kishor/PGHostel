@@ -3951,7 +3951,7 @@ sap.ui.define([
 
             (sSelectedTab === "Payment") ? oProfileModel.setProperty("/paymentCount", length) : oProfileModel.setProperty("/bookingCount", length);
         },
-
+///
         onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment("sap.ui.com.project1.fragment.AdminSignup", this);
@@ -4313,42 +4313,51 @@ sap.ui.define([
             try {
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
 
+                const sUsername = oAdmin.VendorName.trim();
+                const sSalutation = $C("adminSalutation")?.getSelectedItem()?.getText() || "";
+                // console.log(sUsername, sSalutation);
+
                 MessageBox.success(
-                    "Thank you for signing up.\n\n" +
-                    "The team will review all submitted details and documents. Once verification is finished, an email will be shared along with the user credentials.\n\n" +
-                    "Please check your inbox (and spam folder) for further updates.", {
-                    title: "Registration Submitted Successfully",
-                    contentWidth: "500px", // Try adding this directly here
-                    // styleClass: "myCustomMessageBoxSize",
-                    emphasizedAction: MessageBox.Action.OK,
-                    styleClass: "myUnifiedBtn",
-                    onClose: () => {
-                        this._oAdminSignup.close();
-                    }
+                    "Thank you " + sSalutation + " " + sUsername + ", for signing up.\n\n" +
+                    "The team will review all submitted details and documents.\n\n" +
+                    "Once verification is finished, an email will be shared along with the user credentials.\n\n" +
+                    "Please check your inbox (or spam folder) for further updates.",
+                    {
+                        title: "Registration Submitted Successfully",
+                        contentWidth: "500px",
+                        emphasizedAction: MessageBox.Action.OK,
+                        styleClass: "myUnifiedBtn",
+                        onClose: () => {
+                            this._oAdminSignup.close();
+                        }
                 }
                 );
+
             } catch (err) {
+                console.error("Admin signup error:", err);
                 let sErrorMessage = "Registration failed. Please try again later.";
-                // 🔹 Case 1: jQuery AJAX error with JSON response
+
                 if (err?.responseJSON?.message) {
                     sErrorMessage = err.responseJSON.message;
-                }
-                // 🔹 Case 2: OData-style error
-                else if (err?.responseJSON?.error?.message?.value) {
+                } else if (err?.responseJSON?.error?.message?.value) {
                     sErrorMessage = err.responseJSON.error.message.value;
-                }
-                // 🔹 Case 3: Plain text response
-                else if (err?.responseText) {
+                } else if (err?.responseJSON?.error?.innererror?.errordetails?.length) {
+                    sErrorMessage = err.responseJSON.error.innererror.errordetails[0].message || sErrorMessage;
+                } else if (err?.responseText) {
                     try {
                         const oParsed = JSON.parse(err.responseText);
                         sErrorMessage =
                             oParsed?.message ||
+                            oParsed?.error?.message?.value ||
                             oParsed?.error?.message ||
                             sErrorMessage;
                     } catch (e) {
                         sErrorMessage = err.responseText;
                     }
+                } else if (err?.message) {
+                    sErrorMessage = err.message;
                 }
+
                 MessageBox.error(sErrorMessage, {
                     title: "Registration Failed"
                 });
@@ -4357,6 +4366,8 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+
+
 
         onAdminFileSelect: function (oEvent) {
             const oUploader = $C("adminFileUploader");
@@ -4424,20 +4435,12 @@ sap.ui.define([
                 // ✅ CLEAR ERROR STATE HERE (this is what you asked)
                 const table = $C("adminAttachmentTable");
                 table?.removeStyleClass("fileErrorHighlight");
-                // 🔥 Remove used document type from ComboBox
-                oDocType.getItems().forEach(i => {
-                    if (i.getKey() === selectedDocType) {
-                        oDocType.removeItem(i);
-                    }
-                });
                 // 🔁 Reset doc type
                 oModel.setProperty("/CurrentDocType", "");
                 oUploader.clear();
-                // 🔓 Re-enable ONLY if options remain
-                const hasMoreTypes = oDocType.getItems().length > 0;
-                oModel.setProperty("/DocTypeEnabled", hasMoreTypes);
+                // Keep document types available for repeated uploads.
+                oModel.setProperty("/DocTypeEnabled", true);
                 oModel.setProperty("/UploadEnabled", false);
-                if (!hasMoreTypes) MessageToast.show(this.i18nModel.getText("alldocumentsuploaded"));
             };
             reader.readAsDataURL(file);
         },
@@ -4581,7 +4584,6 @@ sap.ui.define([
 
         onAdminDeleteDoc: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
-            const oDocType = $C("adminDocType");
             const table = $C("adminAttachmentTable");
             const oCtx = oEvent.getParameter("listItem").getBindingContext("AdminSignupModel");
             const doc = oCtx.getObject(); // ✅ define first
@@ -4592,11 +4594,6 @@ sap.ui.define([
             const docs = oModel.getProperty("/Documents") || [];
             docs.splice(index, 1);
             oModel.setProperty("/Documents", docs);
-            // ♻️ Restore doc type option
-            oDocType.addItem(new sap.ui.core.ListItem({
-                key: doc.VdocType,
-                text: doc.VdocType
-            }));
             oModel.setProperty("/DocTypeEnabled", true);
             // 🔴 If no documents left → show error highlight
             if (docs.length === 0) table?.addStyleClass("fileErrorHighlight");
