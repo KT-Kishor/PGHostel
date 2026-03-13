@@ -69,14 +69,13 @@
                 <fb:FilterBar
                     id="D_id_FilterbarEmployee"
                     useToolbar="false"
-                    class="sapUiSmallMarginTop"
+                    class="filterBarTheme sapUiSmallMarginTop"
                     clear="D_onPressClear"
                     showClearOnFB="true"
                     search="D_search"
                     visible="false"
                     filterChange="onFilterChange"
                     showFilterConfiguration="false"
-                    class="filterBarTheme"
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
