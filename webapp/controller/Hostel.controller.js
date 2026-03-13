@@ -4821,6 +4821,11 @@ sap.ui.define([
                     this.getView().addDependent(oDialog);
                     oDialog.open();
 
+                    this._supportRequestDialog.attachAfterClose(() => {
+                 
+                    this.HF_onCancelButtonPress();
+                });
+
                 }.bind(this));
 
             } else {
