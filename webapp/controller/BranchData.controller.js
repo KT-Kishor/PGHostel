@@ -770,6 +770,7 @@ sap.ui.define([
                         sap.m.MessageBox.Action.NO
                     ],
                     emphasizedAction: sap.m.MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
 
                     onClose: async (sAction) => {
                         if (sAction === sap.m.MessageBox.Action.YES) {
@@ -1348,7 +1349,8 @@ sap.ui.define([
                 sap.m.MessageBox.information(
                     "No logo is uploaded.",
                     {
-                        title: "Information"
+                        title: "Information",
+                        styleClass: "myUnifiedBtn"
                     }
                 );
                 return;

@@ -527,6 +527,7 @@ sap.ui.define([
                     title: "Confirm Unassign",
                     actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                     emphasizedAction: sap.m.MessageBox.Action.YES,
+                    styleClass: "myUnifiedBtn",
                     onClose: function (oAction) {
                         if (oAction === sap.m.MessageBox.Action.YES) {
 
@@ -817,8 +818,10 @@ sap.ui.define([
                         icon: sap.m.MessageBox.Icon.INFORMATION,
                         actions: [
                             sap.m.MessageBox.Action.OK,
-                            sap.m.MessageBox.Action.CANCEL
+                            sap.m.MessageBox.Action.CANCEL,
                         ],
+                        
+                            styleClass: "myUnifiedBtn",
                         onClose: (sAction) => {
                             if (sAction === sap.m.MessageBox.Action.OK) {
                                 this.getOwnerComponent()
@@ -855,6 +858,7 @@ sap.ui.define([
                     title: "Error",
                     actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
 
                     onClose: function (sAction) {
 

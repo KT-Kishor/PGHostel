@@ -19,6 +19,7 @@ sap.ui.define([
         _onRouteMatched: async function (oEvent) {
             this.call=false
             this._fromRoute = oEvent.getParameter("arguments").from;
+            this.commonLoginFunction();
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
@@ -2083,6 +2084,7 @@ sap.ui.define([
                     "Are you sure you want to Delete this Facility?", {
                     title: "Confirm Delete",
                     actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    styleClass: "myUnifiedBtn",
                     onClose: function (oAction) {
                         if (oAction === sap.m.MessageBox.Action.OK) {
 
@@ -3028,6 +3030,7 @@ sap.ui.define([
                         title: "Upgrade Required",
                         actions: ["Extend Now", "Maybe Later"],
                         emphasizedAction: sap.m.MessageBox.Action.OK,
+                        styleClass: "myUnifiedBtn",
 
                         onClose: function (sAction) {
                             if (sAction === "Maybe Later") {
@@ -3298,6 +3301,7 @@ sap.ui.define([
                 title: "Confirm Cancellation",
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                styleClass: "myUnifiedBtn",
                 onClose: async function (oAction) {
                     if (oAction !== sap.m.MessageBox.Action.YES) {
                         return;
@@ -3461,6 +3465,7 @@ sap.ui.define([
                     "This Document is already Saved. Do you want to Delete it?",
                     {
                         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                        styleClass: "myUnifiedBtn",
                         onClose: function (sAction) {
 
                             if (sAction === MessageBox.Action.YES) {
