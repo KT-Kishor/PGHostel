@@ -632,15 +632,12 @@ sap.ui.define([
                 }
 
                 if (sUnit === "Per Year") {
-                    const diffYears = diffDays / 365;
 
-                    // If less than 1 full year → show days
-                    if (diffYears < 1) {
+                    if (diffDays < 364) {
                         return diffDays + " Days";
                     }
 
-                    // Otherwise normal year logic
-                    const years = Math.floor(diffYears);
+                    const years = Math.round(diffDays / 365);
                     return years + (years === 1 ? " Year" : " Years");
                 }
 
