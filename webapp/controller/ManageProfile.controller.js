@@ -592,11 +592,6 @@ sap.ui.define([
             if (!isEditMode) {
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
-
-                this.getBusyDialog();
-
-                this.closeBusyDialog();
-
                 return;
             }
             const isMandatoryValid = (
@@ -640,7 +635,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
 
             } catch (err) {
-                console.error(err);
+                  this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 this.closeBusyDialog();
