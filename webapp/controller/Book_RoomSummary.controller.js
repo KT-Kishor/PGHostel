@@ -3,7 +3,6 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
     "../utils/validation",
-    "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/m/FlexBox",
@@ -11,7 +10,7 @@ sap.ui.define([
     "sap/m/Button",
     "sap/m/Image",
     "sap/ui/core/HTML"
-], (Controller, JSONModel, Formatter, utils, BusyIndicator, MessageToast, MessageBox, FlexBox, Dialog, Button, Image, HTML) => {
+], (Controller, JSONModel, Formatter, utils, MessageToast, MessageBox, Dialog, Button, Image, HTML) => {
     "use strict";
     return Controller.extend("sap.ui.com.project1.controller.Book_RoomSummary", {
         Formatter: Formatter,

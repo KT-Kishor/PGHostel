@@ -73,7 +73,7 @@ sap.ui.define([
                 this.getView().setModel(oModel, "HostelModel");
 
                 this.closeBusyDialog()
-            }).catch(() => sap.ui.core.BusyIndicator.hide());
+            }).catch(() => this.closeBusyDialog());
         },
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -688,7 +688,7 @@ sap.ui.define([
                     }.bind(this),
                     error: function (err) {
                         sap.m.MessageBox.error(this.i18nModel.getText("errorSavingRoomData"));
-                        sap.ui.core.BusyIndicator.hide()
+                       this.closeBusyDialog()
                     }.bind(this)
                 });
             } else {

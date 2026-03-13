@@ -2,12 +2,10 @@ sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "../model/formatter",
-  "sap/ui/core/BusyIndicator",
   "sap/ui/unified/CalendarLegend",
   "sap/ui/unified/CalendarLegendItem",
   "sap/ui/unified/DateTypeRange"
-], function (Controller, JSONModel, jsPDF, Formatter,
-  BusyIndicator, CalendarLegend, CalendarLegendItem, DateTypeRange) {
+], function (Controller, JSONModel, Formatter) {
   "use strict";
 
   return Controller.extend("sap.ui.com.project1.controller.BaseController", {
@@ -187,7 +185,7 @@ sap.ui.define([
         modelName = modelName.split(" ")[0];
       }
       if (!this.getOwnerComponent().getModel("LoginModel")) {
-        BusyIndicator.hide();
+        this.closeBusyDialog();
         return;
       }
       let url = this.getOwnerComponent().getModel("LoginModel").getData().url + entityName;

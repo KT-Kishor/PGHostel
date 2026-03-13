@@ -191,8 +191,8 @@ sap.ui.define([
 
             var fnDelete = async function () {
 
-                // that.getBusyDialog()
-                sap.ui.core.BusyIndicator.show(0);
+                that.getBusyDialog()
+              
 
                 try {
 
@@ -238,8 +238,7 @@ sap.ui.define([
                     sap.m.MessageToast.show("Error while deleting");
                 }
 
-                // that.closeBusyDialog()
-                sap.ui.core.BusyIndicator.hide();
+                that.closeBusyDialog() 
 
             };
 

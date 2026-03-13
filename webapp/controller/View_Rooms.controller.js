@@ -952,7 +952,7 @@ sap.ui.define([
                 CustomerPhone: (oModel.STDCode || "") + oModel.Mobile,
                 CustomerComment: oModel.Comments || ""
             };
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 const oresponse = await this.ajaxCreateWithJQuery("HM_EnquiryEmail", {
                     data: oData,
@@ -977,7 +977,7 @@ sap.ui.define([
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

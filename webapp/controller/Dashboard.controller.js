@@ -15,7 +15,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();;
             try {
                 this.commonLoginFunction();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -35,12 +35,13 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Something went wrong");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
         loadDashboardData: async function () {
             // sap.ui.core.BusyIndicator.show(0);
+            this.getBusyDialog();
             try {
                 if (!this._aUserBranches || this._aUserBranches.length === 0) {
                     return;
@@ -54,9 +55,11 @@ sap.ui.define([
                 this._aAllBookings = aData;
                 this.dashboardSetDate(aData, this._aUserBranches);
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("Failed to load dashboard data"));
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             }
         },
 
@@ -267,6 +270,7 @@ sap.ui.define([
         _loadMonthChart: async function (oPayload) {
             try {
                 // sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearBarChart", oPayload)
                 console.log("month wise response:", oData);
                 let aData = Array.isArray(oData) ? oData : oData.data;
@@ -276,9 +280,11 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({ data: aData }), "monthlyChartModel");
                 this._bindMonthlyChart();
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
 
             } catch (err) {
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show("Failed to load monthly chart");
             }
         },
@@ -286,6 +292,7 @@ sap.ui.define([
         _loadDayChart: async function (oPayload) {
             try {
                 // sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentMonthBarChart", oPayload)
                 console.log("daily wise response:", oData);
                 let aData = oData.results || [];
@@ -295,8 +302,10 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({ data: aData }), "dailyChartModel");
                 this._bindDailyChart();
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
             } catch (err) {
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog();
                 MessageToast.show("Failed to load daily chart");
             };
         },
@@ -338,6 +347,7 @@ sap.ui.define([
         _loadStatusChart: async function (oPayload) {
             try {
                 // sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearStatusBarChart", oPayload);
                 console.log("status wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : (oData.results || oData.data || []);
@@ -347,8 +357,10 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({ data: aData }), "statusChartModel");
                 this._bindStatusChart();
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             } catch (err) {
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show("Failed to load status chart");
             }
         },
@@ -392,6 +404,7 @@ sap.ui.define([
         _loadPaymentTypeChart: async function (oPayload) {
             try {
                 // sap.ui.core.BusyIndicator.show(0);
+                this.getBusyDialog();
                 const oData = await this.ajaxReadWithJQuery("HM_GetCurrentYearPaymentTypeBarChart", oPayload)
                 console.log("payment wise response:", oData);
                 const aData = Array.isArray(oData) ? oData : oData.results || [];
@@ -401,8 +414,10 @@ sap.ui.define([
                 this.getView().setModel(new JSONModel({ data: aData }), "paymentTypeChartModel");
                 this._bindPaymentTypeChart();
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             } catch (err) {
                 // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
                 MessageToast.show("Failed to load payment type chart");
             };
         },
@@ -546,7 +561,7 @@ sap.ui.define([
         },
 
         D_search: async function () {
-            sap.ui.core.BusyIndicator.show(0);
+           this.getBusyDialog();
             try {
 
                 const aSelectedBranches = this.byId("D_id_BranchCode").getSelectedKeys();
@@ -639,7 +654,8 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Failed to load charts");
             } finally {
-                sap.ui.core.BusyIndicator.hide();
+                // sap.ui.core.BusyIndicator.hide();
+                this.closeBusyDialog()
             }
         },
 

@@ -2,18 +2,14 @@ sap.ui.define([
     "./BaseController",
     "../model/formatter",
     "sap/ui/model/json/JSONModel",
-    "sap/ui/core/BusyIndicator",
     "sap/m/MessageToast",
-       "../utils/validation",
-        "sap/ui/export/Spreadsheet",
+       "../utils/validation"
 ], function (
     BaseController,
     Formatter,
     JSONModel,
-    BusyIndicator,
     MessageToast,
     utils,
-    Spreadsheet
 
 ) {
     "use strict";

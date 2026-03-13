@@ -264,7 +264,7 @@ sap.ui.define([
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
                     this.closeBusyDialog()
-                }).catch(() => sap.ui.core.BusyIndicator.hide());
+                }).catch(() => this.closeBusyDialog());
             } catch (e) {
                 this.closeBusyDialog()
             }

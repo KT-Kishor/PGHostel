@@ -82,7 +82,7 @@ sap.ui.define([
                 this.getView().setModel(oModel, "HostelModel");
 
                 this.closeBusyDialog()
-            }).catch(() => sap.ui.core.BusyIndicator.hide());
+            }).catch(() => this.closeBusyDialog())
         },
 
         _loadBranchCode: async function () {
