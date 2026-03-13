@@ -2925,6 +2925,7 @@ sap.ui.define([
                 icon: MessageBox.Icon.QUESTION,
                 title: this.i18nModel ? this.i18nModel.getText("confirmation") : "Confirm",
                 actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                styleClass: "myUnifiedBtn",
                 onClose: function (oAction) {
                     if (oAction === MessageBox.Action.OK) {
                         // Clear all data before navigating back

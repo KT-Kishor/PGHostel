@@ -182,8 +182,21 @@ sap.ui.define([
             oContainer.removeAllItems();
 
             if (!aCards || aCards.length === 0) {
-                return;
-            }
+                oContainer.addItem(
+            new sap.m.VBox({
+                width: "100%",
+                alignItems: "Center",
+                justifyContent: "Center",
+                items: [
+                    new sap.m.Text({
+                        text: "No booking available",
+                        textAlign: "Center"
+                    }).addStyleClass("sapUiMediumMarginTop")
+                ]
+            })
+        );
+        return;
+    }
             aCards.forEach((oBooking) => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/BookingDashboard.json",

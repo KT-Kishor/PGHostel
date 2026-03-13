@@ -192,12 +192,12 @@
                         />
                     </Column>
 
-                    <Column demandPopin="true">
+                    <!-- <Column demandPopin="true">
                         <Text
                             text="{i18n>logo}"
                             tooltip="{i18n>logo}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column demandPopin="true">
                         <Text
                             text="{i18n>image}"
@@ -245,10 +245,10 @@
                             />
                             <Text text="{mainModel>Pincode}" />
                             <Text text="{mainModel>STD} {mainModel>Contact}" />
-                            <Link
+                            <!-- <Link
                                 text="{i18n>view}"
                                 press="HF_viewroom"
-                            />
+                            /> -->
                             <Link
                                 text="{i18n>view}"
                                 press="HF_viewimage"
