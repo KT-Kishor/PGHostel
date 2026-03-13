@@ -4885,6 +4885,12 @@ sap.ui.define([
         onIssuenamechanges: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
+        onFileSizeExceed: function (oEvent) {
+    const oFileUploader = oEvent.getSource();
+    const sFileName = oEvent.getParameter("fileName");
+
+    sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
+},
        onSupportrequestChange: function (oEvent) {
 
     const oFiles = oEvent.getParameter("files");
@@ -4897,20 +4903,22 @@ sap.ui.define([
     let aAttachments = oUploaderData.getProperty("/attachments") || [];
     let aTokens = oTokenModel.getProperty("/tokens") || [];
 
+
     Array.from(oFiles).forEach((oFile) => {
 
         // Check duplicate file name
         const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
         if (bDuplicate) {
-            MessageToast.show(`"${oFile.name}" is already uploaded.`);
+            MessageToast.show("This file is more than 2 MB and cannot be uploaded");
             return;
         }
-
         // File type validation
         if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
             MessageToast.show("Only JPG, JPEG, PNG allowed");
             return;
         }
+
+        
 
         const oReader = new FileReader();
 

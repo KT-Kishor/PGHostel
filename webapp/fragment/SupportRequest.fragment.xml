@@ -88,6 +88,13 @@
 
 				<!-- Upload Image (UNCHANGED) -->
 				<Label text="{i18n>addImage}" required="true"/>
+				  <MessageStrip
+                    text=" Image files larger than 2 MB are not allowed."
+                    type="Warning"
+                    showIcon="true"
+                    enableFormattedText="true"
+                    class="sapUiSmallMarginBottom"
+                />
 
 			<VBox alignItems="Start" width="100%" renderType="Bare">
 
@@ -95,7 +102,7 @@
     <HBox width="100%">
         <u:FileUploader
             id="HFF_id_FileUploader1"
-            fileSizeExceed="onFileSizeExceeds"
+            fileSizeExceed="onFileSizeExceed"
             maximumFileSize="2"
             typeMissmatch="onFileTypeMissmatch"
             fileType="jpg,jpeg,png"
