@@ -167,7 +167,7 @@
                     type="Emphasized"
                     tooltip="{i18n>applyCoupon}"
                     press="onChangeCouponCode"
-                    class="sapUiTinyMarginEnd"
+                    class="sapUiTinyMarginEnd myUnifiedBtn"
                     id="couponApplyBtn"
                     visible="{HostelModel>/CouponButtonVisible}"
                 />
