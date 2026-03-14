@@ -12,6 +12,7 @@
                 src="./image/SVLogo.png"
                 height="2.5rem"
                 class="logoFix"
+                press="onNavBack"
             />
         </contentLeft>
         <contentRight>
