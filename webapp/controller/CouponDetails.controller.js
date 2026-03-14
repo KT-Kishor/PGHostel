@@ -483,19 +483,17 @@ sap.ui.define([
         _createColumnConfig: function () {
             return [
                 { label: "Hostel Name", property: "BranchName", type: "String" },
-                { label: "Branch Code", property: "BranchCode", type: "String" },
+                { lanel: "Status", property: "Status", type: "String"},
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },
-                { label: "Discount Value", property: "DiscountValue", type: "String" },
+                { label: "Percentage / Discount Value", property: "DiscountValue", type: "String" },
+                { label: "Maximum Discount", property: "UptoValue", type: "String" },
                 { label: "Max Uses", property: "MaxUses", type: "String" },
-                { label: "Description", property: "Description", type: "String" },
-                { label: "Upto Discount Value", property: "UptoValue", type: "String" },
                 { label: "Min Order Value", property: "MinOrderValue", type: "String" },
                 { label: "Start Date", property: "StartDate", type: "String" },
                 { label: "End Date", property: "EndDate", type: "String" },
                 { label: "Created At", property: "CreatedAt", type: "String" },
                 { label: "Created By", property: "CreatedBy", type: EdmType.String },
-                { label: "Status", property: "Status", type: EdmType.String },
             ];
         },
 
