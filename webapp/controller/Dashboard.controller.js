@@ -182,19 +182,21 @@ sap.ui.define([
             oContainer.removeAllItems();
 
             if (!aCards || aCards.length === 0) {
-                oContainer.addItem(
-            new sap.m.VBox({
-                width: "100%",
-                alignItems: "Center",
-                justifyContent: "Center",
-                items: [
-                    new sap.m.Text({
-                        text: "No booking available",
-                        textAlign: "Center"
-                    }).addStyleClass("sapUiMediumMarginTop")
-                ]
-            })
-        );
+                 const oCenterBox = new sap.m.VBox({
+            width: "100%",
+            alignItems: "Center",
+            justifyContent: "Center",
+            items: [
+                new sap.m.IllustratedMessage({
+                    title: "No Bookings",
+                    description: "No bookings available for today",
+                    illustrationType: "sapIllus-NoData",
+                    illustrationSize: "Spot"
+                })
+            ]
+        });
+
+        oContainer.addItem(oCenterBox);
         return;
     }
             aCards.forEach((oBooking) => {

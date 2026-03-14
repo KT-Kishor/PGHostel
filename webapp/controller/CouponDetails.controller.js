@@ -118,9 +118,9 @@ sap.ui.define([
 
                 if (oExistingModel.Role === "Admin") {
                     params.Role = "Admin";
-                } else if (oExistingModel.Role === "SuperAdmin" ) {
+                } else if (oExistingModel.Role === "SuperAdmin") {
                     params.BranchCode = "";
-                } else{
+                } else {
                     params.BranchCode = oExistingModel.BranchCode;
                 }
 
@@ -274,9 +274,9 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            }  else {
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
             try {
@@ -466,7 +466,12 @@ sap.ui.define([
             var aCols = this._createColumnConfig();
 
             var oSheet = new Spreadsheet({
-                workbook: { columns: aCols },
+                workbook: {
+                    columns: aCols,
+                    context: {
+                        sheetName: "Coupons Deatils"
+                    }
+                },
                 dataSource: aFormattedData,
                 fileName: "Coupons.xlsx"
             });
@@ -477,7 +482,7 @@ sap.ui.define([
 
         _createColumnConfig: function () {
             return [
-                {label: "Hostel Name", property: "BranchName", type: "String" },
+                { label: "Hostel Name", property: "BranchName", type: "String" },
                 { label: "Branch Code", property: "BranchCode", type: "String" },
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },
@@ -635,12 +640,12 @@ sap.ui.define([
                 &&
                 utils._LCstrictValidationComboBox(
                     sap.ui.getCore().byId(oView.createId("cbDiscountType")), "ID"
-                )  && 
+                ) &&
                 utils._LCvalidateMandatoryField(
                     sap.ui.getCore().byId(oView.createId("inDiscountValue")), "ID"
                 ) &&
-            this._validateDiscountValueLogic()
-                    && 
+                this._validateDiscountValueLogic()
+                &&
                 (
                     oCoupon.DiscountType !== "Percentage" ||
                     utils._LCvalidateMandatoryField(
@@ -943,30 +948,30 @@ sap.ui.define([
 
         // ===== All numeric fields =====
         onLiveChange_Number_MinOne: function (oEvent) {
-                const oInput = oEvent.getSource();
-                let sValue = oInput.getValue();
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue();
 
-                // ❌ Remove anything that is not a digit
-                sValue = sValue.replace(/\D/g, "");
+            // ❌ Remove anything that is not a digit
+            sValue = sValue.replace(/\D/g, "");
 
-                // ❌ Remove leading zeros (except single digit)
-                sValue = sValue.replace(/^0+/, "");
+            // ❌ Remove leading zeros (except single digit)
+            sValue = sValue.replace(/^0+/, "");
 
-                oInput.setValue(sValue);
+            oInput.setValue(sValue);
 
-                const iVal = parseInt(sValue, 10);
+            const iVal = parseInt(sValue, 10);
 
-                if (!sValue || isNaN(iVal) || iVal < 1) {
-                    oInput.setValueState(sap.ui.core.ValueState.Error);
-                    oInput.setValueStateText(
-                        this.i18nModel.getText("valuemustbeatleast1")
-                    );
-                    return;
-                }
+            if (!sValue || isNaN(iVal) || iVal < 1) {
+                oInput.setValueState(sap.ui.core.ValueState.Error);
+                oInput.setValueStateText(
+                    this.i18nModel.getText("valuemustbeatleast1")
+                );
+                return;
+            }
 
-                // ✅ Natural number confirmed
-                oInput.setValueState(sap.ui.core.ValueState.None);
-            },
+            // ✅ Natural number confirmed
+            oInput.setValueState(sap.ui.core.ValueState.None);
+        },
 
 
         onLiveChange_Number_AllowZero: function (oEvent) {
@@ -1140,7 +1145,7 @@ sap.ui.define([
                 CouponCode: this._oCouponToShare.CouponCode,
                 BranchCode: this._oCouponToShare.BranchCode,
                 BranchName: this._oCouponToShare.BranchName
-            }); 
+            });
             if (!this._oShareDialog) {
                 const oView = this.getView();
                 this._oShareDialog = await sap.ui.core.Fragment.load({
@@ -1383,7 +1388,7 @@ sap.ui.define([
                                 window.location.href =
                                     "mailto:?subject=" +
                                     encodeURIComponent("New Discount Coupon") +
-                                "&body=" + encodeURIComponent(sEmailBody);
+                                    "&body=" + encodeURIComponent(sEmailBody);
                                 this._oSharePopover.close();
                             }),
 
@@ -1533,5 +1538,5 @@ sap.ui.define([
         //         `${sBranchName} Management`
         //     );
         // },
-    }); 
+    });
 });

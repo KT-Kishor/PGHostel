@@ -785,7 +785,10 @@ sap.ui.define([
             const oSettings = {
                 workbook: {
                     columns: aCols,
-                    hierarchyLevel: "Level"
+                    hierarchyLevel: "Level",
+                    context: {
+                        sheetName: "Manage Staff Details"
+                    }
                 },
                 dataSource: adjustedData,
                 fileName: "Manage_Staff.xlsx",

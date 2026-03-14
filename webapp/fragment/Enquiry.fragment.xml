@@ -121,7 +121,7 @@
                             id="id_enq_MobileNo"
                             value="{EnquiryModel>/Mobile}"
                             liveChange="ADMIN_onMobileLiveChange"
-                            maxLength="18"
+                            maxLength="{= ${EnquiryModel>/STDCode} === '+91' ? 10 : 18 }"
                             placeholder="Enter mobile number"
                             width="100%"
                             valueStateText="Enter valid mobile number"

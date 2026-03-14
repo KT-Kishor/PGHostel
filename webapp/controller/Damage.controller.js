@@ -539,7 +539,10 @@ sap.ui.define([
             var aColumns = this.createDamageExcelColumns();
             var oSettings = {
                 workbook: {
-                    columns: aColumns
+                    columns: aColumns,
+                    context: {
+            sheetName: "Damage Details"
+        }
                 },
                 dataSource: aAdjustedData,
                 fileName: "Damage_Report.xlsx",

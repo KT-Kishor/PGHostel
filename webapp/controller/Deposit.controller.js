@@ -144,8 +144,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin") {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
@@ -210,9 +210,9 @@ sap.ui.define([
                 const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
                 if (oExistingModel.Role === "Admin") {
                     params.Role = "Admin";
-                } else if (oExistingModel.Role === "SuperAdmin" ) {
+                } else if (oExistingModel.Role === "SuperAdmin") {
                     params.BranchCode = "";
-                } else{
+                } else {
                     params.BranchCode = oExistingModel.BranchCode;
                 }
 
@@ -625,7 +625,12 @@ sap.ui.define([
             var aCols = this._createDepositColumnConfig();
 
             var oSheet = new Spreadsheet({
-                workbook: { columns: aCols },
+                workbook: {
+                    columns: aCols,
+                    context: {
+                        sheetName: "Deposit Detaild"
+                    }
+                },
                 dataSource: aFormattedData,
                 fileName: "Deposits.xlsx"
             });
@@ -769,7 +774,7 @@ sap.ui.define([
                     ReturnDepositMode: returnMode,
                     ReturnDepositTransactionID: transactionID || "",
                     ReturnDepositBy: currentUser,
-                    BookingID:sBookingID
+                    BookingID: sBookingID
                     // Status: newStatus
                 };
 
@@ -972,7 +977,7 @@ sap.ui.define([
             oInput.setValueState("None");
             return true;
         },
-     
+
 
 
 

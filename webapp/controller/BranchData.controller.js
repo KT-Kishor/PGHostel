@@ -17,6 +17,7 @@ sap.ui.define([
                 Address: "",
                 LandMark: "",
                 GeoLocation: "",
+                PropertyType: "",
                 Pincode: "",
                 Contact: "",
                 stdCode: "",
@@ -50,6 +51,9 @@ sap.ui.define([
             this.getView().setModel(new sap.ui.model.json.JSONModel({
                 tokens: []
             }), "tokenModel");
+            var oPropertyTypeModel = new sap.ui.model.json.JSONModel();
+            oPropertyTypeModel.loadData("model/PropertyType.json");
+            this.getView().setModel(oPropertyTypeModel, "PropertyType");
         },
 
         _onRouteMatched: async function () {
@@ -246,7 +250,7 @@ sap.ui.define([
                 property: "Value",
                 type: "string"
             },
-            
+
             {
                 label: "Late Penalty Amount",
                 property: "Penalty",
@@ -295,7 +299,10 @@ sap.ui.define([
             const oSettings = {
                 workbook: {
                     columns: aCols,
-                    hierarchyLevel: "Level"
+                    hierarchyLevel: "Level",
+                    context: {
+                        sheetName: "Branch Details"
+                    }
                 },
                 dataSource: adjustedData,
                 fileName: "Branch_Details.xlsx",
@@ -379,6 +386,7 @@ sap.ui.define([
                 Address: "",
                 LandMark: "",
                 GeoLocation: "",
+                PropertyType: "",
                 Pincode: "",
                 Contact: "",
                 stdCode: "+91",
@@ -402,6 +410,10 @@ sap.ui.define([
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
+        onPropertyTypeChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+
         MD_onSaveButtonPress: async function () {
             var oView = this.getView();
             const oUpload = oView.getModel("UploadModel").getData();
@@ -411,6 +423,7 @@ sap.ui.define([
 
             var isMandatoryValid = (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idBName")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("BD_id_Type")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idLandmark")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idGeoLocation")), "ID") &&
@@ -504,7 +517,7 @@ sap.ui.define([
 
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
-                sap.m.MessageToast.show("Please upload main image");
+                sap.m.MessageToast.show("Please upload Hostel image");
                 return;
             }
             var oData = {
@@ -512,6 +525,7 @@ sap.ui.define([
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
                 EmailID: this.getOwnerComponent().getModel("LoginModel").getData().EmailID,
                 LandMark: Payload.LandMark,
+                PropertyType: Payload.PropertyType,
                 Address: Payload.Address,
                 GeoLocation: Payload.GeoLocation,
                 Pincode: Payload.Pincode,
@@ -583,6 +597,7 @@ sap.ui.define([
                     Name: "",
                     Address: "",
                     LandMark: "",
+                    PropertyType: "",
                     Pincode: "",
                     Contact: "",
                     Penalty: "",
@@ -864,6 +879,7 @@ sap.ui.define([
                 Name: oData.Name,
                 Address: oData.Address,
                 LandMark: oData.LandMark,
+                PropertyType: oData.PropertyType,
                 GeoLocation: oData.GeoLocation,
                 Pincode: oData.Pincode,
                 Contact: oData.Contact,
@@ -919,6 +935,7 @@ sap.ui.define([
                 BD_idBName: "enterBranchName",
                 BD_idAddress: "enterAddress",
                 BD_idLandmark: "Enter Landmark",
+                BD_id_Type: "Enter property type",
                 BD_idGeoLocation: "enterLocation",
                 BD_idPin: "enterPincode",
                 MC_id_Country: "selectCountry",

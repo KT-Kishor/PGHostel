@@ -121,8 +121,24 @@
                 <columns>
                     <Column demandPopin="true">
                         <Text
+                            text="{i18n>MSbranchlogo}"
+                            tooltip="{i18n>MSbranchlogo}"
+                        />
+                    </Column>
+                    <Column demandPopin="true" width="10rem">
+                        <Text
                             text="{i18n>MSbranchCode}"
                             tooltip="{i18n>MSbranchCode}"
+                        />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="Property Type"
+                            tooltip="Property Type"
                         />
                     </Column>
 
@@ -153,7 +169,7 @@
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
-                        width="28rem"
+                        width="20%"
                         hAlign="Center"
                     >
                         <Text
@@ -215,14 +231,12 @@
                                     displaySize="S"
                                     class="sapUiTinyMarginEnd"
                                 />
-                                <VBox>
-                                    <Text
-                                        text="{mainModel>BranchID}"
-                                        class="sapUiTinyMarginBottom"
-                                    />
-                                    <Text text="{mainModel>Name}" />
-                                </VBox>
                             </HBox>
+                            <Text
+                                text="{= ${mainModel>BranchID} + '(' + ${mainModel>Name} + ')' }"
+                            />
+
+                            <Text text="{mainModel>PropertyType}" />
 
                             <VBox>
                                 <Text text="{mainModel>GSTIN}" />

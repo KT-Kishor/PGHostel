@@ -1,4 +1,5 @@
 <c:FragmentDefinition
+    xmlns:odata="sap.ui.comp.odata"
     xmlns="sap.m"
     xmlns:c="sap.ui.core"
     xmlns:f="sap.ui.layout.form"
@@ -44,6 +45,25 @@
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
                 />
+                
+                <Label
+                    text="{i18n>branchProperty}"
+                    required="true"
+                />
+                <ComboBox
+                    id="BD_id_Type"
+                    required="true"
+                    placeholder="{i18n>enterBranchType}"
+                    valueStateText="{i18n>enterBranchName}"
+                    value="{MDmodel>/PropertyType}"
+                    items="{PropertyType>/}"
+                    change="onPropertyTypeChange"
+                >
+                    <core:Item
+                        key="{PropertyType>PropertyType}"
+                        text="{PropertyType>PropertyType}"
+                    />
+                </ComboBox>
                 <Label
                     text="{i18n>address}"
                     required="true"

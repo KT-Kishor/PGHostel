@@ -378,7 +378,7 @@ sap.ui.define([
         // },
 
         HM_AssignRoom: function (oEvent) {
-            this.selectedIndex=0
+            this.selectedIndex = 0
 
             var Beddata = this.getView().getModel("BedTypeModel").getData()
 
@@ -545,8 +545,8 @@ sap.ui.define([
 
                             this.ajaxUpdateWithJQuery("HM_Booking", oBody)
                                 .then(() => {
-                                    sap.m.MessageToast.show("Room unassigned successfully.");
                                     this.Cust_read(true);
+                                    sap.m.MessageToast.show("Room unassigned successfully.");
                                 })
                                 .catch((oError) => {
                                     sap.m.MessageToast.show(
@@ -795,9 +795,6 @@ sap.ui.define([
             try {
                 this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_BookingDeposit", oBody);
-
-
-
                 await this.Cust_read(true);
                 this.HM_Dialog.close();
 
@@ -820,8 +817,8 @@ sap.ui.define([
                             sap.m.MessageBox.Action.OK,
                             sap.m.MessageBox.Action.CANCEL,
                         ],
-                        
-                            styleClass: "myUnifiedBtn",
+
+                        styleClass: "myUnifiedBtn",
                         onClose: (sAction) => {
                             if (sAction === sap.m.MessageBox.Action.OK) {
                                 this.getOwnerComponent()
@@ -989,7 +986,7 @@ sap.ui.define([
         },
 
         HM_onCancelButtonPress: function () {
-            this.selectedIndex=0;
+            this.selectedIndex = 0;
             var table = this.byId("idPOTable");
             table.removeSelections();
             this.HM_Dialog.close();
@@ -1192,7 +1189,10 @@ sap.ui.define([
             const oSettings = {
                 workbook: {
                     columns: aCols,
-                    hierarchyLevel: "Level"
+                    hierarchyLevel: "Level",
+                    context: {
+                        sheetName: "Admin Details"
+                    }
                 },
                 dataSource: adjustedData,
                 fileName: "Admin_Details.xlsx",
