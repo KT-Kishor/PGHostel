@@ -73,12 +73,11 @@ sap.ui.define([
           emphasizedAction: MessageBox.Action.OK,
           styleClass: "myUnifiedBtn",
           dependentOn: this.getView(),
-          onClose: function (sAction) {
-            if (sAction === sap.m.MessageBox.Action.OK) {
-              window.location.reload(true);
-              this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            }
+          onClose: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            window.location.reload();
           }.bind(this)
+
         }
       );
     }
