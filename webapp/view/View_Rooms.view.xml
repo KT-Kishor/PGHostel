@@ -184,7 +184,7 @@
                                 class="sapUiTinyMarginTop"
                             >
                                     <Link
-                                        text="View Details"
+                                        text="Book Room"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
@@ -310,7 +310,7 @@
                                 class="sapUiTinyMarginTop"
                             >
                                     <Link
-                                        text="View Details"
+                                        text="Book Room"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
