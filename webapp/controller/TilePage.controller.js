@@ -223,31 +223,31 @@ sap.ui.define([
                     accessItems: [
                         {
                             icon: "sap-icon://building",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Infrastructure",
                             detail: "Manage Branches, Rooms, Beds, Facilities and Amenities"
                         },
                         {
                             icon: "sap-icon://customer",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Operations",
                             detail: "Full control over Bookings, Invoices, Deposits & Coupons"
                         },
                         {
                             icon: "sap-icon://group",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "User Management",
                             detail: "Administer Staff members, Vendors and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Feedback & Issues",
                             detail: "Monitor Complaints, Damages and Reviews"
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Analytics",
                             detail: "Real-time insights across all Dashboards"
                         }
@@ -262,31 +262,31 @@ sap.ui.define([
                     accessItems: [
                         {
                             icon: "sap-icon://building",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Infrastructure",
                             detail: "Manage Branches, Rooms, Beds, Facilities and Amenities"
                         },
                         {
                             icon: "sap-icon://customer",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Operations",
                             detail: "Full control over Bookings, Invoices, Deposits & Coupons"
                         },
                         {
                             icon: "sap-icon://group",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "User Management",
                             detail: "Administer Staff members and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Feedback & Issues",
                             detail: "Monitor Complaints, Damages and Reviews"
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Analytics",
                             detail: "Real-time insights across all Dashboards"
                         }
@@ -301,31 +301,31 @@ sap.ui.define([
                     accessItems: [
                         {
                             icon: "sap-icon://building",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Infrastructure",
                             detail: "Manage Rooms, Beds, Facilities and Amenities"
                         },
                         {
                             icon: "sap-icon://customer",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Operations",
                             detail: "Full control over Bookings, Invoices, Deposits & Coupons"
                         },
                         {
                             icon: "sap-icon://group",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "User Management",
                             detail: "Administer Staff members and Customer Support requests"
                         },
                         {
                             icon: "sap-icon://feedback",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Feedback & Issues",
                             detail: "Monitor Complaints, Damages and Reviews"
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
-                            color: "#0070f2",
+                            color: "#008b96",
                             label: "Analytics",
                             detail: "Real-time insights across all Dashboards"
                         }
@@ -340,7 +340,7 @@ sap.ui.define([
 
                     summary: "As a Front Office Employee, you have full access to customer-facing operations (bookings, invoices, complaints) and view-only access to branch-level data.",
                     accessItems: [
-                        { icon: "sap-icon://customer", color: "#0070f2", label: "Full: Customers & Invoices", detail: "Manage customers, invoices, payments and deposits." },
+                        { icon: "sap-icon://customer", color: "#008b96", label: "Full: Customers & Invoices", detail: "Manage customers, invoices, payments and deposits." },
                         { icon: "sap-icon://display", color: "#e9730c", label: "View Only: Config Data", detail: "Branch, Bed, Room, Facilities, Amenities and coupons are read-only." },
 
                     ]
@@ -352,8 +352,8 @@ sap.ui.define([
                     accessIcon: "sap-icon://customer-view",
                     summary: "As a Housekeeping staff member, your access is restricted to Complaint & Complaint Dashbaord",
                     accessItems: [
-                        { icon: "sap-icon://customer-view", color: "#0070f2", label: "View: Complaint Details", detail: "Read-only access to complaint details" },
-                        { icon: "sap-icon://alert", color: "#0070f2", label: "View: Complaint Dashboard", detail: "Read-only access to complaint dashboard." },
+                        { icon: "sap-icon://customer-view", color: "#008b96", label: "View: Complaint Details", detail: "Read-only access to complaint details" },
+                        { icon: "sap-icon://alert", color: "#008b96", label: "View: Complaint Dashboard", detail: "Read-only access to complaint dashboard." },
                     ]
                 },
                 "ManageVendor": {
@@ -363,8 +363,8 @@ sap.ui.define([
                     accessIcon: "sap-icon://supplier",
                     summary: "As a Vendor Manager, you have access to vendor management and customer support requests. All hostel operations, customer data, and dashboards are outside your scope.",
                     accessItems: [
-                        { icon: "sap-icon://supplier", color: "#0070f2", label: "Vendor Management", detail: "Full access to create and manage  vendors" },
-                        { icon: "sap-icon://customer", color: "#0070f2", label: "Customer Support", detail: "Review and manage customer support requests." },
+                        { icon: "sap-icon://supplier", color: "#008b96", label: "Vendor Management", detail: "Full access to create and manage  vendors" },
+                        { icon: "sap-icon://customer", color: "#008b96", label: "Customer Support", detail: "Review and manage customer support requests." },
                
                     ]
                 }
@@ -377,7 +377,7 @@ sap.ui.define([
                 accessIcon: "sap-icon://person-placeholder",
                 summary: "Your access is configured by your system administrator. Use the tour below to explore available modules.",
                 accessItems: [
-                    { icon: "sap-icon://information", color: "#0070f2", label: "Contact Admin", detail: "Reach out to your Super Admin for access queries." }
+                    { icon: "sap-icon://information", color: "#008b96", label: "Contact Admin", detail: "Reach out to your Super Admin for access queries." }
                 ]
             };
         },

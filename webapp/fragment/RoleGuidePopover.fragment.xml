@@ -42,7 +42,7 @@
             <MessageStrip
                 text="{roleGuideModel>/summary}"
                 type="Information"
-                showIcon="true"
+                showIcon="false"
                 showCloseButton="false"
                 class="sapUiSmallMarginBottom"
             />
