@@ -1098,8 +1098,8 @@
   display: block !important;
   /* width: 100% !important; */
   max-width: 100%;
-  text-align: justify !important;
-  text-justify: inter-word;
+  /* text-align: justify !important;
+  text-justify: inter-word; */
   font-size: 1rem !important;
   line-height: 1.5 !important;
   color: #2c3e50 !important;
@@ -3691,6 +3691,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 .AddressIcon {
   flex: 0 0 auto;
   margin-right: 0.5rem;
+  color: #008b96 !important;
 }
 
 .sapMFlexBox.AddressInline {
@@ -3717,7 +3718,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   background-color: transparent !important;
   box-shadow: none !important;
   border: none !important;
-  color: #0064d1 !important;
+  color: #008b96 !important;
 }
 
 .AddressTextLarge.sapMLnk:hover {
@@ -3732,7 +3733,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   padding: 0.75rem 1.25rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
-
+.AddressTextLarge.sapMLnk {
+    color: #008b96 !important;
+    text-decoration: none;        
+}
 /* Remove dialog padding completely */
 .adminPreviewDialog .sapMDialogScroll {
   padding: 0;

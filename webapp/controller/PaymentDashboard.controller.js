@@ -208,7 +208,7 @@ sap.ui.define([
                 }
 
                 this.byId("yearFilter").setValue(financialYear);
-                this.InvoicePaymentDetail = await this.ajaxReadWithJQuery("InvoicePaymentDetail");
+                this.InvoicePaymentDetail = await this.ajaxReadWithJQuery("HM_InvoicePaymentDetail");
                 this.onFilterChange();
             } catch (error) {
                 MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
