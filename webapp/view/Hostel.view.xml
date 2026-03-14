@@ -296,6 +296,7 @@
                                                             hSpacing="2"
                                                             vSpacing="2"
                                                             content="{path: 'VisibilityModel>/Branches'}"
+                                                            visible="{= !${VisibilityModel>/NoData} }"
                                                         >
                                                             <VBox
                                                                 class="BranchCard"

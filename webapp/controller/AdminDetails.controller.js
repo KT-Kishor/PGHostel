@@ -3380,7 +3380,7 @@ sap.ui.define([
                         that.byId("idcancel")?.setVisible(false);
 
                     } catch (err) {
-                        this.closeBusyDialog()
+                        that.closeBusyDialog()
                         sap.m.MessageToast.show(err.message || err.responseText);
                     } finally {
                     }

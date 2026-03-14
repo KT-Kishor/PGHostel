@@ -926,6 +926,7 @@ sap.ui.define([
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
             oVisibilityModel.setProperty("/Branches", {})
+            oVisibilityModel.setProperty("/NoData", false);
             oVisibilityModel.setProperty("/ShowViewMore", false);
 
             const sKey = oEvent.getParameter("item").getKey();
