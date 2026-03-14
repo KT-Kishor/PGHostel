@@ -122,24 +122,15 @@
                         <cells>
                             <Text text="{HostelFeatures>FacilityName}" />
                             <Text text="{HostelFeatures>Type}" />
-                            <ExpandableText
-                                text="{HostelFeatures>Description}"
-                                maxCharacters="20"
-                            />
-                            <Button
-                                text="{i18n>view}"
-                                press="HF_viewroom"
-                            />
+                            <ExpandableText text="{HostelFeatures>Description}" maxCharacters="20"/>
+                            <Button text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }"/>
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <footer>
-         <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
+         <core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
         </footer>
     </Page>
 </mvc:View>
