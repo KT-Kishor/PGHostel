@@ -926,7 +926,6 @@ sap.ui.define([
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
             oVisibilityModel.setProperty("/Branches", {})
-            oVisibilityModel.setProperty("/NoData", false);
             oVisibilityModel.setProperty("/ShowViewMore", false);
 
             const sKey = oEvent.getParameter("item").getKey();
@@ -945,6 +944,7 @@ sap.ui.define([
 
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
+                
 
                 let oModel = this.getOwnerComponent().getModel("sBRModel");
 
@@ -959,11 +959,19 @@ sap.ui.define([
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
+                    
 
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
                         aData = response?.data || [];
                         oModel.setData(aData);
+
+                        // ✅ Handle No Data
+                        if (!aData || aData.length === 0) {
+                            oVisibilityModel.setProperty("/NoData", true);
+                        } else {
+                            oVisibilityModel.setProperty("/NoData", false);
+                        }
                     } finally {
                         this.closeBusyDialog();
                     }

@@ -44,6 +44,7 @@
                     valueStateText="{i18n>pleaseSelectValidBranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
+                    editable="{= !${RoomModel>/_isEditing} }"
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -64,6 +65,7 @@
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"
                     valueStateText="{i18n>pleaseSelectValidBedType}"
+                    editable="{= !${RoomModel>/_isEditing} }"
                 >
                     <core:ListItem
                         key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"
