@@ -141,7 +141,7 @@
                     </Column>
                     <Column
                         demandPopin="true"
-                        minScreenWidth="Tablet"
+                        minScreenWidth="Tablet" 
                     >
                         <Text
                             text="{i18n>MVgender}"
@@ -159,11 +159,13 @@
                     </Column>
                     <Column
                         demandPopin="true"
-                        minScreenWidth="Tablet"
+                        minScreenWidth="Tablet" width="20%"
+                        hAlign="Center"
                     >
                         <Text
                             text="{i18n>address}"
-                            tooltip="{i18n>address}"
+                            tooltip="{i18n>address}"  textAlign="Center"
+                            width="100%"
                         />
                     </Column>
                 </columns>
@@ -183,9 +185,9 @@
                             <Text
                                 text="{mainModel>STDCode} {mainModel>MobileNo}"
                             />
-                            <ExpandableText
+                            <Text
                                 text="{mainModel>Address}"
-                                maxCharacters="20"
+                                wrapping="true"
                             />
                         </cells>
                     </ColumnListItem>

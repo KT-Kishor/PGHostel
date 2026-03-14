@@ -325,7 +325,7 @@
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>MSdelete}"
                                                     press="onAdminDeleteFiles"
-                                                    enabled="false"
+                                                    enabled="{editable>/Edit}"
                                                 />
                                                 <m:Button
                                                     id="V_id_AdminDownloadButton"
@@ -334,7 +334,7 @@
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>download}"
                                                     press="onAdminDownloadFiles"
-                                                    enabled="false"
+                                                    enabled="{editable>/Edit}"
                                                 />
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>
