@@ -744,6 +744,7 @@ sap.ui.define([
                 ...item,
                 MaxBeds: item.MaxBeds ? String(item.MaxBeds) : "",
                 NoOfPerson: item.NoOfPerson ? String(item.NoOfPerson) : "",
+                Deposit: item.Deposit + " " + item.DepositCurrency
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -751,8 +752,8 @@ sap.ui.define([
                     columns: aCols,
                     hierarchyLevel: "Level",
                     context: {
-            sheetName: "Bed Details"
-        }
+                        sheetName: "Bed Details"
+                    }
                 },
                 dataSource: adjustedData,
                 fileName: "Bed_Details.xlsx",
@@ -792,13 +793,13 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Deposit Amount",
-                property: "Deposit",
+                label: "Extra Bed",
+                property: "ExtraBed",
                 type: "string"
             },
             {
-                label: "Deposit Currency",
-                property: "DepositCurrency",
+                label: "Deposit Amount",
+                property: "Deposit",
                 type: "string"
             },
             {

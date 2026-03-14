@@ -149,7 +149,7 @@
                 <TextArea
                     id="id_enq_Comments"
                     value="{EnquiryModel>/Comments}"
-                    rows="3"
+                    rows="7"
                     width="100%"
                     placeholder="Enter comments"
                     maxLength="500"

@@ -2,5 +2,6 @@
     { "PropertyType": "Hostel" },
     { "PropertyType": "PG" },
     { "PropertyType": "Hotel" },
-    { "PropertyType": "Apartments" }
+    { "PropertyType": "Service Apartments" },
+    { "PropertyType": "Rented Properties"}
 ]

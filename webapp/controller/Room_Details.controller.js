@@ -124,6 +124,9 @@ sap.ui.define([
                 Price: item.Price ? String(item.Price) : "",
                 MonthPrice: item.MonthPrice ? String(item.MonthPrice) : "",
                 YearPrice: item.YearPrice ? String(item.YearPrice) : "",
+                Price: item.Price + " " + item.Currency,
+                MonthPrice: item.MonthPrice + " " + item.Currency,
+                YearPrice: item.YearPrice + " " + item.Currency
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -159,11 +162,6 @@ sap.ui.define([
             {
                 label: "Bed Type",
                 property: "BedTypeName",
-                type: "string"
-            },
-            {
-                label: "Extra Bed",
-                property: "ExtraBed",
                 type: "string"
             },
             {
