@@ -258,6 +258,7 @@
         tooltip="{i18n>applyCoupon}"
         type="Emphasized"
         press=".onEditCouponCodeLiveChange"
+        class="myUnifiedBtn"
      
     />
 </HBox>

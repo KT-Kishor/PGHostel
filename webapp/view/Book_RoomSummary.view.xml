@@ -193,7 +193,7 @@
                     type="Emphasized"
                     tooltip="{i18n>}"
                     press="onclickaddBTN"
-                    class="sapUiTinyMarginEnd"
+                    class="sapUiTinyMarginEnd myUnifiedBtn"
                     id="addcouponBtn"
                                     />
                                     </HBox>

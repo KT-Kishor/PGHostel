@@ -1071,7 +1071,7 @@
                                     tooltip="{i18n>applyCoupon}"
                                     type="Emphasized"
                                     press=".onApplyCoupon"
-                                    class="sapUiTinyMarginEnd"
+                                    class="sapUiTinyMarginEnd myUnifiedBtn"
                                     visible="{= !${VisibleModel>/IsCouponApplied} }"
                                 />
                             </HBox>
