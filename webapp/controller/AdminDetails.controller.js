@@ -19,7 +19,6 @@ sap.ui.define([
         _onRouteMatched: async function (oEvent) {
             this.call=false
             this._fromRoute = oEvent.getParameter("arguments").from;
-            this.commonLoginFunction();
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel(this.getOwnerComponent().getModel("LoginModel").getData());
