@@ -997,8 +997,9 @@ sap.ui.define([
             const oSTD = this.byId("id_enq_STD");
 
             const sSTD = oSTD.getSelectedKey();
+            const sValue = (oMobile.getValue() || "").replace(/\D/g, "");
+
             oMobile.setValue(sValue);
-            this.getView().getModel("EnquiryModel").setProperty("/Mobile", sValue);
 
             // ISD mandatory
             if (!sSTD) {
@@ -1031,6 +1032,7 @@ sap.ui.define([
                 }
 
             }
+            // OTHER COUNTRIES
             else {
 
                 if (sValue.length < 4 || sValue.length > 18) {
@@ -1064,11 +1066,11 @@ sap.ui.define([
             oSTD.setValueState("None");
             oSTD.setValueStateText("");
 
-            // if (sKey === "+91") {
-            //     oMobile.setMaxLength(10);
-            // } else {
-            //     oMobile.setMaxLength(18);
-            // }
+            if (sKey === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
 
             // Only validate if mobile already has value
             if (sMobileValue) {
