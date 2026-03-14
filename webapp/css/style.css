@@ -4907,3 +4907,33 @@ width: 44px !important;
 .ratingList{
   min-height: 0.8rem;
 }
+.sapUiLocalBusy .sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimStandard > div::before,
+.sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimStandard > div::before,
+.sapUiLocalBusy .sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimation > div::after,
+.sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimation > div::after,
+.sapUiLocalBusy .sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimation > div::before {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+     /* linear-gradient(135deg, #00a1ae 0%, #006874 100%) !important; */
+    border-color: transparent !important;
+    color: #00a1ae !important;
+}
+
+.sapUiLocalBusy .sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimation > div,
+.sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimation > div {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    /* linear-gradient(135deg, #00a1ae 0%, #006874 100%) !important; */
+    border-color: transparent !important;
+    color: #00a1ae !important;
+}
+
+.sapUiLocalBusy .sapUiLocalBusyIndicator .sapUiLocalBusyIndicatorAnimStandard > div {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    /* linear-gradient(135deg, #00a1ae 0%, #006874 100%) !important; */
+    border-color: transparent !important;
+    box-shadow: 0 0 0 1px #00a1ae !important;
+}
+
+.sapUiLocalBusy .sapUiLocalBusyIndicator,
+.sapUiLocalBusyIndicator {
+    background-color: transparent !important;
+}
