@@ -1103,7 +1103,13 @@ sap.ui.define([
         },
 
         createTableSheet: function () {
-            return [{
+            return [
+                {
+                    label: "Branch Code",
+                    property: "BranchName",
+                    type: "string"
+                },
+                {
                 label: "Customer ID",
                 property: "CustomerID",
                 type: "string"

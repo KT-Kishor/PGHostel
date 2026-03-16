@@ -628,7 +628,7 @@ sap.ui.define([
                 workbook: {
                     columns: aCols,
                     context: {
-                        sheetName: "Deposit Detaild"
+                        sheetName: "Return Deposit Details"
                     }
                 },
                 dataSource: aFormattedData,
