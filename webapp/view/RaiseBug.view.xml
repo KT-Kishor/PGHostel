@@ -1,0 +1,134 @@
+<mvc:View controllerName="sap.ui.com.project1.controller.RaiseBug"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
+                id="Rb_id_Filterbar"
+                persistencyKey="myPersKey"
+                useToolbar="false"
+                clear="SP_onPressClear"
+                showClearOnFB="true"
+                search="CD_read"
+                filterChange="IA_.onFilterChange"
+                afterVariantLoad="IA_.onAfterVariantLoad"
+                showFilterConfiguration="false"
+                filterContainerWidth="auto"
+                class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Room No"
+                        label="{i18n>raisedby}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="RB_id_RaisedBy1"
+                                items="{RaiseBugModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true">
+								<core:ListItem key="{RaiseBugModel>RoomNo}" text="{RaiseBugModel>RoomNo}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Status"
+                        label="{i18n>status}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="RB_id_Status"
+                                items="{RaiseBugModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true">
+								<core:ListItem key="{RaiseBugModel>Status}"
+                                    text="{RaiseBugModel>Status}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="idBugTable"
+                sticky="ColumnHeaders,HeaderToolbar"
+                mode="SingleSelectLeft"
+                width="auto"
+                busyIndicatorDelay="0"
+                class="sapUiResponsiveMargin"
+                items="{path: 'RaiseBugModel>/'}" >
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>
+						<ToolbarSpacer />
+						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
+                        press="RB_resolve" class="myUnifiedBtn"/>
+						<Button text="{i18n>download}" icon="sap-icon://excel-attachment"
+                        tooltip="{i18n>downloadBranchData}" press="RB_onDownload"
+                        class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+                    <Column demandPopin="true">
+						<Text text="{i18n>bugID}" tooltip="{i18n>bugID}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>appname}" tooltip="{i18n>appname}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>bugdetails}" tooltip="{i18n>bugdetails}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>RaisedBy}" tooltip="{i18n>RaisedBy}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>Email}" tooltip="{i18n>Email}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
+					</Column>
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>image}" tooltip="{i18n>image}"/>
+                    </Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+                            <Text text="{RaiseBugModel>BugID}" />
+							<!-- <Text text="{SupportModel>IssueName}" /> -->
+							<Text text="{RaiseBugModel>AppName}" />
+							<ExpandableText text="{RaiseBugModel>BugDescription}" maxCharacters="20"/>
+							<Text text="{RaiseBugModel>RaisedBy}" />
+							<Text text="{RaiseBugModel>Email}" />
+							<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
+							<ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
+                            state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/>
+							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
+                            <Button text="{i18n>view}" press="HF_viewroom"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
+</mvc:View>

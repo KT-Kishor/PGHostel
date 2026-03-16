@@ -1,0 +1,100 @@
+
+  [
+    {
+      "ID": 1,
+      "AppName": "Home Page"
+    },
+    {
+      "ID": 2,
+      "AppName": "Room Section"
+    },
+    {
+      "ID": 3,
+      "AppName": "Contact Section"
+    },
+    {
+      "ID": 4,
+      "AppName": "Login Form"
+    },
+    {
+      "ID": 5,
+      "AppName": "Vendor Registration"
+    },
+    {   
+      "ID": 6,
+      "AppName": "Booking issue"
+    },
+    {
+      "ID": 7,
+      "AppName": "Manage Branch"
+    },
+    {
+      "ID": 8,
+      "AppName": "Manage Bed Template"
+    },
+     {
+      "ID": 9,
+      "AppName": "Manage Room"
+    },
+     {
+      "ID": 10,
+      "AppName": "Manage Facilities"
+    },
+     {
+      "ID": 11,
+      "AppName": "Manage Amenities"
+    },
+     {
+      "ID": 12,
+      "AppName": "Manage Coupon"
+    },
+     {
+      "ID": 13,
+      "AppName": "Manage Staff"
+    },
+     {
+      "ID": 14,
+      "AppName": "Manage Booking"
+    },
+     {
+      "ID": 15,
+      "AppName": "Generate invoice"
+    },
+     {
+      "ID": 16,
+      "AppName": "Deposite Details"
+    },
+     {
+      "ID": 17,
+      "AppName": "Payment History"
+    },
+     {
+      "ID": 18,
+      "AppName": "Damage Details"
+    },
+     {
+      "ID": 19,
+      "AppName": "Complain Details"
+    },
+     {
+      "ID": 20,
+      "AppName": "Customer review"
+    },
+     {
+      "ID": 21,
+      "AppName": "Booking Dashboard"
+    },
+     {
+      "ID": 22,
+      "AppName": "Payment Dashboard"
+    },
+     {
+      "ID": 23,
+      "AppName": "Complain Dashboard"
+    },
+     {
+      "ID": 24,
+      "AppName": "Damage Dashboard"
+    }
+    
+  ]

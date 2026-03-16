@@ -97,6 +97,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/SupportRequest.json",
         "preload": true
+      },
+      "ApplicationName": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/ApplicationName.json",
+        "preload": true
       }
     },
     "resources": {
@@ -390,6 +395,13 @@
           "target": [
             "targetSupportDetails"
           ]
+        },
+         {
+          "name": "RouteBugDetails",
+          "pattern": "BugDetails",
+          "target": [
+            "targetRaiseBugDetails"
+          ]
         }
       ],
       "targets": {
@@ -658,6 +670,13 @@
           "clearControlAggregation": false,
           "viewName": "DamageDashboard",
           "viewId": "DamageDashboard"
+        },
+        "targetRaiseBugDetails": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "RaiseBug",
+          "viewName": "RaiseBug"
         }
       }
     },

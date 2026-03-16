@@ -1,8 +1,9 @@
 sap.ui.define([
     "./BaseController", //call base controller 
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], function (BaseController, JSONModel, MessageToast) {
+    "sap/m/MessageToast",
+     "../utils/validation",
+], function (BaseController, JSONModel, MessageToast,utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.TilePage", {
         onInit: function () {
@@ -35,6 +36,24 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+             this.getView().setModel(
+                new JSONModel({
+                    tokens: []
+                }),
+                "tokenModel"
+            );
+             const oUploaderData = new JSONModel({
+                attachments: []
+            });
+            this.getView().setModel(oUploaderData, "UploaderData");
+             var model = new JSONModel({
+                AppName: "",
+                BugDescription: "",
+                RaisedBy: "",
+                Email: ""
+            });
+            this.getView().setModel(model, "RaiseBugModel")
             this.AppVisibilityReadCall();
         },
 
@@ -172,6 +191,10 @@ sap.ui.define([
           TileV_onpressSupportVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteSupportDetails");
+        },
+          TileV_onpressBugRaiseVendor: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteBugDetails");
         },
 
         // onStartGuide: function () {
@@ -639,6 +662,265 @@ sap.ui.define([
             BaseController.prototype._cleanupTour.apply(this, arguments);
             this._setStepsGuideButtonVisible(true);
         },
+
+        // Raise Bug
+
+           onFileSizeExceed: function (oEvent) {
+    const oFileUploader = oEvent.getSource();
+    const sFileName = oEvent.getParameter("fileName");
+
+    sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
+},
+       onSupportrequestChange: function (oEvent) {
+
+    const oFiles = oEvent.getParameter("files");
+    if (!oFiles || oFiles.length === 0) return;
+
+    const oView = this.getView();
+    const oUploaderData = oView.getModel("UploaderData");
+    const oTokenModel = oView.getModel("tokenModel");
+
+    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+    let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+
+    Array.from(oFiles).forEach((oFile) => {
+
+        // Check duplicate file name
+        const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
+        if (bDuplicate) {
+            MessageToast.show("This file is more than 2 MB and cannot be uploaded");
+            return;
+        }
+        // File type validation
+        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+            MessageToast.show("Only JPG, JPEG, PNG allowed");
+            return;
+        }
+
+        
+
+        const oReader = new FileReader();
+
+        oReader.onload = (e) => {
+
+            const sBase64 = e.target.result.split(",")[1];
+
+            aAttachments.push({
+                filename: oFile.name,
+                fileType: oFile.type,
+                content: sBase64
+            });
+
+            aTokens.push({
+                key: oFile.name,
+                text: oFile.name
+            });
+
+            oUploaderData.setProperty("/attachments", aAttachments);
+            oTokenModel.setProperty("/tokens", aTokens);
+
+        };
+
+        oReader.readAsDataURL(oFile);
+
+    });
+
+    oEvent.getSource().clear();
+
+},
+        onTokenDelete: function (oEvent) {
+
+            const aDeletedTokens = oEvent.getParameter("tokens");
+
+            if (!aDeletedTokens || aDeletedTokens.length === 0) return;
+
+            const oView = this.getView();
+            const oUploaderData = oView.getModel("UploaderData");
+            const oTokenModel = oView.getModel("tokenModel");
+
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+            aDeletedTokens.forEach((oToken) => {
+
+                const sKey = oToken.getKey();
+
+                aAttachments = aAttachments.filter(file => file.filename !== sKey);
+                aTokens = aTokens.filter(token => token.key !== sKey);
+
+            });
+
+            oUploaderData.setProperty("/attachments", aAttachments);
+            oTokenModel.setProperty("/tokens", aTokens);
+
+        },
+
+           onAppnamechanges:function(oEvent){
+ utils._LCstrictValidationComboBox(oEvent)
+        },
+        onBugdescriptionchnages:function(oEvent){
+              utils._LCvalidateMandatoryField(oEvent)
+        },
+        onBugRaisedby:function(oEvent){
+utils._LCvalidateMandatoryField(oEvent)
+        },
+        onBugEmailchange: function (oEvent) {
+            utils._LCvalidateEmail(oEvent)
+        },
+
+        onBugSubmit: async function(){
+            const oView = this.getView();
+            const oBugModel = oView.getModel("RaiseBugModel").getData();
+            const oUploaderData = oView.getModel("UploaderData");
+
+            const aAttachments = this.getView()
+                .getModel("UploaderData")
+                .getProperty("/attachments") || [];
+
+            let photoPayload = {
+                Photo1: "",
+                Photo1Name: "",
+                Photo1Type: "",
+                Photo2: "",
+                Photo2Name: "",
+                Photo2Type: "",
+                Photo3: "",
+                Photo3Name: "",
+                Photo3Type: ""
+            };
+
+            aAttachments.forEach((file, index) => {
+
+                const i = index + 1;
+
+                if (i <= 3) {
+                    photoPayload[`Photo${i}`] = file.content;
+                    photoPayload[`Photo${i}Name`] = file.filename;
+                    photoPayload[`Photo${i}Type`] = file.fileType;
+                }
+
+            });
+            var isMandatoryValid = (
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("RB_id_appname")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("RB_id_bugDescription")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("RB_id_RaisedBy")), "ID") &&
+                utils._LCvalidateEmail(sap.ui.getCore().byId(oView.createId("RB_id_Email")), "ID")
+            );
+
+            if (!isMandatoryValid) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            // IMAGE VALIDATION
+            if (!aAttachments || aAttachments.length === 0) {
+                MessageToast.show("Please upload at least one image.");
+                return;
+            }
+
+            if (aAttachments.length > 3) {
+                MessageToast.show("You can upload maximum 3 images only.");
+                return;
+            }
+
+            const todayDate = new Date().toISOString().split("T")[0];
+
+            const data = {
+                AppName: oBugModel.AppName,
+                BugDescription: oBugModel.BugDescription,
+                RaisedBy: oBugModel.RaisedBy,
+                Email: oBugModel.Email,
+                CreatedDate: todayDate,
+                Status: "Open",
+                ...photoPayload
+            };
+            const payload = {
+                data: data
+            };
+            this.getBusyDialog();
+            await this.ajaxCreateWithJQuery("HM_Bug", payload);
+            this.closeBusyDialog()
+            MessageToast.show("Bug submitted successfully");
+
+          this.RB_onCancelButtonPress()
+        },
+
+
+        onPressbugs:function(){
+             if (!this._RaiseBugDialog) {
+
+                sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.RaiseBug",
+                    controller: this
+                }).then(function (oDialog) {
+
+                    this._RaiseBugDialog = oDialog;
+                    this.getView().addDependent(oDialog);
+                    oDialog.open();
+
+                    this._RaiseBugDialog.attachAfterClose(() => {
+                 
+                    this.RB_onCancelButtonPress();
+                });
+
+                }.bind(this));
+
+            } else {
+                this._RaiseBugDialog.open();
+            }
+        },
+        RB_onCancelButtonPress:function(){
+             const oView = this.getView();
+
+    // 1️⃣ Clear model data
+    const oBugModel = oView.getModel("RaiseBugModel");
+    if (oBugModel) {
+        oBugModel.setData({
+            AppName: "",
+            BugDescription: "",
+            RaisedBy: "",
+            Email: ""
+        });
+    }
+
+    //  Clear uploaded images
+    const oUploaderData = oView.getModel("UploaderData");
+    if (oUploaderData) {
+        oUploaderData.setProperty("/attachments", []);
+    }
+
+    // 3️⃣ Clear tokens
+    const oTokenModel = oView.getModel("tokenModel");
+    if (oTokenModel) {
+        oTokenModel.setProperty("/tokens", []);
+    }
+
+    // 4️⃣ Reset ValueState
+    const aFields = [
+        "RB_id_appname",
+        "RB_id_bugDescription",
+        "RB_id_RaisedBy",
+        "RB_id_Email"
+    ];
+
+    aFields.forEach(id => {
+        const oControl = sap.ui.getCore().byId(oView.createId(id));
+        if (oControl) {
+            oControl.setValueState("None");
+        }
+    });
+
+    // 5️⃣ Clear file uploader
+    const oUploader = sap.ui.getCore().byId(oView.createId("RB_id_FileUploader1"));
+    if (oUploader) {
+        oUploader.clear();
+    }
+
+    // 6️⃣ Close dialog
+    this._RaiseBugDialog.close();
+        }
 
     })
 })

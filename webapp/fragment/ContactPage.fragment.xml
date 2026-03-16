@@ -58,6 +58,14 @@
                 text="Request Support"
                 class="contact-support-btn contact-support-btn-style"
             />
+             <Button
+                press="onPressbugs"
+                tooltip="{i18n>raisebugs}"
+                type="Emphasized"
+                icon="sap-icon://headset"
+                text="Raise Bug"
+                class="contact-support-btn-style"
+            />
         </VBox>
         <!-- Right: Google Map -->
         <VBox class="contact-map-box">

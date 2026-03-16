@@ -1,0 +1,153 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+
+	<Dialog id="RG_id_Dialog"
+		type="Message"
+		class="sapUiContentPadding"
+		contentWidth="28rem"
+		resizable="true"
+		draggable="true">
+
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="Raise Bug"/>
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+
+		<f:SimpleForm
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12"
+			columnsXL="2"
+			columnsL="2"
+			columnsM="1">
+
+			<f:content>
+
+				<!-- Issue Name -->
+				<!-- <Label text="{i18n>issuename}" required="true"/>
+				<Input
+					id="RB_id_"
+					placeholder="{i18n>enterissuename}"
+                    valueStateText="Enter Issue Name"
+					value="{SupportModel>/IssueName}"
+                    liveChange="onIssuenamechanges"
+					maxLength="100"/> -->
+
+				<!-- Issue Type -->
+				<Label text="{i18n>appname}" required="true"/>
+				<ComboBox
+					id="RB_id_appname"
+                    valueStateText="{i18n>enterappname}"
+					placeholder="Select Issue Type"
+                    value="{RaiseBugModel>/AppName}"
+                    change="onAppnamechanges"
+                     items="{ApplicationName>/}">
+					<core:Item key="{ApplicationName>ID}" text="{ApplicationName>AppName}"/>
+					
+				</ComboBox>
+
+				<!-- Issue Description -->
+				<Label text="{i18n>bugdetails}" required="true"/>
+				<TextArea
+					id="RB_id_bugDescription"
+					rows="4"
+                    liveChange="onBugdescriptionchnages"
+                    valueStateText="{i18n>enterdetails}"
+					placeholder="Enter Bug Description"
+					value="{RaiseBugModel>/BugDescription}"
+					maxLength="500"/>
+
+				<!-- Raised By -->
+				<Label text="{i18n>raisedby}" required="true"/>
+				<Input
+					id="RB_id_RaisedBy"
+                    liveChange="onBugRaisedby"
+                    valueStateText="{i18n>enteryourname}"
+					value="{RaiseBugModel>/RaisedBy}"
+					placeholder="Enter Name"/>
+
+				<!-- Email -->
+				<Label text="{i18n>contactemail}" required="true"/>
+				<Input
+					id="RB_id_Email"
+                    liveChange="onBugEmailchange"
+					type="Email"
+                    valueStateText="{i18n>enteremailis}"
+					value="{RaiseBugModel>/Email}"
+					placeholder="Enter Email"/>
+
+				<!-- Upload Image (UNCHANGED) -->
+				<Label text="{i18n>addImage}" required="true"/>
+				  <MessageStrip
+                    text=" Image files larger than 2 MB are not allowed."
+                    type="Warning"
+                    showIcon="true"
+                    enableFormattedText="true"
+                    class="sapUiSmallMarginBottom"
+                />
+
+			<VBox alignItems="Start" width="100%" renderType="Bare">
+
+    <!-- Upload Button -->
+    <HBox width="100%">
+        <u:FileUploader
+            id="RB_id_FileUploader1"
+            fileSizeExceed="onFileSizeExceed"
+            maximumFileSize="2"
+            typeMissmatch="onFileTypeMissmatch"
+            fileType="jpg,jpeg,png"
+            change="onSupportrequestChange"
+            buttonOnly="true"
+            sameFilenameAllowed="true"
+            iconFirst="true"
+            buttonText="Upload Images"
+            multiple="true"
+            uploadOnChange="false"/>
+    </HBox>
+
+    <!-- Tokens -->
+    <Tokenizer
+        id="RB_id_TokenList1"
+        width="100%"
+        class="sapUiSmallMarginTop"
+        tokens="{tokenModel>/tokens}"
+        tokenDelete="onTokenDelete">
+
+        <Token
+            key="{tokenModel>key}"
+            text="{tokenModel>text}" />
+
+    </Tokenizer>
+
+</VBox>
+
+			</f:content>
+		</f:SimpleForm>
+
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button
+					text="Submit"
+					press="onBugSubmit"
+					class="marginRight myUnifiedBtn"/>
+				<Button
+					text="Cancel"
+					press="RB_onCancelButtonPress"
+					class="marginRight myUnifiedBtn"/>
+			</Toolbar>
+		</footer>
+
+	</Dialog>
+
+</c:FragmentDefinition>

@@ -219,8 +219,9 @@ onMonthChange: function (oEvent) {
 
                 this.onFilterChange();
             } catch (error) {
-                MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
                 this.closeBusyDialog()
+                MessageToast.show(error.message || this.i18nModel.getText("technicalError"));
+                
             }
         },
         onHome: function () {

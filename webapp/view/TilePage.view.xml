@@ -8,6 +8,7 @@
     <Page
         id="idPageTile"
         class="service-background Tilehome"
+        enableScrolling="true"
     >
         <headerContent>
             <Text
@@ -27,6 +28,8 @@
                 icon="sap-icon://log"
             />
         </headerContent>
+         <content>
+       
         <VBox class="categoryBlock sapUiMediumMarginTop"
               visible="{= ${TileVisibility>/ManageBranch} !== 0 || ${TileVisibility>/ManageVendor} !== 0 || ${TileVisibility>/ManageBedType} !== 0 }">
             <Title
@@ -145,6 +148,17 @@
                 >
                     <TileContent unit="{i18n>managesupport}">
                         <ImageContent src="sap-icon://headset"/>
+                    </TileContent>
+                </GenericTile>
+                <GenericTile
+                    id="idRaiseBug"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>Bug Details}"
+                    press="TileV_onpressBugRaiseVendor"
+                >
+                    <TileContent unit="{i18n>managebugs}">
+                        <ImageContent src="sap-icon://message-error"/>
                     </TileContent>
                 </GenericTile>
             </FlexBox>
@@ -317,6 +331,21 @@
             icon="sap-icon://learning-assistant"
             press="onStartGuide"
             class="guideButtonLarge myunifiedBtn"
-        />
+        /> 
+     
+        </content>
+        <footer>
+            <OverflowToolbar>
+                 <ToolbarSpacer />
+                <Button
+                    text="{i18n>raisebug}"
+                    tooltip="{i18n>proceedToPay}"
+                    visible="{OBTNModel>/Submit}"
+                    class="myUnifiedBtn"
+                    press="onPressbugs"
+                />
+              
+            </OverflowToolbar>
+        </footer>
     </Page>
 </mvc:View>
