@@ -45,7 +45,7 @@
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
                 />
-                
+
                 <Label
                     text="{i18n>branchProperty}"
                     required="true"
@@ -314,6 +314,7 @@
                     text="For Logo and Image, files larger than 2 MB are not allowed."
                     type="Warning"
                     showIcon="true"
+                    visible="{= !${editableModel>/isEdit}}"
                     enableFormattedText="true"
                     class="sapUiSmallMarginBottom"
                 />

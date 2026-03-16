@@ -125,7 +125,10 @@
                             tooltip="{i18n>MSbranchlogo}"
                         />
                     </Column>
-                    <Column demandPopin="true" width="10rem">
+                    <Column
+                        demandPopin="true"
+                        width="10rem"
+                    >
                         <Text
                             text="{i18n>MSbranchCode}"
                             tooltip="{i18n>MSbranchCode}"
@@ -229,11 +232,14 @@
                                     src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
                                     displayShape="Circle"
                                     displaySize="S"
+                                    press="onpressbranchlogo"
+                                    fallbackIcon="sap-icon://attachment-photo"
                                     class="sapUiTinyMarginEnd"
                                 />
                             </HBox>
+
                             <Text
-                                text="{= ${mainModel>BranchID} + '(' + ${mainModel>Name} + ')' }"
+                                text="{= ${mainModel>Name} + '(' + ${mainModel>BranchID} + ')' }"
                             />
 
                             <Text text="{mainModel>PropertyType}" />
