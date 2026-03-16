@@ -2,7 +2,9 @@ sap.ui.define([
     "./BaseController",
     "../utils/validation",
     "sap/m/MessageBox",
-], function(BaseController, utils, MessageBox) {
+    "sap/ui/export/Spreadsheet",
+    "sap/m/MessageToast"
+], function(BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.HostelFeatures", {
         onInit: function() {
@@ -519,6 +521,62 @@ sap.ui.define([
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+        },
+
+        createTableSheet: function () {
+            return [{
+                label: "Property Name",
+                property: "BranchName",
+                type: "string"
+            },
+            {
+                label: "Amenities Name",
+                property: "FacilityName",
+                type: "string"
+            },
+            {
+                label: "Type",
+                property: "Type",
+                type: "string"
+            },
+            {
+                label: "Description",
+                property: "Description",
+                type: "string"
+            }
+            ]
+        },
+
+        HF_onDownload: function () {
+            const oModel = this.byId("HF_HostelFeatureTable").getModel("HostelFeatures").getData();
+            if (!oModel || oModel.length === 0) {
+                MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+            const adjustedData = oModel.map(item => ({
+                ...item
+            }));
+            const aCols = this.createTableSheet();
+            const oSettings = {
+                workbook: {
+                    columns: aCols,
+                    hierarchyLevel: "Level",
+                    context: {
+                        sheetName: "Amenities Details"
+                    }
+                },
+                dataSource: adjustedData,
+                fileName: "Amenities_Details.xlsx",
+                worker: false
+            };
+            MessageToast.show(this.i18nModel.getText("downloadingAmenitiesDetails"));
+            const oSheet = new sap.ui.export.Spreadsheet(oSettings);
+
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
         },
     });
 });

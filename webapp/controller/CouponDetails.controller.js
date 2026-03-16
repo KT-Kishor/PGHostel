@@ -476,13 +476,16 @@ sap.ui.define([
                 fileName: "Coupons.xlsx"
             });
 
-            oSheet.build()
-                .finally(() => oSheet.destroy());
+            oSheet.build().then(() => {
+                MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
+            }).finally(() => {
+                oSheet.destroy();
+            });
         },
 
         _createColumnConfig: function () {
             return [
-                { label: "Hostel Name", property: "BranchName", type: "String" },
+                { label: "Property Name", property: "BranchName", type: "String" },
                 { lanel: "Status", property: "Status", type: "String"},
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },

@@ -89,6 +89,14 @@
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />
+                        <Button
+                            text="{i18n>download}"
+                            icon="sap-icon://excel-attachment"
+                            tooltip="{i18n>downloadBranchData}"
+                            press="HF_onDownload"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"
+                        />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
