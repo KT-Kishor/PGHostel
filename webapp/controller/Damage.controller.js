@@ -373,7 +373,7 @@ sap.ui.define([
                 title: "Confirm Deletion",
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 emphasizedAction: sap.m.MessageBox.Action.NO,
-                    styleClass: "myUnifiedBtn",
+                styleClass: "myUnifiedBtn",
                 onClose: async function (sAction) {
                     if (sAction !== sap.m.MessageBox.Action.YES) {
                         oTable.removeSelections(true);
@@ -462,7 +462,7 @@ sap.ui.define([
                     const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
-                        BranchName: branch ? branch.Name : bed.BranchCode
+                        BranchName: branch ? branch.Name : bed.BranchID
                     };
                 });
 
@@ -533,7 +533,8 @@ sap.ui.define([
                 ...item,
                 Cost: item.TotalCost ? String(item.TotalCost) : "",
                 InvoiceDate: item.InvoiceDate ? this.Formatter.formatDate(item.InvoiceDate) : "",
-                ReturnDamageDate: item.ReturnDamageDate ? this.Formatter.formatDate(item.ReturnDamageDate) : ""
+                ReturnDamageDate: item.ReturnDamageDate ? this.Formatter.formatDate(item.ReturnDamageDate) : "",
+                TotalCost: item.TotalCost + " " + item.Currency
             }));
 
             var aColumns = this.createDamageExcelColumns();
@@ -541,8 +542,8 @@ sap.ui.define([
                 workbook: {
                     columns: aColumns,
                     context: {
-            sheetName: "Damage Details"
-        }
+                        sheetName: "Damage Details"
+                    }
                 },
                 dataSource: aAdjustedData,
                 fileName: "Damage_Report.xlsx",
@@ -557,6 +558,7 @@ sap.ui.define([
 
         createDamageExcelColumns: function () {
             return [
+                { label: "Branch Name", property: "BranchName", type: "string" },
                 { label: "Customer ID", property: "CustomerID", type: "string" },
                 { label: "Customer Name", property: "CustomerName", type: "string" },
                 { label: "Room No", property: "RoomNo", type: "string" },
@@ -564,8 +566,7 @@ sap.ui.define([
                 { label: "Cost", property: "TotalCost", type: "string" },
                 { label: "Date", property: "InvoiceDate", type: "String" },
                 { label: "Status", property: "Status", type: "string" },
-                { label: "Return Damage Date", property: "ReturnDamageDate", type: "string" }
-
+                { label: "Recover Date", property: "ReturnDamageDate", type: "string" }
             ];
         },
 

@@ -247,24 +247,14 @@ sap.ui.define([
                 type: "string"
             },
             {
+                label: "Customer Name",
+                property: "CustomerName",
+                type: "string"
+            },
+            {
                 label: "Payment Date",
                 property: "Date",
                 type: "String"
-            },
-            {
-                label: "Bank Name",
-                property: "BankName",
-                type: "string"
-            },
-            {
-                label: "Amount",
-                property: "Amount",
-                type: "string"
-            },
-            {
-                label: "Currency",
-                property: "Currency",
-                type: "string"
             },
             {
                 label: "Payment Type",
@@ -277,8 +267,13 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Customer Name",
-                property: "CustomerName",
+                label: "Bank Name",
+                property: "BankName",
+                type: "string"
+            },
+            {
+                label: "Amount",
+                property: "Amount",
                 type: "string"
             }
             ]
@@ -290,7 +285,8 @@ sap.ui.define([
 
             const adjustedData = oModel.map(item => ({
                 ...item,
-                Date: Formatter.displayFormatDate(item.Date)
+                Date: Formatter.displayFormatDate(item.Date),
+                Amount: item.Amount + " " + item.Currency
             }));
             const aCols = this.createTableSheet();
             const oSettings = {

@@ -148,7 +148,7 @@
 							<Text text="{Damage>CustomerID}" />
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
-							<Text text="{parts: ['Damage>TotalCost','Damage>Currency'], formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{parts: ['Damage>TotalCost','Damage>Currency'], formatter: '.Formatter.formatCurrency'}"/>
 							<Text text="{path: 'Damage>InvoiceDate', formatter: '.Formatter.formatDate'}"/>
 							<ObjectStatus
 							inverted="false"

@@ -619,7 +619,9 @@ sap.ui.define([
             const aFormattedData = aData.map(item => ({
                 ...item,
                 DepositDate: Formatter.formatDate(item.DepositDate),
-                ReturnDepositDate: Formatter.formatDate(item.ReturnDepositDate)
+                ReturnDepositDate: Formatter.formatDate(item.ReturnDepositDate),
+                DepositAmount: item.DepositAmount + " "+ item.DepositCurrency,
+                ReturnDepositAmount: item.ReturnDepositAmount + " "+ item.ReturnDepositCurrency
             }));
 
             var aCols = this._createDepositColumnConfig();
@@ -641,22 +643,19 @@ sap.ui.define([
 
         _createDepositColumnConfig: function () {
             return [
+                {label: "Branch Name", property: "BranchName", type: "string"},
                 { label: "Booking ID", property: "BookingID", type: "String" },
                 { label: "Customer Name", property: "CustomerName", type: "String" },
+                                { label: "Deposit Date", property: "DepositDate", type: "String" },
                 { label: "Deposit Amount", property: "DepositAmount", type: "Number" },
-                { label: "Deposit Currency", property: "DepositCurrency", type: "String" },
-                { label: "Deposit Date", property: "DepositDate", type: "String" },
                 { label: "Deposit Mode", property: "DepositMode", type: "String" },
                 { label: "Transaction ID", property: "DepositTransactionID", type: "String" },
                 { label: "Deposit Taken By", property: "DepositTakenBy", type: "String" },
+                                { label: "Return Date", property: "ReturnDepositDate", type: "String" },
                 { label: "Return Amount", property: "ReturnDepositAmount", type: "Number" },
-                { label: "Return Currency", property: "ReturnDepositCurrency", type: "String" },
-                { label: "Return Date", property: "ReturnDepositDate", type: "String" },
                 { label: "Return Mode", property: "ReturnDepositMode", type: "String" },
                 { label: "Return Transaction ID", property: "ReturnDepositTransactionID", type: "String" },
                 { label: "Return Deposit By", property: "ReturnDepositBy", type: "String" },
-                { label: "Branch Code", property: "BranchCode", type: "String" },
-                { label: "Branch Name", property: "BranchName", type: "String" }, // NEW COLUMN
                 { label: "Status", property: "Status", type: "String" }
             ];
         },
