@@ -763,7 +763,7 @@
                                                     />
 											</m:HBox>
 											<!-- Round of -->
-											<!-- <m:HBox
+											<m:HBox
                                                 justifyContent="SpaceBetween"
                                             ><m:Label
                                                     text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :"
@@ -772,7 +772,7 @@
                                                     class="amountText"
                                                     text="{FilteredSOWModel>/RoundOf}"
                                                     textAlign="End"
-                                                /></m:HBox> -->
+                                                /></m:HBox>
 											<!-- Total Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"

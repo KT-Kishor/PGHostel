@@ -855,8 +855,8 @@ sap.ui.define([
                 if (finalAmount < 0) finalAmount = 0;
 
                 // ---------------- ROUND OFF (DISABLED) ----------------
-                const roundedAmount = finalAmount;
-                const roundOffDiff = "0.00";
+                const roundedAmount = Math.round(finalAmount);
+                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
 
                 oSOWModel.setProperty("/RoundOf", roundOffDiff);
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
@@ -2268,9 +2268,9 @@ sap.ui.define([
                     //     ]);
                     // }
                     
-                    // if (data.RoundOf && data.RoundOf !== "0") {
-                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                    // }
+                    if (data.RoundOf && data.RoundOf !== "0") {
+                        summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
+                    }
 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);

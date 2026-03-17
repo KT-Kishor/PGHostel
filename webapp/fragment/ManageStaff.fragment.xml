@@ -67,6 +67,10 @@
                                 key="Dr."
                                 text="Dr."
                             />
+                            <core:ListItem
+                                key="Other."
+                                text="Other."
+                            />
 						</ComboBox>
 					</VBox>
 					<VBox width="75%" class="sapUiTinyMarginBegin">

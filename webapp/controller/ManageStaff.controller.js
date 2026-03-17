@@ -321,7 +321,7 @@ sap.ui.define([
             let filters = {};
 
             // Always apply Vendor type
-            filters.Type = oExistingModel.EmployeeID;
+            // filters.Type = oExistingModel.EmployeeID;
 
             // BranchCode applied based on role
             if (oExistingModel.Role === "Admin") {
@@ -492,6 +492,9 @@ sap.ui.define([
                 oGender.setEnabled(false);
             } else if (sKey === "Ms." || sKey === "Mrs.") {
                 oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            } else if (sKey === "Other."){
+                oGender.setSelectedKey("Other");
                 oGender.setEnabled(false);
             }
 
