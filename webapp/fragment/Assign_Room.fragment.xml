@@ -98,10 +98,6 @@
                         key="Cash"
                         text="Cash"
                     />
-                    <core:ListItem
-                        key="Card"
-                        text="Card"
-                    />
                 </ComboBox>
 
                   <Label

@@ -1756,7 +1756,7 @@ sap.ui.define([
             let originalRent = oCustomerData.getProperty("/OriginalRentPrice");
             if (!originalRent) {
                 originalRent = oCustomerData.getProperty("/OrginalRentPrice") || 0;
-                oCustomerData.setProperty("/OriginalRentPrice1", originalRent);
+                oCustomerData.setProperty("/OriginalRentPrice", originalRent);
             }
 
             const iCount = Number(oEvent.getSource().getSelectedKey()) || 1;
@@ -2944,6 +2944,34 @@ sap.ui.define([
 
             const facilityItems = CustomerData.AllSelectedFacilities || [];
 
+                 var paymentMap = {
+                "monthly": "Per Month",
+                "yearly": "Per Year",
+                "daily": "Per Day"
+            };
+
+            var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
+
+
+            if(paymentMap[unit] === "Per Day"){
+                if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Year")) {
+                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.");
+                    return; // ⛔ stop save
+                }
+            }
+            if(paymentMap[unit] === "Per Month"){
+                if (facilityItems.some(item => item.UnitText === "Per Year")) {
+                    sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.");
+                    return; // ⛔ stop save
+                }
+            }
+            if(paymentMap[unit] === "Per Year"){
+                if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Day")) {
+                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Daily payment plans when your booking is on a Per Year payment plan.");
+                    return; // ⛔ stop save
+                }
+            }
+
             const invalidFacilities = [];
 
             for (let i = 0; i < facilityItems.length; i++) {
@@ -2993,11 +3021,7 @@ sap.ui.define([
             }
 
             // Map UnitText to desired PaymentType
-            var paymentMap = {
-                "monthly": "Per Month",
-                "yearly": "Per Year",
-                "daily": "Per Day"
-            };
+       
 
             // Normalize UnitText: trim and lowercase
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
@@ -3006,7 +3030,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
                 return;
             }
-               const customerEndDate = this._parseDate(CustomerData.EndDate);
+            const customerEndDate = this._parseDate(CustomerData.EndDate);
             const bookingEndDate = this._parseDate(Bookingdata.EndDate);
 
             let isAnyFacilityMatchingBookingEnd = true;
@@ -3049,7 +3073,7 @@ sap.ui.define([
             }
             if(LoginModel.Role === "Customer" || this._fromRoute==="ManageProfile"){
             if (paymentMap[unit] === "Per Day"
-                && (CustomerData.Duration * Number(CustomerData.OrginalRentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
+                && (CustomerData.Duration * Number(CustomerData.RentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
                 && this.flag!==true && CustomerData.DueAmount > 0) {
                 if (!this.PP_Dialog) {
                     if (this.PP_Dialog) {
@@ -3083,7 +3107,7 @@ sap.ui.define([
                 }, 100);
                 return;
             } else if (
-                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.OrginalRentPrice) > this.RentPrice)  
+                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.RentPrice) > this.RentPrice)  
                 && this.flag!==true && CustomerData.DueAmount > 0
             ) {
                  if(Number(CustomerData.RentPrice) > this.RentPrice && CustomerData.TotalFacilityPrice === this.FacilityPrice && CustomerData.PaymentPaid !== "0.00"){
@@ -3214,10 +3238,10 @@ sap.ui.define([
                     CustomerID: CustomerData.CustomerID
                 }
             })
-                .then(() => {
+                .then(async () => {
 
                     // Refresh models
-                    this.AD_onSearch();
+                  await  this.AD_onSearch();
                      if (this.PP_Dialog) {
                        this.PP_Dialog.close();
                            }

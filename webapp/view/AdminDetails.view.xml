@@ -68,7 +68,7 @@
                             </VBox>
                         </FlexBox>
                         <!-- RIGHT SIDE BUTTONS -->
-                        <FlexBox
+                        <!-- <FlexBox
                             class="rightButtons"
                             wrap="NoWrap"
                             justifyContent="End"
@@ -139,7 +139,7 @@
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
-                        </FlexBox>
+                        </FlexBox> -->
                     </FlexBox>
                 </VBox>
             </content>
@@ -1299,11 +1299,94 @@
                 </Panel>
             </VBox>
         </ScrollContainer>
-        <footer>
+        <!-- <footer>
+        
          <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />
-        </footer>
+        </footer> -->
+
+        <footer>
+			<Bar>
+            <contentLeft>
+             <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
+             <Link
+                text="{i18n>devlopby}"
+                href="https://kalpavrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+            
+            </contentLeft>
+				<contentRight>
+                    <!-- Refund Amount -->
+                   <Button
+                                text="Set GST"
+                                id="idGST"
+                                tooltip="GST Setup"
+                                press="onGSTBooking"
+                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
+                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+                            <Button
+                                text="{i18n>MSedit}"
+                                id="idedit"
+                                tooltip="{i18n>MSedit}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                                press="onEditBooking"
+                                visible="{=
+                                    ${CustomerData>/Status} !== 'Cancelled'
+                                     &amp;&amp; ${CustomerData>/Status} !== 'Completed'
+                                     &amp;&amp;
+                                    (
+                                        ${CustomerData>/Status} === 'New' ||
+                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin')
+                                    )
+                                    &amp;&amp; !${VisibleModel>/visible}
+                                }"
+                            />
+
+                            <Button
+                                id="idcancel"
+                                tooltip="{i18n>cancelBooking}"
+                                text="{i18n>cancelBooking}"
+                                press="onPressCancelBooking"
+                                visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+
+                            <Button
+                                text="{i18n>checkOut}"
+                                id="idCheckout"
+                                tooltip="{i18n>checkOut}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                                press="onChekout"
+                                visible="{= ${CustomerData>/Status} === 'Assigned' 
+                                    &amp;&amp; !${VisibleModel>/visible}
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }"
+                            />
+
+                            <Button
+                                text="Submit"
+                                id="idsave"
+                                tooltip="Submit"
+                                press="onSaveBooking"
+                                visible="{VisibleModel>/visible}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+
+                            <Button
+                                id="idcancelbtn"
+                                text="{i18n>CancelButton}"
+                                tooltip="{i18n>CancelButton}"
+                                press="onCancelBooking"
+                                visible="{VisibleModel>/visible}"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
+                </contentRight>
+			</Bar>
+		</footer>
     </Page>
 </mvc:View>

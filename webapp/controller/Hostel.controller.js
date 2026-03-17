@@ -2594,7 +2594,7 @@ sap.ui.define([
 
         Branch: async function (filter) {
             const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
-            this.RoomCount = response?.HM_RoomCount || 0;
+            this.Branchlength = response?.data.length || 0;
             this.getView().setModel(new JSONModel(response?.data), "BranchModel");
 
             // this.getOwnerComponent().getModel("sBRModel").setData(response?.data || []);
@@ -2679,7 +2679,7 @@ sap.ui.define([
             var Branchdata = data.filter((item) => {
                 return item.City === Scity
             })
-            this.Branchlength = Branchdata.length
+            // this.Branchlength = Branchdata.length
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -2755,6 +2755,8 @@ sap.ui.define([
                         Name: branch.Name,
                         City: branch.City,
                         Address: branch.Address,
+                        PropertyType:branch.PropertyType,
+                        LandMark: branch.LandMark,
                         Country: branch.Country,
                         GSTIN: branch.GSTIN,
                         CheckInTime: branch.CheckinTime,

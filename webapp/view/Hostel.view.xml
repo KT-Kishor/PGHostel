@@ -313,6 +313,15 @@
                                                                         <VBox
                                                                             class="imageWrapper"
                                                                         >
+                                                                          <HBox class="areaTagBox">
+                                        <core:Icon
+                                            src="sap-icon://building"
+                                            size="0.9rem"
+                                            color="black"
+                                            class="sapUiTinyMarginEnd"
+                                        />
+                                        <Text text="{VisibilityModel>PropertyType}" />
+                                    </HBox>
                                                                             <!-- Image -->
                                                                             <Image
                                                                                 src="{VisibilityModel>Image}"
@@ -330,7 +339,7 @@
                                                                     class="BranchCardContent"
                                                                 >
                                                                     <Text
-                                                                        text="{= ${VisibilityModel>Name} + ' - ' + ${VisibilityModel>City}}"
+                                                                        text="{= ${VisibilityModel>Name} + ' - ' + ${VisibilityModel>LandMark}}"
                                                                         class="BranchCardTitle"
                                                                     />
                                                                     <!-- ? Rating row EXACT like screenshot -->

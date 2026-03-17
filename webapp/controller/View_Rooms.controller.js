@@ -179,6 +179,10 @@ sap.ui.define([
                     const sGSTIN = oBranchInfo?.GSTIN || "";
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
+                    const PropertyType = oBranchInfo?.PropertyType || "";
+                    const LandMark = oBranchInfo?.LandMark || "";
+
+
                     const aImages = [];
                     for (let i = 1; i <= 5; i++) {
                         const base64 = room[`Photo${i}`];
@@ -224,7 +228,9 @@ sap.ui.define([
                         GeoLocation: oBranchInfo?.GeoLocation || "",
                         EmailID: oBranchInfo?.EmailID || "",
                         AvailableDate: Date,
-                        ExtraBed: room.ExtraBed
+                        ExtraBed: room.ExtraBed,
+                        PropertyType: PropertyType,
+                        LandMark: LandMark
                     };
                 });
 

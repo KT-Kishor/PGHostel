@@ -194,6 +194,15 @@
                             tooltip="{i18n>bookingID}"
                         />
                     </Column>
+                      <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
+                            text="{i18n>bookingtype}"
+                            tooltip="{i18n>bookingtype}"
+                        />
+                    </Column>
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -265,7 +274,9 @@
                                 />
                                 <Text text="{HostelModel>CustomerName}" />
                             </VBox>
-                            <Text text="{HostelModel>BookingID}" />
+                            <Text text="{HostelModel>PaymentType}" />
+                            <Text text="{HostelModel>PaymentType}" />
+
                             <Text
                                 text="{path:'HostelModel>BookingDate',formatter: '.Formatter.formatDate'}"
                             />
