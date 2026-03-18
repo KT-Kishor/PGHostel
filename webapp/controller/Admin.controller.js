@@ -1139,11 +1139,6 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "STD Code",
-                property: "STDCode",
-                type: "string"
-            },
-            {
                 label: "Contact Information",
                 property: "MobileNo",
                 type: "string"
@@ -1191,7 +1186,8 @@ sap.ui.define([
                 ...item,
                 BookingDate: Formatter.formatDate(item.BookingDate),
                 StartDate: Formatter.formatDate(item.StartDate),
-                EndDate: Formatter.formatDate(item.EndDate)
+                EndDate: Formatter.formatDate(item.EndDate),
+                MobileNo: item.STDCode+ " "+ item.MobileNo
                 // Pincode: item.Pincode ? String(item.Pincode) : "",
                 // Contact: item.Contact ? String(item.Contact) : ""
             }));

@@ -485,8 +485,8 @@ sap.ui.define([
 
         _createColumnConfig: function () {
             return [
-                { label: "Property Name", property: "BranchName", type: "String" },
-                { lanel: "Status", property: "Status", type: "String"},
+                { label: "Status", property: "Status", type: "String" },
+                { label: "Branch Name", property: "BranchName", type: "String" },
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },
                 { label: "Percentage / Discount Value", property: "DiscountValue", type: "String" },

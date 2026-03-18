@@ -345,6 +345,11 @@ sap.ui.define(
                     return;
                 }
                 const aCols = [{
+                    label: this.i18nModel.getText("sheetBranchName"),
+                    property: "BranchName",
+                    type: "string"
+                },
+                    {
                     label: this.i18nModel.getText("invoiceNo"),
                     property: "InvNo",
                     type: "string"

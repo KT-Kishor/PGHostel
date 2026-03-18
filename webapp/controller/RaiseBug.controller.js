@@ -351,7 +351,7 @@ sap.ui.define([
                     type: "string"
                 },
                 {
-                    label: "App Aame",
+                    label: "App Name",
                     property: "AppName",
                     type: "string"
                 },

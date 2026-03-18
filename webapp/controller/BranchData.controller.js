@@ -271,11 +271,6 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "STD Code",
-                property: "STD",
-                type: "string"
-            },
-            {
                 label: "Contact Number",
                 property: "Contact",
                 type: "string"
@@ -293,7 +288,8 @@ sap.ui.define([
                 ...item,
                 Pincode: item.Pincode ? String(item.Pincode) : "",
                 Contact: item.Contact ? String(item.Contact) : "",
-                Penalty: item.Penalty + " " + item.Currency
+                Penalty: item.Penalty + " " + item.Currency,
+                Contact: item.STD+ " "+ item.Contact
             }));
             const aCols = this.createTableSheet();
             const oSettings = {

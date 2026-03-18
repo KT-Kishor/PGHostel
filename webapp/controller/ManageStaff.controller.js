@@ -782,7 +782,9 @@ sap.ui.define([
             }
             const adjustedData = oModel.map(item => ({
                 ...item,
-                MobileNo: item.MobileNo ? String(item.MobileNo) : ""
+                MobileNo: item.MobileNo ? String(item.MobileNo) : "",
+                MobileNo: item.STDCode+ " "+ item.MobileNo,
+                UserName: item.Salutation+ " "+ item.UserName
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -820,11 +822,6 @@ sap.ui.define([
                     type: "string"
                 },
                 {
-                    label: "Salutation",
-                    property: "Salutation",
-                    type: "string"
-                },
-                {
                     label: "Staff Name",
                     property: "UserName",
                     type: "string"
@@ -842,11 +839,6 @@ sap.ui.define([
                 {
                     label: "Gender",
                     property: "Gender",
-                    type: "string"
-                },
-                {
-                    label: "STD Code",
-                    property: "STDCode",
                     type: "string"
                 },
                 {

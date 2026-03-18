@@ -341,7 +341,7 @@
                     text="{i18n>raisebug}"
                     tooltip="{i18n>proceedToPay}"
                     visible="{OBTNModel>/Submit}"
-                    class="myUnifiedBtn"
+                    class="myUnifiedBtn sapUiMediumMarginEnd"
                     press="onPressbugs"
                 />
               

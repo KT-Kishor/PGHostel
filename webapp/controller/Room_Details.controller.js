@@ -134,7 +134,7 @@ sap.ui.define([
                     columns: aCols,
                     hierarchyLevel: "Level",
                     context: {
-                        sheetName: "Room Details Details"
+                        sheetName: "Room Details"
                     }
                 },
                 dataSource: adjustedData,
