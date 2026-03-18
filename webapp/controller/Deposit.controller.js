@@ -1162,6 +1162,185 @@ sap.ui.define([
                 var oRouter = this.getOwnerComponent().getRouter();
                 oRouter.navTo("TilePage", {}, true);
             }
+        },
+      onPressEditDeposit: function () {
+
+    var oTable = this.byId("depositTable");
+    var aSelectedItems = oTable.getSelectedItems();
+
+    // Validate selection
+    if (aSelectedItems.length !== 1) {
+        sap.m.MessageToast.show("Please select exactly one deposit to edit");
+        return;
+    }
+
+    // Get selected row context
+    var oContext = aSelectedItems[0].getBindingContext("DepositModel");
+
+    // Create fragment if not already created
+    if (!this._oDepositDialog) {
+        this._oDepositDialog = sap.ui.xmlfragment(
+            this.getView().getId(),
+            "sap.ui.com.project1.fragment.EditDeposit",
+            this
+        );
+        this.getView().addDependent(this._oDepositDialog);
+    }
+
+    // Bind selected row to fragment
+    this._oDepositDialog.setBindingContext(oContext, "DepositModel");
+
+    // Open dialog
+    this._oDepositDialog.open();
+},
+ondepositdate:function(oEvent){
+utils._LCvalidateMandatoryField(oEvent)
+},
+onreturndate:function(){
+utils._LCvalidateMandatoryField(oEvent)
+},
+onDepositmodeChange:function(oEvent){
+utils._LCstrictValidationComboBox(oEvent)
+},
+onreturnModechange:function(oEvent){
+utils._LCstrictValidationComboBox(oEvent)
+},
+onSaveDeposit: async function () {
+
+   var oView = this.getView();
+    var oTable = oView.byId("depositTable");
+
+    var oSelectedItem = oTable.getSelectedItem();
+
+    if (!oSelectedItem) {
+        MessageToast.show("Please select a record");
+        return;
+    }
+ 
+             
+
+    // Get selected row data
+    var oContext = oSelectedItem.getBindingContext("DepositModel");
+    var oDeposit = oContext.getObject();
+     var sStatus = oDeposit.Status || "";
+
+ const oDepositDate = this.byId("depositDate");
+const oReturnDate = this.byId("returnDate");
+const oDepositMode = this.byId("depositModeTxn");
+const oReturnMode = this.byId("returnModeTxn");
+
+let isModeValid = false;
+
+if (sStatus === "Received") {
+    // Validate only deposit fields
+    isModeValid =
+        oDepositDate.getDateValue() &&
+        oDepositMode.getSelectedKey();
+} else {
+    // Validate all fields
+    isModeValid =
+        oDepositDate.getDateValue() &&
+        oReturnDate.getDateValue() &&
+        oDepositMode.getSelectedKey() &&
+        oReturnMode.getSelectedKey();
+}
+
+if (!isModeValid) {
+    MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+    return;
+}    
+
+    var sBookingID = oDeposit.BookingID;
+
+    if (!sBookingID) {
+        MessageToast.show("Booking ID is required");
+        return;
+    }
+    // Validate required fields
+    if (!oDeposit.CustomerName || oDeposit.CustomerName.trim() === "") {
+        MessageToast.show("Customer name is required");
+        return;
+    }
+
+    if (!oDeposit.DepositAmount || parseFloat(oDeposit.DepositAmount) <= 0) {
+        MessageToast.show("Deposit amount must be greater than zero");
+        return;
+    }
+
+    // Format Dates
+    const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+        pattern: "yyyy-MM-dd"
+    });
+
+    const depositDate = oDeposit.DepositDate
+        ? oDateFormat.format(new Date(oDeposit.DepositDate))
+        : null;
+
+    const returnDate = oDeposit.ReturnDepositDate
+        ? oDateFormat.format(new Date(oDeposit.ReturnDepositDate))
+        : null;
+
+    // Get logged in user
+    const oLoginModel = oView.getModel("LoginModel");
+    const currentUser = oLoginModel ? oLoginModel.getProperty("/EmployeeName") : "System";
+
+    // Build update payload
+    const updateData = {
+        BookingID: sBookingID,
+      
+        DepositDate: depositDate,
+       
+        DepositMode: oDeposit.DepositMode || "",
+        DepositTransactionID: oDeposit.DepositTransactionID || "",
+      
+        ReturnDepositDate: returnDate,
+  
+        ReturnDepositMode: oDeposit.ReturnDepositMode || "",
+        ReturnDepositTransactionID: oDeposit.ReturnDepositTransactionID || "",
+     
+      
+    };
+
+    this.getBusyDialog();
+
+    try {
+
+        const apiPayload = {
+            filters: {
+                BookingID: sBookingID
+            },
+            data: updateData
+        };
+
+        const response = await this.ajaxUpdateWithJQuery("HM_Deposit", apiPayload);
+
+        if (response && response.success) {
+            MessageToast.show("Deposit updated successfully");
+        } else {
+            throw new Error(response?.message || "Update failed");
         }
+
+        if (this._oDepositDialog) {
+            this._oDepositDialog.close();
+        }
+
+        await this.onDepositSearch();
+
+    } catch (err) {
+
+        console.error("Error in onSaveDeposit:", err);
+
+          MessageBox.error(
+            err?.responseJSON?.message || err.message || "Failed to update deposit."
+        );
+
+    } finally {
+
+        this.closeBusyDialog();
+    }
+},
+onCancelDeposit:function(){
+    this._oDepositDialog.close()
+}
     });
 });

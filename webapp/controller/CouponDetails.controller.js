@@ -344,6 +344,7 @@ sap.ui.define([
             oViewModel.setProperty("/DialogMode", "Add");
             // ✅ Blank model → placeholders only
             oViewModel.setProperty("/CurrentCoupon", {
+                CouponCode:"",
                 DiscountType: "",
                 DiscountValue: "",
                 UptoValue: "",
@@ -628,6 +629,17 @@ sap.ui.define([
             oInput.setValueState(sap.ui.core.ValueState.None);
             return true;
         },
+        onLiveChange_CouponCode:function(oEvent){
+          utils._LCvalidateMandatoryField(oEvent)
+           var oInput = oEvent.getSource();
+    var sValue = oEvent.getParameter("value");
+
+    // Convert to uppercase
+    var sUpper = sValue.toUpperCase();
+
+    // Update input value (this also updates the model because of two-way binding)
+    oInput.setValue(sUpper);
+        },
 
         onSaveCoupon: async function () {
             var oView = this.getView();
@@ -639,6 +651,9 @@ sap.ui.define([
                     sap.ui.getCore().byId(oView.createId("cbBranchCode")), "ID"
                 )
                 &&
+                utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId(oView.createId("idCouponcode")), "ID"
+                ) &&
                 utils._LCstrictValidationComboBox(
                     sap.ui.getCore().byId(oView.createId("cbDiscountType")), "ID"
                 ) &&
@@ -708,12 +723,12 @@ sap.ui.define([
                             CouponId: oCoupon.CouponId
                         },
                         data: {
+                           
                             DiscountType: oCoupon.DiscountType,
                             DiscountValue: oCoupon.DiscountValue,
                             UptoValue: oCoupon.UptoValue,
                             Description: oCoupon.Description,
                             MaxUses: oCoupon.MaxUses,
-                            //erLimit: oCoupon.PerUserLimit,
                             BranchCode: oCoupon.BranchCode,
                             StartDate: oCoupon.StartDate,
                             EndDate: oCoupon.EndDate,
@@ -769,6 +784,7 @@ sap.ui.define([
         _resetDialogValueStates: function () {
             const oView = this.getView();
             const aFieldIds = [
+                "idCouponcode",
                 "cbDiscountType",
                 "inDiscountValue",
                 "inUptoValue",

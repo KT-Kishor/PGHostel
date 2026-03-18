@@ -207,6 +207,23 @@
                         <ToolbarSpacer />
 
                         <!-- Return Deposit Button -->
+
+                         <!-- <Button
+                            text="{i18n>MSadd}"
+                            tooltip="{i18n>addDeposit}"
+                            press="onPressAddDeposit"
+                            class="myUnifiedBtn"
+                            type="Emphasized"
+                            
+                        /> -->
+                         <Button
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>addDeposit}"
+                            press="onPressEditDeposit"
+                            class="myUnifiedBtn"
+                            type="Emphasized"
+                            
+                        />
                         <Button
                             text="{i18n>returnDeposit}"
                             tooltip="{i18n>returnDeposit}"

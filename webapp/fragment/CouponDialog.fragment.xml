@@ -58,6 +58,20 @@
                     </ComboBox>
                     <Label
                         required="true"
+                        text="{i18n>CDCouponCode}"
+                    />
+<Input
+    id="idCouponcode"
+    value="{CouponView>/CurrentCoupon/CouponCode}"
+    type="Text"
+    liveChange="onLiveChange_CouponCode"
+    placeholder="{i18n>enterCoupon}"
+    maxLength="10"
+    valueStateText="{i18n>pleaseEnterCoupon}"
+/>
+
+                    <Label
+                        required="true"
                         text="{i18n>CDDiscountType}"
                     />
                     <ComboBox

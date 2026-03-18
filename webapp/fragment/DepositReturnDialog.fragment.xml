@@ -60,7 +60,7 @@
                 />
 
                 <!-- Deposit Taken By (Read-only) -->
-                <Label text="Deposit Taken By" />
+                <Label text="Deposit Received By" />
                 <Text
                     id="inDepositTakenBy"
                     text="{DepositView>/CurrentDeposit/DepositTakenBy}"
