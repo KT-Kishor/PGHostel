@@ -674,7 +674,6 @@ sap.ui.define([
         content: new sap.m.Text({ text: sMessage }),
         beginButton: new sap.m.Button({
           text: sOkText || oResourceBundle.getText("OkButton"),
-          type: "Transparent",
           press: function () {
             dialog.close();
 
@@ -689,10 +688,9 @@ sap.ui.define([
                 // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
-        }),
+        }).addStyleClass("myUnifiedBtn"),
         endButton: new sap.m.Button({
           text: sCancelText || oResourceBundle.getText("CancelButton"),
-          type: "Transparent",
           press: function () {
             dialog.close();
 
@@ -707,7 +705,7 @@ sap.ui.define([
                 // this.closeBusyDialog(); // Always close BusyDialog
               }.bind(this));
           }.bind(this)
-        }),
+        }).addStyleClass("myUnifiedBtn"),
         afterClose: function () {
           dialog.destroy();
         }

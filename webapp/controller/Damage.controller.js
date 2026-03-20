@@ -558,11 +558,10 @@ sap.ui.define([
 
         createDamageExcelColumns: function () {
             return [
-                { label: "Branch Name", property: "BranchName", type: "string" },
+                { label: "Property Name", property: "BranchName", type: "string" },
                 { label: "Customer ID", property: "CustomerID", type: "string" },
                 { label: "Customer Name", property: "CustomerName", type: "string" },
                 { label: "Room No", property: "RoomNo", type: "string" },
-                { label: "Bed Type", property: "BedTypeName", type: "string" },
                 { label: "Cost", property: "TotalCost", type: "string" },
                 { label: "Date", property: "InvoiceDate", type: "String" },
                 { label: "Status", property: "Status", type: "string" },

@@ -1202,12 +1202,14 @@ sap.ui.define([
                             title: that.i18nModel.getText("success"),
                             type: sap.m.DialogType.Message,
                             state: sap.ui.core.ValueState.Success,
+                            class: "myUnifiedBtn",
                             content: new sap.m.Text({
                                 text: that.i18nModel.getText("invoiceCreatemsg")
                             }),
                             beginButton: new sap.m.Button({
                                 text: "OK",
                                 type: "Transparent",
+                                class: "myUnifiedBtn",
                                 press: function() {
                                     oDialog.close();
                                     that.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
@@ -1216,6 +1218,7 @@ sap.ui.define([
                             endButton: new sap.m.Button({
                                 text: "Generate PDF",
                                 type: "Transparent",
+                                class: "myUnifiedBtn",
                                 press: async () => {
                                     oDialog.close();
                                     await that.CID_onPressGeneratePdf();

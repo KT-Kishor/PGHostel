@@ -237,13 +237,10 @@ sap.ui.define([
                     console.error(err);
                     sap.m.MessageToast.show("Error while deleting");
                 }
-
                 that.closeBusyDialog() 
-
             };
 
             if (hasSavedItem) {
-
                 sap.m.MessageBox.confirm(
                     "Are you sure you want to delete selected item(s)?",
                     {
@@ -255,13 +252,13 @@ sap.ui.define([
                             }
                         }
                     }
-                );
-                
+                );    
             } else {
                 fnDelete();
             }
 
         },
+
         onNavBack: function () {
             this.getOwnerComponent().getRouter().navTo("RouteDamage");
         },
@@ -270,6 +267,7 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
+
         DM_onPressAddDamageItems: function () {
             var oModel = this.getView().getModel("DamageModel");
             var aItems = oModel.getProperty("/Items");
@@ -342,7 +340,11 @@ sap.ui.define([
                 }
             }
             if (oData.Items.length === 0) {
-                sap.m.MessageBox.error("Please add at least one damage item");
+                sap.m.MessageBox.error("Please add at least one damage item",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
+                );
                 return;
             }
             var aItems = oData.Items || [];
@@ -371,13 +373,14 @@ sap.ui.define([
                 if (aMissingFields.length > 0) {
                     sap.m.MessageBox.error(
                         "Row " + (i + 1) + " : Please fill required field(s): " +
-                        aMissingFields.join(", ")
+                        aMissingFields.join(", "),
+                        {
+                            styleClass: "myUnifiedBtn"
+                        }
                     );
                     return;
                 }
             }
-
-
             var Payload = {
                 data: {
                     CustomerID: oData.CustomerID,
@@ -466,8 +469,7 @@ sap.ui.define([
                         this.decodedPath = Data.InvoiceNo;
                         this.closeBusyDialog()
                         this.OnSearch();
-                        this.getView().getModel("VisibleModel")
-                            .setProperty("/visible", false);
+                        this.getView().getModel("VisibleModel").setProperty("/visible", false);
                         this.getView().byId("HD_id_CustomerID1").setEditable(false);
                         sap.m.MessageBox.confirm(
                             "Damage Created Successfully",
@@ -490,8 +492,6 @@ sap.ui.define([
                                 }
                             }
                         );
-
-
                     })
                     .catch(err => {
                         this.closeBusyDialog()

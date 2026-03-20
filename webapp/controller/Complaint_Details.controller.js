@@ -156,6 +156,11 @@ sap.ui.define([
         },
         createTableSheet: function () {
             return [{
+                label: "Property Name",
+                property: "BranchName",
+                type: "string"
+            },
+                {
                 label: "Name",
                 property: "RaisedBy",
                 type: "string"

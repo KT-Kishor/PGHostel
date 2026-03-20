@@ -2955,19 +2955,31 @@ sap.ui.define([
 
             if(paymentMap[unit] === "Per Day"){
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Year")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.");
+                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.",
+                        {
+                            styleClass: "myUnifiedBtn"
+                        }
+                    );
                     return; // ⛔ stop save
                 }
             }
             if(paymentMap[unit] === "Per Month"){
                 if (facilityItems.some(item => item.UnitText === "Per Year")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.");
+                    sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.",
+                        {
+                            styleClass: "myUnifiedBtn"
+                        }
+                    );
                     return; // ⛔ stop save
                 }
             }
             if(paymentMap[unit] === "Per Year"){
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Day")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Daily payment plans when your booking is on a Per Year payment plan.");
+                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Daily payment plans when your booking is on a Per Year payment plan.",
+                        {
+                            styleClass: "myUnifiedBtn"
+                        }
+                    );
                     return; // ⛔ stop save
                 }
             }
@@ -2997,7 +3009,10 @@ sap.ui.define([
                     "The following facilities have dates outside the booking period:\n\n" +
                     invalidFacilities.map(name => `• ${name}`).join("\n") +
                     `\n\nPlease ensure all facility dates are between ` +
-                    `${Bookingdata.StartDate} and ${Bookingdata.EndDate}.`
+                    `${Bookingdata.StartDate} and ${Bookingdata.EndDate}.`,
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
                 return; // ⛔ stop save
             }

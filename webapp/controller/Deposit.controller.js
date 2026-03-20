@@ -626,14 +626,8 @@ sap.ui.define([
             const aFormattedData = aData.map(item => ({
                 ...item,
 
-                DepositDate: this._isValidDate(item.DepositDate)
-                    ? Formatter.formatDate(item.DepositDate)
-                    : "",
-
-                ReturnDepositDate: this._isValidDate(item.ReturnDepositDate)
-                    ? Formatter.formatDate(item.ReturnDepositDate)
-                    : "",
-
+                DepositDate: this._isValidDate(item.DepositDate)? Formatter.formatDate(item.DepositDate): null,
+                ReturnDepositDate: this._isValidDate(item.ReturnDepositDate)? Formatter.formatDate(item.ReturnDepositDate): "",
                 DepositAmount: item.DepositAmount + " " + item.DepositCurrency,
                 ReturnDepositAmount: item.ReturnDepositAmount + " " + item.ReturnDepositCurrency
             }));
@@ -659,10 +653,10 @@ sap.ui.define([
 
         _createDepositColumnConfig: function () {
             return [
-                { label: "Branch Name", property: "BranchName", type: "string" },
+                { label: "Property Name", property: "BranchName", type: "string" },
                 { label: "Booking ID", property: "BookingID", type: "String" },
                 { label: "Customer Name", property: "CustomerName", type: "String" },
-                { label: "Deposit Date", property: "DepositDate", type: "String" },
+                { label: "Deposit Date", property: "DepositDate", type: "string" },
                 { label: "Deposit Amount", property: "DepositAmount", type: "Number" },
                 { label: "Deposit Mode", property: "DepositMode", type: "String" },
                 { label: "Transaction ID", property: "DepositTransactionID", type: "String" },
@@ -821,13 +815,15 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error in onSaveReturn:", err);
                 MessageBox.error(
-                    err?.responseJSON?.message || err.message || "Failed to process deposit return."
+                    err?.responseJSON?.message || err.message || "Failed to process deposit return.",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
             } finally {
                 this.closeBusyDialog()
             }
         },
-
 
         _validateReturnFields: function () {
             const oView = this.getView();

@@ -82,19 +82,20 @@
 					id="RB_id_Email"
                     liveChange="onBugEmailchange"
 					type="Email"
+					class="sapUiSmallMarginBottom"
                     valueStateText="{i18n>enteremailis}"
 					value="{RaiseBugModel>/Email}"
 					placeholder="Enter Email"/>
 
-				<!-- Upload Image (UNCHANGED) -->
-				<Label text="{i18n>addImage}" required="true"/>
-				  <MessageStrip
+				 <MessageStrip
                     text=" Image files larger than 2 MB are not allowed."
                     type="Warning"
                     showIcon="true"
                     enableFormattedText="true"
                     class="sapUiSmallMarginBottom"
                 />
+				<!-- Upload Image (UNCHANGED) -->
+				<Label text="{i18n>addImage}" required="true"/>
 
 			<VBox alignItems="Start" width="100%" renderType="Bare">
 
