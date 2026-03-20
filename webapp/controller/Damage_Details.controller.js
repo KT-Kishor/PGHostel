@@ -16,7 +16,7 @@ sap.ui.define([
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteDamageDetails").attachMatched(this._onRouteMatched, this);
         },
-        
+
         _onRouteMatched: async function (oEvent) {
             try {
                 this.getBusyDialog();
@@ -192,7 +192,7 @@ sap.ui.define([
             var fnDelete = async function () {
 
                 that.getBusyDialog()
-              
+
 
                 try {
 
@@ -230,14 +230,14 @@ sap.ui.define([
                     oTable.removeSelections();
 
                     sap.m.MessageToast.show("Selected Item(s) Deleted");
-                    
+
 
                 } catch (err) {
                     that.closeBusyDialog()
                     console.error(err);
                     sap.m.MessageToast.show("Error while deleting");
                 }
-                that.closeBusyDialog() 
+                that.closeBusyDialog()
             };
 
             if (hasSavedItem) {
@@ -252,7 +252,7 @@ sap.ui.define([
                             }
                         }
                     }
-                );    
+                );
             } else {
                 fnDelete();
             }
@@ -260,14 +260,21 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteDamage");
+            var flag = this.getView().getModel("VisibleModel").getProperty("/visible");
+            if (flag === true) {
+                sap.m.MessageBox.show("Please Submit before navigating back?", {
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    title: "Warning"
+                });
+            } else {
+                this.getOwnerComponent().getRouter().navTo("RouteDamage");
+            }
         },
 
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
         },
-
         DM_onPressAddDamageItems: function () {
             var oModel = this.getView().getModel("DamageModel");
             var aItems = oModel.getProperty("/Items");
@@ -285,7 +292,7 @@ sap.ui.define([
             var table = this.byId("CID_id_TableInvoiceItem1");
             table.removeSelections();
         },
-         onTotalInputLiveChange: function (oEvent) {
+        onTotalInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
 
@@ -613,7 +620,7 @@ sap.ui.define([
                     {
                         label: "Room No :",
                         value: oModel.RoomNo || "N/A"
-                    }                   
+                    }
                 ];
 
                 // Print right-aligned structured block
@@ -683,28 +690,28 @@ sap.ui.define([
                         lineWidth: 0.5,
                         lineColor: [30, 30, 30],
                         halign: "center"
-                   },
-                            columnStyles: {
-                                1: {
-                                    halign: "left"
-                                },
-                                2: {
-                                    halign: "left"
-                                },
-                                3: {
-                                    halign: "center"
-                                },
-                                4: {
-                                    halign: "center"
-                                },
-                                5: {
-                                    halign: "right"
-                                }
-                            }
-                        });
+                    },
+                    columnStyles: {
+                        1: {
+                            halign: "left"
+                        },
+                        2: {
+                            halign: "left"
+                        },
+                        3: {
+                            halign: "center"
+                        },
+                        4: {
+                            halign: "center"
+                        },
+                        5: {
+                            halign: "right"
+                        }
+                    }
+                });
 
                 currentY = doc.lastAutoTable.finalY + 8;
-                
+
                 // ================= SUMMARY =================
                 const totalAmount = parseFloat(oModel.TotalCost || 0);
                 const summary = [];
@@ -762,7 +769,7 @@ sap.ui.define([
                     }
                 });
 
-                currentY = doc.lastAutoTable.finalY + 8;   
+                currentY = doc.lastAutoTable.finalY + 8;
                 const finalAmount = oModel.Status === "Damage Raised" ? totalAmount : totalAmount;
                 const amountInWords = await this.convertNumberToWords(finalAmount, "INR");
 

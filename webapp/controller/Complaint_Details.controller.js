@@ -434,6 +434,8 @@ sap.ui.define([
                 },
             });
             this.CD_read()
+            MessageToast.show(this.i18nModel.getText("ComplaintUpdatedSuccessfully"));
+
             var table = this.byId("idPOTable1");
             table.removeSelections();
             this.CD_Dialog.close();

@@ -735,7 +735,7 @@ sap.ui.define([
                 sap.m.MessageToast.show("Deposit amount cannot be more than the required deposit of " + this.Deposit);
                 return;
             }
-            if (Number(DepositAmount) === 0) {
+            if (Number(DepositAmount) === 0 && this.selectedIndex === 0) {
                 sap.m.MessageToast.show("Deposit amount cannot be set to zero");
                 return;
             }

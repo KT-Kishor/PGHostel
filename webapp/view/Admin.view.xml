@@ -274,7 +274,7 @@
                                 />
                                 <Text text="{HostelModel>CustomerName}" />
                             </VBox>
-                            <Text text="{HostelModel>PaymentType}" />
+                            <Text text="{HostelModel>BookingID}" />
                             <Text text="{HostelModel>PaymentType}" />
 
                             <Text

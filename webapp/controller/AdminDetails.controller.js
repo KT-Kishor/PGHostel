@@ -3398,7 +3398,7 @@ sap.ui.define([
                             FacilityItems: facilityData
                         }];
 
-                        this.getBusyDialog()
+                        that.getBusyDialog()
                         const custid = oData.BookingID; // FIXED
 
                         await that.ajaxUpdateWithJQuery("HM_Customer", {
@@ -3408,7 +3408,7 @@ sap.ui.define([
                             }
                         });
 
-                        that.AD_onSearch();
+                        await that.AD_onSearch();
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
                         sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));
@@ -4183,10 +4183,10 @@ sap.ui.define([
                         CustomerID: CustData.CustomerID
                     }
                 })
-                    .then(() => {
+                    .then(async () => {
 
                         // Refresh models
-                        this.AD_onSearch();
+                        await this.AD_onSearch();
                         sap.m.MessageToast.show(this.i18nModel.getText("GST Details Saved Successfully"));
 
                         this.getView().getModel("VisibleModel").setProperty("/visible", false);

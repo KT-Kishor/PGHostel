@@ -940,8 +940,8 @@ sap.ui.define([
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
-
-
+                  
+               
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
                 
@@ -2679,7 +2679,7 @@ sap.ui.define([
             var Branchdata = data.filter((item) => {
                 return item.City === Scity
             })
-            // this.Branchlength = Branchdata.length
+            this.Branchlength = Branchdata.length
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -2692,7 +2692,7 @@ sap.ui.define([
                         flag: "true"
                     });
                     aBranchesData = response?.data || [];
-                    this.RoomCount = response?.HM_RoomCount || 0;
+                    // this.Branchlength = aBranchesData.length || 0;
                     if (sBranchCode || BranchName) {
                         this.Branchlength = aBranchesData.length
                     }
