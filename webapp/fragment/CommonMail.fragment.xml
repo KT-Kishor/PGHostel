@@ -136,7 +136,7 @@
                 id="SendMail_Button"
                 text="{i18n>tileFooter}"
                 tooltip="{i18n>tileFooter}"
-                type="Transparent"
+                class="myUnifiedBtn"
                 press="Mail_onSendEmail"
                 enabled="false"
             />
@@ -146,8 +146,8 @@
                 text="{i18n>close}"
                 tooltip="{i18n>close}"
                 width="80px"
+                class="myUnifiedBtn"
                 press="Mail_onPressClose"
-                type="Transparent"
             />
         </endButton>
     </Dialog>

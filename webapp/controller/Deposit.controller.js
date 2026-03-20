@@ -1323,22 +1323,18 @@ if (!isModeValid) {
         if (this._oDepositDialog) {
             this._oDepositDialog.close();
         }
-
         await this.onDepositSearch();
 
     } catch (err) {
-
         console.error("Error in onSaveDeposit:", err);
-
           MessageBox.error(
             err?.responseJSON?.message || err.message || "Failed to update deposit."
         );
-
     } finally {
-
         this.closeBusyDialog();
     }
 },
+
 onCancelDeposit:function(){
     this._oDepositDialog.close()
 }

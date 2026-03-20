@@ -20,7 +20,7 @@ sap.ui.define([
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
-
+                
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_Date", "CID_id_NavInvDate"]);
 
@@ -425,7 +425,11 @@ sap.ui.define([
                         oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
 
                     if (!bookingDetails && facilityArray.length === 0) {
-                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
+                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.",
+                            {
+                                styleClass: "myUnifiedBtn"
+                            }
+                        );
                         return;
                     }
 
@@ -1102,7 +1106,11 @@ sap.ui.define([
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
                         this.getBusyDialog()
-                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
+                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`,
+                            {
+                                styleClass: "myUnifiedBtn"
+                            }
+                        );
                         return false;
                     }
                 }

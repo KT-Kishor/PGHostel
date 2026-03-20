@@ -147,16 +147,15 @@
         <beginButton>
             <Button
                 text="Save"
-                type="Emphasized"
+                class="myUnifiedBtn"
                 press="onSaveDeposit"/>
         </beginButton>
 
         <endButton>
             <Button
                 text="Cancel"
+                class="myUnifiedBtn"
                 press="onCancelDeposit"/>
         </endButton>
-
     </Dialog>
-
 </core:FragmentDefinition>

@@ -221,7 +221,6 @@
                             tooltip="{i18n>addDeposit}"
                             press="onPressEditDeposit"
                             class="myUnifiedBtn"
-                            type="Emphasized"
                             
                         />
                         <Button
@@ -229,7 +228,6 @@
                             tooltip="{i18n>returnDeposit}"
                             press="onReturnDeposit"
                             class="myUnifiedBtn"
-                            type="Emphasized"
                             
                         />
 
