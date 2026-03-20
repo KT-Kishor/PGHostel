@@ -48,7 +48,7 @@
 				<ComboBox
 					id="RB_id_appname"
                     valueStateText="{i18n>enterappname}"
-					placeholder="Select Issue Type"
+					placeholder="Select issue type"
                     value="{RaiseBugModel>/AppName}"
                     change="onAppnamechanges"
                      items="{ApplicationName>/}">
@@ -63,7 +63,7 @@
 					rows="4"
                     liveChange="onBugdescriptionchnages"
                     valueStateText="{i18n>enterdetails}"
-					placeholder="Enter Bug Description"
+					placeholder="Enter bug description"
 					value="{RaiseBugModel>/BugDescription}"
 					maxLength="500"/>
 
@@ -74,7 +74,7 @@
                     liveChange="onBugRaisedby"
                     valueStateText="{i18n>enteryourname}"
 					value="{RaiseBugModel>/RaisedBy}"
-					placeholder="Enter Name"/>
+					placeholder="Enter name"/>
 
 				<!-- Email -->
 				<Label text="{i18n>contactemail}" required="true"/>
@@ -85,7 +85,7 @@
 					class="sapUiSmallMarginBottom"
                     valueStateText="{i18n>enteremailis}"
 					value="{RaiseBugModel>/Email}"
-					placeholder="Enter Email"/>
+					placeholder="Enter email"/>
 
 				 <MessageStrip
                     text=" Image files larger than 2 MB are not allowed."

@@ -4646,15 +4646,15 @@ sap.ui.define([
        this.closeBusyDialog()
 
         // ✅ SMART ERROR HANDLING
-        let errorMsg = this.i18nModel.getText("invalidCredentialsPleasetryagain");
+       MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
 
-        if (err?.responseJSON?.message) {
-            errorMsg = err.responseJSON.message;
-        } else if (err?.message) {
-            errorMsg = err.message;
-        }
+        // if (err?.responseJSON?.message) {
+        //     errorMsg = err.responseJSON.message;
+        // } else if (err?.message) {
+        //     errorMsg = err.message;
+        // }
 
-        MessageToast.show(errorMsg);
+        // MessageToast.show(errorMsg);
 
     } finally {
        this.closeBusyDialog()
@@ -5554,8 +5554,36 @@ sap.ui.define([
         },
         
         onDialogClose: function () {
-            this._oLoginAlertDialog.close()
-        },
+
+    const oEmail = sap.ui.core.Fragment.byId(
+        this.createId("LoginAlertDialog"),
+        "emailInput"
+    );
+
+    const oOTP = sap.ui.core.Fragment.byId(
+        this.createId("LoginAlertDialog"),
+        "otpInput"
+    );
+
+    // ✅ Clear Email
+    if (oEmail) {
+        oEmail.setValue("");
+        oEmail.setValueState("None");
+        oEmail.setValueStateText("");
+    }
+
+    // ✅ Clear OTP
+    if (oOTP) {
+        oOTP.setValue("");
+        oOTP.setValueState("None");
+        oOTP.setValueStateText("");
+    }
+
+    // ✅ Close Dialog
+    if (this._oLoginAlertDialog) {
+        this._oLoginAlertDialog.close();
+    }
+},
          onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const input = e.getSource();

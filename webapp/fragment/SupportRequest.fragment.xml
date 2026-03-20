@@ -38,7 +38,7 @@
 				<Input
 					id="SR_id_IssueName"
 					placeholder="{i18n>enterissuename}"
-                    valueStateText="Enter Issue Name"
+                    valueStateText="Enter issue name"
 					value="{SupportModel>/IssueName}"
                     liveChange="onIssuenamechanges"
 					maxLength="100"/>
@@ -48,7 +48,7 @@
 				<ComboBox
 					id="SR_id_IssueType"
                     valueStateText="{i18n>enterissuetype}"
-					placeholder="Select Issue Type"
+					placeholder="Select issue type"
                     value="{SupportModel>/IssueType}"
                     change="onissuetypechanges"
                      items="{SupportRequest>/}">
@@ -63,7 +63,7 @@
 					rows="4"
                     liveChange="ondescriptionchnages"
                     valueStateText="{i18n>enterdetails}"
-					placeholder="Enter Issue Description"
+					placeholder="Enter issue description"
 					value="{SupportModel>/IssueDescription}"
 					maxLength="500"/>
 
@@ -74,7 +74,7 @@
                     liveChange="onchangesRaisedby"
                     valueStateText="{i18n>enteryourname}"
 					value="{SupportModel>/RaisedBy}"
-					placeholder="Enter Name"/>
+					placeholder="Enter name"/>
 
 				<!-- Email -->
 				<Label text="{i18n>contactemail}" required="true"/>
@@ -84,7 +84,7 @@
 					type="Email"
                     valueStateText="{i18n>enteremailis}"
 					value="{SupportModel>/Email}"
-					placeholder="Enter Email"/>
+					placeholder="Enter email"/>
 
 				<!-- Upload Image (UNCHANGED) -->
 				<Label text="{i18n>addImage}" required="true"/>
