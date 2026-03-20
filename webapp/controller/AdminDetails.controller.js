@@ -1370,7 +1370,7 @@ sap.ui.define([
 
        onEditBooking: async function () {
 
-    this.applyCountryStateCityFilters();
+  this.applyCountryStateCityFilters();
 
     const oMobile = this.byId("CD_ID_idPhone");
     const oView = this.getView();
@@ -1387,7 +1387,7 @@ sap.ui.define([
         if (!this._oLoginAlertDialog) {
             this._oLoginAlertDialog = sap.ui.xmlfragment(
                 this.createId("LoginAlertDialog"),
-                "sap.ui.com.project1.fragment.SignInSignup",
+                "sap.ui.com.project1.fragment.AdminDetailsSignin",
                 this
             );
             oView.addDependent(this._oLoginAlertDialog);
@@ -4206,160 +4206,140 @@ sap.ui.define([
        
         // Signin section
 
-            onSignIn: async function () {
-     
-            var vm = this.getView().getModel("LoginViewModel");
-            
-             var oCustomerData = this.getView().getModel("CustomerData").getData();
-            const isOTP = vm.getProperty("/loginMode") === "otp";
-            var oFragment = this._oLoginAlertDialog; // Correct reference to fragment dialog
+ onSignIn: async function () {
 
-            // fragment controls (use safe lookup)
-            const ctrlEmailId = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
-            const ctrlPassword = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signinPassword");
-            const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
+    var oView = this.getView();
+    var vm = oView.getModel("LoginViewModel");
+    var oCustomerData = oView.getModel("CustomerData").getData();
+    var oFragment = this._oLoginAlertDialog;
 
-            const sOTP = ctrlOTP && ctrlOTP.getValue ? ctrlOTP.getValue().trim() : "";
+    const isOTP = true; // since you only use OTP now
 
-            // --- VALIDATION ---
-            // Always validate UserID and UserName
-            if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
-                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                return;
-            }
+    // Fragment controls (IMPORTANT: fragment ID must match load ID)
+    const ctrlEmailId = sap.ui.core.Fragment.byId(
+        this.createId("LoginAlertDialog"),
+        "emailInput"
+    );
 
-            // Validate password only when in password login mode
-            if (!isOTP) {
-                if (!utils._LCvalidatePassword(ctrlPassword)) {
-                    // _LCvalidatePassword should set value state on ctrlPassword on failure,
-                    // but we'll set explicitly to be safe
-                    if (ctrlPassword) {
-                        ctrlPassword.setValueState("Error");
-                        ctrlPassword.setValueStateText(this.i18nModel.getText("enterValidPassword"));
-                    }
-                    MessageToast.show(this.i18nModel.getText("enterValidPassword"));
-                    return;
-                } else if (ctrlPassword) {
-                    ctrlPassword.setValueState("None");
-                }
-            }
+    const ctrlOTP = sap.ui.core.Fragment.byId(
+        this.createId("LoginAlertDialog"),
+        "otpInput"
+    );
 
-            try {
-                this.getBusyDialog()
-                let payload, oResponse;
+    const sEmail = ctrlEmailId?.getValue()?.trim();
+    const sOTP = ctrlOTP?.getValue()?.trim();
 
-                if (isOTP) {
-                    // OTP-specific flow (keeps your original checks)
-                    const vm = this.getView().getModel("LoginViewModel");
-                    const showOTPField = vm.getProperty("/showOTPField");
-                    const isOtpEntered = vm.getProperty("/isOtpEntered");
-                    // OTP control may not exist if not rendered — guard it
-                    const otpCtrl = ctrlOTP || { setValueState: function () { }, setValueStateText: function () { } };
+    // ================= EMAIL VALIDATION =================
+    if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
+        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+        return;
+    } else {
+        ctrlEmailId.setValueState("None");
+    }
 
-                    // 1️⃣ OTP has NOT been generated
-                    if (!showOTPField) {
-                        MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
-                        return;
-                    }
+    // ================= OTP VALIDATION =================
+    if (!sOTP) {
+        ctrlOTP.setValueState("Error");
+        ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+        return;
+    }
 
-                    // 2️⃣ OTP was generated but user has not typed anything
-                    if (!isOtpEntered) {
-                        otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                        return;
-                    }
+    if (!/^\d{6}$/.test(sOTP)) {
+        ctrlOTP.setValueState("Error");
+        ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+        return;
+    }
 
-                    // 3️⃣ Validate OTP format strictly
-                    if (!/^\d{6}$/.test(sOTP)) {
-                        otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                        return;
-                    }
+    ctrlOTP.setValueState("None");
 
-                    // 4️⃣ Backend verification
-                    const isValid = await this._verifyOTPWithBackend(sOTP);
-                    if (!isValid) {
-                        MessageToast.show(this.i18nModel.getText("incorrectOTP"));
-                        return;
-                    }
+    // ================= OPEN BUSY DIALOG =================
+    var oBusy = this.getBusyDialog();
+    if (oBusy) {
+        oBusy.open();
+    }
 
-                    // 5️⃣ Construct payload and continue login
-                    payload = { CustomerID: oCustomerData.CustomerID, OTP: sOTP };
-                    oResponse = await this.ajaxReadWithJQuery("HM_Customer", payload);
-                    var oView = this.getView();
-var model = oView.getModel("Bookingmodel");
-var data = oView.getModel("CustomerData").getData();
+    try {
 
-// Show booking UI
-oView.getModel("VisibleModel").setProperty("/visible", true);
-model.setProperty("/BedTypeName", data.BedType);
-model.setProperty("/CouponCode", data.CouponCode);
-model.setProperty("/UnitText", data.PaymentType);
-model.setProperty("/StartDate", data.StartDate);
-model.setProperty("/EndDate", data.EndDate);
-model.setProperty("/CustomerName", data.CustomerName);
-model.setProperty("/DateOfBirth", data.DateOfBirth);
-model.setProperty("/Gender", data.Gender);
-model.setProperty("/CustomerEmail", data.CustomerEmail);
-model.setProperty("/Country", data.Country);
-model.setProperty("/State", data.State);
-model.setProperty("/City", data.City);
-model.setProperty("/STDCode", data.STDCode);
-model.setProperty("/MobileNo", data.MobileNo);
-model.setProperty("/Salutation", data.Salutation);
-model.setProperty("/Address", data.Address);
-            if (data.PaymentType === "Per Month") {
-                model.setProperty("/UnitText", "monthly")
-            } else if (data.PaymentType === "Per Day") {
-                model.setProperty("/UnitText", "daily")
-            } else if (data.PaymentType === "Per Year") {
-                model.setProperty("/UnitText", "yearly")
-            }
+        // 1️⃣ Verify OTP
+        const isValid = await this._verifyOTPWithBackend(sOTP);
 
-            if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
-                this.byId("idMonthYearSelect").setVisible(false)
-            }
+        if (!isValid) {
+            MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+            return;
+        }
 
-            // Set Duration for XML binding
-            if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
-                model.setProperty("/DurationUnit", data.Duration);
-                this.byId("idMonthYearSelect").setVisible(true)
+        // 2️⃣ Backend call
+        const payload = {
+            CustomerID: oCustomerData.CustomerID,
+            OTP: sOTP
+        };
 
-            } else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
-                model.setProperty("/DurationUnit", data.Duration);
-                this.byId("idMonthYearSelect").setVisible(true)
+        await this.ajaxReadWithJQuery("HM_Customer", payload);
 
-            }
- 
-            vm.setProperty("/showOTPField", false);  // Hide OTP field
- vm.setProperty("/otpButtonText", "Send OTP");
+        // ================= SUCCESS FLOW =================
+        var model = oView.getModel("Bookingmodel");
+        var data = oCustomerData;
 
+        oView.getModel("VisibleModel").setProperty("/visible", true);
 
-// Clear fields
-const oEmail = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
-const oOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
-oEmail?.setValue("");
-oOTP?.setValue("");
+        model.setProperty("/BedTypeName", data.BedType);
+        model.setProperty("/CouponCode", data.CouponCode);
+        model.setProperty("/UnitText", data.PaymentType);
+        model.setProperty("/StartDate", data.StartDate);
+        model.setProperty("/EndDate", data.EndDate);
+        model.setProperty("/CustomerName", data.CustomerName);
+        model.setProperty("/DateOfBirth", data.DateOfBirth);
+        model.setProperty("/Gender", data.Gender);
+        model.setProperty("/CustomerEmail", data.CustomerEmail);
+        model.setProperty("/Country", data.Country);
+        model.setProperty("/State", data.State);
+        model.setProperty("/City", data.City);
+        model.setProperty("/STDCode", data.STDCode);
+        model.setProperty("/MobileNo", data.MobileNo);
+        model.setProperty("/Salutation", data.Salutation);
+        model.setProperty("/Address", data.Address);
 
-// Clear value states
-oEmail?.setValueState("None");
-oOTP?.setValueState("None");
-MessageToast.show("Login Successful");
-if (oFragment) {
-    oFragment.close();
-}
-                } else {
-                oHostelModel.refresh(true);
-                }
+        // Payment Type Logic
+        if (data.PaymentType === "Per Month") {
+            model.setProperty("/UnitText", "monthly");
+        } else if (data.PaymentType === "Per Day") {
+            model.setProperty("/UnitText", "daily");
+        } else if (data.PaymentType === "Per Year") {
+            model.setProperty("/UnitText", "yearly");
+        }
 
-            } catch (err) {
-                MessageToast.show(err.message || "Invalid Credentials, Please try again");
-            } finally {
-                this.closeBusyDialog()
-            }
-        },
+        if (data.PaymentType !== "Per Day") {
+            this.byId("idMonthYearSelect").setVisible(false);
+        }
+
+        if (data.PaymentType === "Per Month" || data.PaymentType === "Per Year") {
+            model.setProperty("/DurationUnit", data.Duration);
+            this.byId("idMonthYearSelect").setVisible(true);
+        }
+
+        // ================= RESET =================
+        ctrlEmailId?.setValue("");
+        ctrlOTP?.setValue("");
+
+        ctrlEmailId?.setValueState("None");
+        ctrlOTP?.setValueState("None");
+
+        MessageToast.show("Login Successful");
+
+        if (oFragment) {
+            oFragment.close();
+        }
+
+    } catch (err) {
+        MessageToast.show(err.message || "Invalid Credentials, Please try again");
+    } finally {
+        if (oBusy) {
+            oBusy.close();
+        }
+    }
+},
          onSubmitNewPassword: async function () {
             const oNew = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             const oConf = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass");
@@ -4579,63 +4559,93 @@ if (oFragment) {
             }
         },
 
-        onPressOTP: async function () {
-            const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInEmail");
-            var oCustomerData = this.getView().getModel("CustomerData").getData();
+ onPressOTP: async function () {
 
-            const sUserId = oEmailIDCtrl.getValue().trim();
-            // const sUserName = oUserNameCtrl.getValue().trim();
+    const oEmailIDCtrl = sap.ui.core.Fragment.byId(
+        this.createId("LoginAlertDialog"),
+        "emailInput"
+    );
 
-            // Validate inputs
-            if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID")) {
-                MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
-                return;
-            }
+    var oCustomerData = this.getView().getModel("CustomerData").getData();
+    const sUserId = oEmailIDCtrl?.getValue()?.trim();
 
-            const payload = {
-                CustomerID: oCustomerData.CustomerID,
-                CustomerEmail: sUserId,
-                Type: "OTP"
+    // ================= VALIDATION =================
+    if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID")) {
+        MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
+        return;
+    }
+
+    const payload = {
+        CustomerID: oCustomerData.CustomerID,
+        CustomerEmail: sUserId,
+        Type: "OTP"
+    };
+
+    // ✅ Proper BusyDialog
+    
+ this.getBusyDialog()
+    try {
+
+        const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
+
+        // ================= RESPONSE SAFETY =================
+        if (!oResp) {
+            throw new Error("No response from server");
+        }
+
+        // ================= SUCCESS =================
+        if (oResp.success === true) {
+
+            MessageToast.show(
+                oResp.message || this.i18nModel.getText("oTPSentCheckyourEmail")
+            );
+
+            this._oResetUser = {
+                EmailID: sUserId
             };
 
-            this.getBusyDialog()
+            const oOtpCtrl = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "otpInput"
+            );
 
-            try {
-                const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
-
-                if (oResp?.success) {
-
-                    MessageToast.show(this.i18nModel.getText("oTPSentCheckyourEmail"));
-
-
-                    this._oResetUser = { EmailID: sUserId, };
-
-                    const vm = this.getView().getModel("LoginViewModel");
-
-                    // Show OTP input
-                    vm.setProperty("/showOTPField", true);
-
-                    const oOtpCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signInOTP");
-                    oOtpCtrl.setEnabled(true);
-                    oOtpCtrl.setValue("");
-                    oOtpCtrl.setValueState("None");
-                    oOtpCtrl.setValueStateText("");
-                    oOtpCtrl.focus();
-
-                    // 🔥 THIS WAS MISSING
-                    this._startOtpTimer();     // ✅ start 20 sec resend cooldown
-
-                }
-                else {
-                    MessageToast.show(this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
-                }
-
-            } catch (err) {
-                MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
-            } finally {
-                this.closeBusyDialog()
+            if (oOtpCtrl) {
+                oOtpCtrl.setValue("");
+                oOtpCtrl.setValueState("None");
+                oOtpCtrl.setValueStateText("");
+                oOtpCtrl.focus();
             }
-        },
+
+            this._startOtpTimer?.();
+
+        } else {
+            // ✅ SHOW BACKEND MESSAGE
+             this.closeBusyDialog()
+            MessageToast.show(
+                oResp.message || this.i18nModel.getText("usernotFoundUnabletoSendOTP")
+            );
+        }
+
+    } catch (err) {
+
+       this.closeBusyDialog()
+
+        // ✅ SMART ERROR HANDLING
+        let errorMsg = this.i18nModel.getText("invalidCredentialsPleasetryagain");
+
+        if (err?.responseJSON?.message) {
+            errorMsg = err.responseJSON.message;
+        } else if (err?.message) {
+            errorMsg = err.message;
+        }
+
+        MessageToast.show(errorMsg);
+
+    } finally {
+       this.closeBusyDialog()
+    }
+},
+  
 
         onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
