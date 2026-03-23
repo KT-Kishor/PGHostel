@@ -4,11 +4,11 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "../utils/validation",
-     "sap/m/MessageToast",
-     "sap/ui/model/FilterOperator",
-      "sap/ui/model/Filter",
+    "sap/m/MessageToast",
+    "sap/ui/model/FilterOperator",
+    "sap/ui/model/Filter",
 
-], function (BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast,FilterOperator,Filter) {
+], function (BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast, FilterOperator, Filter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.AdminDetails", {
         Formatter: Formatter,
@@ -17,7 +17,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
-            this.call=false
+            this.call = false
             this._fromRoute = oEvent.getParameter("arguments").from;
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -71,7 +71,7 @@ sap.ui.define([
                 BedTypeName: ""
             });
             this.getView().setModel(model, "Bookingmodel");
-             this.flag=false
+            this.flag = false
 
             var model = new JSONModel({
                 visible: false,
@@ -110,12 +110,12 @@ sap.ui.define([
                     VisibleModel.setProperty("/showCancelButton", false);
                 }
             }
-              this.getView().setModel(new JSONModel({
+            this.getView().setModel(new JSONModel({
                 isOtpSelected: false,
                 isPasswordSelected: true,
                 authFlow: "signin",  // [signin, forgot, otp, reset]
                 isOtpBoxVisible: false,
-                isOTPAllowed:false
+                isOTPAllowed: false
             }), "LoginViewModel");
 
             const vm = this.getView().getModel("LoginViewModel");
@@ -129,7 +129,7 @@ sap.ui.define([
             vm.setProperty("/canResendOTP", true);
             vm.setProperty("/otpTimer", 0);
             vm.setProperty("/otpButtonText", "Send OTP");
-              this.getView().setModel(new JSONModel({
+            this.getView().setModel(new JSONModel({
                 fullname: "",
                 Email: "",
                 Mobileno: "",
@@ -137,7 +137,7 @@ sap.ui.define([
                 comfirmpass: "",
                 minDate: new Date(2000, 0, 1)
             }), "LoginMode");
-         
+
         },
 
         valuestate: function () {
@@ -1368,127 +1368,127 @@ sap.ui.define([
             }
         },
 
-       onEditBooking: async function () {
+        onEditBooking: async function () {
 
-  this.applyCountryStateCityFilters();
+            this.applyCountryStateCityFilters();
 
-    const oMobile = this.byId("CD_ID_idPhone");
-    const oView = this.getView();
+            const oMobile = this.byId("CD_ID_idPhone");
+            const oView = this.getView();
 
-    const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-    const oUser = oLoginModel ? oLoginModel.getData() : null;
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            const oUser = oLoginModel ? oLoginModel.getData() : null;
 
-    // ❗ User NOT logged in
-     if (!(oUser?.UserID || oUser?.EmployeeID)) {
+            // ❗ User NOT logged in
+            if (!(oUser?.UserID || oUser?.EmployeeID)) {
 
-        // remember action to resume after login
-        this._pendingAction = "EditBooking";
+                // remember action to resume after login
+                this._pendingAction = "EditBooking";
 
-        if (!this._oLoginAlertDialog) {
-            this._oLoginAlertDialog = sap.ui.xmlfragment(
-                this.createId("LoginAlertDialog"),
-                "sap.ui.com.project1.fragment.AdminDetailsSignin",
-                this
-            );
-            oView.addDependent(this._oLoginAlertDialog);
-        }
+                if (!this._oLoginAlertDialog) {
+                    this._oLoginAlertDialog = sap.ui.xmlfragment(
+                        this.createId("LoginAlertDialog"),
+                        "sap.ui.com.project1.fragment.AdminDetailsSignin",
+                        this
+                    );
+                    oView.addDependent(this._oLoginAlertDialog);
+                }
 
-        this._oLoginAlertDialog.open();
-        return;
-    }
+                this._oLoginAlertDialog.open();
+                return;
+            }
 
-    // ------------------------------
-    // USER IS LOGGED IN → CONTINUE
-    // ------------------------------
+            // ------------------------------
+            // USER IS LOGGED IN → CONTINUE
+            // ------------------------------
 
-    this.getBusyDialog();
+            this.getBusyDialog();
 
-    const response = await this.ajaxReadWithJQuery("HM_Customer", "");
-    this.closeBusyDialog();
+            const response = await this.ajaxReadWithJQuery("HM_Customer", "");
+            this.closeBusyDialog();
 
-    const oCustomer = response?.Customers || response?.value?.[0] || [];
+            const oCustomer = response?.Customers || response?.value?.[0] || [];
 
-    this.getView().getModel("VisibleModel").setProperty("/visible", true);
+            this.getView().getModel("VisibleModel").setProperty("/visible", true);
 
-    var data = this.getView().getModel("CustomerData").getData();
-    var model = this.getView().getModel("Bookingmodel");
-    var aAvailableBeds = this.getView().getModel("Availablebeds").getData();
+            var data = this.getView().getModel("CustomerData").getData();
+            var model = this.getView().getModel("Bookingmodel");
+            var aAvailableBeds = this.getView().getModel("Availablebeds").getData();
 
-    if (data.STDCode === "+91") {
-        oMobile.setMaxLength(10);
-    } else {
-        oMobile.setMaxLength(18);
-    }
+            if (data.STDCode === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
 
-    var filteredBeds = aAvailableBeds.filter(function (bed) {
+            var filteredBeds = aAvailableBeds.filter(function (bed) {
 
-        var assignedCount = oCustomer.filter(function (cust) {
-            return cust.BranchCode === bed.BranchCode &&
-                cust.BedType === bed.BedTypeName &&
-                cust.Status === "Assigned";
-        }).length;
+                var assignedCount = oCustomer.filter(function (cust) {
+                    return cust.BranchCode === bed.BranchCode &&
+                        cust.BedType === bed.BedTypeName &&
+                        cust.Status === "Assigned";
+                }).length;
 
-        var customerHasThisBed = oCustomer.some(function (cust) {
-            return cust.CustomerID === data.CustomerID &&
-                cust.BedType === bed.BedTypeName &&
-                (cust.Status === "Assigned" || cust.Status === "New");
-        });
+                var customerHasThisBed = oCustomer.some(function (cust) {
+                    return cust.CustomerID === data.CustomerID &&
+                        cust.BedType === bed.BedTypeName &&
+                        (cust.Status === "Assigned" || cust.Status === "New");
+                });
 
-        if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
-            return false;
-        }
+                if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
+                    return false;
+                }
 
-        return true;
-    });
+                return true;
+            });
 
-    this.getView().getModel("Availablebeds").setData(filteredBeds);
+            this.getView().getModel("Availablebeds").setData(filteredBeds);
 
-    if (data.CouponCode) {
-        this.Coupon();
-    } else {
-        this.getView().byId("couponInput").setShowValueHelp(false);
-    }
+            if (data.CouponCode) {
+                this.Coupon();
+            } else {
+                this.getView().byId("couponInput").setShowValueHelp(false);
+            }
 
-    model.setProperty("/BedTypeName", data.BedType);
-    model.setProperty("/CouponCode", data.CouponCode);
-    model.setProperty("/UnitText", data.PaymentType);
-    model.setProperty("/StartDate", data.StartDate);
-    model.setProperty("/EndDate", data.EndDate);
-    model.setProperty("/CustomerName", data.CustomerName);
-    model.setProperty("/DateOfBirth", data.DateOfBirth);
-    model.setProperty("/Gender", data.Gender);
-    model.setProperty("/CustomerEmail", data.CustomerEmail);
-    model.setProperty("/Country", data.Country);
-    model.setProperty("/State", data.State);
-    model.setProperty("/City", data.City);
-    model.setProperty("/STDCode", data.STDCode);
-    model.setProperty("/MobileNo", data.MobileNo);
-    model.setProperty("/Salutation", data.Salutation);
-    model.setProperty("/Address", data.Address);
+            model.setProperty("/BedTypeName", data.BedType);
+            model.setProperty("/CouponCode", data.CouponCode);
+            model.setProperty("/UnitText", data.PaymentType);
+            model.setProperty("/StartDate", data.StartDate);
+            model.setProperty("/EndDate", data.EndDate);
+            model.setProperty("/CustomerName", data.CustomerName);
+            model.setProperty("/DateOfBirth", data.DateOfBirth);
+            model.setProperty("/Gender", data.Gender);
+            model.setProperty("/CustomerEmail", data.CustomerEmail);
+            model.setProperty("/Country", data.Country);
+            model.setProperty("/State", data.State);
+            model.setProperty("/City", data.City);
+            model.setProperty("/STDCode", data.STDCode);
+            model.setProperty("/MobileNo", data.MobileNo);
+            model.setProperty("/Salutation", data.Salutation);
+            model.setProperty("/Address", data.Address);
 
-    if (data.PaymentType === "Per Month") {
-        model.setProperty("/UnitText", "monthly");
-    } else if (data.PaymentType === "Per Day") {
-        model.setProperty("/UnitText", "daily");
-    } else if (data.PaymentType === "Per Year") {
-        model.setProperty("/UnitText", "yearly");
-    }
+            if (data.PaymentType === "Per Month") {
+                model.setProperty("/UnitText", "monthly");
+            } else if (data.PaymentType === "Per Day") {
+                model.setProperty("/UnitText", "daily");
+            } else if (data.PaymentType === "Per Year") {
+                model.setProperty("/UnitText", "yearly");
+            }
 
-    if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
-        this.byId("idMonthYearSelect").setVisible(false);
-    }
+            if (data.PaymentType !== "daily" || data.PaymentType !== "Per Day") {
+                this.byId("idMonthYearSelect").setVisible(false);
+            }
 
-    if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
-        model.setProperty("/DurationUnit", data.Duration);
-        this.byId("idMonthYearSelect").setVisible(true);
-    } 
-    else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
-        model.setProperty("/DurationUnit", data.Duration);
-        this.byId("idMonthYearSelect").setVisible(true);
-    }
+            if (data.PaymentType === "monthly" || data.PaymentType === "Per Month") {
+                model.setProperty("/DurationUnit", data.Duration);
+                this.byId("idMonthYearSelect").setVisible(true);
+            }
+            else if (data.PaymentType === "yearly" || data.PaymentType === "Per Year") {
+                model.setProperty("/DurationUnit", data.Duration);
+                this.byId("idMonthYearSelect").setVisible(true);
+            }
 
-    this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
-},
+            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+        },
 
         onBookingEditDateChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -2701,11 +2701,11 @@ sap.ui.define([
         },
         onPaymentTypeSelect: function (oEvent) {
 
-          this.index = oEvent.getSource().getSelectedIndex();
+            this.index = oEvent.getSource().getSelectedIndex();
 
-            const isPayOnCheckIn =  this.index === 0;
-            const isUPI =  this.index === 1;
-            const isCard =  this.index === 2;
+            const isPayOnCheckIn = this.index === 0;
+            const isUPI = this.index === 1;
+            const isCard = this.index === 2;
 
             this._togglePaymentSections(isUPI, isCard, isPayOnCheckIn);
 
@@ -2777,16 +2777,16 @@ sap.ui.define([
                             firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
 
                         } else if (paymentType === "Per Month") {
-                            if(item.UnitText === "Per Month") {
-                            let monthlyAmount = totalAmount;
-                            firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
-                            }else if(item.UnitText === "Per Day"){
+                            if (item.UnitText === "Per Month") {
+                                let monthlyAmount = totalAmount;
+                                firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
+                            } else if (item.UnitText === "Per Day") {
                                 firstMonthAmount = Number(item.Price) * overlapDays;
-                            } else{
+                            } else {
                                 firstMonthAmount = Number(item.Price) * overlapDays * item.TotalHour;
 
                             }
-                        }else if(paymentType === "Per Day") {
+                        } else if (paymentType === "Per Day") {
                             firstMonthAmount = (totalAmount / totalCycleDays) * overlapDays;
                         }
 
@@ -2798,9 +2798,9 @@ sap.ui.define([
                 }, 0);
                 let baseAmount;
                 // if(CustomerData.PaymentPaid ==="0.00"){
-                  baseAmount =  Number(CustomerData.PaymentPaid || 0)==="0.00" ?
-                   (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration)) - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount) :
-                      (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration))
+                baseAmount = Number(CustomerData.PaymentPaid || 0) === "0.00" ?
+                    (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration)) - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount) :
+                    (facilityAmount + (CustomerData.RentPrice / CustomerData.Duration))
                 // }else{
                 //   baseAmount = facilityAmount;
                 // }
@@ -2821,8 +2821,8 @@ sap.ui.define([
                 }
 
                 let Gst = CGST + SGST + IGST;
-                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst +baseAmount - Number(CustomerData.PaymentPaid || 0)  - Number(CustomerData.Discount) : Gst + baseAmount  - Number(CustomerData.Discount)  || 0 
-                
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst + baseAmount - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount) : Gst + baseAmount - Number(CustomerData.Discount) || 0
+
             }
 
             oHostelModel.setProperty(
@@ -2851,7 +2851,7 @@ sap.ui.define([
                 "/PaymentType",
                 isUPI ? "UPI" : "CARD"
             );
-              oHostelModel.setProperty(
+            oHostelModel.setProperty(
                 "/PaymentType",
                 isUPI ? "UPI" : "CARD"
             );
@@ -2944,7 +2944,7 @@ sap.ui.define([
 
             const facilityItems = CustomerData.AllSelectedFacilities || [];
 
-                 var paymentMap = {
+            var paymentMap = {
                 "monthly": "Per Month",
                 "yearly": "Per Year",
                 "daily": "Per Day"
@@ -2953,7 +2953,7 @@ sap.ui.define([
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
 
-            if(paymentMap[unit] === "Per Day"){
+            if (paymentMap[unit] === "Per Day") {
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Year")) {
                     sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.",
                         {
@@ -2963,7 +2963,7 @@ sap.ui.define([
                     return; // ⛔ stop save
                 }
             }
-            if(paymentMap[unit] === "Per Month"){
+            if (paymentMap[unit] === "Per Month") {
                 if (facilityItems.some(item => item.UnitText === "Per Year")) {
                     sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.",
                         {
@@ -2973,7 +2973,7 @@ sap.ui.define([
                     return; // ⛔ stop save
                 }
             }
-            if(paymentMap[unit] === "Per Year"){
+            if (paymentMap[unit] === "Per Year") {
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Day")) {
                     sap.m.MessageBox.error("You cannot select facilities with Monthly or Daily payment plans when your booking is on a Per Year payment plan.",
                         {
@@ -3036,7 +3036,7 @@ sap.ui.define([
             }
 
             // Map UnitText to desired PaymentType
-       
+
 
             // Normalize UnitText: trim and lowercase
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
@@ -3058,7 +3058,7 @@ sap.ui.define([
                     break;
                 }
             }
-            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd && this.call===false) {
+            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd && this.call === false) {
 
                 var that = this;
 
@@ -3071,93 +3071,132 @@ sap.ui.define([
                         styleClass: "myUnifiedBtn",
 
                         onClose: function (sAction) {
-                            if (sAction === "Maybe Later") {
-                                that.call=true
-                                that.onSaveBooking()
-                            }else{
-                                that.call=false
-                                 that.PP_Dialog.close();
+                            if (sAction === "Extend Now") {
 
+                                const bookingEndDate = that._parseDate(Bookingdata.EndDate);
+                                let totalFacilityPrice = 0;
+
+                                facilityItems.forEach(item => {
+
+                                    const startDate = that._parseDate(item.StartDate);
+
+                                    item.EndDate = Bookingdata.EndDate;
+
+                                    let diffTime = bookingEndDate - startDate;
+                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                                    let unit = item.UnitText?.toLowerCase();
+
+                                    let price = Number(item.Price || 0);
+                                    let total = 0;
+
+                                    if (unit === "per day") {
+                                        total = diffDays * price;
+                                    } else if (unit === "per month") {
+                                        let months = Math.ceil(diffDays / 30);
+                                        total = months * price;
+                                    } else if (unit === "per year") {
+                                        let years = Math.ceil(diffDays / 365);
+                                        total = years * price;
+                                    }
+
+                                    item.TotalAmount = total;
+                                    totalFacilityPrice += total;
+                                });
+
+                                CustomerData.TotalFacilityPrice = totalFacilityPrice;
+
+                                CustomerData.GrandTotal =
+                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+
+                                that.getView().getModel("CustomerData").refresh(true);
+
+                                that.call = false;
+
+                                that.onSaveBooking();
+
+                            } else {
+                                that.call = true;
+                                that.onSaveBooking();
                             }
-
                         }
                     }
                 );
 
                 return;
             }
-            if(LoginModel.Role === "Customer" || this._fromRoute==="ManageProfile"){
-            if (paymentMap[unit] === "Per Day"
-                && (CustomerData.Duration * Number(CustomerData.RentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) 
-                && this.flag!==true && CustomerData.DueAmount > 0) {
-                if (!this.PP_Dialog) {
-                    if (this.PP_Dialog) {
-                        this.PP_Dialog.destroy();
-                        this.PP_Dialog = null;
+            if (LoginModel.Role === "Customer" || this._fromRoute === "ManageProfile") {
+                if (paymentMap[unit] === "Per Day"
+                    && (CustomerData.Duration * Number(CustomerData.RentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice)
+                    && this.flag !== true && CustomerData.DueAmount > 0) {
+                    if (!this.PP_Dialog) {
+                        if (this.PP_Dialog) {
+                            this.PP_Dialog.destroy();
+                            this.PP_Dialog = null;
+                        }
+                        var oView = this.getView();
+                        this.PP_Dialog = sap.ui.xmlfragment(
+                            "sap.ui.com.project1.fragment.Payment_Edit",
+                            this
+                        );
+                        oView.addDependent(this.PP_Dialog);
                     }
-                    var oView = this.getView();
-                    this.PP_Dialog = sap.ui.xmlfragment(
-                        "sap.ui.com.project1.fragment.Payment_Edit",
-                        this
-                    );
-                    oView.addDependent(this.PP_Dialog);
+
+                    this.PP_Dialog.open();
+
+                    // set grand total
+                    oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
+
+                    // default payment UI state
+                    setTimeout(() => {
+                        const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+                        if (oGroup) {
+                            oGroup.setSelectedIndex(0); // Pay On CheckIn
+
+                            this.onPaymentTypeSelect({
+                                getSource: () => oGroup
+                            });
+                        }
+                    }, 100);
+                    return;
+                } else if (
+                    (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.RentPrice) > this.RentPrice)
+                    && this.flag !== true && CustomerData.DueAmount > 0
+                ) {
+                    if (Number(CustomerData.RentPrice) > this.RentPrice && CustomerData.TotalFacilityPrice === this.FacilityPrice && CustomerData.PaymentPaid !== "0.00") {
+
+                    } else {
+                        if (!this.PP_Dialog) {
+                            var oView = this.getView();
+                            this.PP_Dialog = sap.ui.xmlfragment(
+                                "sap.ui.com.project1.fragment.Payment_Edit",
+                                this
+                            );
+                            oView.addDependent(this.PP_Dialog);
+                        }
+
+                        this.PP_Dialog.open();
+
+                        // set grand total
+                        oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
+
+                        // default payment UI state
+                        setTimeout(() => {
+                            const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+                            if (oGroup) {
+                                oGroup.setSelectedIndex(0); // Pay On CheckIn
+
+                                this.onPaymentTypeSelect({
+                                    getSource: () => oGroup
+                                });
+                            }
+                        }, 100);
+                        return;
+                    }
                 }
-
-                this.PP_Dialog.open();
-
-                // set grand total
-                oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
-
-                // default payment UI state
-                setTimeout(() => {
-                    const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
-
-                    if (oGroup) {
-                        oGroup.setSelectedIndex(0); // Pay On CheckIn
-
-                        this.onPaymentTypeSelect({
-                            getSource: () => oGroup
-                        });
-                    }
-                }, 100);
-                return;
-            } else if (
-                (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.RentPrice) > this.RentPrice)  
-                && this.flag!==true && CustomerData.DueAmount > 0
-            ) {
-                 if(Number(CustomerData.RentPrice) > this.RentPrice && CustomerData.TotalFacilityPrice === this.FacilityPrice && CustomerData.PaymentPaid !== "0.00"){
-
-                }else{
-                if (!this.PP_Dialog) {
-                    var oView = this.getView();
-                    this.PP_Dialog = sap.ui.xmlfragment(
-                        "sap.ui.com.project1.fragment.Payment_Edit",
-                        this
-                    );
-                    oView.addDependent(this.PP_Dialog);
-                }
-
-                this.PP_Dialog.open();
-
-                // set grand total
-                oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
-
-                // default payment UI state
-                setTimeout(() => {
-                    const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
-
-                    if (oGroup) {
-                        oGroup.setSelectedIndex(0); // Pay On CheckIn
-
-                        this.onPaymentTypeSelect({
-                            getSource: () => oGroup
-                        });
-                    }
-                }, 100);
-                return;
             }
-        }
-        }
 
             var Payload = {
                 "CustomerName": Bookingdata.CustomerName,
@@ -3205,7 +3244,7 @@ sap.ui.define([
                         EndTime: item.EndTime,
                         BasicFacilityPrice: item.Price,
                         CouponCode: item.CouponCode || "",
-                        CouponDiscount: item.CouponDiscount || "0.00" 
+                        CouponDiscount: item.CouponDiscount || "0.00"
                     };
                 }),
                 "Documents": CustomerData.Documents.map(item => {
@@ -3222,28 +3261,28 @@ sap.ui.define([
             };
 
 
-         
-            if(this.flag===true && this.index !== 0){
-            var PaymentPayload = {
-                "BookingID": CustomerData.BookingID,
-                "CustomerName": Bookingdata.CustomerName,
-                "Date": new Date().toISOString().split('T')[0],
-                "Amount":oHostelModel.getProperty("/PerMonthNoPerson"),
-                "PaymentType": oHostelModel.getProperty("/PaymentType"), // fallback to original if mapping not found
-                "BankTransactionID": sap.ui.getCore().byId("idTransactionID").getValue() || "",
-                "CustomerID": CustomerData.CustomerID,
-                "Currency": CustomerData.Currency || "INR",
-                "BranchCode": CustomerData.BranchCode || "",
-                "BranchName": CustomerData.BranchName || "",
 
+            if (this.flag === true && this.index !== 0) {
+                var PaymentPayload = {
+                    "BookingID": CustomerData.BookingID,
+                    "CustomerName": Bookingdata.CustomerName,
+                    "Date": new Date().toISOString().split('T')[0],
+                    "Amount": oHostelModel.getProperty("/PerMonthNoPerson"),
+                    "PaymentType": oHostelModel.getProperty("/PaymentType"), // fallback to original if mapping not found
+                    "BankTransactionID": sap.ui.getCore().byId("idTransactionID").getValue() || "",
+                    "CustomerID": CustomerData.CustomerID,
+                    "Currency": CustomerData.Currency || "INR",
+                    "BranchCode": CustomerData.BranchCode || "",
+                    "BranchName": CustomerData.BranchName || "",
+
+                }
+                this.getBusyDialog()
+
+                this.ajaxCreateWithJQuery("HM_PaymentDetail", {
+                    data: PaymentPayload,
+
+                })
             }
-            this.getBusyDialog()
-
-             this.ajaxCreateWithJQuery("HM_PaymentDetail", {
-                data: PaymentPayload,
-               
-            })
-        }
             // Send payload
             this.getBusyDialog()
 
@@ -3256,12 +3295,12 @@ sap.ui.define([
                 .then(async () => {
 
                     // Refresh models
-                  await  this.AD_onSearch();
-                     if (this.PP_Dialog) {
-                       this.PP_Dialog.close();
-                           }
-                           this.flag=false
-                    
+                    await this.AD_onSearch();
+                    if (this.PP_Dialog) {
+                        this.PP_Dialog.close();
+                    }
+                    this.flag = false
+
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
@@ -3270,14 +3309,14 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
                     console.error(err);
                 });
-             
+
         },
-           onTransactionIDChange: function (oEvent) {
+        onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
-        onSubmitPress:function(){
+        onSubmitPress: function () {
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const paymentType = oPaymentModel.getProperty("/PaymentType");
             const isPayOnCheckIn = paymentType === "PayOnCheckIn";
@@ -3293,16 +3332,16 @@ sap.ui.define([
                     return;
                 }
             }
-            this.flag=true
-             this.onSaveBooking();
+            this.flag = true
+            this.onSaveBooking();
 
         },
         onPaymentClose: function () {
-                this.flag=false
-                this.call=false
-             if (this.PP_Dialog) {
+            this.flag = false
+            this.call = false
+            if (this.PP_Dialog) {
                 this.PP_Dialog.close();
-             }
+            }
         },
         oneditsavebooking: function (Payload) {
             var CustomerData = this.getView().getModel("CustomerData").getData();
@@ -4218,144 +4257,144 @@ sap.ui.define([
         onPercentagetLiveChange: function (oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
         },
-       
+
         // Signin section
 
- onSignIn: async function () {
+        onSignIn: async function () {
 
-    var oView = this.getView();
-    var vm = oView.getModel("LoginViewModel");
-    var oCustomerData = oView.getModel("CustomerData").getData();
-    var oFragment = this._oLoginAlertDialog;
+            var oView = this.getView();
+            var vm = oView.getModel("LoginViewModel");
+            var oCustomerData = oView.getModel("CustomerData").getData();
+            var oFragment = this._oLoginAlertDialog;
 
-    const isOTP = true; // since you only use OTP now
+            const isOTP = true; // since you only use OTP now
 
-    // Fragment controls (IMPORTANT: fragment ID must match load ID)
-    const ctrlEmailId = sap.ui.core.Fragment.byId(
-        this.createId("LoginAlertDialog"),
-        "emailInput"
-    );
+            // Fragment controls (IMPORTANT: fragment ID must match load ID)
+            const ctrlEmailId = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "emailInput"
+            );
 
-    const ctrlOTP = sap.ui.core.Fragment.byId(
-        this.createId("LoginAlertDialog"),
-        "otpInput"
-    );
+            const ctrlOTP = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "otpInput"
+            );
 
-    const sEmail = ctrlEmailId?.getValue()?.trim();
-    const sOTP = ctrlOTP?.getValue()?.trim();
+            const sEmail = ctrlEmailId?.getValue()?.trim();
+            const sOTP = ctrlOTP?.getValue()?.trim();
 
-    // ================= EMAIL VALIDATION =================
-    if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
-        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-        return;
-    } else {
-        ctrlEmailId.setValueState("None");
-    }
+            // ================= EMAIL VALIDATION =================
+            if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            } else {
+                ctrlEmailId.setValueState("None");
+            }
 
-    // ================= OTP VALIDATION =================
-    if (!sOTP) {
-        ctrlOTP.setValueState("Error");
-        ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-        return;
-    }
+            // ================= OTP VALIDATION =================
+            if (!sOTP) {
+                ctrlOTP.setValueState("Error");
+                ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                return;
+            }
 
-    if (!/^\d{6}$/.test(sOTP)) {
-        ctrlOTP.setValueState("Error");
-        ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-        MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-        return;
-    }
+            if (!/^\d{6}$/.test(sOTP)) {
+                ctrlOTP.setValueState("Error");
+                ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                return;
+            }
 
-    ctrlOTP.setValueState("None");
+            ctrlOTP.setValueState("None");
 
-    // ================= OPEN BUSY DIALOG =================
-    var oBusy = this.getBusyDialog();
-    if (oBusy) {
-        oBusy.open();
-    }
+            // ================= OPEN BUSY DIALOG =================
+            var oBusy = this.getBusyDialog();
+            if (oBusy) {
+                oBusy.open();
+            }
 
-    try {
+            try {
 
-        // 1️⃣ Verify OTP
-        const isValid = await this._verifyOTPWithBackend(sOTP);
+                // 1️⃣ Verify OTP
+                const isValid = await this._verifyOTPWithBackend(sOTP);
 
-        if (!isValid) {
-            MessageToast.show(this.i18nModel.getText("incorrectOTP"));
-            return;
-        }
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+                    return;
+                }
 
-        // 2️⃣ Backend call
-        const payload = {
-            CustomerID: oCustomerData.CustomerID,
-            OTP: sOTP
-        };
+                // 2️⃣ Backend call
+                const payload = {
+                    CustomerID: oCustomerData.CustomerID,
+                    OTP: sOTP
+                };
 
-        await this.ajaxReadWithJQuery("HM_Customer", payload);
+                await this.ajaxReadWithJQuery("HM_Customer", payload);
 
-        // ================= SUCCESS FLOW =================
-        var model = oView.getModel("Bookingmodel");
-        var data = oCustomerData;
+                // ================= SUCCESS FLOW =================
+                var model = oView.getModel("Bookingmodel");
+                var data = oCustomerData;
 
-        oView.getModel("VisibleModel").setProperty("/visible", true);
+                oView.getModel("VisibleModel").setProperty("/visible", true);
 
-        model.setProperty("/BedTypeName", data.BedType);
-        model.setProperty("/CouponCode", data.CouponCode);
-        model.setProperty("/UnitText", data.PaymentType);
-        model.setProperty("/StartDate", data.StartDate);
-        model.setProperty("/EndDate", data.EndDate);
-        model.setProperty("/CustomerName", data.CustomerName);
-        model.setProperty("/DateOfBirth", data.DateOfBirth);
-        model.setProperty("/Gender", data.Gender);
-        model.setProperty("/CustomerEmail", data.CustomerEmail);
-        model.setProperty("/Country", data.Country);
-        model.setProperty("/State", data.State);
-        model.setProperty("/City", data.City);
-        model.setProperty("/STDCode", data.STDCode);
-        model.setProperty("/MobileNo", data.MobileNo);
-        model.setProperty("/Salutation", data.Salutation);
-        model.setProperty("/Address", data.Address);
+                model.setProperty("/BedTypeName", data.BedType);
+                model.setProperty("/CouponCode", data.CouponCode);
+                model.setProperty("/UnitText", data.PaymentType);
+                model.setProperty("/StartDate", data.StartDate);
+                model.setProperty("/EndDate", data.EndDate);
+                model.setProperty("/CustomerName", data.CustomerName);
+                model.setProperty("/DateOfBirth", data.DateOfBirth);
+                model.setProperty("/Gender", data.Gender);
+                model.setProperty("/CustomerEmail", data.CustomerEmail);
+                model.setProperty("/Country", data.Country);
+                model.setProperty("/State", data.State);
+                model.setProperty("/City", data.City);
+                model.setProperty("/STDCode", data.STDCode);
+                model.setProperty("/MobileNo", data.MobileNo);
+                model.setProperty("/Salutation", data.Salutation);
+                model.setProperty("/Address", data.Address);
 
-        // Payment Type Logic
-        if (data.PaymentType === "Per Month") {
-            model.setProperty("/UnitText", "monthly");
-        } else if (data.PaymentType === "Per Day") {
-            model.setProperty("/UnitText", "daily");
-        } else if (data.PaymentType === "Per Year") {
-            model.setProperty("/UnitText", "yearly");
-        }
+                // Payment Type Logic
+                if (data.PaymentType === "Per Month") {
+                    model.setProperty("/UnitText", "monthly");
+                } else if (data.PaymentType === "Per Day") {
+                    model.setProperty("/UnitText", "daily");
+                } else if (data.PaymentType === "Per Year") {
+                    model.setProperty("/UnitText", "yearly");
+                }
 
-        if (data.PaymentType !== "Per Day") {
-            this.byId("idMonthYearSelect").setVisible(false);
-        }
+                if (data.PaymentType !== "Per Day") {
+                    this.byId("idMonthYearSelect").setVisible(false);
+                }
 
-        if (data.PaymentType === "Per Month" || data.PaymentType === "Per Year") {
-            model.setProperty("/DurationUnit", data.Duration);
-            this.byId("idMonthYearSelect").setVisible(true);
-        }
+                if (data.PaymentType === "Per Month" || data.PaymentType === "Per Year") {
+                    model.setProperty("/DurationUnit", data.Duration);
+                    this.byId("idMonthYearSelect").setVisible(true);
+                }
 
-        // ================= RESET =================
-        ctrlEmailId?.setValue("");
-        ctrlOTP?.setValue("");
+                // ================= RESET =================
+                ctrlEmailId?.setValue("");
+                ctrlOTP?.setValue("");
 
-        ctrlEmailId?.setValueState("None");
-        ctrlOTP?.setValueState("None");
+                ctrlEmailId?.setValueState("None");
+                ctrlOTP?.setValueState("None");
 
-        MessageToast.show("Login Successful");
+                MessageToast.show("Login Successful");
 
-        if (oFragment) {
-            oFragment.close();
-        }
+                if (oFragment) {
+                    oFragment.close();
+                }
 
-    } catch (err) {
-        MessageToast.show(err.message || "Invalid Credentials, Please try again");
-    } finally {
-        if (oBusy) {
-            oBusy.close();
-        }
-    }
-},
-         onSubmitNewPassword: async function () {
+            } catch (err) {
+                MessageToast.show(err.message || "Invalid Credentials, Please try again");
+            } finally {
+                if (oBusy) {
+                    oBusy.close();
+                }
+            }
+        },
+        onSubmitNewPassword: async function () {
             const oNew = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             const oConf = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass");
 
@@ -4552,11 +4591,11 @@ sap.ui.define([
         },
 
         _verifyOTPWithBackend: async function (otp) {
-             var oCustomerData = this.getView().getModel("CustomerData").getData();
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
             this.getBusyDialog()
             try {
                 const oPayload = {
-                    CustomerID:oCustomerData.CustomerID,
+                    CustomerID: oCustomerData.CustomerID,
                     OTP: otp.trim()
                 };
 
@@ -4574,93 +4613,93 @@ sap.ui.define([
             }
         },
 
- onPressOTP: async function () {
+        onPressOTP: async function () {
 
-    const oEmailIDCtrl = sap.ui.core.Fragment.byId(
-        this.createId("LoginAlertDialog"),
-        "emailInput"
-    );
-
-    var oCustomerData = this.getView().getModel("CustomerData").getData();
-    const sUserId = oEmailIDCtrl?.getValue()?.trim();
-
-    // ================= VALIDATION =================
-    if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID")) {
-        MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
-        return;
-    }
-
-    const payload = {
-        CustomerID: oCustomerData.CustomerID,
-        CustomerEmail: sUserId,
-        Type: "OTP"
-    };
-
-    // ✅ Proper BusyDialog
-    
- this.getBusyDialog()
-    try {
-
-        const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
-
-        // ================= RESPONSE SAFETY =================
-        if (!oResp) {
-            throw new Error("No response from server");
-        }
-
-        // ================= SUCCESS =================
-        if (oResp.success === true) {
-
-            MessageToast.show(
-                oResp.message || this.i18nModel.getText("oTPSentCheckyourEmail")
-            );
-
-            this._oResetUser = {
-                EmailID: sUserId
-            };
-
-            const oOtpCtrl = sap.ui.core.Fragment.byId(
+            const oEmailIDCtrl = sap.ui.core.Fragment.byId(
                 this.createId("LoginAlertDialog"),
-                "otpInput"
+                "emailInput"
             );
 
-            if (oOtpCtrl) {
-                oOtpCtrl.setValue("");
-                oOtpCtrl.setValueState("None");
-                oOtpCtrl.setValueStateText("");
-                oOtpCtrl.focus();
+            var oCustomerData = this.getView().getModel("CustomerData").getData();
+            const sUserId = oEmailIDCtrl?.getValue()?.trim();
+
+            // ================= VALIDATION =================
+            if (!utils._LCvalidateMandatoryField(oEmailIDCtrl, "ID")) {
+                MessageToast.show(this.i18nModel.getText("enterValidUserIDUserName"));
+                return;
             }
 
-            this._startOtpTimer?.();
+            const payload = {
+                CustomerID: oCustomerData.CustomerID,
+                CustomerEmail: sUserId,
+                Type: "BookingOTP"
+            };
 
-        } else {
-            // ✅ SHOW BACKEND MESSAGE
-             this.closeBusyDialog()
-            MessageToast.show(
-                oResp.message || this.i18nModel.getText("usernotFoundUnabletoSendOTP")
-            );
-        }
+            // ✅ Proper BusyDialog
 
-    } catch (err) {
+            this.getBusyDialog()
+            try {
 
-       this.closeBusyDialog()
+                const oResp = await this.ajaxCreateWithJQuery("EmailOTP", payload);
 
-        // ✅ SMART ERROR HANDLING
-       MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
+                // ================= RESPONSE SAFETY =================
+                if (!oResp) {
+                    throw new Error("No response from server");
+                }
 
-        // if (err?.responseJSON?.message) {
-        //     errorMsg = err.responseJSON.message;
-        // } else if (err?.message) {
-        //     errorMsg = err.message;
-        // }
+                // ================= SUCCESS =================
+                if (oResp.success === true) {
 
-        // MessageToast.show(errorMsg);
+                    MessageToast.show(
+                        oResp.message || this.i18nModel.getText("oTPSentCheckyourEmail")
+                    );
 
-    } finally {
-       this.closeBusyDialog()
-    }
-},
-  
+                    this._oResetUser = {
+                        EmailID: sUserId
+                    };
+
+                    const oOtpCtrl = sap.ui.core.Fragment.byId(
+                        this.createId("LoginAlertDialog"),
+                        "otpInput"
+                    );
+
+                    if (oOtpCtrl) {
+                        oOtpCtrl.setValue("");
+                        oOtpCtrl.setValueState("None");
+                        oOtpCtrl.setValueStateText("");
+                        oOtpCtrl.focus();
+                    }
+
+                    this._startOtpTimer?.();
+
+                } else {
+                    // ✅ SHOW BACKEND MESSAGE
+                    this.closeBusyDialog()
+                    MessageToast.show(
+                        oResp.message || this.i18nModel.getText("usernotFoundUnabletoSendOTP")
+                    );
+                }
+
+            } catch (err) {
+
+                this.closeBusyDialog()
+
+                // ✅ SMART ERROR HANDLING
+                MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
+
+                // if (err?.responseJSON?.message) {
+                //     errorMsg = err.responseJSON.message;
+                // } else if (err?.message) {
+                //     errorMsg = err.message;
+                // }
+
+                // MessageToast.show(errorMsg);
+
+            } finally {
+                this.closeBusyDialog()
+            }
+        },
+
 
         onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
@@ -4739,7 +4778,7 @@ sap.ui.define([
 
             }
         },
-         _startOtpCooldown: function (iSeconds = 20) {
+        _startOtpCooldown: function (iSeconds = 20) {
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
@@ -4778,7 +4817,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             vm.setProperty("/canResendOTP", false);
         },
-         _clearAllAuthFields: function () {
+        _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
                 "fpEmailId", "fpOTP",
@@ -4815,7 +4854,7 @@ sap.ui.define([
             this._resetOtpState();
 
         },
-         onForgotPassword: function () {
+        onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             vm.setProperty("/authFlow", "forgot");
@@ -4888,7 +4927,7 @@ sap.ui.define([
         //             State: data.State,
         //             City: data.City,
         //             Address: data.Address.trim(),
-                   
+
         //         }
         //     };
 
@@ -4993,7 +5032,7 @@ sap.ui.define([
         //         this.closeBusyDialog()
         //     }
         // },
-         onChangeState: function (oEvent) {
+        onChangeState: function (oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -5158,8 +5197,8 @@ sap.ui.define([
 
             return true;
         },
-        
-         onCityChange: function (oEvent) {
+
+        onCityChange: function (oEvent) {
             const oCity = oEvent.getSource();
 
             // Sanitize manual typing
@@ -5429,7 +5468,7 @@ sap.ui.define([
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-          _getLoginFragmentControl: function (localId) {
+        _getLoginFragmentControl: function (localId) {
             // 1) If you stored the fragment instance (best practice), use it
             if (this._oLoginFragment && typeof this._oLoginFragment.byId === "function") {
                 const c = this._oLoginFragment.byId(localId);
@@ -5521,7 +5560,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oPwdInput, oStrength);
         }
         ,
-         onSelectLoginMode: function (e) {
+        onSelectLoginMode: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const mode = e.getSource().getText().toLowerCase();
 
@@ -5552,39 +5591,39 @@ sap.ui.define([
                 passCtrl.setValueState("None");
             }
         },
-        
+
         onDialogClose: function () {
 
-    const oEmail = sap.ui.core.Fragment.byId(
-        this.createId("LoginAlertDialog"),
-        "emailInput"
-    );
+            const oEmail = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "emailInput"
+            );
 
-    const oOTP = sap.ui.core.Fragment.byId(
-        this.createId("LoginAlertDialog"),
-        "otpInput"
-    );
+            const oOTP = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "otpInput"
+            );
 
-    // ✅ Clear Email
-    if (oEmail) {
-        oEmail.setValue("");
-        oEmail.setValueState("None");
-        oEmail.setValueStateText("");
-    }
+            // ✅ Clear Email
+            if (oEmail) {
+                oEmail.setValue("");
+                oEmail.setValueState("None");
+                oEmail.setValueStateText("");
+            }
 
-    // ✅ Clear OTP
-    if (oOTP) {
-        oOTP.setValue("");
-        oOTP.setValueState("None");
-        oOTP.setValueStateText("");
-    }
+            // ✅ Clear OTP
+            if (oOTP) {
+                oOTP.setValue("");
+                oOTP.setValueState("None");
+                oOTP.setValueStateText("");
+            }
 
-    // ✅ Close Dialog
-    if (this._oLoginAlertDialog) {
-        this._oLoginAlertDialog.close();
-    }
-},
-         onLoginOtpLive: function (e) {
+            // ✅ Close Dialog
+            if (this._oLoginAlertDialog) {
+                this._oLoginAlertDialog.close();
+            }
+        },
+        onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const input = e.getSource();
 
@@ -5606,7 +5645,7 @@ sap.ui.define([
                 input.setValueState("None");
             }
         },
-         _addPasswordGenerateIcon: function () {
+        _addPasswordGenerateIcon: function () {
 
             const aInputs = [
                 sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword"),
@@ -5627,7 +5666,7 @@ sap.ui.define([
             });
         },
 
-          SM_onCopyPassword: function (oEvent) {
+        SM_onCopyPassword: function (oEvent) {
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent();
 
