@@ -222,6 +222,8 @@ sap.ui.define([
                 }),
                 "tokenModel"
             );
+         
+
         },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -949,7 +951,6 @@ sap.ui.define([
                 if (!oModel) {
                     oModel = new JSONModel([]);
                     this.getOwnerComponent().setModel(oModel, "sBRModel");
-
                 }
 
                 let aData = oModel.getData();
@@ -958,28 +959,29 @@ sap.ui.define([
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
+                    
 
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
                         aData = response?.data || [];
                         oModel.setData(aData);
- // ✅ After API response & model update
-oModel.setData(aData);
 
-// ✅ Add No Data to ComboBox input field
-const oBranchCombo = this.byId("id_Branch");
-if (aData.length === 0) {
-    oBranchCombo.setValue("No Data");
-} else {
-    oBranchCombo.setValue("");  // Clear when data loads
-    oBranchCombo.setValueState("None");
-}
 
-// Handle No Data visibility
+                        const oBranchCombo = this.byId("id_Branch");
 if (aData.length === 0) {
-    oVisibilityModel.setProperty("/NoData", true);
+    // Clear input first
+    oBranchCombo.setValue("");
+    
+    // Insert No Data item to dropdown
+    if (oBranchCombo.getItems().length === 0) {
+        oBranchCombo.insertItem(new sap.ui.core.ListItem({
+            key: "",
+            text: "No Data"
+        }), 0);
+    }
 } else {
-    oVisibilityModel.setProperty("/NoData", false);
+    // Clear any manual No Data items when real data loads
+    oBranchCombo.removeAllItems();
 }
 
                         // ✅ Handle No Data
@@ -2697,8 +2699,6 @@ if (aData.length === 0) {
             })
             this.Branchlength = Branchdata.length
             try {
-             
-
                 let aBranchesData;
                 if (!this.isInitialLoad) {
                     let response = await this.ajaxReadWithJQuery("HM_Branch", {
@@ -2716,30 +2716,6 @@ if (aData.length === 0) {
                     }
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
-
-                    const oRoomtypeCombo = this.byId("id_Roomtype");
-const oAreaCombo = this.byId("id_Area");
-
-if (aExistingData.length === 0) {
-    // Roomtype ComboBox - No Data
-    oRoomtypeCombo.setValue("No Data");
-   
- 
-    
-    // Area ComboBox - No Data  
-    oAreaCombo.setValue("No Data");
- 
- 
-} else {
-    // Clear when data available
-    oRoomtypeCombo.setValue("");
- 
-    oRoomtypeCombo.setValueState("None");
-    
-    oAreaCombo.setValue("");
-
-    oAreaCombo.setValueState("None");
-}
 
                     let aFilteredData = aBranchesData.filter(newItem => {
                         return !aExistingData.some(existingItem =>
