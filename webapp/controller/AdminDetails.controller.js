@@ -5701,8 +5701,258 @@ sap.ui.define([
                 });
         },
 
+        onGeneratePDF: async function() {
+            const data = this.getView().getModel("CustomerData").getData();
 
+            let filter = {BranchID: [data.BranchCode]};
+            const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            const company = oCompanyDetailsModel.data[0];
 
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
 
+            const currency = (data.Currency || "INR").trim();
+            let y = 0;
+
+            const MARGIN_LEFT = 10;
+            const CARD_WIDTH = 190;
+
+            const BORDER_COLOR = [120, 120, 120];
+            const BORDER_WIDTH = 0.6;
+
+            const addHeader = () => {
+                doc.setFillColor(20, 170, 183);
+                doc.rect(0, 0, 210, 25, "F");
+
+                doc.setFont("times", "bold");
+                doc.setFontSize(18);
+                doc.setTextColor(255, 255, 255);
+                doc.text("BOOKING VOUCHER", 10, 15);
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(10);
+
+                doc.text(`Booking ID : ${data.BookingID}`, 10, 32);
+                doc.text(`Booked On : ${Formatter.formatDate(data.BookingDate)}`, 10, 37);
+
+                y = 45;
+            };
+
+            const checkPage = (space = 20) => {
+                if (y + space > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+            };
+
+            addHeader();
+            checkPage(50);
+
+            doc.setDrawColor(...BORDER_COLOR);
+            doc.setLineWidth(BORDER_WIDTH);
+            doc.roundedRect(MARGIN_LEFT, y, CARD_WIDTH, 40, 3, 3);
+
+            doc.setFontSize(12);
+
+            doc.setFont("times", "bold");
+            doc.text(company.Name, 12, y + 8);
+
+            doc.setFont("times", "normal");
+            doc.setFontSize(10);
+
+            let addressLines = doc.splitTextToSize(company.Address || "", 180);
+            doc.text(addressLines, 12, y + 14);
+
+            let lineY = y + 14 + (addressLines.length * 4);
+
+            doc.text(`Contact: ${company.Contact || ""}`, 12, lineY + 5);
+            doc.text(`Email: ${company.EmailID || ""}`, 12, lineY + 10);
+
+            if (company.GeoLocation) {
+                doc.setTextColor(0, 0, 255);
+                doc.textWithLink("View Property on Map", 12, lineY + 15, {
+                    url: company.GeoLocation
+                });
+                doc.setTextColor(0, 0, 0);
+            }
+
+            y += 50;
+
+            checkPage(50);
+
+            doc.setDrawColor(...BORDER_COLOR);
+            doc.setLineWidth(BORDER_WIDTH);
+
+              doc.roundedRect(10, y, 90, 35, 3, 3);
+            doc.setFont("times", "bold").setFontSize(12);
+            doc.text("Guest Details :", 12, y + 8);
+
+            doc.setFont("times", "normal").setFontSize(10);
+            doc.text(`Name : ${data.Salutation || ""} ${data.CustomerName}`, 12, y + 16);
+            doc.text(`Email : ${data.CustomerEmail || ""}`, 12, y + 22);
+            doc.text(`Contact No : ${data.STDCode || ""} ${data.MobileNo || ""}`, 12, y + 28);
+
+            doc.roundedRect(110, y, 90, 35, 3, 3);
+            doc.setFont("times", "bold").setFontSize(12);
+            doc.text("Stay Details : ", 112, y + 8);
+
+            doc.setFont("times", "normal").setFontSize(10);
+            doc.text(`Check-in: ${data.StartDate}`, 112, y + 16);
+            doc.text(`Check-out: ${data.EndDate}`, 112, y + 22);
+            doc.text(`Room: ${data.BedType}`, 112, y + 28);
+
+            y += 45;
+
+            doc.setFont("times", "bold");
+            doc.setFontSize(12);
+            doc.text("Facility Details :", MARGIN_LEFT, y);
+
+            y += 5;
+
+            const facilities = data.AllSelectedFacilities || [];
+
+            const body = facilities.map((item, index) => [
+                index + 1,
+                item.FacilityName,
+                item.StartDate || "",
+                item.EndDate || "",
+                Formatter.fromatNumber(parseFloat(item.Price) || 0),
+                item.UnitText,
+                Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)
+            ]);
+
+            doc.autoTable({
+                startY: y,
+                margin: {
+                    left: MARGIN_LEFT,
+                    right: 10
+                }, 
+                head: [
+                    ['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                ],
+                body: body,
+                theme: 'grid',
+
+                styles: {
+                    font: "times",
+                    fontSize: 10,
+                    cellPadding: 3,
+                    lineWidth: BORDER_WIDTH,
+                    lineColor: BORDER_COLOR,
+                    halign: "center"
+                },
+
+                headStyles: {
+                    fillColor: [20, 170, 183],
+                    textColor: 255,
+                    lineWidth: BORDER_WIDTH,
+                    lineColor: BORDER_COLOR
+                },
+
+                tableLineWidth: BORDER_WIDTH,
+                tableLineColor: BORDER_COLOR
+            });
+
+            const tableEndY = doc.lastAutoTable.finalY;
+
+            y = tableEndY + 10;
+
+            checkPage(80);
+
+            doc.setFillColor(250, 250, 250);
+            doc.setDrawColor(...BORDER_COLOR);
+            doc.setLineWidth(BORDER_WIDTH);
+
+            doc.roundedRect(105, y, 95, 70, 3, 3, "FD");
+
+            doc.setFont("bold");
+            doc.setFontSize(12);
+            doc.text("Payment Summary", 110, y + 8);
+
+            let sy = y + 15;
+
+            const addRow = (label, value, bold = false) => {
+                doc.setFont("times", bold ? "bold" : "normal");
+                doc.setFontSize(bold ? 11 : 10);
+                doc.text(label, 110, sy);
+                doc.text(value, 195, sy, {
+                    align: "right"
+                });
+                sy += 6;
+            };
+
+            addRow("Room Rent", Formatter.fromatNumber(data.RentPrice || 0));
+            addRow("Facilities", Formatter.fromatNumber(data.TotalFacilityPrice || 0));
+            addRow("Sub Total", Formatter.fromatNumber(data.SubTotal || 0));
+
+            if (data.GSTType === "CGST/SGST") {
+                addRow(`CGST (${data.GSTValue}%)`, Formatter.fromatNumber(data.CGST || 0));
+                addRow(`SGST (${data.GSTValue}%)`, Formatter.fromatNumber(data.SGST || 0));
+            }
+
+            if (data.GSTType === "IGST") {
+                addRow(`IGST (${data.GSTValue}%)`, Formatter.fromatNumber(data.CGST || 0));
+            }
+
+            addRow("Discount", "- " + Formatter.fromatNumber(data.Discount || 0));
+            addRow("Deposit", Formatter.fromatNumber(data.Deposit || 0));
+
+            doc.line(110, sy, 195, sy);
+            sy += 5;
+
+            doc.setTextColor(0, 102, 204);
+            addRow("Grand Total", Formatter.fromatNumber(data.GrandTotal || 0), true);
+            doc.setTextColor(0, 0, 0);
+
+            y += 80;
+            checkPage(30);
+
+            doc.setFont("bold");
+            doc.text("Amount in Words:", 10, y);
+
+            doc.setFont("normal");
+            const words = await this.convertNumberToWords(data.GrandTotal, currency);
+            doc.text(doc.splitTextToSize(words || "", 180), 10, y + 6);
+
+            y += 20;
+            checkPage(50);
+
+            doc.setFillColor(255, 248, 230);
+            doc.roundedRect(10, y, 190, 30, 3, 3, "F");
+
+            doc.setFont("bold");
+            doc.text("Important Information", 12, y + 8);
+
+            doc.setFont("normal");
+
+            [
+                "Valid ID required (Aadhaar, Passport, DL)",
+                "GST invoice available at property",
+                "Booking is non-refundable"
+            ].forEach((t, i) => {
+                doc.text("• " + t, 12, y + 15 + (i * 5));
+            });
+
+            y += 35;
+
+            checkPage(15);
+
+            doc.setDrawColor(200);
+            doc.line(10, y, 200, y);
+
+            doc.setFontSize(9);
+            doc.text("Thank you for choosing StayVriksha!", 10, y + 5);
+            doc.text("Support: admin@stayvriksha.in", 200, y + 5, {
+                align: "right"
+            });
+
+            y += 10;
+
+            doc.save("StayVriksha_Booking.pdf");
+        }
     });
 });

@@ -1385,6 +1385,13 @@
                                 visible="{VisibleModel>/visible}"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
+
+                            <Button id="idgeneratePDFbtn"
+                                text="{i18n>GeneratePDF}"
+                                tooltip="{i18n>GeneratePDF}"
+                                press="onGeneratePDF"
+                                class="sapUiSmallMarginBegin myUnifiedBtn"
+                            />
                 </contentRight>
 			</Bar>
 		</footer>
