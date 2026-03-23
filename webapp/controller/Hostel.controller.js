@@ -222,8 +222,6 @@ sap.ui.define([
                 }),
                 "tokenModel"
             );
-         
-
         },
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -951,6 +949,7 @@ sap.ui.define([
                 if (!oModel) {
                     oModel = new JSONModel([]);
                     this.getOwnerComponent().setModel(oModel, "sBRModel");
+
                 }
 
                 let aData = oModel.getData();
@@ -959,12 +958,32 @@ sap.ui.define([
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
-                    
 
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
                         aData = response?.data || [];
                         oModel.setData(aData);
+ // ✅ After API response & model update
+oModel.setData(aData);
+
+// ✅ Add No Data to ComboBox input field
+const oBranchCombo = this.byId("id_Branch");
+if (aData.length === 0) {
+    oBranchCombo.setValue("No Data");
+    oBranchCombo.setEnabled(false);  // Optional: disable selection
+    oBranchCombo.setValueState("Warning");  // Visual feedback
+} else {
+    oBranchCombo.setValue("");  // Clear when data loads
+    oBranchCombo.setEnabled(true);
+    oBranchCombo.setValueState("None");
+}
+
+// Handle No Data visibility
+if (aData.length === 0) {
+    oVisibilityModel.setProperty("/NoData", true);
+} else {
+    oVisibilityModel.setProperty("/NoData", false);
+}
 
                         // ✅ Handle No Data
                         if (!aData || aData.length === 0) {
@@ -2681,6 +2700,8 @@ sap.ui.define([
             })
             this.Branchlength = Branchdata.length
             try {
+             
+
                 let aBranchesData;
                 if (!this.isInitialLoad) {
                     let response = await this.ajaxReadWithJQuery("HM_Branch", {

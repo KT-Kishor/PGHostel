@@ -261,14 +261,37 @@ sap.ui.define([
 
                     const oModel = new sap.ui.model.json.JSONModel(mappedData);
                     this.getView().setModel(oModel, "HostelModel");
+                 
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
+                    this._addNoDataToComboBoxes();
                     this.closeBusyDialog()
                 }).catch(() => this.closeBusyDialog());
             } catch (e) {
                 this.closeBusyDialog()
             }
         },
+
+        _addNoDataToComboBoxes: function() {
+    const comboBoxes = [
+        "PO_id_BookingId",
+        "PO_id_CompanyName",    // RoomNo filter
+        "PO_id_Status",         // Status filter  
+        "PO_id_CustomerName"    // CustomerName filter
+    ];
+    
+    comboBoxes.forEach(sId => {
+        const oComboBox = this.byId(sId);
+        if (oComboBox && oComboBox.getItems().length === 0) {
+            oComboBox.insertItem(new sap.ui.core.ListItem({
+                key: "",
+                text: "No Data",
+                textAlign: "Center"
+            }), 0);
+        }
+    });
+},
+
 
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {

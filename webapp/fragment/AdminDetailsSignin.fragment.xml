@@ -13,7 +13,7 @@
          <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="{LoginViewModel>/dialogTitle}" />
+                    <Title text="Login" />
                 </contentMiddle>
                 <contentRight>
                     <Button

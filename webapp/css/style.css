@@ -4941,3 +4941,10 @@ width: 44px !important;
 .sapUiLocalBusyIndicator {
     background-color: transparent !important;
 }
+/* Center ONLY empty BookingID items */
+.sapMComboBoxPicker .sapMLIB .sapMText,
+.sapMComboBoxBasePicker .sapMLIB .sapMText {
+    text-align: center !important;
+    justify-content: center !important;
+}
+
