@@ -970,11 +970,8 @@ oModel.setData(aData);
 const oBranchCombo = this.byId("id_Branch");
 if (aData.length === 0) {
     oBranchCombo.setValue("No Data");
-    oBranchCombo.setEnabled(false);  // Optional: disable selection
-    oBranchCombo.setValueState("Warning");  // Visual feedback
 } else {
     oBranchCombo.setValue("");  // Clear when data loads
-    oBranchCombo.setEnabled(true);
     oBranchCombo.setValueState("None");
 }
 
@@ -2719,6 +2716,30 @@ if (aData.length === 0) {
                     }
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
+
+                    const oRoomtypeCombo = this.byId("id_Roomtype");
+const oAreaCombo = this.byId("id_Area");
+
+if (aExistingData.length === 0) {
+    // Roomtype ComboBox - No Data
+    oRoomtypeCombo.setValue("No Data");
+   
+ 
+    
+    // Area ComboBox - No Data  
+    oAreaCombo.setValue("No Data");
+ 
+ 
+} else {
+    // Clear when data available
+    oRoomtypeCombo.setValue("");
+ 
+    oRoomtypeCombo.setValueState("None");
+    
+    oAreaCombo.setValue("");
+
+    oAreaCombo.setValueState("None");
+}
 
                     let aFilteredData = aBranchesData.filter(newItem => {
                         return !aExistingData.some(existingItem =>
