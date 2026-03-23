@@ -11,7 +11,7 @@
         title="Manage Damage Details"
         showNavButton="true"
         navButtonPress="onNavBack"
-        id="CID_id_MyPageId"
+        id="CID_id_MyPage"
     >
         <m:headerContent>
             <m:Button
@@ -211,8 +211,6 @@
                                                 />
                                             </m:Column>
                                             <m:Column
-
-                                                id="idGSTCalculation"
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >

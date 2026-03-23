@@ -462,6 +462,9 @@
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressDelete"
                                                 />
+                                                <m:Button text="Refresh" press="onRefreshInvoice"
+                                                visible="{visiablityPlay>/refresh}"
+                                                class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>

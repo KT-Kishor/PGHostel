@@ -20,7 +20,7 @@ sap.ui.define([
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
-                
+
                 this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
                 this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_Date", "CID_id_NavInvDate"]);
 
@@ -79,7 +79,7 @@ sap.ui.define([
                     IncomePerc: "10",
                     RoomNo: "",
                     BranchCode: "",
-                    RefundAmount : ""
+                    RefundAmount: ""
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
 
@@ -113,6 +113,7 @@ sap.ui.define([
                     flexVisiable: false,
                     CInvoice: false,
                     addInvBtn: true,
+                    refresh: false,
                     merge: false,
                     GST: true,
                     payByDate: false,
@@ -143,11 +144,11 @@ sap.ui.define([
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                     const sCustomerID = oNavCtx?.getProperty("/CustomerID");
-                    const sBookingID  = oNavCtx?.getProperty("/BookingID");
+                    const sBookingID = oNavCtx?.getProperty("/BookingID");
                     const sCustomerName = oNavCtx?.getProperty("/CustomerName");
 
                     const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
-                    const oBookingCombo  = this.byId("CID_id_AddBooking");
+                    const oBookingCombo = this.byId("CID_id_AddBooking");
 
                     if (sCustomerID && sBookingID) {
                         oCustomerCombo.setSelectedKey(null);
@@ -156,8 +157,8 @@ sap.ui.define([
 
                         oCustomerCombo.setSelectedKey(sCustomerID); // Set selected keys
                         oBookingCombo.setSelectedKey(sBookingID);
-                        this.SelectKey = sCustomerID;  // Store customer for booking 
-                        oCustomerCombo.setEditable(false);  // Lock customer selection
+                        this.SelectKey = sCustomerID; // Store customer for booking 
+                        oCustomerCombo.setEditable(false); // Lock customer selection
 
                         const customerData = [{
                             CustomerID: sCustomerID,
@@ -183,20 +184,19 @@ sap.ui.define([
                         // Clear navigation context
                         oNavCtx.setProperty("/CustomerID", "");
                         oNavCtx.setProperty("/BookingID", "");
-                    } 
-                    else {
-                    const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
-                    if (oNavCtx) {
-                        oNavCtx.setProperty("/CustomerID", "");
-                        oNavCtx.setProperty("/BookingID", "");
-                    }
+                    } else {
+                        const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
+                        if (oNavCtx) {
+                            oNavCtx.setProperty("/CustomerID", "");
+                            oNavCtx.setProperty("/BookingID", "");
+                        }
 
-                    oCustomerCombo.setSelectedKey(null); // Also clear ComboBox UI state
-                    oBookingCombo.setSelectedKey(null);
-                    sap.ui.getCore().applyChanges();
+                        oCustomerCombo.setSelectedKey(null); // Also clear ComboBox UI state
+                        oBookingCombo.setSelectedKey(null);
+                        sap.ui.getCore().applyChanges();
 
-                    oCustomerCombo.setEditable(true);
-                        await this.onSearch(); 
+                        oCustomerCombo.setEditable(true);
+                        await this.onSearch();
                     }
                     this.closeBusyDialog()
                     return;
@@ -207,6 +207,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/editVisi", true);
                 this.visiablityPlay.setProperty("/editable", false);
                 this.visiablityPlay.setProperty("/addInvBtn", false);
+                this.visiablityPlay.setProperty("/refresh", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 // this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
@@ -227,7 +228,7 @@ sap.ui.define([
                     oHeader.InvoiceDate = this.Formatter.DateFormat(oHeader.InvoiceDate);
                     var PayByDate = oHeader.PayByDate;
                     oHeader.PayByDate = this.Formatter.DateFormat(oHeader.PayByDate);
-                    var InvDate = oHeader.InvDate 
+                    var InvDate = oHeader.InvDate
                     oHeader.InvDate = this.Formatter.formatDate(InvDate);
                     this.SelectedCustomerModel.setData(oHeader);
 
@@ -254,8 +255,8 @@ sap.ui.define([
                         GrossPriceEditable: false,
                         UnitEditable: false,
                         DurationEditable: false,
-                        StartDateEditable : false, 
-                        EndDateEditable : false
+                        StartDateEditable: false,
+                        EndDateEditable: false
                         // editable :false
                     }));
 
@@ -309,7 +310,7 @@ sap.ui.define([
                     if (Status === "Payment Received") {
                         this.visiablityPlay.setProperty("/payByDate", false);
                         this.visiablityPlay.setProperty("/createVisi", false);
-                        this.visiablityPlay.setProperty("/Edit", false);
+                        // this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/MultiEmail", false);
                     }
                     this.Status = Status;
@@ -334,9 +335,8 @@ sap.ui.define([
 
                     this.ajaxReadWithJQuery("HM_CustomerReadCall", filter)
                         .then((oData) => {
-                            var aData = Array.isArray(oData.commentData)
-                                ? oData.commentData
-                                : [oData.commentData];
+                            var aData = Array.isArray(oData.commentData) ?
+                                oData.commentData : [oData.commentData];
 
                             const aFilteredData = aData.filter(item =>
                                 item.Status === "Assigned" || item.Status === "Completed"
@@ -425,11 +425,7 @@ sap.ui.define([
                         oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
 
                     if (!bookingDetails && facilityArray.length === 0) {
-                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.",
-                            {
-                                styleClass: "myUnifiedBtn"
-                            }
-                        );
+                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
                         return;
                     }
 
@@ -512,7 +508,7 @@ sap.ui.define([
                         bookingDetails.PaymentType,
                         bookingDetails.StartDate,
                         bookingDetails.EndDate
-                        
+
                     );
 
                     finalInvoiceItems.push({
@@ -532,8 +528,8 @@ sap.ui.define([
                         GrossPriceEditable: false,
                         UnitEditable: false,
                         DurationEditable: false,
-                        StartDateEditable : false, 
-                        EndDateEditable : false
+                        StartDateEditable: false,
+                        EndDateEditable: false
                     });
 
                     facilityArray.forEach((item, index) => {
@@ -541,18 +537,20 @@ sap.ui.define([
                             item.UnitText,
                             item.StartDate,
                             item.EndDate,
-                            item.TotalHour 
+                            item.TotalHour
                         );
 
                         let particulars = ""; // Build Particulars
                         if (item.FacilityName === "Penalty Charges") {
                             particulars = "Penalty Charges";
                         } else if (item.UnitText === "Per Hour") {
-                           const totalHours = Number(item.TotalHour) || 1;
+                            const totalHours = Number(item.TotalHour) || 1;
                             particulars = `${item.FacilityName} - Facility (${totalHours} Hours)`;
                         } else {
                             particulars = `${item.FacilityName} - Facility`;
                         }
+
+
 
                         finalInvoiceItems.push({
                             IndexNo: index + 2,
@@ -571,8 +569,8 @@ sap.ui.define([
                             GrossPriceEditable: false,
                             UnitEditable: false,
                             DurationEditable: false,
-                            StartDateEditable : false, 
-                            EndDateEditable : false
+                            StartDateEditable: false,
+                            EndDateEditable: false
                         });
                     });
 
@@ -598,11 +596,11 @@ sap.ui.define([
                             GrossPriceEditable: false,
                             UnitEditable: false,
                             DurationEditable: false,
-                            StartDateEditable : false, 
-                            EndDateEditable : false
+                            StartDateEditable: false,
+                            EndDateEditable: false
                         });
                     }
-                
+
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalInvoiceItems);
                     await this.totalAmountCalculation();
                     utils._LCvalidateMandatoryField(oEvent);
@@ -677,7 +675,7 @@ sap.ui.define([
             },
 
             onPayByDateDatePickerChange: function(oEvent) {
-                    utils._LCvalidateDate(oEvent);
+                utils._LCvalidateDate(oEvent);
             },
 
             onChangeDate: function(oEvent) {
@@ -718,7 +716,7 @@ sap.ui.define([
                     StartDate: this.Formatter.formatDate(startDate),
                     EndDate: this.Formatter.formatDate(endDate),
                     UnitText: unitText,
-                    DurationText: this._getDurationText(unitText, startDate, endDate, 1), 
+                    DurationText: this._getDurationText(unitText, startDate, endDate, 1),
                     Currency: currency,
                     Discount: "0.00",
                     GrossPrice: "0.00",
@@ -726,8 +724,8 @@ sap.ui.define([
                     GrossPriceEditable: true,
                     UnitEditable: true,
                     DurationEditable: true,
-                    StartDateEditable : true, 
-                    EndDateEditable : true
+                    StartDateEditable: true,
+                    EndDateEditable: true
                 };
 
                 if (this.Update) {
@@ -776,8 +774,7 @@ sap.ui.define([
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled = 
-                    !!taxType &&
+                const isGSTEnabled = !!taxType &&
                     taxRate > 0 &&
                     currency === "INR";
 
@@ -1004,8 +1001,8 @@ sap.ui.define([
                 utils._LCvalidateDate(oEvent)
             },
 
-            CID_ValidateGstNumber:function(oEvent){
-                 var oInput = oEvent.getSource();
+            CID_ValidateGstNumber: function(oEvent) {
+                var oInput = oEvent.getSource();
                 utils._LCvalidateGstNumber(oEvent)
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
@@ -1036,23 +1033,20 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-                const paidAmount   = Number(oSelectedCustomerModel.PaidAmount) || 0;
-                const totalAmount  = Number(oSelectedCustomerModel.TotalAmount) || 0;
+                const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
+                const totalAmount = Number(oSelectedCustomerModel.TotalAmount) || 0;
                 const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
                 let sFinalStatus = "Submitted";
 
                 if (paidAmount === totalAmount) {
                     sFinalStatus = "Payment Received";
-                } 
-                else if (balanceAmount === totalAmount) {
+                } else if (balanceAmount === totalAmount) {
                     sFinalStatus = "Submitted";
-                }
-                else if (paidAmount < totalAmount) {
+                } else if (paidAmount < totalAmount) {
                     sFinalStatus = "Payment Partially";
-                } 
-                else if (paidAmount > totalAmount) {
+                } else if (paidAmount > totalAmount) {
                     sFinalStatus = "Payment Received";
-                } 
+                }
 
                 const oPayload = {
                     InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
@@ -1092,9 +1086,9 @@ sap.ui.define([
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
                     BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
-                    CustomerGSTNO:oSelectedCustomerModel.CustomerGSTNO || "",
-                    RefundAmount : oSelectedCustomerModel.RefundAmount || "",
-                    DueAmount : oSelectedCustomerModel.BalanceAmount || ""
+                    CustomerGSTNO: oSelectedCustomerModel.CustomerGSTNO || "",
+                    RefundAmount: oSelectedCustomerModel.RefundAmount || "",
+                    DueAmount: oSelectedCustomerModel.BalanceAmount || ""
                 };
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1106,11 +1100,7 @@ sap.ui.define([
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
                         this.getBusyDialog()
-                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`,
-                            {
-                                styleClass: "myUnifiedBtn"
-                            }
-                        );
+                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
                         return false;
                     }
                 }
@@ -1125,7 +1115,7 @@ sap.ui.define([
                         Currency: item.Currency,
                         GSTCalculation: item.GSTCalculation,
                         Discount: item.Discount,
-                        DurationText:item.DurationText,
+                        DurationText: item.DurationText,
                         StartDate: item.StartDate.split('/').reverse().join('-'),
                         EndDate: item.EndDate.split('/').reverse().join('-'),
                     };
@@ -1195,7 +1185,7 @@ sap.ui.define([
                         oSelectedCustomerModel.setProperty("/InvNo", response.InvoiceNo);
                         var CustomerName = oSelectedCustomerModel.getProperty("/Customer") || oPayload.payload.CustomerName;
                         oSelectedCustomerModel.setProperty("/CustomerName", CustomerName)
-                        var Status=  oSelectedCustomerModel.getProperty("/Status") || oPayload.payload.Status;
+                        var Status = oSelectedCustomerModel.getProperty("/Status") || oPayload.payload.Status;
                         oSelectedCustomerModel.setProperty("/Status", Status)
                         that.closeBusyDialog();
                         var oDialog = new sap.m.Dialog({
@@ -1250,6 +1240,7 @@ sap.ui.define([
                     this.visiablityPlay.setProperty("/merge", false);
                     this.visiablityPlay.setProperty("/MultiEmail", false);
                     this.visiablityPlay.setProperty("/payByDate", false);
+                    this.visiablityPlay.setProperty("/refresh", true);
                 }
             },
 
@@ -1392,6 +1383,7 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/MultiEmail", true);
                         if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
@@ -1415,8 +1407,8 @@ sap.ui.define([
                 var that = this;
                 var status = "";
                 if (that.oDialog) {
-                     that.oDialog.destroy();
-                     that.oDialog = null;
+                    that.oDialog.destroy();
+                    that.oDialog = null;
                 }
 
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
@@ -1560,12 +1552,12 @@ sap.ui.define([
 
                 const items = oData.data || [];
 
-            // Case 1: Only 1 record and it is Used = X → Do NOTHING
-            if (items.length === 1 && items[0].Used === "X") {
-                return; // Exit function
-            }
+                // Case 1: Only 1 record and it is Used = X → Do NOTHING
+                if (items.length === 1 && items[0].Used === "X") {
+                    return; // Exit function
+                }
 
-            // Case 2: Normal calculation but ignore Used = X rows
+                // Case 2: Normal calculation but ignore Used = X rows
                 const validItems = items.filter(item => item.Used !== "X");
 
                 // Sum received amount only from valid items
@@ -1648,7 +1640,7 @@ sap.ui.define([
                             InvNo: this.decodedPath
                         });
                         await this.Readcall("HM_InvoicePaymentDetail", {
-                        InvNo: this.decodedPath
+                            InvNo: this.decodedPath
                         });
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
@@ -1658,10 +1650,11 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
 
                         if (this.oDialog) {
-                                this.oDialog.destroy();
-                                this.oDialog = null;
+                            this.oDialog.destroy();
+                            this.oDialog = null;
                         }
 
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
@@ -1690,7 +1683,7 @@ sap.ui.define([
                 utils._LCvalidateMandatoryField(oEvent);
             },
 
-            onPaymentModeChange: function (oEvent) {
+            onPaymentModeChange: function(oEvent) {
                 utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             },
 
@@ -2017,7 +2010,9 @@ sap.ui.define([
             CID_onPressGeneratePdf: async function() {
                 try {
                     this.getBusyDialog()
-                    const { jsPDF } = window.jspdf;
+                    const {
+                        jsPDF
+                    } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
@@ -2159,8 +2154,8 @@ sap.ui.define([
                         head: head,
                         body: body,
                         theme: 'grid',
-                        pageBreak: 'auto',   
-                        rowPageBreak: 'auto', 
+                        pageBreak: 'auto',
+                        rowPageBreak: 'auto',
                         headStyles: {
                             fillColor: [20, 170, 183]
                         },
@@ -2261,7 +2256,7 @@ sap.ui.define([
                     if (parseFloat(oModel.CouponDiscount) > 0) {
                         summaryBody.push([
                             `Discount (${oModel.CouponCode}) :`,
-                          "- " +  Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                            "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
                         ]);
                     }
 
@@ -2278,7 +2273,7 @@ sap.ui.define([
                     //         Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
                     //     ]);
                     // }
-                    
+
                     if (data.RoundOf && data.RoundOf !== "0") {
                         summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
@@ -2291,8 +2286,8 @@ sap.ui.define([
                         head: [],
                         body: summaryBody,
                         theme: 'plain',
-                        pageBreak: 'auto',   
-                        rowPageBreak: 'auto', 
+                        pageBreak: 'auto',
+                        rowPageBreak: 'auto',
                         styles: {
                             font: "times",
                             fontSize: 10,
@@ -2350,10 +2345,10 @@ sap.ui.define([
                     if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
 
                         // Page break check
-                                if (currentY + 60 > pageHeight) {
-                                doc.addPage();
-                                currentY = 20;
-                            }
+                        if (currentY + 60 > pageHeight) {
+                            doc.addPage();
+                            currentY = 20;
+                        }
 
                         doc.setFont("times", "bold").setFontSize(11);
                         doc.text("Transaction History", margin, currentY);
@@ -2377,8 +2372,8 @@ sap.ui.define([
                             ],
                             body: paymentBody,
                             theme: 'grid',
-                            pageBreak: 'auto',   
-                            rowPageBreak: 'auto', 
+                            pageBreak: 'auto',
+                            rowPageBreak: 'auto',
                             headStyles: {
                                 fillColor: [20, 170, 183]
                             },
@@ -2414,11 +2409,11 @@ sap.ui.define([
 
                     currentY += 15;
 
-                     // Page break check
-                        if (currentY + 20 > pageHeight) {
-                            doc.addPage();
-                            currentY = 20;
-                        }
+                    // Page break check
+                    if (currentY + 20 > pageHeight) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
                     doc.setFontSize(11);
                     doc.text("Thank you for staying with us.", margin - 2, currentY);
 
@@ -2497,7 +2492,9 @@ sap.ui.define([
                 try {
                     this.getBusyDialog()
 
-                    const { jsPDF } = window.jspdf;
+                    const {
+                        jsPDF
+                    } = window.jspdf;
                     const oView = this.getView();
 
                     const oTable = this.byId("CID_id_TableInvoiceItem");
@@ -2523,13 +2520,14 @@ sap.ui.define([
                     const taxRate = parseFloat(oCustomerModel.Value) || 0;
                     const currency = oSOWModel.Currency;
 
-                    const isGSTEnabled =
-                        !!taxType &&
+                    const isGSTEnabled = !!taxType &&
                         taxRate > 0 &&
                         currency === "INR";
 
                     // ================= COMPANY DETAILS =================
-                    const filter = { BranchID: [oCustomerModel.BranchCode] };
+                    const filter = {
+                        BranchID: [oCustomerModel.BranchCode]
+                    };
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
 
@@ -2552,7 +2550,7 @@ sap.ui.define([
                         }
 
                         const isGSTApplicable =
-                            isGSTEnabled && item.GSTCalculation === "YES"; 
+                            isGSTEnabled && item.GSTCalculation === "YES";
 
                         item.SAC = isGSTApplicable ? "996322" : "-";
 
@@ -2630,7 +2628,7 @@ sap.ui.define([
                     );
 
                     if (companyImage) {
-                        doc.addImage("data:image/png;base64," + companyImage,"PNG", margin, 15, 40, 40);
+                        doc.addImage("data:image/png;base64," + companyImage, "PNG", margin, 15, 40, 40);
                     }
 
                     // ================= INVOICE DETAILS =================
@@ -2779,10 +2777,10 @@ sap.ui.define([
                     if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
 
                     if (couponDiscount > 0)
-                    summary.push([
-                        `Discount (${oCustomerModel.CouponCode}) :`,
-                        "- " + Formatter.fromatNumber(couponDiscount)
-                    ]);
+                        summary.push([
+                            `Discount (${oCustomerModel.CouponCode}) :`,
+                            "- " + Formatter.fromatNumber(couponDiscount)
+                        ]);
 
                     const totalRowIndex = summary.length;
                     summary.push(["Total :", Formatter.fromatNumber(roundedAmount)]);
@@ -2856,7 +2854,9 @@ sap.ui.define([
             CID_onPressGenerateSummaryPDF: async function() {
                 try {
                     this.getBusyDialog()
-                    const { jsPDF } = window.jspdf;
+                    const {
+                        jsPDF
+                    } = window.jspdf;
                     const oView = this.getView();
 
                     // ================= FETCH OVERALL INVOICE DATA =================
@@ -3111,7 +3111,7 @@ sap.ui.define([
                         if (parseFloat(oModel.CouponDiscount) > 0) {
                             summaryBody.push([
                                 `Discount (${oModel.CouponCode}) :`,
-                            "- " +  Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                                "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
                             ]);
                         }
 
@@ -3241,27 +3241,27 @@ sap.ui.define([
                 }
             },
 
-             CID_onPressrefundAmount: function() {
-                    var that = this;   
-                    if (this.oDialog) {
-                        this.oDialog.destroy();
-                        this.oDialog = null;
-                    }
-                    var oView = that.getView();
-                    if (!that.oDialog) {
-                        sap.ui.core.Fragment.load({
-                            name: "sap.ui.com.project1.fragment.RefundAmount",
-                            controller: that
-                        }).then(function(oDialog) {
-                            that.oDialog = oDialog;
-                            oView.addDependent(oDialog);
-                            oDialog.open();
-                            that.refundFunction();
-                        });
-                    } else {
-                        that.oDialog.open();
+            CID_onPressrefundAmount: function() {
+                var that = this;
+                if (this.oDialog) {
+                    this.oDialog.destroy();
+                    this.oDialog = null;
+                }
+                var oView = that.getView();
+                if (!that.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.ui.com.project1.fragment.RefundAmount",
+                        controller: that
+                    }).then(function(oDialog) {
+                        that.oDialog = oDialog;
+                        oView.addDependent(oDialog);
+                        oDialog.open();
                         that.refundFunction();
-                    }      
+                    });
+                } else {
+                    that.oDialog.open();
+                    that.refundFunction();
+                }
             },
 
             refundFunction: function() {
@@ -3285,20 +3285,20 @@ sap.ui.define([
                 var RefundModel = this.getView().getModel("RefundModel").getData();
                 const isMandatoryValid =
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("HM_id_PaymentMode"), "ID") &&
-		            utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("HM_id_ReceivedDate"), "ID");
 
-                    const isValid = isMandatoryValid
-                    if (!isValid) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
+                const isValid = isMandatoryValid
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
 
                 this.getBusyDialog()
                 const jsonData = {
                     InvNo: String(RefundModel.InvNo),
                     BankTransactionID: String(RefundModel.TransactionId),
-                    Date : RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     Amount: (RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
@@ -3306,8 +3306,8 @@ sap.ui.define([
                     BookingID: RefundModel.BookingID,
                     BranchCode: RefundModel.BranchCode,
                     PaymentType: RefundModel.PaymentMode,
-                    BankName : RefundModel.PaymentMode,
-                    Used : "Y"
+                    BankName: RefundModel.PaymentMode,
+                    Used: "Y"
                 };
 
                 try {
@@ -3321,7 +3321,7 @@ sap.ui.define([
                         await this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
-                       
+
                         var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
                         });
@@ -3331,20 +3331,21 @@ sap.ui.define([
 
                         // Format dates
                         oInvoice.InvoiceDate = this.Formatter.formatDate(oInvoice.InvoiceDate);
-                        oInvoice.PayByDate   = this.Formatter.formatDate(oInvoice.PayByDate);
+                        oInvoice.PayByDate = this.Formatter.formatDate(oInvoice.PayByDate);
 
                         // Set model
                         oSelectedModel.setData(oInvoice);
                         oSelectedModel.refresh(true);
-                        oSelectedModel.refresh(true);  
+                        oSelectedModel.refresh(true);
                         this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
                         if (this.oDialog) {
-                                this.oDialog.destroy();
-                                this.oDialog = null;
+                            this.oDialog.destroy();
+                            this.oDialog = null;
                         }
                         MessageToast.show(this.i18nModel.getText("refundMessage"));
                     }
@@ -3366,5 +3367,192 @@ sap.ui.define([
                     this.oDialog = null;
                 }
             },
+
+            onRefreshInvoice: async function() {
+                try {
+                    const oView = this.getView();
+                    const oModel = oView.getModel("SelectedCustomerModel").getData();
+                    const existingItems = oView.getModel("ManageInvoiceItemModel")
+                        .getProperty("/ManageInvoiceItem") || [];
+
+                    this.getBusyDialog();
+
+                    const oData = await this.ajaxReadWithJQuery("HM_BookingFacilityItems", {
+                        CustomerID: oModel.CustomerID,
+                    });
+
+                    const finalItems = this._prepareInvoiceItems(oData);
+
+                    oView.getModel("ManageInvoiceItemModel")
+                        .setProperty("/ManageInvoiceItem", finalItems);
+
+                    await this.totalAmountCalculation();
+
+                } catch (e) {
+                    MessageToast.show(e.message);
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            _prepareInvoiceItems: function(oData) {
+
+                const oView = this.getView();
+
+                const existingItems = oView.getModel("ManageInvoiceItemModel")
+                    .getProperty("/ManageInvoiceItem") || [];
+
+                // ================= BOOKING DATE RANGE =================
+                const bookingItem = existingItems.find(i =>
+                    i.Particulars.includes("Room Rent")
+                );
+
+                if (!bookingItem) return existingItems;
+
+                const bookingStart = this._parseDate(bookingItem.StartDate);
+                const bookingEnd = this._parseDate(bookingItem.EndDate);
+
+                // ================= SPLIT ITEMS =================
+                const nonFacilityItems = existingItems.filter(i =>
+                    !i.Particulars.includes("Facility")
+                );
+
+                const existingFacilityItems = existingItems.filter(i =>
+                    i.Particulars.includes("Facility")
+                );
+
+                // ================= EXISTING MAP =================
+                const existingMap = new Map();
+
+                existingFacilityItems.forEach(item => {
+                    const key = this._getKey(
+                        item.Particulars,
+                        item.StartDate,
+                        item.EndDate
+                    );
+                    existingMap.set(key, item);
+                });
+
+                // ================= DB FILTER =================
+                const dbFacilitiesRaw = (oData.commentData || []).filter(f => f.FacilityName);
+
+                // 👉 FILTER BY BOOKING RANGE
+                const dbFacilities = dbFacilitiesRaw.filter(f => {
+
+                    const fStart = new Date(f.StartDate);
+                    const fEnd = new Date(f.EndDate);
+
+                    return (
+                        fStart <= bookingEnd &&
+                        fEnd >= bookingStart
+                    );
+                });
+
+                // ================= DB MAP =================
+                const dbMap = new Map();
+
+                dbFacilities.forEach(f => {
+
+                    const key = this._getKey(
+                        `${f.FacilityName} - Facility`,
+                        this.Formatter.DateFormat(f.StartDate),
+                        this.Formatter.DateFormat(f.EndDate)
+                    );
+
+                    dbMap.set(key, f);
+                });
+
+                // ================= FINAL FACILITY =================
+                const updatedFacilityItems = [];
+
+                dbMap.forEach((dbItem, key) => {
+
+                    if (existingMap.has(key)) {
+                        // ✔ KEEP EXISTING
+                        updatedFacilityItems.push(existingMap.get(key));
+                    } else {
+                        // ➕ ADD NEW
+
+                        updatedFacilityItems.push({
+                            InvNo: existingItems[0]?.InvNo,
+
+                            Particulars: `${dbItem.FacilityName} - Facility`,
+                            UnitText: dbItem.UnitText,
+
+                            DurationText: this._getDurationText(
+                                dbItem.UnitText,
+                                dbItem.StartDate,
+                                dbItem.EndDate,
+                                dbItem.TotalHour
+                            ),
+
+                            GrossPrice: Number(dbItem.BasicFacilityPrice) || 0,
+
+                            // 🔥 CALCULATION
+                            Total: this._calculateFacilityTotal(dbItem),
+
+                            StartDate: this.Formatter.DateFormat(dbItem.StartDate),
+                            EndDate: this.Formatter.DateFormat(dbItem.EndDate),
+
+                            Currency: dbItem.Currency || "INR",
+
+                            GSTCalculation: "YES",
+                            Discount: "0.00",
+
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        });
+                    }
+
+                });
+
+                // ================= FINAL =================
+                const finalItems = [
+                    ...nonFacilityItems,
+                    ...updatedFacilityItems
+                ];
+
+                finalItems.forEach((item, index) => {
+                    item.IndexNo = index + 1;
+                });
+
+                return finalItems;
+            },
+
+            _parseDate: function(dateStr) {
+                const [day, month, year] = dateStr.split("/");
+                return new Date(`${year}-${month}-${day}`);
+            },
+
+            _getKey: function(particulars, start, end) {
+                return `${particulars}_${start}_${end}`;
+            },
+
+            _calculateFacilityTotal: function(item) {
+
+                const price = Number(item.BasicFacilityPrice) || 0;
+
+                if (item.UnitText === "Per Day") {
+
+                    const days = Math.ceil(
+                        (new Date(item.EndDate) - new Date(item.StartDate)) / 86400000
+                    );
+
+                    return price * days;
+                }
+
+                if (item.UnitText === "Per Hour") {
+
+                    const hours = Number(item.TotalHour) || 1;
+
+                    return price * hours;
+                }
+
+                // Per Month / Fixed
+                return price;
+            }
         });
     });

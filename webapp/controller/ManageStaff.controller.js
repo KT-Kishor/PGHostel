@@ -240,13 +240,26 @@ sap.ui.define([
             }
 
             const TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
-            const aBranchCodes = C("MS_id_Branchcode").getSelectedKeys();
+
+            // ---------------- MULTICOMBOBOX ----------------
+            const oBranchControl = C("MS_id_Branchcode");
+
+            // Branch Codes (keys)
+            const aBranchCodes = oBranchControl.getSelectedKeys();
+
+            // Branch Names (additionalText)
+            const aSelectedItems = oBranchControl.getSelectedItems();
+
+            const abranchName = aSelectedItems.map(item =>
+                item.getAdditionalText() || item.getText()
+            );
 
             const payload = {
                 Salutation: C("MS_id_signUpSalutation").getSelectedKey(),
                 UserName: data.UserName.trim(),
                 Role: C("MS_id_Role").getSelectedKey() || C("MS_id_Role").getValue(),
                 BranchCode: aBranchCodes.join(","),
+                BranchName: abranchName.join(","),
                 EmailID: data.Email.trim(),
                 // Password: btoa(data.password),
                 STDCode: data.STDCode || std,
