@@ -2973,16 +2973,7 @@ sap.ui.define([
                     return; // ⛔ stop save
                 }
             }
-            if (paymentMap[unit] === "Per Year") {
-                if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Day")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Daily payment plans when your booking is on a Per Year payment plan.",
-                        {
-                            styleClass: "myUnifiedBtn"
-                        }
-                    );
-                    return; // ⛔ stop save
-                }
-            }
+       
 
             const invalidFacilities = [];
 
@@ -3083,7 +3074,7 @@ sap.ui.define([
                                     item.EndDate = Bookingdata.EndDate;
 
                                     let diffTime = bookingEndDate - startDate;
-                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
                                     let unit = item.UnitText?.toLowerCase();
 
@@ -3092,12 +3083,30 @@ sap.ui.define([
 
                                     if (unit === "per day") {
                                         total = diffDays * price;
-                                    } else if (unit === "per month") {
-                                        let months = Math.ceil(diffDays / 30);
+                                         item.TotalDays = diffDays;
+
+                                    }else if(unit === "per hour"){
+                                        let diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                                        total = diffHours * price;
+
+                                    }
+                                     else if (unit === "per month") {
+                                        if(CustomerData.PaymentType==="yearly"){
+                                        let months = CustomerData.Duration * 12
                                         total = months * price;
+                                         item.TotalMonths = months;
+
+                                        }else{
+                                         let months = CustomerData.Duration 
+                                         total = months * price;
+                                         item.TotalMonths = months;
+
+                                        }
+                                     
                                     } else if (unit === "per year") {
-                                        let years = Math.ceil(diffDays / 365);
+                                        let years = CustomerData.Duration;
                                         total = years * price;
+                                           item.TotalYears = years; 
                                     }
 
                                     item.TotalAmount = total;
@@ -3149,7 +3158,7 @@ sap.ui.define([
 
                     // default payment UI state
                     setTimeout(() => {
-                        const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+                        const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup1");
 
                         if (oGroup) {
                             oGroup.setSelectedIndex(0); // Pay On CheckIn
@@ -3183,7 +3192,7 @@ sap.ui.define([
 
                         // default payment UI state
                         setTimeout(() => {
-                            const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+                            const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup1");
 
                             if (oGroup) {
                                 oGroup.setSelectedIndex(0); // Pay On CheckIn

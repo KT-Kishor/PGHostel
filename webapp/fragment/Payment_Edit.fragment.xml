@@ -55,7 +55,7 @@
                     design="Bold"
                 />
                 <RadioButtonGroup
-                    id="idPaymentTypeGroup"
+                    id="idPaymentTypeGroup1"
                     columns="1"
                     select="onPaymentTypeSelect"
                     selectedIndex="2"
