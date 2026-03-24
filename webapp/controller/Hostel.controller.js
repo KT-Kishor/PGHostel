@@ -2713,36 +2713,10 @@ if (aData.length === 0) {
                     if (sBranchCode || BranchName) {
                         this.Branchlength = aBranchesData.length
                     }
-                    const oRoomtypeCombo = this.byId("id_Roomtype");
-const oAreaCombo = this.byId("id_Area");
+                  
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
 
-
-                   if (aExistingData.length === 0) {
-    // Clear input first
-    oRoomtypeCombo.setValue("");
-    oAreaCombo.setValue("");
-    
-    // Insert No Data item to dropdown
-    if (oRoomtypeCombo.getItems().length === 0) {
-        oRoomtypeCombo.insertItem(new sap.ui.core.ListItem({
-            key: "",
-            text: "No Data"
-        }), 0);
-    }
-    if (oAreaCombo.getItems().length === 0) {
-        oAreaCombo.insertItem(new sap.ui.core.ListItem({
-            key: "",
-            text: "No Data"
-        }), 0);
-    }
-} else {
-    // Clear any manual No Data items when real data loads
-    oRoomtypeCombo.removeAllItems();
-    oAreaCombo.removeAllItems();
-}
-oVisibilityModel.setProperty("/NoData", aExistingData.length === 0);
                     let aFilteredData = aBranchesData.filter(newItem => {
                         return !aExistingData.some(existingItem =>
                             existingItem.Name === newItem.Name
