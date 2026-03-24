@@ -3395,24 +3395,26 @@ sap.ui.define([
                 }
             },
 
-            _prepareInvoiceItems: function(oData) {
-
+            _prepareInvoiceItems: function (oData) {
                 const oView = this.getView();
 
                 const existingItems = oView.getModel("ManageInvoiceItemModel")
                     .getProperty("/ManageInvoiceItem") || [];
 
-                // ================= BOOKING DATE RANGE =================
-                const bookingItem = existingItems.find(i =>
+                // ================= GET INVOICE CYCLE =================
+                const roomRent = existingItems.find(i =>
                     i.Particulars.includes("Room Rent")
                 );
 
-                if (!bookingItem) return existingItems;
+                if (!roomRent) return existingItems;
 
-                const bookingStart = this._parseDate(bookingItem.StartDate);
-                const bookingEnd = this._parseDate(bookingItem.EndDate);
+                const cycleStart = this._parseDate(roomRent.StartDate);
+                const cycleEnd   = this._parseDate(roomRent.EndDate);
 
-                // ================= SPLIT ITEMS =================
+                cycleStart.setHours(0,0,0,0);
+                cycleEnd.setHours(0,0,0,0);
+
+                // ================= SPLIT =================
                 const nonFacilityItems = existingItems.filter(i =>
                     !i.Particulars.includes("Facility")
                 );
@@ -3425,76 +3427,91 @@ sap.ui.define([
                 const existingMap = new Map();
 
                 existingFacilityItems.forEach(item => {
-                    const key = this._getKey(
-                        item.Particulars,
-                        item.StartDate,
-                        item.EndDate
-                    );
+                    const key = `${item.Particulars}_${item.UnitText}`;
                     existingMap.set(key, item);
                 });
 
-                // ================= DB FILTER =================
-                const dbFacilitiesRaw = (oData.commentData || []).filter(f => f.FacilityName);
+                // ================= RAW BACKEND DATA =================
+                const dbFacilitiesRaw = oData.commentData || [];
 
-                // 👉 FILTER BY BOOKING RANGE
-                const dbFacilities = dbFacilitiesRaw.filter(f => {
-
-                    const fStart = new Date(f.StartDate);
-                    const fEnd = new Date(f.EndDate);
-
-                    return (
-                        fStart <= bookingEnd &&
-                        fEnd >= bookingStart
-                    );
-                });
-
-                // ================= DB MAP =================
-                const dbMap = new Map();
-
-                dbFacilities.forEach(f => {
-
-                    const key = this._getKey(
-                        `${f.FacilityName} - Facility`,
-                        this.Formatter.DateFormat(f.StartDate),
-                        this.Formatter.DateFormat(f.EndDate)
-                    );
-
-                    dbMap.set(key, f);
-                });
-
-                // ================= FINAL FACILITY =================
                 const updatedFacilityItems = [];
 
-                dbMap.forEach((dbItem, key) => {
+                dbFacilitiesRaw.forEach(f => {
 
-                    if (existingMap.has(key)) {
-                        // ✔ KEEP EXISTING
-                        updatedFacilityItems.push(existingMap.get(key));
+                    let fStart = new Date(f.StartDate);
+                    let fEnd   = new Date(f.EndDate);
+
+                    fStart.setHours(0,0,0,0);
+                    fEnd.setHours(0,0,0,0);
+
+                    // skip outside invoice cycle
+                    if (fEnd < cycleStart || fStart > cycleEnd) return;
+
+                    // ✅ CUT INTO CYCLE RANGE
+                    const effectiveStart = fStart > cycleStart ? fStart : cycleStart;
+                    const effectiveEnd   = fEnd < cycleEnd ? fEnd : cycleEnd;
+
+                    // ================= PARTICULARS =================
+                    let particulars = "";
+
+                    if (f.FacilityName === "Penalty Charges") {
+                        particulars = "Penalty Charges";
+                    } else if (f.UnitText === "Per Hour") {
+                        const hrs = Number(f.TotalHour) || 1;
+                        particulars = `${f.FacilityName} - Facility (${hrs} Hours)`;
                     } else {
-                        // ➕ ADD NEW
+                        particulars = `${f.FacilityName} - Facility`;
+                    }
+
+                    const key = `${particulars}_${f.UnitText}`;
+
+                    // ================= TOTAL CALC =================
+                    const total = this._calculateFacilityTotal(
+                        f,
+                        effectiveStart,
+                        effectiveEnd
+                    );
+
+                    // ================= UPDATE / ADD =================
+                    if (existingMap.has(key)) {
+
+                        const existing = existingMap.get(key);
+
+                        existing.StartDate = this.Formatter.DateFormat(effectiveStart);
+                        existing.EndDate   = this.Formatter.DateFormat(effectiveEnd);
+                        existing.Total     = total;
+
+                        existing.DurationText = this._getDurationText(
+                            f.UnitText,
+                            effectiveStart,
+                            effectiveEnd,
+                            f.TotalHour
+                        );
+
+                        updatedFacilityItems.push(existing);
+
+                    } else {
 
                         updatedFacilityItems.push({
                             InvNo: existingItems[0]?.InvNo,
 
-                            Particulars: `${dbItem.FacilityName} - Facility`,
-                            UnitText: dbItem.UnitText,
+                            Particulars: particulars,
+                            UnitText: f.UnitText,
 
                             DurationText: this._getDurationText(
-                                dbItem.UnitText,
-                                dbItem.StartDate,
-                                dbItem.EndDate,
-                                dbItem.TotalHour
+                                f.UnitText,
+                                effectiveStart,
+                                effectiveEnd,
+                                f.TotalHour
                             ),
 
-                            GrossPrice: Number(dbItem.BasicFacilityPrice) || 0,
+                            GrossPrice: Number(f.BasicFacilityPrice) || 0,
+                            Total: total,
 
-                            // 🔥 CALCULATION
-                            Total: this._calculateFacilityTotal(dbItem),
+                            StartDate: this.Formatter.DateFormat(effectiveStart),
+                            EndDate: this.Formatter.DateFormat(effectiveEnd),
 
-                            StartDate: this.Formatter.DateFormat(dbItem.StartDate),
-                            EndDate: this.Formatter.DateFormat(dbItem.EndDate),
-
-                            Currency: dbItem.Currency || "INR",
+                            Currency: f.Currency || "INR",
 
                             GSTCalculation: "YES",
                             Discount: "0.00",
@@ -3506,7 +3523,6 @@ sap.ui.define([
                             EndDateEditable: false
                         });
                     }
-
                 });
 
                 // ================= FINAL =================
@@ -3522,7 +3538,7 @@ sap.ui.define([
                 return finalItems;
             },
 
-            _parseDate: function(dateStr) {
+            _parseDate: function (dateStr) {
                 const [day, month, year] = dateStr.split("/");
                 return new Date(`${year}-${month}-${day}`);
             },
@@ -3531,28 +3547,77 @@ sap.ui.define([
                 return `${particulars}_${start}_${end}`;
             },
 
-            _calculateFacilityTotal: function(item) {
+            _calculateFacilityTotal: function (item, start, end) {
 
-                const price = Number(item.BasicFacilityPrice) || 0;
+                // ✅ NORMALIZE (VERY IMPORTANT)
+                start = new Date(start);
+                end = new Date(end);
 
-                if (item.UnitText === "Per Day") {
+                start.setHours(0, 0, 0, 0);
+                end.setHours(0, 0, 0, 0);
 
-                    const days = Math.ceil(
-                        (new Date(item.EndDate) - new Date(item.StartDate)) / 86400000
-                    );
+                const unit = item.UnitText?.toLowerCase();
 
+                // PER DAY
+                if (unit === "per day") {
+                    const price = Number(item.BasicFacilityPrice) || 0;
+
+                    const days = Math.floor((end - start) / 86400000);
                     return price * days;
                 }
 
-                if (item.UnitText === "Per Hour") {
+                // PER HOUR
+                if (unit === "per hour") {
+                    const price = Number(item.BasicFacilityPrice) || 0;
+                    const hrs = Number(item.TotalHour) || 1;
 
-                    const hours = Number(item.TotalHour) || 1;
-
-                    return price * hours;
+                    const days = Math.floor((end - start) / 86400000);
+                    return price * hrs * days;
                 }
 
-                // Per Month / Fixed
-                return price;
-            }
+                // PER MONTH
+                if (unit === "per month") {
+                    const price = Number(item.BasicFacilityPrice) || 0;
+
+                    let months =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() >= start.getDate()) months += 1;
+
+                    return price * months;
+                }
+
+                // PER YEAR
+                if (unit === "per year") {
+
+                    const totalprice = Number(item.FacilitiPrice || item.BasicFacilityPrice) || 0;
+
+                    const totalDays = Math.floor((end - start) / 86400000) + 1; // inclusive
+
+                    let totalMonths =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() >= start.getDate()) totalMonths += 1;
+
+                    const years = Math.ceil(totalMonths / 12) || 1;
+
+                    const yearlyPrice = totalprice / years;
+
+                    if (totalDays >= 364) {
+                        return this._round2(yearlyPrice);
+                    } else {
+                        const dailyRate = yearlyPrice / 365;
+                        return this._round2(dailyRate * totalDays);
+                    }
+                }
+
+                return Number(item.BasicFacilityPrice) || 0;
+            },
+
+            _round2: function(val) {
+                return Math.round((val + Number.EPSILON) * 100) / 100;
+            },
         });
     });
