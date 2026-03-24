@@ -13,5 +13,6 @@
     { "ID": 12, "FacilityName": "Room Heater" },
     { "ID": 13, "FacilityName": "Study Room Access" },
     { "ID": 14, "FacilityName": "Extra Bed" },
-    { "ID": 15, "FacilityName": "Others" }
+    { "ID": 15, "FacilityName": "Extra Pillow" },
+    { "ID": 16, "FacilityName": "Others" }
 ]

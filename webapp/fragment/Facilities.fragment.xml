@@ -82,7 +82,41 @@
                         text="{FacilityType>FacilityName}"
                     />
 				</ComboBox>
-				<Label text="{i18n>hourlyPrice}" />
+				<Label
+                    text="Selection Mode"
+                    required="true"
+                />
+				<ComboBox
+                    id="idSelectionMode"
+                    selectedKey="{FacilitiesModel>/SelectionMode}"
+                    items="{SelectionModeModel>/}"
+                    placeholder="Select selection mode"
+                    valueStateText="Select selection mode"
+                    change="onSelectionModeChange"
+                >
+					<core:Item
+                        key="{SelectionModeModel>key}"
+                        text="{SelectionModeModel>text}"
+                    />
+				</ComboBox>
+				<Label
+                    text="{i18n>unitPrice}"
+                    required="true"
+                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' }"
+                />
+				<Input
+                    id="idUnitPrice"
+                    placeholder="{i18n>enterUnitPrice}"
+                    value="{FacilitiesModel>/UnitPrice}"
+                    maxLength="7"
+                    liveChange="onPriceChange"
+                    valueStateText="{i18n>enterUnitPrice}"
+                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' }"
+                />
+				<Label
+                    text="{i18n>hourlyPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
+                />
 				<Input
                     id="idPerHourPrice"
                     placeholder="{i18n>enterPerHourPrice}"
@@ -90,8 +124,12 @@
                     maxLength="10"
                     liveChange="onPriceChange"
                     valueStateText="{i18n>enterPerHourPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                 />
-				<Label text="{i18n>dailyPrice}" />
+				<Label
+                    text="{i18n>dailyPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
+                />
 				<Input
                     id="idPerDayPrice"
                     placeholder="{i18n>enterPerDayPrice}"
@@ -99,8 +137,12 @@
                     maxLength="10"
                     liveChange="onPriceChange"
                     valueStateText="{i18n>enterPerDayPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                 />
-				<Label text="{i18n>monthlyPrice}" />
+				<Label
+                    text="{i18n>monthlyPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
+                />
 				<Input
                     id="idPerMonthPrice"
                     placeholder="{i18n>enterPerMonthPrice}"
@@ -108,8 +150,12 @@
                     maxLength="10"
                     liveChange="onPriceChange"
                     valueStateText="{i18n>enterPerMonthPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                 />
-				<Label text="{i18n>yearlyPrice}" />
+				<Label
+                    text="{i18n>yearlyPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
+                />
 				<Input
                     id="idPerYearPrice"
                     placeholder="{i18n>enterPerYearPrice}"
@@ -117,6 +163,7 @@
                     maxLength="10"
                     liveChange="onPriceChange"
                     valueStateText="{i18n>enterPerYearPrice}"
+                    visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                 />
 				<Label
                     text="{i18n>currency}"

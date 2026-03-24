@@ -29,6 +29,8 @@ sap.ui.define([
                     BranchCode: "",
                     Type: "",
                     FacilityName: "",
+                    RequiresUnitPrice: false,
+                    UnitPrice: "",
                     PerHourPrice: "",
                     PerDayPrice: "",
                     PerMonthPrice: "",
@@ -145,6 +147,7 @@ sap.ui.define([
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+            this._syncFacilityPricingFields();
         },
 
         onFacilityRateChange: function(oEvent) {
@@ -297,10 +300,19 @@ sap.ui.define([
 
 
 
-                if ((Payload.PerHourPrice === "" || Payload.PerHourPrice === 0) &&
-                    (Payload.PerDayPrice === "" || Payload.PerDayPrice === 0) &&
-                    (Payload.PerMonthPrice === "" || Payload.PerMonthPrice === 0) &&
-                    (Payload.PerYearPrice === "" || Payload.PerYearPrice === 0)) {
+                if (this._requiresUnitPriceByType(Payload.Type)) {
+                    if (!utils._LCvalidateMandatoryField(oView.byId("FD_id_UnitPrice"), "ID")) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+                    if (Payload.UnitPrice === "" || Number(Payload.UnitPrice) === 0) {
+                        MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
+                        return;
+                    }
+                } else if ((Payload.PerHourPrice === "" || Number(Payload.PerHourPrice) === 0) &&
+                    (Payload.PerDayPrice === "" || Number(Payload.PerDayPrice) === 0) &&
+                    (Payload.PerMonthPrice === "" || Number(Payload.PerMonthPrice) === 0) &&
+                    (Payload.PerYearPrice === "" || Number(Payload.PerYearPrice) === 0)) {
                     MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     return;
                 }
@@ -331,10 +343,11 @@ sap.ui.define([
                             BranchCode: Payload.BranchCode,
                             FacilityName: Payload.FacilityName,
                             Type: Payload.Type,
-                            PerHourPrice: Payload.PerHourPrice || 0,
-                            PerDayPrice: Payload.PerDayPrice || 0,
-                            PerMonthPrice: Payload.PerMonthPrice || 0,
-                            PerYearPrice: Payload.PerYearPrice || 0,
+                            UnitPrice: this._requiresUnitPriceByType(Payload.Type) ? (Payload.UnitPrice || 0) : 0,
+                            PerHourPrice: this._requiresUnitPriceByType(Payload.Type) ? 0 : (Payload.PerHourPrice || 0),
+                            PerDayPrice: this._requiresUnitPriceByType(Payload.Type) ? 0 : (Payload.PerDayPrice || 0),
+                            PerMonthPrice: this._requiresUnitPriceByType(Payload.Type) ? 0 : (Payload.PerMonthPrice || 0),
+                            PerYearPrice: this._requiresUnitPriceByType(Payload.Type) ? 0 : (Payload.PerYearPrice || 0),
                             Currency: Payload.Currency,
                         },
                         Attachment: {
@@ -386,6 +399,7 @@ sap.ui.define([
                 const oFacilityDetails = oData.data.data[0];
                 const oImageDetails = oData.data.FactDeta[0] || {};
 
+                oFacilityDetails.RequiresUnitPrice = this._requiresUnitPriceByType(oFacilityDetails.Type);
                 this.getView().getModel("FacilitiesModel").setData(oFacilityDetails);
 
                 const aDisplayImages = [];
@@ -414,6 +428,27 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("errorRefreshingFacilityDetails"));
             } finally {
                 this.closeBusyDialog()
+            }
+        },
+
+        _requiresUnitPriceByType: function(sType) {
+            var sNormalizedType = String(sType || "").toLowerCase().trim();
+            return sNormalizedType === "laundry service" || sNormalizedType === "ironing service";
+        },
+
+        _syncFacilityPricingFields: function() {
+            var oModel = this.getView().getModel("FacilitiesModel");
+            if (!oModel) return;
+
+            var bRequiresUnitPrice = this._requiresUnitPriceByType(oModel.getProperty("/Type"));
+            oModel.setProperty("/RequiresUnitPrice", bRequiresUnitPrice);
+            if (bRequiresUnitPrice) {
+                oModel.setProperty("/PerHourPrice", "");
+                oModel.setProperty("/PerDayPrice", "");
+                oModel.setProperty("/PerMonthPrice", "");
+                oModel.setProperty("/PerYearPrice", "");
+            } else {
+                oModel.setProperty("/UnitPrice", "");
             }
         },
 

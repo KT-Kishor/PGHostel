@@ -2825,9 +2825,8 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 /* ---------- SAP Flex Safety ---------- */
-.sapMFlexBox .serviceCard {
-  flex-shrink: 0 !important;
-}
+
+
 
 /* ----- Minimal override: restore rounded image corners ----- */
 .serviceCard.serviceCardSelected .imageContainer,
@@ -2929,6 +2928,11 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   /* slightly smaller to reveal the card rim */
   border-radius: 11px !important;
 }
+.serviceImage,
+.imageContainer img {
+    height: 110px !important;
+    width: 110px !important;
+}
 
 /* ---------- Selected Badge ---------- */
 .selectedBadge {
@@ -2974,9 +2978,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 /* Base spacing for all screens */
-.serviceCard {
-  margin: 0.5rem;
-}
+
 
 /* Extra spacing for larger screens */
 @media screen and (max-width: 600px) {
@@ -4941,10 +4943,48 @@ width: 44px !important;
 .sapUiLocalBusyIndicator {
     background-color: transparent !important;
 }
-/* Center ONLY empty BookingID items */
-.sapMComboBoxPicker .sapMLIB .sapMText,
-.sapMComboBoxBasePicker .sapMLIB .sapMText {
-    text-align: center !important;
-    justify-content: center !important;
+
+.facilityTrack {
+    display: flex;
+    flex-wrap: nowrap !important;
+    transition: transform 0.45s cubic-bezier(.25,.8,.25,1);
+    will-change: transform;
 }
 
+.facilityNavBtn {
+    min-width: 2.5rem;
+    z-index: 2;
+}
+  
+
+.facilityViewport {
+    overflow: hidden !important;
+    white-space: nowrap;
+    position: relative;
+    min-height: 260px;
+}
+.facilityMessageStrip {
+    width: 100%;
+}
+
+.facilityMessageStrip .sapMMsgStrip {
+    width: 100%;
+}
+
+
+.customBookingPanel .sapMPanelHdr{
+   background: linear-gradient(135deg, #00b7c7, #008b96) !important; 
+    color: white !important;
+}
+/* Agar aapne headerToolbar use kiya hai toh ye kaam karega */
+.customBookingPanel .sapMOTB {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border-bottom: none !important;
+}
+
+/* Title aur Icons ka color white karne ke liye */
+.customBookingPanel .sapMOTB .sapMTitle, 
+.customBookingPanel .sapMOTB .sapMBtnIcon,
+.customBookingPanel .sapMOTB .sapMBtnTransparent {
+    color: white !important;
+}

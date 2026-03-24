@@ -111,7 +111,25 @@
                                                 text="{FacilityType>FacilityName}"
                                             />
                                         </m:ComboBox>
-                                        <m:Label text="{i18n>hourlyPrice}" />
+                                        <m:Label
+                                            text="{i18n>unitPrice}"
+                                            required="true"
+                                            visible="{FacilitiesModel>/RequiresUnitPrice}"
+                                        />
+                                        <m:Input
+                                            id="FD_id_UnitPrice"
+                                            placeholder="{i18n>enterUnitPrice}"
+                                            value="{FacilitiesModel>/UnitPrice}"
+                                            maxLength="7"
+                                            editable="{editable>/Edit}"
+                                            liveChange="onPriceChange"
+                                            valueStateText="{i18n>enterUnitPrice}"
+                                            visible="{FacilitiesModel>/RequiresUnitPrice}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>hourlyPrice}"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                        />
                                         <m:Input
                                             id="FD_id_PerHourPrice"
                                             placeholder="{i18n>enterPerHourPrice}"
@@ -119,8 +137,12 @@
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
                                         />
-                                        <m:Label text="{i18n>dailyPrice}" />
+                                        <m:Label
+                                            text="{i18n>dailyPrice}"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                        />
                                         <m:Input
                                             id="FD_id_PerDayPrice"
                                             placeholder="{i18n>enterPerDayPrice}"
@@ -128,8 +150,12 @@
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
                                         />
-                                        <m:Label text="{i18n>monthlyPrice}" />
+                                        <m:Label
+                                            text="{i18n>monthlyPrice}"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                        />
                                         <m:Input
                                             id="FD_id_PerMonthPrice"
                                             placeholder="{i18n>enterPerMonthPrice}"
@@ -137,8 +163,12 @@
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
                                         />
-                                        <m:Label text="{i18n>yearlyPrice}" />
+                                        <m:Label
+                                            text="{i18n>yearlyPrice}"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                        />
                                         <m:Input
                                             id="FD_id_PerYearPrice"
                                             placeholder="{i18n>enterPerYearPrice}"
@@ -146,6 +176,7 @@
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
+                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
                                         />
                                         <!-- Currency -->
                                         <m:Label

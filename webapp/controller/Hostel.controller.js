@@ -370,7 +370,22 @@ sap.ui.define([
         },
 
         onConfirmBooking: function () {
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
+         
+            if (!bLoggedIn) {
+                MessageBox.information("Please log in to continue booking.", {
+                    title: "Login Required",
+                    actions: [MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    onClose: function () {
+                        this.onpressLogin();
+                        sessionStorage.setItem("homePageReturnTab", "idRooms");
+                    }.bind(this)
+                });
 
+                return;
+            }
             const oView = this.getView();
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
@@ -405,6 +420,7 @@ sap.ui.define([
                 RoomNo: oData.RoomNo || "",
                 BedType: oData.BedType || "",
                 ACType: oData.ACType || "",
+                PropertyType: oData.PropertyType || "Hostel",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
                 Area: oData.Area || "",
@@ -621,8 +637,12 @@ sap.ui.define([
                     // Price logic
                     let price = 0;
                     let unit = "";
+                    const bHasUnitPrice = parseFloat(f.UnitPrice) > 0;
 
-                    if (parseFloat(f.PerHourPrice) > 0) {
+                    if (bHasUnitPrice) {
+                        price = f.UnitPrice;
+                        unit = "Unit Price";
+                    } else if (parseFloat(f.PerHourPrice) > 0) {
                         price = f.PerHourPrice;
                         unit = "Per Hour";
                     } else if (parseFloat(f.PerDayPrice) > 0) {
@@ -639,11 +659,11 @@ sap.ui.define([
                     }
 
                     const hasImage = !!(f.Photo1 && f.Photo1.trim());
-                    const name = (f.Type || "").trim();
+                    const name = (f.Type || f.FacilityName || "").trim();
 
                     return {
                         FacilityID: f.ID,
-                        FacilityName: name,
+                        FacilityName: f.FacilityName || name,
                         Price: price,
                         UnitText: unit,
                         Currency: f.Currency || "INR",

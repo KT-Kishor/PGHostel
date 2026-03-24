@@ -3,8 +3,9 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    "sap/m/MessageBox",
     "../utils/validation",
-], function (BaseController, Formatter, JSONModel, MessageToast, utils) {
+], function (BaseController, Formatter, JSONModel, MessageToast, MessageBox, utils) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
@@ -229,8 +230,8 @@ sap.ui.define([
                         EmailID: oBranchInfo?.EmailID || "",
                         AvailableDate: Date,
                         ExtraBed: room.ExtraBed,
-                        PropertyType: PropertyType,
-                        LandMark: LandMark
+                        LandMark: LandMark, 
+                        PropertyType: "Hostel"
                     };
                 });
 
@@ -294,8 +295,8 @@ sap.ui.define([
                     GSTIN: oSelected.GSTIN || "",
                     GeoLocation: oSelected.GeoLocation,
                     AvailableDate: oSelected.AvailableDate,
-                    ExtraBed: oSelected.ExtraBed || 0
-
+                    ExtraBed: oSelected.ExtraBed || 0,
+                    PropertyType: "Hostel"
                 };
 
                 const oHostelModel = new JSONModel(oFullDetails);
@@ -457,7 +458,22 @@ sap.ui.define([
         },
 
         onConfirmBooking: function () {
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
+         
 
+            if (!bLoggedIn) {
+                MessageBox.information("Please log in to continue booking. You will be redirected to the Hostel page.", {
+                    title: "Login Required",
+                    actions: [MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    onClose: function () {
+                        this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                    }.bind(this)
+                });
+
+                return;
+            }
             const oView = this.getView();
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
@@ -492,6 +508,7 @@ sap.ui.define([
                 RoomNo: oData.RoomNo || "",
                 BedType: oData.BedType || "",
                 ACType: oData.ACType || "",
+                PropertyType: oData.PropertyType || "Hostel",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
                 Area: oData.Area || "",
@@ -562,7 +579,7 @@ sap.ui.define([
                 oHostelModel.setData({});
             }
             const oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteBookRoom");
+            oRouter.navTo("RouteBooking");
         },
         onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
@@ -699,8 +716,12 @@ sap.ui.define([
                     // Price logic
                     let price = 0;
                     let unit = "";
+                    const bHasUnitPrice = parseFloat(f.UnitPrice) > 0;
 
-                    if (parseFloat(f.PerHourPrice) > 0) {
+                    if (bHasUnitPrice) {
+                        price = f.UnitPrice;
+                        unit = "Unit Price";
+                    } else if (parseFloat(f.PerHourPrice) > 0) {
                         price = f.PerHourPrice;
                         unit = "Per Hour";
                     } else if (parseFloat(f.PerDayPrice) > 0) {
@@ -717,11 +738,11 @@ sap.ui.define([
                     }
 
                     const hasImage = !!(f.Photo1 && f.Photo1.trim());
-                    const name = (f.Type || "").trim();
+                    const name = (f.Type || f.FacilityName || "").trim();
 
                     return {
                         FacilityID: f.ID,
-                        FacilityName: name,
+                        FacilityName: f.FacilityName || name,
                         Price: price,
                         UnitText: unit,
                         Currency: f.Currency || "INR",

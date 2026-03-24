@@ -196,6 +196,13 @@
           ]
         },
         {
+          "name": "RouteBooking",
+          "pattern": "Booking",
+          "target": [
+            "TargetBooking"
+          ]
+        },
+        {
           "name": "RouteBookRoomSummary",
           "pattern": "BookRoomSummary",
           "target": [
@@ -382,21 +389,21 @@
             "targetDamageDashboard"
           ]
         },
-          {
+        {
           "name": "RouteDamageDetails",
           "pattern": "DamageDetails/{sPath}",
           "target": [
             "targetDamageDetails"
           ]
         },
-         {
+        {
           "name": "RouteSupportDetails",
           "pattern": "SupportDetails",
           "target": [
             "targetSupportDetails"
           ]
         },
-         {
+        {
           "name": "RouteBugDetails",
           "pattern": "BugDetails",
           "target": [
@@ -412,7 +419,7 @@
           "viewId": "Hostel",
           "viewName": "Hostel"
         },
-          "targetDamageDetails": {
+        "targetDamageDetails": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
@@ -481,6 +488,13 @@
           "clearControlAggregation": false,
           "viewId": "Book_Room",
           "viewName": "Book_Room"
+        },
+        "TargetBooking": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Booking",
+          "viewName": "Booking"
         },
         "TargetBookRoomSummary": {
           "viewType": "XML",
@@ -608,7 +622,7 @@
           "viewId": "PaymentDashboard",
           "viewName": "PaymentDashboard"
         },
-         "targetSupportDetails": {
+        "targetSupportDetails": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,

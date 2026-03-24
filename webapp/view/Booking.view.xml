@@ -1,0 +1,455 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Booking"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:unified="sap.ui.unified"
+    displayBlock="true"
+>
+    <Page
+        showHeader="true"
+        enableScrolling="true"
+        class="defaultBGBlur"
+    >
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
+                type="XML"
+            />
+        </headerContent>
+
+        <content>
+            <VBox
+                width="100%"
+                class="sapUiSmallMargin"
+            >
+                <HBox
+                    width="100%"
+                    wrap="Wrap"
+                    alignItems="Start"
+                    renderType="Bare"
+                >
+                    <VBox
+                        width="60%"
+                        class="sapUiTinyMarginEnd"
+                    >
+                        <Panel headerText="Booking" class="customBookingPanel" >
+                            <MessageStrip
+                                text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiTinyMarginBottom"
+                            />
+
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="4"
+                                labelSpanL="4"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                columnsXL="2"
+                                columnsL="2"
+                                columnsM="1"
+                            >
+                                <Label text="Property Type" />
+                                <ComboBox
+                                    selectedKey="{HostelModel>/PropertyType}"
+                                    items="{BookingView>/PropertyTypes}"
+                                    selectionChange="onPropertyTypeChange"
+                                >
+                                    <core:Item
+                                        key="{BookingView>key}"
+                                        text="{BookingView>text}"
+                                    />
+                                </ComboBox>
+                                <Label text="Rent Price" />
+                                <Input
+                                    value="{= ${HostelModel>/RoomPrice} + ' ' + ${HostelModel>/Currency}}"
+                                    editable="false"
+                                />
+
+                                <Label text="Room Plan" />
+                                <ComboBox
+                                    selectedKey="{HostelModel>/SelectedPriceType}"
+                                    items="{HostelModel>/AvailablePaymentMethods}"
+                                    selectionChange="onRoomPlanChange"
+                                >
+                                    <core:Item
+                                        key="{HostelModel>key}"
+                                        text="{HostelModel>text}"
+                                    />
+                                </ComboBox>
+
+                                <Label text="No. of Persons" />
+                                <Input
+                                    value="{HostelModel>/SelectedPerson}"
+                                    editable="false"
+                                />
+
+                                <Label
+                                    text="Duration"
+                                    visible="{BookingView>/showDurationSelector}"
+                                />
+                                <Select
+                                    selectedKey="{HostelModel>/SelectedMonths}"
+                                    items="{BookingView>/DurationOptions}"
+                                    visible="{BookingView>/showDurationSelector}"
+                                    change="onDurationChange"
+                                >
+                                    <core:Item
+                                        key="{BookingView>key}"
+                                        text="{BookingView>text}"
+                                    />
+                                </Select>
+
+                                <Label text="Start Date" />
+                                <DatePicker
+                                    value="{HostelModel>/StartDate}"
+                                    valueFormat="dd/MM/yyyy"
+                                    displayFormat="dd/MM/yyyy"
+                                    minDate="{HostelModel>/TodayDate}"
+                                    change="onStartDateChange"
+                                />
+
+                                <Label text="End Date" />
+                                <DatePicker
+                                    value="{HostelModel>/EndDate}"
+                                    valueFormat="dd/MM/yyyy"
+                                    displayFormat="dd/MM/yyyy"
+                                    editable="{BookingView>/endDateEditable}"
+                                    change="onEndDateChange"
+                                />
+
+                                <Label text="Full Name" />
+                                <Input value="{HostelModel>/FullName}" />
+                            </f:SimpleForm>
+                        </Panel>
+
+                        <Panel
+                            class="sapUiSmallMarginTop customBookingPanel"
+                            visible="{BookingView>/showFamilySection}"
+                        >
+                            <headerToolbar>
+                                <OverflowToolbar class="customBookingPanel">
+                                    <Title text="Members" />
+                                    <ToolbarSpacer />
+                                    <Button
+                                        text="Add Member"
+                                        icon="sap-icon://add"
+                                        press="onAddFamilyMember"
+                                        type="Transparent"
+                                        class="myUnifiedBtn"
+                                    />
+                                </OverflowToolbar>
+                            </headerToolbar>
+
+                            <Table
+                                items="{BookingView>/FamilyMembers}"
+                                noDataText="No members found"
+                            >
+                                <columns>
+                                    <Column width="5rem">
+                                        <Text text="Pick" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Name" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Relation" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Age" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Document Type" />
+                                    </Column>
+                                    <Column width="14rem">
+                                        <Text text="Document" />
+                                    </Column>
+                                    <Column width="8rem">
+                                        <Text text="Action" />
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <CheckBox
+                                                selected="{BookingView>Selected}"
+                                                select="onFamilyMemberSelect"
+                                                enabled="{= !${BookingView>IsNew} }"
+                                            />
+
+                                            <VBox>
+                                                <Input
+                                                    value="{BookingView>Name}"
+                                                    visible="{BookingView>IsNew}"
+                                                    placeholder="Enter name"
+                                                />
+                                                <Text
+                                                    text="{BookingView>Name}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <VBox>
+                                                <Input
+                                                    value="{BookingView>Relation}"
+                                                    visible="{BookingView>IsNew}"
+                                                    placeholder="Enter relation"
+                                                />
+                                                <Text
+                                                    text="{BookingView>Relation}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <VBox>
+                                                <Input
+                                                    value="{BookingView>Age}"
+                                                    type="Number"
+                                                    visible="{BookingView>IsNew}"
+                                                    placeholder="Enter age"
+                                                />
+                                                <Text
+                                                    text="{BookingView>Age}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <VBox>
+                                                <Select
+                                                    selectedKey="{BookingView>DocumentType}"
+                                                    visible="{BookingView>IsNew}"
+                                                    width="100%"
+                                                    items="{BookingView>/DocumentTypeOptions}"
+                                                >
+                                                    <core:Item
+                                                        key="{BookingView>key}"
+                                                        text="{BookingView>text}"
+                                                    />
+                                                </Select>
+                                                <Text
+                                                    text="{BookingView>DocumentType}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <VBox>
+                                                <unified:FileUploader
+                                                    width="100%"
+                                                    visible="{BookingView>IsNew}"
+                                                    sameFilenameAllowed="true"
+                                                    change="onFamilyDocumentChange"
+                                                    buttonText="Upload"
+                                                />
+                                                <Text
+                                                    text="{BookingView>DocumentName}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <HBox
+                                                renderType="Bare"
+                                                justifyContent="Start"
+                                            >
+                                                <Button
+                                                    text="Add"
+                                                    type="Emphasized"
+                                                    visible="{BookingView>IsNew}"
+                                                    press="onSaveFamilyMember"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Button
+                                                    text="Delete"
+                                                    type="Reject"
+                                                    visible="{BookingView>IsNew}"
+                                                    press="onDeleteFamilyMemberRow"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </Panel>
+
+                        <Panel
+                            headerText="Choose Facilities"
+                            class="sapUiSmallMarginTop customBookingPanel"
+                        >
+                            <VBox class="sapUiTinyMargin">
+                                <MessageStrip
+                                    text="Add only the facilities you need. Each facility follows its configured selection mode for room, quantity, person, or person-wise quantity."
+                                    type="Information"
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                    class="sapUiTinyMarginBottom facilityMessageStrip"
+                                />
+
+                                <HBox
+                                    width="100%"
+                                    alignItems="Center"
+                                    justifyContent="SpaceBetween"
+                                >
+                                    <Button
+                                        icon="sap-icon://slim-arrow-left"
+                                        type="Transparent"
+                                        press="onFacilityPrev"
+                                        class="facilityNavBtn sapUiTinyMarginEnd"
+                                    />
+
+                                    <HBox
+                                        id="facilityViewport"
+                                        width="100%"
+                                        renderType="Bare"
+                                        class="facilityViewport"
+                                    >
+                                        <HBox
+                                            id="facilityCardsContainer"
+                                            renderType="Bare"
+                                            class="facilityTrack"
+                                        />
+                                    </HBox>
+
+                                    <Button
+                                        icon="sap-icon://slim-arrow-right"
+                                        type="Transparent"
+                                        press="onFacilityNext"
+                                        class="facilityNavBtn sapUiTinyMarginBegin"
+                                    />
+                                </HBox>
+                            </VBox>
+                        </Panel>
+                        <Panel
+                            headerText="Selected Facilities"
+                            class="sapUiSmallMarginTop customBookingPanel"
+                        >
+                            <Table
+                                items="{HostelModel>/AllSelectedFacilities}"
+                                noDataText="-- No facilities opted --"
+                                autoPopinMode="true"
+                            >
+                                <columns>
+                                    <Column>
+                                        <Text text="Facility" />
+                                    </Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
+                                        <Text text="Rate" />
+                                    </Column>
+                                    <Column
+                                        minScreenWidth="Desktop"
+                                        demandPopin="true"
+                                        width="45%"
+                                    >
+                                        <Text
+                                            text="Breakdown (Who &amp; Qty)"
+                                        />
+                                    </Column>
+                                    <Column hAlign="End">
+                                        <Text text="Total" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem vAlign="Top">
+                                        <cells>
+                                            <Text
+                                                text="{HostelModel>FacilityName}"
+                                            />
+                                            <Text
+                                                text="{HostelModel>RateText}"
+                                            />
+                                            <Text
+                                                text="{HostelModel>BreakdownText}"
+                                                wrapping="true"
+                                            />
+                                            <Text
+                                                text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
+                                            />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </Panel>
+                    </VBox>
+
+                    <VBox
+                        width="35%"
+                        class="sapUiLargeMarginBegin sapUiTinyMarginEnd"
+                    >
+                        <Panel
+                            headerText="Coupon Code"
+                            class="sapUiTinyMarginTop customBookingPanel"
+                        >
+                            <VBox class="sapUiTinyMarginTop">
+                                <Input
+                                    value="{HostelModel>/CouponCode}"
+                                    placeholder="Enter coupon code"
+                                    liveChange="onCouponLiveChange"
+                                />
+                                <HBox class="sapUiTinyMarginTop">
+                                    <Button
+                                        text="Apply Coupon"
+                                        type="Emphasized"
+                                        press="onApplyCoupon"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Button
+                                        text="Remove"
+                                        press="onRemoveCoupon"
+                                    />
+                                </HBox>
+                            </VBox>
+                        </Panel>
+
+                        <Panel
+                            headerText="Price Section"
+                            class="sapUiTinyMarginTop customBookingPanel"
+                        >
+                            <VBox class="sapUiTinyMargin">
+                                <!-- <Text
+                                    text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
+                                />
+                                <Text
+                                    text="{HostelModel>/RoomBreakdownText}"
+                                    wrapping="true"
+                                /> -->
+                                <Text
+                                    text="Facilities: {HostelModel>/TotalFacilityPrice} {HostelModel>/Currency}"
+                                />
+                                <!-- <Text
+                                    text="Deposit: {HostelModel>/Deposit} {HostelModel>/DepositCurrency}"
+                                /> -->
+                                <Title
+                                    text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
+                                />
+                                <Title
+                                    text="Grand Total: {HostelModel>/GrandTotal} {HostelModel>/Currency}"
+                                />
+                            </VBox>
+                        </Panel>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Back"
+                    press="onNavBack"
+                />
+                <Button
+                    text="Continue"
+                    type="Emphasized"
+                    press="onContinueBooking"
+                />
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>
