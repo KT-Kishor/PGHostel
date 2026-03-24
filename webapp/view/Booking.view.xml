@@ -66,7 +66,7 @@
                                 </ComboBox>
                                 <Label text="Rent Price" />
                                 <Input
-                                    value="{= ${HostelModel>/RoomPrice} + ' ' + ${HostelModel>/Currency}}"
+                                    value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
                                     editable="false"
                                 />
 
@@ -411,19 +411,36 @@
                             class="sapUiTinyMarginTop customBookingPanel"
                         >
                             <VBox class="sapUiTinyMargin">
-                                <!-- <Text
+                                <Label
+                                    text="GSTIN"
+                                    visible="{BookingView>/showGSTField}"
+                                />
+                                <Input
+                                    value="{HostelModel>/GSTIN}"
+                                    placeholder="Enter GSTIN (Optional)"
+                                    visible="{BookingView>/showGSTField}"
+                                    liveChange="onGSTINLiveChange"
+                                    change="onGSTINChange"
+                                    class="sapUiTinyMarginBottom"
+                                    valueStateText="{i18n>gstError}"
+                                />
+                                <Text
                                     text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
                                 />
                                 <Text
                                     text="{HostelModel>/RoomBreakdownText}"
                                     wrapping="true"
-                                /> -->
+                                />
                                 <Text
                                     text="Facilities: {HostelModel>/TotalFacilityPrice} {HostelModel>/Currency}"
                                 />
-                                <!-- <Text
-                                    text="Deposit: {HostelModel>/Deposit} {HostelModel>/DepositCurrency}"
-                                /> -->
+                                <MessageStrip
+                                    text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                    type="Information"
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                    visible="{= ${HostelModel>/Deposit} > 0}"
+                                />
                                 <Title
                                     text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
                                 />

@@ -1,9 +1,10 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
+    "../utils/validation",
     "sap/m/MessageToast",
     "sap/m/MessageBox"
-], function (BaseController, JSONModel, MessageToast, MessageBox) {
+], function (BaseController, JSONModel, utils, MessageToast, MessageBox) {
 
     "use strict";
 
@@ -28,6 +29,37 @@ sap.ui.define([
         _isSinglePersonOnlyPropertyType: function (sPropertyType) {
             const sType = String(sPropertyType || "").trim();
             return sType === "Hostel" || sType === "PG";
+        },
+
+        _shouldShowGSTField: function (sPropertyType) {
+            return !this._isSinglePersonOnlyPropertyType(sPropertyType);
+        },
+
+        _validateGSTINField: function (oField) {
+            const sValue = String(oField.getValue() || "").trim().toUpperCase();
+            const oI18nModel = this.getOwnerComponent().getModel("i18n") || this.getView().getModel("i18n");
+            const oResourceBundle = oI18nModel && oI18nModel.getResourceBundle ? oI18nModel.getResourceBundle() : null;
+
+            oField.setValue(sValue);
+
+            if (!sValue) {
+                oField.setValueState("None");
+                oField.setValueStateText("");
+                return true;
+            }
+
+            const bValid = utils._LCvalidateGstNumber(oField, "ID");
+
+            oField.setValueStateText(bValid || !oResourceBundle ? "" : oResourceBundle.getText("gstError"));
+            return bValid;
+        },
+
+        onGSTINLiveChange: function (oEvent) {
+            return this._validateGSTINField(oEvent.getSource());
+        },
+
+        onGSTINChange: function (oEvent) {
+            return this._validateGSTINField(oEvent.getSource());
         },
 
         _getSelectedPersonCount: function () {
@@ -65,13 +97,7 @@ sap.ui.define([
 
             return aOccupants;
         },
-        ////////////////////////////////////////////////////////////////////////////////////////
 
-
-        /* =========================
-           FACILITY REVAMP PATCH
-           Replace old facility methods with these
-           ========================= */
 
         _getFacilitySelectionMode: function (oFacility) {
             const sMode = String(oFacility.SelectionMode || "").toUpperCase().trim();
@@ -339,87 +365,6 @@ sap.ui.define([
             }.bind(this));
         },
 
-        // _syncSelectedFacilityPersonsWithOccupants: function () {
-        //     const aOccupants = this._getOccupantOptions();
-        //     const aValidOccupants = aOccupants.map(function (oItem) {
-        //         return oItem.id;
-        //     });
-
-        //     (this._aAllFacilities || []).forEach(function (oFacility) {
-        //         const sChargeMode = oFacility.ChargeMode || this._getFacilityChargeMode(oFacility);
-
-        //         if (!Array.isArray(oFacility.SelectedPersonIds)) {
-        //             oFacility.SelectedPersonIds = [];
-        //         }
-
-        //         oFacility.SelectedPersonIds = oFacility.SelectedPersonIds.filter(function (sId) {
-        //             return aValidOccupants.includes(sId);
-        //         });
-
-        //         if (sChargeMode === "per_person" && oFacility.Selected && oFacility.SelectedPersonIds.length === 0) {
-        //             oFacility.SelectedPersonIds = ["SELF"];
-        //         }
-
-        //         if (sChargeMode === "per_person_quantity_split") {
-        //             oFacility.PersonQuantities = this._buildLaundryLines(oFacility).filter(function (oLine) {
-        //                 return aValidOccupants.includes(oLine.personId);
-        //             });
-        //         }
-        //     }.bind(this));
-        // },
-
-        // _applyFacilityPriceFilter: function () {
-        //     const oModel = this.getView().getModel("HostelModel");
-        //     const oFacilityModel = this.getView().getModel("FacilityModel");
-        //     const sPlan = oModel.getProperty("/SelectedPriceType");
-
-        //     if (!oFacilityModel) {
-        //         return;
-        //     }
-
-        //     oFacilityModel.setProperty("/Facilities", (this._aAllFacilities || [])
-        //         .filter(function (oFacility) {
-        //             return this._buildFacilityPriceOptions(oFacility).length > 0;
-        //         }.bind(this))
-        //         .map(function (oFacility) {
-        //             const aPriceOptions = this._buildFacilityPriceOptions(oFacility);
-        //             let oDefaultOption = aPriceOptions.find(function (oOption) {
-        //                 return oOption.key === sPlan;
-        //             });
-
-        //             if (!oDefaultOption) {
-        //                 oDefaultOption = aPriceOptions.find(function (oOption) {
-        //                     return oOption.key === "Unit Price";
-        //                 }) || aPriceOptions[0];
-        //             }
-
-        //             oFacility.CurrentPrice = oDefaultOption ? oDefaultOption.price : 0;
-        //             oFacility.CurrentPriceType = oDefaultOption ? oDefaultOption.key : sPlan;
-        //             oFacility.DisplayPrice = (oFacility.CurrentPrice || 0) + " " + oFacility.Currency;
-        //             oFacility.UiMode = oFacility.UiMode || this._getFacilityUiMode(oFacility);
-        //             oFacility.ChargeMode = oFacility.ChargeMode || this._getFacilityChargeMode(oFacility);
-        //             oFacility.ChargeModeLabel = this._getFacilityChargeModeLabel(oFacility.ChargeMode);
-
-        //             if (oFacility.Selected && (!oFacility.SelectedPrice || !aPriceOptions.some(function (oOption) {
-        //                 return oOption.key === oFacility.SelectedPriceType;
-        //             }))) {
-        //                 oFacility.SelectedPrice = oFacility.CurrentPrice;
-        //                 oFacility.SelectedPriceType = oFacility.CurrentPriceType;
-        //             }
-
-        //             if (oFacility.ChargeMode === "per_person_quantity_split") {
-        //                 oFacility.PersonQuantities = this._buildLaundryLines(oFacility);
-        //             }
-
-        //             this._setFacilitySelectionSummary(oFacility);
-        //             return oFacility;
-        //         }.bind(this)));
-
-        //     this._iFacilityStartIndex = 0;
-        //     this._renderFacilityCards();
-        //     this._rebuildSelectedFacilities();
-        // },
-
 
 
         // Replace or update the part where CurrentPrice and CurrentPriceType are assigned
@@ -463,30 +408,7 @@ sap.ui.define([
             this._rebuildSelectedFacilities();
         },
 
-        // _openFacilitySelectionDialog: function (oFacility) {
-        //     const oSelectionModel = this.getView().getModel("FacilitySelection");
-
-        //     // pick the current plan price
-        //     const sPlan = oFacility.CurrentPriceType || "Unit Price";
-        //     const fPrice = oFacility.CurrentPrice || oFacility.UnitPrice || 0;
-
-        //     oSelectionModel.setData({
-        //         title: oFacility.FacilityName,
-        //         DisplayPrice: fPrice + " " + (oFacility.Currency || "INR"),
-        //         chargeMode: oFacility.ChargeMode,
-        //         chargeModeLabel: oFacility.ChargeModeLabel,
-        //         quantity: oFacility.Quantity || 1,
-        //         selectedPriceType: sPlan,   // <- assign selectedPriceType here
-        //         selectedPrice: fPrice,      // <- assign selectedPrice here
-        //         selectedPersonIds: oFacility.SelectedPersonIds || [],
-        //         personQuantities: oFacility.PersonQuantities || [],
-        //         personOptions: this._getOccupantOptions() || []
-        //     });
-
-        //     this._getFacilitySelectionDialog().data("facilityRef", oFacility);
-        //     this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
-        //     this._oFacilityDialog.open();
-        // },
+       
 
         _openFacilitySelectionDialog: function (oFacility) {
             const oSelectionModel = this.getView().getModel("FacilitySelection");
@@ -556,182 +478,6 @@ sap.ui.define([
                 return oLine.personName + ": " + oLine.qty;
             }).join("\n");
         },
-
-        // _getFacilitySelectionDialog: function () {
-        //     if (this._oFacilityDialog) {
-        //         return this._oFacilityDialog;
-        //     }
-
-        //     const oDialog = new sap.m.Dialog({
-        //         title: "{FacilitySelection>/title}",
-        //         contentWidth: "34rem",
-        //         contentHeight: "30rem",
-        //         verticalScrolling: true,
-        //         content: [
-        //             new sap.m.VBox({
-        //                 width: "100%",
-        //                 items: [
-        //                     new sap.m.ObjectStatus({
-        //                         text: "{FacilitySelection>/chargeModeLabel}",
-        //                         state: "Information"
-        //                     }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                     new sap.m.Label({
-        //                         text: "Price option",
-        //                         design: "Bold"
-        //                     }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                     new sap.m.Text({
-        //                         text: "{FacilitySelection>/DisplayPrice}", // shows only current room plan price
-        //                         wrapping: true,
-        //                         design: "Bold"
-        //                     }).addStyleClass("sapUiSmallMarginBottom"),
-
-
-        //                     new sap.m.Label({
-        //                         text: "Quantity",
-        //                         design: "Bold",
-        //                         visible: {
-        //                             path: "FacilitySelection>/chargeMode",
-        //                             formatter: function (sChargeMode) {
-        //                                 return sChargeMode === "per_quantity";
-        //                             }
-        //                         }
-        //                     }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                     new sap.m.StepInput({
-        //                         width: "100%",
-        //                         min: 1,
-        //                         value: "{FacilitySelection>/quantity}",
-        //                         visible: {
-        //                             path: "FacilitySelection>/chargeMode",
-        //                             formatter: function (sChargeMode) {
-        //                                 return sChargeMode === "per_quantity";
-        //                             }
-        //                         }
-        //                     }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                     new sap.m.Label({
-        //                         text: "For whom",
-        //                         design: "Bold",
-        //                         visible: {
-        //                             path: "FacilitySelection>/chargeMode",
-        //                             formatter: function (sChargeMode) {
-        //                                 return sChargeMode === "per_person";
-        //                             }
-        //                         }
-        //                     }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                     new sap.m.VBox({
-        //                         width: "100%",
-        //                         visible: {
-        //                             path: "FacilitySelection>/chargeMode",
-        //                             formatter: function (sChargeMode) {
-        //                                 return sChargeMode === "per_person";
-        //                             }
-        //                         },
-        //                         items: {
-        //                             path: "FacilitySelection>/personOptions",
-        //                             template: new sap.m.CheckBox({
-        //                                 text: "{FacilitySelection>name}",
-        //                                 selected: {
-        //                                     path: "FacilitySelection>/selectedPersonIds",
-        //                                     formatter: function (aSelectedIds) {
-        //                                         const sId = this.getBindingContext("FacilitySelection").getProperty("id");
-        //                                         return aSelectedIds.includes(sId);
-        //                                     }
-        //                                 },
-        //                                 select: function (oEvent) {
-        //                                     const oCheckBox = oEvent.getSource();
-        //                                     const sId = oCheckBox.getBindingContext("FacilitySelection").getProperty("id");
-        //                                     const oModel = oCheckBox.getModel("FacilitySelection");
-        //                                     const aSelected = oModel.getProperty("/selectedPersonIds") || [];
-
-        //                                     if (oCheckBox.getSelected()) {
-        //                                         if (!aSelected.includes(sId)) aSelected.push(sId);
-        //                                     } else {
-        //                                         const iIndex = aSelected.indexOf(sId);
-        //                                         if (iIndex > -1) aSelected.splice(iIndex, 1);
-        //                                     }
-
-        //                                     oModel.setProperty("/selectedPersonIds", aSelected);
-        //                                 }
-        //                             })
-        //                         }
-        //                     }).addStyleClass("sapUiSmallMarginBottom"),
-
-
-        //                     new sap.m.VBox({
-        //                         visible: {
-        //                             path: "FacilitySelection>/chargeMode",
-        //                             formatter: function (sChargeMode) {
-        //                                 return sChargeMode === "per_person_quantity_split";
-        //                             }
-        //                         },
-        //                         items: [
-        //                             new sap.m.Label({
-        //                                 text: "Laundry quantity by person",
-        //                                 design: "Bold"
-        //                             }).addStyleClass("sapUiTinyMarginBottom"),
-
-        //                             new sap.m.Table({
-        //                                 inset: false,
-        //                                 growing: false,
-        //                                 items: {
-        //                                     path: "FacilitySelection>/personQuantities",
-        //                                     template: new sap.m.ColumnListItem({
-        //                                         cells: [
-        //                                             new sap.m.Text({
-        //                                                 text: "{FacilitySelection>personName}"
-        //                                             }),
-        //                                             new sap.m.StepInput({
-        //                                                 min: 0,
-        //                                                 step: 1,
-        //                                                 value: "{FacilitySelection>qty}",
-        //                                                 change: this.onLaundryQtyChange.bind(this)
-        //                                             })
-        //                                         ]
-        //                                     })
-        //                                 },
-        //                                 columns: [
-        //                                     new sap.m.Column({
-        //                                         header: new sap.m.Text({ text: "Person" })
-        //                                     }),
-        //                                     new sap.m.Column({
-        //                                         header: new sap.m.Text({ text: "Qty" })
-        //                                     })
-        //                                 ]
-        //                             })
-        //                         ]
-        //                     })
-        //                 ]
-        //             }).addStyleClass("sapUiContentPadding")
-        //         ],
-        //         buttons: [
-        //             this._oFacilityRemoveButton = new sap.m.Button({
-        //                 text: "Remove",
-        //                 type: "Transparent",
-        //                 visible: false,
-        //                 press: this.onFacilityDialogRemove.bind(this)
-        //             }),
-        //             new sap.m.Button({
-        //                 text: "Cancel",
-        //                 press: function () {
-        //                     oDialog.close();
-        //                 }
-        //             }),
-        //             new sap.m.Button({
-        //                 text: "Confirm",
-        //                 type: "Emphasized",
-        //                 press: this.onFacilityDialogConfirm.bind(this)
-        //             })
-        //         ]
-        //     });
-
-        //     this.getView().addDependent(oDialog);
-        //     this._oFacilityDialog = oDialog;
-        //     return this._oFacilityDialog;
-        // },
 
 
         _getFacilitySelectionDialog: function () {
@@ -1074,61 +820,6 @@ sap.ui.define([
         },
 
 
-        // onFacilityDialogConfirm: function (oEvent) {
-        //     const oDialog = oEvent.getSource().getParent();
-        //     const oFacility = oDialog.data("facilityRef");
-        //     const oSelectionModel = this.getView().getModel("FacilitySelection");
-
-        //     const sChargeMode = oSelectionModel.getProperty("/chargeMode");
-        //     const iQuantity = Math.max(parseInt(oSelectionModel.getProperty("/quantity"), 10) || 1, 1);
-        //     const aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
-        //     const aPersonQuantities = (oSelectionModel.getProperty("/personQuantities") || []).map(function (oLine) {
-        //         return {
-        //             personId: oLine.personId,
-        //             personName: oLine.personName,
-        //             qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
-        //         };
-        //     });
-
-        //     const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
-        //     const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
-
-        //     // Validation for person selection
-        //     if (sChargeMode === "per_person" && aSelectedPersonIds.length === 0) {
-        //         sap.m.MessageToast.show("Please choose at least one person.");
-        //         return;
-        //     }
-
-        //     // Validation for laundry
-        //     if (sChargeMode === "per_person_quantity_split") {
-        //         const iLaundryQty = aPersonQuantities.reduce((sum, o) => sum + o.qty, 0);
-        //         if (iLaundryQty <= 0) {
-        //             sap.m.MessageToast.show("Please enter laundry quantity for at least one person.");
-        //             return;
-        //         }
-        //     }
-
-        //     // Set facility selection directly
-        //     oFacility.Selected = true;
-        //     oFacility.SelectedPrice = fSelectedPrice;
-        //     oFacility.SelectedPriceType = sSelectedPriceType;
-        //     oFacility.Quantity = iQuantity;
-        //     oFacility.ChargeMode = sChargeMode;
-        //     oFacility.SelectedPersonIds = aSelectedPersonIds.slice();
-        //     oFacility.PersonQuantities = aPersonQuantities;
-
-        //     // Update summary
-        //     this._setFacilitySelectionSummary(oFacility);
-
-        //     // Refresh models
-        //     this.getView().getModel("FacilityModel").refresh(true);
-        //     this._resetCouponState(true);
-        //     this._renderFacilityCards();
-        //     this._rebuildSelectedFacilities();
-        //     this._recalculateSummary();
-
-        //     oDialog.close();
-        // },
         _setFacilitySelectedPrice: function (oFacility, sSelectedType, fSelectedPrice, iQuantity, aSelectedPersonIds, aPersonQuantities) {
             oFacility.Selected = true;
             oFacility.SelectedPrice = fSelectedPrice;
@@ -1157,31 +848,7 @@ sap.ui.define([
         },
 
 
-        // _setFacilitySelectedPrice: function (oFacility, sSelectedType, fSelectedPrice, iQuantity, aSelectedPersonIds, aPersonQuantities) {
-        //     oFacility.Selected = true;
-        //     oFacility.SelectedPrice = fSelectedPrice;
-        //     oFacility.SelectedPriceType = sSelectedType;
-        //     oFacility.Quantity = iQuantity || 1;
-        //     oFacility.ChargeMode = oFacility.ChargeMode || this._getFacilityChargeMode(oFacility);
-        //     oFacility.SelectedPersonIds = Array.isArray(aSelectedPersonIds) ? aSelectedPersonIds.slice() : [];
-        //     oFacility.PersonQuantities = Array.isArray(aPersonQuantities)
-        //         ? aPersonQuantities.map(function (oLine) {
-        //             return {
-        //                 personId: oLine.personId,
-        //                 personName: oLine.personName,
-        //                 qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
-        //             };
-        //         })
-        //         : [];
-
-        //     this._setFacilitySelectionSummary(oFacility);
-
-        //     this.getView().getModel("FacilityModel").refresh(true);
-        //     this._resetCouponState(true);
-        //     this._renderFacilityCards();
-        //     this._rebuildSelectedFacilities();
-        //     this._recalculateSummary();
-        // },
+     
 
         onFacilityDialogRemove: function (oEvent) {
             const oDialog = oEvent.getSource().getParent();
@@ -1219,134 +886,7 @@ sap.ui.define([
             this._renderFacilityCards();
         },
 
-        // _rebuildSelectedFacilities: function () {
-        //     const oModel = this.getView().getModel("HostelModel");
-        //     const oUnits = this._getBookingUnits();
-        //     const aOccupants = this._getOccupantOptions();
-        //     const mOccupants = aOccupants.reduce(function (mMap, oPerson) {
-        //         mMap[oPerson.id] = oPerson.name;
-        //         return mMap;
-        //     }, {});
-
-        //     const aSelectedFacilities = (this._aAllFacilities || [])
-        //         .filter(function (oFacility) {
-        //             return oFacility.Selected;
-        //         })
-        //         .map(function (oFacility) {
-        //             const fSelectedPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice);
-        //             const sSelectedPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType;
-        //             const sChargeMode = oFacility.ChargeMode || this._getFacilityChargeMode(oFacility);
-        //             const iQuantity = sChargeMode === "per_quantity"
-        //                 ? (parseInt(oFacility.Quantity, 10) || 1)
-        //                 : 1;
-
-        //             const aSelectedPersonIds = sChargeMode === "per_person"
-        //                 ? ((oFacility.SelectedPersonIds || []).filter(function (sId) {
-        //                     return !!mOccupants[sId];
-        //                 }))
-        //                 : [];
-
-        //             const aSelectedPersons = aSelectedPersonIds.map(function (sId) {
-        //                 return mOccupants[sId];
-        //             });
-
-        //             const aLaundryLines = sChargeMode === "per_person_quantity_split"
-        //                 ? (oFacility.PersonQuantities || []).filter(function (oLine) {
-        //                     return !!mOccupants[oLine.personId] && (parseInt(oLine.qty, 10) || 0) > 0;
-        //                 }).map(function (oLine) {
-        //                     return {
-        //                         personId: oLine.personId,
-        //                         personName: mOccupants[oLine.personId],
-        //                         qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
-        //                     };
-        //                 })
-        //                 : [];
-
-        //             let fPeriodMultiplier = 1;
-        //             let iUsageMultiplier = 1;
-        //             let fTotal = 0;
-        //             let sBreakdown = "";
-        //             let sForWhomText = "Room";
-        //             let sQuantityText = "-";
-        //             let sRateText = fSelectedPrice + " " + oFacility.Currency + " / " + sSelectedPriceType;
-        //             const aBreakdownParts = [sRateText];
-
-        //             if (sSelectedPriceType === "Unit Price") {
-        //                 fPeriodMultiplier = 1;
-        //             } else if (sSelectedPriceType === "Per Day") {
-        //                 fPeriodMultiplier = oUnits.days;
-        //             } else if (sSelectedPriceType === "Per Month") {
-        //                 fPeriodMultiplier = oUnits.months;
-        //             } else if (sSelectedPriceType === "Per Year") {
-        //                 fPeriodMultiplier = oUnits.years;
-        //             }
-
-        //             if (sSelectedPriceType !== "Unit Price") {
-        //                 aBreakdownParts.push(this._getFacilityMultiplierLabel(sSelectedPriceType, oUnits));
-        //             }
-
-        //             if (sChargeMode === "per_person") {
-        //                 iUsageMultiplier = Math.max(aSelectedPersons.length, 0);
-        //                 sForWhomText = aSelectedPersons.join(", ");
-        //                 aBreakdownParts.push(iUsageMultiplier + " person(s)");
-        //             } else if (sChargeMode === "per_quantity") {
-        //                 iUsageMultiplier = iQuantity;
-        //                 sQuantityText = String(iQuantity);
-        //                 aBreakdownParts.push(iQuantity + " qty");
-        //             } else if (sChargeMode === "per_person_quantity_split") {
-        //                 const iLaundryQty = aLaundryLines.reduce(function (iSum, oLine) {
-        //                     return iSum + oLine.qty;
-        //                 }, 0);
-
-        //                 iUsageMultiplier = iLaundryQty;
-        //                 sForWhomText = aLaundryLines.map(function (oLine) {
-        //                     return oLine.personName + " (" + oLine.qty + ")";
-        //                 }).join(", ");
-        //                 sQuantityText = String(iLaundryQty);
-        //                 aBreakdownParts.push(iLaundryQty + " qty");
-        //             }
-
-        //             fTotal = fSelectedPrice * fPeriodMultiplier * iUsageMultiplier;
-        //             sBreakdown = aBreakdownParts.join(" x ") + " = " + Number(fTotal.toFixed(2)) + " " + oFacility.Currency;
-
-        //             return {
-        //                 FacilityID: oFacility.FacilityID,
-        //                 FacilityName: oFacility.FacilityName,
-        //                 Currency: oFacility.Currency,
-        //                 BranchCode: oFacility.BranchCode,
-        //                 Image: oFacility.Image,
-        //                 Price: fSelectedPrice,
-        //                 SelectedPrice: fSelectedPrice,
-        //                 Quantity: iQuantity,
-        //                 QuantityText: sQuantityText,
-        //                 UnitText: sSelectedPriceType,
-        //                 SelectedPriceType: sSelectedPriceType,
-        //                 ChargeMode: sChargeMode,
-        //                 ChargeModeLabel: this._getFacilityChargeModeLabel(sChargeMode),
-        //                 SelectedPersonIds: aSelectedPersonIds,
-        //                 PersonQuantities: aLaundryLines,
-        //                 ForWhomText: sForWhomText,
-        //                 SelectedPersonNames: aSelectedPersons,
-        //                 RateText: sRateText,
-        //                 StartDate: oModel.getProperty("/StartDate"),
-        //                 EndDate: oModel.getProperty("/EndDate"),
-        //                 TotalAmount: Number(fTotal.toFixed(2)),
-        //                 BreakdownText: sBreakdown
-        //             };
-        //         }.bind(this));
-
-        //     oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
-        //     oModel.setProperty("/TotalFacilityPrice", Number(
-        //         aSelectedFacilities.reduce(function (fSum, oFacility) {
-        //             return fSum + (Number(oFacility.TotalAmount) || 0);
-        //         }, 0).toFixed(2)
-        //     ));
-        // },
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+      
         _rebuildSelectedFacilities: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oUnits = this._getBookingUnits();
@@ -1731,6 +1271,7 @@ sap.ui.define([
                 showDurationSelector: false,
                 endDateEditable: false,
                 showFamilySection: false,
+                showGSTField: false,
                 maxPersons: 1,
                 originalPersonOptions: [],
                 DocumentTypeOptions: [
@@ -1739,41 +1280,7 @@ sap.ui.define([
                     { key: "Driving License", text: "Driving License" },
                     { key: "Voter ID", text: "Voter ID" }
                 ],
-                FamilyMembers: [
-                    // {
-                    //     id: "FM1",
-                    //     Name: "Anita Sharma",
-                    //     Relation: "Spouse",
-                    //     Age: "31",
-                    //     Selected: false,
-                    //     DocumentType: "",
-                    //     DocumentName: "",
-                    //     DocumentFile: null,
-                    //     IsNew: false
-                    // },
-                    // {
-                    //     id: "FM2",
-                    //     Name: "Aarav Sharma",
-                    //     Relation: "Son",
-                    //     Age: "8",
-                    //     Selected: false,
-                    //     DocumentType: "",
-                    //     DocumentName: "",
-                    //     DocumentFile: null,
-                    //     IsNew: false
-                    // },
-                    // {
-                    //     id: "FM3",
-                    //     Name: "Saanvi Sharma",
-                    //     Relation: "Daughter",
-                    //     Age: "5",
-                    //     Selected: false,
-                    //     DocumentType: "",
-                    //     DocumentName: "",
-                    //     DocumentFile: null,
-                    //     IsNew: false
-                    // }
-                ]
+                FamilyMembers: []
 
             }), "BookingView");
             this.getView().setModel(new JSONModel({ Facilities: [] }), "FacilityModel");
@@ -1841,6 +1348,7 @@ sap.ui.define([
             oModel.setProperty("/CouponCode", oData.CouponCode || "");
             oModel.setProperty("/AppliedDiscount", this._toNumber(oData.AppliedDiscount));
             oModel.setProperty("/AppliedCouponCode", oData.AppliedCouponCode || "");
+            oModel.setProperty("/GSTIN", oData.GSTIN || "");
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
                 oModel.setProperty("/SelectedPriceType", aPaymentMethods[0].key);
@@ -1877,6 +1385,8 @@ sap.ui.define([
             const iCapacity = Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
             const aOriginalOptions = this._buildKeyTextList(iCapacity);
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+
+            oBookingView.setProperty("/showGSTField", this._shouldShowGSTField(sPropertyType));
 
             if (bSinglePersonOnly) {
                 oBookingView.setProperty("/showFamilySection", false);
@@ -2335,7 +1845,6 @@ sap.ui.define([
             const sPlan = oModel.getProperty("/SelectedPriceType");
             const fBasePrice = this._toNumber(oModel.getProperty("/FinalPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
-            const fDeposit = this._toNumber(oModel.getProperty("/Deposit"));
             const fDiscount = this._toNumber(oModel.getProperty("/AppliedDiscount"));
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
@@ -2364,7 +1873,7 @@ sap.ui.define([
             oModel.setProperty("/TotalDays", iDays);
             oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
             oModel.setProperty("/RoomPrice", Number(fRoomPrice.toFixed(2)));
-            oModel.setProperty("/GrandTotal", Number(Math.max(fRoomPrice + fFacilityPrice - fDiscount + fDeposit, 0).toFixed(2)));
+            oModel.setProperty("/GrandTotal", Number(Math.max(fRoomPrice + fFacilityPrice - fDiscount, 0).toFixed(2)));
         },
 
         _parseDate: function (vDate) {
