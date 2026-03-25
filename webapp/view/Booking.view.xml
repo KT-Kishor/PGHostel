@@ -434,6 +434,21 @@
                                 <Text
                                     text="Facilities: {HostelModel>/TotalFacilityPrice} {HostelModel>/Currency}"
                                 />
+                                <Text
+                                    text="Sub Total: {HostelModel>/BookingSubTotal} {HostelModel>/Currency}"
+                                />
+                                <Text
+                                    text="CGST: {HostelModel>/CGST} {HostelModel>/Currency}"
+                                    visible="{= ${HostelModel>/CGST} > 0}"
+                                />
+                                <Text
+                                    text="SGST: {HostelModel>/SGST} {HostelModel>/Currency}"
+                                    visible="{= ${HostelModel>/SGST} > 0}"
+                                />
+                                <Text
+                                    text="IGST: {HostelModel>/IGST} {HostelModel>/Currency}"
+                                    visible="{= ${HostelModel>/IGST} > 0}"
+                                />
                                 <MessageStrip
                                     text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
                                     type="Information"

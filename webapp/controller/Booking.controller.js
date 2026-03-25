@@ -1348,7 +1348,13 @@ sap.ui.define([
             oModel.setProperty("/CouponCode", oData.CouponCode || "");
             oModel.setProperty("/AppliedDiscount", this._toNumber(oData.AppliedDiscount));
             oModel.setProperty("/AppliedCouponCode", oData.AppliedCouponCode || "");
+            oModel.setProperty("/GSTType", oData.GSTType || "");
+            oModel.setProperty("/GSTValue", this._toNumber(oData.GSTValue));
             oModel.setProperty("/GSTIN", oData.GSTIN || "");
+            oModel.setProperty("/BookingSubTotal", this._toNumber(oData.BookingSubTotal));
+            oModel.setProperty("/CGST", this._toNumber(oData.CGST));
+            oModel.setProperty("/SGST", this._toNumber(oData.SGST));
+            oModel.setProperty("/IGST", this._toNumber(oData.IGST));
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
                 oModel.setProperty("/SelectedPriceType", aPaymentMethods[0].key);
@@ -1846,6 +1852,8 @@ sap.ui.define([
             const fBasePrice = this._toNumber(oModel.getProperty("/FinalPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
             const fDiscount = this._toNumber(oModel.getProperty("/AppliedDiscount"));
+            const sGSTType = String(oModel.getProperty("/GSTType") || "").trim();
+            const fGSTValue = this._toNumber(oModel.getProperty("/GSTValue"));
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
@@ -1855,6 +1863,10 @@ sap.ui.define([
             let fRoomPrice = fBasePrice;
             let iDays = 0;
             let sRoomBreakdown = fBasePrice + " " + (oModel.getProperty("/Currency") || "");
+            let fSubTotal = 0;
+            let fCGST = 0;
+            let fSGST = 0;
+            let fIGST = 0;
 
             if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
                 iDays = Math.floor((oEndDate - oStartDate) / 86400000);
@@ -1873,7 +1885,21 @@ sap.ui.define([
             oModel.setProperty("/TotalDays", iDays);
             oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
             oModel.setProperty("/RoomPrice", Number(fRoomPrice.toFixed(2)));
-            oModel.setProperty("/GrandTotal", Number(Math.max(fRoomPrice + fFacilityPrice - fDiscount, 0).toFixed(2)));
+
+            fSubTotal = Number((fRoomPrice + fFacilityPrice).toFixed(2));
+
+            if (sGSTType === "CGST/SGST") {
+                fCGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
+                fSGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
+            } else if (sGSTType === "IGST") {
+                fIGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
+            }
+
+            oModel.setProperty("/BookingSubTotal", fSubTotal);
+            oModel.setProperty("/CGST", fCGST);
+            oModel.setProperty("/SGST", fSGST);
+            oModel.setProperty("/IGST", fIGST);
+            oModel.setProperty("/GrandTotal", Number(Math.max(fSubTotal + fCGST + fSGST + fIGST - fDiscount, 0).toFixed(2)));
         },
 
         _parseDate: function (vDate) {
@@ -1949,3 +1975,32 @@ sap.ui.define([
         }
     });
 });
+
+
+// The new booking-level GST logic is now implemented in Booking.controller.js (line 1847) and surfaced in Booking.view.xml (line 424).
+
+// What changed:
+
+// subtotal is now booking-level: room total + facilities total
+// GST is calculated once for the whole booking, not per person
+// CGST/SGST uses GSTValue on each side
+// IGST uses GSTValue once
+// coupon is subtracted after GST
+// deposit remains display-only and is not part of GrandTotal
+// The Price Section now shows:
+
+// Room
+// Facilities
+// Sub Total
+// CGST / SGST or IGST when applicable
+// offline deposit message strip
+// coupon
+// final Grand Total
+// I haven’t run the UI in-browser here, so the next best check is:
+
+// test one CGST/SGST property
+// test one IGST property
+// compare Sub Total, tax lines, and Grand Total against a manual calculation
+// If you want, I can do one more pass next to carry these same GST fields into the new booking payload as well.
+
+
