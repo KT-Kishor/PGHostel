@@ -697,6 +697,7 @@ sap.ui.define([
                 return;
             }
         },
+
         HM_DeleteRoom: function () {
             var CustData = this.getView().getModel("HostelModel").getData();
             var table = this.byId("id_ARD_Table");
@@ -740,7 +741,10 @@ sap.ui.define([
             // Single selection & assigned → stop
             if (aSelectedItems.length === 1 && aAssignedRooms.length === 1) {
                 sap.m.MessageBox.warning(
-                    "Cannot delete! Selected room is already assigned."
+                    "Cannot delete! Selected room is already assigned.",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
                 return;
             }
@@ -748,7 +752,10 @@ sap.ui.define([
             // All selected rooms are assigned
             if (aDeletableRooms.length === 0) {
                 sap.m.MessageBox.warning(
-                    "All selected rooms are already assigned and cannot be deleted."
+                    "All selected rooms are already assigned and cannot be deleted.",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
                 return;
             }
@@ -758,14 +765,11 @@ sap.ui.define([
                 .map(room => room.roomNo)
                 .join(", ");
             var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
-
             let sMessage = `Are you sure you want to delete the following room(s): ${sRoomNos}?`;
-
 
             if (sRoomNos && sRoomNos.length > 0) {
                 sMessage += `\nThese rooms cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`;
             }
-
             sap.m.MessageBox.confirm(
                 sMessage,
                 {
