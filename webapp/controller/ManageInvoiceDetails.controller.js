@@ -706,6 +706,7 @@ sap.ui.define([
 
                 const startDate = new Date();
                 const endDate = new Date();
+                endDate.setDate(endDate.getDate() + 1);
                 const unitText = "Fix"; // default unit
 
                 const newItem = {
@@ -741,9 +742,60 @@ sap.ui.define([
                 const oItem = oEvent.getSource().getBindingContext("ManageInvoiceItemModel").getObject();
                 const unit = oItem.UnitText;
 
-                oItem.DurationText = this._getDurationText(unit, oItem.StartDate, oItem.EndDate, oItem.TotalHour || 1);
+                oItem.DurationText = this._getText(unit, oItem.StartDate, oItem.EndDate, oItem.TotalHour || 1);
 
                 this.getView().getModel("ManageInvoiceItemModel").refresh(true);
+            },
+
+            _getText: function(sUnit, sStartDate, sEndDate, totalHour) {
+                if (!sStartDate || !sEndDate) return "";
+
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "dd/MM/yyyy"
+                });
+
+                const start = oDateFormat.parse(sStartDate);
+                const end = oDateFormat.parse(sEndDate);
+
+                if (!start || !end) return "";
+
+                const diffTime = end.getTime() - start.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (sUnit === "Per Day") {
+                    return diffDays + (diffDays === 1 ? " Day" : " Days");
+                }
+
+                if (sUnit === "Per Month") {
+                    let months =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() >= start.getDate()) months += 1;
+
+                    return months + (months === 1 ? " Month" : " Months");
+                }
+
+                if (sUnit === "Per Year") {
+                    if (diffDays < 364) {
+                        return diffDays + " Days";
+                    }
+
+                    const years = Math.round(diffDays / 365);
+                    return years + (years === 1 ? " Year" : " Years");
+                }
+
+                if (sUnit === "Per Hour") {
+                    const hoursPerDay = Number(totalHour) || 1;
+                    const totalHours = hoursPerDay * diffDays;
+                    return totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                }
+
+                if (sUnit === "Fix") {
+                    return "-";
+                }
+
+                return "";
             },
 
             onChangeTotal: function(oEvent) {
@@ -774,11 +826,7 @@ sap.ui.define([
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled = !!taxType &&
-                    taxRate > 0 &&
-                    currency === "INR";
-
-                // Controls only UI visibility / enablement
+                const isGSTEnabled = !!taxType && taxRate > 0 && currency === "INR";
                 this.visiablityPlay.setProperty("/GST", isGSTEnabled);
 
                 // ---------------- ITEM CALCULATION ----------------
@@ -803,9 +851,12 @@ sap.ui.define([
                     const finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    // ---------- GST APPLICABILITY  ----------
-                    const isGSTApplicable =
-                        isGSTEnabled && item.GSTCalculation === "YES";
+                    // ---------- GST FIX (IMPORTANT) ----------
+                    if (item._isGSTSelected === undefined) {
+                        item._isGSTSelected = item.GSTCalculation === "YES";
+                    }
+
+                    const isGSTApplicable = isGSTEnabled && item._isGSTSelected;
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
                     item.GSTCalculation = isGSTApplicable ? "YES" : "NO";
@@ -851,11 +902,11 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
-                // ---------------- APPLY COUPON AFTER GST ----------------
+                // ---------------- APPLY COUPON ----------------
                 finalAmount -= couponDiscount;
                 if (finalAmount < 0) finalAmount = 0;
 
-                // ---------------- ROUND OFF (DISABLED) ----------------
+                // ---------------- ROUND OFF ----------------
                 const roundedAmount = Math.round(finalAmount);
                 const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
 
@@ -874,16 +925,15 @@ sap.ui.define([
                     allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
                 }
 
-
                 let totalPaid = paidAmount + allReceivedAmount;
                 let balanceAmount = 0;
                 let refundAmount = 0;
 
                 if (totalPaid > roundedAmount) {
-                    refundAmount = totalPaid - roundedAmount; // Overpayment → refund
+                    refundAmount = totalPaid - roundedAmount;
                     balanceAmount = 0;
                 } else {
-                    balanceAmount = roundedAmount - totalPaid; // Remaining due
+                    balanceAmount = roundedAmount - totalPaid;
                     refundAmount = 0;
                 }
 
@@ -2319,9 +2369,14 @@ sap.ui.define([
                     //     ]);
                     // }
 
-                    if (data.RoundOf && data.RoundOf !== "0") {
+                    const roundOff = Number(data.RoundOf);
+                    if (!isNaN(roundOff) && roundOff !== 0) {
                         summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
                     }
+
+                    // if (data.RoundOf && data.RoundOf !== "0") {
+                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
+                    // }
 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
