@@ -671,7 +671,7 @@ sap.ui.define([
 
     sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
 },
-       onSupportrequestChange: function (oEvent) {
+ onSupportrequestChange: function (oEvent) {
 
     const oFiles = oEvent.getParameter("files");
     if (!oFiles || oFiles.length === 0) return;
@@ -683,22 +683,33 @@ sap.ui.define([
     let aAttachments = oUploaderData.getProperty("/attachments") || [];
     let aTokens = oTokenModel.getProperty("/tokens") || [];
 
+    // ✅ Restrict total files to 3
+    if (aAttachments.length >= 3) {
+        sap.m.MessageToast.show("You can upload a maximum of 3 files only");
+        oEvent.getSource().clear();
+        return;
+    }
 
     Array.from(oFiles).forEach((oFile) => {
+
+        // ✅ Check if adding this file exceeds limit
+        if (aAttachments.length >= 3) {
+            sap.m.MessageToast.show("Maximum 3 files allowed");
+            return;
+        }
 
         // Check duplicate file name
         const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
         if (bDuplicate) {
-            MessageToast.show("This file is more than 2 MB and cannot be uploaded");
-            return;
-        }
-        // File type validation
-        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-            MessageToast.show("Only JPG, JPEG, PNG allowed");
+            sap.m.MessageToast.show("File already uploaded");
             return;
         }
 
-        
+        // File type validation
+        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+            sap.m.MessageToast.show("Only JPG, JPEG, PNG allowed");
+            return;
+        }
 
         const oReader = new FileReader();
 
@@ -727,7 +738,6 @@ sap.ui.define([
     });
 
     oEvent.getSource().clear();
-
 },
         onTokenDelete: function (oEvent) {
 

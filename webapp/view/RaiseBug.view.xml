@@ -33,10 +33,12 @@
 						<fb:control>
 							<ComboBox
                                 id="RB_id_RaisedBy1"
-                                items="{RaiseBugModel>/}"
+                            
                                 showClearIcon="true"
                                 showSecondaryValues="true">
-								<core:ListItem key="{RaiseBugModel>RoomNo}" text="{RaiseBugModel>RoomNo}"/>
+								<core:ListItem key="{RaiseBugModel>RaisedBy
+}" text="{RaiseBugModel>RaisedBy
+}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -50,7 +52,7 @@
 						<fb:control>
 							<ComboBox
                                 id="RB_id_Status"
-                                items="{RaiseBugModel>/}"
+                             
                                 showClearIcon="true"
                                 showSecondaryValues="true">
 								<core:ListItem key="{RaiseBugModel>Status}"

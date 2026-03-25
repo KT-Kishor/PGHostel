@@ -21,6 +21,7 @@ sap.ui.define([
             this.getView().byId("RB_id_RaisedBy1").setSelectedKey("")
             this.getView().byId("RB_id_Status").setSelectedKey("")
             this.CD_read()
+            this._loadAllFilterData()
         },
 
         SP_onPressClear: function() {
@@ -28,61 +29,94 @@ sap.ui.define([
             this.getView().byId("RB_id_Status").setSelectedKey("")
         },
 
-        CD_read: async function() {
-            const SRaisedBy = this.byId("RB_id_RaisedBy1").getSelectedKey() ||
-                this.byId("RB_id_RaisedBy1").getValue();
+       CD_read: async function () {
 
-            const SStatus = this.byId("RB_id_Status").getSelectedKey() ||
-                this.byId("RB_id_Status").getValue();
+    const SRaisedBy = this.byId("RB_id_RaisedBy1").getSelectedKey() ||
+        this.byId("RB_id_RaisedBy1").getValue();
 
-            let filters = {};
+    const SStatus = this.byId("RB_id_Status").getSelectedKey() ||
+        this.byId("RB_id_Status").getValue();
 
-            if (SRaisedBy) filters.RaisedBy = SRaisedBy;
-            if (SStatus) filters.Status = SStatus;
-            this.getBusyDialog()
-            await this.ajaxReadWithJQuery("HM_Bug", filters).then((oData) => {
-                var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+    let filters = {};
 
-                if (!this._originalRoomdata) {
-                    this._originalRoomdata = oFCIAerData;
-                }
-                var model = new JSONModel(oFCIAerData);
-                this.getView().setModel(model, "RaiseBugModel");
-                this._populateUniqueFilterValues(this._originalRoomdata);
-            })
-            this.closeBusyDialog()
-        },
+    if (SRaisedBy) filters.RaisedBy = SRaisedBy;
+    if (SStatus) filters.Status = SStatus;
 
-        _populateUniqueFilterValues: function(data) {
-            let uniqueValues = {
-                RB_id_RaisedBy1: new Set(),
-                RB_id_Status: new Set()
-            };
-            data.forEach(item => {
+    this.getBusyDialog();
 
-                if (item.RaisedBy && item.RaisedBy.trim()) {
-                    uniqueValues.RB_id_RaisedBy1.add(item.RaisedBy.trim());
-                }
-                if (item.Status) {
-                    uniqueValues.RB_id_Status.add(item.Status.trim());
-                }
+    await this.ajaxReadWithJQuery("HM_Bug", filters).then((oData) => {
+
+        var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+        // ✅ Set table data (filtered)
+        var model = new JSONModel(oFCIAerData);
+        this.getView().setModel(model, "RaiseBugModel");
+
+    });
+
+    this.closeBusyDialog();
+},
+_loadAllFilterData: async function () {
+
+    await this.ajaxReadWithJQuery("HM_Bug", {}).then((oData) => {
+
+        var aFullData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+        // ✅ Store full dataset
+        this._allData = aFullData;
+
+        // ✅ Populate dropdown from full data
+        this._populateUniqueFilterValues(this._allData);
+    });
+},
+
+        _populateUniqueFilterValues: function (data) {
+
+    let uniqueValues = {
+        RB_id_RaisedBy1: new Set(),
+        RB_id_Status: new Set()
+    };
+
+    data.forEach(item => {
+
+        if (item.RaisedBy && item.RaisedBy.trim()) {
+            uniqueValues.RB_id_RaisedBy1.add(item.RaisedBy.trim());
+        }
+
+        if (item.Status && item.Status.trim()) {
+            uniqueValues.RB_id_Status.add(item.Status.trim());
+        }
+    });
+
+    let oView = this.getView();
+
+    ["RB_id_RaisedBy1", "RB_id_Status"].forEach(field => {
+
+        let oComboBox = oView.byId(field);
+        if (!oComboBox) return;
+
+        // ✅ Preserve selected value before reset
+        let sSelectedKey = oComboBox.getSelectedKey();
+
+        oComboBox.destroyItems();
+
+        Array.from(uniqueValues[field])
+            .sort()
+            .forEach(value => {
+                oComboBox.addItem(new sap.ui.core.Item({
+                    key: value,
+                    text: value
+                }));
             });
-            let oView = this.getView();
 
-            ["RB_id_RaisedBy1", "RB_id_Status"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                if (!oComboBox) return;
-                oComboBox.destroyItems();
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(
-                        new sap.ui.core.Item({
-                            key: value,
-                            text: value
-                        })
-                    );
-                });
-            });
-        },
+        // ✅ Restore selection if still valid
+        if (sSelectedKey && uniqueValues[field].has(sSelectedKey)) {
+            oComboBox.setSelectedKey(sSelectedKey);
+        } else {
+            oComboBox.setSelectedKey("");
+        }
+    });
+},
 
         onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
