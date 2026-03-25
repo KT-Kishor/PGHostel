@@ -463,8 +463,7 @@
                                                     press="CID_onPressDelete"
                                                 />
                                                 <m:Button text="Refresh" press="onRefreshInvoice"
-                                                visible="{visiablityPlay>/refresh}"
-                                                class="myUnifiedBtn"/>
+                                                visible="{visiablityPlay>/refresh}" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
 										</m:headerToolbar>
@@ -805,21 +804,7 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-											<!-- Pending Amount -->
-											<m:HBox
-                                                justifyContent="SpaceBetween"
-                                                visible="{= ${SelectedCustomerModel>/BalanceAmount} > 0 }"
-                                            >
-												<m:Label
-                                                    text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
-                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                />
-												<m:Text
-                                                    class="amountText"
-                                                    text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
-                                                    textAlign="End"
-                                                />
-											</m:HBox>
+											
 											<!-- Refund Due -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -871,6 +856,25 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
+                                            <!-- Balance Amount -->
+                                           <m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{=
+                                                    (
+                                                        Number(${FilteredSOWModel>/TotalAmount} || 0) -
+                                                        (
+                                                            Number(${SelectedCustomerModel>/PaidAmount} || 0) +
+                                                            Number(${InvoicePayment>/AllReceivedAmount} || 0)
+                                                        )
+                                                    ) > 0
+                                                }"
+                                            >
+                                            <m:Label text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
+                                            class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"/>
+                                            <m:Text class="amountText"
+                                            text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
+                                             textAlign="End"/>
+                                            </m:HBox>
 											<!-- Due Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"

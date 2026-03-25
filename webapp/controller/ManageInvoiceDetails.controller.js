@@ -314,10 +314,10 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/MultiEmail", false);
                     }
                     this.Status = Status;
-                    this.totalAmountCalculation();
-                    this.Readcall("HM_InvoicePaymentDetail", {
+                    await this.Readcall("HM_InvoicePaymentDetail", {
                         InvNo: this.decodedPath
                     })
+                    await this.totalAmountCalculation();
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
@@ -867,16 +867,23 @@ sap.ui.define([
                 // ---------------- PAID & BALANCE ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
+                const oInvoicePaymentModel = oView.getModel("InvoicePayment");
+                let allReceivedAmount = 0;
+
+                if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
+                    allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+                }
+
+
+                let totalPaid = paidAmount + allReceivedAmount;
                 let balanceAmount = 0;
                 let refundAmount = 0;
 
-                if (paidAmount > roundedAmount) {
-                    // Overpayment → refund required
-                    refundAmount = paidAmount - roundedAmount;
+                if (totalPaid > roundedAmount) {
+                    refundAmount = totalPaid - roundedAmount; // Overpayment → refund
                     balanceAmount = 0;
                 } else {
-                    // Normal balance
-                    balanceAmount = roundedAmount - paidAmount;
+                    balanceAmount = roundedAmount - totalPaid; // Remaining due
                     refundAmount = 0;
                 }
 
@@ -1121,7 +1128,7 @@ sap.ui.define([
                     };
                     if (sMode === "update") {
                         let filters;
-                        if (item.flag === "create") {
+                        if (item.flag === "create" || !item.ItemID) {
                             filters = {
                                 flag: "create"
                             };
@@ -1389,7 +1396,7 @@ sap.ui.define([
                         if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
                         if (Status === "Payment Received") {
                             this.visiablityPlay.setProperty("/MultiEmail", false);
-                            this.visiablityPlay.setProperty("/Edit", false);
+                            // this.visiablityPlay.setProperty("/Edit", false);
                         }
                         MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
                         this.closeBusyDialog()
@@ -1449,16 +1456,32 @@ sap.ui.define([
                 var fTotalAmount = parseFloat(oNavigationModel.TotalAmount) || 0;
                 var fPaidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
 
-                // NEW: calculate balance amount
-                var fBalanceAmount = fTotalAmount > fPaidAmount ? (fTotalAmount - fPaidAmount) : fTotalAmount;
-
                 var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
-                var fDueAmount = 0;
 
-                if (oInvoicePaymentModel && oInvoicePaymentModel.getData().length !== 0) {
-                    fDueAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllDueAmount")) || fBalanceAmount;
+                var fAllReceivedAmount = 0;
+                var fBackendDueAmount = null;
+
+                if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
+                    fAllReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+
+                    var tempDue = parseFloat(oInvoicePaymentModel.getProperty("/AllDueAmount"));
+                    if (!isNaN(tempDue)) {
+                        fBackendDueAmount = tempDue;
+                    }
+                }
+
+                var fTotalReceived = fPaidAmount + fAllReceivedAmount; // Total received
+
+                var fCalculatedDue = fTotalAmount - fTotalReceived;
+                if (fCalculatedDue < 0) {
+                    fCalculatedDue = 0;
+                }
+
+                var fFinalDue;
+                if (fTotalAmount > fAllReceivedAmount) {
+                    fFinalDue = fCalculatedDue; 
                 } else {
-                    fDueAmount = fBalanceAmount;
+                    fFinalDue = (fBackendDueAmount !== null) ? fBackendDueAmount : fCalculatedDue;
                 }
 
                 var oModel = new sap.ui.model.json.JSONModel({
@@ -1466,8 +1489,8 @@ sap.ui.define([
                     TransactionId: "",
                     ReceivedDate: "",
                     ReceivedAmount: "",
-                    TotalAmount: fBalanceAmount.toFixed(2),
-                    DueAmount: fDueAmount.toFixed(2),
+                    TotalAmount: fTotalAmount.toFixed(2),
+                    DueAmount: fFinalDue.toFixed(2),
                     Currency: oNavigationModel.Currency,
                     ConversionRate: "",
                     AmountInINR: "",
@@ -1489,11 +1512,14 @@ sap.ui.define([
             onChangeReceivedAmount: function(oEvent) {
                 var paymentModel = this.getView().getModel("PaymentModel");
                 var allPaymentData = this.getView().getModel("InvoicePayment");
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
 
                 var totalReceivedAmount = 0;
                 if (allPaymentData) {
-                    totalReceivedAmount = allPaymentData.getProperty("/AllReceivedAmount") || 0;
+                    totalReceivedAmount = parseFloat(allPaymentData.getProperty("/AllReceivedAmount")) || 0;
                 }
+
+                var paidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
 
                 var sValue = paymentModel.getProperty("/ReceivedAmount") || "";
                 sValue = sValue.replaceAll(',', '');
@@ -1502,20 +1528,30 @@ sap.ui.define([
                 var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
                 var receivedAmount = parseFloat(sValue) || 0;
 
-                var dueAmount = totalAmount - totalReceivedAmount - receivedAmount;
+                var totalPaidTillNow = paidAmount + totalReceivedAmount + receivedAmount;
+
+                var dueAmount = totalAmount - totalPaidTillNow;
+                if (dueAmount < 0) {
+                    dueAmount = 0;
+                }
+
                 paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
                 this.onChangePaymentConvertionRate();
 
                 if (oEvent) {
                     var enteredAmount = parseFloat(oEvent.getParameter("value").replaceAll(',', '')) || 0;
-                    var dueAmount = parseFloat(this.DueAmount);
+
+                    var remainingDue = totalAmount - (paidAmount + totalReceivedAmount);
+
                     this.ResivedAmount = true;
-                    if (enteredAmount === dueAmount) {
+
+                    if (enteredAmount === remainingDue) {
                         sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
-                    } else if (enteredAmount > dueAmount) {
+                    } else if (enteredAmount > remainingDue) {
                         this.ResivedAmount = false;
                         sap.ui.getCore().byId("idReceivedAmount").setValueState("Error");
-                        sap.ui.getCore().byId("idReceivedAmount").setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                        sap.ui.getCore().byId("idReceivedAmount")
+                            .setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
                     } else {
                         sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                         this.ResivedAmount = true;
@@ -1552,27 +1588,36 @@ sap.ui.define([
 
                 const items = oData.data || [];
 
-                // Case 1: Only 1 record and it is Used = X → Do NOTHING
+                // Case 1: Only 1 record and Used = X → skip calculation
                 if (items.length === 1 && items[0].Used === "X") {
-                    return; // Exit function
+                    return;
                 }
 
-                // Case 2: Normal calculation but ignore Used = X rows
                 const validItems = items.filter(item => item.Used !== "X");
 
-                // Sum received amount only from valid items
+                // Sum of post-invoice payments
                 const totalReceivedAmount = validItems.reduce(
                     (sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0),
                     0
                 );
 
-                // Get TotalAmount from first valid record (NOT items[0])
-                const totalAmount = parseFloat(validItems[0]?.TotalAmount || 0);
+                // Safe TotalAmount fetch
+                const totalAmount = parseFloat(
+                    validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0
+                );
 
-                // Calculate due amount
-                const totalDueAmount = totalAmount - totalReceivedAmount;
+                // PaidAmount (advance)
+                const oNavigationModel = view.getModel("SelectedCustomerModel")?.getData() || {};
+                const paidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
 
-                // Update model
+                // FINAL CALCULATION
+                const totalPaid = paidAmount + totalReceivedAmount;
+
+                let totalDueAmount = totalAmount - totalPaid;
+                if (totalDueAmount < 0) {
+                    totalDueAmount = 0;
+                }
+
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
                 invoiceModel.setProperty("/AllDueAmount", totalDueAmount.toFixed(2));
@@ -3337,7 +3382,7 @@ sap.ui.define([
                         oSelectedModel.setData(oInvoice);
                         oSelectedModel.refresh(true);
                         oSelectedModel.refresh(true);
-                        this.visiablityPlay.setProperty("/Edit", false);
+                        // this.visiablityPlay.setProperty("/Edit", false);
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
@@ -3372,8 +3417,6 @@ sap.ui.define([
                 try {
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
-                    const existingItems = oView.getModel("ManageInvoiceItemModel")
-                        .getProperty("/ManageInvoiceItem") || [];
 
                     this.getBusyDialog();
 
@@ -3383,11 +3426,9 @@ sap.ui.define([
 
                     const finalItems = this._prepareInvoiceItems(oData);
 
-                    oView.getModel("ManageInvoiceItemModel")
-                        .setProperty("/ManageInvoiceItem", finalItems);
+                    oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
 
                     await this.totalAmountCalculation();
-
                 } catch (e) {
                     MessageToast.show(e.message);
                 } finally {
@@ -3395,13 +3436,11 @@ sap.ui.define([
                 }
             },
 
-            _prepareInvoiceItems: function (oData) {
+            _prepareInvoiceItems: function(oData) {
                 const oView = this.getView();
-
                 const existingItems = oView.getModel("ManageInvoiceItemModel")
                     .getProperty("/ManageInvoiceItem") || [];
 
-                // ================= GET INVOICE CYCLE =================
                 const roomRent = existingItems.find(i =>
                     i.Particulars.includes("Room Rent")
                 );
@@ -3409,49 +3448,36 @@ sap.ui.define([
                 if (!roomRent) return existingItems;
 
                 const cycleStart = this._parseDate(roomRent.StartDate);
-                const cycleEnd   = this._parseDate(roomRent.EndDate);
+                const cycleEnd = this._parseDate(roomRent.EndDate);
 
-                cycleStart.setHours(0,0,0,0);
-                cycleEnd.setHours(0,0,0,0);
+                cycleStart.setHours(0, 0, 0, 0);
+                cycleEnd.setHours(0, 0, 0, 0);
 
-                // ================= SPLIT =================
+                const existingFacilities = existingItems.filter(i =>
+                    i.Particulars.includes("Facility")
+                );
+
                 const nonFacilityItems = existingItems.filter(i =>
                     !i.Particulars.includes("Facility")
                 );
 
-                const existingFacilityItems = existingItems.filter(i =>
-                    i.Particulars.includes("Facility")
-                );
-
-                // ================= EXISTING MAP =================
-                const existingMap = new Map();
-
-                existingFacilityItems.forEach(item => {
-                    const key = `${item.Particulars}_${item.UnitText}`;
-                    existingMap.set(key, item);
-                });
-
-                // ================= RAW BACKEND DATA =================
                 const dbFacilitiesRaw = oData.commentData || [];
 
-                const updatedFacilityItems = [];
+                const newFacilityItems = [];
 
-                dbFacilitiesRaw.forEach(f => {
+                dbFacilitiesRaw.forEach((f) => {
 
                     let fStart = new Date(f.StartDate);
-                    let fEnd   = new Date(f.EndDate);
+                    let fEnd = new Date(f.EndDate);
 
-                    fStart.setHours(0,0,0,0);
-                    fEnd.setHours(0,0,0,0);
+                    fStart.setHours(0, 0, 0, 0);
+                    fEnd.setHours(0, 0, 0, 0);
 
-                    // skip outside invoice cycle
                     if (fEnd < cycleStart || fStart > cycleEnd) return;
 
-                    // ✅ CUT INTO CYCLE RANGE
                     const effectiveStart = fStart > cycleStart ? fStart : cycleStart;
-                    const effectiveEnd   = fEnd < cycleEnd ? fEnd : cycleEnd;
+                    const effectiveEnd = fEnd < cycleEnd ? fEnd : cycleEnd;
 
-                    // ================= PARTICULARS =================
                     let particulars = "";
 
                     if (f.FacilityName === "Penalty Charges") {
@@ -3463,72 +3489,49 @@ sap.ui.define([
                         particulars = `${f.FacilityName} - Facility`;
                     }
 
-                    const key = `${particulars}_${f.UnitText}`;
-
-                    // ================= TOTAL CALC =================
-                    const total = this._calculateFacilityTotal(
-                        f,
-                        effectiveStart,
-                        effectiveEnd
+                    const startStr = this.Formatter.DateFormat(effectiveStart);
+                    const endStr = this.Formatter.DateFormat(effectiveEnd);
+                    const isAlreadyExists = existingFacilities.some(e =>
+                        e.Particulars === particulars &&
+                        e.StartDate === startStr &&
+                        e.EndDate === endStr
                     );
 
-                    // ================= UPDATE / ADD =================
-                    if (existingMap.has(key)) {
+                    if (isAlreadyExists) return;
 
-                        const existing = existingMap.get(key);
+                    // ================= ADD NEW =================
+                    newFacilityItems.push({
+                        ItemID: null,
+                        InvNo: nonFacilityItems[0]?.InvNo,
+                        Particulars: particulars,
+                        UnitText: f.UnitText,
 
-                        existing.StartDate = this.Formatter.DateFormat(effectiveStart);
-                        existing.EndDate   = this.Formatter.DateFormat(effectiveEnd);
-                        existing.Total     = total;
-
-                        existing.DurationText = this._getDurationText(
+                        DurationText: this._getDurationText(
                             f.UnitText,
                             effectiveStart,
                             effectiveEnd,
                             f.TotalHour
-                        );
+                        ),
 
-                        updatedFacilityItems.push(existing);
-
-                    } else {
-
-                        updatedFacilityItems.push({
-                            InvNo: existingItems[0]?.InvNo,
-
-                            Particulars: particulars,
-                            UnitText: f.UnitText,
-
-                            DurationText: this._getDurationText(
-                                f.UnitText,
-                                effectiveStart,
-                                effectiveEnd,
-                                f.TotalHour
-                            ),
-
-                            GrossPrice: Number(f.BasicFacilityPrice) || 0,
-                            Total: total,
-
-                            StartDate: this.Formatter.DateFormat(effectiveStart),
-                            EndDate: this.Formatter.DateFormat(effectiveEnd),
-
-                            Currency: f.Currency || "INR",
-
-                            GSTCalculation: "YES",
-                            Discount: "0.00",
-
-                            GrossPriceEditable: false,
-                            UnitEditable: false,
-                            DurationEditable: false,
-                            StartDateEditable: false,
-                            EndDateEditable: false
-                        });
-                    }
+                        GrossPrice: Number(f.BasicFacilityPrice) || 0,
+                        Total: this._calculateFacilityTotal(f, effectiveStart, effectiveEnd),
+                        StartDate: startStr,
+                        EndDate: endStr,
+                        Currency: f.Currency || "INR",
+                        GSTCalculation: "YES",
+                        Discount: "0.00",
+                        GrossPriceEditable: false,
+                        UnitEditable: false,
+                        DurationEditable: false,
+                        StartDateEditable: false,
+                        EndDateEditable: false
+                    });
                 });
 
-                // ================= FINAL =================
                 const finalItems = [
                     ...nonFacilityItems,
-                    ...updatedFacilityItems
+                    ...existingFacilities, 
+                    ...newFacilityItems 
                 ];
 
                 finalItems.forEach((item, index) => {
@@ -3538,18 +3541,13 @@ sap.ui.define([
                 return finalItems;
             },
 
-            _parseDate: function (dateStr) {
+            _parseDate: function(dateStr) {
                 const [day, month, year] = dateStr.split("/");
                 return new Date(`${year}-${month}-${day}`);
             },
 
-            _getKey: function(particulars, start, end) {
-                return `${particulars}_${start}_${end}`;
-            },
+            _calculateFacilityTotal: function(item, start, end) {
 
-            _calculateFacilityTotal: function (item, start, end) {
-
-                // ✅ NORMALIZE (VERY IMPORTANT)
                 start = new Date(start);
                 end = new Date(end);
 
@@ -3561,7 +3559,6 @@ sap.ui.define([
                 // PER DAY
                 if (unit === "per day") {
                     const price = Number(item.BasicFacilityPrice) || 0;
-
                     const days = Math.floor((end - start) / 86400000);
                     return price * days;
                 }
@@ -3570,7 +3567,6 @@ sap.ui.define([
                 if (unit === "per hour") {
                     const price = Number(item.BasicFacilityPrice) || 0;
                     const hrs = Number(item.TotalHour) || 1;
-
                     const days = Math.floor((end - start) / 86400000);
                     return price * hrs * days;
                 }
@@ -3593,7 +3589,7 @@ sap.ui.define([
 
                     const totalprice = Number(item.FacilitiPrice || item.BasicFacilityPrice) || 0;
 
-                    const totalDays = Math.floor((end - start) / 86400000) + 1; // inclusive
+                    const totalDays = Math.floor((end - start) / 86400000) + 1;
 
                     let totalMonths =
                         (end.getFullYear() - start.getFullYear()) * 12 +
