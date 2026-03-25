@@ -411,18 +411,53 @@
                             class="sapUiTinyMarginTop customBookingPanel"
                         >
                             <VBox class="sapUiTinyMargin">
+                                <HBox
+                                    justifyContent="SpaceBetween"
+                                    alignItems="Center"
+                                    visible="{BookingView>/showBusinessTravelOption}"
+                                    class="sapUiTinyMarginBottom"
+                                >
+                                    <Text text="GST Details(optional)" />
+                                    <Switch
+                                        state="{HostelModel>/IsBusinessTravel}"
+                                        change="onBusinessTravelToggle"
+                                        enabled="{BookingView>/showBusinessTravelOption}"
+                                    />
+                                </HBox>
                                 <Label
                                     text="GSTIN"
-                                    visible="{BookingView>/showGSTField}"
+                                    visible="{BookingView>/showBusinessGSTSection}"
                                 />
                                 <Input
-                                    value="{HostelModel>/GSTIN}"
-                                    placeholder="Enter GSTIN (Optional)"
-                                    visible="{BookingView>/showGSTField}"
+                                    value="{HostelModel>/CustomerGSTIN}"
+                                    placeholder="Enter GSTIN"
+                                    visible="{BookingView>/showBusinessGSTSection}"
                                     liveChange="onGSTINLiveChange"
                                     change="onGSTINChange"
                                     class="sapUiTinyMarginBottom"
                                     valueStateText="{i18n>gstError}"
+                                />
+                                <Label
+                                    text="Company Name"
+                                    visible="{BookingView>/showBusinessGSTSection}"
+                                />
+                                <Input
+                                    value="{HostelModel>/CompanyName}"
+                                    placeholder="Enter company name"
+                                    visible="{BookingView>/showBusinessGSTSection}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <Label
+                                    text="Company Address"
+                                    visible="{BookingView>/showBusinessGSTSection}"
+                                />
+                                <TextArea
+                                    value="{HostelModel>/CompanyAddress}"
+                                    placeholder="Enter company address"
+                                    visible="{BookingView>/showBusinessGSTSection}"
+                                    rows="3"
+                                    class="sapUiTinyMarginBottom"
+                                    width="100%"
                                 />
                                 <Text
                                     text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
@@ -438,6 +473,13 @@
                                     text="Sub Total: {HostelModel>/BookingSubTotal} {HostelModel>/Currency}"
                                 />
                                 <Text
+                                    text="Property GSTIN: {HostelModel>/PropertyGSTIN}"
+                                />
+                                <Text
+                                    text="Customer GSTIN: {HostelModel>/CustomerGSTIN}"
+                                    visible="{= !!${HostelModel>/CustomerGSTIN}}"
+                                />
+                                <Text
                                     text="CGST: {HostelModel>/CGST} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/CGST} > 0}"
                                 />
@@ -448,6 +490,13 @@
                                 <Text
                                     text="IGST: {HostelModel>/IGST} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/IGST} > 0}"
+                                />
+                                <MessageStrip
+                                    text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
+                                    type="Information"
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                    class="sapUiTinyMarginBottom"
                                 />
                                 <MessageStrip
                                     text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"

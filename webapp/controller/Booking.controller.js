@@ -31,6 +31,16 @@ sap.ui.define([
             return sType === "Hostel" || sType === "PG";
         },
 
+        _isGSTEligiblePropertyType: function (sPropertyType) {
+            const sType = String(sPropertyType || "").trim();
+            return ["Hotel", "Service Apartments", "Rented Properties"].includes(sType);
+        },
+
+        _supportsCustomerGSTOverride: function (sPropertyType) {
+            const sType = String(sPropertyType || "").trim();
+            return ["Hotel", "Service Apartments", "Rented Properties"].includes(sType);
+        },
+
         _shouldShowGSTField: function (sPropertyType) {
             return !this._isSinglePersonOnlyPropertyType(sPropertyType);
         },
@@ -54,12 +64,52 @@ sap.ui.define([
             return bValid;
         },
 
+        _isValidGSTINValue: function (sValue) {
+            return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
+                String(sValue || "").trim().toUpperCase()
+            );
+        },
+
         onGSTINLiveChange: function (oEvent) {
-            return this._validateGSTINField(oEvent.getSource());
+            const bValid = this._validateGSTINField(oEvent.getSource());
+            this.getView().getModel("HostelModel").setProperty("/CustomerGSTIN", oEvent.getSource().getValue());
+            this._recalculateSummary();
+            return bValid;
         },
 
         onGSTINChange: function (oEvent) {
-            return this._validateGSTINField(oEvent.getSource());
+            const bValid = this._validateGSTINField(oEvent.getSource());
+            this.getView().getModel("HostelModel").setProperty("/CustomerGSTIN", oEvent.getSource().getValue());
+            this._recalculateSummary();
+            return bValid;
+        },
+
+        onBusinessTravelToggle: function (oEvent) {
+            const oModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
+            const bSelected = !!oEvent.getParameter("state");
+
+            oModel.setProperty("/IsBusinessTravel", bSelected);
+            oBookingView.setProperty("/showBusinessGSTSection", bSelected && !!oBookingView.getProperty("/showBusinessTravelOption"));
+
+            if (!bSelected) {
+                this._resetBusinessTravelData();
+            }
+
+            this._recalculateSummary();
+        },
+
+        _resetBusinessTravelData: function () {
+            const oModel = this.getView().getModel("HostelModel");
+
+            oModel.setProperty("/IsBusinessTravel", false);
+            oModel.setProperty("/CustomerGSTIN", "");
+            oModel.setProperty("/CompanyName", "");
+            oModel.setProperty("/CompanyAddress", "");
+            oModel.setProperty("/EffectiveGSTType", "");
+            oModel.setProperty("/EffectiveGSTValue", 0);
+            oModel.setProperty("/CustomerStateCode", "");
+            oModel.setProperty("/SourceStateCode", "");
         },
 
         _getSelectedPersonCount: function () {
@@ -1272,6 +1322,8 @@ sap.ui.define([
                 endDateEditable: false,
                 showFamilySection: false,
                 showGSTField: false,
+                showBusinessTravelOption: false,
+                showBusinessGSTSection: false,
                 maxPersons: 1,
                 originalPersonOptions: [],
                 DocumentTypeOptions: [
@@ -1350,7 +1402,16 @@ sap.ui.define([
             oModel.setProperty("/AppliedCouponCode", oData.AppliedCouponCode || "");
             oModel.setProperty("/GSTType", oData.GSTType || "");
             oModel.setProperty("/GSTValue", this._toNumber(oData.GSTValue));
-            oModel.setProperty("/GSTIN", oData.GSTIN || "");
+            oModel.setProperty("/PropertyGSTIN", oData.PropertyGSTIN || oData.GSTIN || "");
+            oModel.setProperty("/GSTIN", oData.PropertyGSTIN || oData.GSTIN || "");
+            oModel.setProperty("/CustomerGSTIN", oData.CustomerGSTIN || "");
+            oModel.setProperty("/CompanyName", oData.CompanyName || "");
+            oModel.setProperty("/CompanyAddress", oData.CompanyAddress || "");
+            oModel.setProperty("/IsBusinessTravel", !!oData.IsBusinessTravel);
+            oModel.setProperty("/EffectiveGSTType", oData.EffectiveGSTType || "");
+            oModel.setProperty("/EffectiveGSTValue", this._toNumber(oData.EffectiveGSTValue));
+            oModel.setProperty("/CustomerStateCode", oData.CustomerStateCode || "");
+            oModel.setProperty("/SourceStateCode", oData.SourceStateCode || "");
             oModel.setProperty("/BookingSubTotal", this._toNumber(oData.BookingSubTotal));
             oModel.setProperty("/CGST", this._toNumber(oData.CGST));
             oModel.setProperty("/SGST", this._toNumber(oData.SGST));
@@ -1388,11 +1449,19 @@ sap.ui.define([
             const oBookingView = this.getView().getModel("BookingView");
             const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
             const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
+            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const iCapacity = Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
             const aOriginalOptions = this._buildKeyTextList(iCapacity);
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
 
             oBookingView.setProperty("/showGSTField", this._shouldShowGSTField(sPropertyType));
+            oBookingView.setProperty("/showBusinessTravelOption", bSupportsCustomerGST);
+            oBookingView.setProperty("/showBusinessGSTSection", bSupportsCustomerGST && !!oModel.getProperty("/IsBusinessTravel"));
+
+            if (!bSupportsCustomerGST) {
+                this._resetBusinessTravelData();
+                oBookingView.setProperty("/showBusinessGSTSection", false);
+            }
 
             if (bSinglePersonOnly) {
                 oBookingView.setProperty("/showFamilySection", false);
@@ -1852,13 +1921,17 @@ sap.ui.define([
             const fBasePrice = this._toNumber(oModel.getProperty("/FinalPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
             const fDiscount = this._toNumber(oModel.getProperty("/AppliedDiscount"));
+            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
+            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const sGSTType = String(oModel.getProperty("/GSTType") || "").trim();
             const fGSTValue = this._toNumber(oModel.getProperty("/GSTValue"));
+            const sPropertyGSTIN = String(oModel.getProperty("/PropertyGSTIN") || oModel.getProperty("/GSTIN") || "").trim().toUpperCase();
+            const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
             const iPersons = this._getSelectedPersonCount();
-            const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(oModel.getProperty("/PropertyType"));
+            const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
             const iRoomMultiplier = bSinglePersonOnly ? 1 : iPersons;
             let fRoomPrice = fBasePrice;
             let iDays = 0;
@@ -1867,6 +1940,10 @@ sap.ui.define([
             let fCGST = 0;
             let fSGST = 0;
             let fIGST = 0;
+            let sEffectiveGSTType = sGSTType;
+            let fEffectiveGSTValue = 0;
+            let sSourceStateCode = "";
+            let sCustomerStateCode = "";
 
             if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
                 iDays = Math.floor((oEndDate - oStartDate) / 86400000);
@@ -1888,17 +1965,36 @@ sap.ui.define([
 
             fSubTotal = Number((fRoomPrice + fFacilityPrice).toFixed(2));
 
-            if (sGSTType === "CGST/SGST") {
-                fCGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
-                fSGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
-            } else if (sGSTType === "IGST") {
-                fIGST = Number((fSubTotal * fGSTValue / 100).toFixed(2));
+            if (sGSTType || fGSTValue > 0) {
+                fEffectiveGSTValue = fGSTValue;
+
+                if (bSupportsCustomerGST && this._isValidGSTINValue(sCustomerGSTIN) && this._isValidGSTINValue(sPropertyGSTIN)) {
+                    sSourceStateCode = sPropertyGSTIN.substring(0, 2);
+                    sCustomerStateCode = sCustomerGSTIN.substring(0, 2);
+
+                    if (sSourceStateCode === sCustomerStateCode) {
+                        sEffectiveGSTType = "CGST/SGST";
+                    } else {
+                        sEffectiveGSTType = "IGST";
+                    }
+                }
+
+                if (sEffectiveGSTType === "CGST/SGST") {
+                    fCGST = Number((fSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
+                    fSGST = Number((fSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
+                } else if (sEffectiveGSTType === "IGST") {
+                    fIGST = Number((fSubTotal * fEffectiveGSTValue / 100).toFixed(2));
+                }
             }
 
             oModel.setProperty("/BookingSubTotal", fSubTotal);
             oModel.setProperty("/CGST", fCGST);
             oModel.setProperty("/SGST", fSGST);
             oModel.setProperty("/IGST", fIGST);
+            oModel.setProperty("/EffectiveGSTType", sEffectiveGSTType);
+            oModel.setProperty("/EffectiveGSTValue", fEffectiveGSTValue);
+            oModel.setProperty("/SourceStateCode", sSourceStateCode);
+            oModel.setProperty("/CustomerStateCode", sCustomerStateCode);
             oModel.setProperty("/GrandTotal", Number(Math.max(fSubTotal + fCGST + fSGST + fIGST - fDiscount, 0).toFixed(2)));
         },
 
@@ -1965,11 +2061,39 @@ sap.ui.define([
 
         onContinueBooking: function () {
             const oModel = this.getView().getModel("HostelModel");
+            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
+            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
+            const bIsBusinessTravel = !!oModel.getProperty("/IsBusinessTravel");
+            const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim();
+            const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
+            const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
 
             if (!oModel.getProperty("/FullName") || !oModel.getProperty("/StartDate") || !oModel.getProperty("/EndDate")) {
                 MessageToast.show("Please fill mandatory booking details");
                 return;
             }
+
+            if (bSupportsCustomerGST && bIsBusinessTravel) {
+                if (!sCustomerGSTIN || !sCompanyName || !sCompanyAddress) {
+                    MessageToast.show("Please fill business GST details");
+                    return;
+                }
+
+                if (!this._isValidGSTINValue(sCustomerGSTIN)) {
+                    MessageToast.show("Please enter a valid GSTIN");
+                    return;
+                }
+            }
+
+            oModel.setProperty("/BookingPayload", {
+                isB2B: bSupportsCustomerGST && bIsBusinessTravel && !!sCustomerGSTIN,
+                customerGSTIN: sCustomerGSTIN,
+                companyName: sCompanyName,
+                companyAddress: sCompanyAddress,
+                propertyGSTIN: oModel.getProperty("/PropertyGSTIN") || "",
+                gstType: oModel.getProperty("/EffectiveGSTType") || "",
+                gstValue: oModel.getProperty("/EffectiveGSTValue") || 0
+            });
 
             MessageToast.show("Booking details captured successfully");
         }
