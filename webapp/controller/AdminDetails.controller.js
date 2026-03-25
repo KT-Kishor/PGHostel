@@ -2778,7 +2778,12 @@ sap.ui.define([
 
                         } else if (paymentType === "Per Month") {
                             if (item.UnitText === "Per Month") {
-                                let monthlyAmount = totalAmount;
+                                const totalMonths =
+                                    (facilityEnd.getFullYear() - facilityStart.getFullYear()) * 12 +
+                                    (facilityEnd.getMonth() - facilityStart.getMonth());
+
+                                let monthlyAmount = totalAmount / totalMonths;
+
                                 firstMonthAmount = (monthlyAmount / totalCycleDays) * overlapDays;
                             } else if (item.UnitText === "Per Day") {
                                 firstMonthAmount = Number(item.Price) * overlapDays;
@@ -2973,7 +2978,7 @@ sap.ui.define([
                     return; // ⛔ stop save
                 }
             }
-       
+
 
             const invalidFacilities = [];
 
@@ -3083,30 +3088,30 @@ sap.ui.define([
 
                                     if (unit === "per day") {
                                         total = diffDays * price;
-                                         item.TotalDays = diffDays;
+                                        item.TotalDays = diffDays;
 
-                                    }else if(unit === "per hour"){
+                                    } else if (unit === "per hour") {
                                         let diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
                                         total = diffHours * price;
 
                                     }
-                                     else if (unit === "per month") {
-                                        if(CustomerData.PaymentType==="yearly"){
-                                        let months = CustomerData.Duration * 12
-                                        total = months * price;
-                                         item.TotalMonths = months;
+                                    else if (unit === "per month") {
+                                        if (CustomerData.PaymentType === "yearly") {
+                                            let months = CustomerData.Duration * 12
+                                            total = months * price;
+                                            item.TotalMonths = months;
 
-                                        }else{
-                                         let months = CustomerData.Duration 
-                                         total = months * price;
-                                         item.TotalMonths = months;
+                                        } else {
+                                            let months = CustomerData.Duration
+                                            total = months * price;
+                                            item.TotalMonths = months;
 
                                         }
-                                     
+
                                     } else if (unit === "per year") {
                                         let years = CustomerData.Duration;
                                         total = years * price;
-                                           item.TotalYears = years; 
+                                        item.TotalYears = years;
                                     }
 
                                     item.TotalAmount = total;
@@ -4091,7 +4096,7 @@ sap.ui.define([
             sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue(CustData.GSTNumber || "");
 
             sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
-            sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType === "IGST" ? 0 : 1);
+            sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType? CustData.GSTType === "IGST" ? 0 : 1 : 0);
 
             if (sap.ui.getCore().byId("idBranchGSTNumber").getValue() === "") {
                 sap.ui.getCore().byId("idBranchGSTNumber").setVisible(false);
@@ -5710,10 +5715,10 @@ sap.ui.define([
                 });
         },
 
-        onGeneratePDF: async function() {
+        onGeneratePDF: async function () {
             const data = this.getView().getModel("CustomerData").getData();
 
-            let filter = {BranchID: [data.BranchCode]};
+            let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];
 
@@ -5796,7 +5801,7 @@ sap.ui.define([
             doc.setDrawColor(...BORDER_COLOR);
             doc.setLineWidth(BORDER_WIDTH);
 
-              doc.roundedRect(10, y, 90, 35, 3, 3);
+            doc.roundedRect(10, y, 90, 35, 3, 3);
             doc.setFont("times", "bold").setFontSize(12);
             doc.text("Guest Details :", 12, y + 8);
 
@@ -5839,7 +5844,7 @@ sap.ui.define([
                 margin: {
                     left: MARGIN_LEFT,
                     right: 10
-                }, 
+                },
                 head: [
                     ['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
                 ],
