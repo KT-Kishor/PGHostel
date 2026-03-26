@@ -606,7 +606,7 @@ sap.ui.define([
                 }
                 const sYear = this.byId("D_id_year").getValue();
                 const sMonth = this.byId("D_id_month").getSelectedKey();
-                const oUserBranch = aBranchesToUse.join(",");
+                const oUserBranch = aBranchesToUse.includes("ALL") ? "" : aBranchesToUse.join(",");
                 let StartDate;
                 let EndDate;
 
@@ -634,9 +634,14 @@ sap.ui.define([
                     StartDate = "2000-01-01";
                     EndDate = "2099-12-31";
                 }
-                let aFilteredBookings = (this._aAllBookings || []).filter(b =>
-                    aBranchesToUse.includes(b.BranchCode)
-                );
+                let aFilteredBookings;
+                if (aBranchesToUse.includes("ALL")) {
+                    aFilteredBookings = this._aAllBookings || [];
+                } else {
+                    aFilteredBookings = (this._aAllBookings || []).filter(b =>
+                        aBranchesToUse.includes(b.BranchCode)
+                    );
+                }
                 aFilteredBookings = aFilteredBookings.filter(b => {
                     const d = new Date(b.BookingDate);
                     const formatted =
