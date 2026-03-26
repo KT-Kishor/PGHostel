@@ -770,6 +770,7 @@ sap.ui.define([
                     CustomerEmail: ID.CustomerEmail,
                     CustomerID: ID.CustomerID,
                     RoomNo: selectedRoomNo,
+                    CustomerName: ID.CustomerName,
                     Status: "Assigned"
                 };
 
@@ -808,6 +809,7 @@ sap.ui.define([
                     CustomerID: ID.CustomerID,
                     CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
+                    CustomerName: ID.CustomerName,
                     Status: "Assigned"
                 };
 
@@ -1110,7 +1112,6 @@ sap.ui.define([
         },
         onRoomNoChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-
         },
         DepositAmountLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
