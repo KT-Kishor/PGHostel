@@ -1,10 +1,11 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
+    "sap/ui/core/Fragment",
     "../utils/validation",
     "sap/m/MessageToast",
     "sap/m/MessageBox"
-], function (BaseController, JSONModel, utils, MessageToast, MessageBox) {
+], function (BaseController, JSONModel, Fragment, utils, MessageToast, MessageBox) {
 
     "use strict";
 
@@ -1352,6 +1353,12 @@ sap.ui.define([
                 personQuantities: [],
                 priceOptions: []
             }), "FacilitySelection");
+            this.getView().setModel(new JSONModel({
+                Amount: 0,
+                PaymentType: "PayOnCheckIn",
+                PaymentDate: "",
+                BankTransactionID: ""
+            }), "PaymentModel");
 
             this._initializeBookingData();
             this._prefillLoggedInUser();
@@ -1416,6 +1423,8 @@ sap.ui.define([
             oModel.setProperty("/CGST", this._toNumber(oData.CGST));
             oModel.setProperty("/SGST", this._toNumber(oData.SGST));
             oModel.setProperty("/IGST", this._toNumber(oData.IGST));
+            oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
+            oModel.setProperty("/BookingPayload", oData.BookingPayload || null);
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
                 oModel.setProperty("/SelectedPriceType", aPaymentMethods[0].key);
@@ -2045,6 +2054,413 @@ sap.ui.define([
             return this._toNumber(vTotalAmount) + (sCurrency ? " " + sCurrency : "");
         },
 
+        _formatDateToISO: function (vDate) {
+            const oDate = this._parseDate(vDate);
+
+            if (!oDate) {
+                return "";
+            }
+
+            return [
+                oDate.getFullYear(),
+                String(oDate.getMonth() + 1).padStart(2, "0"),
+                String(oDate.getDate()).padStart(2, "0")
+            ].join("-");
+        },
+
+        _getTodayISODate: function () {
+            return this._formatDateToISO(new Date());
+        },
+
+        _formatBedTypeText: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const aParts = [
+                String(oModel.getProperty("/BedType") || "").trim(),
+                String(oModel.getProperty("/ACType") || "").trim()
+            ].filter(Boolean);
+
+            return aParts.join(" - ");
+        },
+
+        _getBranchName: function () {
+            const oModel = this.getView().getModel("HostelModel");
+
+            return String(
+                oModel.getProperty("/BranchName") ||
+                oModel.getProperty("/Area") ||
+                oModel.getProperty("/Branch") ||
+                ""
+            ).trim();
+        },
+
+        _syncPaymentModel: function (sPaymentType) {
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sResolvedType = sPaymentType || oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn";
+            const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
+
+            oPaymentModel.setProperty("/PaymentType", sResolvedType);
+            oPaymentModel.setProperty("/Amount", sResolvedType === "PayOnCheckIn" ? 0 : fGrandTotal);
+            oPaymentModel.setProperty("/PaymentDate", sResolvedType === "PayOnCheckIn" ? "" : this._formatDateToDDMMYYYY(new Date()));
+
+            if (sResolvedType === "PayOnCheckIn") {
+                oPaymentModel.setProperty("/BankTransactionID", "");
+            }
+        },
+
+        _togglePaymentSections: function (bShowUPI, bShowCard, bPayOnCheckIn) {
+            const oUPISection = sap.ui.getCore().byId("idUPISection");
+            const oCardSection = sap.ui.getCore().byId("idCardSection");
+            const oRightPanel = sap.ui.getCore().byId("idRightPanel");
+
+            if (oUPISection) {
+                oUPISection.setVisible(bShowUPI);
+            }
+
+            if (oCardSection) {
+                oCardSection.setVisible(bShowCard);
+            }
+
+            if (oRightPanel) {
+                oRightPanel.setVisible(!bPayOnCheckIn);
+            }
+        },
+
+        _getSelectedPaymentOption: function () {
+            const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+            return oGroup && oGroup.getSelectedIndex() === 1 ? "UPI" : "PayOnCheckIn";
+        },
+
+        _ensurePaymentDialog: async function () {
+            if (!this._pPaymentDialog) {
+                this._pPaymentDialog = Fragment.load({
+                    name: "sap.ui.com.project1.fragment.PaymentPage",
+                    controller: this
+                }).then(function (oDialog) {
+                    this.getView().addDependent(oDialog);
+                    return oDialog;
+                }.bind(this));
+            }
+
+            this._oPaymentDialog = await this._pPaymentDialog;
+            return this._oPaymentDialog;
+        },
+
+        _getPaymentPayloadDetails: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+            const sPaymentType = oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn";
+            const sCustomerName = oHostelModel.getProperty("/FullName") || "";
+
+            if (sPaymentType === "PayOnCheckIn") {
+                return {
+                    Amount: 0,
+                    PaymentType: "PayOnCheckIn",
+                    BankTransactionID: "",
+                    Date: this._getTodayISODate(),
+                    BranchCode: oHostelModel.getProperty("/BranchCode") || "",
+                    CustomerName: sCustomerName,
+                    Currency: oHostelModel.getProperty("/Currency") || "INR",
+                    BranchName: this._getBranchName(),
+                    BankName: "PayOnCheckIn"
+                };
+            }
+
+            return {
+                Amount: this._toNumber(oPaymentModel.getProperty("/Amount")),
+                PaymentType: sPaymentType,
+                BankTransactionID: String(oPaymentModel.getProperty("/BankTransactionID") || "").trim(),
+                Date: this._formatDateToISO(oPaymentModel.getProperty("/PaymentDate")) || this._getTodayISODate(),
+                BranchCode: oHostelModel.getProperty("/BranchCode") || "",
+                CustomerName: sCustomerName,
+                Currency: oHostelModel.getProperty("/Currency") || "INR",
+                BranchName: this._getBranchName(),
+                BankName: sPaymentType
+            };
+        },
+
+        _buildMembersPayload: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+
+            return (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                return !oMember.IsNew && !!oMember.Selected;
+            }).map(function (oMember) {
+                return {
+                    Name: oMember.Name || "",
+                    Age: parseInt(oMember.Age, 10) || 0,
+                    Relation: oMember.Relation || "",
+                    DocumentType: oMember.DocumentType || "",
+                    FileName: oMember.DocumentName || "",
+                    FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : ""
+                };
+            });
+        },
+
+        _buildDocumentsPayload: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            return (oHostelModel.getProperty("/Documents") || []).map(function (oDocument) {
+                return {
+                    DocumentType: oDocument.DocumentType || "",
+                    File: oDocument.File || oDocument.Document || "",
+                    FileName: oDocument.FileName || "",
+                    FileType: oDocument.FileType || ""
+                };
+            });
+        },
+
+        _getFacilityMemberIdValue: function (oFacility) {
+            const oBookingView = this.getView().getModel("BookingView");
+            const aFamilyMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
+            const aSelectedIds = [];
+
+            if (Array.isArray(oFacility.SelectedPersonIds)) {
+                oFacility.SelectedPersonIds.forEach(function (sPersonId) {
+                    if (sPersonId && sPersonId !== "SELF" && !aSelectedIds.includes(sPersonId)) {
+                        aSelectedIds.push(sPersonId);
+                    }
+                });
+            }
+
+            if (Array.isArray(oFacility.PersonQuantities)) {
+                oFacility.PersonQuantities.forEach(function (oLine) {
+                    const sPersonId = oLine.personId;
+                    const iQty = parseInt(oLine.qty, 10) || 0;
+
+                    if (sPersonId && sPersonId !== "SELF" && iQty > 0 && !aSelectedIds.includes(sPersonId)) {
+                        aSelectedIds.push(sPersonId);
+                    }
+                });
+            }
+
+            return aSelectedIds.map(function (sPersonId) {
+                const oMatchedMember = aFamilyMembers.find(function (oMember) {
+                    return oMember.MemberID === sPersonId || oMember.id === sPersonId;
+                });
+
+                return oMatchedMember ? (oMatchedMember.MemberID || oMatchedMember.id || "") : sPersonId;
+            }).filter(Boolean).join(",");
+        },
+
+        _buildFacilityItemsPayload: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            return (oHostelModel.getProperty("/AllSelectedFacilities") || []).map(function (oFacility) {
+                return {
+                    FacilityID: oFacility.FacilityID || "",
+                    FacilityName: oFacility.FacilityName || "",
+                    FacilitiPrice: this._toNumber(oFacility.TotalAmount).toFixed(2),
+                    StartDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
+                    EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
+                    PaidStatus: "Pending",
+                    CustomerID: oHostelModel.getProperty("/CustomerID") || "",
+                    MemberID: this._getFacilityMemberIdValue(oFacility),
+                    SelectionMode: oFacility.SelectionMode || "",
+                    Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
+                    UnitText: oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "",
+                    Currency: oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
+                    UnitPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2),
+                    BasicFacilityPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2)
+                };
+            }.bind(this));
+        },
+
+        _buildBookingItemsPayload: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            return [{
+                BookingDate: this._getTodayISODate(),
+                RentPrice: this._toNumber(oHostelModel.getProperty("/GrandTotal")).toFixed(2),
+                RoomPrice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
+                NoOfPersons: this._getSelectedPersonCount(),
+                StartDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
+                EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
+                Status: "New",
+                PaymentType: oHostelModel.getProperty("/SelectedPriceType") || "",
+                BedType: this._formatBedTypeText(),
+                BranchCode: oHostelModel.getProperty("/BranchCode") || "",
+                Currency: oHostelModel.getProperty("/Currency") || "INR",
+                Discount: this._toNumber(oHostelModel.getProperty("/AppliedDiscount")).toFixed(2),
+                CouponCode: oHostelModel.getProperty("/AppliedCouponCode") || "",
+                TotalRoomprice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
+                UserID: oHostelModel.getProperty("/UserID") || "",
+                GSTType: oHostelModel.getProperty("/EffectiveGSTType") || oHostelModel.getProperty("/GSTType") || "",
+                GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
+                GSTIN: oHostelModel.getProperty("/CustomerGSTIN") || oHostelModel.getProperty("/PropertyGSTIN") || "",
+                CustomerName: oHostelModel.getProperty("/FullName") || ""
+            }];
+        },
+
+        _buildBookingCreatePayload: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            return {
+                data: [{
+                    Salutation: oHostelModel.getProperty("/Salutation") || "Mr.",
+                    CustomerName: oHostelModel.getProperty("/FullName") || "",
+                    UserID: oHostelModel.getProperty("/UserID") || "",
+                    STDCode: oHostelModel.getProperty("/STDCode") || "+91",
+                    MobileNo: oHostelModel.getProperty("/MobileNo") || "",
+                    Gender: oHostelModel.getProperty("/Gender") || "",
+                    DateOfBirth: this._formatDateToISO(oHostelModel.getProperty("/DateOfBirth")),
+                    CustomerEmail: oHostelModel.getProperty("/CustomerEmail") || "",
+                    Country: oHostelModel.getProperty("/Country") || "",
+                    State: oHostelModel.getProperty("/State") || "",
+                    City: oHostelModel.getProperty("/City") || "",
+                    PermanentAddress: oHostelModel.getProperty("/Address") || "",
+                    Members: this._buildMembersPayload(),
+                    Documents: this._buildDocumentsPayload(),
+                    Booking: this._buildBookingItemsPayload(),
+                    FacilityItems: this._buildFacilityItemsPayload(),
+                    PaymentDetails: [this._getPaymentPayloadDetails()]
+                }]
+            };
+        },
+
+        _validateBookingBeforePayment: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
+            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
+            const bIsBusinessTravel = !!oModel.getProperty("/IsBusinessTravel");
+            const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim();
+            const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
+            const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
+
+            if (!oModel.getProperty("/FullName") || !oModel.getProperty("/StartDate") || !oModel.getProperty("/EndDate")) {
+                MessageToast.show("Please fill mandatory booking details");
+                return false;
+            }
+
+            if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
+                MessageToast.show("Please complete contact details before payment");
+                return false;
+            }
+
+            if (bSupportsCustomerGST && bIsBusinessTravel) {
+                if (!sCustomerGSTIN || !sCompanyName || !sCompanyAddress) {
+                    MessageToast.show("Please fill business GST details");
+                    return false;
+                }
+
+                if (!this._isValidGSTINValue(sCustomerGSTIN)) {
+                    MessageToast.show("Please enter a valid GSTIN");
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        onPaymentTypeSelect: function (oEvent) {
+            const iSelectedIndex = oEvent.getSource().getSelectedIndex();
+            const bPayOnCheckIn = iSelectedIndex === 0;
+            const bUPI = iSelectedIndex === 1;
+
+            this._togglePaymentSections(bUPI, false, bPayOnCheckIn);
+            this._syncPaymentModel(bUPI ? "UPI" : "PayOnCheckIn");
+        },
+
+        onPaymentClose: function () {
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+
+            if (oPaymentModel) {
+                oPaymentModel.setProperty("/BankTransactionID", "");
+            }
+
+            if (this._oPaymentDialog) {
+                this._oPaymentDialog.close();
+            }
+        },
+
+        onTransactionIDChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+            const sValue = String(oInput.getValue() || "").trim();
+
+            this.getView().getModel("PaymentModel").setProperty("/BankTransactionID", sValue);
+            utils._LCvalidateMandatoryField(oEvent);
+
+            if (!sValue) {
+                oInput.setValueState("None");
+            }
+        },
+
+        onPaymentDateChange: function (oEvent) {
+            const oInput = oEvent.getSource();
+
+            if (!oInput.getValue()) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Select payment date");
+                return;
+            }
+
+            oInput.setValueState("None");
+        },
+
+        onSubmitPress: async function () {
+            const oPaymentModel = this.getView().getModel("PaymentModel");
+            const bPayOnCheckIn = (oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn";
+
+            if (!bPayOnCheckIn) {
+                const bValidPaymentFields = (
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("idPaymentDate"), "ID")
+                );
+
+                if (!bValidPaymentFields) {
+                    MessageToast.show("Please complete payment verification details");
+                    return;
+                }
+            }
+
+            try {
+                const oPayload = this._buildBookingCreatePayload();
+                const oHostelModel = this.getView().getModel("HostelModel");
+                this.getBusyDialog();
+                const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
+                const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
+                let sMessage = "Booking created successfully.";
+
+                oHostelModel.setProperty("/BookingPayload", oPayload);
+
+                if (aBookingDetails.length) {
+                    sMessage = "Booking created successfully.\n\n" + aBookingDetails.map(function (oItem) {
+                        return "Booking ID: " + oItem.BookingID;
+                    }).join("\n");
+                }
+
+                if (this._oPaymentDialog) {
+                    this._oPaymentDialog.close();
+                }
+
+                MessageBox.success(sMessage, {
+                    title: "Success",
+                    onClose: function () {
+                        this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                    }.bind(this)
+                });
+            } catch (oError) {
+                let sErrorMessage = "Unable to create booking.";
+
+                if (oError && oError.responseJSON) {
+                    sErrorMessage = oError.responseJSON.message || oError.responseJSON.error || sErrorMessage;
+                } else if (oError && oError.responseText) {
+                    try {
+                        const oParsedError = JSON.parse(oError.responseText);
+                        sErrorMessage = oParsedError.message || oParsedError.error || sErrorMessage;
+                    } catch (e) {
+                        sErrorMessage = oError.responseText || sErrorMessage;
+                    }
+                } else if (oError && oError.message) {
+                    sErrorMessage = oError.message;
+                }
+
+                MessageBox.error(sErrorMessage);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
 
         onNavBack: function () {
             const sBranchCode = this.getView().getModel("HostelModel").getProperty("/BranchCode");
@@ -2059,7 +2475,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
         },
 
-        onContinueBooking: function () {
+        onContinueBooking: async function () {
             const oModel = this.getView().getModel("HostelModel");
             const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
             const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
@@ -2067,22 +2483,10 @@ sap.ui.define([
             const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim();
             const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
+            let oPaymentTypeGroup;
 
-            if (!oModel.getProperty("/FullName") || !oModel.getProperty("/StartDate") || !oModel.getProperty("/EndDate")) {
-                MessageToast.show("Please fill mandatory booking details");
+            if (!this._validateBookingBeforePayment()) {
                 return;
-            }
-
-            if (bSupportsCustomerGST && bIsBusinessTravel) {
-                if (!sCustomerGSTIN || !sCompanyName || !sCompanyAddress) {
-                    MessageToast.show("Please fill business GST details");
-                    return;
-                }
-
-                if (!this._isValidGSTINValue(sCustomerGSTIN)) {
-                    MessageToast.show("Please enter a valid GSTIN");
-                    return;
-                }
             }
 
             oModel.setProperty("/BookingPayload", {
@@ -2095,36 +2499,24 @@ sap.ui.define([
                 gstValue: oModel.getProperty("/EffectiveGSTValue") || 0
             });
 
-            MessageToast.show("Booking details captured successfully");
+            await this._ensurePaymentDialog();
+            oPaymentTypeGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
+
+            if (oPaymentTypeGroup) {
+                oPaymentTypeGroup.setSelectedIndex(0);
+                this.onPaymentTypeSelect({
+                    getSource: function () {
+                        return oPaymentTypeGroup;
+                    }
+                });
+            } else {
+                this._togglePaymentSections(false, false, true);
+                this._syncPaymentModel("PayOnCheckIn");
+            }
+
+            this._oPaymentDialog.open();
         }
     });
 });
-
-
-// The new booking-level GST logic is now implemented in Booking.controller.js (line 1847) and surfaced in Booking.view.xml (line 424).
-
-// What changed:
-
-// subtotal is now booking-level: room total + facilities total
-// GST is calculated once for the whole booking, not per person
-// CGST/SGST uses GSTValue on each side
-// IGST uses GSTValue once
-// coupon is subtracted after GST
-// deposit remains display-only and is not part of GrandTotal
-// The Price Section now shows:
-
-// Room
-// Facilities
-// Sub Total
-// CGST / SGST or IGST when applicable
-// offline deposit message strip
-// coupon
-// final Grand Total
-// I haven’t run the UI in-browser here, so the next best check is:
-
-// test one CGST/SGST property
-// test one IGST property
-// compare Sub Total, tax lines, and Grand Total against a manual calculation
-// If you want, I can do one more pass next to carry these same GST fields into the new booking payload as well.
 
 

@@ -58,7 +58,7 @@
                     id="idPaymentTypeGroup"
                     columns="1"
                     select="onPaymentTypeSelect"
-                    selectedIndex="2"
+                    selectedIndex="0"
                     class="paymentTypeGroup"
                 >
                     <RadioButton text="{i18n>payatcheckintime}" />
@@ -143,7 +143,7 @@
                         <Input
                             id="idAmount"
                             type="Number"
-                            value="{HostelModel>/PerMonthNoPerson}"
+                            value="{PaymentModel>/Amount}"
                             placeholder="{i18n>enterAmount}"
                             maxLength="15"
                             editable="false"
@@ -170,6 +170,7 @@
                             id="idTransactionID"
                             placeholder="{i18n>enterTransactionID}"
                             liveChange="onTransactionIDChange"
+                            value="{PaymentModel>/BankTransactionID}"
                             valueStateText="Enter Transaction ID"
                             maxLength="25"
                         />
