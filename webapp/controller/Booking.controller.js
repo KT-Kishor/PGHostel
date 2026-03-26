@@ -1453,6 +1453,11 @@ sap.ui.define([
 
             const oUser = oLoginModel.getData() || {};
 
+            oHostelModel.setProperty("/UserID", oUser.UserID || oUser.EmployeeID || oHostelModel.getProperty("/UserID") || "");
+            oHostelModel.setProperty("/Salutation", oUser.Salutation || oHostelModel.getProperty("/Salutation") || "Mr.");
+            oHostelModel.setProperty("/STDCode", oUser.STDCode || oHostelModel.getProperty("/STDCode") || "+91");
+            oHostelModel.setProperty("/Gender", oUser.Gender || oHostelModel.getProperty("/Gender") || "");
+            oHostelModel.setProperty("/DateOfBirth", oUser.DateOfBirth || oUser.DateofBirth || oHostelModel.getProperty("/DateOfBirth") || "");
             oHostelModel.setProperty("/FullName", oUser.UserName || oHostelModel.getProperty("/FullName") || "");
             oHostelModel.setProperty("/CustomerEmail", oUser.EmailID || oHostelModel.getProperty("/CustomerEmail") || "");
             oHostelModel.setProperty("/MobileNo", oUser.MobileNo || oHostelModel.getProperty("/MobileNo") || "");
@@ -1950,11 +1955,13 @@ sap.ui.define([
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
             const iPersons = this._getSelectedPersonCount();
             const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
-            const iRoomMultiplier = bSinglePersonOnly ? 1 : iPersons;
+            const bFixedRoomRentProperty = this._supportsCustomerGSTOverride(sPropertyType);
+            const iRoomMultiplier = (bSinglePersonOnly || bFixedRoomRentProperty) ? 1 : iPersons;
             let fRoomPrice = fBasePrice;
             let iDays = 0;
             let sRoomBreakdown = fBasePrice + " " + (oModel.getProperty("/Currency") || "");
             let fSubTotal = 0;
+            let fDiscountedSubTotal = 0;
             let fCGST = 0;
             let fSGST = 0;
             let fIGST = 0;
@@ -1982,6 +1989,7 @@ sap.ui.define([
             oModel.setProperty("/RoomPrice", Number(fRoomPrice.toFixed(2)));
 
             fSubTotal = Number((fRoomPrice + fFacilityPrice).toFixed(2));
+            fDiscountedSubTotal = Number(Math.max(fSubTotal - fDiscount, 0).toFixed(2));
 
             if (sGSTType || fGSTValue > 0) {
                 fEffectiveGSTValue = fGSTValue;
@@ -1998,14 +2006,15 @@ sap.ui.define([
                 }
 
                 if (sEffectiveGSTType === "CGST/SGST") {
-                    fCGST = Number((fSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
-                    fSGST = Number((fSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
+                    fCGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
+                    fSGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
                 } else if (sEffectiveGSTType === "IGST") {
-                    fIGST = Number((fSubTotal * fEffectiveGSTValue / 100).toFixed(2));
+                    fIGST = Number((fDiscountedSubTotal * fEffectiveGSTValue / 100).toFixed(2));
                 }
             }
 
             oModel.setProperty("/BookingSubTotal", fSubTotal);
+            oModel.setProperty("/BookingNetSubTotal", fDiscountedSubTotal);
             oModel.setProperty("/CGST", fCGST);
             oModel.setProperty("/SGST", fSGST);
             oModel.setProperty("/IGST", fIGST);
@@ -2013,7 +2022,7 @@ sap.ui.define([
             oModel.setProperty("/EffectiveGSTValue", fEffectiveGSTValue);
             oModel.setProperty("/SourceStateCode", sSourceStateCode);
             oModel.setProperty("/CustomerStateCode", sCustomerStateCode);
-            oModel.setProperty("/GrandTotal", Number(Math.max(fSubTotal + fCGST + fSGST + fIGST - fDiscount, 0).toFixed(2)));
+            oModel.setProperty("/GrandTotal", Number(Math.max(fDiscountedSubTotal + fCGST + fSGST + fIGST, 0).toFixed(2)));
         },
 
         _parseDate: function (vDate) {
@@ -2459,6 +2468,13 @@ sap.ui.define([
                 MessageBox.success(sMessage, {
                     title: "Success",
                     onClose: function () {
+                        const sUserID = oHostelModel.getProperty("/UserID");
+
+                        if (sUserID) {
+                            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                            return;
+                        }
+
                         this.getOwnerComponent().getRouter().navTo("RouteHostel");
                     }.bind(this)
                 });
