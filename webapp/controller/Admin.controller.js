@@ -767,6 +767,7 @@ sap.ui.define([
 
             if (ID.Status === "Assigned") {
                 Payload = {
+                    CustomerEmail: ID.CustomerEmail,
                     CustomerID: ID.CustomerID,
                     RoomNo: selectedRoomNo,
                     Status: "Assigned"
@@ -782,6 +783,7 @@ sap.ui.define([
             } else if (DepositAmount) {
                 Payload = {
                     CustomerID: ID.CustomerID,
+                    CustomerEmail: ID.CustomerEmail,
                     CustomerName: ID.CustomerName,
                     DepositAmount: parseInt(DepositAmount),
                     DepositCurrency: "INR",
@@ -804,6 +806,7 @@ sap.ui.define([
             } else {
                 Payload = {
                     CustomerID: ID.CustomerID,
+                    CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
                     Status: "Assigned"
                 };
@@ -877,10 +880,10 @@ sap.ui.define([
                 }
                 this.closeBusyDialog()
 
-                sap.m.MessageBox.error(sErrorMsg);
+                // sap.m.MessageBox.error(sErrorMsg);
                 sap.m.MessageBox.error(sErrorMsg, {
                     title: "Error",
-                    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    actions: [sap.m.MessageBox.Action.OK],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
                     styleClass: "myUnifiedBtn",
 
@@ -888,13 +891,15 @@ sap.ui.define([
 
                         if (sAction === sap.m.MessageBox.Action.OK) {
 
-                            var sCustomerID = ID.CustomerID;
-                            var sEncodedID = btoa(sCustomerID.toString());
+                            // var sCustomerID = ID.CustomerID;
+                            // var sEncodedID = btoa(sCustomerID.toString());
 
-                            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                                sPath: encodeURIComponent(sEncodedID),
-                                from: "Customerdetails"
-                            });
+                            // this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
+                            //     sPath: encodeURIComponent(sEncodedID),
+                            //     from: "Customerdetails"
+                            // });
+                            this.HM_Dialog.close();
+                            this.byId("idPOTable").removeSelections();  
                         }
 
                         // If Cancel → Do nothing

@@ -4784,3 +4784,48 @@ width: 44px !important;
 .customBookingPanel .sapMOTB .sapMBtnTransparent {
     color: white !important;
 }
+
+.Tilehome {
+  height: 100%;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.Tilehome::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  transform: scale(1.08);
+  z-index: 0;
+}
+
+.Tilehome::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.Tilehome > * {
+  position: absolute;  /* ✅ FIXED */
+  z-index: 1;
+}
+
+.formContainer {
+  max-width: 600px;
+  width: 80%;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+}

@@ -767,7 +767,7 @@ sap.ui.define([
             var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
             let sMessage = `Are you sure you want to delete the following room(s): ${sRoomNos}?`;
 
-            if (sRoomNos && sRoomNos.length > 0) {
+            if (aAssignedRooms && aAssignedRooms.length > 0) {
                 sMessage += `\nThese rooms cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`;
             }
             sap.m.MessageBox.confirm(

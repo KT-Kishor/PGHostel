@@ -43,6 +43,8 @@
               
                    <Label
                     text="Deposit Amount"
+                    visible="{Visiblemodel>/Visible}"
+
                 />
                 <Input
                     id="id_DepositAmount"
@@ -54,7 +56,9 @@
                     valueStateText="Enter deposit amount"
                     editable="false"
                 />
-                  <RadioButtonGroup id="roomTypeGroup1" columns="2" select=".onDepositTypeSelect">
+                  <RadioButtonGroup id="roomTypeGroup1" columns="2" select=".onDepositTypeSelect" 
+                    visible="{Visiblemodel>/Visible}"
+                  >
                                 <buttons>
                                     <RadioButton text="Yes" />
                                     <RadioButton text="No" />

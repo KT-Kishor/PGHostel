@@ -68,7 +68,7 @@
                 width="auto"
                 busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
-                items="{path: 'RaiseBugModel>/'}" >
+                items="{path: 'RaiseBugModel>/',sorter: {path: 'Status', group: true}}" >
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>

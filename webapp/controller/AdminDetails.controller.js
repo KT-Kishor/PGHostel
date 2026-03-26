@@ -3000,18 +3000,88 @@ sap.ui.define([
 
             }
 
-            if (invalidFacilities.length > 0) {
-                sap.m.MessageBox.error(
-                    "The following facilities have dates outside the booking period:\n\n" +
-                    invalidFacilities.map(name => `• ${name}`).join("\n") +
-                    `\n\nPlease ensure all facility dates are between ` +
-                    `${Bookingdata.StartDate} and ${Bookingdata.EndDate}.`,
-                    {
-                        styleClass: "myUnifiedBtn"
-                    }
-                );
-                return; // ⛔ stop save
-            }
+        if (invalidFacilities.length > 0) {
+
+    let that = this;
+
+    sap.m.MessageBox.show(
+        "The following facilities have dates outside the booking period:\n\n" +
+        invalidFacilities.map(name => `• ${name}`).join("\n") +
+        `\n\nDo you want to auto-adjust facility dates to match booking period?`,
+        {
+            icon: sap.m.MessageBox.Icon.WARNING,
+            title: "Date Mismatch",
+            actions: ["Change", "Cancel"],
+            emphasizedAction: "Change",
+            styleClass: "myUnifiedBtn",
+
+            onClose: function (oAction) {
+
+                if (oAction === "Change") {
+
+                    const bookingStart = that._parseDate(Bookingdata.StartDate);
+                    const bookingEnd = that._parseDate(Bookingdata.EndDate);
+
+                    let totalFacilityPrice = 0;
+
+                    facilityItems.forEach(item => {
+
+                        item.StartDate = Bookingdata.StartDate;
+                        item.EndDate = Bookingdata.EndDate;
+
+                        const startDate = bookingStart;
+                        const endDate = bookingEnd;
+
+                        let diffTime = endDate - startDate;
+
+                        let unit = item.UnitText?.toLowerCase();
+                        let price = Number(item.Price || 0);
+                        let total = 0;
+
+                        if (unit === "per day") {
+                            let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            total = days * price;
+                            item.TotalDays = days;
+
+                        } else if (unit === "per hour") {
+                            let hours = Math.ceil(diffTime / (1000 * 60 * 60));
+                            total = hours * price;
+
+                        } else if (unit === "per month") {
+
+                            let months = CustomerData.PaymentType === "yearly"
+                                ? CustomerData.Duration * 12
+                                : CustomerData.Duration;
+
+                            total = months * price;
+                            item.TotalMonths = months;
+
+                        } else if (unit === "per year") {
+
+                            let years = CustomerData.Duration;
+                            total = years * price;
+                            item.TotalYears = years;
+                        }
+
+                        item.TotalAmount = total;
+                        totalFacilityPrice += total;
+                    });
+
+                    CustomerData.TotalFacilityPrice = totalFacilityPrice;
+
+                    CustomerData.GrandTotal =
+                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+
+                    that.getView().getModel("CustomerData").refresh(true);
+
+                    that.onSaveBooking();
+                }
+            }   
+        }
+    );
+
+    return;
+}
 
 
             if (Bookingdata.STDCode === "+91") {

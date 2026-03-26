@@ -409,6 +409,13 @@
           "target": [
             "targetRaiseBugDetails"
           ]
+        },
+           {
+          "name": "RouteUploadDocs",
+          "pattern": "UploadDocs",
+          "target": [
+            "targetUploadDocs"
+          ]
         }
       ],
       "targets": {
@@ -691,6 +698,13 @@
           "clearControlAggregation": false,
           "viewId": "RaiseBug",
           "viewName": "RaiseBug"
+        },
+         "targetUploadDocs": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Document",
+          "viewName": "Document"
         }
       }
     },
