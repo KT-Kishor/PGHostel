@@ -1177,14 +1177,23 @@ sap.ui.define([
             const sPath = oContext.getPath();
             const oModel = this.getView().getModel("BookingView");
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
+            const oReader = new FileReader();
 
             if (!oFile) {
                 return;
             }
 
-            oModel.setProperty(sPath + "/DocumentName", oFile.name);
-            oModel.setProperty(sPath + "/DocumentFile", oFile);
-            oModel.refresh(true);
+            oReader.onload = function (oLoadEvent) {
+                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+
+                oModel.setProperty(sPath + "/DocumentName", oFile.name);
+                oModel.setProperty(sPath + "/DocumentFile", oFile);
+                oModel.setProperty(sPath + "/Document", sBase64);
+                oModel.setProperty(sPath + "/File", sBase64);
+                oModel.refresh(true);
+            };
+
+            oReader.readAsDataURL(oFile);
         },
 
         onSaveFamilyMember: function (oEvent) {
@@ -2191,6 +2200,7 @@ sap.ui.define([
                     Age: parseInt(oMember.Age, 10) || 0,
                     Relation: oMember.Relation || "",
                     DocumentType: oMember.DocumentType || "",
+                    File: oMember.File || oMember.Document || "",
                     FileName: oMember.DocumentName || "",
                     FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : ""
                 };
@@ -2268,6 +2278,12 @@ sap.ui.define([
 
         _buildBookingItemsPayload: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
+            const bIsBusinessTravel = !!oHostelModel.getProperty("/IsBusinessTravel");
+            const sCustomerGSTIN = String(oHostelModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
+            const sCompanyName = String(oHostelModel.getProperty("/CompanyName") || "").trim();
+            const sCompanyAddress = String(oHostelModel.getProperty("/CompanyAddress") || "").trim();
+            const sEffectiveGSTType = oHostelModel.getProperty("/EffectiveGSTType") || oHostelModel.getProperty("/GSTType") || "";
+            const sPropertyGSTIN = oHostelModel.getProperty("/PropertyGSTIN") || oHostelModel.getProperty("/GSTIN") || "";
 
             return [{
                 BookingDate: this._getTodayISODate(),
@@ -2285,10 +2301,17 @@ sap.ui.define([
                 CouponCode: oHostelModel.getProperty("/AppliedCouponCode") || "",
                 TotalRoomprice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
                 UserID: oHostelModel.getProperty("/UserID") || "",
-                GSTType: oHostelModel.getProperty("/EffectiveGSTType") || oHostelModel.getProperty("/GSTType") || "",
+                GSTType: sEffectiveGSTType,
                 GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
-                GSTIN: oHostelModel.getProperty("/CustomerGSTIN") || oHostelModel.getProperty("/PropertyGSTIN") || "",
-                CustomerName: oHostelModel.getProperty("/FullName") || ""
+                GSTIN: sPropertyGSTIN,
+                CustomerName: oHostelModel.getProperty("/FullName") || "",
+                CustomerGSTIN: bIsBusinessTravel ? sCustomerGSTIN : "",
+                CustCompanyName: bIsBusinessTravel ? sCompanyName : "",
+                CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : "",
+                CustomerGSTINGSTType: bIsBusinessTravel ? sEffectiveGSTType : "",
+                CustomerGSTINGSTValue: bIsBusinessTravel
+                    ? String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue")))
+                    : "0"
             }];
         },
 
