@@ -26,8 +26,18 @@ sap.ui.define([
                 this.byId("D_id_month").setSelectedKey(String(iMonth));
                 this.byId("D_id_year").setValue(String(iYear));
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
-                if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
-                this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
+                if (!oLogin) {
+                    return MessageToast.show("Login data not found");
+                }
+                if (oLogin.Role === "SuperAdmin") {
+                    this._aUserBranches = ["ALL"];
+                }
+                else if (oLogin.BranchCode) {
+                    this._aUserBranches = oLogin.BranchCode.split(",").map(b => b.trim());
+                }
+                else {
+                    return MessageToast.show("Login branch not found");
+                }
                 await this._loadCustomers();
                 await this._loadUserBranches();
                 await this.loadDashboardData();
@@ -47,9 +57,8 @@ sap.ui.define([
                     return;
                 }
                 var oFilter = {
-                    BranchID: this._aUserBranches.join(",")
+                    BranchID: this._aUserBranches.includes("ALL") ? "" : this._aUserBranches.join(",")
                 };
-
                 const oData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
                 var aData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 this._aAllBookings = aData;
@@ -73,13 +82,10 @@ sap.ui.define([
                 String(today.getDate()).padStart(2, "0");
             aData.forEach((oBooking) => {
                 if (!["New", "Assigned", "Completed", "Cancelled"].includes(oBooking.Status)) return;
-                if (!aAllowedBranches.includes(oBooking.BranchCode)) return;
+                if (!aAllowedBranches.includes("ALL") && !aAllowedBranches.includes(oBooking.BranchCode)
+                ) return;
                 const d = new Date(oBooking.BookingDate);
-                const bookingDate =
-                    d.getFullYear() + "-" +
-                    String(d.getMonth() + 1).padStart(2, "0") + "-" +
-                    String(d.getDate()).padStart(2, "0");
-
+                const bookingDate = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
                 if (bookingDate !== todayFormatted) return;
                 aCards.push({
                     BookingID: oBooking.BookingID,
@@ -182,23 +188,23 @@ sap.ui.define([
             oContainer.removeAllItems();
 
             if (!aCards || aCards.length === 0) {
-                 const oCenterBox = new sap.m.VBox({
-            width: "100%",
-            alignItems: "Center",
-            justifyContent: "Center",
-            items: [
-                new sap.m.IllustratedMessage({
-                    title: "No Bookings",
-                    description: "No bookings available for today",
-                    illustrationType: "sapIllus-NoData",
-                    illustrationSize: "Spot"
-                })
-            ]
-        });
+                const oCenterBox = new sap.m.VBox({
+                    width: "100%",
+                    alignItems: "Center",
+                    justifyContent: "Center",
+                    items: [
+                        new sap.m.IllustratedMessage({
+                            title: "No Bookings",
+                            description: "No bookings available for today",
+                            illustrationType: "sapIllus-NoData",
+                            illustrationSize: "Spot"
+                        })
+                    ]
+                });
 
-        oContainer.addItem(oCenterBox);
-        return;
-    }
+                oContainer.addItem(oCenterBox);
+                return;
+            }
             aCards.forEach((oBooking) => {
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/BookingDashboard.json",
@@ -576,7 +582,7 @@ sap.ui.define([
         },
 
         D_search: async function () {
-           this.getBusyDialog();
+            this.getBusyDialog();
             try {
 
                 const aSelectedBranches = this.byId("D_id_BranchCode").getSelectedKeys();
@@ -677,8 +683,16 @@ sap.ui.define([
         _loadUserBranches: async function () {
             const oData = await this.ajaxReadWithJQuery("HM_Branch", {});
             let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
-            let aFiltered = aAllBranches.filter(b =>
-                this._aUserBranches.includes(b.BranchID));
+            let aFiltered;
+            if (this._aUserBranches.includes("ALL")) {
+                aFiltered = aAllBranches;
+            } else {
+                aFiltered = aAllBranches.filter(b =>
+                    this._aUserBranches.includes(b.BranchID)
+                );
+            }
+            // let aFiltered = aAllBranches.filter(b =>
+            //     this._aUserBranches.includes(b.BranchID));
             this.getView().setModel(new JSONModel(aFiltered), "branchModel");
         },
 
