@@ -256,7 +256,6 @@
         id="idApplyNowButton"
         text="{i18n>applyNow}"
         tooltip="{i18n>applyCoupon}"
-        type="Emphasized"
         press=".onEditCouponCodeLiveChange"
         class="myUnifiedBtn"
      

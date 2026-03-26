@@ -1,23 +1,24 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:f="sap.ui.layout.form">
-
+    xmlns:f="sap.ui.layout.form"
+>
     <Dialog
         id="Dialog"
         draggable="true"
         resizable="true"
         class="authDialog"
         contentWidth="28rem"
-        contentHeight="auto">
-         <customHeader>
+        contentHeight="auto"
+    >
+        <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
                     <Title text="Login" />
                 </contentMiddle>
                 <contentRight>
                     <Button
-                        type="Transparent"
+                        class="myUnifiedBtn"
                         icon="sap-icon://decline"
                         tooltip="{i18n>close}"
                         press="onDialogClose"
@@ -40,43 +41,49 @@
             emptySpanS="0"
             columnsXL="1"
             columnsL="1"
-            columnsM="1">
-
+            columnsM="1"
+        >
             <!-- Email -->
-            <Label  text="{i18n>emailId}"
-                        required="true"/>
+            <Label
+                text="{i18n>emailId}"
+                required="true"
+            />
             <Input
                 id="emailInput"
                 type="Email"
                 placeholder="{i18n>enteryourEmail}"
                 width="100%"
-                 valueLiveUpdate="true"
-                        liveChange="onEmailliveChange"
-                        valueStateText="{i18n>MSenterValidEmail}" />
+                valueLiveUpdate="true"
+                liveChange="onEmailliveChange"
+                valueStateText="{i18n>MSenterValidEmail}"
+            />
 
             <!-- OTP -->
-            <Label   text="{i18n>enterOTP}"
-                            required="true" />
+            <Label
+                text="{i18n>enterOTP}"
+                required="true"
+            />
 
             <HBox
                 width="100%"
                 alignItems="Center"
-                justifyContent="SpaceBetween" renderType="Bare">
-
+                justifyContent="SpaceBetween"
+                renderType="Bare"
+            >
                 <!-- OTP Input -->
                 <Input
                     id="otpInput"
-                  placeholder="{i18n>enterOTP}"
-                 liveChange="onLoginOtpLive"
-                 class="sapUiTinyMarginEnd"
-                    />
+                    placeholder="{i18n>enterOTP}"
+                    liveChange="onLoginOtpLive"
+                    class="sapUiTinyMarginEnd"
+                />
 
                 <!-- Send OTP Button -->
                 <Button
-                     text="{LoginViewModel>/otpButtonText}"
-                    type="Emphasized"
-                   class="myUnifiedBtn"
-                     press="onPressOTP" />
+                    text="{LoginViewModel>/otpButtonText}"
+                    class="myUnifiedBtn"
+                    press="onPressOTP"
+                />
             </HBox>
 
             <!-- Empty label for alignment -->
@@ -85,13 +92,10 @@
             <!-- Sign In Button -->
             <Button
                 text="Sign In"
-                type="Accept"
                 class="myUnifiedBtn"
                 width="100px"
-                press="onSignIn" />
-
+                press="onSignIn"
+            />
         </f:SimpleForm>
-
     </Dialog>
-
 </core:FragmentDefinition>

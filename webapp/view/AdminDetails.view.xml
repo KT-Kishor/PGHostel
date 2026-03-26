@@ -1069,7 +1069,6 @@
                                     id="idApplyNowButton"
                                     text="{i18n>applyNow}"
                                     tooltip="{i18n>applyCoupon}"
-                                    type="Emphasized"
                                     press=".onApplyCoupon"
                                     class="sapUiTinyMarginEnd myUnifiedBtn"
                                     visible="{= !${VisibleModel>/IsCouponApplied} }"

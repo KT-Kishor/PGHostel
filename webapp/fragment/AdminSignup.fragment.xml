@@ -21,7 +21,7 @@
                 </contentMiddle>
                 <contentRight>
                     <Button
-                        type="Transparent"
+                        class="myUnifiedBtn"
                         icon="sap-icon://decline"
                         tooltip="{i18n>close}"
                         press="onCloseAdminSignup"
@@ -412,7 +412,6 @@ filterSecondaryValues="true"
             <Button
                 text="{i18n>register}"
                 tooltip="{i18n>register}"
-                type="Emphasized"
                 press="onSubmitAdminSignup"
                 class="myUnifiedBtn sapUiSmallMargin"
                 width="120px"

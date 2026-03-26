@@ -1,21 +1,24 @@
 <c:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:c="sap.ui.core"
-	xmlns:f="sap.ui.layout.form"
-	xmlns:core="sap.ui.core">
-	<Dialog id="HM_id_Refund"
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="HM_id_Refund"
         type="Message"
         class="sapUiContentPadding"
         contentWidth="28rem"
-        contentHeight="auto">
-		<customHeader>
-			<Bar class="barheader">
-				<contentMiddle>
-					<Title text="{i18n>refundCAmount}" />
-				</contentMiddle>
-			</Bar>
-		</customHeader>
-		<f:SimpleForm
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>refundCAmount}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+        <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -24,10 +27,12 @@
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1">
-			<f:content>
-				<Label text="Refund Amount"/>
-				<Input id="HM_id_RefundAmount"
+            columnsM="1"
+        >
+            <f:content>
+                <Label text="Refund Amount" />
+                <Input
+                    id="HM_id_RefundAmount"
                     placeholder="Enter refund amount"
                     value="{RefundModel>/RefundAmount}"
                     maxLength="6"
@@ -35,39 +40,70 @@
                     editable="false"
                 />
 
-				<Label text="Payment Mode" required="true"/>
-				<ComboBox id="HM_id_PaymentMode" placeholder="Select payment mode"
-                    selectedKey="{RefundModel>/PaymentMode}" valueStateText="Select payment mode" change="onPaymentModeChange">
-					<core:ListItem key="UPI" text="UPI"/>
-					<core:ListItem key="Cash" text="Cash"/>
-					<core:ListItem key="Card" text="Card"/>
-				</ComboBox>
+                <Label
+                    text="Payment Mode"
+                    required="true"
+                />
+                <ComboBox
+                    id="HM_id_PaymentMode"
+                    placeholder="Select payment mode"
+                    selectedKey="{RefundModel>/PaymentMode}"
+                    valueStateText="Select payment mode"
+                    change="onPaymentModeChange"
+                >
+                    <core:ListItem
+                        key="UPI"
+                        text="UPI"
+                    />
+                    <core:ListItem
+                        key="Cash"
+                        text="Cash"
+                    />
+                    <core:ListItem
+                        key="Card"
+                        text="Card"
+                    />
+                </ComboBox>
 
-				<Label text="Transaction / Person Name"/>
-				<Input id="HM_id_TransactionID" placeholder="Enter transaction / person name"
-                    value="{RefundModel>/TransactionId}" liveChange="onLiveTransactionID"
-                    valueStateText="Enter Transaction / Person Name" maxLength="20"/>
+                <Label text="Transaction / Person Name" />
+                <Input
+                    id="HM_id_TransactionID"
+                    placeholder="Enter transaction / person name"
+                    value="{RefundModel>/TransactionId}"
+                    liveChange="onLiveTransactionID"
+                    valueStateText="Enter Transaction / Person Name"
+                    maxLength="20"
+                />
 
-                <Label text="{i18n>invoiceReceivedDate}" required="true"/>
-				<DatePicker displayFormat="dd/MM/yyyy" id="HM_id_ReceivedDate" valueFormat="dd/MM/yyyy" value="{RefundModel>/ReceivedDate}" change="onReceivedDateDatePickerChange" valueStateText="{i18n>dateValueState}"/>
-			</f:content>
-		</f:SimpleForm>
-		<beginButton>
-			<Button
+                <Label
+                    text="{i18n>invoiceReceivedDate}"
+                    required="true"
+                />
+                <DatePicker
+                    displayFormat="dd/MM/yyyy"
+                    id="HM_id_ReceivedDate"
+                    valueFormat="dd/MM/yyyy"
+                    value="{RefundModel>/ReceivedDate}"
+                    change="onReceivedDateDatePickerChange"
+                    valueStateText="{i18n>dateValueState}"
+                />
+            </f:content>
+        </f:SimpleForm>
+        <beginButton>
+            <Button
                 text="Submit"
                 tooltip="Submit"
                 press="HM_onPressRefundAmount"
-                type="Accept"
                 class="marginRight myUnifiedBtn"
             />
-		</beginButton>
-		<endButton>
-			<Button
+        </beginButton>
+        <endButton>
+            <Button
                 text="{i18n>close}"
                 tooltip="{i18n>close}"
                 class="myUnifiedBtn"
                 press="HM_onPressClose"
             />
-		</endButton>
-	</Dialog>
+        </endButton>
+    </Dialog>
 </c:FragmentDefinition>

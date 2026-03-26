@@ -9,7 +9,7 @@
         draggable="true"
         resizable="true"
         afterClose="onDialogAfterClose"
-         contentWidth="28rem"
+        contentWidth="28rem"
         contentHeight="auto"
     >
         <customHeader>
@@ -60,15 +60,15 @@
                         required="true"
                         text="{i18n>CDCouponCode}"
                     />
-<Input
-    id="idCouponcode"
-    value="{CouponView>/CurrentCoupon/CouponCode}"
-    type="Text"
-    liveChange="onLiveChange_CouponCode"
-    placeholder="{i18n>enterCoupon}"
-    maxLength="10"
-    valueStateText="{i18n>pleaseEnterCoupon}"
-/>
+                    <Input
+                        id="idCouponcode"
+                        value="{CouponView>/CurrentCoupon/CouponCode}"
+                        type="Text"
+                        liveChange="onLiveChange_CouponCode"
+                        placeholder="{i18n>enterCoupon}"
+                        maxLength="10"
+                        valueStateText="{i18n>pleaseEnterCoupon}"
+                    />
 
                     <Label
                         required="true"
@@ -96,14 +96,14 @@
                         required="true"
                         text="{i18n>CDDiscountValue}"
                     />
-<Input
-    id="inDiscountValue"
-    value="{CouponView>/CurrentCoupon/DiscountValue}"
-    type="Text"
-    liveChange="onLiveChange_DiscountValue"
-    placeholder="{i18n>enterDiscountValue}"
-    valueStateText="{i18n>enterDiscountValue}"
-/>
+                    <Input
+                        id="inDiscountValue"
+                        value="{CouponView>/CurrentCoupon/DiscountValue}"
+                        type="Text"
+                        liveChange="onLiveChange_DiscountValue"
+                        placeholder="{i18n>enterDiscountValue}"
+                        valueStateText="{i18n>enterDiscountValue}"
+                    />
 
                     <Label
                         required="{CouponView>/isReq}"
@@ -127,7 +127,8 @@
                         placeholder="{i18n>enterMaxUses}"
                         id="inMaxUses"
                         value="{CouponView>/CurrentCoupon/MaxUses}"
-                        type="Text" maxLength="8"
+                        type="Text"
+                        maxLength="8"
                         liveChange="onLiveChange_Number_MinOne"
                         valueStateText="{i18n>enterMaxUses}"
                     />
@@ -168,16 +169,19 @@
                             text="Expired"
                         />
                     </ComboBox>
-                    <Label required="true" text="{i18n>CDDescription}" />
-                    <TextArea 
+                    <Label
+                        required="true"
+                        text="{i18n>CDDescription}"
+                    />
+                    <TextArea
                         placeholder="{i18n>CDDescription}"
                         id="inDescription"
                         value="{CouponView>/CurrentCoupon/Description}"
-                        liveChange="onLiveChange_Description" 
+                        liveChange="onLiveChange_Description"
                         maxLength="200"
                         rows="3"
                         valueStateText="{i18n>enterCouponDescription}"
-                    ></TextArea>
+                    />
                     <Label
                         required="true"
                         text="{i18n>startDate}"
@@ -210,7 +214,6 @@
         </content>
         <beginButton>
             <Button
-                type="Emphasized"
                 class="myUnifiedBtn"
                 text="{= ${CouponView>/DialogMode} === 'Add' ? 'Create Coupon' : 'Update Coupon'}"
                 tooltip="{= ${CouponView>/DialogMode} === 'Add' ? 'Create Coupon' : 'Update Coupon'}"
@@ -218,14 +221,12 @@
             />
         </beginButton>
         <endButton>
-    <Button
-        type="Emphasized"
-        class="myUnifiedBtn"
-        text="{i18n>CancelButton}"
-        tooltip="{i18n>CancelButton}"
-        press="onDialogClose"
-    />
-</endButton>
-
+            <Button
+                class="myUnifiedBtn"
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="onDialogClose"
+            />
+        </endButton>
     </Dialog>
 </core:FragmentDefinition>

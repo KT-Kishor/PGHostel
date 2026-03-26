@@ -53,34 +53,38 @@
                     tooltip="{i18n>personName}"
                 />
             </Column>
-           <Column demandPopin="true">
+            <Column demandPopin="true">
                 <Text
                     text="{i18n>roomplan}"
                     tooltip="{i18n>roomplan}"
                 />
             </Column>
-           <Column demandPopin="true">
+            <Column demandPopin="true">
                 <Text
                     text="{= ${HostelModel>/SelectedPriceType} === 'Per Month' ?  'First Payment' : 'Full Payment'}"
                     tooltip="{i18n>roomplan}"
                 />
             </Column>
-             <Column demandPopin="true" 
-            visible="{=
+            <Column
+                demandPopin="true"
+                visible="{=
     (
         ${HostelModel>/SelectedPriceType} === 'Per Month' ||
         ${HostelModel>/SelectedPriceType} === 'Per Year'
     )
    &amp;&amp; ${HostelModel>/SelectedMonths} > 1
-}">
+}"
+            >
                 <Text
                     text="{i18n>nextpayment}"
                     tooltip="{i18n>nextpayment}"
                 />
             </Column>
-            
-            <Column  minScreenWidth="Desktop"
-                        demandPopin="true">
+
+            <Column
+                minScreenWidth="Desktop"
+                demandPopin="true"
+            >
                 <Text
                     text="{i18n>totalcost}"
                     tooltip="{i18n>totalcost}"
@@ -91,7 +95,7 @@
         <items>
             <ColumnListItem>
                 <cells>
-                 <!-- <ObjectIdentifier
+                    <!-- <ObjectIdentifier
                             title="{HostelModel>FullName}"
                             text="{
                    parts: [
@@ -99,10 +103,10 @@
         'HostelModel>/Currency'
     ], formatter: '.Formatter.formatCurrency'
                 }"/> -->
-                <Text  text="{HostelModel>FullName}"/>
-                  
+                    <Text text="{HostelModel>FullName}" />
+
                     <Text
-                         text="{
+                        text="{
         parts: [                                                                          
             { path: 'HostelModel>/SelectedPriceType' },
             { path: 'HostelModel>/SelectedMonths' },
@@ -117,14 +121,14 @@
             formatter: '.Formatter.formatCurrency'
         }"
                     />
-                    
+
                     <Text
                         text="{
             parts: ['HostelModel>MonthlyCostPerson','HostelModel>/Currency'],
             formatter: '.Formatter.formatCurrency'
         }"
                     />
-                   
+
                     <Text
                         class="totalColumnBold"
                         text="{ parts: [
@@ -143,9 +147,8 @@
     >
         <!-- Totals for THIS person (NOTE: all RELATIVE, no leading "/") -->
         <VBox class="sapUiSmallMarginTop custom-vbox">
-           
-                <!-- Coupon Label -->
-                <!-- <Label
+            <!-- Coupon Label -->
+            <!-- <Label
                     text="{i18n>couponCode}"
                     class="totalColumnBold1 sapUiTinyMarginEnd"
                     width="120px"
@@ -164,8 +167,8 @@
                     change="onCouponLiveChange"
                 /> -->
 
-                <!-- Apply Now Button -->
-                <!-- <Button
+            <!-- Apply Now Button -->
+            <!-- <Button
                     text="{i18n>applyNow}"
                     type="Emphasized"
                     tooltip="{i18n>applyCoupon}"
@@ -174,30 +177,29 @@
                     id="couponApplyBtn"
                     visible="{HostelModel>/CouponButtonVisible}"
                 /> -->
-                 <HBox
+            <HBox
                 id="SummaryCouponid"
                 width="100%"
                 justifyContent="SpaceBetween"
                 alignItems="Center"
                 class="sapUiSmallMarginBottom couponContainer"
             >
-              <MessageStrip
-        text="{= 'Secuerity Deposit' +' ' +${HostelModel>/Deposit} +' '+ ${HostelModel>/DepositCurrency}}"
-        type="Information"
-        showIcon="true"
-        class="sapUiTinyMarginEnd"
-    />
- 
+                <MessageStrip
+                    text="{= 'Secuerity Deposit' +' ' +${HostelModel>/Deposit} +' '+ ${HostelModel>/DepositCurrency}}"
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiTinyMarginEnd"
+                />
+
                 <Button
                     text="Add Coupon"
-                    type="Emphasized"
                     tooltip="{i18n>}"
                     press="onclickaddBTN"
                     class="sapUiTinyMarginEnd myUnifiedBtn"
                     id="addcouponBtn"
-                                    />
-                                    </HBox>
-          
+                />
+            </HBox>
+
             <HBox
                 justifyContent="End"
                 class="sapUiSmallMarginTop"
@@ -210,10 +212,7 @@
                     text="{parts:['HostelModel>/GrandTotal','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency'}"
                     class="totalColumnBold1"
                 />
-                </HBox>
-                
-            
+            </HBox>
         </VBox>
     </FlexBox>
-  
 </mvc:View>

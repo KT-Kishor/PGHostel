@@ -13,8 +13,10 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-<Title text="{i18n>yearlyinvoicefor} {dialogData>/year} {headerModel>/filterSuffix}"/>
-                             </contentMiddle>
+                    <Title
+                        text="{i18n>yearlyinvoicefor} {dialogData>/year} {headerModel>/filterSuffix}"
+                    />
+                </contentMiddle>
                 <contentRight>
                     <Button
                         icon="sap-icon://decline"

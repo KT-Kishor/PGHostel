@@ -11,15 +11,14 @@
         enableScrolling="false"
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
     >
-     <headerContent>
+        <headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
             />
         </headerContent>
-       
+
         <content>
-          
             <ScrollContainer
                 width="100%"
                 height="100%"
@@ -42,15 +41,14 @@
                         validated="{HostelModel>/IsGeneralInfoValid}"
                         class="customPanelHeader"
                     >
-                    <HBox >
-                    
-                    <MessageStrip
-                                    text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
-                                    showIcon="true"
-                                    showCloseButton="false"
-                                />
-                    </HBox>
-                    
+                        <HBox>
+                            <MessageStrip
+                                text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
+                                showIcon="true"
+                                showCloseButton="false"
+                            />
+                        </HBox>
+
                         <core:Fragment
                             fragmentName="sap.ui.com.project1.fragment.GeneralInfo"
                             type="XML"
@@ -84,7 +82,6 @@
                                 <!--  LOGIN BUTTON HERE -->
                                 <Button
                                     text="{i18n>login}"
-                                    type="Emphasized"
                                     tooltip="{i18n>clickLogin}"
                                     class="myUnifiedBtn"
                                     press="onPressLoginBanner"
@@ -112,15 +109,15 @@
         </content>
         <footer>
             <OverflowToolbar>
-            
-    <Button
-    id="messagePopoverBtn"
-    icon="sap-icon://alert"
-    text="{= ${message>/}.length }"
-    visible="{=${message>/}.length > 0}"
-    type="Emphasized"
-    press="onMessagePopoverPress" class="myUnifiedBtn" />
-                 <ToolbarSpacer />
+                <Button
+                    id="messagePopoverBtn"
+                    icon="sap-icon://alert"
+                    text="{= ${message>/}.length }"
+                    visible="{=${message>/}.length > 0}"
+                    press="onMessagePopoverPress"
+                    class="myUnifiedBtn"
+                />
+                <ToolbarSpacer />
                 <Button
                     text="{i18n>proceedToPay}"
                     tooltip="{i18n>proceedToPay}"

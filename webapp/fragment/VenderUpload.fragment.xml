@@ -54,25 +54,25 @@
                     change="onidproofchange"
                 >
                     <core:ListItem
-                                                        key="Aadhar Card"
-                                                        text="Aadhar Card"
-                                                    />
-                                                    <core:ListItem
-                                                        key="PAN Card"
-                                                        text="PAN Card"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Company Registration Certificate"
-                                                        text="Company Registration Certificate"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Bank Account"
-                                                        text="Bank Account"
-                                                    />
-                                                    <core:ListItem
-                                                        key="Other"
-                                                        text="Other"
-                                                    />
+                        key="Aadhar Card"
+                        text="Aadhar Card"
+                    />
+                    <core:ListItem
+                        key="PAN Card"
+                        text="PAN Card"
+                    />
+                    <core:ListItem
+                        key="Company Registration Certificate"
+                        text="Company Registration Certificate"
+                    />
+                    <core:ListItem
+                        key="Bank Account"
+                        text="Bank Account"
+                    />
+                    <core:ListItem
+                        key="Other"
+                        text="Other"
+                    />
                 </ComboBox>
                 <Label
                     text="{i18n>uploadDocument}"

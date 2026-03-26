@@ -46,11 +46,9 @@ sap.ui.define([
             }), "complaintTemp");
 
             // Router matched
-            this.getOwnerComponent()
-                .getRouter()
-                .getRoute("RouteManageProfile")
-                .attachPatternMatched(this._onRouteMatched, this);
+            this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
         },
+
         _onRouteMatched: function () {
             this.ManageData();
             this.commonLoginFunction()
@@ -526,23 +524,19 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("failedtoUpdateProfilePhoto"));
             }
         },
+
         onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
+
         onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
+
         onChangeDOB: function (oEventOrControl) {
-
-            const oDP =
-                (typeof oEventOrControl.getSource === "function")
-                    ? oEventOrControl.getSource()
-                    : oEventOrControl;
-
+            const oDP = (typeof oEventOrControl.getSource === "function") ? oEventOrControl.getSource() : oEventOrControl;
             if (!oDP) return false;
-
             const v = oDP.getDateValue();
-
             if (!v) {
                 oDP.setValueState("Error");
                 oDP.setValueStateText(this.i18nModel.getText("dateofBirthisRequired"));
@@ -629,13 +623,15 @@ sap.ui.define([
 
             try {
                 this.getBusyDialog();
-
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 Object.assign(this._oLoggedInUser, payload.data);
+                const oLoginmodel = this.getView().getModel("LoginModel");
+                oLoginmodel.setProperty("/EmployeeName", payload.data.UserName);
+                oLoginmodel.refresh(true);
                 MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
 
             } catch (err) {
-                  this.closeBusyDialog();
+                this.closeBusyDialog();
                 MessageToast.show(this.i18nModel.getText("errorUpdatingProfile"));
             } finally {
                 this.closeBusyDialog();
@@ -644,30 +640,25 @@ sap.ui.define([
 
             }
         },
+
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this.getView().getModel("profileData");
             var aCustomers = oProfileModel.getProperty("/aCustomers");
             var aFacilities = oProfileModel.getProperty("/facility");
-
             var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
-
             if (!sCustomerID) {
                 MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
                 return;
             }
-
             var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
             if (!oCustomer) {
                 MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
                 return;
             }
-
             var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
-
             // Calculate totals
             var oTotals = this.calculateTotals(
                 [{
@@ -683,7 +674,6 @@ sap.ui.define([
             if (!oTotals) {
                 return;
             }
-
             // Prepare data for details view
             var oFullCustomerData = {
                 salutation: oCustomer.salutation,
@@ -709,20 +699,20 @@ sap.ui.define([
                 TotalFacilityPrice: oTotals.TotalFacilityPrice,
                 GrandTotal: oTotals.GrandTotal
             };
-
             // Set model for next screen
             var oHostelModel = new JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
-
             // Navigate
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: btoa(encodeURIComponent(sCustomerID)),
                 from: "ManageProfile"
             });
         },
+
         onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "Customerinvoice" });
         },
+
         calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
@@ -731,10 +721,8 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("invalidStartEndDate"));
                 return null;
             }
-
             const diffTime = oEndDate - oStartDate;
             const iDays = Math.ceil(diffTime / (1000 * 3600 * 24));
-
             // if (iDays <= 0) {
             //     MessageToast.show(this.i18nModel.getText("endDatemustbeafterStartDate"));
             //     return null;
@@ -742,10 +730,8 @@ sap.ui.define([
 
             let totalFacilityPricePerDay = 0;
             let aAllFacilities = [];
-
             aPersons.forEach((oPerson, iIndex) => {
                 const aFacilities = oPerson.Facilities?.SelectedFacilities || [];
-
                 aFacilities.forEach((f) => {
                     // Defensive coding to avoid undefined values
                     const sFacilityName = f.facilitiname || f.facilityname || "N/A";
@@ -813,7 +799,7 @@ sap.ui.define([
                 oTable = this.byId("Id_CompmaintTable");
             } else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
-            }else if (sSelectedTab === "Members") {
+            } else if (sSelectedTab === "Members") {
                 oTable = this.byId("Id_MemberTable");
             }
 
@@ -829,7 +815,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/complainCount", length);
             } else if (sSelectedTab === "Damage") {
                 oProfileModel.setProperty("/damageCount", length);
-            }else if (sSelectedTab === "Members") {
+            } else if (sSelectedTab === "Members") {
                 oProfileModel.setProperty("/memberCount", length);
             }
         },
@@ -883,27 +869,27 @@ sap.ui.define([
             }
             else if (sKey === "Members") {
                 // await this._loadMembers();
-                 this.getBusyDialog();
-                    const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
-                    if (!sUserID) {
-                        MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
-                        return;
-                    }
+                this.getBusyDialog();
+                const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+                if (!sUserID) {
+                    MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
+                    return;
+                }
 
-                    const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
-                    const aMember = Array.isArray(resp?.commentData) ? resp.commentData : (resp?.commentData ? [resp.commentData] : []);
+                const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
+                const aMember = Array.isArray(resp?.commentData) ? resp.commentData : (resp?.commentData ? [resp.commentData] : []);
 
-                    const aMembers = aMember.map(mem => ({
-                        Name: mem.Name || inv.Name || "",
-                        Age: mem.Age || "",
-                        Relation: mem.Relation || "",
-                        BookingID:mem.BookingID || ""
-                       
-                    }));
+                const aMembers = aMember.map(mem => ({
+                    Name: mem.Name || inv.Name || "",
+                    Age: mem.Age || "",
+                    Relation: mem.Relation || "",
+                    BookingID: mem.BookingID || ""
 
-                    oModel.setProperty("/Members", aMembers);
-                     this._updateRowCount();
-                     this.closeBusyDialog()
+                }));
+
+                oModel.setProperty("/Members", aMembers);
+                this._updateRowCount();
+                this.closeBusyDialog()
             }
         },
         _loadComplaints: async function (bSilent) {
@@ -1990,7 +1976,7 @@ sap.ui.define([
                 this.byId("id_tabBar1")?.setSelectedKey("Complaints");
                 await this._refreshComplaints();
 
-                this.closeBusyDialog();   
+                this.closeBusyDialog();
 
             } catch (err) {
                 console.error("AJAX error:", err);

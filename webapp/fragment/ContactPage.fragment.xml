@@ -53,7 +53,6 @@
             <Button
                 press="onSupportRequest"
                 tooltip="{i18n>requestSupport}"
-                type="Emphasized"
                 icon="sap-icon://headset"
                 text="Request Support"
                 class="contact-support-btn contact-support-btn-style"

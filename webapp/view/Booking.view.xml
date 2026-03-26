@@ -139,7 +139,6 @@
                                         text="Add Member"
                                         icon="sap-icon://add"
                                         press="onAddFamilyMember"
-                                        type="Transparent"
                                         class="myUnifiedBtn"
                                     />
                                 </OverflowToolbar>
@@ -257,14 +256,12 @@
                                             >
                                                 <Button
                                                     text="Add"
-                                                    type="Emphasized"
                                                     visible="{BookingView>IsNew}"
                                                     press="onSaveFamilyMember"
                                                     class="sapUiTinyMarginEnd"
                                                 />
                                                 <Button
                                                     text="Delete"
-                                                    type="Reject"
                                                     visible="{BookingView>IsNew}"
                                                     press="onDeleteFamilyMemberRow"
                                                 />
@@ -394,13 +391,13 @@
                                 <HBox class="sapUiTinyMarginTop">
                                     <Button
                                         text="Apply Coupon"
-                                        type="Emphasized"
                                         press="onApplyCoupon"
-                                        class="sapUiTinyMarginEnd"
+                                        class="myUnifiedBtn"
                                     />
                                     <Button
                                         text="Remove"
                                         press="onRemoveCoupon"
+                                        class="myUnifiedBtn sapUiTinyMarginBegin"
                                     />
                                 </HBox>
                             </VBox>

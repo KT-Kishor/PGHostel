@@ -153,7 +153,6 @@
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
                 press="FD_onsavebuttonpress"
-                type="Accept"
                 id="FDD_id_saveButton"
                 class="marginRight myUnifiedBtn"
             />
@@ -163,7 +162,6 @@
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="BD_onCancelButtonPress"
-                type="Reject"
                 id="BD_id_CancelBtn"
                 class="marginRight myUnifiedBtn"
             />

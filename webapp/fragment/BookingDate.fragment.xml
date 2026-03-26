@@ -1,14 +1,14 @@
-<core:FragmentDefinition 
+<core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:f="sap.ui.layout.form">
-
+    xmlns:f="sap.ui.layout.form"
+>
     <Dialog
         id="idBookingDateDialog"
         title="Select Booking Date"
-         contentWidth="28rem"
-        contentHeight="auto">
-
+        contentWidth="28rem"
+        contentHeight="auto"
+    >
         <f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -21,46 +21,52 @@
             columnsM="1"
         >
             <f:content>
-                  <!-- <MessageStrip
+                <!-- <MessageStrip
                 text="Kindly select a date to view availability."
                 showIcon="true"
                 type="Information"
             /> -->
-            <Label text="Check-in Date" required="true" />
-            <DatePicker
-                id="idBookingDate"
-                width="100%"
-                displayFormat="dd/MM/yyyy"
-                valueFormat="yyyy-MM-dd"
-                change="onDatePickerChange"
-                valueStateText="Please select date"
-            />
-              <Label text="Check-out Date" required="true" />
-            <DatePicker
-                id="idBookingEndDate"
-                width="100%"
-                displayFormat="dd/MM/yyyy"
-                valueFormat="yyyy-MM-dd"
-                change="onDatePickerChange"
-                valueStateText="Please select date"
-            />
-             
-
+                <Label
+                    text="Check-in Date"
+                    required="true"
+                />
+                <DatePicker
+                    id="idBookingDate"
+                    width="100%"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onDatePickerChange"
+                    valueStateText="Please select date"
+                />
+                <Label
+                    text="Check-out Date"
+                    required="true"
+                />
+                <DatePicker
+                    id="idBookingEndDate"
+                    width="100%"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onDatePickerChange"
+                    valueStateText="Please select date"
+                />
             </f:content>
         </f:SimpleForm>
 
         <beginButton>
             <Button
                 text="Confirm"
-                type="Emphasized"
-                press="Bookingdatepress" />
+                class="myUnifiedBtn"
+                press="Bookingdatepress"
+            />
         </beginButton>
 
         <endButton>
             <Button
                 text="Cancel"
-                press=".onBookingDateCancel" />
+                class="myUnifiedBtn"
+                press=".onBookingDateCancel"
+            />
         </endButton>
-
     </Dialog>
 </core:FragmentDefinition>

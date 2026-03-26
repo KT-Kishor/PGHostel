@@ -376,6 +376,7 @@ sap.ui.define([
             if (!bLoggedIn) {
                 MessageBox.information("Please log in to continue booking.", {
                     title: "Login Required",
+                    styleClass: "myUnifiedBtn",
                     actions: [MessageBox.Action.OK],
                     emphasizedAction: MessageBox.Action.OK,
                     onClose: function () {

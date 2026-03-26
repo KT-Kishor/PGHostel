@@ -1,28 +1,28 @@
 <core:FragmentDefinition
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core">
-	<MessagePopover
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <MessagePopover
         id="idMessagePopover"
-		items="{message>/}"
-		initiallyExpanded="true"  
-        class="bookingPOP">
-         <headerButton>
-           <Button text="Error Messages" 
-                    type="Emphasized" 
-                    class="myUnifiedBtn popoverHeaderBtn"
+        items="{message>/}"
+        initiallyExpanded="true"
+        class="bookingPOP"
+    >
+        <headerButton>
+            <Button
+                text="Error Messages"
+                class="myUnifiedBtn popoverHeaderBtn"
             >
                 <layoutData>
-                    <OverflowToolbarLayoutData 
-                        priority="NeverOverflow"
-                       />
+                    <OverflowToolbarLayoutData priority="NeverOverflow" />
                 </layoutData>
             </Button>
         </headerButton>
-		<MessageItem
-			type="{message>type}"
-			title="{message>message}"
-			subtitle="{message>additionalText}"
-			description="{message>description}"/>
-   
-	</MessagePopover>
+        <MessageItem
+            type="{message>type}"
+            title="{message>message}"
+            subtitle="{message>additionalText}"
+            description="{message>description}"
+        />
+    </MessagePopover>
 </core:FragmentDefinition>

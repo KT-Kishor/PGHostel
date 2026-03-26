@@ -63,7 +63,6 @@
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
                 press="Ck_onsavebuttonpress"
-                type="Accept"
                 id="Ck_id_saveButton"
                 class="marginRight myUnifiedBtn"
             />
@@ -73,7 +72,6 @@
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="Ck_onCancelButtonPress"
-                type="Reject"
                 id="Ck_id_CancelButton"
                 class="marginRight myUnifiedBtn"
             />

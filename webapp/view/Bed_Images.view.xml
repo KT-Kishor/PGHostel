@@ -275,7 +275,6 @@
                                                 icon="sap-icon://delete"
                                                 visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
                                                 press=".onDeleteImage"
-                                                type="Reject"
                                                 tooltip="{i18n>deleteImage}"
                                                 width="100%"
                                             />

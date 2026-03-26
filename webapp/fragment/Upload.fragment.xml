@@ -24,7 +24,6 @@
                     <Button
                         icon="sap-icon://decline"
                         press="onCloseDialog"
-                        type="Transparent"
                     />
                 </contentRight>
             </Bar>

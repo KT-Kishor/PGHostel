@@ -4421,8 +4421,8 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   object-fit: contain;
   display: block;
 }
-.profileAvatar{
 
+.profileAvatar{
 height: 44px !important;
 width: 44px !important;
 }
