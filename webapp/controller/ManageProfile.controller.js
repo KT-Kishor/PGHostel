@@ -13,7 +13,6 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             const oView = this.getView();
-
             // Login form model
             oView.setModel(new JSONModel({
                 fullname: "",
@@ -79,6 +78,7 @@ sap.ui.define([
                 const oTempModel = new JSONModel({
                     bookings: [],
                     Payments: [],
+                    Members: [],
                     isEditMode: false,
                     selectedTab: "Booking History",
                     isTableBusy: true
@@ -148,10 +148,10 @@ sap.ui.define([
 
                 });
 
-
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
+
                 const oProfileModel = new JSONModel({
                     ...fullUserData,
                     isEditMode: false,
@@ -813,6 +813,8 @@ sap.ui.define([
                 oTable = this.byId("Id_CompmaintTable");
             } else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
+            }else if (sSelectedTab === "Members") {
+                oTable = this.byId("Id_MemberTable");
             }
 
 
@@ -827,6 +829,8 @@ sap.ui.define([
                 oProfileModel.setProperty("/complainCount", length);
             } else if (sSelectedTab === "Damage") {
                 oProfileModel.setProperty("/damageCount", length);
+            }else if (sSelectedTab === "Members") {
+                oProfileModel.setProperty("/memberCount", length);
             }
         },
         onTableSelect: async function (oEvent) {
@@ -876,6 +880,30 @@ sap.ui.define([
             // When Damage tab selected, fetch damages and bind
             else if (sKey === "Damage") {
                 await this._loadDamage();
+            }
+            else if (sKey === "Members") {
+                // await this._loadMembers();
+                 this.getBusyDialog();
+                    const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+                    if (!sUserID) {
+                        MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
+                        return;
+                    }
+
+                    const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
+                    const aMember = Array.isArray(resp?.commentData) ? resp.commentData : (resp?.commentData ? [resp.commentData] : []);
+
+                    const aMembers = aMember.map(mem => ({
+                        Name: mem.Name || inv.Name || "",
+                        Age: mem.Age || "",
+                        Relation: mem.Relation || "",
+                        BookingID:mem.BookingID || ""
+                       
+                    }));
+
+                    oModel.setProperty("/Members", aMembers);
+                     this._updateRowCount();
+                     this.closeBusyDialog()
             }
         },
         _loadComplaints: async function (bSilent) {

@@ -265,6 +265,9 @@
                     <IconTabFilter
                         key="Booking History"
                         text="{= ${profileData>/bookingCount} > 0 ? 'Booking History (' + ${profileData>/bookingCount} + ')' : 'Booking History' }"/>
+                    <IconTabFilter
+                        key="Members"
+                        text="{= ${profileData>/memberCount} > 0 ? 'Members (' + ${profileData>/memberCount} + ')' : 'Members' }"/>
 
                     <IconTabFilter
                         key="Payment"
@@ -342,6 +345,52 @@
                             text="{profileData>status}"
                             state="{ path:'profileData>status',
                                      formatter:'.Formatter.formatObjectStatus'}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <Table
+            id="Id_MemberTable"
+            visible="{= ${profileData>/selectedTab} === 'Members' }"
+            busy="{profileData>/isTableBusy}"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No Member history found"
+            items="{
+                    path: 'profileData>/Members',
+                   sorter: [
+                        { path: 'BookingID', descending: false, group: true }
+                      
+                    ]
+                }"
+                 width="auto" 
+           class="sapUiSmallMargin customRoundedTable"
+           
+        >
+
+            <columns>
+                <Column demandPopin="true">
+                <Text text="{i18n>Studentname}"/></Column>
+                <Column demandPopin="true"><Text text="{i18n>age}"/></Column>
+                <Column demandPopin="true"><Text text="{i18n>relation}"/></Column>
+                <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>amount}"/></Column>
+                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
+            </columns>
+
+            <items>
+                <ColumnListItem  press="">
+                    <cells>
+                        <Text
+                            text="{profileData>Name}"/>
+                        <Text text="{profileData>Age}"/>
+                        <Text text="{profileData>Relation}"/>
+                        <!-- <Text
+                            text="{ parts:['profileData>amount','profileData>currency'],
+                                    formatter:'.Formatter.formatCurrency'}"/>
+                        <ObjectStatus
+                            text="{profileData>status}"
+                            state="{ path:'profileData>status',
+                                     formatter:'.Formatter.formatObjectStatus'}"/> -->
                     </cells>
                 </ColumnListItem>
             </items>
