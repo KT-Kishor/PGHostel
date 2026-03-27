@@ -101,9 +101,9 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
-					</Column>
+					</Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
 					</Column>
@@ -121,8 +121,8 @@
 							<Text text="{SupportModel>RaisedBy}" />
 							<Text text="{SupportModel>Email}" />
 							<Text text="{path:'SupportModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
-							<ObjectStatus inverted="false" text="{SupportModel>Status}"
-                            state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/>
+							<!-- <ObjectStatus inverted="false" text="{SupportModel>Status}"
+                            state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${SupportModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${SupportModel>ResolvedDate} === null ? '' : ${path: 'SupportModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
                             <Button text="{i18n>view}" press="HF_viewroom"/>
 						</cells>
