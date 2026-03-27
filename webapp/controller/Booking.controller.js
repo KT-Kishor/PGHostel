@@ -1919,8 +1919,28 @@ sap.ui.define([
 
 
 
+        _getGrossTotalBeforeDiscount: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const fSubTotal = this._toNumber(oModel.getProperty("/BookingSubTotal"));
+            const fGSTValue = this._toNumber(oModel.getProperty("/EffectiveGSTValue") || oModel.getProperty("/GSTValue"));
+            const sGSTType = String(oModel.getProperty("/EffectiveGSTType") || oModel.getProperty("/GSTType") || "").trim();
+
+            if (!sGSTType || fGSTValue <= 0) {
+                return Number(fSubTotal.toFixed(2));
+            }
+
+            return Number((fSubTotal + (fSubTotal * fGSTValue / 100)).toFixed(2));
+        },
+
         _getCouponBaseAmount: function () {
             const oModel = this.getView().getModel("HostelModel");
+            const sPlan = oModel.getProperty("/SelectedPriceType");
+            const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+            if (sPlan === "Per Month" && iDuration > 0) {
+                return Number((this._getGrossTotalBeforeDiscount() / iDuration).toFixed(2));
+            }
+
             return this._toNumber(oModel.getProperty("/RoomPrice")) + this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
         },
 
@@ -2111,14 +2131,27 @@ sap.ui.define([
             ).trim();
         },
 
+        _getPayableNowAmount: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sPlan = oHostelModel.getProperty("/SelectedPriceType");
+            const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
+            const fDiscount = this._toNumber(oHostelModel.getProperty("/AppliedDiscount"));
+            const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+            if (sPlan === "Per Month" && iDuration > 0) {
+                return Number(Math.max(this._getCouponBaseAmount() - fDiscount, 0).toFixed(2));
+            }
+
+            return fGrandTotal;
+        },
+
         _syncPaymentModel: function (sPaymentType) {
             const oPaymentModel = this.getView().getModel("PaymentModel");
-            const oHostelModel = this.getView().getModel("HostelModel");
             const sResolvedType = sPaymentType || oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn";
-            const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
+            const fPayableNow = this._getPayableNowAmount();
 
             oPaymentModel.setProperty("/PaymentType", sResolvedType);
-            oPaymentModel.setProperty("/Amount", sResolvedType === "PayOnCheckIn" ? 0 : fGrandTotal);
+            oPaymentModel.setProperty("/Amount", sResolvedType === "PayOnCheckIn" ? 0 : fPayableNow);
             oPaymentModel.setProperty("/PaymentDate", sResolvedType === "PayOnCheckIn" ? "" : this._formatDateToDDMMYYYY(new Date()));
 
             if (sResolvedType === "PayOnCheckIn") {
@@ -2186,7 +2219,7 @@ sap.ui.define([
             }
 
             return {
-                Amount: this._toNumber(oPaymentModel.getProperty("/Amount")),
+                Amount: this._toNumber(oPaymentModel.getProperty("/Amount")) || this._getPayableNowAmount(),
                 PaymentType: sPaymentType,
                 BankTransactionID: String(oPaymentModel.getProperty("/BankTransactionID") || "").trim(),
                 Date: this._formatDateToISO(oPaymentModel.getProperty("/PaymentDate")) || this._getTodayISODate(),
@@ -2553,5 +2586,3 @@ sap.ui.define([
         }
     });
 });
-
-
