@@ -2316,11 +2316,7 @@ sap.ui.define([
                 CustomerName: oHostelModel.getProperty("/FullName") || "",
                 CustomerGSTIN: bIsBusinessTravel ? sCustomerGSTIN : "",
                 CustCompanyName: bIsBusinessTravel ? sCompanyName : "",
-                CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : "",
-                CustomerGSTINGSTType: bIsBusinessTravel ? sEffectiveGSTType : "",
-                CustomerGSTINGSTValue: bIsBusinessTravel
-                    ? String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue")))
-                    : "0"
+                CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : ""
             }];
         },
 
