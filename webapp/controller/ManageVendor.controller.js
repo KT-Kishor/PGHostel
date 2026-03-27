@@ -56,14 +56,12 @@ sap.ui.define([
             if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
-
             let filters = {};
             if (oExistingModel.Role !== "") {
                 filters = {
                     BranchID: aBranchCodes
                 };
             }
-
             this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
@@ -78,7 +76,6 @@ sap.ui.define([
 
         Onsearch: function (flag) {
             var oView = this.getView();
-
             // Read FilterBar inputs
             var sUserID = oView.byId("MV_id_UserID").getSelectedKey() ||
                 oView.byId("MV_id_UserID").getValue();
@@ -91,25 +88,20 @@ sap.ui.define([
 
             // Build Filters for backend
             let filters = {};
-
             // Always apply Vendor type
             filters.Type = "Vendor";
-
             // Apply UserID filter
             if (sUserID) {
                 filters.UserID = sUserID;
             }
-
             // Apply UserName filter
             if (sUserName) {
                 filters.UserName = sUserName;
             }
-
             // Apply Status Filter
             if (sStatus) {
                 filters.Status = sStatus;
             }
-
             this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
 
@@ -120,18 +112,15 @@ sap.ui.define([
                     const index = aStatusOrder.indexOf(item.Status);
                     item._StatusPriority = index === -1 ? 999 : index;
                 });
-
                 if (!this._originalStaffData || flag === "true") {
                     this._originalStaffData = response;
                 }
-
                 let finalData;
                 if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
                     finalData = this._originalStaffData;
                 } else {
                     finalData = response;
                 }
-
                 const model = new sap.ui.model.json.JSONModel(response);
                 var oTable = this.byId("MV_id_ManageVendor");
                 oTable.attachEventOnce("updateFinished", function () {
@@ -159,7 +148,6 @@ sap.ui.define([
                     text: oContext.getProperty("Status")
                 };
             });
-
             oBinding.sort(oSorter);
         },
 
@@ -167,7 +155,7 @@ sap.ui.define([
             let uniqueValues = {
                 MV_id_UserID: new Set(),
                 MV_id_UserName: new Set(),
-                MV_id_Status : new Set()
+                MV_id_Status: new Set()
             };
 
             data.forEach(item => {
@@ -175,13 +163,11 @@ sap.ui.define([
                 if (item.UserName) uniqueValues.MV_id_UserName.add(item.UserName);
                 if (item.Status) uniqueValues.MV_id_Status.add(item.Status);
             });
-
             let oView = this.getView();
 
             ["MV_id_UserID", "MV_id_UserName", "MV_id_Status"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
-
                 oComboBox.destroyItems();
 
                 Array.from(uniqueValues[field]).sort().forEach(value => {
@@ -224,8 +210,8 @@ sap.ui.define([
             const adjustedData = oModel.map(item => ({
                 ...item,
                 MobileNo: item.MobileNo ? String(item.MobileNo) : "",
-                UserName: item.Salutation + " "+ item.UserName,
-                MobileNo: item.STDCode + " "+ item.MobileNo
+                UserName: item.Salutation + " " + item.UserName,
+                MobileNo: item.STDCode + " " + item.MobileNo
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -251,6 +237,11 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [{
+                label: "Status",
+                property: "Status",
+                type: "string"
+            },
+            {
                 label: "User ID",
                 property: "UserID",
                 type: "string"
