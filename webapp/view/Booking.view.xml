@@ -58,11 +58,14 @@
 
                                 class="responsiveForm"
                             >
-                                <Label text="Property Type" />
+                                <Label text="Property Type"  />
                                 <ComboBox
+                                id="BookProperty_ID"
                                     selectedKey="{HostelModel>/PropertyType}"
                                     items="{BookingView>/PropertyTypes}"
                                     selectionChange="onPropertyTypeChange"
+                                    valueStateText="Select PropertyType"
+                                    change="onPropertyChange"
                                 >
                                     <core:Item
                                         key="{BookingView>key}"
@@ -75,11 +78,14 @@
                                     editable="false"
                                 />
 
-                                <Label text="Room Plan" />
+                                <Label text="Room Plan" required="true"/>
                                 <ComboBox
+                                id="BookRoom_ID"
                                     selectedKey="{HostelModel>/SelectedPriceType}"
                                     items="{HostelModel>/AvailablePaymentMethods}"
                                     selectionChange="onRoomPlanChange"
+                                    change="onRoomplane"
+                                     valueStateText="Select Room plane"
                                 >
                                     <core:Item
                                         key="{HostelModel>key}"
@@ -98,10 +104,12 @@
                                     visible="{BookingView>/showDurationSelector}"
                                 />
                                 <Select
+                                id="BookDuration_ID"
                                     selectedKey="{HostelModel>/SelectedMonths}"
                                     items="{BookingView>/DurationOptions}"
                                     visible="{BookingView>/showDurationSelector}"
                                     change="onDurationChange"
+                                    valueStateText="Select Duration"
                                 >
                                     <core:Item
                                         key="{BookingView>key}"
@@ -109,26 +117,30 @@
                                     />
                                 </Select>
 
-                                <Label text="Start Date" />
+                                <Label text="Start Date" required="true"/>
                                 <DatePicker
+                                id="BookStartdate_ID"
                                     value="{HostelModel>/StartDate}"
                                     valueFormat="dd/MM/yyyy"
                                     displayFormat="dd/MM/yyyy"
                                     minDate="{HostelModel>/TodayDate}"
                                     change="onStartDateChange"
+                                    valueStateText="Enter a valid Date"
                                 />
 
-                                <Label text="End Date" />
+                                <Label text="End Date"  />
                                 <DatePicker
+                                id="BookEnddate_ID"
                                     value="{HostelModel>/EndDate}"
                                     valueFormat="dd/MM/yyyy"
                                     displayFormat="dd/MM/yyyy"
                                     editable="{BookingView>/endDateEditable}"
+                                    valueStateText="Enter a valid Date"
                                     change="onEndDateChange"
                                 />
 
-                                <Label text="Full Name" />
-                                <Input value="{HostelModel>/FullName}" />
+                                <Label text="Full Name"  required="true"/>
+                                <Input value="{HostelModel>/FullName}" id="BookFullname_Id" change="onChangeFullname" valueStateText="Enter your name"/>
                             </f:SimpleForm>
                         </Panel>
 
@@ -381,6 +393,7 @@
                         <Panel
                             headerText="Price Section"
                             class="sapUiTinyMarginTop customBookingPanel"
+                            
                         >
                             <VBox class="sapUiTinyMargin">
                                 <HBox
@@ -397,10 +410,12 @@
                                     />
                                 </HBox>
                                 <Label
+                                required="true"
                                     text="GSTIN"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                 />
                                 <Input
+                                    id="BookGst_ID"
                                     value="{HostelModel>/CustomerGSTIN}"
                                     placeholder="Enter GSTIN"
                                     visible="{BookingView>/showBusinessGSTSection}"
@@ -411,17 +426,22 @@
                                     width="100%"
                                 />
                                 <Label
+                                required="true"
                                     text="Company Name"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                 />
                                 <Input
+                                id="BookCompanyname_ID"
                                     value="{HostelModel>/CompanyName}"
                                     placeholder="Enter company name"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                     class="sapUiTinyMarginBottom"
                                     width="100%"
+                                    change="onchangeCompanyname"
+                                    valueStateText = "Enter  company name"
                                 />
                                 <Label
+                                required="true"
                                     text="Company Address"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                 />
@@ -432,6 +452,9 @@
                                     rows="3"
                                     class="sapUiTinyMarginBottom"
                                     width="100%"
+                                    change="onchangeConpanyAddress"
+                                    valueStateText = "Enter company address"
+                                    id="BookconpanyAddress_ID"
                                 />
                                 <Text
                                     text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
@@ -553,12 +576,9 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Back"
-                    press="onNavBack"
-                />
-                <Button
-                    text="Continue"
+                    text="BOOK THIS NOW"
                     type="Emphasized"
+                    class="myUnifiedBtn"
                     press="onContinueBooking"
                 />
             </Toolbar>

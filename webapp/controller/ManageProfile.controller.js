@@ -601,7 +601,7 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                MessageToast.show(this.i18nModel.getText("mandatoryFieldsAreMandatory"));
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
             const payload = {
@@ -2003,7 +2003,7 @@ sap.ui.define([
             const aBlockedStatuses = ["in progress", "resolved"];
 
             if (aBlockedStatuses.includes(status)) {
-                sap.m.MessageToast.show(
+                MessageToast.show(
                     "Complaints with status 'In Progress' or 'Resolved' cannot be edited"
                 );
                 return;
@@ -2016,5 +2016,6 @@ sap.ui.define([
             const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
             this._setComplaintRoomComboData(sBranchCode, "");
         },
+       
     });
 });

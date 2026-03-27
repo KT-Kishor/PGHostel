@@ -1654,6 +1654,7 @@ sap.ui.define([
         },
 
         onDurationChange: function (oEvent) {
+             utils._LCstrictValidationComboBox(oEvent)
             const oModel = this.getView().getModel("HostelModel");
 
             oModel.setProperty("/SelectedMonths", oEvent.getSource().getSelectedKey() || "1");
@@ -1663,7 +1664,8 @@ sap.ui.define([
             this._recalculateSummary();
         },
 
-        onStartDateChange: function () {
+        onStartDateChange: function (oEvent) {
+             utils._LCvalidateDate(oEvent);
             const oModel = this.getView().getModel("HostelModel");
             const sStartDate = oModel.getProperty("/StartDate");
             const oStartDate = this._parseDate(sStartDate);
@@ -1691,7 +1693,8 @@ sap.ui.define([
             this._recalculateSummary();
         },
 
-        onEndDateChange: function () {
+        onEndDateChange: function (oEvent) {
+            utils._LCvalidateDate(oEvent)
             const oModel = this.getView().getModel("HostelModel");
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
@@ -1739,11 +1742,18 @@ sap.ui.define([
         },
 
         onPropertyTypeChange: function (oEvent) {
+            
             this.getView().getModel("HostelModel").setProperty("/PropertyType", oEvent.getSource().getSelectedKey());
             this._resetCouponState(false);
             this._syncPropertyTypeState();
             this._rebuildSelectedFacilities();
             this._recalculateSummary();
+        },
+        onPropertyChange:function(oEvent){
+           utils._LCstrictValidationComboBox(oEvent)
+        },
+        onRoomplane:function(oEvent){
+ utils._LCstrictValidationComboBox(oEvent)
         },
 
         onFamilyMemberSelect: function (oEvent) {
@@ -2377,6 +2387,9 @@ sap.ui.define([
                 }]
             };
         },
+        onChangeFullname:function(oEvent){
+            utils._LCvalidateMandatoryField(oEvent)
+        },
 
         _validateBookingBeforePayment: function () {
             const oModel = this.getView().getModel("HostelModel");
@@ -2387,18 +2400,31 @@ sap.ui.define([
             const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
 
-            if (!oModel.getProperty("/FullName") || !oModel.getProperty("/StartDate") || !oModel.getProperty("/EndDate")) {
+            var isMandatoryValid  = (
+                utils._LCstrictValidationComboBox(this.getView().byId(("BookProperty_ID")), "ID") && utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") && utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") && utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
+            )
+            if(!isMandatoryValid){
                 MessageToast.show("Please fill mandatory booking details");
                 return false;
             }
+
+            // if (!oModel.getProperty("/FullName") || !oModel.getProperty("/StartDate") || !oModel.getProperty("/EndDate")) {
+            //     MessageToast.show("Please fill mandatory booking details");
+            //     return false;
+            // }
 
             if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
                 MessageToast.show("Please complete contact details before payment");
                 return false;
             }
+             
 
             if (bSupportsCustomerGST && bIsBusinessTravel) {
-                if (!sCustomerGSTIN || !sCompanyName || !sCompanyAddress) {
+               var isGStvalidate= (
+                utils._LCvalidateGstNumber(this.getView().byId(("BookGst_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookCompanyname_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookconpanyAddress_ID")), "ID")
+              )
+              
+                if (!isGStvalidate) {
                     MessageToast.show("Please fill business GST details");
                     return false;
                 }
@@ -2581,6 +2607,15 @@ sap.ui.define([
             }
 
             this._oPaymentDialog.open();
+        },
+         onGSTINChange:function(oEvent){
+            utils._LCvalidateGstNumber(oEvent)
+        },
+        onchangeCompanyname:function(oEvent){
+          utils._LCvalidateMandatoryField(oEvent)
+        },
+        onchangeConpanyAddress:function(oEvent){
+           utils._LCvalidateMandatoryField(oEvent)
         }
     });
 });
