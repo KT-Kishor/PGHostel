@@ -6,6 +6,7 @@
     xmlns:core="sap.ui.core"
     xmlns:unified="sap.ui.unified"
     displayBlock="true"
+    xmlns:l="sap.ui.layout"
 >
     <Page
         showHeader="true"
@@ -138,9 +139,136 @@
                                     valueStateText="Enter a valid Date"
                                     change="onEndDateChange"
                                 />
+                                <Label text="Full Name" required="true"/>
+                                <HBox width="100%" fitContainer="true" renderType="Bare" wrap="NoWrap" alignItems="Center">
+                                    <layoutData>
+                                        <l:GridData span="XL8 L8 M8 S12" />
+                                    </layoutData>
+                                    <Input 
+                                        value="{HostelModel>/Salutation}" 
+                                        editable="false">
+                                        <layoutData>
+                                            <FlexItemData growFactor="1" baseSize="1rem" />
+                                        </layoutData>
+                                    </Input>
+                                <Input 
+                                    value="{HostelModel>/FullName}" 
+                                    id="BookFullname_Id" change="onChangeFullname" valueStateText="Enter your name"
+                                    class="sapUiTinyMarginBegin" 
+                                    editable="false">
+                                    <layoutData>
+                                        <FlexItemData growFactor="3" baseSize="0" />
+                                    </layoutData>
+                                </Input>
+                                </HBox>
 
-                                <Label text="Full Name"  required="true"/>
-                                <Input value="{HostelModel>/FullName}" id="BookFullname_Id" change="onChangeFullname" valueStateText="Enter your name"/>
+                                <Label
+                                    text="Documents"
+                                    visible="{= !!${HostelModel>/UserID} }"
+                                />
+                                <VBox
+                                    visible="{= !!${HostelModel>/UserID} }"
+                                >
+                                    <layoutData>
+                                        <l:GridData span="XL8 L8 M8 S12" />
+                                    </layoutData>
+
+                                    <Toolbar design="Transparent">
+                                        <Title
+                                            text="Upload Documents"
+                                            level="H4"
+                                        />
+                                        <ToolbarSpacer />
+                                        <Button
+                                            text="Add Document"
+                                            icon="sap-icon://add"
+                                            press="onAddCustomerDocument"
+                                            class="myUnifiedBtn"
+                                        />
+                                    </Toolbar>
+
+                                    <Table
+                                        items="{HostelModel>/Documents}"
+                                        noDataText="No documents"
+                                        class="responsiveTable"
+                                    >
+                                        <columns>
+                                            <Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <Text text="Document Type" />
+                                            </Column>
+                                            <Column
+                                                minScreenWidth="Desktop"
+                                                demandPopin="true"
+                                                width="14rem"
+                                            >
+                                                <Text text="Document" />
+                                            </Column>
+                                            <Column width="8rem">
+                                                <Text text="Action" />
+                                            </Column>
+                                        </columns>
+
+                                        <items>
+                                            <ColumnListItem>
+                                                <cells>
+                                                    <VBox>
+                                                        <Select
+                                                            selectedKey="{HostelModel>DocumentType}"
+                                                            visible="{HostelModel>IsNew}"
+                                                            width="100%"
+                                                            items="{BookingView>/DocumentTypeOptions}"
+                                                        >
+                                                            <core:Item
+                                                                key="{BookingView>key}"
+                                                                text="{BookingView>text}"
+                                                            />
+                                                        </Select>
+                                                        <Text
+                                                            text="{HostelModel>DocumentType}"
+                                                            visible="{= !${HostelModel>IsNew} }"
+                                                        />
+                                                    </VBox>
+
+                                                    <VBox>
+                                                        <unified:FileUploader
+                                                            width="100%"
+                                                            visible="{HostelModel>IsNew}"
+                                                            sameFilenameAllowed="true"
+                                                            change="onCustomerDocumentChange"
+                                                            buttonText="Upload"
+                                                            fileType="pdf,jpg,jpeg,png,webp"
+                                                        />
+                                                        <Link
+                                                            text="{HostelModel>FileName}"
+                                                            press="onPreviewCustomerDocument"
+                                                            visible="{= !!${HostelModel>FileName} }"
+                                                        />
+                                                    </VBox>
+
+                                                    <HBox
+                                                        renderType="Bare"
+                                                        justifyContent="Start"
+                                                        class="responsiveActionButtons"
+                                                    >
+                                                        <Button
+                                                            text="Add"
+                                                            visible="{HostelModel>IsNew}"
+                                                            press="onSaveCustomerDocumentRow"
+                                                            class="sapUiTinyMarginEnd"
+                                                        />
+                                                        <Button
+                                                            text="Delete"
+                                                            press="onDeleteCustomerDocumentRow"
+                                                        />
+                                                    </HBox>
+                                                </cells>
+                                            </ColumnListItem>
+                                        </items>
+                                    </Table>
+                                </VBox>
                             </f:SimpleForm>
                         </Panel>
 
@@ -185,6 +313,12 @@
                                         demandPopin="true"
                                     >
                                         <Text text="Age" />
+                                    </Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
+                                        <Text text="Gender" />
                                     </Column>
                                     <Column
                                         minScreenWidth="Tablet"
@@ -249,6 +383,24 @@
                                                 />
                                                 <Text
                                                     text="{BookingView>Age}"
+                                                    visible="{= !${BookingView>IsNew} }"
+                                                />
+                                            </VBox>
+
+                                            <VBox>
+                                                <Select
+                                                    selectedKey="{BookingView>Gender}"
+                                                    visible="{BookingView>IsNew}"
+                                                    width="100%"
+                                                    items="{BookingView>/GenderOptions}"
+                                                >
+                                                    <core:Item
+                                                        key="{BookingView>key}"
+                                                        text="{BookingView>text}"
+                                                    />
+                                                </Select>
+                                                <Text
+                                                    text="{BookingView>Gender}"
                                                     visible="{= !${BookingView>IsNew} }"
                                                 />
                                             </VBox>

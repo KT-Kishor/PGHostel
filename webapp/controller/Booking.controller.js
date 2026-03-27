@@ -51,6 +51,11 @@ sap.ui.define([
                     { key: "Driving License", text: "Driving License" },
                     { key: "Voter ID", text: "Voter ID" }
                 ],
+                GenderOptions: [
+                    { key: "Male", text: "Male" },
+                    { key: "Female", text: "Female" },
+                    { key: "Other", text: "Other" }
+                ],
                 FamilyMembers: []
 
             }), "BookingView");
@@ -1226,6 +1231,7 @@ sap.ui.define([
                 Name: "",
                 Relation: "",
                 Age: "",
+                Gender: "",
                 Selected: false,
                 DocumentType: "",
                 DocumentName: "",
@@ -1235,6 +1241,282 @@ sap.ui.define([
 
             oBookingView.setProperty("/FamilyMembers", aMembers);
             oBookingView.refresh(true);
+        },
+
+        onAddCustomerDocument: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const aDocuments = oHostelModel.getProperty("/Documents") || [];
+
+            if (aDocuments.length >= 1) {
+                MessageToast.show("Only one document can be added.");
+                return;
+            }
+
+            const bHasPendingRow = aDocuments.some(function (oDocument) {
+                return oDocument && oDocument.IsNew;
+            });
+
+            if (bHasPendingRow) {
+                MessageToast.show("Please complete the current new document row first.");
+                return;
+            }
+
+            aDocuments.push({
+                id: "DOC" + Date.now(),
+                DocumentType: "",
+                File: "",
+                Document: "",
+                FileName: "",
+                FileType: "",
+                IsNew: true
+            });
+
+            oHostelModel.setProperty("/Documents", aDocuments);
+            oHostelModel.refresh(true);
+        },
+
+        onCustomerDocumentChange: function (oEvent) {
+            const oFileUploader = oEvent.getSource();
+            const oContext = oFileUploader.getBindingContext("HostelModel");
+            const sPath = oContext && oContext.getPath ? oContext.getPath() : "";
+            const oModel = this.getView().getModel("HostelModel");
+            const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
+            const oReader = new FileReader();
+            const iMaxSize = 2 * 1024 * 1024;
+            const sFileName = String(oFile && oFile.name || "");
+            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
+            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
+            const sMimeType = String(oFile && oFile.type || "").toLowerCase();
+            const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
+
+            if (!oFile || !sPath) {
+                return;
+            }
+
+            if (oFile.size > iMaxSize) {
+                MessageToast.show("File size must not exceed 2 MB.");
+                oFileUploader.clear();
+                return;
+            }
+
+            if (!bAllowedMime && !bAllowedExt) {
+                MessageToast.show("Only image files and PDF are allowed.");
+                oFileUploader.clear();
+                return;
+            }
+
+            oReader.onload = function (oLoadEvent) {
+                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+
+                oModel.setProperty(sPath + "/FileName", oFile.name);
+                oModel.setProperty(sPath + "/FileType", oFile.type || "");
+                oModel.setProperty(sPath + "/Document", sBase64);
+                oModel.setProperty(sPath + "/File", sBase64);
+                oModel.refresh(true);
+            };
+
+            oReader.readAsDataURL(oFile);
+        },
+
+        onSaveCustomerDocumentRow: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("HostelModel");
+            const sPath = oContext.getPath();
+            const oModel = this.getView().getModel("HostelModel");
+            const oDocument = Object.assign({}, oModel.getProperty(sPath));
+            const aDocuments = oModel.getProperty("/Documents") || [];
+
+            if (!oDocument.DocumentType) {
+                MessageToast.show("Please select document type.");
+                return;
+            }
+
+            if (!oDocument.FileName) {
+                MessageToast.show("Please upload a document.");
+                return;
+            }
+
+            const bDuplicateType = aDocuments.some(function (oItem, iIndex) {
+                const bSameRow = ("/Documents/" + iIndex) === sPath;
+                return !bSameRow && !oItem.IsNew && (oItem.DocumentType || "") === (oDocument.DocumentType || "");
+            });
+
+            if (bDuplicateType) {
+                MessageToast.show("Document type is already uploaded.");
+                return;
+            }
+
+            oDocument.IsNew = false;
+            oModel.setProperty(sPath, oDocument);
+            oModel.refresh(true);
+            MessageToast.show("Document added successfully.");
+        },
+
+        onDeleteCustomerDocumentRow: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("HostelModel");
+            const oModel = this.getView().getModel("HostelModel");
+            const sPath = oContext.getPath(); // /Documents/<index>
+            const aMatch = /\/Documents\/(\d+)/.exec(sPath);
+            const iIndex = aMatch ? parseInt(aMatch[1], 10) : -1;
+            const aDocuments = oModel.getProperty("/Documents") || [];
+
+            if (iIndex < 0 || iIndex >= aDocuments.length) {
+                return;
+            }
+
+            aDocuments.splice(iIndex, 1);
+            oModel.setProperty("/Documents", aDocuments);
+            oModel.refresh(true);
+        },
+
+        onPreviewCustomerDocument: function (oEvent) {
+            const oDoc = oEvent.getSource().getBindingContext("HostelModel")?.getObject();
+            const sRawBase64 = String(oDoc?.File || oDoc?.Document || "").trim();
+
+            if (!sRawBase64) {
+                MessageToast.show("No document to preview.");
+                return;
+            }
+
+            const autoDecodeBase64 = function (sValue) {
+                if (!sValue) {
+                    return "";
+                }
+
+                let sDecoded = String(sValue).replace(/\s/g, "");
+                let sLast = sDecoded;
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (sLast.startsWith("iVB") || sLast.startsWith("/9j") || sLast.startsWith("JVBER")) {
+                            return sLast;
+                        }
+
+                        sLast = atob(sLast);
+                    } catch (e) {
+                        break;
+                    }
+                }
+
+                return sLast;
+            };
+
+            const sBase64 = autoDecodeBase64(sRawBase64);
+            let sMimeType = String(oDoc.FileType || "").toLowerCase();
+
+            if (!sMimeType) {
+                if (sBase64.startsWith("iVB")) {
+                    sMimeType = "image/png";
+                } else if (sBase64.startsWith("/9j")) {
+                    sMimeType = "image/jpeg";
+                } else if (sBase64.startsWith("JVBER")) {
+                    sMimeType = "application/pdf";
+                }
+            }
+
+            if (sMimeType.indexOf("image/") === 0) {
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                const oImage = new sap.m.Image({
+                    densityAware: false,
+                    width: "100%",
+                    height: "100%"
+                });
+
+                const oDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || "Document Preview",
+                    contentWidth: "50%",
+                    contentHeight: "60%",
+                    draggable: true,
+                    resizable: true,
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [oImage]
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        oDialog.destroy();
+                    }
+                });
+
+                this.getView().addDependent(oDialog);
+                oImage.setSrc(sImageSrc);
+                oDialog.open();
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                const sByteChars = atob(sBase64);
+                const aByteArrays = [];
+
+                for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
+                    const sSlice = sByteChars.slice(iOffset, iOffset + 512);
+                    const aByteNumbers = new Array(sSlice.length);
+
+                    for (let i = 0; i < sSlice.length; i++) {
+                        aByteNumbers[i] = sSlice.charCodeAt(i);
+                    }
+
+                    aByteArrays.push(new Uint8Array(aByteNumbers));
+                }
+
+                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
+
+                if (this._customerPreviewUrl) {
+                    URL.revokeObjectURL(this._customerPreviewUrl);
+                }
+
+                this._customerPreviewUrl = URL.createObjectURL(oBlob);
+
+                const oPdfDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || "Document Preview",
+                    stretch: true,
+                    draggable: true,
+                    resizable: true,
+                    contentWidth: "60%",
+                    contentHeight: "60%",
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                            <div style="width:100%;height:100%;overflow:hidden;">
+                                <iframe src="${this._customerPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+                            </div>
+                        `
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oPdfDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        if (this._customerPreviewUrl) {
+                            URL.revokeObjectURL(this._customerPreviewUrl);
+                            this._customerPreviewUrl = null;
+                        }
+
+                        oPdfDialog.destroy();
+                    }.bind(this)
+                });
+
+                this.getView().addDependent(oPdfDialog);
+                oPdfDialog.open();
+                return;
+            }
+
+            MessageToast.show("Preview not supported for this file type.");
         },
 
         onFamilyDocumentChange: function (oEvent) {
@@ -1281,6 +1563,11 @@ sap.ui.define([
 
             if (!oMember.Age || isNaN(parseInt(oMember.Age, 10))) {
                 MessageToast.show("Please enter valid age.");
+                return;
+            }
+
+            if (!oMember.Gender) {
+                MessageToast.show("Please select gender.");
                 return;
             }
 
@@ -1565,7 +1852,9 @@ sap.ui.define([
                 "air conditioner": "./image/Air Conditioner.jpeg",
                 "room heater": "./image/Room Heater.jpeg",
                 "study room access": "./image/Study Room.png",
-                "extra bed": "./image/ExtraBed.jpg"
+                "extra bed": "./image/ExtraBed.jpg",
+                "extra pillow" : "../image/pillow.jpg"
+
             };
             const sTypeKey = String(oFacility.Type || "").toLowerCase().trim();
             const sFallback = mDefaultTypeImages[sTypeKey] || "./image/Fallback.png";
@@ -2250,25 +2539,53 @@ sap.ui.define([
                     Name: oMember.Name || "",
                     Age: parseInt(oMember.Age, 10) || 0,
                     Relation: oMember.Relation || "",
+                    Gender: oMember.Gender || ""
+                };
+            });
+        },
+
+        _buildMemberDocumentsPayload: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+
+            return (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                const sType = String(oMember.DocumentType || "").trim();
+                const sFile = String(oMember.File || oMember.Document || "").trim();
+                const sName = String(oMember.DocumentName || oMember.FileName || "").trim();
+
+                return !oMember.IsNew && !!oMember.Selected && !!(sType && sFile && sName);
+            }).map(function (oMember) {
+                return {
                     DocumentType: oMember.DocumentType || "",
                     File: oMember.File || oMember.Document || "",
-                    FileName: oMember.DocumentName || "",
-                    FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : ""
+                    FileName: oMember.DocumentName || oMember.FileName || "",
+                    FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : (oMember.FileType || ""),
+                    MemberID: oMember.MemberID || oMember.id || ""
                 };
             });
         },
 
         _buildDocumentsPayload: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
+            const aCustomerDocuments = (oHostelModel.getProperty("/Documents") || []).filter(function (oDocument) {
+                if (!oDocument) {
+                    return false;
+                }
 
-            return (oHostelModel.getProperty("/Documents") || []).map(function (oDocument) {
+                const sType = String(oDocument.DocumentType || "").trim();
+                const sFile = String(oDocument.File || oDocument.Document || "").trim();
+                const sName = String(oDocument.FileName || oDocument.DocumentName || "").trim();
+
+                return !!(sType && sFile && sName) && !oDocument.IsNew;
+            }).map(function (oDocument) {
                 return {
                     DocumentType: oDocument.DocumentType || "",
                     File: oDocument.File || oDocument.Document || "",
-                    FileName: oDocument.FileName || "",
+                    FileName: oDocument.FileName || oDocument.DocumentName || "",
                     FileType: oDocument.FileType || ""
                 };
             });
+
+            return aCustomerDocuments.concat(this._buildMemberDocumentsPayload());
         },
 
         _getFacilityMemberIdValue: function (oFacility) {
