@@ -2,17 +2,17 @@ sap.ui.define([
     "./BaseController",
     "sap/m/MessageBox",
     "../utils/validation",
-     "sap/ui/model/json/JSONModel",
-     "sap/m/MessageToast",
-], function(BaseController, MessageBox, utils,JSONModel,MessageToast) {
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+], function (BaseController, MessageBox, utils, JSONModel, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.FacilitiesDetails", {
 
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteFacilitiesDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function(oEvent) {
+        _onRouteMatched: async function (oEvent) {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageFacility");
                 if (!LoginFUnction) return;
@@ -21,13 +21,14 @@ sap.ui.define([
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // Editable control model
-                const oEditableModel = new JSONModel({Edit: false,Save: false});
+                const oEditableModel = new JSONModel({ Edit: false, Save: false });
                 this.getView().setModel(oEditableModel, "editable");
 
                 // Reset facility model
                 const oFacilityModel = new JSONModel({
                     BranchCode: "",
                     Type: "",
+                    SelectionMode: "",
                     FacilityName: "",
                     RequiresUnitPrice: false,
                     UnitPrice: "",
@@ -47,10 +48,10 @@ sap.ui.define([
                 this.closeBusyDialog()
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
-            } finally {}
+            } finally { }
         },
 
-        _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -67,8 +68,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
@@ -93,7 +94,7 @@ sap.ui.define([
             }
         },
 
-        BI_onEditButtonPress: function() {
+        BI_onEditButtonPress: function () {
             const oView = this.getView();
             oView.getModel("editable").setProperty("/Edit", true);
 
@@ -122,7 +123,7 @@ sap.ui.define([
             oModel.setProperty("/DisplayImages", aImages);
         },
 
-        BI_onButtonPress: function() {
+        BI_onButtonPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteFacilitis", {
                 value: "Facilities",
@@ -131,38 +132,38 @@ sap.ui.define([
             this.getView().getModel("DisplayImagesModel").setData({});
         },
 
-        onFacilitybranchChange: function(oEvent) {
+        onFacilitybranchChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function(oEvent) {
+        onFacilityNameChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityTypeChange: function(oEvent) {
+        onFacilityTypeChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             this._syncFacilityPricingFields();
         },
 
-        onFacilityRateChange: function(oEvent) {
+        onFacilityRateChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onPriceChange: function(oEvent) {
+        onPriceChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateAmount(oEvent.getSource(), "ID");
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onDeleteImage: function(oEvent) {
+        onDeleteImage: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("DisplayImagesModel");
             const sFileName = oContext.getProperty("fileName");
             const oModel = this.getView().getModel("DisplayImagesModel");
@@ -186,7 +187,7 @@ sap.ui.define([
             oModel.setProperty("/CanAddMore", aRealImages.length < maxImages);
         },
 
-        onFileSelected: function(oEvent) {
+        onFileSelected: function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
@@ -245,7 +246,7 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
-        Onsearch: function() {
+        Onsearch: function () {
             this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_ExtraFacilities", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -254,21 +255,35 @@ sap.ui.define([
             })
         },
 
-        BT_onsavebuttonpress: async function() {
+        BT_onsavebuttonpress: async function () {
             var oView = this.getView();
             var Payload = oView.getModel("FacilitiesModel").getData();
             var aFacilitiesData = oView.getModel("Facilities").getData();
-
+            var bIsUnit = String(Payload.SelectionMode || "").toUpperCase().trim() === "PERSON_QTY";
             // Field validations
             if (
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_RoomType123"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("FD_id_FacilityName"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("FD_id_FacilityName1"), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_SelectionMode")), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
-            ) {
+            )
+                if (bIsUnit) {
+                    if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID")) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+
+                    if (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0) {
+                        MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
+                        return;
+                    }
+
+                }
+            {
                 var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
 
-                var uploadedImages = attachments.filter(function(item) {
+                var uploadedImages = attachments.filter(function (item) {
                     return !item.isPlaceholder;
                 });
 
@@ -285,7 +300,7 @@ sap.ui.define([
                 }
 
                 //  Duplicate check
-                var bDuplicate = aFacilitiesData.some(function(facility) {
+                var bDuplicate = aFacilitiesData.some(function (facility) {
                     if (Payload.ID && facility.ID === Payload.ID) return false; // Skip comparing the same record during update
                     return (
                         facility.BranchCode === Payload.BranchCode &&
@@ -391,7 +406,7 @@ sap.ui.define([
             }
         },
 
-        _refreshFacilityDetails: async function(sFacilityID) {
+        _refreshFacilityDetails: async function (sFacilityID) {
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
                     ID: sFacilityID
@@ -431,12 +446,12 @@ sap.ui.define([
             }
         },
 
-        _requiresUnitPriceByType: function(sType) {
+        _requiresUnitPriceByType: function (sType) {
             var sNormalizedType = String(sType || "").toLowerCase().trim();
             return sNormalizedType === "laundry service" || sNormalizedType === "ironing service";
         },
 
-        _syncFacilityPricingFields: function() {
+        _syncFacilityPricingFields: function () {
             var oModel = this.getView().getModel("FacilitiesModel");
             if (!oModel) return;
 
@@ -452,7 +467,7 @@ sap.ui.define([
             }
         },
 
-        onImagePress: function(oEvent) {
+        onImagePress: function (oEvent) {
             var oSource = oEvent.getSource();
             var sImageSrc = oSource.getSrc();
 
@@ -490,11 +505,11 @@ sap.ui.define([
 
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function() {
+                        press: function () {
                             this._oImageDialog.close();
                         }.bind(this)
                     }),
-                    afterClose: function() {
+                    afterClose: function () {
                         this._oImageDialog.destroy();
                         this._oImageDialog = null;
                     }.bind(this)
@@ -506,6 +521,105 @@ sap.ui.define([
             // Set clicked image
             this.byId("previewImage").setSrc(sImageSrc);
             this._oImageDialog.open();
-        }
+        },
+
+        onSelectionModeChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCstrictValidationComboBox(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
+            this._syncFacilityPricingFields();
+        },
+
+        _syncFacilityPricingFields: function () {
+            var oModel = this.getView().getModel("FacilitiesModel");
+            if (!oModel) return;
+
+            var sSelectionMode = oModel.getProperty("/SelectionMode");
+
+            var bIsUnitPriceMode = sSelectionMode === "PERSON_QTY";
+
+            if (bIsUnitPriceMode) {
+                oModel.setProperty("/PerHourPrice", "");
+                oModel.setProperty("/PerDayPrice", "");
+                oModel.setProperty("/PerMonthPrice", "");
+                oModel.setProperty("/PerYearPrice", "");
+            } else {
+                oModel.setProperty("/UnitPrice", "");
+            }
+        },
+
+        onFacilityTypeChange: function (oEvent) {
+            var oComboBox = oEvent.getSource();
+            utils._LCvalidateMandatoryField(oEvent);
+
+            if (!oComboBox.getValue()) {
+                oComboBox.setValueState("None");
+            }
+
+            var oSelectedItem = oComboBox.getSelectedItem();
+            if (!oSelectedItem) {
+                this.byId("id_SelectionMode").unbindItems();
+                return;
+            }
+
+            var sFacilityID = oSelectedItem.getKey();
+            sFacilityID = parseInt(sFacilityID, 10);
+            this._filterSelectionModes(sFacilityID);
+            this._syncFacilityPricingFields();
+        },
+
+        _filterSelectionModes: function (sFacilityID) {
+            var oMap = this._getFacilitySelectionModeMap();
+            var aAllowedKeys = oMap[sFacilityID] || [];
+
+            var oComboBox = this.byId("id_SelectionMode");
+            var oModel = this.getView().getModel("SelectionModeModel");
+
+            if (!oComboBox || !oModel) return;
+
+            oComboBox.bindItems({
+                path: "SelectionModeModel>/",
+                template: new sap.ui.core.Item({
+                    key: "{SelectionModeModel>key}",
+                    text: "{SelectionModeModel>text}"
+                }),
+                filters: aAllowedKeys.map(function (sKey) {
+                    return new sap.ui.model.Filter(
+                        "key",
+                        sap.ui.model.FilterOperator.EQ,
+                        sKey
+                    );
+                }),
+                templateShareable: false
+            });
+
+            var oFacilitiesModel = this.getView().getModel("FacilitiesModel");
+            var sCurrentMode = oFacilitiesModel.getProperty("/SelectionMode");
+
+            if (!aAllowedKeys.includes(sCurrentMode)) {
+                oFacilitiesModel.setProperty("/SelectionMode", "");
+            }
+        },
+
+        _getFacilitySelectionModeMap: function () {
+            return {
+                1: ["SINGLE"],                 // High-Speed Wi-Fi
+                2: ["PERSON_QTY"],             // Laundry Service
+                3: ["PERSON_QTY"],             // Ironing Service
+                4: ["SINGLE"],                 // Housekeeping
+                5: ["PERSON"],                 // Meals / Food Subscription
+                6: ["PERSON"],                 // Gym Membership
+                7: ["SINGLE"],                 // Two-Wheeler Parking
+                8: ["SINGLE"],                 // Four-Wheeler Parking
+                9: ["SINGLE"],                 // Locker / Storage
+                10: ["SINGLE"],                // Power Backup
+                11: ["SINGLE"],                // AC
+                12: ["SINGLE"],                // Heater
+                13: ["PERSON"],                // Study Room
+                14: ["QTY"],                   // Extra Bed
+                15: ["QTY"],                   // Extra Pillow
+                16: ["SINGLE", "QTY", "PERSON", "PERSON_QTY"] // Others (all allowed)
+            };
+        },
     });
 });

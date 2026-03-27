@@ -111,6 +111,24 @@
                                                 text="{FacilityType>FacilityName}"
                                             />
                                         </m:ComboBox>
+
+                                        <m:Label
+                                            text="Selection Mode"
+                                            required="true"
+                                        />
+                                        <m:ComboBox
+                                            id="id_SelectionMode"
+                                            selectedKey="{FacilitiesModel>/SelectionMode}"
+                                            items="{SelectionModeModel>/}"
+                                            placeholder="Select selection mode"
+                                            valueStateText="Select selection mode"
+                                            change="onSelectionModeChange"
+                                        >
+                                            <core:Item
+                                                key="{SelectionModeModel>key}"
+                                                text="{SelectionModeModel>text}"
+                                            />
+                                        </m:ComboBox>
                                         <m:Label
                                             text="{i18n>unitPrice}"
                                             required="true"
@@ -304,7 +322,6 @@
                         tooltip="{i18n>MSedit}"
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
-						
                     />
                     <m:Button
                         id="FD_id_SaveButton"
