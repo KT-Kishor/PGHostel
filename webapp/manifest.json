@@ -102,6 +102,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/ApplicationName.json",
         "preload": true
+      },
+      "SelectionModeModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/SelectionModeModel.json",
+        "preload": true
       }
     },
     "resources": {

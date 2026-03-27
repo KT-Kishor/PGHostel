@@ -1,0 +1,6 @@
+[
+    { "key": "SINGLE", "text": "Single (Per Room)" },
+    { "key": "QTY", "text": "Quantity" },
+    { "key": "PERSON", "text": "Person Selection" },
+    { "key": "PERSON_QTY", "text": "Person + Quantity" }
+]
