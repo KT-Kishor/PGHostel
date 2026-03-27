@@ -24,14 +24,17 @@
                 width="100%"
                 class="sapUiSmallMargin"
             >
+                <!-- Responsive HBox that wraps on mobile -->
                 <HBox
                     width="100%"
                     wrap="Wrap"
                     alignItems="Start"
                     renderType="Bare"
+                    class="responsiveColumns"
                 >
+                    <!-- Left Column - Takes full width on mobile, 60% on tablet/desktop -->
                     <VBox
-                        width="60%"
+                        width="{= ${device>/system/phone} ? '100%' : '60%'}"
                         class="sapUiTinyMarginEnd"
                     >
                         <Panel headerText="Booking" class="customBookingPanel" >
@@ -52,6 +55,8 @@
                                 columnsXL="2"
                                 columnsL="2"
                                 columnsM="1"
+
+                                class="responsiveForm"
                             >
                                 <Label text="Property Type" />
                                 <ComboBox
@@ -144,9 +149,11 @@
                                 </OverflowToolbar>
                             </headerToolbar>
 
+                            <!-- Responsive Table for Members -->
                             <Table
                                 items="{BookingView>/FamilyMembers}"
                                 noDataText="No members found"
+                                class="responsiveTable"
                             >
                                 <columns>
                                     <Column width="5rem">
@@ -155,16 +162,29 @@
                                     <Column>
                                         <Text text="Name" />
                                     </Column>
-                                    <Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
                                         <Text text="Relation" />
                                     </Column>
-                                    <Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
                                         <Text text="Age" />
                                     </Column>
-                                    <Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
                                         <Text text="Document Type" />
                                     </Column>
-                                    <Column width="14rem">
+                                    <Column
+                                        minScreenWidth="Desktop"
+                                        demandPopin="true"
+                                        width="14rem"
+                                    >
                                         <Text text="Document" />
                                     </Column>
                                     <Column width="8rem">
@@ -186,6 +206,7 @@
                                                     value="{BookingView>Name}"
                                                     visible="{BookingView>IsNew}"
                                                     placeholder="Enter name"
+                                                    width="100%"
                                                 />
                                                 <Text
                                                     text="{BookingView>Name}"
@@ -198,6 +219,7 @@
                                                     value="{BookingView>Relation}"
                                                     visible="{BookingView>IsNew}"
                                                     placeholder="Enter relation"
+                                                    width="100%"
                                                 />
                                                 <Text
                                                     text="{BookingView>Relation}"
@@ -211,6 +233,7 @@
                                                     type="Number"
                                                     visible="{BookingView>IsNew}"
                                                     placeholder="Enter age"
+                                                    width="100%"
                                                 />
                                                 <Text
                                                     text="{BookingView>Age}"
@@ -243,6 +266,7 @@
                                                     sameFilenameAllowed="true"
                                                     change="onFamilyDocumentChange"
                                                     buttonText="Upload"
+                                                    fileType="pdf,doc,docx,jpg,png"
                                                 />
                                                 <Text
                                                     text="{BookingView>DocumentName}"
@@ -253,6 +277,7 @@
                                             <HBox
                                                 renderType="Bare"
                                                 justifyContent="Start"
+                                                class="responsiveActionButtons"
                                             >
                                                 <Button
                                                     text="Add"
@@ -289,6 +314,7 @@
                                     width="100%"
                                     alignItems="Center"
                                     justifyContent="SpaceBetween"
+                                    class="facilitiesNavContainer"
                                 >
                                     <Button
                                         icon="sap-icon://slim-arrow-left"
@@ -319,63 +345,11 @@
                                 </HBox>
                             </VBox>
                         </Panel>
-                        <Panel
-                            headerText="Selected Facilities"
-                            class="sapUiSmallMarginTop customBookingPanel"
-                        >
-                            <Table
-                                items="{HostelModel>/AllSelectedFacilities}"
-                                noDataText="-- No facilities opted --"
-                                autoPopinMode="true"
-                            >
-                                <columns>
-                                    <Column>
-                                        <Text text="Facility" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                    >
-                                        <Text text="Rate" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Desktop"
-                                        demandPopin="true"
-                                        width="45%"
-                                    >
-                                        <Text
-                                            text="Breakdown (Who &amp; Qty)"
-                                        />
-                                    </Column>
-                                    <Column hAlign="End">
-                                        <Text text="Total" />
-                                    </Column>
-                                </columns>
-                                <items>
-                                    <ColumnListItem vAlign="Top">
-                                        <cells>
-                                            <Text
-                                                text="{HostelModel>FacilityName}"
-                                            />
-                                            <Text
-                                                text="{HostelModel>RateText}"
-                                            />
-                                            <Text
-                                                text="{HostelModel>BreakdownText}"
-                                                wrapping="true"
-                                            />
-                                            <Text
-                                                text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
-                                            />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
-                        </Panel>
                     </VBox>
 
+                    <!-- Right Column - Takes full width on mobile, 35% on tablet/desktop -->
                     <VBox
-                        width="35%"
+                        width="{= ${device>/system/phone} ? '100%' : '35%'}"
                         class="sapUiLargeMarginBegin sapUiTinyMarginEnd"
                     >
                         <Panel
@@ -387,6 +361,7 @@
                                     value="{HostelModel>/CouponCode}"
                                     placeholder="Enter coupon code"
                                     liveChange="onCouponLiveChange"
+                                    width="100%"
                                 />
                                 <HBox class="sapUiTinyMarginTop">
                                     <Button
@@ -433,6 +408,7 @@
                                     change="onGSTINChange"
                                     class="sapUiTinyMarginBottom"
                                     valueStateText="{i18n>gstError}"
+                                    width="100%"
                                 />
                                 <Label
                                     text="Company Name"
@@ -443,6 +419,7 @@
                                     placeholder="Enter company name"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                     class="sapUiTinyMarginBottom"
+                                    width="100%"
                                 />
                                 <Label
                                     text="Company Address"
@@ -512,6 +489,63 @@
                         </Panel>
                     </VBox>
                 </HBox>
+
+                <!-- Selected Facilities Panel - Full Width Responsive -->
+                <Panel
+                    headerText="Selected Facilities"
+                    class="sapUiSmallMarginTop customBookingPanel"
+                      width="98.5%"
+                >
+                    <Table
+                        items="{HostelModel>/AllSelectedFacilities}"
+                        noDataText="-- No facilities opted --"
+                        autoPopinMode="true"
+                        class="responsiveTable"
+                    >
+                        <columns>
+                            <Column>
+                                <Text text="Facility" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+                                <Text text="Rate" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Desktop"
+                                demandPopin="true"
+                                width="45%"
+                            >
+                                <Text
+                                    text="Breakdown (Who &amp; Qty)"
+                                />
+                            </Column>
+                            <Column hAlign="End">
+                                <Text text="Total" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem vAlign="Top">
+                                <cells>
+                                    <Text
+                                        text="{HostelModel>FacilityName}"
+                                    />
+                                    <Text
+                                        text="{HostelModel>RateText}"
+                                    />
+                                    <Text
+                                        text="{HostelModel>BreakdownText}"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
             </VBox>
         </content>
 

@@ -100,9 +100,9 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
-					</Column>
+					</Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
 					</Column>
@@ -120,8 +120,8 @@
 							<Text text="{RaiseBugModel>RaisedBy}" />
 							<Text text="{RaiseBugModel>Email}" />
 							<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
-							<ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
-                            state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/>
+							<!-- <ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
+                            state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
                             <Button text="{i18n>view}" press="HF_viewroom"/>
 						</cells>

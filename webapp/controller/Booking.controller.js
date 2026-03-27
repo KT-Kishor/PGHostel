@@ -16,6 +16,77 @@ sap.ui.define([
             this._iFacilityPageSize = 3; // show 3 cards at once
 
         },
+         _onRouteMatched: async function () {
+             if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
+            let oHostelModel = sap.ui.getCore().getModel("HostelModel");
+            if (!oHostelModel) {
+                oHostelModel = new JSONModel({});
+                sap.ui.getCore().setModel(oHostelModel, "HostelModel");
+            }
+
+            this.getView().setModel(oHostelModel, "HostelModel");
+            this.getView().setModel(new JSONModel({
+                PropertyTypes: [
+                    { key: "Hostel", text: "Hostel" },
+                    { key: "PG", text: "PG" },
+                    { key: "Hotel", text: "Hotel" },
+                    { key: "Service Apartments", text: "Service Apartments" },
+                    { key: "Rented Properties", text: "Rented Properties" }
+                ],
+                DurationOptions: this._buildKeyTextList(11),
+                showDurationSelector: false,
+                endDateEditable: false,
+                showFamilySection: false,
+                showGSTField: false,
+                showBusinessTravelOption: false,
+                showBusinessGSTSection: false,
+                maxPersons: 1,
+                originalPersonOptions: [],
+                DocumentTypeOptions: [
+                    { key: "Aadhaar", text: "Aadhaar" },
+                    { key: "Passport", text: "Passport" },
+                    { key: "Driving License", text: "Driving License" },
+                    { key: "Voter ID", text: "Voter ID" }
+                ],
+                FamilyMembers: []
+
+            }), "BookingView");
+            this.getView().setModel(new JSONModel({ Facilities: [] }), "FacilityModel");
+            this.getView().setModel(new JSONModel({
+                title: "",
+                facilityName: "",
+                currency: "",
+                selectionMode: "SINGLE",
+                selectionModeLabel: "",
+                singleOccupantMode: false,
+                primaryGuestName: "",
+                quantity: 1,
+                singlePersonQty: 0,
+                selectedPriceType: "",
+                personOptions: [],
+                selectedPersonIds: [],
+                personQuantities: [],
+                priceOptions: []
+            }), "FacilitySelection");
+            this.getView().setModel(new JSONModel({
+                Amount: 0,
+                PaymentType: "PayOnCheckIn",
+                PaymentDate: "",
+                BankTransactionID: ""
+            }), "PaymentModel");
+
+            this._initializeBookingData();
+            this._prefillLoggedInUser();
+            this._syncPropertyTypeState();
+            this._syncPlanState();
+            await this._loadFacilities();
+            this._rebuildSelectedFacilities();
+            this._recalculateSummary();
+            oHostelModel.refresh(true);
+        },
         onNavBack: function () {
             const sTabKey = "idRooms"
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
@@ -544,13 +615,8 @@ sap.ui.define([
                 horizontalScrolling: false,
                 content: [
                     new sap.m.VBox({
-                        width: "100%",
+                        width: "93%",
                         items: [
-                            new sap.m.ObjectStatus({
-                                text: "{FacilitySelection>/selectionModeLabel}",
-                                state: "Information"
-                            }).addStyleClass("sapUiTinyMarginBottom"),
-
                             new sap.m.Label({
                                 text: "Price",
                                 design: "Bold"
@@ -570,7 +636,7 @@ sap.ui.define([
                                         return sSelectionMode === "QTY";
                                     }
                                 }
-                            }).addStyleClass("sapUiTinyMarginBottom"),
+                            }).addStyleClass("sapUiSmallMargin"),
 
                             new sap.m.StepInput({
                                 width: "100%",
@@ -582,7 +648,7 @@ sap.ui.define([
                                         return sSelectionMode === "QTY";
                                     }
                                 }
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                            }).addStyleClass("sapUiSmallMargin"),
 
                             new sap.m.VBox({
                                 visible: {
@@ -1266,12 +1332,12 @@ sap.ui.define([
 
             aVisibleFacilities.forEach(function (oFacility) {
                 const oCard = new sap.m.VBox({
-                    width: "290px",
+                    width: "250px",
                     alignItems: "Center",
                     justifyContent: "Center",
                     items: [
                         new sap.m.VBox({
-                            width: "264px",
+                            width: "240px",
                             height: "178px",
                             items: [
                                 new sap.m.HBox({
@@ -1282,7 +1348,7 @@ sap.ui.define([
                                 }).addStyleClass("selectedBadge"),
                                 new sap.m.Image({
                                     src: oFacility.Image,
-                                    width: "264px",
+                                    width: "240px",
                                     height: "178px",
                                     densityAware: false,
                                     decorative: false
@@ -1311,74 +1377,7 @@ sap.ui.define([
             oContainer.addItem(oRow);
         },
 
-        _onRouteMatched: async function () {
-            let oHostelModel = sap.ui.getCore().getModel("HostelModel");
-            if (!oHostelModel) {
-                oHostelModel = new JSONModel({});
-                sap.ui.getCore().setModel(oHostelModel, "HostelModel");
-            }
-
-            this.getView().setModel(oHostelModel, "HostelModel");
-            this.getView().setModel(new JSONModel({
-                PropertyTypes: [
-                    { key: "Hostel", text: "Hostel" },
-                    { key: "PG", text: "PG" },
-                    { key: "Hotel", text: "Hotel" },
-                    { key: "Service Apartments", text: "Service Apartments" },
-                    { key: "Rented Properties", text: "Rented Properties" }
-                ],
-                DurationOptions: this._buildKeyTextList(11),
-                showDurationSelector: false,
-                endDateEditable: false,
-                showFamilySection: false,
-                showGSTField: false,
-                showBusinessTravelOption: false,
-                showBusinessGSTSection: false,
-                maxPersons: 1,
-                originalPersonOptions: [],
-                DocumentTypeOptions: [
-                    { key: "Aadhaar", text: "Aadhaar" },
-                    { key: "Passport", text: "Passport" },
-                    { key: "Driving License", text: "Driving License" },
-                    { key: "Voter ID", text: "Voter ID" }
-                ],
-                FamilyMembers: []
-
-            }), "BookingView");
-            this.getView().setModel(new JSONModel({ Facilities: [] }), "FacilityModel");
-            this.getView().setModel(new JSONModel({
-                title: "",
-                facilityName: "",
-                currency: "",
-                selectionMode: "SINGLE",
-                selectionModeLabel: "",
-                singleOccupantMode: false,
-                primaryGuestName: "",
-                quantity: 1,
-                singlePersonQty: 0,
-                selectedPriceType: "",
-                personOptions: [],
-                selectedPersonIds: [],
-                personQuantities: [],
-                priceOptions: []
-            }), "FacilitySelection");
-            this.getView().setModel(new JSONModel({
-                Amount: 0,
-                PaymentType: "PayOnCheckIn",
-                PaymentDate: "",
-                BankTransactionID: ""
-            }), "PaymentModel");
-
-            this._initializeBookingData();
-            this._prefillLoggedInUser();
-            this._syncPropertyTypeState();
-            this._syncPlanState();
-            await this._loadFacilities();
-            this._rebuildSelectedFacilities();
-            this._recalculateSummary();
-            oHostelModel.refresh(true);
-        },
-
+    
         _initializeBookingData: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oData = oModel.getData() || {};
@@ -2417,7 +2416,6 @@ sap.ui.define([
             const iSelectedIndex = oEvent.getSource().getSelectedIndex();
             const bPayOnCheckIn = iSelectedIndex === 0;
             const bUPI = iSelectedIndex === 1;
-
             this._togglePaymentSections(bUPI, false, bPayOnCheckIn);
             this._syncPaymentModel(bUPI ? "UPI" : "PayOnCheckIn");
         },
