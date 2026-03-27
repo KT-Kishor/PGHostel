@@ -123,6 +123,7 @@
                                             placeholder="Select selection mode"
                                             valueStateText="Select selection mode"
                                             change="onSelectionModeChange"
+                                            editable="{editable>/Edit}"
                                         >
                                             <core:Item
                                                 key="{SelectionModeModel>key}"
