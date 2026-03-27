@@ -708,7 +708,8 @@ sap.ui.define([
                 "Air Conditioner": "../image/Air Conditioner.jpeg",
                 "Room Heater": "../image/Room Heater.jpeg",
                 "Study Room Access": "../image/Study Room.png",
-                "Others": "../image/defaultFacility.png"
+                "Others": "../image/defaultFacility.png",
+                "Extra Pillow" : "../image/pillow.jpg"
             };
 
             return list
