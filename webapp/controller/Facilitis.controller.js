@@ -393,7 +393,6 @@ sap.ui.define([
                 await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {
                     data: oData
                 });
-                MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
                 oView.getModel("UploaderData").setData({ attachments: [] });
                 oView.getModel("tokenModel").setData({ tokens: [] });
                 this.ARD_Dialog.close();
@@ -406,6 +405,7 @@ sap.ui.define([
                 MessageToast.show(err.message || err.responseText);
             } finally {
                 this.closeBusyDialog();
+                MessageToast.show(this.i18nModel.getText("facilityAddedSuccessfully"));
             }
         },
 
@@ -703,13 +703,14 @@ sap.ui.define([
                             });
 
                             await Promise.all(aDeletePromises);
-                            MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
                             return that.readCallForFacilities("Initial");
                         } catch (err) {
                             that.closeBusyDialog()
                             MessageToast.show(err.message || err.responseText);
                         } finally {
                             that.closeBusyDialog()
+                            
+                            MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
                             oTable.removeSelections(true);
                         }
                     } else {

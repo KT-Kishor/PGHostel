@@ -289,14 +289,15 @@ sap.ui.define([
                             UserID: data.UserID
                         }
                     });
+                    this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("MSstaffeditsuccess"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Login", {
                         data: payload
                     });
+                    this.closeBusyDialog();
                     MessageToast.show(this.i18nModel.getText("MSstaffadd"));
                 }
-
                 this.FD_onCancelButtonPress();
                 await this.Onsearch("true");
             } catch (err) {
@@ -440,13 +441,12 @@ sap.ui.define([
                                     UserID: oData.UserID
                                 }
                             });
-
-                            MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
                             await that.Onsearch("true"); // refresh table
                         } catch (err) {
                             sap.m.MessageToast.show(err.message || err.responseText);
                         } finally {
                             that.closeBusyDialog()
+                            MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
                             oTable.removeSelections(true);
                         }
                     } else {
@@ -506,7 +506,7 @@ sap.ui.define([
             } else if (sKey === "Ms." || sKey === "Mrs.") {
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
-            } else if (sKey === "Other."){
+            } else if (sKey === "Other.") {
                 oGender.setSelectedKey("Other");
                 oGender.setEnabled(false);
             }
@@ -796,8 +796,8 @@ sap.ui.define([
             const adjustedData = oModel.map(item => ({
                 ...item,
                 MobileNo: item.MobileNo ? String(item.MobileNo) : "",
-                MobileNo: item.STDCode+ " "+ item.MobileNo,
-                UserName: item.Salutation+ " "+ item.UserName
+                MobileNo: item.STDCode + " " + item.MobileNo,
+                UserName: item.Salutation + " " + item.UserName
             }));
             const aCols = this.createTableSheet();
             const oSettings = {

@@ -264,6 +264,7 @@ sap.ui.define([
             if (flag === true) {
                 sap.m.MessageBox.show("Please Submit before navigating back?", {
                     icon: sap.m.MessageBox.Icon.WARNING,
+                    styleClass: "myUnifiedBtn",
                     title: "Warning"
                 });
             } else {

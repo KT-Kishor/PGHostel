@@ -4,14 +4,14 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast"
-], function(BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
+], function (BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.HostelFeatures", {
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteHostelFeatures").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
                 if (!LoginFUnction) return;
@@ -30,7 +30,7 @@ sap.ui.define([
                     Photo1Type: "",
                     Photo1Name: ""
                 }), "UploadModel");
-                
+
                 // Token model
                 this.getView().setModel(new sap.ui.model.json.JSONModel({
                     tokens: []
@@ -47,7 +47,7 @@ sap.ui.define([
             }
         },
 
-        _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -63,9 +63,9 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            } else{
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
             this.getBusyDialog()
@@ -80,7 +80,7 @@ sap.ui.define([
             }
         },
 
-        HM_AddHostelFeature: function() {
+        HM_AddHostelFeature: function () {
             const oView = this.getView();
 
             if (!this.ARD_Dialog) {
@@ -94,7 +94,7 @@ sap.ui.define([
                 FacilityName: "",
                 Description: "",
                 ID: "",
-                Type:""
+                Type: ""
             });
 
             oView.getModel("UploadModel").setData({
@@ -111,7 +111,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HM_EditHostelFeature: function() {
+        HM_EditHostelFeature: function () {
             const oTable = this.byId("HF_HostelFeatureTable");
             const oSelected = oTable.getSelectedItems();
 
@@ -156,31 +156,31 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HF_onCancelButtonPress: function() {
+        HF_onCancelButtonPress: function () {
             this.ARD_Dialog.close();
             this.byId("HFF_id_BranchCode").setValueState("None");
             this.byId("HF_HostelFeatureTable").removeSelections(true);
         },
 
-        onNameInputLiveChange: function(oEvent) {
+        onNameInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function(oEvent) {
+        onFacilityNameChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onHostelbranchChange: function(oEvent) {
+        onHostelbranchChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        HF_onsavebuttonpress: async function() {
+        HF_onsavebuttonpress: async function () {
             const oView = this.getView();
             const oHostelFeaturesModel = oView.getModel("HostelFeaturesModel");
             const Payload = oHostelFeaturesModel.getData();
@@ -191,7 +191,7 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_BranchCode")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_FacilityName")), "ID") &&
-                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_Amenities")), "ID") && 
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HFF_id_Amenities")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HFF_id_Description")), "ID")
             );
 
@@ -201,12 +201,12 @@ sap.ui.define([
             }
 
             //  Duplicate check
-            var bDuplicate = aHostelData.some(function(facility) {
+            var bDuplicate = aHostelData.some(function (facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false; // Skip comparing the same record during update
                 return (
                     facility.BranchCode === Payload.BranchCode &&
                     facility.FacilityName.trim().toLowerCase() === Payload.FacilityName.trim().toLowerCase()
-                );  
+                );
             });
 
             if (bDuplicate) {
@@ -220,7 +220,7 @@ sap.ui.define([
                     return;
                 }
             }
-            
+
             this.getBusyDialog()
             try {
                 const oPayload = {
@@ -230,7 +230,7 @@ sap.ui.define([
                     Photo1: oUpload.Photo1,
                     Photo1Type: oUpload.Photo1Type,
                     Photo1Name: oUpload.Photo1Name,
-                    Type:Payload.Type
+                    Type: Payload.Type
                 };
 
                 if (Payload.ID) {
@@ -264,7 +264,7 @@ sap.ui.define([
             }
         },
 
-        onFacilityFileChange: function(oEvent) {
+        onFacilityFileChange: function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
             const oReader = new FileReader();
@@ -287,7 +287,7 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
-        onTokenDelete: function(oEvent) {
+        onTokenDelete: function (oEvent) {
             this.getView().getModel("UploadModel").setData({
                 Photo1: "",
                 Photo1Type: "",
@@ -298,7 +298,7 @@ sap.ui.define([
             });
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -311,63 +311,63 @@ sap.ui.define([
 
             let aBranchCodes = [];
 
-         if (Array.isArray(omainModel) && omainModel.length) {
+            if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
-            }else if (oExistingModel.BranchCode) {
+            } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
 
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
-                filters = { BranchCode: aBranchCodes};
+                filters = { BranchCode: aBranchCodes };
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchCode = "";
-            } else{
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchCode = "";
+            } else {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
 
             if (sFacilityName) filters.FacilityName = sFacilityName;
             this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_HostelFeatures", filters).then((oData) => {
-                    let response = Array.isArray(oData.data) ? oData.data : [oData.data];
+                let response = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                      const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+                const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
-        // Map BranchCode to BranchName directly in response
-        response = response.map(bed => {
-            const branch = branchData.find(br => br.BranchID === bed.BranchCode);
-            return {
-                ...bed,
-                BranchName: branch ? branch.Name : bed.BranchID 
-            };
-        });
+                // Map BranchCode to BranchName directly in response
+                response = response.map(bed => {
+                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);
+                    return {
+                        ...bed,
+                        BranchName: branch ? branch.Name : bed.BranchID
+                    };
+                });
 
-                    if (!this._originalBedData || flag === "true") {
-                        this._originalBedData = response;
-                    }
+                if (!this._originalBedData || flag === "true") {
+                    this._originalBedData = response;
+                }
 
-                    if (Object.keys(filters).length === 0) {
-                        const model = new sap.ui.model.json.JSONModel(this._originalBedData);
-                        this.getView().setModel(model, "HostelFeatures");
-                        this._populateUniqueFilterValues(this._originalBedData);
-                        return;
-                    }
-
-                    const filteredData = response;
-                    const model = new sap.ui.model.json.JSONModel(filteredData);
+                if (Object.keys(filters).length === 0) {
+                    const model = new sap.ui.model.json.JSONModel(this._originalBedData);
                     this.getView().setModel(model, "HostelFeatures");
                     this._populateUniqueFilterValues(this._originalBedData);
-                }).catch((err) => {
-                    this.closeBusyDialog()
-                    sap.m.MessageToast.show(err.message || err.responseText);
-                }).finally(() => {
-                    this.closeBusyDialog()
-                });
+                    return;
+                }
+
+                const filteredData = response;
+                const model = new sap.ui.model.json.JSONModel(filteredData);
+                this.getView().setModel(model, "HostelFeatures");
+                this._populateUniqueFilterValues(this._originalBedData);
+            }).catch((err) => {
+                this.closeBusyDialog()
+                sap.m.MessageToast.show(err.message || err.responseText);
+            }).finally(() => {
+                this.closeBusyDialog()
+            });
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 HF_id_FacilityName: new Set(),
             };
@@ -389,7 +389,7 @@ sap.ui.define([
             });
         },
 
-        HM_DeleteHostelFeature: async function() {
+        HM_DeleteHostelFeature: async function () {
             var oTable = this.byId("HF_HostelFeatureTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -408,73 +408,72 @@ sap.ui.define([
 
             MessageBox.confirm(
                 `Are you sure you want to Delete the Selected Amenities: ${sNames}?`, {
-                    icon: MessageBox.Icon.WARNING,
-                    title: "Confirm Deletion",
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.NO,
-                    styleClass: "myUnifiedBtn",
-                    onClose: async function(sAction) {
-                        if (sAction === MessageBox.Action.YES) {
-                            try {
-                                that.getBusyDialog()
+                icon: MessageBox.Icon.WARNING,
+                title: "Confirm Deletion",
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.NO,
+                styleClass: "myUnifiedBtn",
+                onClose: async function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        try {
+                            that.getBusyDialog()
 
-                                // Collect all delete promises
-                                const aDeletePromises = aSelectedItems.map(async (item) => {
-                                    var oData = item.getBindingContext("HostelFeatures").getObject();
-                                    await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
-                                        filters: {
-                                            ID: oData.ID
-                                        }
-                                    });
+                            // Collect all delete promises
+                            const aDeletePromises = aSelectedItems.map(async (item) => {
+                                var oData = item.getBindingContext("HostelFeatures").getObject();
+                                await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
+                                    filters: {
+                                        ID: oData.ID
+                                    }
                                 });
+                            });
 
-                                // Wait for all deletions to complete
-                                await Promise.all(aDeletePromises);
-
-                                sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
-                                await that.Onsearch("true"); // refresh table
-                            } catch (err) {
-                                that.closeBusyDialog()
-                                sap.m.MessageToast.show(err.message || err.responseText);
-                            } finally {
-                                that.closeBusyDialog()
-                                oTable.removeSelections(true);
-                            }
-                        } else {
+                            // Wait for all deletions to complete
+                            await Promise.all(aDeletePromises);
+                            await that.Onsearch("true"); // refresh table
+                        } catch (err) {
+                            that.closeBusyDialog()
+                            sap.m.MessageToast.show(err.message || err.responseText);
+                        } finally {
+                            that.closeBusyDialog()
+                            sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
                             oTable.removeSelections(true);
                         }
+                    } else {
+                        oTable.removeSelections(true);
                     }
                 }
+            }
             );
         },
 
-        _resetFacilityValueStates: function() {
+        _resetFacilityValueStates: function () {
             ["HFF_id_FacilityName", "HFF_id_Description"].forEach(id => {
                 const oField = this.byId(id);
                 if (oField) oField.setValueState("None");
             });
         },
 
-        FC_onPressClear: function() {
+        FC_onPressClear: function () {
             this.getView().byId("HF_id_FacilityName").setSelectedKey("")
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("HostelFeatures").setData({});
         },
 
-        onHome: function() {
+        onHome: function () {
             this.CommonLogoutFunction();
         },
 
-        HF_viewroom: function(oEvent) {
+        HF_viewroom: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("HostelFeatures");
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
-                  sap.m.MessageBox.information(
+                sap.m.MessageBox.information(
                     "No image is uploaded.",
                     {
                         title: "Information",
@@ -505,19 +504,19 @@ sap.ui.define([
                 content: [oImage],
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function() {
+                    press: function () {
                         oDialog.close();
                     }
                 }),
-                afterClose: function() {
+                afterClose: function () {
                     oDialog.destroy();
                 }
             });
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
         },
-        
-        onAmenitieTypeChange: function(oEvent) {
+
+        onAmenitieTypeChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
