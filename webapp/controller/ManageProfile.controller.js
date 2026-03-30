@@ -877,7 +877,7 @@ sap.ui.define([
                 }
 
                 const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
-                const aMember = Array.isArray(resp?.commentData) ? resp.commentData : (resp?.commentData ? [resp.commentData] : []);
+                const aMember = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
 
                 const aMembers = aMember.map(mem => ({
                     Name: mem.Name || inv.Name || "",

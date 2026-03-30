@@ -2262,9 +2262,7 @@ sap.ui.define([
         },
 
         onDurationChange: function (oEvent) {
-             utils._LCstrictValidationComboBox(oEvent)
             const oModel = this.getView().getModel("HostelModel");
-
             oModel.setProperty("/SelectedMonths", oEvent.getSource().getSelectedKey() || "1");
             this._resetCouponState(false);
             this._updateAutoEndDate();

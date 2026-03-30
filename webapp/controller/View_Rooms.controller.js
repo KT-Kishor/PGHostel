@@ -486,7 +486,7 @@ const oUser = oLoginModel?.getData?.() || {};
             userID: oUser?.UserID   
         });
 
-        aMember = resp?.commentData || [];
+        aMember = resp?.data || [];
     } catch (error) {
         console.error("Member fetch failed", error);
     }
