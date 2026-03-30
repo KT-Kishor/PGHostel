@@ -553,13 +553,13 @@
                                 <Button
                                     text="Apply Coupon"
                                     press="onApplyCoupon"
-                                    class="myUnifiedBtn couponButton"
+                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
                                     visible="{= !${HostelModel>/AppliedCouponCode} }"
                                 />
                                 <Button
                                     text="Remove"
                                     press="onRemoveCoupon"
-                                    class="myUnifiedBtn couponButton"
+                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
                                     visible="{= !!${HostelModel>/AppliedCouponCode} }"
                                 />
                             </HBox>

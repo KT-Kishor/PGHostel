@@ -3605,6 +3605,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   flex-wrap: nowrap;
 }
 
+.couponInput {
+  margin-right: 0.25rem;
+}
+
 /* Mobile devices */
 @media (max-width: 600px) {
   .couponContainer {
@@ -3615,6 +3619,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
   .couponInput {
     width: 100% !important;
+    margin-right: 0;
     margin-bottom: 0.5rem;
   }
 

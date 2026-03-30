@@ -33,7 +33,22 @@ sap.ui.define([
             }
 
             this.getView().setModel(oHostelModel, "HostelModel");
-            this.getView().setModel(new JSONModel({
+            this.getView().setModel(new JSONModel(this._getBookingViewInitialData()), "BookingView");
+            this.getView().setModel(new JSONModel(this._getFacilityModelInitialData()), "FacilityModel");
+            this.getView().setModel(new JSONModel(this._getFacilitySelectionInitialData()), "FacilitySelection");
+            this.getView().setModel(new JSONModel(this._getPaymentModelInitialData()), "PaymentModel");
+
+            this._initializeBookingData();
+            this._prefillLoggedInUser();
+            this._syncPropertyTypeState();
+            this._syncPlanState();
+            await this._loadFacilities();
+            this._rebuildSelectedFacilities();
+            this._recalculateSummary();
+            oHostelModel.refresh(true);
+        },
+        _getBookingViewInitialData: function () {
+            return {
                 PropertyTypes: [
                     { key: "Hostel", text: "Hostel" },
                     { key: "PG", text: "PG" },
@@ -62,10 +77,17 @@ sap.ui.define([
                     { key: "Other", text: "Other" }
                 ],
                 FamilyMembers: []
+            };
+        },
 
-            }), "BookingView");
-            this.getView().setModel(new JSONModel({ Facilities: [] }), "FacilityModel");
-            this.getView().setModel(new JSONModel({
+        _getFacilityModelInitialData: function () {
+            return {
+                Facilities: []
+            };
+        },
+
+        _getFacilitySelectionInitialData: function () {
+            return {
                 title: "",
                 facilityName: "",
                 currency: "",
@@ -81,27 +103,57 @@ sap.ui.define([
                 selectedPersonIds: [],
                 personQuantities: [],
                 priceOptions: []
-            }), "FacilitySelection");
-            this.getView().setModel(new JSONModel({
+            };
+        },
+
+        _getPaymentModelInitialData: function () {
+            return {
                 Amount: 0,
                 PaymentType: "PayOnCheckIn",
                 PaymentDate: "",
                 BankTransactionID: ""
-            }), "PaymentModel");
-
-            this._initializeBookingData();
-            this._prefillLoggedInUser();
-            this._syncPropertyTypeState();
-            this._syncPlanState();
-            await this._loadFacilities();
-            this._rebuildSelectedFacilities();
-            this._recalculateSummary();
-            oHostelModel.refresh(true);
+            };
         },
-        onNavBack: function () {
-            const sTabKey = "idRooms"
-            this.getOwnerComponent().getRouter().navTo("RouteHostel");
-            sessionStorage.setItem("homePageReturnTab", sTabKey);
+
+        _resetBookingPageModels: function () {
+            const oView = this.getView();
+            const oHostelModel = oView.getModel("HostelModel");
+            const oBookingView = oView.getModel("BookingView");
+            const oFacilityModel = oView.getModel("FacilityModel");
+            const oFacilitySelectionModel = oView.getModel("FacilitySelection");
+            const oPaymentModel = oView.getModel("PaymentModel");
+
+            this._aAllFacilities = [];
+            this._iFacilityStartIndex = 0;
+
+            if (oHostelModel) {
+                oHostelModel.setData({});
+                oHostelModel.refresh(true);
+            }
+
+            if (oBookingView) {
+                oBookingView.setData(this._getBookingViewInitialData());
+                oBookingView.refresh(true);
+            }
+
+            if (oFacilityModel) {
+                oFacilityModel.setData(this._getFacilityModelInitialData());
+                oFacilityModel.refresh(true);
+            }
+
+            if (oFacilitySelectionModel) {
+                oFacilitySelectionModel.setData(this._getFacilitySelectionInitialData());
+                oFacilitySelectionModel.refresh(true);
+            }
+
+            if (oPaymentModel) {
+                oPaymentModel.setData(this._getPaymentModelInitialData());
+                oPaymentModel.refresh(true);
+            }
+
+            if (this._oPaymentDialog) {
+                this._oPaymentDialog.close();
+            }
         },
 
         onHome: function () {
@@ -2029,6 +2081,8 @@ sap.ui.define([
             const aMemberList = Array.isArray(oData.MemberList) ? oData.MemberList : [];
             if (aMemberList.length > 0) {
                 const aConvertedMembers = aMemberList.map(function (oServerMember, index) {
+                    const oMemberDocument = Array.isArray(oServerMember.Documents) && oServerMember.Documents.length > 0 ? oServerMember.Documents[0] : {};
+
                     return {
                         id: "FM_" + (oServerMember.MemberID || oServerMember.id || Date.now() + index),
                         Name: oServerMember.Name || oServerMember.FullName || "",
@@ -2036,8 +2090,11 @@ sap.ui.define([
                         Age: oServerMember.Age || "",
                         Gender: oServerMember.Gender || "",
                         Selected: false, // Initially not selected
-                        DocumentType: oServerMember.DocumentType || "",
-                        DocumentName: oServerMember.DocumentName || oServerMember.FileName || "",
+                        DocumentType: oServerMember.DocumentType || oMemberDocument.DocumentType || "",
+                        DocumentName: oServerMember.DocumentName || oServerMember.FileName || oMemberDocument.FileName || "",
+                        Document: oServerMember.Document || oServerMember.File || oMemberDocument.File || "",
+                        File: oServerMember.File || oServerMember.Document || oMemberDocument.File || "",
+                        FileType: oServerMember.FileType || oMemberDocument.FileType || "",
                         DocumentFile: null,
                         IsNew: false // These are existing members from server
                     };
@@ -2513,7 +2570,8 @@ sap.ui.define([
                 // Show success message with coupon description if available
                 let sMessage = "Coupon applied successfully";
                 if (oMatchedCoupon.Description) {
-                    sMessage += ": " + oMatchedCoupon.Description;
+                    sMessage;
+                    // += ": " + oMatchedCoupon.Description;
                 }
                 MessageToast.show(sMessage);
             } catch (oError) {
@@ -2873,29 +2931,29 @@ sap.ui.define([
                     Name: oMember.Name || "",
                     Age: parseInt(oMember.Age, 10) || 0,
                     Relation: oMember.Relation || "",
-                    Gender: oMember.Gender || ""
+                    Gender: oMember.Gender || "",
+                    Documents: this._buildSingleMemberDocumentsPayload(oMember)
                 };
-            });
+            }.bind(this));
         },
 
-        _buildMemberDocumentsPayload: function () {
-            const oBookingView = this.getView().getModel("BookingView");
+        
 
-            return (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
-                const sType = String(oMember.DocumentType || "").trim();
-                const sFile = String(oMember.File || oMember.Document || "").trim();
-                const sName = String(oMember.DocumentName || oMember.FileName || "").trim();
+        _buildSingleMemberDocumentsPayload: function (oMember) {
+            const sType = String(oMember && oMember.DocumentType || "").trim();
+            const sFile = String(oMember && (oMember.File || oMember.Document) || "").trim();
+            const sName = String(oMember && (oMember.DocumentName || oMember.FileName) || "").trim();
 
-                return !oMember.IsNew && !!oMember.Selected && !!(sType && sFile && sName);
-            }).map(function (oMember) {
-                return {
-                    DocumentType: oMember.DocumentType || "",
-                    File: oMember.File || oMember.Document || "",
-                    FileName: oMember.DocumentName || oMember.FileName || "",
-                    FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : (oMember.FileType || ""),
-                    MemberID: oMember.MemberID || oMember.id || ""
-                };
-            });
+            if (!(sType && sFile && sName)) {
+                return [];
+            }
+
+            return [{
+                DocumentType: oMember.DocumentType || "",
+                File: oMember.File || oMember.Document || "",
+                FileName: oMember.DocumentName || oMember.FileName || "",
+                FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : (oMember.FileType || "")
+            }];
         },
 
         _buildDocumentsPayload: function () {
@@ -2915,11 +2973,12 @@ sap.ui.define([
                     DocumentType: oDocument.DocumentType || "",
                     File: oDocument.File || oDocument.Document || "",
                     FileName: oDocument.FileName || oDocument.DocumentName || "",
-                    FileType: oDocument.FileType || ""
+                    FileType: oDocument.FileType || "",
+                    MemberID: oDocument.MemberID || ""
                 };
             });
 
-            return aCustomerDocuments.concat(this._buildMemberDocumentsPayload());
+            return aCustomerDocuments;
         },
 
         _getFacilityMemberIdValue: function (oFacility) {
@@ -3208,15 +3267,32 @@ sap.ui.define([
 
         onNavBack: function () {
             const sBranchCode = this.getView().getModel("HostelModel").getProperty("/BranchCode");
+            const oRouter = this.getOwnerComponent().getRouter();
 
-            if (sBranchCode) {
-                this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
-                    sPath: sBranchCode
-                });
-                return;
-            }
+            MessageBox.warning(
+                "Do you really want to go back? All saved changes will be lost",
+                {
+                    actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    onClose: function (sAction) {
+                        if (sAction !== MessageBox.Action.OK) {
+                            return;
+                        }
 
-            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                        this._resetBookingPageModels();
+
+                        if (sBranchCode) {
+                            oRouter.navTo("RouteViewRooms", {
+                                sPath: sBranchCode
+                            });
+                            return;
+                        }
+
+                        sessionStorage.setItem("homePageReturnTab", "idRooms");
+                        oRouter.navTo("RouteHostel");
+                    }.bind(this)
+                }
+            );
         },
 
         onContinueBooking: async function () {
