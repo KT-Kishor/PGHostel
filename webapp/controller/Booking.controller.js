@@ -16,6 +16,11 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // show 3 cards at once
+            this.getView().addEventDelegate({
+                onBeforeHide: function () {
+                    this._resetBookingPageModels();
+                }.bind(this)
+            });
 
         },
         onAfterRendering: function () {
@@ -27,6 +32,7 @@ sap.ui.define([
                 oRouter.navTo("RouteHostel", {}, true);
             }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
+            const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
                 oHostelModel = new JSONModel({});
                 sap.ui.getCore().setModel(oHostelModel, "HostelModel");
@@ -37,6 +43,8 @@ sap.ui.define([
             this.getView().setModel(new JSONModel(this._getFacilityModelInitialData()), "FacilityModel");
             this.getView().setModel(new JSONModel(this._getFacilitySelectionInitialData()), "FacilitySelection");
             this.getView().setModel(new JSONModel(this._getPaymentModelInitialData()), "PaymentModel");
+            this._resetBookingPageModels();
+            oHostelModel.setData(oIncomingBookingData);
 
             this._initializeBookingData();
             this._prefillLoggedInUser();
@@ -2084,7 +2092,7 @@ sap.ui.define([
                     const oMemberDocument = Array.isArray(oServerMember.Documents) && oServerMember.Documents.length > 0 ? oServerMember.Documents[0] : {};
 
                     return {
-                        id: "FM_" + (oServerMember.MemberID || oServerMember.id || Date.now() + index),
+                        id: "FM_UI_" + (Date.now() + index),
                         Name: oServerMember.Name || oServerMember.FullName || "",
                         Relation: oServerMember.Relation || "Family Member",
                         Age: oServerMember.Age || "",
@@ -2974,7 +2982,7 @@ sap.ui.define([
                     File: oDocument.File || oDocument.Document || "",
                     FileName: oDocument.FileName || oDocument.DocumentName || "",
                     FileType: oDocument.FileType || "",
-                    MemberID: oDocument.MemberID || ""
+                    MemberID: ""
                 };
             });
 
@@ -2982,36 +2990,7 @@ sap.ui.define([
         },
 
         _getFacilityMemberIdValue: function (oFacility) {
-            const oBookingView = this.getView().getModel("BookingView");
-            const aFamilyMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
-            const aSelectedIds = [];
-
-            if (Array.isArray(oFacility.SelectedPersonIds)) {
-                oFacility.SelectedPersonIds.forEach(function (sPersonId) {
-                    if (sPersonId && sPersonId !== "SELF" && !aSelectedIds.includes(sPersonId)) {
-                        aSelectedIds.push(sPersonId);
-                    }
-                });
-            }
-
-            if (Array.isArray(oFacility.PersonQuantities)) {
-                oFacility.PersonQuantities.forEach(function (oLine) {
-                    const sPersonId = oLine.personId;
-                    const iQty = parseInt(oLine.qty, 10) || 0;
-
-                    if (sPersonId && sPersonId !== "SELF" && iQty > 0 && !aSelectedIds.includes(sPersonId)) {
-                        aSelectedIds.push(sPersonId);
-                    }
-                });
-            }
-
-            return aSelectedIds.map(function (sPersonId) {
-                const oMatchedMember = aFamilyMembers.find(function (oMember) {
-                    return oMember.MemberID === sPersonId || oMember.id === sPersonId;
-                });
-
-                return oMatchedMember ? (oMatchedMember.MemberID || oMatchedMember.id || "") : sPersonId;
-            }).filter(Boolean).join(",");
+            return "";
         },
 
         _buildFacilityItemsPayload: function () {
@@ -3026,7 +3005,7 @@ sap.ui.define([
                     EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
                     PaidStatus: "Pending",
                     CustomerID: oHostelModel.getProperty("/CustomerID") || "",
-                    MemberID: this._getFacilityMemberIdValue(oFacility),
+                    MemberID: "",
                     SelectionMode: oFacility.SelectionMode || "",
                     FacilityChargeType: oFacility.FacilityChargeType || "",
                     Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
