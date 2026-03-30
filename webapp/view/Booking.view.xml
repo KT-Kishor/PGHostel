@@ -38,7 +38,14 @@
                         width="{= ${device>/system/phone} ? '100%' : '60%'}"
                         class="sapUiTinyMarginEnd"
                     >
-                        <Panel headerText="Booking" class="customBookingPanel" >
+                        <!-- Booking Details Section -->
+                        <Title
+                            text="Booking Details"
+                            class="booking-section-header"
+                            wrapping="true"
+                        />
+                        
+                        <Panel class="customBookingPanel booking-panel-enhanced" >
                             <MessageStrip
                                 text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
                                 showIcon="true"
@@ -56,7 +63,6 @@
                                 columnsXL="2"
                                 columnsL="2"
                                 columnsM="1"
-
                                 class="responsiveForm"
                             >
                                 <Label text="Property Type"  />
@@ -73,12 +79,6 @@
                                         text="{BookingView>text}"
                                     />
                                 </ComboBox>
-                                <Label text="Rent Price" />
-                                <Input
-                                    value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
-                                    editable="false"
-                                />
-
                                 <Label text="Room Plan" required="true"/>
                                 <ComboBox
                                 id="BookRoom_ID"
@@ -93,6 +93,13 @@
                                         text="{HostelModel>text}"
                                     />
                                 </ComboBox>
+
+                                <Label text="Rent Price" />
+                                <Input
+                                    value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
+                                    editable="false"
+                                />
+
 
                                 <Label text="No. of Persons" />
                                 <Input
@@ -126,7 +133,10 @@
                                     displayFormat="dd/MM/yyyy"
                                     minDate="{HostelModel>/TodayDate}"
                                     change="onStartDateChange"
-                                    valueStateText="Enter a valid Date"
+                                    liveChange="onStartDateChange"
+                                    valueStateText="Please select a valid start date (cannot be in the past)"
+                                    showValueStateMessage="true"
+                                    placeholder="Select start date"
                                 />
 
                                 <Label text="End Date"  />
@@ -136,8 +146,11 @@
                                     valueFormat="dd/MM/yyyy"
                                     displayFormat="dd/MM/yyyy"
                                     editable="{BookingView>/endDateEditable}"
-                                    valueStateText="Enter a valid Date"
+                                    valueStateText="End date must be after start date"
                                     change="onEndDateChange"
+                                    liveChange="onEndDateChange"
+                                    showValueStateMessage="true"
+                                    placeholder="Select end date"
                                 />
                                 <Label text="Full Name" required="true"/>
                                 <HBox width="100%" fitContainer="true" renderType="Bare" wrap="NoWrap" alignItems="Center">
@@ -151,19 +164,23 @@
                                             <FlexItemData growFactor="1" baseSize="1rem" />
                                         </layoutData>
                                     </Input>
-                                <Input 
-                                    value="{HostelModel>/FullName}" 
-                                    id="BookFullname_Id" change="onChangeFullname" valueStateText="Enter your name"
-                                    class="sapUiTinyMarginBegin" 
-                                    editable="false">
+                                <Input
+                                    value="{HostelModel>/FullName}"
+                                    id="BookFullname_Id"
+                                    change="onChangeFullname"
+                                    liveChange="onChangeFullname"
+                                    valueStateText="Enter your full name (minimum 3 characters)"
+                                    class="sapUiTinyMarginBegin"
+                                    editable="false"
+                                    placeholder="Enter your full name"
+                                    showValueStateMessage="true">
                                     <layoutData>
                                         <FlexItemData growFactor="3" baseSize="0" />
                                     </layoutData>
                                 </Input>
                                 </HBox>
-
                                 <Label
-                                    text="Documents"
+                                    text="Upload Document"
                                     visible="{= !!${HostelModel>/UserID} }"
                                 />
                                 <VBox
@@ -173,121 +190,104 @@
                                         <l:GridData span="XL8 L8 M8 S12" />
                                     </layoutData>
 
-                                    <Toolbar design="Transparent">
-                                        <Title
-                                            text="Upload Documents"
-                                            level="H4"
-                                        />
-                                        <ToolbarSpacer />
-                                        <Button
-                                            text="Add Document"
-                                            icon="sap-icon://add"
-                                            press="onAddCustomerDocument"
-                                            class="myUnifiedBtn"
-                                        />
-                                    </Toolbar>
-
-                                    <Table
-                                        items="{HostelModel>/Documents}"
-                                        noDataText="No documents"
-                                        class="responsiveTable"
+                                    <HBox
+                                        binding="{HostelModel>/Documents/0}"
+                                        width="100%"
+                                        fitContainer="true"
+                                        wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                                        alignItems="Center"
                                     >
-                                        <columns>
-                                            <Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
+                                        <core:Icon
+                                            id="bookingDocumentInfoIcon"
+                                            src="sap-icon://hint"
+                                            size="1rem"
+                                            color="#0064d1"
+                                            hoverColor="DarkBlue"
+                                            press="onDocumentInfoPress"
+                                            tooltip="Upload info"
+                                            class="sapUiTinyMarginEnd"
+                                        />
+
+                                        <ComboBox
+                                            selectedKey="{HostelModel>DocumentType}"
+                                            width="{= ${device>/system/phone} ? '100%' : '12rem'}"
+                                            enabled="{= !${HostelModel>FileName} }"
+                                            placeholder="Select document"
+                                            items="{BookingView>/DocumentTypeOptions}"
+                                            class="sapUiTinyMarginEnd"
+                                        >
+                                            <core:Item
+                                                key="{BookingView>key}"
+                                                text="{BookingView>text}"
+                                            />
+                                        </ComboBox>
+
+                                        <HBox
+                                            alignItems="Center"
+                                        >
+                                            <unified:FileUploader
+                                                width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+                                                visible="{= !${HostelModel>FileName} }"
+                                                enabled="{= !!${HostelModel>DocumentType} }"
+                                                buttonOnly="true"
+                                                maximumFileSize="2"
+                                                sameFilenameAllowed="true"
+                                                change="onCustomerDocumentChange"
+                                                typeMissmatch="onDocumentUploadTypeMismatch"
+                                                fileSizeExceed="onDocumentUploadSizeExceed"
+                                                buttonText="Upload"
+                                                fileType="pdf,jpg,jpeg,png,webp"
+                                                class="sapUiTinyMarginEnd myUnifiedBtn"
+                                            />
+
+                                            <HBox
+                                                visible="{= !!${HostelModel>FileName} }"
+                                                wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                                                alignItems="Center"
                                             >
-                                                <Text text="Document Type" />
-                                            </Column>
-                                            <Column
-                                                minScreenWidth="Desktop"
-                                                demandPopin="true"
-                                                width="14rem"
-                                            >
-                                                <Text text="Document" />
-                                            </Column>
-                                            <Column width="8rem">
-                                                <Text text="Action" />
-                                            </Column>
-                                        </columns>
-
-                                        <items>
-                                            <ColumnListItem>
-                                                <cells>
-                                                    <VBox>
-                                                        <Select
-                                                            selectedKey="{HostelModel>DocumentType}"
-                                                            visible="{HostelModel>IsNew}"
-                                                            width="100%"
-                                                            items="{BookingView>/DocumentTypeOptions}"
-                                                        >
-                                                            <core:Item
-                                                                key="{BookingView>key}"
-                                                                text="{BookingView>text}"
-                                                            />
-                                                        </Select>
-                                                        <Text
-                                                            text="{HostelModel>DocumentType}"
-                                                            visible="{= !${HostelModel>IsNew} }"
-                                                        />
-                                                    </VBox>
-
-                                                    <VBox>
-                                                        <unified:FileUploader
-                                                            width="100%"
-                                                            visible="{HostelModel>IsNew}"
-                                                            sameFilenameAllowed="true"
-                                                            change="onCustomerDocumentChange"
-                                                            buttonText="Upload"
-                                                            fileType="pdf,jpg,jpeg,png,webp"
-                                                        />
-                                                        <Link
-                                                            text="{HostelModel>FileName}"
-                                                            press="onPreviewCustomerDocument"
-                                                            visible="{= !!${HostelModel>FileName} }"
-                                                        />
-                                                    </VBox>
-
-                                                    <HBox
-                                                        renderType="Bare"
-                                                        justifyContent="Start"
-                                                        class="responsiveActionButtons"
-                                                    >
-                                                        <Button
-                                                            text="Add"
-                                                            visible="{HostelModel>IsNew}"
-                                                            press="onSaveCustomerDocumentRow"
-                                                            class="sapUiTinyMarginEnd"
-                                                        />
-                                                        <Button
-                                                            text="Delete"
-                                                            press="onDeleteCustomerDocumentRow"
-                                                        />
-                                                    </HBox>
-                                                </cells>
-                                            </ColumnListItem>
-                                        </items>
-                                    </Table>
+                                                <Link
+                                                    text="{path: 'HostelModel>FileName', formatter: '.formatDocumentFileName'}"
+                                                    tooltip="{HostelModel>FileName}"
+                                                    press="onPreviewCustomerDocument"
+                                                    width="10rem"
+                                                    class="automatedEllipsis"
+                                                />
+                                                <Button
+                                                    text="Remove"
+                                                    type="Transparent"
+                                                    icon="sap-icon://delete"
+                                                    press="onDeleteCustomerDocumentRow"
+                                                    class="sapUiTinyMarginBegin myUnifiedBtn"
+                                                />
+                                            </HBox>
+                                        </HBox>
+                                    </HBox>
                                 </VBox>
                             </f:SimpleForm>
                         </Panel>
 
+<!-- Guest Information Section -->
+<Title
+    text="Guest Information"
+    class="booking-section-header"
+    wrapping="true"
+    visible="{BookingView>/showFamilySection}"
+/>
+
                         <Panel
-                            class="sapUiSmallMarginTop customBookingPanel"
+                            class="customBookingPanel booking-panel-enhanced"
                             visible="{BookingView>/showFamilySection}"
                         >
-                            <headerToolbar>
-                                <OverflowToolbar class="customBookingPanel">
-                                    <Title text="Members" />
-                                    <ToolbarSpacer />
+                            <VBox class="sapUiTinyMargin">
+                                <HBox justifyContent="End" class="sapUiTinyMarginBottom">
                                     <Button
                                         text="Add Member"
                                         icon="sap-icon://add"
                                         press="onAddFamilyMember"
                                         class="myUnifiedBtn"
                                     />
-                                </OverflowToolbar>
-                            </headerToolbar>
+                                </HBox>
+                            </VBox>
 
                             <!-- Responsive Table for Members -->
                             <Table
@@ -427,10 +427,15 @@
                                                 <unified:FileUploader
                                                     width="100%"
                                                     visible="{BookingView>IsNew}"
+                                                    maximumFileSize="2"
                                                     sameFilenameAllowed="true"
                                                     change="onFamilyDocumentChange"
+                                                    typeMissmatch="onDocumentUploadTypeMismatch"
+                                                    fileSizeExceed="onDocumentUploadSizeExceed"
                                                     buttonText="Upload"
-                                                    fileType="pdf,doc,docx,jpg,png"
+                                                    fileType="pdf,jpg,jpeg,png"
+                                                    class="myUnifiedBtn"
+
                                                 />
                                                 <Text
                                                     text="{BookingView>DocumentName}"
@@ -447,12 +452,13 @@
                                                     text="Add"
                                                     visible="{BookingView>IsNew}"
                                                     press="onSaveFamilyMember"
-                                                    class="sapUiTinyMarginEnd"
+                                                    class="sapUiTinyMarginEnd myUnifiedBtn"
                                                 />
                                                 <Button
                                                     text="Delete"
                                                     visible="{BookingView>IsNew}"
                                                     press="onDeleteFamilyMemberRow"
+                                                    class="myUnifiedBtn"
                                                 />
                                             </HBox>
                                         </cells>
@@ -461,13 +467,19 @@
                             </Table>
                         </Panel>
 
+<!-- Facilities Section -->
+<Title
+    text="Facilities"
+    class="booking-section-header"
+    wrapping="true"
+/>
+
                         <Panel
-                            headerText="Choose Facilities"
-                            class="sapUiSmallMarginTop customBookingPanel"
+                            class="customBookingPanel booking-panel-enhanced"
                         >
                             <VBox class="sapUiTinyMargin">
                                 <MessageStrip
-                                    text="Add only the facilities you need. Each facility follows its configured selection mode for room, quantity, person, or person-wise quantity."
+                                    text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
                                     type="Information"
                                     showIcon="true"
                                     showCloseButton="false"
@@ -484,7 +496,7 @@
                                         icon="sap-icon://slim-arrow-left"
                                         type="Transparent"
                                         press="onFacilityPrev"
-                                        class="facilityNavBtn sapUiTinyMarginEnd"
+                                        class="facilityNavBtn sapUiTinyMarginEnd myUnifiedBtn"
                                     />
 
                                     <HBox
@@ -504,7 +516,7 @@
                                         icon="sap-icon://slim-arrow-right"
                                         type="Transparent"
                                         press="onFacilityNext"
-                                        class="facilityNavBtn sapUiTinyMarginBegin"
+                                        class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"
                                     />
                                 </HBox>
                             </VBox>
@@ -516,36 +528,52 @@
                         width="{= ${device>/system/phone} ? '100%' : '35%'}"
                         class="sapUiLargeMarginBegin sapUiTinyMarginEnd"
                     >
+<!-- Coupon Section -->
+<Title
+    text="Coupon &amp; Discounts"
+    class="booking-section-header"
+    wrapping="true"
+/>
+
                         <Panel
-                            headerText="Coupon Code"
-                            class="sapUiTinyMarginTop customBookingPanel"
+                            class="customBookingPanel booking-panel-enhanced"
                         >
-                            <VBox class="sapUiTinyMarginTop">
+                            <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center">
                                 <Input
                                     value="{HostelModel>/CouponCode}"
                                     placeholder="Enter coupon code"
                                     liveChange="onCouponLiveChange"
+                                    class="sapUiSmallMarginEnd couponInput"
                                     width="100%"
+                                >
+                                    <layoutData>
+                                        <FlexItemData growFactor="1" />
+                                    </layoutData>
+                                </Input>
+                                <Button
+                                    text="Apply Coupon"
+                                    press="onApplyCoupon"
+                                    class="myUnifiedBtn couponButton"
+                                    visible="{= !${HostelModel>/AppliedCouponCode} }"
                                 />
-                                <HBox class="sapUiTinyMarginTop">
-                                    <Button
-                                        text="Apply Coupon"
-                                        press="onApplyCoupon"
-                                        class="myUnifiedBtn"
-                                    />
-                                    <Button
-                                        text="Remove"
-                                        press="onRemoveCoupon"
-                                        class="myUnifiedBtn sapUiTinyMarginBegin"
-                                    />
-                                </HBox>
-                            </VBox>
+                                <Button
+                                    text="Remove"
+                                    press="onRemoveCoupon"
+                                    class="myUnifiedBtn couponButton"
+                                    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+                                />
+                            </HBox>
                         </Panel>
 
+<!-- Payment Summary Section -->
+<Title
+    text="Pricing Details"
+    class="booking-section-header"
+    wrapping="true"
+/>
+
                         <Panel
-                            headerText="Price Section"
-                            class="sapUiTinyMarginTop customBookingPanel"
-                            
+                            class="customBookingPanel booking-panel-enhanced"
                         >
                             <VBox class="sapUiTinyMargin">
                                 <HBox
@@ -581,32 +609,42 @@
                                 required="true"
                                     text="Company Name"
                                     visible="{BookingView>/showBusinessGSTSection}"
+                                    class="required-field-label"
                                 />
                                 <Input
                                 id="BookCompanyname_ID"
                                     value="{HostelModel>/CompanyName}"
-                                    placeholder="Enter company name"
+                                    placeholder="Enter company name (minimum 3 characters)"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                     class="sapUiTinyMarginBottom"
                                     width="100%"
                                     change="onchangeCompanyname"
-                                    valueStateText = "Enter  company name"
+                                    liveChange="onchangeCompanyname"
+                                    valueStateText="Please enter a valid company name"
+                                    showValueStateMessage="true"
+                                    maxLength="100"
                                 />
                                 <Label
                                 required="true"
                                     text="Company Address"
                                     visible="{BookingView>/showBusinessGSTSection}"
+                                    class="required-field-label"
                                 />
                                 <TextArea
                                     value="{HostelModel>/CompanyAddress}"
-                                    placeholder="Enter company address"
+                                    placeholder="Enter complete company address"
                                     visible="{BookingView>/showBusinessGSTSection}"
                                     rows="3"
                                     class="sapUiTinyMarginBottom"
                                     width="100%"
                                     change="onchangeConpanyAddress"
-                                    valueStateText = "Enter company address"
+                                    liveChange="onchangeConpanyAddress"
+                                    valueStateText="Please enter a valid company address (minimum 10 characters)"
+                                    showValueStateMessage="true"
                                     id="BookconpanyAddress_ID"
+                                    maxLength="500"
+                                    growing="true"
+                                    growingMaxLines="5"
                                 />
                                 <Text
                                     text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
@@ -665,11 +703,16 @@
                     </VBox>
                 </HBox>
 
-                <!-- Selected Facilities Panel - Full Width Responsive -->
+<!-- Selected Facilities Summary Section -->
+<Title
+    text="Selected Facilities Summary"
+    class="booking-section-header"
+    wrapping="true"
+/>
+
                 <Panel
-                    headerText="Selected Facilities"
-                    class="sapUiSmallMarginTop customBookingPanel"
-                      width="98.5%"
+                    class="customBookingPanel booking-panel-enhanced"
+                    width="98.5%"
                 >
                     <Table
                         items="{HostelModel>/AllSelectedFacilities}"
@@ -685,7 +728,8 @@
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
-                                <Text text="Rate" />
+<Text text="Rate / Unit" />
+
                             </Column>
                             <Column
                                 minScreenWidth="Desktop"

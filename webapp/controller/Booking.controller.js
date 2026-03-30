@@ -3,9 +3,11 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/ui/core/Fragment",
     "../utils/validation",
+    "sap/m/ResponsivePopover",
+    "sap/m/Text",
     "sap/m/MessageToast",
     "sap/m/MessageBox"
-], function (BaseController, JSONModel, Fragment, utils, MessageToast, MessageBox) {
+], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox) {
 
     "use strict";
 
@@ -16,11 +18,14 @@ sap.ui.define([
             this._iFacilityPageSize = 3; // show 3 cards at once
 
         },
+        onAfterRendering: function () {
+            this._attachDocumentInfoHover();
+        },
          _onRouteMatched: async function () {
-             if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            //  if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
                 oHostelModel = new JSONModel({});
@@ -70,6 +75,7 @@ sap.ui.define([
                 primaryGuestName: "",
                 quantity: 1,
                 singlePersonQty: 0,
+                facilityChargeType: "ONCE_PER_BOOKING",
                 selectedPriceType: "",
                 personOptions: [],
                 selectedPersonIds: [],
@@ -259,8 +265,67 @@ sap.ui.define([
             return sSelectionMode === "PERSON_QTY";
         },
 
+        _supportsFacilityChargeType: function (sSelectionMode) {
+            return sSelectionMode === "PERSON_QTY";
+        },
+
+        _getFacilityChargeType: function (oFacility) {
+            return this._supportsFacilityChargeType(oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility))
+                ? (oFacility.FacilityChargeType || "ONCE_PER_BOOKING")
+                : "";
+        },
+
+        _getFacilityChargeTypeLabel: function (sChargeType) {
+            return sChargeType === "DAILY" ? "Daily" : "Once per booking";
+        },
+
         _isUnitBasedFacility: function (oFacility) {
             return this._getFacilitySelectionMode(oFacility) === "PERSON_QTY";
+        },
+
+        _getFacilityRateUnitText: function (sPriceType) {
+            const mUnitLabels = {
+                "Unit Price": "Unit",
+                "Per Day": "Day",
+                "Per Month": "Month",
+                "Per Year": "Year"
+            };
+
+            return mUnitLabels[sPriceType] || "Unit";
+        },
+
+        _formatFacilityPriceWithUnit: function (fPrice, sCurrency, sPriceType) {
+            return this._toNumber(fPrice) + " " + (sCurrency || "INR") + " / " + this._getFacilityRateUnitText(sPriceType);
+        },
+
+        _getFacilityChargeableDayCount: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const sPlan = oModel.getProperty("/SelectedPriceType");
+            const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
+            const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
+            let oBillingEndDate = null;
+
+            if (!oStartDate || !oEndDate || oEndDate <= oStartDate) {
+                return 0;
+            }
+
+            if (sPlan === "Per Day") {
+                oBillingEndDate = oEndDate;
+            } else if (sPlan === "Per Month") {
+                oBillingEndDate = new Date(oStartDate);
+                oBillingEndDate.setMonth(oBillingEndDate.getMonth() + 1);
+            } else if (sPlan === "Per Year") {
+                oBillingEndDate = new Date(oStartDate);
+                oBillingEndDate.setFullYear(oBillingEndDate.getFullYear() + 1);
+            } else {
+                oBillingEndDate = oEndDate;
+            }
+
+            if (oBillingEndDate > oEndDate) {
+                oBillingEndDate = oEndDate;
+            }
+
+            return Math.max(Math.floor((oBillingEndDate - oStartDate) / 86400000), 0);
         },
 
         _buildFacilityPersonLines: function (oFacility) {
@@ -364,10 +429,16 @@ sap.ui.define([
 
             if (oFacility.SelectedPriceType) {
                 aParts.push(
-                    oFacility.SelectedPriceType + " - " +
-                    this._toNumber(oFacility.SelectedPrice) + " " +
-                    (oFacility.Currency || "")
+                    this._formatFacilityPriceWithUnit(
+                        oFacility.SelectedPrice,
+                        oFacility.Currency || "",
+                        oFacility.SelectedPriceType
+                    )
                 );
+            }
+
+            if (this._supportsFacilityChargeType(sSelectionMode)) {
+                aParts.push("Charge: " + this._getFacilityChargeTypeLabel(this._getFacilityChargeType(oFacility)));
             }
 
             if (sSelectionMode === "PERSON" && iPersonCount > 0) {
@@ -439,6 +510,7 @@ sap.ui.define([
                             Selected: !!oSelectedFacility.FacilityID,
                             SelectedPrice: this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price),
                             SelectedPriceType: oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "",
+                            FacilityChargeType: oSelectedFacility.FacilityChargeType || "ONCE_PER_BOOKING",
                             Quantity: this._toNumber(oSelectedFacility.Quantity) || 1,
                             SelectedPersonIds: Array.isArray(oSelectedFacility.SelectedPersonIds)
                                 ? oSelectedFacility.SelectedPersonIds.slice()
@@ -516,9 +588,14 @@ sap.ui.define([
 
                     oFacility.CurrentPrice = fCurrentPrice;
                     oFacility.CurrentPriceType = sCurrentPriceType;
-                    oFacility.DisplayPrice = fCurrentPrice + " " + (oFacility.Currency || "INR");
+                    oFacility.DisplayPrice = this._formatFacilityPriceWithUnit(
+                        fCurrentPrice,
+                        oFacility.Currency || "INR",
+                        sCurrentPriceType
+                    );
                     oFacility.SelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
                     oFacility.SelectionModeLabel = this._getFacilitySelectionModeLabel(oFacility.SelectionMode);
+                    oFacility.FacilityChargeType = this._getFacilityChargeType(oFacility);
 
                     // Update selection summary
                     if (oFacility.Selected) {
@@ -571,13 +648,18 @@ sap.ui.define([
 
             oSelectionModel.setData({
                 title: oFacility.FacilityName,
-                DisplayPrice: fPrice + " " + (oFacility.Currency || "INR"),
+                DisplayPrice: this._formatFacilityPriceWithUnit(
+                    fPrice,
+                    oFacility.Currency || "INR",
+                    sPlan
+                ),
                 selectionMode: sSelectionMode,
                 selectionModeLabel: oFacility.SelectionModeLabel || this._getFacilitySelectionModeLabel(sSelectionMode),
                 singleOccupantMode: bIsSingleOccupant,
                 primaryGuestName: sPrimaryGuestName,
                 quantity: oFacility.Quantity || 1,
                 singlePersonQty: iSinglePersonQty,
+                facilityChargeType: this._getFacilityChargeType(oFacility),
                 selectedPriceType: sPlan,
                 selectedPrice: fPrice,
                 selectedPersonIds: aSelectedPersonIds,
@@ -630,6 +712,45 @@ sap.ui.define([
                             new sap.m.Label({
                                 text: "{FacilitySelection>/DisplayPrice}",
                                 design: "Bold"
+                            }).addStyleClass("sapUiSmallMarginBottom"),
+
+                            new sap.m.VBox({
+                                visible: {
+                                    path: "FacilitySelection>/selectionMode",
+                                    formatter: function (sSelectionMode) {
+                                        return sSelectionMode === "PERSON_QTY";
+                                    }
+                                },
+                                items: [
+                                    new sap.m.Label({
+                                        text: "Billing option",
+                                        design: "Bold"
+                                    }).addStyleClass("sapUiTinyMarginBottom"),
+                                    new sap.m.RadioButtonGroup({
+                                        columns: 1,
+                                        selectedIndex: {
+                                            path: "FacilitySelection>/facilityChargeType",
+                                            formatter: function (sChargeType) {
+                                                return sChargeType === "DAILY" ? 1 : 0;
+                                            }
+                                        },
+                                        select: function (oEvent) {
+                                            const iIndex = oEvent.getParameter("selectedIndex");
+                                            this.getView().getModel("FacilitySelection").setProperty(
+                                                "/facilityChargeType",
+                                                iIndex === 1 ? "DAILY" : "ONCE_PER_BOOKING"
+                                            );
+                                        }.bind(this),
+                                        buttons: [
+                                            new sap.m.RadioButton({
+                                                text: "Once for entire booking"
+                                            }),
+                                            new sap.m.RadioButton({
+                                                text: "Daily"
+                                            })
+                                        ]
+                                    })
+                                ]
                             }).addStyleClass("sapUiSmallMarginBottom"),
 
                             new sap.m.Label({
@@ -865,6 +986,7 @@ sap.ui.define([
             const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
+            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "ONCE_PER_BOOKING";
 
             let aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
             let aPersonQuantities = oSelectionModel.getProperty("/personQuantities") || [];
@@ -927,6 +1049,7 @@ sap.ui.define([
             oFacility.Quantity = iQuantity;
             oFacility.SelectionMode = sSelectionMode;
             oFacility.SelectionModeLabel = this._getFacilitySelectionModeLabel(sSelectionMode);
+            oFacility.FacilityChargeType = this._supportsFacilityChargeType(sSelectionMode) ? sFacilityChargeType : "";
             oFacility.SelectedPersonIds = aSelectedPersonIds.slice();
             oFacility.PersonQuantities = aPersonQuantities;
 
@@ -949,6 +1072,7 @@ sap.ui.define([
             oFacility.Quantity = iQuantity || 1;
             oFacility.SelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             oFacility.SelectionModeLabel = this._getFacilitySelectionModeLabel(oFacility.SelectionMode);
+            oFacility.FacilityChargeType = this._getFacilityChargeType(oFacility);
             oFacility.SelectedPersonIds = Array.isArray(aSelectedPersonIds) ? aSelectedPersonIds.slice() : [];
             oFacility.PersonQuantities = Array.isArray(aPersonQuantities)
                 ? aPersonQuantities.map(function (oLine) {
@@ -980,6 +1104,7 @@ sap.ui.define([
             oFacility.SelectedPrice = 0;
             oFacility.SelectedPriceType = "";
             oFacility.Quantity = 1;
+            oFacility.FacilityChargeType = "ONCE_PER_BOOKING";
             oFacility.SelectedPersonIds = [];
             oFacility.PersonQuantities = [];
             oFacility.SelectionSummary = "";
@@ -998,6 +1123,7 @@ sap.ui.define([
                 oFacility.SelectedPrice = 0;
                 oFacility.SelectedPriceType = "";
                 oFacility.Quantity = 1;
+                oFacility.FacilityChargeType = "ONCE_PER_BOOKING";
                 oFacility.SelectedPersonIds = [];
                 oFacility.PersonQuantities = [];
                 oFacility.SelectionSummary = "";
@@ -1027,10 +1153,10 @@ sap.ui.define([
                     return oUnits.days || 1;
                 }
                 if (sPriceType === "Per Month") {
-                    return oUnits.months || 1;
+                    return 1;
                 }
                 if (sPriceType === "Per Year") {
-                    return oUnits.years || 1;
+                    return 1;
                 }
                 if (sPriceType === "Unit Price") {
                     return 1;
@@ -1048,6 +1174,8 @@ sap.ui.define([
                     const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
                     const sCurrency = oFacility.Currency || "INR";
                     const fPeriodMultiplier = fnGetPeriodMultiplier(sPriceType);
+                    const sFacilityChargeType = this._getFacilityChargeType(oFacility);
+                    const iChargeableDayCount = this._getFacilityChargeableDayCount();
                     const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
                     const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
 
@@ -1102,10 +1230,17 @@ sap.ui.define([
                             return sName + "(" + iQty + ")";
                         });
 
-                        fTotal = fPrice * fPeriodMultiplier * iTotalQty;
-                        sBreakdown = "Breakdown: " + aNames.join(", ") + " x " + fPeriodMultiplier + " " + sPriceType;
+                        if (sFacilityChargeType === "DAILY") {
+                            fTotal = fPrice * iTotalQty * iChargeableDayCount;
+                            sBreakdown = "Breakdown: " + aNames.join(", ") + " | Daily x " + iChargeableDayCount + " day(s)";
+                        } else {
+                            fTotal = fPrice * iTotalQty;
+                            sBreakdown = "Breakdown: " + aNames.join(", ") + " | Once per booking";
+                        }
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
+                            facilityChargeType: sFacilityChargeType,
+                            chargeableDays: sFacilityChargeType === "DAILY" ? iChargeableDayCount : 0,
                             totalQuantity: iTotalQty,
                             selectedPersons: aValidLines.map(function (oLine) {
                                 return {
@@ -1131,6 +1266,7 @@ sap.ui.define([
                         SelectionMode: sSelectionMode,
                         Price: fPrice,
                         UnitText: sPriceType,
+                        FacilityChargeType: sFacilityChargeType,
                         Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
                         SelectedPersonIds: aSelectedPersonIds.slice(),
                         PersonQuantities: aPersonQuantities.map(function (oLine) {
@@ -1141,7 +1277,7 @@ sap.ui.define([
                             };
                         }),
                         AllocationDetails: sAllocationDetails,
-                        RateText: fPrice + " " + sCurrency + " / " + sPriceType,
+                        RateText: this._formatFacilityPriceWithUnit(fPrice, sCurrency, sPriceType),
                         TotalAmount: Number(fTotal.toFixed(2)),
                         BreakdownText: sBreakdown
                     };
@@ -1164,10 +1300,10 @@ sap.ui.define([
                 return oUnits.days + " day(s)";
             }
             if (sSelectedPriceType === "Per Month") {
-                return oUnits.months + " month(s)";
+                return "1 month";
             }
             if (sSelectedPriceType === "Per Year") {
-                return oUnits.years + " year(s)";
+                return "1 year";
             }
             return "1 unit";
         },
@@ -1275,6 +1411,141 @@ sap.ui.define([
             oHostelModel.refresh(true);
         },
 
+        _getEmptyCustomerDocument: function () {
+            return {
+                id: "DOC" + Date.now(),
+                DocumentType: "",
+                File: "",
+                Document: "",
+                FileName: "",
+                FileType: "",
+                IsNew: true
+            };
+        },
+
+        _ensureCustomerDocumentSlot: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            let aDocuments = oHostelModel.getProperty("/Documents");
+
+            if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
+                aDocuments = [this._getEmptyCustomerDocument()];
+            } else {
+                aDocuments = [Object.assign(this._getEmptyCustomerDocument(), aDocuments[0])];
+            }
+
+            oHostelModel.setProperty("/Documents", aDocuments);
+            oHostelModel.refresh(true);
+        },
+
+        _getDocumentInfoPopover: function () {
+            if (!this._oDocumentInfoPopover) {
+                this._oDocumentInfoPopover = new ResponsivePopover({
+                    showHeader: false,
+                    placement: "Bottom",
+                    contentWidth: "18rem",
+                    content: [
+                        new Text({
+                            text: "Choose a document type first, then upload a PDF or image up to 2 MB.",
+                            wrapping: true
+                        }).addStyleClass("sapUiSmallMargin")
+                    ]
+                });
+
+                this.getView().addDependent(this._oDocumentInfoPopover);
+            }
+
+            return this._oDocumentInfoPopover;
+        },
+
+        _attachDocumentInfoHover: function () {
+            const oIcon = this.byId("bookingDocumentInfoIcon");
+
+            if (!oIcon || oIcon.data("hoverBound")) {
+                return;
+            }
+
+            oIcon.data("hoverBound", true);
+            oIcon.attachBrowserEvent("mouseenter", this._openDocumentInfoPopover.bind(this));
+            oIcon.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
+
+            this._getDocumentInfoPopover().attachAfterOpen(function () {
+                const oPopover = this._getDocumentInfoPopover();
+
+                if (!oPopover.data("hoverBound")) {
+                    oPopover.data("hoverBound", true);
+                    oPopover.attachBrowserEvent("mouseenter", this._clearDocumentInfoPopoverClose.bind(this));
+                    oPopover.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
+                }
+            }.bind(this));
+        },
+
+        _openDocumentInfoPopover: function () {
+            const oIcon = this.byId("bookingDocumentInfoIcon");
+
+            this._clearDocumentInfoPopoverClose();
+
+            if (oIcon) {
+                this._getDocumentInfoPopover().openBy(oIcon);
+            }
+        },
+
+        _clearDocumentInfoPopoverClose: function () {
+            if (this._iDocumentInfoPopoverTimer) {
+                clearTimeout(this._iDocumentInfoPopoverTimer);
+                this._iDocumentInfoPopoverTimer = null;
+            }
+        },
+
+        _scheduleDocumentInfoPopoverClose: function () {
+            this._clearDocumentInfoPopoverClose();
+            this._iDocumentInfoPopoverTimer = setTimeout(function () {
+                if (this._oDocumentInfoPopover) {
+                    this._oDocumentInfoPopover.close();
+                }
+            }.bind(this), 180);
+        },
+
+        onDocumentInfoPress: function () {
+            const oPopover = this._getDocumentInfoPopover();
+
+            this._clearDocumentInfoPopoverClose();
+
+            if (oPopover.isOpen()) {
+                oPopover.close();
+                return;
+            }
+
+            this._openDocumentInfoPopover();
+        },
+
+        _showDocumentUploadTypeError: function () {
+            MessageToast.show("Only PDF and image files are allowed.");
+        },
+
+        _showDocumentUploadSizeError: function () {
+            MessageToast.show("Maximum file size allowed is 2 MB.");
+        },
+
+        onDocumentUploadTypeMismatch: function (oEvent) {
+            const oUploader = oEvent.getSource();
+
+            this._showDocumentUploadTypeError();
+
+            if (oUploader && oUploader.clear) {
+                oUploader.clear();
+            }
+        },
+
+        onDocumentUploadSizeExceed: function (oEvent) {
+            const oUploader = oEvent.getSource();
+
+            this._showDocumentUploadSizeError();
+
+            if (oUploader && oUploader.clear) {
+                oUploader.clear();
+            }
+        },
+
         onCustomerDocumentChange: function (oEvent) {
             const oFileUploader = oEvent.getSource();
             const oContext = oFileUploader.getBindingContext("HostelModel");
@@ -1288,19 +1559,26 @@ sap.ui.define([
             const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
             const sMimeType = String(oFile && oFile.type || "").toLowerCase();
             const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
+            const sDocumentType = String(oModel.getProperty(sPath + "/DocumentType") || "").trim();
 
             if (!oFile || !sPath) {
                 return;
             }
 
+            if (!sDocumentType) {
+                MessageToast.show("Please select document type first.");
+                oFileUploader.clear();
+                return;
+            }
+
             if (oFile.size > iMaxSize) {
-                MessageToast.show("File size must not exceed 2 MB.");
+                this._showDocumentUploadSizeError();
                 oFileUploader.clear();
                 return;
             }
 
             if (!bAllowedMime && !bAllowedExt) {
-                MessageToast.show("Only image files and PDF are allowed.");
+                this._showDocumentUploadTypeError();
                 oFileUploader.clear();
                 return;
             }
@@ -1312,6 +1590,7 @@ sap.ui.define([
                 oModel.setProperty(sPath + "/FileType", oFile.type || "");
                 oModel.setProperty(sPath + "/Document", sBase64);
                 oModel.setProperty(sPath + "/File", sBase64);
+                oModel.setProperty(sPath + "/IsNew", false);
                 oModel.refresh(true);
             };
 
@@ -1363,7 +1642,7 @@ sap.ui.define([
                 return;
             }
 
-            aDocuments.splice(iIndex, 1);
+            aDocuments[iIndex] = this._getEmptyCustomerDocument();
             oModel.setProperty("/Documents", aDocuments);
             oModel.refresh(true);
         },
@@ -1526,8 +1805,26 @@ sap.ui.define([
             const oModel = this.getView().getModel("BookingView");
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             const oReader = new FileReader();
+            const iMaxSize = 2 * 1024 * 1024;
+            const sFileName = String(oFile && oFile.name || "");
+            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
+            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
+            const sMimeType = String(oFile && oFile.type || "").toLowerCase();
+            const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
 
             if (!oFile) {
+                return;
+            }
+
+            if (oFile.size > iMaxSize) {
+                this._showDocumentUploadSizeError();
+                oFileUploader.clear();
+                return;
+            }
+
+            if (!bAllowedMime && !bAllowedExt) {
+                this._showDocumentUploadTypeError();
+                oFileUploader.clear();
                 return;
             }
 
@@ -1719,6 +2016,7 @@ sap.ui.define([
             oModel.setProperty("/SGST", this._toNumber(oData.SGST));
             oModel.setProperty("/IGST", this._toNumber(oData.IGST));
             oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
+            this._ensureCustomerDocumentSlot();
             oModel.setProperty("/BookingPayload", oData.BookingPayload || null);
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
@@ -2192,7 +2490,13 @@ sap.ui.define([
                 oModel.setProperty("/AppliedDiscount", Number(fDiscountAmount.toFixed(2)));
                 oModel.setProperty("/AppliedCouponCode", sEnteredCode);
                 this._recalculateSummary();
-                MessageToast.show("Coupon applied successfully");
+                
+                // Show success message with coupon description if available
+                let sMessage = "Coupon applied successfully";
+                if (oMatchedCoupon.Description) {
+                    sMessage += ": " + oMatchedCoupon.Description;
+                }
+                MessageToast.show(sMessage);
             } catch (oError) {
                 MessageToast.show("Error applying coupon");
             } finally {
@@ -2201,8 +2505,9 @@ sap.ui.define([
         },
 
         onRemoveCoupon: function () {
-            this._resetCouponState(true);
+            this._resetCouponState(false);
             this._recalculateSummary();
+            sap.m.MessageToast.show("Coupon removed");
         },
 
         _resetCouponState: function (bKeepTypedValue) {
@@ -2384,6 +2689,16 @@ sap.ui.define([
                 String(oDate.getMonth() + 1).padStart(2, "0"),
                 oDate.getFullYear()
             ].join("/");
+        },
+
+        formatDocumentFileName: function (sFileName) {
+            const sName = String(sFileName || "").trim();
+
+            if (sName.length <= 15) {
+                return sName;
+            }
+
+            return sName.slice(0, 15) + "...";
         },
 
         formatFacilityTotal: function (vTotalAmount, sCurrency) {
@@ -2635,6 +2950,7 @@ sap.ui.define([
                     CustomerID: oHostelModel.getProperty("/CustomerID") || "",
                     MemberID: this._getFacilityMemberIdValue(oFacility),
                     SelectionMode: oFacility.SelectionMode || "",
+                    FacilityChargeType: oFacility.FacilityChargeType || "",
                     Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
                     UnitText: oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "",
                     Currency: oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
