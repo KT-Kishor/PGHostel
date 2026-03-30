@@ -460,8 +460,8 @@ sap.ui.define([
         onConfirmBooking:async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
-              const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-               const oUser = oLoginModel.getData() || {};
+             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+const oUser = oLoginModel?.getData?.() || {};
          
             if (!bLoggedIn) {
                 MessageBox.information("Please log in to continue booking. You will be redirected to the Hostel page.", {

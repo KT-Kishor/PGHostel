@@ -373,8 +373,8 @@
                 <Text text="{i18n>Studentname}"/></Column>
                 <Column demandPopin="true"><Text text="{i18n>age}"/></Column>
                 <Column demandPopin="true"><Text text="{i18n>relation}"/></Column>
-                <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>amount}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
+             <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>document}"/></Column>
+                <!-- <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
             </columns>
 
             <items>
@@ -384,10 +384,11 @@
                             text="{profileData>Name}"/>
                         <Text text="{profileData>Age}"/>
                         <Text text="{profileData>Relation}"/>
-                        <!-- <Text
-                            text="{ parts:['profileData>amount','profileData>currency'],
-                                    formatter:'.Formatter.formatCurrency'}"/>
-                        <ObjectStatus
+                        <Link
+                                text="{i18n>view}"
+                                press="HF_viewimage"
+                            />
+                        <!--  <ObjectStatus
                             text="{profileData>status}"
                             state="{ path:'profileData>status',
                                      formatter:'.Formatter.formatObjectStatus'}"/> -->
