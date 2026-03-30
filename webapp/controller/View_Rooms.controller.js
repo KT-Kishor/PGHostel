@@ -457,11 +457,12 @@ sap.ui.define([
             oTile.addStyleClass("selectedTile");
         },
 
-        onConfirmBooking: function () {
+        onConfirmBooking:async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
+              const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+               const oUser = oLoginModel.getData() || {};
          
-
             if (!bLoggedIn) {
                 MessageBox.information("Please log in to continue booking. You will be redirected to the Hostel page.", {
                     title: "Login Required",
@@ -472,12 +473,23 @@ sap.ui.define([
                         this.getOwnerComponent().getRouter().navTo("RouteHostel");
                     }.bind(this)
                 });
-
                 return;
             }
             const oView = this.getView();
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
+
+
+             let aMember = [];
+    try {
+        let resp = await this.ajaxReadWithJQuery("HM_Member", {
+            userID: oUser?.UserID   
+        });
+
+        aMember = resp?.commentData || [];
+    } catch (error) {
+        console.error("Member fetch failed", error);
+    }
 
             // -------------------------
             // BASIC VALIDATIONS
@@ -533,7 +545,9 @@ sap.ui.define([
                 GSTType: oData.GSTType,
                 GSTIN: oData.GSTIN || "",
                 AvailableDate: oData.AvailableDate,
-                ExtraBed: oData.ExtraBed || 0
+                ExtraBed: oData.ExtraBed || 0,
+
+                MemberList:aMember
 
             };
 

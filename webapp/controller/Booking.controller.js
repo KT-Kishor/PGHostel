@@ -22,10 +22,10 @@ sap.ui.define([
             this._attachDocumentInfoHover();
         },
          _onRouteMatched: async function () {
-            //  if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+             if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
                 oHostelModel = new JSONModel({});
