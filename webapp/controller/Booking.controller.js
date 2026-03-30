@@ -1445,7 +1445,7 @@ sap.ui.define([
                     contentWidth: "18rem",
                     content: [
                         new Text({
-                            text: "Choose a document type first, then upload a PDF or image up to 2 MB.",
+                            text: "Choose a document & upload clear image or PDF up to 2 MB",
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
@@ -2024,6 +2024,27 @@ sap.ui.define([
             }
 
             oModel.setProperty("/SelectedPerson", String(oData.SelectedPerson || "1"));
+
+            // Load members from MemberList if available (from View_Rooms.controller.js)
+            const aMemberList = Array.isArray(oData.MemberList) ? oData.MemberList : [];
+            if (aMemberList.length > 0) {
+                const aConvertedMembers = aMemberList.map(function (oServerMember, index) {
+                    return {
+                        id: "FM_" + (oServerMember.MemberID || oServerMember.id || Date.now() + index),
+                        Name: oServerMember.Name || oServerMember.FullName || "",
+                        Relation: oServerMember.Relation || "Family Member",
+                        Age: oServerMember.Age || "",
+                        Gender: oServerMember.Gender || "",
+                        Selected: false, // Initially not selected
+                        DocumentType: oServerMember.DocumentType || "",
+                        DocumentName: oServerMember.DocumentName || oServerMember.FileName || "",
+                        DocumentFile: null,
+                        IsNew: false // These are existing members from server
+                    };
+                });
+                oBookingView.setProperty("/FamilyMembers", aConvertedMembers);
+            }
+
             this._applySelectedPlanPrice();
         },
 
@@ -2629,8 +2650,8 @@ sap.ui.define([
                 }
 
                 if (sEffectiveGSTType === "CGST/SGST") {
-                    fCGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
-                    fSGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue / 2) / 100).toFixed(2));
+                    fCGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue) / 100).toFixed(2));
+                    fSGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue ) / 100).toFixed(2));
                 } else if (sEffectiveGSTType === "IGST") {
                     fIGST = Number((fDiscountedSubTotal * fEffectiveGSTValue / 100).toFixed(2));
                 }

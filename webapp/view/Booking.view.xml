@@ -268,7 +268,7 @@
 
 <!-- Guest Information Section -->
 <Title
-    text="Guest Information"
+    text="Manage Members"
     class="booking-section-header"
     wrapping="true"
     visible="{BookingView>/showFamilySection}"
@@ -530,7 +530,7 @@
                     >
 <!-- Coupon Section -->
 <Title
-    text="Coupon &amp; Discounts"
+    text="Have a Coupon?"
     class="booking-section-header"
     wrapping="true"
 />
