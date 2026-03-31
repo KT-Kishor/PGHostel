@@ -41,6 +41,7 @@
                     growing="true"
                     growingScrollToLoad="true"
                     updateFinished="onMemberDialogTableUpdateFinished"
+                    selectionChange="onMemberSelectionChange"
                 >
                     <columns>
                         <Column><Text text="Full Name" /></Column>

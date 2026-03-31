@@ -1589,6 +1589,34 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
+        onMemberSelectionChange: function (oEvent) {
+            // Prevent infinite recursion when we adjust selection programmatically
+            if (this._bAdjustingSelection) {
+                return;
+            }
+
+            const oTable = oEvent.getSource();
+            const aSelectedContexts = oTable.getSelectedContexts("BookingView");
+            const oBookingView = this.getView().getModel("BookingView");
+            const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
+            const iAllowedFamilyMembers = iMaxPersons - 1; // primary person counts as 1
+
+            // If selection exceeds allowed family members, trim selection
+            if (aSelectedContexts.length > iAllowedFamilyMembers) {
+                MessageToast.show("Selected room capacity does not allow more members.");
+                this._bAdjustingSelection = true;
+                try {
+                    // Deselect extra items, keep the first iAllowedFamilyMembers selected
+                    const aSelectedItems = oTable.getSelectedItems();
+                    for (let i = iAllowedFamilyMembers; i < aSelectedItems.length; i++) {
+                        oTable.setSelectedItem(aSelectedItems[i], false);
+                    }
+                } finally {
+                    this._bAdjustingSelection = false;
+                }
+            }
+        },
+
         onConfirmMemberSelection: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oTable = this.byId("memberSelectTable");
@@ -1598,6 +1626,14 @@ sap.ui.define([
                 oMember.Selected = true;
                 return oMember;
             }.bind(this));
+
+            // Capacity validation: total persons (primary + selected family members) must not exceed room capacity
+            const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
+            const iTotalPersons = 1 + aSelectedMembers.length;
+            if (iTotalPersons > iMaxPersons) {
+                MessageToast.show("Selected room capacity does not allow more members.");
+                return;
+            }
 
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
             oBookingView.refresh(true);
