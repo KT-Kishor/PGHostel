@@ -3301,6 +3301,29 @@ sap.ui.define([
             return "";
         },
 
+        _getFacilityFlagValue: function (oFacility) {
+            const sSelectionMode = String(oFacility && oFacility.SelectionMode || "").toUpperCase().trim();
+            const aSelectedPersonIds = Array.isArray(oFacility && oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
+            const aPersonQuantities = Array.isArray(oFacility && oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
+
+            if (sSelectionMode === "PERSON") {
+                return aSelectedPersonIds.some(function (sPersonId) {
+                    return sPersonId && sPersonId !== "SELF";
+                }) ? "X" : "";
+            }
+
+            if (sSelectionMode === "PERSON_QTY") {
+                return aPersonQuantities.some(function (oLine) {
+                    return oLine &&
+                        oLine.personId &&
+                        oLine.personId !== "SELF" &&
+                        (parseInt(oLine.qty, 10) || 0) > 0;
+                }) ? "X" : "";
+            }
+
+            return "";
+        },
+
         _buildFacilityItemsPayload: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
 
@@ -3320,7 +3343,8 @@ sap.ui.define([
                     UnitText: oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "",
                     Currency: oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
                     UnitPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2),
-                    BasicFacilityPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2)
+                    BasicFacilityPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2),
+                    Flag: this._getFacilityFlagValue(oFacility)
                 };
             }.bind(this));
         },
