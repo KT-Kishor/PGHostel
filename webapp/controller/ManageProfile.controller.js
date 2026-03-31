@@ -879,13 +879,21 @@ sap.ui.define([
                 const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
                 const aMember = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
 
-                const aMembers = aMember.map(mem => ({
-                    Name: mem.Name || inv.Name || "",
-                    Age: mem.Age || "",
-                    Relation: mem.Relation || "",
-                    BookingID: mem.BookingID || ""
+               const aMembers = aMember.map(mem => {
+    const oDoc = mem.Documents && mem.Documents.length > 0 ? mem.Documents[0] : {};
 
-                }));
+    return {
+        Name: mem.Name || "",
+        Age: mem.Age || "",
+        Relation: mem.Relation || "",
+        BookingID: mem.BookingID || "",
+
+        // FIXED
+        Attachment: oDoc.File || "",
+        FileName: oDoc.FileName || "",
+        FileType: oDoc.FileType || ""
+    };
+});
 
                 oModel.setProperty("/Members", aMembers);
                 this._updateRowCount();
@@ -2017,49 +2025,51 @@ sap.ui.define([
             this._setComplaintRoomComboData(sBranchCode, "");
         },
 
-          HF_viewimage: function (oEvent) {
-            var oContext = oEvent.getSource().getBindingContext("profileData");
-            var oData = oContext.getObject();
+    HF_viewimage: function (oEvent) {
+    var oContext = oEvent.getSource().getBindingContext("profileData");
+    var oData = oContext.getObject();
 
-            if (!oData.Attachment || !oData.Attachment.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthismember"));
-                return;
+    if (!oData.Attachment) {
+        sap.m.MessageToast.show("No document found");
+        return;
+    }
+
+    var sBase64 = oData.Attachment.trim();
+
+    // DEBUG
+    console.log("Base64 Length:", sBase64.length);
+
+    // FIX: Ensure proper prefix
+    var sMimeType = oData.FileType || "image/png";
+
+    // Always rebuild URL
+    var sSrc = "data:" + sMimeType + ";base64," + sBase64;
+
+    var oImage = new sap.m.Image({
+        src: sSrc,
+        width: "100%",
+        height: "100%",
+        densityAware: false
+    });
+
+    var oDialog = new sap.m.Dialog({
+        title: oData.FileName || "Image",
+        contentWidth: "50%",
+        contentHeight: "60%",
+        content: [oImage],
+        endButton: new sap.m.Button({
+            text: "Close",
+            press: function () {
+                oDialog.close();
             }
-            var sBase64 = oData.Attachment.replace(/\s/g, "");
-            var sPhotoName = oData.AttachmentName || "Attachment";
-            if (sBase64 && !sBase64.startsWith("data:image")) {
-                sBase64 = "data:image/jpeg;base64," + sBase64;
-            }
-            var oImage = new sap.m.Image({
-                src: sBase64,
-                densityAware: false,
-                decorative: false,
-                width: "100%",
-                height: "100%",
-                style: "object-fit: contain; display:block; margin:0; padding:0;"
-            });
-
-            var oDialog = new sap.m.Dialog({
-                title: sPhotoName,
-                contentWidth: "50%",
-                contentHeight: "60%",
-                horizontalScrolling: false,
-                verticalScrolling: false,
-                content: [oImage],
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: function () {
-                        oDialog.close();
-                    }
-                }).addStyleClass("myUnifiedBtn"),
-                afterClose: function () {
-                    oDialog.destroy();
-                }
-            }).addStyleClass("barheader");
-
-            oDialog.addStyleClass("ImageDialogNoPadding");
-            oDialog.open();
+        }),
+        afterClose: function () {
+            oDialog.destroy();
         }
+    });
+
+    oDialog.open();
+}
        
     });
 });

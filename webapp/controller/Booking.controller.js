@@ -8,12 +8,14 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+      "../model/formatter",
+], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator, Formatter) {
 
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.Booking", {
+        Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;

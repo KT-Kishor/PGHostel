@@ -529,18 +529,16 @@
                                     growing="true"
                                     growingMaxLines="5"
                                 />
-                                <Text
-                                    text="Room: {HostelModel>/RoomPrice} {HostelModel>/Currency}"
-                                />
+                               <Text text="Room :{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}  {HostelModel>/Currency} " />
                                 <Text
                                     text="{HostelModel>/RoomBreakdownText}"
                                     wrapping="true"
                                 />
                                 <Text
-                                    text="Facilities: {HostelModel>/TotalFacilityPrice} {HostelModel>/Currency}"
+                                    text="Facilities: {path:'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                 />
                                 <Text
-                                    text="Sub Total: {HostelModel>/BookingSubTotal} {HostelModel>/Currency}"
+                                    text="Sub Total: {path: 'HostelModel>/BookingSubTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                 />
                                 <Text
                                     text="Property GSTIN: {HostelModel>/PropertyGSTIN}"
@@ -550,15 +548,15 @@
                                     visible="{= !!${HostelModel>/CustomerGSTIN}}"
                                 />
                                 <Text
-                                    text="CGST: {HostelModel>/CGST} {HostelModel>/Currency}"
+                                    text="CGST: {path: 'HostelModel>/CGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/CGST} > 0}"
                                 />
                                 <Text
-                                    text="SGST: {HostelModel>/SGST} {HostelModel>/Currency}"
+                                    text="SGST: {path: 'HostelModel>/SGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/SGST} > 0}"
                                 />
                                 <Text
-                                    text="IGST: {HostelModel>/IGST} {HostelModel>/Currency}"
+                                    text="IGST: {path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/IGST} > 0}"
                                 />
                                 <MessageStrip
@@ -579,7 +577,7 @@
                                     text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
                                 />
                                 <Title
-                                    text="Grand Total: {HostelModel>/GrandTotal} {HostelModel>/Currency}"
+                                    text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                 />
                             </VBox>
                         </Panel>
@@ -634,7 +632,7 @@
                                         text="{HostelModel>FacilityName}"
                                     />
                                     <Text
-                                        text="{HostelModel>RateText}"
+                                        text="{path: 'HostelModel>RateText', formatter:'.Formatter.fromatNumber'}"
                                     />
                                     <Text
                                         text="{HostelModel>BreakdownText}"
