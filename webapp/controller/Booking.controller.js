@@ -9,6 +9,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/model/FilterOperator",
       "../model/formatter",
 ], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator, Formatter) {
 
@@ -1433,6 +1434,7 @@ sap.ui.define([
         _createMemberDraft: function () {
             return {
                 id: "FM_" + Date.now(),
+                MemberID: "",
                 Name: "",
                 Relation: "",
                 Age: "",
@@ -1453,6 +1455,7 @@ sap.ui.define([
 
             return {
                 id: oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex)),
+                MemberID: oMember.MemberID || oMember.ID || "",
                 Name: oMember.Name || oMember.FullName || "",
                 Relation: oMember.Relation || "Other",
                 Age: oMember.Age || "",
@@ -1669,7 +1672,6 @@ sap.ui.define([
 
         onSaveNewMember: async function () {
             const oBookingView = this.getView().getModel("BookingView");
-            const oHostelModel = this.getView().getModel("HostelModel");
             const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
             const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
@@ -1700,26 +1702,10 @@ sap.ui.define([
             }
 
             oDraft.id = oDraft.id || ("FM_" + Date.now());
+            oDraft.MemberID = "";
             oDraft.Selected = true;
             oDraft.IsNew = false;
             oDraft.Name = String(oDraft.Name).trim();
-
-            try {
-                await this.ajaxCreateWithJQuery("HM_Member", {
-                    data: [{
-                        UserID: oHostelModel.getProperty("/UserID") || "",
-                        Name: oDraft.Name || "",
-                        Relation: oDraft.Relation || "",
-                        Gender: oDraft.Gender || "",
-                        DocumentType: oDraft.DocumentType || "",
-                        File: oDraft.File || "",
-                        FileName: oDraft.DocumentName || "",
-                        FileType: oDraft.FileType || ""
-                    }]
-                });
-            } catch (oError) {
-                // Backend create is optional for this flow; keep local add functional.
-            }
 
             oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers, [oDraft])));
             oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers, [oDraft])).map(function (oMember) {
@@ -3244,6 +3230,7 @@ sap.ui.define([
                 return !oMember.IsNew && !!oMember.Selected;
             }).map(function (oMember) {
                 return {
+                    MemberID: oMember.MemberID || "",
                     Name: oMember.Name || "",
                     Age: parseInt(oMember.Age, 10) || 0,
                     Relation: oMember.Relation || "",
@@ -3324,29 +3311,122 @@ sap.ui.define([
             return "";
         },
 
-        _buildFacilityItemsPayload: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
+        _getFacilityMemberRecord: function (sPersonId) {
+            const oBookingView = this.getView().getModel("BookingView");
+            const aMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
 
-            return (oHostelModel.getProperty("/AllSelectedFacilities") || []).map(function (oFacility) {
+            if (!sPersonId || sPersonId === "SELF") {
+                return null;
+            }
+
+            return aMembers.find(function (oMember) {
+                return oMember.id === sPersonId || oMember.MemberID === sPersonId;
+            }) || null;
+        },
+
+        _getFacilityMemberIdentity: function (sPersonId, sFallbackName) {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const oMember = this._getFacilityMemberRecord(sPersonId);
+
+            if (sPersonId === "SELF") {
+                return {
+                    MemberID: "",
+                    MemberName: String(oHostelModel.getProperty("/FullName") || sFallbackName || "Primary Guest").trim()
+                };
+            }
+
+            return {
+                MemberID: String(oMember && oMember.MemberID || "").trim(),
+                MemberName: String(oMember && oMember.Name || sFallbackName || "").trim()
+            };
+        },
+
+        _buildFacilityPayloadRows: function (oFacility, oHostelModel) {
+            const sSelectionMode = String(oFacility.SelectionMode || "").toUpperCase().trim();
+            const sStartDate = this._formatDateToISO(oHostelModel.getProperty("/StartDate"));
+            const sEndDate = this._formatDateToISO(oHostelModel.getProperty("/EndDate"));
+            const sCustomerID = oHostelModel.getProperty("/CustomerID") || "";
+            const sCurrency = oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR";
+            const sUnitText = oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "";
+            const fUnitPrice = this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0);
+            const sChargeType = oFacility.FacilityChargeType || "";
+            const sFlag = this._getFacilityFlagValue(oFacility);
+            const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
+            const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
+            const iChargeableDays = sChargeType === "DAILY" ? this._getFacilityChargeableDayCount() : 0;
+            const fnCreateBaseRow = function () {
                 return {
                     FacilityID: oFacility.FacilityID || "",
                     FacilityName: oFacility.FacilityName || "",
-                    FacilitiPrice: this._toNumber(oFacility.TotalAmount).toFixed(2),
-                    StartDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
-                    EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
+                    StartDate: sStartDate,
+                    EndDate: sEndDate,
                     PaidStatus: "Pending",
-                    CustomerID: oHostelModel.getProperty("/CustomerID") || "",
+                    CustomerID: sCustomerID,
                     MemberID: "",
+                    MemberName: "",
                     SelectionMode: oFacility.SelectionMode || "",
-                    FacilityChargeType: oFacility.FacilityChargeType || "",
-                    Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
-                    UnitText: oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "",
-                    Currency: oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
-                    UnitPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2),
-                    BasicFacilityPrice: this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0).toFixed(2),
-                    Flag: this._getFacilityFlagValue(oFacility)
+                    FacilityChargeType: sChargeType,
+                    Quantity: 1,
+                    UnitText: sUnitText,
+                    Currency: sCurrency,
+                    UnitPrice: fUnitPrice.toFixed(2),
+                    BasicFacilityPrice: fUnitPrice.toFixed(2),
+                    FacilitiPrice: "0.00",
+                    Flag: sFlag
                 };
-            }.bind(this));
+            };
+
+            if (sSelectionMode === "PERSON") {
+                return aSelectedPersonIds.map(function (sPersonId) {
+                    const oIdentity = this._getFacilityMemberIdentity(sPersonId);
+                    const oRow = fnCreateBaseRow();
+
+                    oRow.MemberID = oIdentity.MemberID;
+                    oRow.MemberName = oIdentity.MemberName;
+                    oRow.Quantity = 1;
+                    oRow.FacilitiPrice = fUnitPrice.toFixed(2);
+                    return oRow;
+                }.bind(this));
+            }
+
+            if (sSelectionMode === "PERSON_QTY") {
+                return aPersonQuantities.filter(function (oLine) {
+                    return (parseInt(oLine.qty, 10) || 0) > 0;
+                }).map(function (oLine) {
+                    const iQty = Math.max(parseInt(oLine.qty, 10) || 0, 0);
+                    const oIdentity = this._getFacilityMemberIdentity(oLine.personId, oLine.personName);
+                    const oRow = fnCreateBaseRow();
+                    const fRowTotal = sChargeType === "DAILY" ? (fUnitPrice * iQty * iChargeableDays) : (fUnitPrice * iQty);
+
+                    oRow.MemberID = oIdentity.MemberID;
+                    oRow.MemberName = oIdentity.MemberName;
+                    oRow.Quantity = iQty;
+                    oRow.FacilitiPrice = fRowTotal.toFixed(2);
+                    return oRow;
+                }.bind(this));
+            }
+
+            if (sSelectionMode === "QTY") {
+                const oRow = fnCreateBaseRow();
+                const iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+
+                oRow.Quantity = iQty;
+                oRow.FacilitiPrice = (fUnitPrice * iQty).toFixed(2);
+                return [oRow];
+            }
+
+            const oRow = fnCreateBaseRow();
+            oRow.Quantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+            oRow.FacilitiPrice = this._toNumber(oFacility.TotalAmount).toFixed(2);
+            return [oRow];
+        },
+
+        _buildFacilityItemsPayload: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+
+            return (oHostelModel.getProperty("/AllSelectedFacilities") || []).reduce(function (aItems, oFacility) {
+                return aItems.concat(this._buildFacilityPayloadRows(oFacility, oHostelModel));
+            }.bind(this), []);
         },
 
         _buildBookingItemsPayload: function () {
