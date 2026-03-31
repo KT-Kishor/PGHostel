@@ -6,8 +6,10 @@ sap.ui.define([
     "sap/m/ResponsivePopover",
     "sap/m/Text",
     "sap/m/MessageToast",
-    "sap/m/MessageBox"
-], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox) {
+    "sap/m/MessageBox",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator) {
 
     "use strict";
 
@@ -57,13 +59,7 @@ sap.ui.define([
         },
         _getBookingViewInitialData: function () {
             return {
-                PropertyTypes: [
-                    { key: "Hostel", text: "Hostel" },
-                    { key: "PG", text: "PG" },
-                    { key: "Hotel", text: "Hotel" },
-                    { key: "Service Apartments", text: "Service Apartments" },
-                    { key: "Rented Properties", text: "Rented Properties" }
-                ],
+                PropertyTypes: [],
                 DurationOptions: this._buildKeyTextList(11),
                 showDurationSelector: false,
                 endDateEditable: false,
@@ -84,6 +80,28 @@ sap.ui.define([
                     { key: "Female", text: "Female" },
                     { key: "Other", text: "Other" }
                 ],
+                RelationshipOptions: [
+                    { key: "Father", text: "Father" },
+                    { key: "Mother", text: "Mother" },
+                    { key: "Brother", text: "Brother" },
+                    { key: "Sister", text: "Sister" },
+                    { key: "Spouse", text: "Spouse" },
+                    { key: "Child", text: "Child" },
+                    { key: "Friend", text: "Friend" },
+                    { key: "Other", text: "Other" }
+                ],
+                MasterMembers: [],
+                NewMemberDraft: {
+                    Name: "",
+                    Relation: "",
+                    Gender: "",
+                    DocumentType: "",
+                    DocumentName: "",
+                    Document: "",
+                    File: "",
+                    FileType: "",
+                    DocumentFile: null
+                },
                 FamilyMembers: []
             };
         },
@@ -1410,33 +1428,328 @@ sap.ui.define([
         },
 
 
-        onAddFamilyMember: function () {
-            const oBookingView = this.getView().getModel("BookingView");
-            const aMembers = oBookingView.getProperty("/FamilyMembers") || [];
-            const bHasPendingRow = aMembers.some(function (oMember) {
-                return oMember.IsNew;
-            });
-
-            if (bHasPendingRow) {
-                MessageToast.show("Please complete the current new member row first.");
-                return;
-            }
-
-            aMembers.push({
-                id: "FM" + Date.now(),
+        _createMemberDraft: function () {
+            return {
+                id: "FM_" + Date.now(),
                 Name: "",
                 Relation: "",
                 Age: "",
                 Gender: "",
-                Selected: false,
+                Selected: true,
                 DocumentType: "",
                 DocumentName: "",
+                Document: "",
+                File: "",
+                FileType: "",
                 DocumentFile: null,
-                IsNew: true
-            });
+                IsNew: false
+            };
+        },
 
-            oBookingView.setProperty("/FamilyMembers", aMembers);
+        _normalizeMemberRecord: function (oMember, iIndex) {
+            const oMemberDocument = Array.isArray(oMember && oMember.Documents) && oMember.Documents.length > 0 ? oMember.Documents[0] : {};
+
+            return {
+                id: oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex)),
+                Name: oMember.Name || oMember.FullName || "",
+                Relation: oMember.Relation || "Other",
+                Age: oMember.Age || "",
+                Gender: oMember.Gender || "",
+                Selected: !!oMember.Selected,
+                DocumentType: oMember.DocumentType || oMemberDocument.DocumentType || "",
+                DocumentName: oMember.DocumentName || oMember.FileName || oMemberDocument.FileName || "",
+                Document: oMember.Document || oMember.File || oMemberDocument.File || "",
+                File: oMember.File || oMember.Document || oMemberDocument.File || "",
+                FileType: oMember.FileType || oMemberDocument.FileType || "",
+                DocumentFile: null,
+                IsNew: false
+            };
+        },
+
+        _mergeMembersById: function (aMembers) {
+            const oMap = {};
+
+            (aMembers || []).forEach(function (oMember, iIndex) {
+                const oNormalized = this._normalizeMemberRecord(oMember || {}, iIndex);
+                oMap[oNormalized.id] = Object.assign({}, oMap[oNormalized.id] || {}, oNormalized);
+            }.bind(this));
+
+            return Object.keys(oMap).map(function (sKey) {
+                return oMap[sKey];
+            });
+        },
+
+        _syncMemberDialogSelections: function () {
+            const oTable = this.byId("memberSelectTable");
+            const oBookingView = this.getView().getModel("BookingView");
+
+            if (!oTable || !oBookingView) {
+                return;
+            }
+
+            const aSelectedIds = new Set((oBookingView.getProperty("/FamilyMembers") || []).map(function (oMember) {
+                return oMember.id;
+            }));
+
+            oTable.removeSelections(true);
+            oTable.getItems().forEach(function (oItem) {
+                const oCtx = oItem.getBindingContext("BookingView");
+
+                if (oCtx && aSelectedIds.has(oCtx.getProperty("id"))) {
+                    oTable.setSelectedItem(oItem, true);
+                }
+            });
+        },
+
+        _loadMasterMembersForDialog: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+            const aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList")) ? oHostelModel.getProperty("/MemberList") : [];
+            const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const aCombined = this._mergeMembersById([].concat(aMasterMembers, aServerMemberList, aSelectedMembers));
+
+            oBookingView.setProperty("/MasterMembers", aCombined);
             oBookingView.refresh(true);
+        },
+
+        _getMemberSelectionDialog: function () {
+            if (!this._pMemberSelectionDialog) {
+                this._pMemberSelectionDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.MemberSelectDialog",
+                    controller: this
+                }).then(function (oDialog) {
+                    this.getView().addDependent(oDialog);
+                    return oDialog;
+                }.bind(this));
+            }
+
+            return this._pMemberSelectionDialog;
+        },
+
+        _getNewMemberDialog: function () {
+            if (!this._pNewMemberDialog) {
+                this._pNewMemberDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.NewMemberDialog",
+                    controller: this
+                }).then(function (oDialog) {
+                    this.getView().addDependent(oDialog);
+                    return oDialog;
+                }.bind(this));
+            }
+
+            return this._pNewMemberDialog;
+        },
+
+        onAddFamilyMember: function () {
+            this.onMemberValueHelpRequest();
+        },
+
+        onMemberValueHelpRequest: async function () {
+            this._loadMasterMembersForDialog();
+            const oDialog = await this._getMemberSelectionDialog();
+            this._syncMemberDialogSelections();
+            oDialog.open();
+        },
+
+        onMemberDialogTableUpdateFinished: function () {
+            this._syncMemberDialogSelections();
+        },
+
+        onMemberSearch: function (oEvent) {
+            const sValue = String(oEvent.getParameter("newValue") || oEvent.getParameter("query") || "").trim();
+            const oTable = this.byId("memberSelectTable");
+            const oBinding = oTable && oTable.getBinding("items");
+            let aFilters = [];
+
+            if (!oBinding) {
+                return;
+            }
+
+            if (sValue) {
+                aFilters = [new Filter({
+                    filters: [
+                        new Filter("Name", FilterOperator.Contains, sValue),
+                        new Filter("Relation", FilterOperator.Contains, sValue),
+                        new Filter("Gender", FilterOperator.Contains, sValue),
+                        new Filter("DocumentType", FilterOperator.Contains, sValue),
+                        new Filter("DocumentName", FilterOperator.Contains, sValue)
+                    ],
+                    and: false
+                })];
+            }
+
+            oBinding.filter(aFilters);
+        },
+
+        onConfirmMemberSelection: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oTable = this.byId("memberSelectTable");
+            const aSelectedContexts = oTable ? oTable.getSelectedContexts("BookingView") : [];
+            const aSelectedMembers = aSelectedContexts.map(function (oCtx, iIndex) {
+                const oMember = this._normalizeMemberRecord(oCtx.getObject(), iIndex);
+                oMember.Selected = true;
+                return oMember;
+            }.bind(this));
+
+            oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+            oBookingView.refresh(true);
+            this._updateSelectedPersonsFromFamily();
+            this._syncSelectedFacilityPersonsWithOccupants();
+            this._rebuildSelectedFacilities();
+            this._recalculateSummary();
+            this.onCloseMemberSelectionDialog();
+        },
+
+        onCloseMemberSelectionDialog: async function () {
+            const oDialog = await this._getMemberSelectionDialog();
+            oDialog.close();
+        },
+
+        onAddNewMemberFromDialog: async function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oDraft = this._createMemberDraft();
+            const oDialog = await this._getNewMemberDialog();
+
+            oBookingView.setProperty("/NewMemberDraft", oDraft);
+            oBookingView.refresh(true);
+            oDialog.open();
+        },
+
+        onCloseNewMemberDialog: async function () {
+            const oDialog = await this._getNewMemberDialog();
+            oDialog.close();
+        },
+
+        onNewMemberDocumentChange: function (oEvent) {
+            const oFileUploader = oEvent.getSource();
+            const oModel = this.getView().getModel("BookingView");
+            const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
+            const oReader = new FileReader();
+            const iMaxSize = 2 * 1024 * 1024;
+            const sFileName = String(oFile && oFile.name || "");
+            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
+            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
+            const sMimeType = String(oFile && oFile.type || "").toLowerCase();
+            const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
+
+            if (!oFile) {
+                return;
+            }
+
+            if (oFile.size > iMaxSize) {
+                this._showDocumentUploadSizeError();
+                oFileUploader.clear();
+                return;
+            }
+
+            if (!bAllowedMime && !bAllowedExt) {
+                this._showDocumentUploadTypeError();
+                oFileUploader.clear();
+                return;
+            }
+
+            oReader.onload = function (oLoadEvent) {
+                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+
+                oModel.setProperty("/NewMemberDraft/DocumentName", oFile.name);
+                oModel.setProperty("/NewMemberDraft/DocumentFile", oFile);
+                oModel.setProperty("/NewMemberDraft/Document", sBase64);
+                oModel.setProperty("/NewMemberDraft/File", sBase64);
+                oModel.setProperty("/NewMemberDraft/FileType", oFile.type || "");
+                oModel.refresh(true);
+            };
+
+            oReader.readAsDataURL(oFile);
+        },
+
+        onSaveNewMember: async function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
+            const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+            const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+
+            if (!String(oDraft.Name || "").trim()) {
+                MessageToast.show("Please enter full name.");
+                return;
+            }
+
+            if (!String(oDraft.Gender || "").trim()) {
+                MessageToast.show("Please select gender.");
+                return;
+            }
+
+            if (!String(oDraft.Relation || "").trim()) {
+                MessageToast.show("Please select relationship.");
+                return;
+            }
+
+            if (!String(oDraft.DocumentType || "").trim()) {
+                MessageToast.show("Please select document type.");
+                return;
+            }
+
+            if (!String(oDraft.DocumentName || "").trim()) {
+                MessageToast.show("Please upload a document.");
+                return;
+            }
+
+            oDraft.id = oDraft.id || ("FM_" + Date.now());
+            oDraft.Selected = true;
+            oDraft.IsNew = false;
+            oDraft.Name = String(oDraft.Name).trim();
+
+            try {
+                await this.ajaxCreateWithJQuery("HM_Member", {
+                    data: [{
+                        UserID: oHostelModel.getProperty("/UserID") || "",
+                        Name: oDraft.Name || "",
+                        Relation: oDraft.Relation || "",
+                        Gender: oDraft.Gender || "",
+                        DocumentType: oDraft.DocumentType || "",
+                        File: oDraft.File || "",
+                        FileName: oDraft.DocumentName || "",
+                        FileType: oDraft.FileType || ""
+                    }]
+                });
+            } catch (oError) {
+                // Backend create is optional for this flow; keep local add functional.
+            }
+
+            oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers, [oDraft])));
+            oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers, [oDraft])).map(function (oMember) {
+                oMember.Selected = true;
+                return oMember;
+            }));
+            oBookingView.refresh(true);
+            this._updateSelectedPersonsFromFamily();
+            this._syncSelectedFacilityPersonsWithOccupants();
+            this._rebuildSelectedFacilities();
+            this._recalculateSummary();
+
+            MessageToast.show("Member added successfully.");
+            this.onCloseNewMemberDialog();
+            this._syncMemberDialogSelections();
+        },
+
+        formatSelectedMembersSummary: function (aMembers) {
+            const aNames = (Array.isArray(aMembers) ? aMembers : []).map(function (oMember) {
+                return String(oMember.Name || "").trim();
+            }).filter(Boolean);
+
+            if (!aNames.length) {
+                return "";
+            }
+
+            return aNames.join(", ");
+        },
+
+        formatSelectedMembersCount: function (aMembers) {
+            const iCount = Array.isArray(aMembers) ? aMembers.length : 0;
+            return iCount + " member(s) selected";
         },
 
         onAddCustomerDocument: function () {
@@ -2030,6 +2343,7 @@ sap.ui.define([
             const aPaymentMethods = [];
             let aOriginalPersonOptions = Array.isArray(oData.NoOfPersonsList) ? oData.NoOfPersonsList.slice() : [];
             const iCapacity = Math.max(parseInt(oData.Capacity, 10) || 1, 1);
+            const sPropertyType = String(oData.PropertyType || "").trim();
 
             oToday.setHours(0, 0, 0, 0);
 
@@ -2049,8 +2363,12 @@ sap.ui.define([
 
             oBookingView.setProperty("/originalPersonOptions", aOriginalPersonOptions);
             oBookingView.setProperty("/maxPersons", iCapacity);
+            oBookingView.setProperty("/PropertyTypes", sPropertyType ? [{
+                key: sPropertyType,
+                text: sPropertyType
+            }] : []);
 
-            oModel.setProperty("/PropertyType", oData.PropertyType || "Hostel");
+            oModel.setProperty("/PropertyType", sPropertyType);
             oModel.setProperty("/AvailablePaymentMethods", aPaymentMethods);
             oModel.setProperty("/SelectedMonths", String(oData.SelectedMonths || "1"));
             oModel.setProperty("/TodayDate", oData.TodayDate instanceof Date ? oData.TodayDate : oToday);
@@ -2085,30 +2403,18 @@ sap.ui.define([
 
             oModel.setProperty("/SelectedPerson", String(oData.SelectedPerson || "1"));
 
-            // Load members from MemberList if available (from View_Rooms.controller.js)
+            // Load saved members from backend-provided booking data.
             const aMemberList = Array.isArray(oData.MemberList) ? oData.MemberList : [];
-            if (aMemberList.length > 0) {
-                const aConvertedMembers = aMemberList.map(function (oServerMember, index) {
-                    const oMemberDocument = Array.isArray(oServerMember.Documents) && oServerMember.Documents.length > 0 ? oServerMember.Documents[0] : {};
+            const aExistingSelectedMembers = Array.isArray(oData.FamilyMembers) ? oData.FamilyMembers : [];
+            const aMasterMembers = this._mergeMembersById(aMemberList);
+            const aSelectedMembers = this._mergeMembersById(aExistingSelectedMembers).map(function (oMember) {
+                oMember.Selected = true;
+                return oMember;
+            });
 
-                    return {
-                        id: "FM_UI_" + (Date.now() + index),
-                        Name: oServerMember.Name || oServerMember.FullName || "",
-                        Relation: oServerMember.Relation || "Family Member",
-                        Age: oServerMember.Age || "",
-                        Gender: oServerMember.Gender || "",
-                        Selected: false, // Initially not selected
-                        DocumentType: oServerMember.DocumentType || oMemberDocument.DocumentType || "",
-                        DocumentName: oServerMember.DocumentName || oServerMember.FileName || oMemberDocument.FileName || "",
-                        Document: oServerMember.Document || oServerMember.File || oMemberDocument.File || "",
-                        File: oServerMember.File || oServerMember.Document || oMemberDocument.File || "",
-                        FileType: oServerMember.FileType || oMemberDocument.FileType || "",
-                        DocumentFile: null,
-                        IsNew: false // These are existing members from server
-                    };
-                });
-                oBookingView.setProperty("/FamilyMembers", aConvertedMembers);
-            }
+            oBookingView.setProperty("/MasterMembers", aMasterMembers);
+            oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+            this._updateSelectedPersonsFromFamily();
 
             this._applySelectedPlanPrice();
         },
@@ -3091,7 +3397,11 @@ sap.ui.define([
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
 
             var isMandatoryValid  = (
-                utils._LCstrictValidationComboBox(this.getView().byId(("BookProperty_ID")), "ID") && utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") && utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") && utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
+                !!sPropertyType &&
+                utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") &&
+                utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") &&
+                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") &&
+                utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
             )
             if(!isMandatoryValid){
                 MessageToast.show("Please fill mandatory booking details");

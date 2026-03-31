@@ -231,7 +231,7 @@ sap.ui.define([
                         AvailableDate: Date,
                         ExtraBed: room.ExtraBed,
                         LandMark: LandMark, 
-                        PropertyType: "Hostel"
+                        PropertyType: PropertyType || room.PropertyType || ""
                     };
                 });
 
@@ -296,7 +296,7 @@ sap.ui.define([
                     GeoLocation: oSelected.GeoLocation,
                     AvailableDate: oSelected.AvailableDate,
                     ExtraBed: oSelected.ExtraBed || 0,
-                    PropertyType: "Hostel"
+                    PropertyType: oSelected.PropertyType || ""
                 };
 
                 const oHostelModel = new JSONModel(oFullDetails);
@@ -521,7 +521,7 @@ const oUser = oLoginModel?.getData?.() || {};
                 RoomNo: oData.RoomNo || "",
                 BedType: oData.BedType || "",
                 ACType: oData.ACType || "",
-                PropertyType: oData.PropertyType || "Hostel",
+                PropertyType: oData.PropertyType || "",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
                 Area: oData.Area || "",

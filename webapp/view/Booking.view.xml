@@ -66,19 +66,11 @@
                                 class="responsiveForm"
                             >
                                 <Label text="Property Type"  />
-                                <ComboBox
-                                id="BookProperty_ID"
-                                    selectedKey="{HostelModel>/PropertyType}"
-                                    items="{BookingView>/PropertyTypes}"
-                                    selectionChange="onPropertyTypeChange"
-                                    valueStateText="Select PropertyType"
-                                    change="onPropertyChange"
-                                >
-                                    <core:Item
-                                        key="{BookingView>key}"
-                                        text="{BookingView>text}"
-                                    />
-                                </ComboBox>
+                                <Input
+                                    id="BookProperty_ID"
+                                    value="{HostelModel>/PropertyType}"
+                                    editable="false"
+                                />
                                 <Label text="Room Plan" required="true"/>
                                 <ComboBox
                                 id="BookRoom_ID"
@@ -279,192 +271,83 @@
                             visible="{BookingView>/showFamilySection}"
                         >
                             <VBox class="sapUiTinyMargin">
-                                <HBox justifyContent="End" class="sapUiTinyMarginBottom">
-                                    <Button
-                                        text="Add Member"
-                                        icon="sap-icon://add"
-                                        press="onAddFamilyMember"
-                                        class="myUnifiedBtn"
-                                    />
-                                </HBox>
-                            </VBox>
+                                <Input
+                                    id="memberValueHelpInput"
+                                    value="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersSummary'}"
+                                    placeholder="Click value help to select members"
+                                    showValueHelp="true"
+                                    valueHelpOnly="true"
+                                    valueHelpRequest="onMemberValueHelpRequest"
+                                />
+                                <Text
+                                    text="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersCount'}"
+                                    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                />
 
-                            <!-- Responsive Table for Members -->
-                            <Table
-                                items="{BookingView>/FamilyMembers}"
-                                noDataText="No members found"
-                                class="responsiveTable"
-                            >
-                                <columns>
-                                    <Column width="5rem">
-                                        <Text text="Pick" />
-                                    </Column>
-                                    <Column>
-                                        <Text text="Name" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                    >
-                                        <Text text="Relation" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                    >
-                                        <Text text="Age" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                    >
-                                        <Text text="Gender" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                    >
-                                        <Text text="Document Type" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Desktop"
-                                        demandPopin="true"
-                                        width="14rem"
-                                    >
-                                        <Text text="Document" />
-                                    </Column>
-                                    <Column width="8rem">
-                                        <Text text="Action" />
-                                    </Column>
-                                </columns>
+                                <Table
+                                    items="{BookingView>/FamilyMembers}"
+                                    noDataText="No members selected"
+                                    class="responsiveTable"
+                                >
+                                    <columns>
+                                        <Column>
+                                            <Text text="Full Name" />
+                                        </Column>
+                                        <Column minScreenWidth="Tablet" demandPopin="true">
+                                            <Text text="Gender" />
+                                        </Column>
+                                        <Column minScreenWidth="Tablet" demandPopin="true">
+                                            <Text text="Relationship" />
+                                        </Column>
+                                        <Column minScreenWidth="Tablet" demandPopin="true">
+                                            <Text text="Document Type" />
+                                        </Column>
+                                        <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
+                                            <Text text="Document" />
+                                        </Column>
+                                        <Column width="6rem">
+                                            <Text text="Action" />
+                                        </Column>
+                                    </columns>
 
-                                <items>
-                                    <ColumnListItem>
-                                        <cells>
-                                            <CheckBox
-                                                selected="{BookingView>Selected}"
-                                                select="onFamilyMemberSelect"
-                                                enabled="{= !${BookingView>IsNew} }"
-                                            />
-
-                                            <VBox>
-                                                <Input
-                                                    value="{BookingView>Name}"
-                                                    visible="{BookingView>IsNew}"
-                                                    placeholder="Enter name"
-                                                    width="100%"
-                                                />
-                                                <Text
-                                                    text="{BookingView>Name}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <VBox>
-                                                <Input
-                                                    value="{BookingView>Relation}"
-                                                    visible="{BookingView>IsNew}"
-                                                    placeholder="Enter relation"
-                                                    width="100%"
-                                                />
-                                                <Text
-                                                    text="{BookingView>Relation}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <VBox>
-                                                <Input
-                                                    value="{BookingView>Age}"
-                                                    type="Number"
-                                                    visible="{BookingView>IsNew}"
-                                                    placeholder="Enter age"
-                                                    width="100%"
-                                                />
-                                                <Text
-                                                    text="{BookingView>Age}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <VBox>
-                                                <Select
-                                                    selectedKey="{BookingView>Gender}"
-                                                    visible="{BookingView>IsNew}"
-                                                    width="100%"
-                                                    items="{BookingView>/GenderOptions}"
-                                                >
-                                                    <core:Item
-                                                        key="{BookingView>key}"
-                                                        text="{BookingView>text}"
-                                                    />
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Input value="{BookingView>Name}" placeholder="Name" />
+                                                <Select selectedKey="{BookingView>Gender}" items="{BookingView>/GenderOptions}">
+                                                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select>
-                                                <Text
-                                                    text="{BookingView>Gender}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <VBox>
-                                                <Select
-                                                    selectedKey="{BookingView>DocumentType}"
-                                                    visible="{BookingView>IsNew}"
-                                                    width="100%"
-                                                    items="{BookingView>/DocumentTypeOptions}"
-                                                >
-                                                    <core:Item
-                                                        key="{BookingView>key}"
-                                                        text="{BookingView>text}"
-                                                    />
+                                                <Input value="{BookingView>Relation}" placeholder="Relationship" />
+                                                <Select selectedKey="{BookingView>DocumentType}" items="{BookingView>/DocumentTypeOptions}">
+                                                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select>
-                                                <Text
-                                                    text="{BookingView>DocumentType}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <VBox>
-                                                <unified:FileUploader
-                                                    width="100%"
-                                                    visible="{BookingView>IsNew}"
-                                                    maximumFileSize="2"
-                                                    sameFilenameAllowed="true"
-                                                    change="onFamilyDocumentChange"
-                                                    typeMissmatch="onDocumentUploadTypeMismatch"
-                                                    fileSizeExceed="onDocumentUploadSizeExceed"
-                                                    buttonText="Upload"
-                                                    fileType="pdf,jpg,jpeg,png"
-                                                    class="myUnifiedBtn"
-
-                                                />
-                                                <Text
-                                                    text="{BookingView>DocumentName}"
-                                                    visible="{= !${BookingView>IsNew} }"
-                                                />
-                                            </VBox>
-
-                                            <HBox
-                                                renderType="Bare"
-                                                justifyContent="Start"
-                                                class="responsiveActionButtons"
-                                            >
+                                                <HBox alignItems="Center" wrap="Wrap">
+                                                    <unified:FileUploader
+                                                        width="8rem"
+                                                        buttonOnly="true"
+                                                        maximumFileSize="2"
+                                                        sameFilenameAllowed="true"
+                                                        change="onFamilyDocumentChange"
+                                                        typeMissmatch="onDocumentUploadTypeMismatch"
+                                                        fileSizeExceed="onDocumentUploadSizeExceed"
+                                                        buttonText="Upload"
+                                                        fileType="pdf,jpg,jpeg,png,webp"
+                                                        class="myUnifiedBtn sapUiTinyMarginEnd"
+                                                    />
+                                                    <Text text="{BookingView>DocumentName}" />
+                                                </HBox>
                                                 <Button
-                                                    text="Add"
-                                                    visible="{BookingView>IsNew}"
-                                                    press="onSaveFamilyMember"
-                                                    class="sapUiTinyMarginEnd myUnifiedBtn"
-                                                />
-                                                <Button
-                                                    text="Delete"
-                                                    visible="{BookingView>IsNew}"
+                                                    icon="sap-icon://delete"
+                                                    type="Transparent"
+                                                    tooltip="Remove member"
                                                     press="onDeleteFamilyMemberRow"
                                                     class="myUnifiedBtn"
                                                 />
-                                            </HBox>
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
                         </Panel>
 
 <!-- Facilities Section -->
