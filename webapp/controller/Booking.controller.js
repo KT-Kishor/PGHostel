@@ -3531,6 +3531,7 @@ sap.ui.define([
                 StartDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
                 EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
                 Status: "New",
+                PropertyType: oHostelModel.getProperty("/PropertyType") || "",
                 PaymentType: oHostelModel.getProperty("/SelectedPriceType") || "",
                 BedType: this._formatBedTypeText(),
                 BranchCode: oHostelModel.getProperty("/BranchCode") || "",
