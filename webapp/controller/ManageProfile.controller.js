@@ -2018,6 +2018,7 @@ sap.ui.define([
             }
             this._openComplaintDialog(oComplaint);
         },
+        
         onComBranch: function (oEvent) {
             const oBranchCombo = oEvent.getSource();
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
@@ -2025,51 +2026,177 @@ sap.ui.define([
             this._setComplaintRoomComboData(sBranchCode, "");
         },
 
-    HF_viewimage: function (oEvent) {
-    var oContext = oEvent.getSource().getBindingContext("profileData");
-    var oData = oContext.getObject();
+        HF_viewimage: function (oEvent) {
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
 
-    if (!oData.Attachment) {
-        sap.m.MessageToast.show("No document found");
-        return;
-    }
-
-    var sBase64 = oData.Attachment.trim();
-
-    // DEBUG
-    console.log("Base64 Length:", sBase64.length);
-
-    // FIX: Ensure proper prefix
-    var sMimeType = oData.FileType || "image/png";
-
-    // Always rebuild URL
-    var sSrc = "data:" + sMimeType + ";base64," + sBase64;
-
-    var oImage = new sap.m.Image({
-        src: sSrc,
-        width: "100%",
-        height: "100%",
-        densityAware: false
-    });
-
-    var oDialog = new sap.m.Dialog({
-        title: oData.FileName || "Image",
-        contentWidth: "50%",
-        contentHeight: "60%",
-        content: [oImage],
-        endButton: new sap.m.Button({
-            text: "Close",
-            press: function () {
-                oDialog.close();
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") ||   // PNG
+                            last.startsWith("/9j") ||   // JPG
+                            last.startsWith("JVBER")   // PDF
+                        ) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return last;
             }
-        }),
-        afterClose: function () {
-            oDialog.destroy();
-        }
-    });
 
-    oDialog.open();
-}
-       
+            const oContext = oEvent.getSource().getBindingContext("profileData");
+            const oData = oContext?.getObject();
+
+            if (!oData || !oData.Attachment) {
+                sap.m.MessageToast.show("No document found");
+                return;
+            }
+
+            const sBase64 = autoDecodeBase64(oData.Attachment);
+
+            // 🔹 Detect MIME type
+            let sMimeType = "application/octet-stream";
+
+            if (sBase64.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sBase64.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            }
+
+            // ================= IMAGE PREVIEW =================
+            if (sMimeType.startsWith("image/")) {
+
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+
+                if (!this._oHFPreviewDialog) {
+
+                    const oFlex = new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [
+                            new sap.m.Image(this.createId("hfPreviewImage"), {
+                                width: "100%",
+                                height: "100%",
+                                densityAware: false
+                            })
+                        ]
+                    });
+
+                    this._oHFPreviewDialog = new sap.m.Dialog({
+                        title: oData.FileName || "Image Preview",
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        content: [oFlex],
+
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: function () {
+                                this._oHFPreviewDialog.close();
+                            }.bind(this)
+                        }),
+
+                        afterClose: function () {
+                            this._oHFPreviewDialog.destroy();
+                            this._oHFPreviewDialog = null;
+                        }.bind(this)
+                    });
+
+                    this.getView().addDependent(this._oHFPreviewDialog);
+                } else {
+                    this._oHFPreviewDialog.setTitle(oData.FileName || "Image Preview");
+                }
+
+                this.byId("hfPreviewImage").setSrc(sImageSrc);
+                this._oHFPreviewDialog.open();
+                return;
+            }
+
+            // ================= PDF PREVIEW =================
+            if (sMimeType === "application/pdf") {
+
+                if (!this._oHFPreviewDialog) {
+                    this._oHFPreviewDialog = new sap.m.Dialog({
+                        title: "Document Preview",
+                        stretch: true,
+                        draggable: true,
+                        resizable: true,
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        contentPadding: "0rem",
+
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => {
+                                if (this._previewUrl) {
+                                    URL.revokeObjectURL(this._previewUrl);
+                                    this._previewUrl = null;
+                                }
+                                this._oHFPreviewDialog.close();
+                            }
+                        }),
+
+                        afterClose: function () {
+                            this._oHFPreviewDialog.destroy();
+                            this._oHFPreviewDialog = null;
+                        }.bind(this)
+                    });
+
+                    this.getView().addDependent(this._oHFPreviewDialog);
+                }
+
+                this._oHFPreviewDialog.removeAllContent();
+
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: sMimeType });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._oHFPreviewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                            <iframe 
+                                src="${this._previewUrl}" 
+                                style="width:100%; height:600px; border:none;">
+                            </iframe>
+                        `
+                    })
+                );
+
+                this._oHFPreviewDialog.open();
+                return;
+            }
+
+            sap.m.MessageToast.show("Preview not supported.");
+        }
     });
 });
