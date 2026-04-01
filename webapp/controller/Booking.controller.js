@@ -3181,7 +3181,7 @@ sap.ui.define([
                 }
 
                 if (sEffectiveGSTType === "CGST/SGST") {
-                    const fHalfGSTValue = fEffectiveGSTValue / 2;
+                    const fHalfGSTValue = fEffectiveGSTValue;
                     fCGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
                     fSGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
                 } else if (sEffectiveGSTType === "IGST") {

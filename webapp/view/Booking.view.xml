@@ -710,7 +710,7 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="BOOK THIS NOW"
+                    text="Continue"
                     type="Emphasized"
                     class="myUnifiedBtn"
                     press="onContinueBooking"
