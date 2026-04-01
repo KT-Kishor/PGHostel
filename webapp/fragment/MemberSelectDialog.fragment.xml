@@ -24,7 +24,7 @@
         </customHeader>
 
         <content>
-            <VBox class="sapUiSmallMargin" width="100%">
+            <VBox class="sapUiSmallMargin">
                 <SearchField
                     width="100%"
                     placeholder="Search by name / relationship / document"

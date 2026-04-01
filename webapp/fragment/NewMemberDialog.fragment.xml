@@ -23,7 +23,7 @@
         </customHeader>
 
         <content>
-            <VBox class="sapUiSmallMargin" width="100%">
+            <VBox class="sapUiSmallMargin" >
                 <Label text="Full Name" required="true" />
                 <Input value="{BookingView>/NewMemberDraft/Name}" placeholder="Enter full name" />
 
