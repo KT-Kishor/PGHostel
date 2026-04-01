@@ -281,9 +281,10 @@
                                     items="{BookingView>/FamilyMembers}"
                                     noDataText="No members selected"
                                     class="responsiveTable"
+                                    autoPopinMode="true"
                                 >
                                     <columns>
-                                        <Column>
+                                        <Column minScreenWidth="Tablet" demandPopin="true">
                                             <Text text="Full Name" />
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true">
@@ -292,13 +293,13 @@
                                         <Column minScreenWidth="Tablet" demandPopin="true">
                                             <Text text="Relationship" />
                                         </Column>
-                                        <Column minScreenWidth="Tablet" demandPopin="true">
+                                        <Column minScreenWidth="Desktop" demandPopin="true">
                                             <Text text="Document Type" />
                                         </Column>
-                                        <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
+                                        <Column minScreenWidth="Desktop" demandPopin="true" >
                                             <Text text="Document" />
                                         </Column>
-                                        <Column width="6rem">
+                                        <Column minScreenWidth="Desktop" demandPopin="true"  >
                                             <Text text="Action" />
                                         </Column>
                                     </columns>
@@ -587,7 +588,29 @@
                                     growing="true"
                                     growingMaxLines="5"
                                 />
-                               <Text text="Room :{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}  {HostelModel>/Currency} " />
+                                <HBox alignItems="Center">
+    <Text text="Payment Details:" />
+
+    <core:Icon
+        id="PaymentSummaryInfoIcon"
+        src="sap-icon://hint"
+        size="1rem"
+        color="#0064d1"
+        hoverColor="DarkBlue"
+        class="sapUiTinyMarginBegin"
+    />
+</HBox>
+                               <!-- <Text text="Room :{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}  {HostelModel>/Currency} " />
+                               <core:Icon
+                                            id="PaymentSummaryInfoIcon"
+                                            src="sap-icon://hint"
+                                            size="1rem"
+                                            color="#0064d1"
+                                            hoverColor="DarkBlue"
+                                            press="onpaymentsummaryPress"
+                                            tooltip="payment summary info"
+                                            class="sapUiTinyMarginEnd"
+                                        />
                                 <Text
                                     text="{HostelModel>/RoomBreakdownText}"
                                     wrapping="true"
@@ -616,7 +639,7 @@
                                 <Text
                                     text="IGST: {path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/IGST} > 0}"
-                                />
+                                /> -->
                                 <MessageStrip
                                     text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
                                     type="Information"

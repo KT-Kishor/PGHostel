@@ -29,6 +29,7 @@ sap.ui.define([
         },
         onAfterRendering: function () {
             this._attachDocumentInfoHover();
+            this._attachPaymentSummaryHover();
         },
          _onRouteMatched: async function () {
              if (performance.navigation && performance.navigation.type === 1) {
@@ -1942,6 +1943,199 @@ sap.ui.define([
             }
         },
 
+        // payment icon
+        _attachPaymentSummaryHover: function () {
+    const oIcon = this.byId("PaymentSummaryInfoIcon");
+
+    if (!oIcon || oIcon.data("hoverBound")) {
+        return;
+    }
+
+    oIcon.data("hoverBound", true);
+
+    oIcon.attachBrowserEvent("mouseenter", this._openPaymentSummaryPopover.bind(this));
+    oIcon.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
+
+    this._getPaymentSummaryPopover().attachAfterOpen(function () {
+        const oPopover = this._getPaymentSummaryPopover();
+
+        if (!oPopover.data("hoverBound")) {
+            oPopover.data("hoverBound", true);
+
+            oPopover.attachBrowserEvent("mouseenter", this._clearPaymentPopoverClose.bind(this));
+            oPopover.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
+        }
+    }.bind(this));
+},
+_getPaymentSummaryPopover: function () {
+    if (!this._oPaymentSummaryPopover) {
+
+        this._oPaymentSummaryPopover = new sap.m.ResponsivePopover({
+            showHeader: false,
+            placement: "Bottom",
+            contentWidth: "22rem",
+            content: [
+                new sap.m.VBox({
+                    items: [
+
+                       new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/RoomPrice" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.getView().getController().Formatter.fromatNumber(price);
+            return "Room: " + formatted + " " + currency;
+        }.bind(this)
+    }
+}),
+
+                        new sap.m.Text({
+                            text: "{HostelModel>/RoomBreakdownText}",
+                            wrapping: true
+                        }),
+
+                       new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/TotalFacilityPrice" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.Formatter.fromatNumber(price);
+            return "Facilities: " + formatted + " " + currency;
+        }.bind(this)
+    }
+}),
+
+                       new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/BookingSubTotal" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.Formatter.fromatNumber(price);
+            return "Sub Total: " + formatted + " " + currency;
+        }.bind(this)
+    }
+}),
+
+                       new sap.m.Text({
+    text: {
+        path: "HostelModel>/PropertyGSTIN",
+        formatter: function (gst) {
+            return "Property GSTIN: " + gst;
+        }
+    }
+}),
+
+                       new sap.m.Text({
+    text: {
+        path: "HostelModel>/CustomerGSTIN",
+        formatter: function (gst) {
+            return "Customer GSTIN: " + gst;
+        }
+    },
+    visible: {
+        path: "HostelModel>/CustomerGSTIN",
+        formatter: function (gst) {
+            return !!gst;
+        }
+    }
+}),
+
+                        new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/CGST" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.Formatter.fromatNumber(price);
+            return "CGST: " + formatted + " " + currency;
+        }.bind(this)
+    },
+    visible: {
+        path: "HostelModel>/CGST",
+        formatter: function (price) {
+            return price > 0;
+        }
+    }
+}),
+
+                        new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/SGST" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.Formatter.fromatNumber(price);
+            return "SGST: " + formatted + " " + currency;
+        }.bind(this)
+    },
+    visible: {
+        path: "HostelModel>/SGST",
+        formatter: function (price) {
+            return price > 0;
+        }
+    }
+}),
+
+                        new sap.m.Text({
+    text: {
+        parts: [
+            { path: "HostelModel>/IGST" },
+            { path: "HostelModel>/Currency" }
+        ],
+        formatter: function (price, currency) {
+            const formatted = this.Formatter.fromatNumber(price);
+            return "IGST: " + formatted + " " + currency;
+        }.bind(this)
+    },
+    visible: {
+        path: "HostelModel>/IGST",
+        formatter: function (price) {
+            return price > 0;
+        }
+    }
+})
+
+                    ]
+                }).addStyleClass("sapUiSmallMargin")
+            ]
+        });
+
+        this.getView().addDependent(this._oPaymentSummaryPopover);
+    }
+
+    return this._oPaymentSummaryPopover;
+},
+_openPaymentSummaryPopover: function () {
+    const oIcon = this.byId("PaymentSummaryInfoIcon");
+
+    this._clearPaymentPopoverClose();
+
+    if (oIcon) {
+        this._getPaymentSummaryPopover().openBy(oIcon);
+    }
+},
+
+_schedulePaymentPopoverClose: function () {
+    this._paymentPopoverTimer = setTimeout(function () {
+        this._getPaymentSummaryPopover().close();
+    }.bind(this), 300);
+},
+
+_clearPaymentPopoverClose: function () {
+    if (this._paymentPopoverTimer) {
+        clearTimeout(this._paymentPopoverTimer);
+        this._paymentPopoverTimer = null;
+    }
+},
+
         onCustomerDocumentChange: function (oEvent) {
             const oFileUploader = oEvent.getSource();
             const oContext = oFileUploader.getBindingContext("HostelModel");
@@ -2300,24 +2494,26 @@ sap.ui.define([
             }
 
             const iStart = this._iFacilityStartIndex || 0;
-            const iPageSize = this._iFacilityPageSize || 3;
+           const bPhone = sap.ui.Device.system.phone;
+const iPageSize = bPhone ? 1 : 3;
+this._iFacilityPageSize = iPageSize;
             const aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
 
             const oRow = new sap.m.HBox({
                 width: "100%",
                 justifyContent: "Start",
                 alignItems: "Start",
-                wrap: "NoWrap"
+              wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
             }).addStyleClass("sapUiSmallMarginTop");
 
             aVisibleFacilities.forEach(function (oFacility) {
                 const oCard = new sap.m.VBox({
-                    width: "250px",
+                    width: sap.ui.Device.system.phone ? "100%" : "250px",
                     alignItems: "Center",
                     justifyContent: "Center",
                     items: [
                         new sap.m.VBox({
-                            width: "240px",
+                            width: "100%",
                             height: "178px",
                             items: [
                                 new sap.m.HBox({
