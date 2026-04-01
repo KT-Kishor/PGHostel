@@ -19,25 +19,18 @@
                 type="XML"
             />
         </headerContent>
+        <l:Grid
+    defaultSpan="XL12 L12 M12 S12"
+    hSpacing="1"
+    vSpacing="1"
+    width="100%"
+>
 
-        <content>
-            <VBox
-                width="100%"
-                class="sapUiSmallMargin"
-            >
-                <!-- Responsive HBox that wraps on mobile -->
-                <HBox
-                    width="100%"
-                    wrap="Wrap"
-                    alignItems="Start"
-                    renderType="Bare"
-                    class="responsiveColumns"
-                >
-                    <!-- Left Column - Takes full width on mobile, 60% on tablet/desktop -->
-                    <VBox
-                        width="{= ${device>/system/phone} ? '100%' : '60%'}"
-                        class="sapUiTinyMarginEnd"
-                    >
+        <l:content>
+            <VBox>
+            <layoutData>
+                <l:GridData span="XL8 L8 M12 S12"/>
+            </layoutData>
                         <!-- Booking Details Section -->
                         <Title
                             text="Booking Details"
@@ -404,13 +397,78 @@
                                 </HBox>
                             </VBox>
                         </Panel>
+                        <!-- Selected Facilities Summary Section -->
+<Title
+    text="Selected Facilities Summary"
+    class="booking-section-header"
+    wrapping="true"
+/>
+
+                <Panel
+                    class="customBookingPanel booking-panel-enhanced"
+                  
+                >
+                    <Table
+                        items="{HostelModel>/AllSelectedFacilities}"
+                        noDataText="-- No facilities opted --"
+                        autoPopinMode="true"
+                        class="responsiveTable"
+                    >
+                        <columns>
+                            <Column>
+                                <Text text="Facility" />
+                            </Column>
+                            <Column
+                                minScreenWidth="Tablet"
+                                demandPopin="true"
+                            >
+<Text text="Rate / Unit" />
+
+                            </Column>
+                            <Column
+                                minScreenWidth="Desktop"
+                                demandPopin="true"
+                                width="45%"
+                            >
+                                <Text
+                                    text="Breakdown (Who &amp; Qty)"
+                                />
+                            </Column>
+                            <Column hAlign="End">
+                                <Text text="Total" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem vAlign="Top">
+                                <cells>
+                                    <Text
+                                        text="{HostelModel>FacilityName}"
+                                    />
+                                    <Text
+                                        text="{path: 'HostelModel>RateText', formatter:'.Formatter.fromatNumber'}"
+                                    />
+                                    <Text
+                                        text="{HostelModel>BreakdownText}"
+                                        wrapping="true"
+                                    />
+                                    <Text
+                                        text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
                     </VBox>
+                    </l:content>
 
                     <!-- Right Column - Takes full width on mobile, 35% on tablet/desktop -->
-                    <VBox
-                        width="{= ${device>/system/phone} ? '100%' : '35%'}"
-                        class="sapUiLargeMarginBegin sapUiTinyMarginEnd"
-                    >
+                   
+                    <l:content>
+                     <VBox>
+            <layoutData>
+                <l:GridData span="XL4 L4 M12 S12"/>
+            </layoutData>
 <!-- Coupon Section -->
 <Title
     text="Have a Coupon?"
@@ -581,73 +639,14 @@
                                 />
                             </VBox>
                         </Panel>
-                    </VBox>
-                </HBox>
+                        </VBox>
+                    </l:content>
+                
 
-<!-- Selected Facilities Summary Section -->
-<Title
-    text="Selected Facilities Summary"
-    class="booking-section-header"
-    wrapping="true"
-/>
 
-                <Panel
-                    class="customBookingPanel booking-panel-enhanced"
-                    width="98.5%"
-                >
-                    <Table
-                        items="{HostelModel>/AllSelectedFacilities}"
-                        noDataText="-- No facilities opted --"
-                        autoPopinMode="true"
-                        class="responsiveTable"
-                    >
-                        <columns>
-                            <Column>
-                                <Text text="Facility" />
-                            </Column>
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-<Text text="Rate / Unit" />
-
-                            </Column>
-                            <Column
-                                minScreenWidth="Desktop"
-                                demandPopin="true"
-                                width="45%"
-                            >
-                                <Text
-                                    text="Breakdown (Who &amp; Qty)"
-                                />
-                            </Column>
-                            <Column hAlign="End">
-                                <Text text="Total" />
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem vAlign="Top">
-                                <cells>
-                                    <Text
-                                        text="{HostelModel>FacilityName}"
-                                    />
-                                    <Text
-                                        text="{path: 'HostelModel>RateText', formatter:'.Formatter.fromatNumber'}"
-                                    />
-                                    <Text
-                                        text="{HostelModel>BreakdownText}"
-                                        wrapping="true"
-                                    />
-                                    <Text
-                                        text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
-                                    />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </Panel>
-            </VBox>
-        </content>
+            
+  
+        </l:Grid>
 
         <footer>
             <Toolbar>

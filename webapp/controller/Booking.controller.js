@@ -9,7 +9,6 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/model/FilterOperator",
       "../model/formatter",
 ], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator, Formatter) {
 
