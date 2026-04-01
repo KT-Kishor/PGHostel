@@ -9,13 +9,29 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.Document",
         {
             onInit: function () {
-                this.getOwnerComponent().getRouter().getRoute("RouteUploadDocs").attachMatched(this._onRouteMatched,
-                    this);
-            },
+            this.getOwnerComponent().getRouter().getRoute("RouteUploadDocs").attachMatched(this._onRouteMatched, this);
+        },
 
             _onRouteMatched: function (oEvent) {
-                const CustomerId = oEvent.getParameter("arguments").CustomerId;
-                console.log("Customer ID:", CustomerId  );
+                const sEncodedCustomerID = oEvent.getParameter("arguments")?.EncodedCustomerID;
+
+                if (!sEncodedCustomerID) {
+                    return this._goToNotFound();
+                }
+
+                const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+
+                if (!base64Regex.test(sEncodedCustomerID)) {
+                    return this._goToNotFound();
+                }
+
+                try {
+                    this._decodedCustomerID = atob(sEncodedCustomerID);
+                } catch (e) {
+                    return this._goToNotFound();
+                }
+
+                // Models
                 const oUploadModel = new JSONModel({
                     attachments: []
                 });
@@ -77,7 +93,8 @@ sap.ui.define([
                 };
                 oReader.readAsDataURL(oFile);
             },
-            onpressSave: function () {
+
+                onpressSave: function () {
                 const oModel = this.getView().getModel("UploaderData");
                 const aFiles = oModel.getProperty("/attachments");
 
@@ -86,42 +103,42 @@ sap.ui.define([
                     return;
                 }
 
+                if (!this._decodedCustomerID) {
+                    sap.m.MessageBox.error("Invalid Customer ID");
+                    return;
+                }
+
                 aFiles.forEach(item => {
                     let Payload = {
                         data: {
-                            CustomerId: "C026",
+                            CustomerID: this._decodedCustomerID, // ✅ dynamic
                             DocumentType: item.documentType,
                             FileName: item.filename,
                             FileType: item.fileType,
-                            File: item.content   // Base64
+                            File: item.content
                         }
                     };
 
-                    this.ajaxCreateWithJQuery("HM_CustomerDocument", Payload).then(() => {
-                        // ;
-                    }).catch(() => {
-                        sap.m.MessageBox.error("Failed to save document")
-                    });
+                    this.ajaxCreateWithJQuery("HM_CustomerDocument", Payload)
+                        .catch(() => {
+                            sap.m.MessageBox.error("Failed to save document");
+                        });
                 });
+
                 sap.m.MessageBox.information("Document saved successfully", {
                     title: "Success",
                     actions: [sap.m.MessageBox.Action.OK],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
                     styleClass: "myUnifiedBtn",
-
                     onClose: function (sAction) {
-
                         if (sAction === sap.m.MessageBox.Action.OK) {
                             this.getOwnerComponent().getRouter().navTo("RouteHostel");
-
                         }
-
                     }.bind(this)
                 });
-
             },
-             onFileLinkPress: function (oEvent) {
 
+             onFileLinkPress: function (oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");

@@ -417,7 +417,7 @@
         },
            {
           "name": "RouteUploadDocs",
-          "pattern": "UploadDocs",
+          "pattern": "UploadDocs/{EncodedCustomerID}",
           "target": [
             "targetUploadDocs"
           ]
