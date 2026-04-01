@@ -60,6 +60,7 @@
                     placeholder="Select Name"
                     items="{CustomerData>/AllMembers}"
                     value="{edit>/MemberName}"
+                    change="onMemberNameChange"
                     width="100%"
                     visible="{= ${CustomerData>/PropertyType}==='Hotel'}"
                     valueStateText="Please Select Name"

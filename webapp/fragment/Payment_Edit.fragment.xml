@@ -103,21 +103,21 @@
                         >
                             <Label text="{i18n>cardNumber}" />
                             <Input
-                                id="idCardNumber"
+                                id="idCardNumber1"
                                 maxLength="16"
                                 placeholder="{i18n>enterCardNumber}"
                             />
 
                             <Label text="{i18n>expiry}" />
                             <Input
-                                id="idCardExpiry"
+                                id="idCardExpiry1"
                                 maxLength="5"
                                 placeholder="MM/YY"
                             />
 
                             <Label text="{i18n>cVV}" />
                             <Input
-                                id="idCardCVV"
+                                id="idCardCVV1"
                                 type="Password"
                                 maxLength="3"
                                 placeholder="***"
@@ -141,7 +141,7 @@
                            
                         />      
                         <Input
-                            id="idAmount"
+                            id="idAmount1"
                             type="Number"
                             value="{HostelModel>/PerMonthNoPerson}"
                             placeholder="{i18n>enterAmount}"
@@ -154,7 +154,7 @@
                            
                         />
                         <Input
-                            id="idPaymentTypeField"
+                            id="idPaymentTypeField1"
                             placeholder="{i18n>enterPaymentType}"
                             value="{PaymentModel>/PaymentType}"
                             maxLength="20"
@@ -167,7 +167,7 @@
                             required="true"
                         />
                         <Input
-                            id="idTransactionID"
+                            id="idTransactionID1"
                             placeholder="{i18n>enterTransactionID}"
                             liveChange="onTransactionIDChange"
                             valueStateText="Enter Transaction ID"
@@ -178,7 +178,7 @@
                             text="{i18n>date}"
                         />
                         <DatePicker
-                            id="idPaymentDate"
+                            id="idPaymentDate1"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="dd/MM/yyyy"
                             value="{PaymentModel>/PaymentDate}"

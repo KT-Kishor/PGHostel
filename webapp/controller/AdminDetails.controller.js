@@ -411,7 +411,7 @@ sap.ui.define([
                     // OrginalRentPrice: oCustomer.Bookings?.[0]?.RoomPrice || 0,
                     BedType: oCustomer.Bookings?.[0]?.BedType || "",
                     BookingDate: new Date(oCustomer.Bookings?.[0]?.BookingDate || ""),
-                    PropertyType:oCustomer.Bookings?.[0]?.PropertyType,
+                    PropertyType: oCustomer.Bookings?.[0]?.PropertyType,
                     BookingID: oCustomer.Bookings?.[0]?.BookingID || "",
                     BranchCode: oCustomer.Bookings?.[0]?.BranchCode || "",
                     NoOfPersons: oCustomer.Bookings?.[0]?.NoOfPersons || "",
@@ -729,7 +729,7 @@ sap.ui.define([
                         TotalYears: totalYears,
                         TotalAmount: fTotal,
                         FacilityChargeType: f.FacilityChargeType,
-                        MemberName:f.MemberName,
+                        MemberName: f.MemberName,
                         TotalHour: f.TotalHour,
                         quantity: f.Quantity,
                         SelectionMode: f.SelectionMode,
@@ -912,7 +912,7 @@ sap.ui.define([
             sap.ui.getCore().byId("id_Period").setVisible(false)
 
 
-                 var Data=this.getView().getModel("CustomerData").getData()
+            var Data = this.getView().getModel("CustomerData").getData()
 
             var oUnitType = sap.ui.getCore().byId("idUnitType");
             sap.ui.getCore().byId("editPrice").setValue("");
@@ -930,12 +930,12 @@ sap.ui.define([
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
             if (!oSelectedFacility) return;
 
-            if(this.getView().getModel("CustomerData").getProperty("/PropertyType")==="Hotel" && Data.AllMembers.length !==0 && (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "PERSON")) {
-                 sap.ui.getCore().byId("editMembername").setVisible(true)
-            }else{
-                 sap.ui.getCore().byId("editMembername").setVisible(false)
+            if (this.getView().getModel("CustomerData").getProperty("/PropertyType") === "Hotel" && Data.AllMembers.length !== 0 && (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "PERSON")) {
+                sap.ui.getCore().byId("editMembername").setVisible(true)
+            } else {
+                sap.ui.getCore().byId("editMembername").setVisible(false)
             }
-             this.SelectionMode=oSelectedFacility.SelectionMode
+            this.SelectionMode = oSelectedFacility.SelectionMode
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
@@ -1024,7 +1024,9 @@ sap.ui.define([
             this.getView().getModel("edit").setProperty("/Price", Total)
 
         },
-
+        onMemberNameChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
         onUnitTextChange: function (oEvent) {
 
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
@@ -1096,6 +1098,8 @@ sap.ui.define([
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
 
+         
+
             if (!sUnit || !sStartDate) return;
 
             const oSelect =
@@ -1120,7 +1124,13 @@ sap.ui.define([
             if (sEndDate.includes("/")) {
                 sEndDate = sEndDate.split("/").reverse().join("-");
             }
-
+            if(sStartDate!=="" && sEndDate!==""){
+               if(sEndDate<=sStartDate){
+                sap.m.MessageToast.show("Please select a valid date");
+                oModel.setProperty("/EndDate", "");
+                return;
+            }
+        }
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
             //   var oEndDatePicker = sap.ui.getCore().byId("editEndDate");
@@ -1272,7 +1282,7 @@ sap.ui.define([
                     return;
                 }
             }
-            if (oPayload.UnitText !== "Unit Price") {
+            if (oPayload.UnitText !== "Unit Price" && oPayload.UnitText !=="") {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1284,8 +1294,8 @@ sap.ui.define([
                     return;
                 }
 
-            }else if(this.SelectionMode==="PERSON_QTY" || this.SelectionMode==="PERSON"){
-                   if (
+            } else if (this.SelectionMode === "PERSON_QTY" || this.SelectionMode === "PERSON") {
+                if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idUnitType"), "ID") ||
@@ -1297,8 +1307,8 @@ sap.ui.define([
                     return;
                 }
             }
-                
-                else {
+
+            else {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1379,14 +1389,14 @@ sap.ui.define([
             const iCount = oPayload.TotalHour || 1;
 
             // CALCULATE PRICE BASED ON UNIT
-            if ((oPayload.UnitText === "Per Day" && oPayload.UnitText !== "Unit Price") ) {
-                finalPrice =iquantity !=="" ? basePrice * iDays * iquantity:basePrice * iDays;
+            if ((oPayload.UnitText === "Per Day" && oPayload.UnitText !== "Unit Price")) {
+                finalPrice = iquantity !== "" ? basePrice * iDays * iquantity : basePrice * iDays;
             } else if ((oPayload.UnitText === "Per Month" && oPayload.UnitText !== "Unit Price")) {
-                finalPrice =iquantity !=="" ? basePrice * iCount * iquantity:basePrice * iCount;
+                finalPrice = iquantity !== "" ? basePrice * iCount * iquantity : basePrice * iCount;
             } else if ((oPayload.UnitText === "Per Year" && oPayload.UnitText !== "Unit Price")) {
-                finalPrice =iquantity !=="" ?  basePrice * iCount * iquantity:basePrice * iCount;
+                finalPrice = iquantity !== "" ? basePrice * iCount * iquantity : basePrice * iCount;
             } else if ((oPayload.UnitText === "Per Hour" && oPayload.UnitText !== "Unit Price")) {
-                finalPrice =iquantity !=="" ? basePrice * iHours * iDays * iquantity:basePrice * iHours * iDays;
+                finalPrice = iquantity !== "" ? basePrice * iHours * iDays * iquantity : basePrice * iHours * iDays;
             } else if (oPayload.UnitText === "Unit Price") {
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
                     finalPrice = basePrice * iquantity * iDays;
@@ -1402,7 +1412,7 @@ sap.ui.define([
             oPayload.TotalYears = oPayload.TotalUnits || "1"
             oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 ? "DAILY" : "ONCE_PER_BOOKING" : ""
             oPayload.MemberName = sap.ui.getCore().byId("editMembername").getValue() || ""
-            oPayload.SelectionMode =  this.SelectionMode
+            oPayload.SelectionMode = this.SelectionMode
 
 
 
@@ -2132,7 +2142,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("editStartDate").setEditable(false)
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
                 sap.ui.getCore().byId("editDays").setVisible(false)
-            } else if (oSelectedData.SelectionMode === "QTY" ||  (oSelectedData.quantity !== undefined && oSelectedData.quantity !== "")) {
+            } else if (oSelectedData.SelectionMode === "QTY" || (oSelectedData.quantity !== undefined && oSelectedData.quantity !== "")) {
                 sap.ui.getCore().byId("editquantity").setVisible(true)
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
@@ -2145,9 +2155,9 @@ sap.ui.define([
                 sap.ui.getCore().byId("editDays").setVisible(true)
             }
 
-            if(oSelectedData.MemberName!==""){
+            if (oSelectedData.MemberName !== "") {
                 sap.ui.getCore().byId("editMembername").setVisible(true)
-            }else{
+            } else {
                 sap.ui.getCore().byId("editMembername").setVisible(false)
             }
 
@@ -2964,8 +2974,7 @@ sap.ui.define([
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                                    var subtotal = edit.Price * Number(edit.quantity) * (edit.TotalDays || 1);
+                                if (sap.ui.getCore().byId("id_Period")?sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 : false) {
                                     firstMonthAmount = Number(item.TotalAmount) * overlapDays;
                                 } else {
                                     firstMonthAmount = Number(item.TotalAmount)
@@ -3081,13 +3090,13 @@ sap.ui.define([
 
             // clear all fields
             const aFields = [
-                "idAmount",
-                "idPaymentTypeField",
-                "idTransactionID",
-                "idPaymentDate",
-                "idCardNumber",
-                "idCardExpiry",
-                "idCardCVV"
+                "idAmount1",
+                "idPaymentTypeField1",
+                "idTransactionID1",
+                "idPaymentDate1",
+                "idCardNumber1",
+                "idCardExpiry1",
+                "idCardCVV1"
             ];
 
             aFields.forEach(function (sId) {
@@ -3541,7 +3550,7 @@ sap.ui.define([
                     "Date": new Date().toISOString().split('T')[0],
                     "Amount": oHostelModel.getProperty("/PerMonthNoPerson"),
                     "PaymentType": oHostelModel.getProperty("/PaymentType"), // fallback to original if mapping not found
-                    "BankTransactionID": sap.ui.getCore().byId("idTransactionID").getValue() || "",
+                    "BankTransactionID": sap.ui.getCore().byId("idTransactionID1").getValue() || "",
                     "CustomerID": CustomerData.CustomerID,
                     "Currency": CustomerData.Currency || "INR",
                     "BranchCode": CustomerData.BranchCode || "",
@@ -3595,8 +3604,8 @@ sap.ui.define([
 
             if (!isPayOnCheckIn) {
                 const isMandatoryValid = (
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID"), "ID") &&
-                    utils._LCvalidateDate(sap.ui.getCore().byId("idPaymentDate"), "ID")
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idTransactionID1"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("idPaymentDate1"), "ID")
                 );
 
                 if (!isMandatoryValid) {
@@ -6115,86 +6124,86 @@ sap.ui.define([
             // ========== FACILITY DETAILS TABLE ==========
 
             const facilities = data.AllSelectedFacilities || [];
-            
+
             if (facilities.length > 0) {
 
-            checkNewPage(20);
+                checkNewPage(20);
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("FACILITY DETAILS", 15, currentY);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+                doc.text("FACILITY DETAILS", 15, currentY);
 
-            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.setLineWidth(0.8);
-            doc.line(15, currentY + 3, 70, currentY + 3);
+                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.setLineWidth(0.8);
+                doc.line(15, currentY + 3, 70, currentY + 3);
 
-            currentY += 8;
+                currentY += 8;
 
-            let tableBody = [];
-            if (facilities.length > 0) {
-                tableBody = facilities.map((item, index) => [
-                    (index + 1).toString(),
-                    item.FacilityName || "-",
-                    item.StartDate || "-",
-                    item.EndDate || "-",
-                    `${Formatter.fromatNumber(parseFloat(item.Price) || 0)}`,
-                    item.UnitText || "-",
-                    `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
-                ]);
-            } else {
-                tableBody = [["", "No facilities selected", "", "", "", "", ""]];
-            }
-
-            // Calculate if table will fit on current page
-            const estimatedTableHeight = (tableBody.length + 1) * 8; // Approximate height in mm
-            if (currentY + estimatedTableHeight > 260) {
-                doc.addPage();
-                currentY = 20;
-            }
-
-            doc.autoTable({
-                startY: currentY,
-                margin: { left: 15, right: 10 },
-                head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
-                body: tableBody,
-                theme: 'striped',
-
-                styles: {
-                    font: "helvetica",
-                    fontSize: 9,
-                    cellPadding: 2,
-                    lineColor: [220, 220, 220],
-                    lineWidth: 0.1,
-                    valign: "middle"
-                },
-
-                headStyles: {
-                    fillColor: PRIMARY_COLOR,
-                    textColor: [255, 255, 255],
-                    fontStyle: "bold",
-                    fontSize: 10,
-                    halign: "center"
-                },
-
-                alternateRowStyles: {
-                    fillColor: [250, 250, 250]
-                },
-
-                columnStyles: {
-                    0: { cellWidth: 12, halign: "center" },
-                    1: { cellWidth: 48, halign: "left" },
-                    2: { cellWidth: 24, halign: "center" },
-                    3: { cellWidth: 24, halign: "center" },
-                    4: { cellWidth: 24, halign: "right" },
-                    5: { cellWidth: 18, halign: "center" },
-                    6: { cellWidth: 28, halign: "right" }
+                let tableBody = [];
+                if (facilities.length > 0) {
+                    tableBody = facilities.map((item, index) => [
+                        (index + 1).toString(),
+                        item.FacilityName || "-",
+                        item.StartDate || "-",
+                        item.EndDate || "-",
+                        `${Formatter.fromatNumber(parseFloat(item.Price) || 0)}`,
+                        item.UnitText || "-",
+                        `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
+                    ]);
+                } else {
+                    tableBody = [["", "No facilities selected", "", "", "", "", ""]];
                 }
-            });
 
-            currentY = doc.lastAutoTable.finalY + 15;
+                // Calculate if table will fit on current page
+                const estimatedTableHeight = (tableBody.length + 1) * 8; // Approximate height in mm
+                if (currentY + estimatedTableHeight > 260) {
+                    doc.addPage();
+                    currentY = 20;
+                }
 
-        }
+                doc.autoTable({
+                    startY: currentY,
+                    margin: { left: 15, right: 10 },
+                    head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
+                    body: tableBody,
+                    theme: 'striped',
+
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 9,
+                        cellPadding: 2,
+                        lineColor: [220, 220, 220],
+                        lineWidth: 0.1,
+                        valign: "middle"
+                    },
+
+                    headStyles: {
+                        fillColor: PRIMARY_COLOR,
+                        textColor: [255, 255, 255],
+                        fontStyle: "bold",
+                        fontSize: 10,
+                        halign: "center"
+                    },
+
+                    alternateRowStyles: {
+                        fillColor: [250, 250, 250]
+                    },
+
+                    columnStyles: {
+                        0: { cellWidth: 12, halign: "center" },
+                        1: { cellWidth: 48, halign: "left" },
+                        2: { cellWidth: 24, halign: "center" },
+                        3: { cellWidth: 24, halign: "center" },
+                        4: { cellWidth: 24, halign: "right" },
+                        5: { cellWidth: 18, halign: "center" },
+                        6: { cellWidth: 28, halign: "right" }
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 15;
+
+            }
 
             // Force page break before payment summary if there's not enough space
             if (currentY > 200) {

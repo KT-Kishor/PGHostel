@@ -23,8 +23,8 @@
             <content>
                 <VBox class="sapUiSmallMargin">
                     <Title
-                        text="{i18n>hostelBooking} ( {CustomerData>/BranchName} )"
-                        class="boldBlackText sapUiSmallMarginBottom"
+                     text="{= ${CustomerData>/PropertyType} + ' booking (' + ${CustomerData>/BranchName} + ')' }"
+                     class="boldBlackText sapUiSmallMarginBottom"
                     />
                     <!-- Responsive Booking Status and Buttons -->
                     <!-- Left Side Info -->
@@ -1394,6 +1394,7 @@
                                 tooltip="{i18n>GeneratePDF}"
                                 press="onGeneratePDF"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
+                                visible="{= !${VisibleModel>/visible}}"
                             />
                 </contentRight>
 			</Bar>
