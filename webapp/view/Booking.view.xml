@@ -494,36 +494,52 @@
                         wrapping="true"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced">
-                        <HBox
-                            class="sapUiTinyMarginTop couponContainer"
-                            alignItems="Center"
+                        <Panel
+                            class="customBookingPanel booking-panel-enhanced"
                         >
-                            <Input
-                                value="{HostelModel>/CouponCode}"
-                                placeholder="Enter coupon code"
-                                liveChange="onCouponLiveChange"
-                                class="sapUiSmallMarginEnd couponInput"
-                                width="100%"
-                            >
+                            <!-- <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center"> -->
+                            <HBox
+    width="100%"
+    alignItems="Center"
+    justifyContent="Start"
+    wrap="NoWrap"
+    class="sapUiTinyMarginTop"
+>
+                                <Input
+                                    value="{HostelModel>/CouponCode}"
+                                    placeholder="Enter coupon code"
+                                    liveChange="onCouponLiveChange"
+                                    class="sapUiSmallMarginEnd couponInput"
+                                    width="100%"
+                                >
+
+                                    <layoutData>
+                                        <FlexItemData growFactor="1"  shrinkFactor="1"/>
+                                    </layoutData>
+                                </Input>
+                                <Button
+                                    text="Apply Coupon"
+                                    press="onApplyCoupon"
+                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
+                                    visible="{= !${HostelModel>/AppliedCouponCode} }"
+                                >
                                 <layoutData>
-                                    <FlexItemData growFactor="1" />
-                                </layoutData>
-                            </Input>
-                            <Button
-                                text="Apply Coupon"
-                                press="onApplyCoupon"
-                                class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
-                                visible="{= !${HostelModel>/AppliedCouponCode} }"
-                            />
-                            <Button
-                                text="Remove"
-                                press="onRemoveCoupon"
-                                class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
-                                visible="{= !!${HostelModel>/AppliedCouponCode} }"
-                            />
-                        </HBox>
-                    </Panel>
+        <FlexItemData growFactor="0" shrinkFactor="0"/>
+    </layoutData>
+                                
+                                </Button>
+                                <Button
+                                    text="Remove"
+                                    press="onRemoveCoupon"
+                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
+                                    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+                                >
+                                <layoutData>
+        <FlexItemData growFactor="0"/>
+    </layoutData>
+                                </Button>
+                            </HBox>
+                        </Panel>
 
                     <!-- Payment Summary Section -->
                     <Title
@@ -656,30 +672,31 @@
                                     text="IGST: {path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/IGST} > 0}"
                                 /> -->
-                            <MessageStrip
-                                text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
-                                type="Information"
-                                showIcon="true"
-                                showCloseButton="false"
-                                class="sapUiTinyMarginBottom"
-                            />
-                            <MessageStrip
-                                text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
-                                type="Information"
-                                showIcon="true"
-                                showCloseButton="false"
-                                visible="{= ${HostelModel>/Deposit} > 0}"
-                            />
-                            <Title
-                                text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
-                            />
-                            <Title
-                                text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
-                            />
+                                <MessageStrip
+                                    text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
+                                    type="Information"
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                    class="sapUiTinyMarginBottom"
+                                />
+                                <MessageStrip
+                                    text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                    type="Information"
+                                    showIcon="true"
+                                    showCloseButton="false"
+                                    visible="{= ${HostelModel>/Deposit} > 0}"
+                                />
+                                <Title
+                                    text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
+                                />
+                                <Title
+                                    text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
+                                />
+                            </VBox>
+                        </Panel>
                         </VBox>
-                    </Panel>
-                </VBox>
-            </l:content>
+                    </l:content>
+
         </l:Grid>
 
         <footer>
