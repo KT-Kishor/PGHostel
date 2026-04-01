@@ -3373,29 +3373,6 @@ sap.ui.define([
             return "";
         },
 
-        _getFacilityFlagValue: function (oFacility) {
-            const sSelectionMode = String(oFacility && oFacility.SelectionMode || "").toUpperCase().trim();
-            const aSelectedPersonIds = Array.isArray(oFacility && oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
-            const aPersonQuantities = Array.isArray(oFacility && oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
-
-            if (sSelectionMode === "PERSON") {
-                return aSelectedPersonIds.some(function (sPersonId) {
-                    return sPersonId && sPersonId !== "SELF";
-                }) ? "X" : "";
-            }
-
-            if (sSelectionMode === "PERSON_QTY") {
-                return aPersonQuantities.some(function (oLine) {
-                    return oLine &&
-                        oLine.personId &&
-                        oLine.personId !== "SELF" &&
-                        (parseInt(oLine.qty, 10) || 0) > 0;
-                }) ? "X" : "";
-            }
-
-            return "";
-        },
-
         _getFacilityMemberRecord: function (sPersonId) {
             const oBookingView = this.getView().getModel("BookingView");
             const aMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
@@ -3407,6 +3384,22 @@ sap.ui.define([
             return aMembers.find(function (oMember) {
                 return oMember.id === sPersonId || oMember.MemberID === sPersonId;
             }) || null;
+        },
+
+        _isNamedFamilyMemberFacilityPerson: function (sPersonId) {
+            const oMember = this._getFacilityMemberRecord(sPersonId);
+
+            return !!(
+                sPersonId &&
+                sPersonId !== "SELF" &&
+                oMember &&
+                oMember.Selected &&
+                String(oMember.Name || "").trim()
+            );
+        },
+
+        _getFacilityFlagValue: function (sPersonId) {
+            return this._isNamedFamilyMemberFacilityPerson(sPersonId) ? "X" : "";
         },
 
         _getFacilityMemberIdentity: function (sPersonId, sFallbackName) {
@@ -3438,7 +3431,6 @@ sap.ui.define([
             const sUnitText = oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "";
             const fUnitPrice = this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0);
             const sChargeType = oFacility.FacilityChargeType || "";
-            const sFlag = this._getFacilityFlagValue(oFacility);
             const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
             const iChargeableDays = sChargeType === "DAILY" ? this._getFacilityChargeableDayCount() : 0;
@@ -3461,7 +3453,7 @@ sap.ui.define([
                     UnitPrice: fUnitPrice.toFixed(2),
                     BasicFacilityPrice: fUnitPrice.toFixed(2),
                     FacilitiPrice: "0.00",
-                    Flag: sFlag
+                    Flag: ""
                 };
             };
 
@@ -3475,6 +3467,7 @@ sap.ui.define([
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = 1;
                     oRow.FacilitiPrice = fUnitPrice.toFixed(2);
+                    oRow.Flag = this._getFacilityFlagValue(sPersonId);
                     return oRow;
                 }.bind(this));
             }
@@ -3493,6 +3486,7 @@ sap.ui.define([
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = iQty;
                     oRow.FacilitiPrice = fRowTotal.toFixed(2);
+                    oRow.Flag = this._getFacilityFlagValue(oLine.personId);
                     return oRow;
                 }.bind(this));
             }
