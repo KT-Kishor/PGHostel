@@ -846,7 +846,7 @@ sap.ui.define([
                             }).addStyleClass("sapUiSmallMargin"),
 
                             new sap.m.StepInput({
-                                width: "100%",
+                                width: "93%",
                                 min: 1,
                                 value: "{FacilitySelection>/quantity}",
                                 visible: {
