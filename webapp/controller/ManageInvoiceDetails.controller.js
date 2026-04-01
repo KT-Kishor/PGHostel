@@ -508,7 +508,6 @@ sap.ui.define([
                         bookingDetails.PaymentType,
                         bookingDetails.StartDate,
                         bookingDetails.EndDate
-
                     );
 
                     finalInvoiceItems.push({
@@ -537,7 +536,9 @@ sap.ui.define([
                             item.UnitText,
                             item.StartDate,
                             item.EndDate,
-                            item.TotalHour
+                            item.TotalHour,
+                            item.SelectionMode,   
+                            item.Quantity       
                         );
 
                         let particulars = ""; // Build Particulars
@@ -549,8 +550,6 @@ sap.ui.define([
                         } else {
                             particulars = `${item.FacilityName} - Facility`;
                         }
-
-
 
                         finalInvoiceItems.push({
                             IndexNo: index + 2,
@@ -611,49 +610,100 @@ sap.ui.define([
                 }
             },
 
-            _getDurationText: function(sUnit, sStartDate, sEndDate, totalHour) {
+            _getDurationText: function(sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity) {
+
                 if (!sStartDate || !sEndDate) return "";
 
                 const start = new Date(sStartDate);
                 const end = new Date(sEndDate);
+
                 const diffTime = end - start;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                if (sUnit === "Per Day") {
-                    return diffDays + (diffDays === 1 ? " Day" : " Days");
+                const qty = Number(quantity) || 1;
+                const mode = selectionMode?.toUpperCase();
+                const unit = sUnit?.toLowerCase();
+
+                let baseDuration = "";
+                let result = "";
+
+                // -------------------------
+                // BASE DURATION CALCULATION
+                // -------------------------
+                if (unit === "per day") {
+                    baseDuration = diffDays + (diffDays === 1 ? " Day" : " Days");
                 }
 
-                if (sUnit === "Per Month") {
+                else if (unit === "per month") {
                     let months =
                         (end.getFullYear() - start.getFullYear()) * 12 +
                         (end.getMonth() - start.getMonth());
 
                     if (end.getDate() >= start.getDate()) months += 1;
 
-                    return months + (months === 1 ? " Month" : " Months");
+                    baseDuration = months + (months === 1 ? " Month" : " Months");
                 }
 
-                if (sUnit === "Per Year") {
-
+                else if (unit === "per year") {
                     if (diffDays < 364) {
-                        return diffDays + " Days";
+                        baseDuration = diffDays + " Days";
+                    } else {
+                        const years = Math.round(diffDays / 365);
+                        baseDuration = years + (years === 1 ? " Year" : " Years");
                     }
-
-                    const years = Math.round(diffDays / 365);
-                    return years + (years === 1 ? " Year" : " Years");
                 }
 
-                if (sUnit === "Per Hour") {
+                else if (unit === "per hour") {
                     const hoursPerDay = Number(totalHour) || 1;
                     const totalHours = hoursPerDay * diffDays;
-                    return totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                    baseDuration = totalHours + (totalHours === 1 ? " Hour" : " Hours");
                 }
 
-                if (sUnit === "Fix") {
+                else if (unit === "unit price") {
+                    baseDuration = ""; // handled below
+                }
+
+                else if (unit === "fix") {
                     return "-";
                 }
 
-                return "";
+                // -------------------------
+                // SELECTION MODE HANDLING
+                // -------------------------
+
+                if (mode === "SINGLE") {
+                    return "-";
+                }
+
+                if (mode === "QTY") {
+                    if (unit === "unit price") {
+                        return `${qty} Qty`;
+                    }
+                    return `${qty} Qty × ${baseDuration}`;
+                }
+
+                if (mode === "PERSON") {
+                    if (unit === "unit price") {
+                        return `${qty} Persons`;
+                    }
+                    return `${qty} Persons × ${baseDuration}`;
+                }
+
+                if (mode === "PERSON_QTY") {
+
+                    if (unit === "unit price") {
+                        return `${qty} Units`;
+                    }
+
+                    if (unit === "per day") {
+                        const totalUnits = qty * diffDays;
+                        return `${totalUnits} Units (${qty} × ${diffDays} Days)`;
+                    }
+
+                    return `${qty} Units × ${baseDuration}`;
+                }
+
+                return baseDuration;
             },
 
             onChangeInvoiceDate: function(oEvent) {
@@ -3565,7 +3615,9 @@ sap.ui.define([
                             f.UnitText,
                             effectiveStart,
                             effectiveEnd,
-                            f.TotalHour
+                            f.TotalHour,
+                            f.SelectionMode,
+                            f.Quantity
                         ),
 
                         GrossPrice: Number(f.BasicFacilityPrice) || 0,
