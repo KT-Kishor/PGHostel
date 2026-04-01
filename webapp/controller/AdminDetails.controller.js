@@ -6113,6 +6113,11 @@ sap.ui.define([
             currentY += 55;
 
             // ========== FACILITY DETAILS TABLE ==========
+
+            const facilities = data.AllSelectedFacilities || [];
+            
+            if (facilities.length > 0) {
+
             checkNewPage(20);
 
             doc.setFont("helvetica", "bold");
@@ -6125,8 +6130,6 @@ sap.ui.define([
             doc.line(15, currentY + 3, 70, currentY + 3);
 
             currentY += 8;
-
-            const facilities = data.AllSelectedFacilities || [];
 
             let tableBody = [];
             if (facilities.length > 0) {
@@ -6190,6 +6193,8 @@ sap.ui.define([
             });
 
             currentY = doc.lastAutoTable.finalY + 15;
+
+        }
 
             // Force page break before payment summary if there's not enough space
             if (currentY > 200) {
