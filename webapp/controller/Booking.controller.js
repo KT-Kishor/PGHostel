@@ -2936,29 +2936,68 @@ sap.ui.define([
 
 
 
-        _getGrossTotalBeforeDiscount: function () {
+        _calculateTaxBreakup: function (fTaxableAmount) {
             const oModel = this.getView().getModel("HostelModel");
-            const fSubTotal = this._toNumber(oModel.getProperty("/BookingSubTotal"));
-            const fGSTValue = this._toNumber(oModel.getProperty("/EffectiveGSTValue") || oModel.getProperty("/GSTValue"));
-            const sGSTType = String(oModel.getProperty("/EffectiveGSTType") || oModel.getProperty("/GSTType") || "").trim();
+            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
+            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
+            const sGSTType = String(oModel.getProperty("/GSTType") || "").trim();
+            const fGSTValue = this._toNumber(oModel.getProperty("/GSTValue"));
+            const sPropertyGSTIN = String(oModel.getProperty("/PropertyGSTIN") || oModel.getProperty("/GSTIN") || "").trim().toUpperCase();
+            const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
+            let fCGST = 0;
+            let fSGST = 0;
+            let fIGST = 0;
+            let sEffectiveGSTType = sGSTType;
+            let fEffectiveGSTValue = 0;
+            let sSourceStateCode = "";
+            let sCustomerStateCode = "";
 
-            if (!sGSTType || fGSTValue <= 0) {
-                return Number(fSubTotal.toFixed(2));
+            if (sGSTType || fGSTValue > 0) {
+                fEffectiveGSTValue = fGSTValue;
+
+                if (bSupportsCustomerGST && this._isValidGSTINValue(sCustomerGSTIN) && this._isValidGSTINValue(sPropertyGSTIN)) {
+                    sSourceStateCode = sPropertyGSTIN.substring(0, 2);
+                    sCustomerStateCode = sCustomerGSTIN.substring(0, 2);
+
+                    if (sSourceStateCode === sCustomerStateCode) {
+                        sEffectiveGSTType = "CGST/SGST";
+                    } else {
+                        sEffectiveGSTType = "IGST";
+                    }
+                }
+
+                if (sEffectiveGSTType === "CGST/SGST") {
+                    const fHalfGSTValue = fEffectiveGSTValue / 2;
+                    fCGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
+                    fSGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
+                } else if (sEffectiveGSTType === "IGST") {
+                    fIGST = Number((fTaxableAmount * fEffectiveGSTValue / 100).toFixed(2));
+                }
             }
 
-            return Number((fSubTotal + (fSubTotal * fGSTValue / 100)).toFixed(2));
+            return {
+                CGST: fCGST,
+                SGST: fSGST,
+                IGST: fIGST,
+                EffectiveGSTType: sEffectiveGSTType,
+                EffectiveGSTValue: fEffectiveGSTValue,
+                SourceStateCode: sSourceStateCode,
+                CustomerStateCode: sCustomerStateCode
+            };
         },
 
         _getCouponBaseAmount: function () {
             const oModel = this.getView().getModel("HostelModel");
             const sPlan = oModel.getProperty("/SelectedPriceType");
+            const fRoomPrice = this._toNumber(oModel.getProperty("/RoomPrice"));
+            const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
 
-            if (sPlan === "Per Month" && iDuration > 0) {
-                return Number((this._getGrossTotalBeforeDiscount() / iDuration).toFixed(2));
+            if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
+                return Number((fRoomPrice / iDuration + fFacilityPrice).toFixed(2));
             }
 
-            return this._toNumber(oModel.getProperty("/RoomPrice")) + this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
+            return Number((fRoomPrice + fFacilityPrice).toFixed(2));
         },
 
         _isCouponExpired: function (vEndDate) {
@@ -2981,31 +3020,15 @@ sap.ui.define([
             const fBasePrice = this._toNumber(oModel.getProperty("/FinalPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
             const fDiscount = this._toNumber(oModel.getProperty("/AppliedDiscount"));
-            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
-            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
-            const sGSTType = String(oModel.getProperty("/GSTType") || "").trim();
-            const fGSTValue = this._toNumber(oModel.getProperty("/GSTValue"));
-            const sPropertyGSTIN = String(oModel.getProperty("/PropertyGSTIN") || oModel.getProperty("/GSTIN") || "").trim().toUpperCase();
-            const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
-            const iPersons = this._getSelectedPersonCount();
-            const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
-            const bFixedRoomRentProperty = this._supportsCustomerGSTOverride(sPropertyType);
-            const iRoomMultiplier = (bSinglePersonOnly || bFixedRoomRentProperty) ? 1 : iPersons;
             let fRoomPrice = fBasePrice;
             let iDays = 0;
             let sRoomBreakdown = fBasePrice + " " + (oModel.getProperty("/Currency") || "");
             let fSubTotal = 0;
             let fDiscountedSubTotal = 0;
-            let fCGST = 0;
-            let fSGST = 0;
-            let fIGST = 0;
-            let sEffectiveGSTType = sGSTType;
-            let fEffectiveGSTValue = 0;
-            let sSourceStateCode = "";
-            let sCustomerStateCode = "";
+            let oTaxBreakup;
 
             if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
                 iDays = Math.floor((oEndDate - oStartDate) / 86400000);
@@ -3016,50 +3039,24 @@ sap.ui.define([
                 sRoomBreakdown = fBasePrice + " x " + iDuration + (sPlan === "Per Month" ? " month(s)" : " year(s)");
             }
 
-            if (iRoomMultiplier > 1) {
-                fRoomPrice *= iRoomMultiplier;
-                sRoomBreakdown += " x " + iRoomMultiplier + " person(s)";
-            }
-
             oModel.setProperty("/TotalDays", iDays);
             oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
             oModel.setProperty("/RoomPrice", Number(fRoomPrice.toFixed(2)));
 
             fSubTotal = Number((fRoomPrice + fFacilityPrice).toFixed(2));
             fDiscountedSubTotal = Number(Math.max(fSubTotal - fDiscount, 0).toFixed(2));
-
-            if (sGSTType || fGSTValue > 0) {
-                fEffectiveGSTValue = fGSTValue;
-
-                if (bSupportsCustomerGST && this._isValidGSTINValue(sCustomerGSTIN) && this._isValidGSTINValue(sPropertyGSTIN)) {
-                    sSourceStateCode = sPropertyGSTIN.substring(0, 2);
-                    sCustomerStateCode = sCustomerGSTIN.substring(0, 2);
-
-                    if (sSourceStateCode === sCustomerStateCode) {
-                        sEffectiveGSTType = "CGST/SGST";
-                    } else {
-                        sEffectiveGSTType = "IGST";
-                    }
-                }
-
-                if (sEffectiveGSTType === "CGST/SGST") {
-                    fCGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue) / 100).toFixed(2));
-                    fSGST = Number((fDiscountedSubTotal * (fEffectiveGSTValue ) / 100).toFixed(2));
-                } else if (sEffectiveGSTType === "IGST") {
-                    fIGST = Number((fDiscountedSubTotal * fEffectiveGSTValue / 100).toFixed(2));
-                }
-            }
+            oTaxBreakup = this._calculateTaxBreakup(fDiscountedSubTotal);
 
             oModel.setProperty("/BookingSubTotal", fSubTotal);
             oModel.setProperty("/BookingNetSubTotal", fDiscountedSubTotal);
-            oModel.setProperty("/CGST", fCGST);
-            oModel.setProperty("/SGST", fSGST);
-            oModel.setProperty("/IGST", fIGST);
-            oModel.setProperty("/EffectiveGSTType", sEffectiveGSTType);
-            oModel.setProperty("/EffectiveGSTValue", fEffectiveGSTValue);
-            oModel.setProperty("/SourceStateCode", sSourceStateCode);
-            oModel.setProperty("/CustomerStateCode", sCustomerStateCode);
-            oModel.setProperty("/GrandTotal", Number(Math.max(fDiscountedSubTotal + fCGST + fSGST + fIGST, 0).toFixed(2)));
+            oModel.setProperty("/CGST", oTaxBreakup.CGST);
+            oModel.setProperty("/SGST", oTaxBreakup.SGST);
+            oModel.setProperty("/IGST", oTaxBreakup.IGST);
+            oModel.setProperty("/EffectiveGSTType", oTaxBreakup.EffectiveGSTType);
+            oModel.setProperty("/EffectiveGSTValue", oTaxBreakup.EffectiveGSTValue);
+            oModel.setProperty("/SourceStateCode", oTaxBreakup.SourceStateCode);
+            oModel.setProperty("/CustomerStateCode", oTaxBreakup.CustomerStateCode);
+            oModel.setProperty("/GrandTotal", Number(Math.max(fDiscountedSubTotal + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST, 0).toFixed(2)));
         },
 
         _parseDate: function (vDate) {
@@ -3164,9 +3161,16 @@ sap.ui.define([
             const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
             const fDiscount = this._toNumber(oHostelModel.getProperty("/AppliedDiscount"));
             const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+            let fFirstPeriodSubTotal;
+            let fFirstPeriodNetAmount;
+            let oTaxBreakup;
 
-            if (sPlan === "Per Month" && iDuration > 0) {
-                return Number(Math.max(this._getCouponBaseAmount() - fDiscount, 0).toFixed(2));
+            if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
+                fFirstPeriodSubTotal = this._getCouponBaseAmount();
+                fFirstPeriodNetAmount = Number(Math.max(fFirstPeriodSubTotal - fDiscount, 0).toFixed(2));
+                oTaxBreakup = this._calculateTaxBreakup(fFirstPeriodNetAmount);
+
+                return Number((fFirstPeriodNetAmount + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST).toFixed(2));
             }
 
             return fGrandTotal;
@@ -3260,11 +3264,13 @@ sap.ui.define([
 
         _buildMembersPayload: function () {
             const oBookingView = this.getView().getModel("BookingView");
+            const mTempMemberIds = this._getTempMemberIdMap();
 
             return (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return !oMember.IsNew && !!oMember.Selected;
             }).map(function (oMember) {
                 return {
+                    TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
                     MemberID: oMember.MemberID || "",
                     Name: oMember.Name || "",
                     Age: parseInt(oMember.Age, 10) || 0,
@@ -3319,6 +3325,50 @@ sap.ui.define([
             return aCustomerDocuments;
         },
 
+        _getTempMemberIdMap: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const aMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
+            const mTempMemberIds = {};
+            let iTempIndex = 1;
+
+            aMembers.filter(function (oMember) {
+                return !oMember.IsNew && !!oMember.Selected;
+            }).forEach(function (oMember) {
+                const sTempMemberId = String(oMember.TempMemberID || ("TMP" + iTempIndex)).trim();
+                const aKeys = [
+                    oMember.id,
+                    oMember.MemberID,
+                    oMember.ID
+                ].filter(Boolean);
+
+                aKeys.forEach(function (sKey) {
+                    mTempMemberIds[String(sKey).trim()] = sTempMemberId;
+                });
+
+                iTempIndex += 1;
+            });
+
+            return mTempMemberIds;
+        },
+
+        _getTempMemberIdForMember: function (oMember, mTempMemberIds) {
+            const aKeys = [
+                oMember && oMember.id,
+                oMember && oMember.MemberID,
+                oMember && oMember.ID
+            ].filter(Boolean);
+
+            for (let i = 0; i < aKeys.length; i += 1) {
+                const sKey = String(aKeys[i]).trim();
+
+                if (sKey && mTempMemberIds && mTempMemberIds[sKey]) {
+                    return mTempMemberIds[sKey];
+                }
+            }
+
+            return String(oMember && oMember.TempMemberID || "").trim();
+        },
+
         _getFacilityMemberIdValue: function (oFacility) {
             return "";
         },
@@ -3362,15 +3412,18 @@ sap.ui.define([
         _getFacilityMemberIdentity: function (sPersonId, sFallbackName) {
             const oHostelModel = this.getView().getModel("HostelModel");
             const oMember = this._getFacilityMemberRecord(sPersonId);
+            const mTempMemberIds = this._getTempMemberIdMap();
 
             if (sPersonId === "SELF") {
                 return {
+                    TempMemberID: "",
                     MemberID: "",
                     MemberName: String(oHostelModel.getProperty("/FullName") || sFallbackName || "Primary Guest").trim()
                 };
             }
 
             return {
+                TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
                 MemberID: String(oMember && oMember.MemberID || "").trim(),
                 MemberName: String(oMember && oMember.Name || sFallbackName || "").trim()
             };
@@ -3397,6 +3450,7 @@ sap.ui.define([
                     EndDate: sEndDate,
                     PaidStatus: "Pending",
                     CustomerID: sCustomerID,
+                    TempMemberID: "",
                     MemberID: "",
                     MemberName: "",
                     SelectionMode: oFacility.SelectionMode || "",
@@ -3416,6 +3470,7 @@ sap.ui.define([
                     const oIdentity = this._getFacilityMemberIdentity(sPersonId);
                     const oRow = fnCreateBaseRow();
 
+                    oRow.TempMemberID = oIdentity.TempMemberID;
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = 1;
@@ -3433,6 +3488,7 @@ sap.ui.define([
                     const oRow = fnCreateBaseRow();
                     const fRowTotal = sChargeType === "DAILY" ? (fUnitPrice * iQty * iChargeableDays) : (fUnitPrice * iQty);
 
+                    oRow.TempMemberID = oIdentity.TempMemberID;
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = iQty;
