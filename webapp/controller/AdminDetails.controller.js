@@ -411,7 +411,7 @@ sap.ui.define([
                     // OrginalRentPrice: oCustomer.Bookings?.[0]?.RoomPrice || 0,
                     BedType: oCustomer.Bookings?.[0]?.BedType || "",
                     BookingDate: new Date(oCustomer.Bookings?.[0]?.BookingDate || ""),
-
+                    PropertyType:oCustomer.Bookings?.[0]?.PropertyType,
                     BookingID: oCustomer.Bookings?.[0]?.BookingID || "",
                     BranchCode: oCustomer.Bookings?.[0]?.BranchCode || "",
                     NoOfPersons: oCustomer.Bookings?.[0]?.NoOfPersons || "",
@@ -436,6 +436,8 @@ sap.ui.define([
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
                     AllSelectedFacilities: oCustomer.FaciltyItems || [],
+                    AllMembers: oCustomer.Members || [],
+
                     Documents: oCustomer.Documents || []
                 };
                 let sDate = this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.BookingDate || "");
@@ -727,6 +729,7 @@ sap.ui.define([
                         TotalYears: totalYears,
                         TotalAmount: fTotal,
                         FacilityChargeType: f.FacilityChargeType,
+                        MemberName:f.MemberName,
                         TotalHour: f.TotalHour,
                         quantity: f.Quantity,
                         SelectionMode: f.SelectionMode,
@@ -887,6 +890,8 @@ sap.ui.define([
             sap.ui.getCore().byId("editStartDate").setValueState("None").setEditable(true)
             sap.ui.getCore().byId("editEndDate").setValueState("None")
             sap.ui.getCore().byId("editquantity").setValueState("None")
+            sap.ui.getCore().byId("editMembername").setVisible(false).setSelectedKey("").setValueState("None")
+
 
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
@@ -901,11 +906,13 @@ sap.ui.define([
         },
 
         onFacilityChange: function (oEvent) {
+
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             sap.ui.getCore().byId("editquantity").setVisible(false)
             sap.ui.getCore().byId("id_Period").setVisible(false)
 
 
+                 var Data=this.getView().getModel("CustomerData").getData()
 
             var oUnitType = sap.ui.getCore().byId("idUnitType");
             sap.ui.getCore().byId("editPrice").setValue("");
@@ -923,6 +930,12 @@ sap.ui.define([
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
             if (!oSelectedFacility) return;
 
+            if(this.getView().getModel("CustomerData").getProperty("/PropertyType")==="Hotel" && Data.AllMembers.length !==0 && (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "PERSON")) {
+                 sap.ui.getCore().byId("editMembername").setVisible(true)
+            }else{
+                 sap.ui.getCore().byId("editMembername").setVisible(false)
+            }
+             this.SelectionMode=oSelectedFacility.SelectionMode
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
@@ -1271,7 +1284,21 @@ sap.ui.define([
                     return;
                 }
 
-            } else {
+            }else if(this.SelectionMode==="PERSON_QTY" || this.SelectionMode==="PERSON"){
+                   if (
+                    !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
+                    !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||
+                    !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idUnitType"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editquantity"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editStartDate"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editEndDate"), "ID")
+                ) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    return;
+                }
+            }
+                
+                else {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1352,14 +1379,14 @@ sap.ui.define([
             const iCount = oPayload.TotalHour || 1;
 
             // CALCULATE PRICE BASED ON UNIT
-            if ((oPayload.UnitText === "Per Day" && oPayload.UnitText !== "Unit Price") && oPayload.quantity !== "") {
-                finalPrice = basePrice * iDays * iquantity;
-            } else if ((oPayload.UnitText === "Per Month" && oPayload.UnitText !== "Unit Price") && oPayload.quantity !== "") {
-                finalPrice = basePrice * iCount * iquantity;
-            } else if ((oPayload.UnitText === "Per Year" && oPayload.UnitText !== "Unit Price") && oPayload.quantity !== "") {
-                finalPrice = basePrice * iCount * iquantity;
-            } else if ((oPayload.UnitText === "Per Hour" && oPayload.UnitText !== "Unit Price") && oPayload.quantity !== "") {
-                finalPrice = basePrice * iHours * iDays * iquantity;
+            if ((oPayload.UnitText === "Per Day" && oPayload.UnitText !== "Unit Price") ) {
+                finalPrice =iquantity !=="" ? basePrice * iDays * iquantity:basePrice * iDays;
+            } else if ((oPayload.UnitText === "Per Month" && oPayload.UnitText !== "Unit Price")) {
+                finalPrice =iquantity !=="" ? basePrice * iCount * iquantity:basePrice * iCount;
+            } else if ((oPayload.UnitText === "Per Year" && oPayload.UnitText !== "Unit Price")) {
+                finalPrice =iquantity !=="" ?  basePrice * iCount * iquantity:basePrice * iCount;
+            } else if ((oPayload.UnitText === "Per Hour" && oPayload.UnitText !== "Unit Price")) {
+                finalPrice =iquantity !=="" ? basePrice * iHours * iDays * iquantity:basePrice * iHours * iDays;
             } else if (oPayload.UnitText === "Unit Price") {
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
                     finalPrice = basePrice * iquantity * iDays;
@@ -1374,6 +1401,8 @@ sap.ui.define([
             oPayload.TotalMonths = oPayload.TotalUnits || "1"
             oPayload.TotalYears = oPayload.TotalUnits || "1"
             oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 ? "DAILY" : "ONCE_PER_BOOKING" : ""
+            oPayload.MemberName = sap.ui.getCore().byId("editMembername").getValue() || ""
+            oPayload.SelectionMode =  this.SelectionMode
 
 
 
@@ -2090,24 +2119,36 @@ sap.ui.define([
 
 
             if (oSelectedData.FacilityChargeType === "DAILY") {
+                sap.ui.getCore().byId("editquantity").setVisible(true)
+
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(0)
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else if (oSelectedData.FacilityChargeType === "ONCE_PER_BOOKING") {
+                sap.ui.getCore().byId("editquantity").setVisible(true)
+
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(1)
                 sap.ui.getCore().byId("editStartDate").setEditable(false)
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
                 sap.ui.getCore().byId("editDays").setVisible(false)
-            } else if (oSelectedData.SelectionMode === "QTY" || oSelectedData.quantity !== "") {
+            } else if (oSelectedData.SelectionMode === "QTY" ||  (oSelectedData.quantity !== undefined && oSelectedData.quantity !== "")) {
                 sap.ui.getCore().byId("editquantity").setVisible(true)
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else {
+                sap.ui.getCore().byId("editquantity").setVisible(false)
+
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
+            }
+
+            if(oSelectedData.MemberName!==""){
+                sap.ui.getCore().byId("editMembername").setVisible(true)
+            }else{
+                sap.ui.getCore().byId("editMembername").setVisible(false)
             }
 
             var sSelectedFacility = oSelectedData.FacilityName;
@@ -3466,6 +3507,7 @@ sap.ui.define([
                         Quantity: item.quantity,
                         SelectionMode: item.quantity !== "" ? "QTY" : "",
                         FacilityChargeType: item.FacilityChargeType,
+                        MemberName: item.MemberName || "",
                         TotalHour: item.TotalHour,
                         BookingID: CustomerData.BookingID,
                         CustomerID: CustomerData.CustomerID,

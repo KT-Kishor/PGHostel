@@ -86,7 +86,7 @@ sap.ui.define([
                         fileType: oFile.type,
                         size: oFile.size,
                         documentType: sDocType,
-                        content: oLoadEvent.target.result
+                        content: oLoadEvent.target.result.split(',')[1]
                     });
                     oModel.setProperty("/attachments", aFiles);
                     oEvent.getSource().clear();

@@ -31,6 +31,7 @@
         >
             <f:content>
                 <!-- Facility Name -->
+                
                 <Label
                     text="{i18n>facilityname}"
                     required="true"
@@ -47,6 +48,25 @@
                     <core:Item
                         key="{Facilities>FacilityName}"
                         text="{Facilities>FacilityName}"
+                    />
+                </ComboBox>
+
+                  <Label
+                    text="Name"
+                    required="true"
+                />
+                <ComboBox
+                    id="editMembername"
+                    placeholder="Select Name"
+                    items="{CustomerData>/AllMembers}"
+                    value="{edit>/MemberName}"
+                    width="100%"
+                    visible="{= ${CustomerData>/PropertyType}==='Hotel'}"
+                    valueStateText="Please Select Name"
+                >
+                    <core:Item
+                        key="{CustomerData>Name}"
+                        text="{CustomerData>Name}"
                     />
                 </ComboBox>
 

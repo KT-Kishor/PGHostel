@@ -941,7 +941,7 @@
                         <items>
                             <ColumnListItem>
                                 <cells>
-                                    <Text text="{CustomerData>FacilityName}" />
+                                   <Text text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }" />
                                     <Text
                                         text="{
                                                 parts: [
