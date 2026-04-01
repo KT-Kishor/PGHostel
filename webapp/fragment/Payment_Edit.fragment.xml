@@ -79,7 +79,7 @@
                     >
                         <!-- UPI SECTION -->
                         <VBox
-                            id="idUPISection"
+                            id="idUPISection1"
                             visible="true"
                         >
                             <Title
@@ -98,7 +98,7 @@
 
                         <!-- CARD SECTION -->
                         <VBox
-                            id="idCardSection"
+                            id="idCardSection1"
                             visible="false"
                         >
                             <Label text="{i18n>cardNumber}" />
@@ -127,7 +127,7 @@
 
                     <!-- RIGHT COLUMN -->
                     <VBox
-                        id="idRightPanel"
+                        id="idRightPanel1"
                         class="sapUiSmallMargin"
                     >
                         <Title

@@ -71,6 +71,28 @@
                     />
                 </ComboBox>
 
+                <Label text="{i18n>quantity}" />
+                <Input
+                    id="editquantity"
+                    value="{edit>/quantity}"
+                    maxLength="2"
+                    visible="{= ${edit>/UnitText} === 'Unit Price' }"
+
+                    placeholder="Enter Quantity"
+                    valueStateText="Enter Quantity"
+                    liveChange=".onQuantityLiveChange"
+
+                />
+                    <RadioButtonGroup id="id_Period" columns="2" select=".onPeriodTypeSelect" 
+                        visible="{= ${edit>/UnitText} === 'Unit Price' }"
+
+                  >
+                                <buttons>
+                                    <RadioButton text="Daily" />
+                                    <RadioButton text="ONCE_PER_BOOKING" />
+                                </buttons>
+                            </RadioButtonGroup> 
+
                 <!-- Facility Price -->
                 <Label text="{i18n>faciltyprice}" />
                 <Input
@@ -116,13 +138,13 @@
 
                 <Label
                     text="{i18n>howmany}"
-                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' }"
                 />
 
                 <Select
                     id="idMonthYearSelectFragment"
                     width="100%"
-                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' }"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' }"
                     selectedKey="{edit>/TotalUnits}"
                     change=".onMonthYearChange"
                 >

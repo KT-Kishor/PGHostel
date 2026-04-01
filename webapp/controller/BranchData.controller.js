@@ -397,6 +397,15 @@ sap.ui.define([
                 CheckoutTime: ""
             });
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
+            this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
+              if(this.getView().getModel("LoginModel").getProperty("/Role")==="SuperAdmin")
+            {
+            this.getView().byId("Bd_id_Active").setVisible(true)
+            this.getView().byId("Bd_id_Mode_Label").setVisible(true)
+            }
+
+
+
             this.setDefaultTimesOnCreate();
             this.isEdit = false;
             this.oDialog.open();
@@ -524,6 +533,7 @@ sap.ui.define([
                 PropertyType: Payload.PropertyType,
                 Address: Payload.Address,
                 GeoLocation: Payload.GeoLocation,
+                Status: Payload.Mode || "Active",
                 Pincode: Payload.Pincode,
                 Contact: Payload.Contact,
                 STD: Payload.stdCode,
@@ -869,7 +879,13 @@ sap.ui.define([
                 this.oDialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.BranchData", this);
                 oView.addDependent(this.oDialog);
             }
+            if(this.getView().getModel("LoginModel").getProperty("/Role")==="SuperAdmin")
+            {
+            this.getView().byId("Bd_id_Active").setVisible(true)
+            this.getView().byId("Bd_id_Mode_Label").setVisible(true)
+            }
             var oMDmodel = oView.getModel("MDmodel");
+
             oMDmodel.setData({
                 BranchID: oData.BranchID,
                 Name: oData.Name,
@@ -886,6 +902,7 @@ sap.ui.define([
                 GSTIN: oData.GSTIN,
                 Type: oData.Type,
                 Value: oData.Value,
+                Mode:oData.Status,
                 Currency: oData.Currency,
                 CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),

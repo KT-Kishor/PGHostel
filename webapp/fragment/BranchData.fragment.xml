@@ -308,8 +308,34 @@
                     maxLength="10"
                     liveChange="onPenaltyInputLiveChange"
                     valueStateText="{i18n>enterPenalty}"
-                    class="sapUiSmallMarginBottom"
                 />
+                 <Label
+                 id="Bd_id_Mode_Label"
+                    text="Mode"
+                    required="true"
+                    visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
+                />
+                 <Select
+                    id="Bd_id_Active"
+                    selectedKey="{MDmodel>/Mode}"
+                    valueStateText="{i18n>selectCurrency}"
+                    width="100%"
+                    placeholder="{i18n>selectCurrency}"
+                    showSecondaryValues="true"
+                     visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
+                    class="sapUiSmallMarginBottom"
+
+
+                >
+                    <core:Item
+                        key="Active"
+                        text="Active"
+                    />
+                    <core:Item
+                        key="Inactive"
+                        text="Inactive"
+                    />
+                </Select>
                 <MessageStrip
                     text="For Logo and Image, files larger than 2 MB are not allowed."
                     type="Warning"
