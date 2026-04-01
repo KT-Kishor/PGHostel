@@ -129,7 +129,7 @@
                                             value="{SelectedCustomerModel>/BookingID}"
                                             editable="false"
                                         />
-                                        <m:Label  visible="{visiablityPlay>/createVisi}"
+										<m:Label  visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
@@ -140,8 +140,7 @@
                                             value="{path:'SelectedCustomerModel>/InvDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onChangeDate" visible="{visiablityPlay>/createVisi}"
                                         />
-
-                                        <m:Label
+										<m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>invoiceDate}"
                                             required="true"
@@ -157,8 +156,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="onChangeDate"
                                         />
-
-                                        <m:Label
+										<m:Label
                                             visible="false"
                                             text="{i18n>invoiceDate}"
                                             required="true"
@@ -174,7 +172,6 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="CID_ValidateDate"
                                         />
-                                        
 										<m:Label
                                             visible="false"
                                             text="{i18n>invoiceDate}"
@@ -323,8 +320,7 @@
                                             maxLength="20"
                                             editable="{visiablityPlay>/editable}"
                                         />
-										<!-- <m:Label text="{i18n>panCardCommon}" />
-										<m:Input
+										<!-- <m:Label text="{i18n>panCardCommon}" /><m:Input
                                             value="{SelectedCustomerModel>/PAN}"
                                             id="CID_id_InputPAN"
                                             liveChange="CID_onPressLiveChangePAN"
@@ -462,7 +458,7 @@
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressDelete"
                                                 />
-                                                <m:Button text="Refresh" press="onRefreshInvoice"
+												<m:Button text="Refresh" press="onRefreshInvoice"
                                                 visible="{visiablityPlay>/refresh}" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
 											</m:Toolbar>
@@ -488,7 +484,7 @@
 											</m:Column>
 											<m:Column
                                                 id="idSAC"
-                                                width="7rem"
+                                                width="6rem"
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
@@ -511,7 +507,7 @@
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
-                                                width="7rem"
+                                                width="6rem"
                                             >
 												<m:Text
                                                     text="{i18n>startDate}"
@@ -521,7 +517,7 @@
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
-                                                width="7rem"
+                                                width="6rem"
                                             >
 												<m:Text
                                                     text="{i18n>endDate}"
@@ -548,12 +544,12 @@
                                                     tooltip="{i18n>Unit}"
                                                 />
 											</m:Column>
-                                             <m:Column
+											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
-                                                width="6rem">
-                                                <m:Text text="Duration" />
-                                            </m:Column>
+                                                width="8rem">
+												<m:Text text="Duration" />
+											</m:Column>
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -590,7 +586,7 @@
                                                         value="{ManageInvoiceItemModel>SAC}"
                                                         selectedKey="{ManageInvoiceItemModel>SAC}"
                                                     >
-                                                        <core:ListItem key="{InvoiceSAC>SAC}" text="{InvoiceSAC>SAC}" additionalText="{InvoiceSAC>Description}"/>
+														<core:ListItem key="{InvoiceSAC>SAC}" text="{InvoiceSAC>SAC}" additionalText="{InvoiceSAC>Description}"/>
 													</m:ComboBox>
 												</m:cells>
 												<m:cells>
@@ -653,9 +649,9 @@
                                                         />
 													</m:ComboBox>
 												</m:cells>
-                                                <m:cells>
-                                                <m:Input value="{ManageInvoiceItemModel>DurationText}" editable="{ManageInvoiceItemModel>DurationEditable}"/>
-                                                </m:cells>
+												<m:cells>
+													<m:Input value="{ManageInvoiceItemModel>DurationText}" editable="{ManageInvoiceItemModel>DurationEditable}"/>
+												</m:cells>
 												<m:cells>
 													<m:Input
                                                         value="{path:'ManageInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}"
@@ -767,14 +763,17 @@
 											<!-- Round of -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
-                                            ><m:Label
+                                            >
+												<m:Label
                                                     text="{i18n>roundOf} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                /><m:Text
+                                                />
+												<m:Text
                                                     class="amountText"
                                                     text="{FilteredSOWModel>/RoundOf}"
                                                     textAlign="End"
-                                                /></m:HBox>
+                                                />
+											</m:HBox>
 											<!-- Total Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -804,7 +803,6 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-											
 											<!-- Refund Due -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -856,8 +854,8 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
-                                            <!-- Balance Amount -->
-                                           <m:HBox
+											<!-- Balance Amount -->
+											<m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{=
                                                     (
@@ -869,12 +867,12 @@
                                                     ) > 0
                                                 }"
                                             >
-                                            <m:Label text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
+												<m:Label text="{i18n>balanceAmount} ({FilteredSOWModel>/Currency}) :"
                                             class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"/>
-                                            <m:Text class="amountText"
+												<m:Text class="amountText"
                                             text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
                                              textAlign="End"/>
-                                            </m:HBox>
+											</m:HBox>
 											<!-- Due Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -907,19 +905,18 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Bar>
-            <m:contentLeft>
-             <m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
-             <m:Link
+				<m:contentLeft>
+					<m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
+					<m:Link
                 text="{i18n>devlopby}"
                 href="https://kalpavrikshatechnologies.com/"
                 target="_blank"
                 class="customLinkWhiteBg"
             />
-            
-            </m:contentLeft>
+				</m:contentLeft>
 				<m:contentRight>
-                    <!-- Refund Amount -->
-                    <m:Button
+					<!-- Refund Amount -->
+					<m:Button
                         visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
                             &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
                             &amp;&amp; (
@@ -935,9 +932,8 @@
                         press="CID_onPressrefundAmount"
                         class="myUnifiedBtn"
                     />
-
-                    <!-- Submit -->
-                    <m:Button
+					<!-- Submit -->
+					<m:Button
                         visible="{= ${visiablityPlay>/createVisi}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -951,8 +947,7 @@
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
-
-                    <!-- <m:Button
+					<!-- <m:Button
                          visible="{= ${visiablityPlay>/Edit}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -966,9 +961,8 @@
                         tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
                     /> -->
-
-                    <!-- Edit / Save -->
-                    <m:Button
+					<!-- Edit / Save -->
+					<m:Button
                         visible="{= ${visiablityPlay>/Edit}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -981,9 +975,8 @@
                         press="CID_onPressEdit"
                         class="sendMail myUnifiedBtn"
                     />
-
-                    <!-- Multi Email -->
-                    <m:Button
+					<!-- Multi Email -->
+					<m:Button
                         visible="{= ${visiablityPlay>/MultiEmail}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -997,9 +990,8 @@
                         press="CID_onPressSendMultipalEmail"
                         class="myUnifiedBtn"
                     />
-
-                    <!-- Generate PDF -->
-                    <m:MenuButton
+					<!-- Generate PDF -->
+					<m:MenuButton
                         visible="{= ${visiablityPlay>/merge}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -1011,21 +1003,21 @@
                         text="{i18n>GeneratePDF}"
                         tooltip="{i18n>GeneratePDF}"
                         class="myUnifiedBtn">
-                        <m:menu>
-                            <m:Menu>
-                                <m:MenuItem
+						<m:menu>
+							<m:Menu>
+								<m:MenuItem
                                     text="{i18n>GeneratePDF}"
                                     press="CID_onPressGeneratePdf" />
-                                <m:MenuItem
+								<m:MenuItem
                                     text="{i18n>printInvoice}"
                                     press="CID_onPressGenerateSelectedPDF" />
-                                <m:MenuItem
+								<m:MenuItem
                                     text="{i18n>summaryInvoice}"
                                     press="CID_onPressGenerateSummaryPDF" />
-                            </m:Menu>
-                        </m:menu>
-                    </m:MenuButton>
-                </m:contentRight>
+							</m:Menu>
+						</m:menu>
+					</m:MenuButton>
+				</m:contentRight>
 			</m:Bar>
 		</m:footer>
 	</m:Page>
