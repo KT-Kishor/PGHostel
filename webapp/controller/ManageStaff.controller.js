@@ -364,11 +364,11 @@ sap.ui.define([
                     this._originalStaffData = response;
                 }
 
-                let finalData;
-                if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
-                    finalData = this._originalStaffData;
-                } else {
-                    finalData = response;
+                let finalData = response;
+                if (oExistingModel.Role === "SuperAdmin") {
+                    finalData = finalData.filter(item => 
+                        item.Role !== "Customer" && item.Role !== "SuperAdmin"
+                    );
                 }
 
                 const model = new sap.ui.model.json.JSONModel(finalData);
