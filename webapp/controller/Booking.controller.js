@@ -9,7 +9,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-      "../model/formatter",
+    "../model/formatter",
 ], function (BaseController, JSONModel, Fragment, utils, ResponsivePopover, Text, MessageToast, MessageBox, Filter, FilterOperator, Formatter) {
 
     "use strict";
@@ -31,8 +31,8 @@ sap.ui.define([
             this._attachDocumentInfoHover();
             this._attachPaymentSummaryHover();
         },
-         _onRouteMatched: async function () {
-             if (performance.navigation && performance.navigation.type === 1) {
+        _onRouteMatched: async function () {
+            if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
             }
@@ -693,7 +693,7 @@ sap.ui.define([
             this._rebuildSelectedFacilities();
         },
 
-       
+
 
         _openFacilitySelectionDialog: function (oFacility) {
             const oSelectionModel = this.getView().getModel("FacilitySelection");
@@ -1175,7 +1175,7 @@ sap.ui.define([
         },
 
 
-     
+
 
         onFacilityDialogRemove: function (oEvent) {
             const oDialog = oEvent.getSource().getParent();
@@ -1215,7 +1215,7 @@ sap.ui.define([
             this._renderFacilityCards();
         },
 
-      
+
         _rebuildSelectedFacilities: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oUnits = this._getBookingUnits();
@@ -1945,196 +1945,214 @@ sap.ui.define([
 
         // payment icon
         _attachPaymentSummaryHover: function () {
-    const oIcon = this.byId("PaymentSummaryInfoIcon");
+            const oIcon = this.byId("PaymentSummaryInfoIcon");
 
-    if (!oIcon || oIcon.data("hoverBound")) {
-        return;
-    }
+            if (!oIcon || oIcon.data("hoverBound")) {
+                return;
+            }
 
-    oIcon.data("hoverBound", true);
+            oIcon.data("hoverBound", true);
 
-    oIcon.attachBrowserEvent("mouseenter", this._openPaymentSummaryPopover.bind(this));
-    oIcon.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
+            oIcon.attachBrowserEvent("mouseenter", this._openPaymentSummaryPopover.bind(this));
+            oIcon.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
 
-    this._getPaymentSummaryPopover().attachAfterOpen(function () {
-        const oPopover = this._getPaymentSummaryPopover();
+            this._getPaymentSummaryPopover().attachAfterOpen(function () {
+                const oPopover = this._getPaymentSummaryPopover();
 
-        if (!oPopover.data("hoverBound")) {
-            oPopover.data("hoverBound", true);
+                if (!oPopover.data("hoverBound")) {
+                    oPopover.data("hoverBound", true);
 
-            oPopover.attachBrowserEvent("mouseenter", this._clearPaymentPopoverClose.bind(this));
-            oPopover.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
-        }
-    }.bind(this));
-},
-_getPaymentSummaryPopover: function () {
-    if (!this._oPaymentSummaryPopover) {
+                    oPopover.attachBrowserEvent("mouseenter", this._clearPaymentPopoverClose.bind(this));
+                    oPopover.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
+                }
+            }.bind(this));
+        },
+        _getPaymentSummaryPopover: function () {
+            if (!this._oPaymentSummaryPopover) {
 
-        this._oPaymentSummaryPopover = new sap.m.ResponsivePopover({
-            showHeader: false,
-            placement: "Bottom",
-            contentWidth: "22rem",
-            content: [
-                new sap.m.VBox({
-                    items: [
+                this._oPaymentSummaryPopover = new sap.m.ResponsivePopover({
+                    showHeader: false,
+                    placement: "Bottom",
+                    contentWidth: "22rem",
+                    content: [
+                        new sap.m.VBox({
+                            items: [
 
-                       new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/RoomPrice" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.getView().getController().Formatter.fromatNumber(price);
-            return "Room: " + formatted + " " + currency;
-        }.bind(this)
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/RoomPrice" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.getView().getController().Formatter.fromatNumber(price);
+                                            return "Room: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    }
+                                }),
 
-                        new sap.m.Text({
-                            text: "{HostelModel>/RoomBreakdownText}",
-                            wrapping: true
-                        }),
+                                new sap.m.Text({
+                                    text: "{HostelModel>/RoomBreakdownText}",
+                                    wrapping: true
+                                }),
 
-                       new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/TotalFacilityPrice" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.Formatter.fromatNumber(price);
-            return "Facilities: " + formatted + " " + currency;
-        }.bind(this)
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/TotalFacilityPrice" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.Formatter.fromatNumber(price);
+                                            return "Facilities: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    }
+                                }),
 
-                       new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/BookingSubTotal" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.Formatter.fromatNumber(price);
-            return "Sub Total: " + formatted + " " + currency;
-        }.bind(this)
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/BookingSubTotal" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.Formatter.fromatNumber(price);
+                                            return "Sub Total: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    }
+                                }),
 
-                       new sap.m.Text({
-    text: {
-        path: "HostelModel>/PropertyGSTIN",
-        formatter: function (gst) {
-            return "Property GSTIN: " + gst;
-        }
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        path: "HostelModel>/PropertyGSTIN",
+                                        formatter: function (gst) {
+                                            return "Property GSTIN: " + gst;
+                                        }
+                                    }
+                                }),
 
-                       new sap.m.Text({
-    text: {
-        path: "HostelModel>/CustomerGSTIN",
-        formatter: function (gst) {
-            return "Customer GSTIN: " + gst;
-        }
-    },
-    visible: {
-        path: "HostelModel>/CustomerGSTIN",
-        formatter: function (gst) {
-            return !!gst;
-        }
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        path: "HostelModel>/CustomerGSTIN",
+                                        formatter: function (gst) {
+                                            return "Customer GSTIN: " + gst;
+                                        }
+                                    },
+                                    visible: {
+                                        path: "HostelModel>/CustomerGSTIN",
+                                        formatter: function (gst) {
+                                            return !!gst;
+                                        }
+                                    }
+                                }),
 
-                        new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/CGST" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.Formatter.fromatNumber(price);
-            return "CGST: " + formatted + " " + currency;
-        }.bind(this)
-    },
-    visible: {
-        path: "HostelModel>/CGST",
-        formatter: function (price) {
-            return price > 0;
-        }
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/CGST" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.Formatter.fromatNumber(price);
+                                            return "CGST: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    },
+                                    visible: {
+                                        path: "HostelModel>/CGST",
+                                        formatter: function (price) {
+                                            return price > 0;
+                                        }
+                                    }
+                                }),
 
-                        new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/SGST" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.Formatter.fromatNumber(price);
-            return "SGST: " + formatted + " " + currency;
-        }.bind(this)
-    },
-    visible: {
-        path: "HostelModel>/SGST",
-        formatter: function (price) {
-            return price > 0;
-        }
-    }
-}),
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/SGST" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.Formatter.fromatNumber(price);
+                                            return "SGST: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    },
+                                    visible: {
+                                        path: "HostelModel>/SGST",
+                                        formatter: function (price) {
+                                            return price > 0;
+                                        }
+                                    }
+                                }),
 
-                        new sap.m.Text({
-    text: {
-        parts: [
-            { path: "HostelModel>/IGST" },
-            { path: "HostelModel>/Currency" }
-        ],
-        formatter: function (price, currency) {
-            const formatted = this.Formatter.fromatNumber(price);
-            return "IGST: " + formatted + " " + currency;
-        }.bind(this)
-    },
-    visible: {
-        path: "HostelModel>/IGST",
-        formatter: function (price) {
-            return price > 0;
-        }
-    }
-})
+                                new sap.m.Text({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/IGST" },
+                                            { path: "HostelModel>/Currency" }
+                                        ],
+                                        formatter: function (price, currency) {
+                                            const formatted = this.Formatter.fromatNumber(price);
+                                            return "IGST: " + formatted + " " + currency;
+                                        }.bind(this)
+                                    },
+                                    visible: {
+                                        path: "HostelModel>/IGST",
+                                        formatter: function (price) {
+                                            return price > 0;
+                                        }
+                                    }
+                                }),
+                                ,
 
+                                new sap.m.MessageStrip({
+                                    text: {
+                                        parts: [
+                                            { path: "HostelModel>/EffectiveGSTType" },
+                                            { path: "HostelModel>/EffectiveGSTValue" }
+                                        ],
+                                        formatter: function (sType, sValue) {
+                                            return sType
+                                                ? "Applied Tax: " + sType + " (" + sValue + "%)"
+                                                : "No GST applied";
+                                        }
+                                    },
+                                    type: "Information",
+                                    showIcon: true,
+                                    showCloseButton: false
+                                }).addStyleClass("sapUiTinyMarginTop sapUiTinyMarginBottom")
+
+                            ]
+                        }).addStyleClass("sapUiSmallMargin")
                     ]
-                }).addStyleClass("sapUiSmallMargin")
-            ]
-        });
+                });
 
-        this.getView().addDependent(this._oPaymentSummaryPopover);
-    }
+                this.getView().addDependent(this._oPaymentSummaryPopover);
+            }
 
-    return this._oPaymentSummaryPopover;
-},
-_openPaymentSummaryPopover: function () {
-    const oIcon = this.byId("PaymentSummaryInfoIcon");
+            return this._oPaymentSummaryPopover;
+        },
+        _openPaymentSummaryPopover: function () {
+            const oIcon = this.byId("PaymentSummaryInfoIcon");
 
-    this._clearPaymentPopoverClose();
+            this._clearPaymentPopoverClose();
 
-    if (oIcon) {
-        this._getPaymentSummaryPopover().openBy(oIcon);
-    }
-},
+            if (oIcon) {
+                this._getPaymentSummaryPopover().openBy(oIcon);
+            }
+        },
 
-_schedulePaymentPopoverClose: function () {
-    this._paymentPopoverTimer = setTimeout(function () {
-        this._getPaymentSummaryPopover().close();
-    }.bind(this), 300);
-},
+        _schedulePaymentPopoverClose: function () {
+            this._paymentPopoverTimer = setTimeout(function () {
+                this._getPaymentSummaryPopover().close();
+            }.bind(this), 300);
+        },
 
-_clearPaymentPopoverClose: function () {
-    if (this._paymentPopoverTimer) {
-        clearTimeout(this._paymentPopoverTimer);
-        this._paymentPopoverTimer = null;
-    }
-},
+        _clearPaymentPopoverClose: function () {
+            if (this._paymentPopoverTimer) {
+                clearTimeout(this._paymentPopoverTimer);
+                this._paymentPopoverTimer = null;
+            }
+        },
 
         onCustomerDocumentChange: function (oEvent) {
             const oFileUploader = oEvent.getSource();
@@ -2494,16 +2512,16 @@ _clearPaymentPopoverClose: function () {
             }
 
             const iStart = this._iFacilityStartIndex || 0;
-           const bPhone = sap.ui.Device.system.phone;
-const iPageSize = bPhone ? 1 : 3;
-this._iFacilityPageSize = iPageSize;
+            const bPhone = sap.ui.Device.system.phone;
+            const iPageSize = bPhone ? 1 : 3;
+            this._iFacilityPageSize = iPageSize;
             const aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
 
             const oRow = new sap.m.HBox({
                 width: "100%",
                 justifyContent: "Start",
                 alignItems: "Start",
-              wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
+                wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
             }).addStyleClass("sapUiSmallMarginTop");
 
             aVisibleFacilities.forEach(function (oFacility) {
@@ -2553,7 +2571,7 @@ this._iFacilityPageSize = iPageSize;
             oContainer.addItem(oRow);
         },
 
-    
+
         _initializeBookingData: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oData = oModel.getData() || {};
@@ -2762,7 +2780,7 @@ this._iFacilityPageSize = iPageSize;
                 "room heater": "./image/Room Heater.jpeg",
                 "study room access": "./image/Study Room.png",
                 "extra bed": "./image/ExtraBed.jpg",
-                "extra pillow" : "../image/pillow.jpg"
+                "extra pillow": "../image/pillow.jpg"
 
             };
             const sTypeKey = String(oFacility.Type || "").toLowerCase().trim();
@@ -2861,7 +2879,7 @@ this._iFacilityPageSize = iPageSize;
         },
 
         onStartDateChange: function (oEvent) {
-             utils._LCvalidateDate(oEvent);
+            utils._LCvalidateDate(oEvent);
             const oModel = this.getView().getModel("HostelModel");
             const sStartDate = oModel.getProperty("/StartDate");
             const oStartDate = this._parseDate(sStartDate);
@@ -2938,18 +2956,18 @@ this._iFacilityPageSize = iPageSize;
         },
 
         onPropertyTypeChange: function (oEvent) {
-            
+
             this.getView().getModel("HostelModel").setProperty("/PropertyType", oEvent.getSource().getSelectedKey());
             this._resetCouponState(false);
             this._syncPropertyTypeState();
             this._rebuildSelectedFacilities();
             this._recalculateSummary();
         },
-        onPropertyChange:function(oEvent){
-           utils._LCstrictValidationComboBox(oEvent)
+        onPropertyChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent)
         },
-        onRoomplane:function(oEvent){
- utils._LCstrictValidationComboBox(oEvent)
+        onRoomplane: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent)
         },
 
         onFamilyMemberSelect: function (oEvent) {
@@ -3099,7 +3117,7 @@ this._iFacilityPageSize = iPageSize;
                 oModel.setProperty("/AppliedDiscount", Number(fDiscountAmount.toFixed(2)));
                 oModel.setProperty("/AppliedCouponCode", sEnteredCode);
                 this._recalculateSummary();
-                
+
                 // Show success message with coupon description if available
                 let sMessage = "Coupon applied successfully";
                 if (oMatchedCoupon.Description) {
@@ -3477,7 +3495,7 @@ this._iFacilityPageSize = iPageSize;
             }.bind(this));
         },
 
-        
+
 
         _buildSingleMemberDocumentsPayload: function (oMember) {
             const sType = String(oMember && oMember.DocumentType || "").trim();
@@ -3771,7 +3789,7 @@ this._iFacilityPageSize = iPageSize;
                 }]
             };
         },
-        onChangeFullname:function(oEvent){
+        onChangeFullname: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
 
@@ -3784,14 +3802,14 @@ this._iFacilityPageSize = iPageSize;
             const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
 
-            var isMandatoryValid  = (
+            var isMandatoryValid = (
                 !!sPropertyType &&
                 utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") &&
                 utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") &&
                 utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID")
-              
+
             )
-            if(!isMandatoryValid){
+            if (!isMandatoryValid) {
                 MessageToast.show("Please fill mandatory booking details");
                 return false;
             }
@@ -3805,13 +3823,13 @@ this._iFacilityPageSize = iPageSize;
                 MessageToast.show("Please complete contact details before payment");
                 return false;
             }
-             
+
 
             if (bSupportsCustomerGST && bIsBusinessTravel) {
-               var isGStvalidate= (
-                utils._LCvalidateGstNumber(this.getView().byId(("BookGst_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookCompanyname_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookconpanyAddress_ID")), "ID")
-              )
-              
+                var isGStvalidate = (
+                    utils._LCvalidateGstNumber(this.getView().byId(("BookGst_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookCompanyname_ID")), "ID") && utils._LCvalidateMandatoryField(this.getView().byId(("BookconpanyAddress_ID")), "ID")
+                )
+
                 if (!isGStvalidate) {
                     MessageToast.show("Please fill business GST details");
                     return false;
@@ -3844,7 +3862,7 @@ this._iFacilityPageSize = iPageSize;
             if (this._oPaymentDialog) {
                 this._oPaymentDialog.close();
             }
-             const aFields = [
+            const aFields = [
                 "idTransactionID"
             ];
             aFields.forEach(id => {
@@ -3854,8 +3872,8 @@ this._iFacilityPageSize = iPageSize;
                     oField.setValueState("None");
                     oField.setValueStateText("");
                 }
-                })
-        
+            })
+
         },
 
         onTransactionIDChange: function (oEvent) {
@@ -3963,7 +3981,7 @@ this._iFacilityPageSize = iPageSize;
                 {
                     actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
                     emphasizedAction: MessageBox.Action.OK,
-                     styleClass: "myUnifiedBtn",
+                    styleClass: "myUnifiedBtn",
                     onClose: function (sAction) {
                         if (sAction !== MessageBox.Action.OK) {
                             return;
@@ -4026,14 +4044,14 @@ this._iFacilityPageSize = iPageSize;
 
             this._oPaymentDialog.open();
         },
-         onGSTINChange:function(oEvent){
+        onGSTINChange: function (oEvent) {
             utils._LCvalidateGstNumber(oEvent)
         },
-        onchangeCompanyname:function(oEvent){
-          utils._LCvalidateMandatoryField(oEvent)
+        onchangeCompanyname: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         },
-        onchangeConpanyAddress:function(oEvent){
-           utils._LCvalidateMandatoryField(oEvent)
+        onchangeConpanyAddress: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         }
     });
 });

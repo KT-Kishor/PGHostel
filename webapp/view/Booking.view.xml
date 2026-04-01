@@ -567,6 +567,7 @@
                                 required="true"
                                 text="GSTIN"
                                 visible="{BookingView>/showBusinessGSTSection}"
+                                class="sapUiTinyMarginBottom"
                             />
                             <Input
                                 id="BookGst_ID"
@@ -583,7 +584,7 @@
                                 required="true"
                                 text="Company Name"
                                 visible="{BookingView>/showBusinessGSTSection}"
-                                class="required-field-label"
+                                class="required-field-label sapUiTinyMarginBottom "
                             />
                             <Input
                                 id="BookCompanyname_ID"
@@ -602,7 +603,7 @@
                                 required="true"
                                 text="Company Address"
                                 visible="{BookingView>/showBusinessGSTSection}"
-                                class="required-field-label"
+                                class="required-field-label sapUiTinyMarginBottom"
                             />
                             <TextArea
                                 value="{HostelModel>/CompanyAddress}"
@@ -621,7 +622,7 @@
                                 growingMaxLines="5"
                             />
                             <HBox alignItems="Center">
-                                <Text text="Payment Details:" />
+                                <Text text="Pricing Breakdown:" class="sapUiTinyMarginBottom"/>
 
                                 <core:Icon
                                     id="PaymentSummaryInfoIcon"
@@ -630,6 +631,7 @@
                                     color="#0064d1"
                                     hoverColor="DarkBlue"
                                     class="sapUiTinyMarginBegin"
+                                   
                                 />
                             </HBox>
                             <!-- <Text text="Room :{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}  {HostelModel>/Currency} " />
@@ -672,25 +674,28 @@
                                     text="IGST: {path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
                                     visible="{= ${HostelModel>/IGST} > 0}"
                                 /> -->
-                                <MessageStrip
+                                <!-- <MessageStrip
                                     text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
                                     type="Information"
                                     showIcon="true"
                                     showCloseButton="false"
                                     class="sapUiTinyMarginBottom"
-                                />
+                                /> -->
                                 <MessageStrip
-                                    text="{= 'Security Deposit (Collected Offline): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                    text="{= 'Security Deposit (Collected in person): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
                                     type="Information"
                                     showIcon="true"
                                     showCloseButton="false"
                                     visible="{= ${HostelModel>/Deposit} > 0}"
+                                    class="sapUiSmallMarginBottom" 
                                 />
                                 <Title
                                     text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
+                                    class="sapUiTinyMarginBottom"
                                 />
                                 <Title
                                     text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"
+                                    class="sapUiTinyMarginBottom"
                                 />
                             </VBox>
                         </Panel>
