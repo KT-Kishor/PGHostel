@@ -374,9 +374,10 @@
                         text="Facilities"
                         class="booking-section-header"
                         wrapping="true"
+                         visible="{= ${FacilityModel>/Facilities}.length > 0 }"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced">
+                    <Panel class="customBookingPanel booking-panel-enhanced" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
                                 text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
@@ -426,9 +427,10 @@
                         text="Selected Facilities Summary"
                         class="booking-section-header"
                         wrapping="true"
+                           visible="{= ${FacilityModel>/Facilities}.length > 0 }"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced">
+                    <Panel class="customBookingPanel booking-panel-enhanced" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
                         <Table
                             items="{HostelModel>/AllSelectedFacilities}"
                             noDataText="-- No facilities opted --"
