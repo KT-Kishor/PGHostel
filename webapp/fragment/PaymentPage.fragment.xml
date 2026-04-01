@@ -40,13 +40,16 @@
             <VBox>
                 <!-- ===== GRAND TOTAL ===== -->
                 <HBox>
-                    <Label
+                    <!-- <Label
                         text="{i18n>grandTotal}"
                         class="sapUiTinyMargin"
                     />
                     <Text
                         text="{parts: ['HostelModel>/GrandTotal','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
-                    />
+                    /> -->
+                     <Title
+                                    text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.formatCurrency'} {HostelModel>/Currency}"
+                                />
                 </HBox>
 
                 <!-- ===== PAYMENT TYPE (Radio) ===== -->

@@ -3788,8 +3788,8 @@ this._iFacilityPageSize = iPageSize;
                 !!sPropertyType &&
                 utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") &&
                 utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") &&
-                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") &&
-                utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
+                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID")
+              
             )
             if(!isMandatoryValid){
                 MessageToast.show("Please fill mandatory booking details");
@@ -3844,6 +3844,18 @@ this._iFacilityPageSize = iPageSize;
             if (this._oPaymentDialog) {
                 this._oPaymentDialog.close();
             }
+             const aFields = [
+                "idTransactionID"
+            ];
+            aFields.forEach(id => {
+                const oField = sap.ui.getCore().byId(id);
+                if (oField) {
+                    oField.setValue("");
+                    oField.setValueState("None");
+                    oField.setValueStateText("");
+                }
+                })
+        
         },
 
         onTransactionIDChange: function (oEvent) {
@@ -3951,6 +3963,7 @@ this._iFacilityPageSize = iPageSize;
                 {
                     actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
                     emphasizedAction: MessageBox.Action.OK,
+                     styleClass: "myUnifiedBtn",
                     onClose: function (sAction) {
                         if (sAction !== MessageBox.Action.OK) {
                             return;
