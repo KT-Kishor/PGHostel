@@ -490,13 +490,12 @@ sap.ui.define([
             let aMember = [];
             let aUserDocs = [];
 
+            var filter = {
+                        UserID: oUser?.UserID
+                    };
+
             try {
-                let resp = await this.ajaxReadWithJQuery(
-                    "HM_CustomerAndMemberDocuments",
-                    {
-                        userID: oUser?.UserID
-                    }
-                );
+                let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
 
                 aMember = resp?.data?.Members || [];
                 aUserDocs = resp?.data?.UserDocuments || [];
