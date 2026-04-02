@@ -3789,6 +3789,7 @@ sap.ui.define([
                 }]
             };
         },
+        
         onChangeFullname: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
@@ -3917,9 +3918,22 @@ sap.ui.define([
             }
 
             try {
-                const oPayload = this._buildBookingCreatePayload();
                 const oHostelModel = this.getView().getModel("HostelModel");
                 this.getBusyDialog();
+
+                const oPayloadData = this._buildBookingCreatePayload();
+                const oMainData = oPayloadData.data[0];
+
+                const pdfBase64 = await this.onGeneratePDF(oMainData);
+                const oPayload = {
+                    data: oPayloadData.data,
+                    pdfAttachment: {
+                        fileName: "BookingVoucher.pdf",
+                        mimeType: "application/pdf",
+                        content: pdfBase64
+                    }
+                };
+        
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
                 let sMessage = "Booking created successfully.";
@@ -3971,6 +3985,384 @@ sap.ui.define([
             }
         },
 
+        onGeneratePDF: async function (data) {
+            const booking = data.Booking?.[0] || {};
+            const facilities = data.FacilityItems || [];
+            const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
+
+            let filter = { BranchID: [booking.BranchCode] };
+            const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            const company = oCompanyDetailsModel.data[0] || {};
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            const currency = (booking.Currency || "INR").trim();
+
+            let currentY = 15;
+
+            const PRIMARY_COLOR = [20, 170, 183];
+            const ACCENT_COLOR = [244, 185, 66];
+            const LIGHT_GRAY = [245, 245, 245];
+            const BORDER_LIGHT = [230, 230, 230];
+
+            const checkNewPage = (requiredSpace = 20) => {
+                if (currentY + requiredSpace > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                    return true;
+                }
+                return false;
+            };
+
+            // ========== HEADER SECTION ==========
+            doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.rect(0, 0, 210, 35, "F");
+
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(0, 35, 210, 3, "F");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(255, 255, 255);
+            doc.text("BOOKING VOUCHER", 20, 22);
+
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(255, 255, 255);
+            doc.setLineWidth(0.2);
+            doc.roundedRect(140, 12, 55, 18, 3, 3, "FD");
+
+            doc.setFontSize(9);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            // doc.text(`Booking ID: ${booking.BookingID || "N/A"}`, 142, 19);
+            doc.text(`Booked On: ${Formatter.formatDate(booking.BookingDate) || "N/A"}`, 142, 24);
+
+            currentY = 45;
+
+            // ================= PROPERTY =================
+            checkNewPage(50);
+
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(15, currentY, 180, 45, 5, 5, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text(company.Name || "StayVriksha", 20, currentY + 10);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            let address = doc.splitTextToSize(company.Address || "Kalpavriksha Karekal layout, Near, Railway Bridge, Kalaburagi,Karnataka", 130);
+            doc.text(address, 20, currentY + 18);
+
+            let contactY = currentY + 18 + (address.length * 4);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Contact: ${company.Contact || "9122333333"}`, 20, contactY);
+            doc.text(`Email: ${company.EmailID || "contact@pskhostel.com"}`, 20, contactY + 5);
+
+            if (company.GeoLocation) {
+                doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.textWithLink("View Property on Map", 20, contactY + 10, { url: company.GeoLocation });
+            }
+
+            currentY += 55;
+
+            // ================= GUEST & STAY =================
+            checkNewPage(50);
+
+            // Guest Details Box
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.roundedRect(15, currentY, 88, 45, 4, 4, "FD");
+
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(15, currentY, 5, 45, "F");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("GUEST DETAILS", 24, currentY + 8);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(60, 60, 60);
+            doc.text(`Name: ${data.CustomerName || "Guest"}`, 24, currentY + 18);
+            doc.text(`Email: ${data.CustomerEmail || "N/A"}`, 24, currentY + 26);
+            doc.text(`Contact: ${data.MobileNo || "N/A"}`, 24, currentY + 34);
+
+            // Stay Details Box
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.roundedRect(107, currentY, 88, 45, 4, 4, "FD");
+
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(107, currentY, 5, 45, "F");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("STAY DETAILS", 116, currentY + 8);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(60, 60, 60);
+
+            doc.text(`Check-in: ${booking.StartDate || "N/A"}`, 116, currentY + 18);
+            doc.text(`Check-out: ${booking.EndDate || "N/A"}`, 116, currentY + 26);
+            doc.text(`Room: ${booking.BedType || "N/A"}`, 116, currentY + 34);
+
+            currentY += 55;
+
+            if (facilities.length > 0) {
+
+                checkNewPage(20);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+                doc.text("FACILITY DETAILS", 15, currentY);
+
+                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.setLineWidth(0.8);
+                doc.line(15, currentY + 3, 70, currentY + 3);
+
+                currentY += 8;
+
+                let tableBody = [];
+                if (facilities.length > 0) {
+                    tableBody = facilities.map((item, index) => [
+                        (index + 1).toString(),
+                        item.FacilityName || "-",
+                        `${Formatter.formatDate(item.StartDate) || "-"}`,
+                        `${Formatter.formatDate(item.EndDate) || "-"}`,
+                        `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
+                        item.UnitText || "-",
+                        `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
+                    ]);
+                } else {
+                    tableBody = [["", "No facilities selected", "", "", "", "", ""]];
+                }
+
+                // Calculate if table will fit on current page
+                const estimatedTableHeight = (tableBody.length + 1) * 8; // Approximate height in mm
+                if (currentY + estimatedTableHeight > 260) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                doc.autoTable({
+                    startY: currentY,
+                    margin: { left: 15, right: 10 },
+                    head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
+                    body: tableBody,
+                    theme: 'striped',
+
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 9,
+                        cellPadding: 2,
+                        lineColor: [220, 220, 220],
+                        lineWidth: 0.1,
+                        valign: "middle"
+                    },
+
+                    headStyles: {
+                        fillColor: PRIMARY_COLOR,
+                        textColor: [255, 255, 255],
+                        fontStyle: "bold",
+                        fontSize: 10,
+                        halign: "center"
+                    },
+
+                    columnStyles: {
+                        0: { cellWidth: 12, halign: "center" },
+                        1: { cellWidth: 48, halign: "left" },
+                        2: { cellWidth: 24, halign: "center" },
+                        3: { cellWidth: 24, halign: "center" },
+                        4: { cellWidth: 24, halign: "right" },
+                        5: { cellWidth: 18, halign: "center" },
+                        6: { cellWidth: 28, halign: "right" }
+                    }
+                });
+
+                currentY = doc.lastAutoTable.finalY + 15;
+
+            }
+
+            // Force page break before payment summary if there's not enough space
+            if (currentY > 200) {
+                doc.addPage();
+                currentY = 20;
+            } else {
+                // Check if payment summary (85mm height) will fit
+                if (currentY + 95 > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+            }
+
+            // ========== PAYMENT SUMMARY ==========
+            // Calculate totals
+            const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
+            const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
+            const subTotal = roomRent + facilityTotal;
+            const discount = parseFloat(booking.Discount) || 0;
+            const deposit = parseFloat(booking.Deposit) || 0;
+            const grandTotal = oHostelModel.GrandTotal;
+
+            // Payment Summary Card
+            const summaryHeight = 90;
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(245, 186, 66);
+            //  doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(15, currentY, 180, summaryHeight, 4, 4, "FD");
+
+            // Title
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("PAYMENT SUMMARY", 20, currentY + 10);
+
+            // Content area
+            let summaryY = currentY + 22;
+            const leftX = 20;
+            const rightX = 185;
+
+            const addLine = (label, value, isGrandTotal = false) => {
+                if (isGrandTotal) {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                } else {
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(80, 80, 80);
+                }
+
+                doc.text(label, leftX, summaryY);
+                doc.text(value, rightX, summaryY, { align: "right" });
+                summaryY += 7;
+            };
+
+            // Add all payment lines
+            addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+            addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
+
+            // GST Section
+            if (booking.GSTType === "CGST/SGST") {
+                const cgst = parseFloat(oHostelModel.CGST) || 0;
+                const sgst = parseFloat(oHostelModel.SGST) || 0;
+                addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
+                addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
+            }
+
+            if (booking.GSTType === "IGST") {
+                const igst = parseFloat(oHostelModel.IGST) || 0;
+                addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+            }
+
+            addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+            addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
+
+            // Add separator line
+            summaryY += 2;
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
+
+            // Grand Total
+            summaryY += 2;
+            addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
+
+            currentY += summaryHeight + 10;
+
+            // ========== AMOUNT IN WORDS ==========
+            if (currentY + 30 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.roundedRect(15, currentY, 180, 20, 4, 4, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("Amount in Words:", 20, currentY + 8);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            const words = await this.convertNumberToWords(grandTotal, currency);
+            const wrappedWords = doc.splitTextToSize(words || "Zero Rupees Only", 160);
+            doc.text(wrappedWords, 20, currentY + 15);
+
+            currentY += 28;
+
+            // ========== IMPORTANT INFORMATION ==========
+            if (currentY + 50 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            doc.setFillColor(255, 250, 240);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("IMPORTANT INFORMATION", 20, currentY + 8);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+
+            const infoItems = [
+                "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
+                "• GST invoice available at the property upon request",
+                "• Check-in: 12:00 PM | Check-out: 10:00 AM",
+                "• Early check-in/late check-out subject to availability"
+            ];
+
+            let infoY = currentY + 16;
+            infoItems.forEach((item) => {
+                doc.text(item, 20, infoY);
+                infoY += 5;
+            });
+
+            currentY += 48;
+
+            // ========== FOOTER ==========
+            if (currentY + 15 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.setLineWidth(0.3);
+            doc.line(15, currentY, 195, currentY);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(120, 120, 120);
+            doc.text("Thank you for choosing us! We look forward to hosting you.", 15, currentY + 5);
+
+            doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
+
+            // ✅ RETURN BASE64 (IMPORTANT CHANGE)
+            return doc.output("datauristring").split(",")[1];
+        },
 
         onNavBack: function () {
             const sBranchCode = this.getView().getModel("HostelModel").getProperty("/BranchCode");
