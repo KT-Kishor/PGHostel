@@ -3895,7 +3895,7 @@ sap.ui.define([
                     MemberName: "",
                     SelectionMode: oFacility.SelectionMode || "",
                     FacilityChargeType: sChargeType,
-                    Quantity: 1,
+                    Quantity: "",
                     UnitText: sUnitText,
                     Currency: sCurrency,
                     UnitPrice: fUnitPrice.toFixed(2),
@@ -3913,7 +3913,6 @@ sap.ui.define([
                     oRow.TempMemberID = oIdentity.TempMemberID;
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
-                    oRow.Quantity = 1;
                     oRow.FacilitiPrice = (fUnitPrice * fPeriodMultiplier).toFixed(2);
                     oRow.Flag = this._getFacilityFlagValue(sPersonId);
                     return oRow;
@@ -3949,7 +3948,9 @@ sap.ui.define([
             }
 
             const oRow = fnCreateBaseRow();
-            oRow.Quantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+            if (sSelectionMode !== "SINGLE") {
+                oRow.Quantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+            }
             oRow.FacilitiPrice = this._toNumber(oFacility.TotalAmount).toFixed(2);
             return [oRow];
         },
