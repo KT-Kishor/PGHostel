@@ -3593,18 +3593,10 @@ sap.ui.define([
             const oHostelModel = this.getView().getModel("HostelModel");
             const sPlan = oHostelModel.getProperty("/SelectedPriceType");
             const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
-            const fDiscount = this._toNumber(oHostelModel.getProperty("/AppliedDiscount"));
             const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
-            let fFirstPeriodSubTotal;
-            let fFirstPeriodNetAmount;
-            let oTaxBreakup;
 
             if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
-                fFirstPeriodSubTotal = this._getCouponBaseAmount();
-                fFirstPeriodNetAmount = Number(Math.max(fFirstPeriodSubTotal - fDiscount, 0).toFixed(2));
-                oTaxBreakup = this._calculateTaxBreakup(fFirstPeriodNetAmount);
-
-                return Number((fFirstPeriodNetAmount + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST).toFixed(2));
+                return Number((fGrandTotal / iDuration).toFixed(2));
             }
 
             return fGrandTotal;
