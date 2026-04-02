@@ -656,15 +656,41 @@ sap.ui.define([
 
             if (!oFacilityModel) return;
 
+            (this._aAllFacilities || []).forEach(function (oFacility) {
+                const aPriceOptions = this._buildFacilityPriceOptions(oFacility);
+                const oMatchedOption = aPriceOptions.find(function (oOption) {
+                    return oOption.key === sPlan;
+                }) || aPriceOptions.find(function (oOption) {
+                    return oOption.key === "Unit Price";
+                });
+
+                if (oMatchedOption) {
+                    return;
+                }
+
+                oFacility.Selected = false;
+                oFacility.SelectedPrice = 0;
+                oFacility.SelectedPriceType = "";
+                oFacility.CurrentPrice = 0;
+                oFacility.CurrentPriceType = "";
+                oFacility.DisplayPrice = "";
+                oFacility.SelectionSummary = "";
+            }.bind(this));
+
             oFacilityModel.setProperty("/Facilities", (this._aAllFacilities || [])
-                .filter(oFacility => this._buildFacilityPriceOptions(oFacility).length > 0)
+                .filter(function (oFacility) {
+                    const aPriceOptions = this._buildFacilityPriceOptions(oFacility);
+                    return aPriceOptions.some(function (oOption) {
+                        return oOption.key === sPlan || oOption.key === "Unit Price";
+                    });
+                }.bind(this))
                 .map(oFacility => {
                     const aPriceOptions = this._buildFacilityPriceOptions(oFacility);
                     const oMatchedOption = aPriceOptions.find(function (oOption) {
                         return oOption.key === sPlan;
                     }) || aPriceOptions.find(function (oOption) {
                         return oOption.key === "Unit Price";
-                    }) || aPriceOptions[0];
+                    });
                     const fCurrentPrice = oMatchedOption ? this._toNumber(oMatchedOption.price) : 0;
                     const sCurrentPriceType = oMatchedOption ? oMatchedOption.key : sPlan;
 
