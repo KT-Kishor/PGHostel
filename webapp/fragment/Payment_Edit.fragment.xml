@@ -74,7 +74,7 @@
                 >
                     <!-- LEFT COLUMN -->
                     <VBox
-                        id="idLeftColumn"
+                        id="idLeftColumn1"
                         class="sapUiSmallMargin"
                     >
                         <!-- UPI SECTION -->

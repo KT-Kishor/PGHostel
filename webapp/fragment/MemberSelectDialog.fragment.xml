@@ -57,7 +57,11 @@
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
                                 <Text text="{BookingView>DocumentType}" />
-                                <Text text="{BookingView>DocumentName}" />
+                                <!-- <Text text="{BookingView>DocumentName}" /> -->
+                                <Link
+                                text="{BookingView>DocumentName}"
+                                press="MS_viewimage"
+                            />
                             </cells>
                         </ColumnListItem>
                     </items>
