@@ -3868,6 +3868,20 @@ sap.ui.define([
             const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
             const iChargeableDays = sChargeType === "DAILY" ? this._getFacilityChargeableDayCount() : 0;
+            const oUnits = this._getBookingUnits();
+            const fnGetPeriodMultiplier = function (sPriceType) {
+                if (sPriceType === "Per Day") {
+                    return oUnits.days || 1;
+                }
+                if (sPriceType === "Per Month") {
+                    return oUnits.months || 1;
+                }
+                if (sPriceType === "Per Year") {
+                    return oUnits.years || 1;
+                }
+                return 1;
+            };
+            const fPeriodMultiplier = fnGetPeriodMultiplier(sUnitText);
             const fnCreateBaseRow = function () {
                 return {
                     FacilityID: oFacility.FacilityID || "",
@@ -3900,7 +3914,7 @@ sap.ui.define([
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = 1;
-                    oRow.FacilitiPrice = fUnitPrice.toFixed(2);
+                    oRow.FacilitiPrice = (fUnitPrice * fPeriodMultiplier).toFixed(2);
                     oRow.Flag = this._getFacilityFlagValue(sPersonId);
                     return oRow;
                 }.bind(this));
