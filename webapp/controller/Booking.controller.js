@@ -1492,7 +1492,7 @@ sap.ui.define([
                 Relation: "",
                 Age: "",
                 Gender: "",
-                Selected: true,
+                Selected: false,
                 DocumentType: "",
                 DocumentName: "",
                 Document: "",
@@ -1884,11 +1884,39 @@ sap.ui.define([
             oBookingView.setProperty("/NewMemberDraft", oDraft);
             oBookingView.refresh(true);
             oDialog.open();
+            this._attachDocumentInfoHover();
         },
 
         onCloseNewMemberDialog: async function () {
             const oDialog = await this._getNewMemberDialog();
             oDialog.close();
+        },
+
+        onNewMemberDialogAfterClose: function () {
+            this._resetNewMemberDialogState();
+        },
+
+        _resetNewMemberDialogState: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oFileUploader = this.byId("newMemberFileUploader");
+
+            oBookingView.setProperty("/NewMemberDraft", this._createMemberDraft());
+            oBookingView.refresh(true);
+
+            [
+                this.byId("newMemberNameInput"),
+                this.byId("newMemberGenderCombo"),
+                this.byId("newMemberRelationCombo"),
+                this.byId("newMemberDocumentTypeCombo")
+            ].forEach(function (oControl) {
+                if (oControl) {
+                    oControl.setValueState("None");
+                }
+            });
+
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
         },
 
         onNewMemberDocumentChange: function (oEvent) {
@@ -1933,45 +1961,252 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
+        onDeleteNewMemberDocument: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oFileUploader = this.byId("newMemberFileUploader");
+
+            oBookingView.setProperty("/NewMemberDraft/DocumentName", "");
+            oBookingView.setProperty("/NewMemberDraft/DocumentFile", null);
+            oBookingView.setProperty("/NewMemberDraft/Document", "");
+            oBookingView.setProperty("/NewMemberDraft/File", "");
+            oBookingView.setProperty("/NewMemberDraft/FileType", "");
+            oBookingView.refresh(true);
+
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
+        },
+
+        onNewMemberDocumentInfoPress: function () {
+            const oPopover = this._getDocumentInfoPopover();
+            const oIcon = this.byId("newMemberDocumentInfoIcon");
+
+            this._clearDocumentInfoPopoverClose();
+
+            if (oPopover.isOpen()) {
+                oPopover.close();
+                return;
+            }
+
+            if (oIcon) {
+                oPopover.openBy(oIcon);
+            }
+        },
+
+        onPreviewNewMemberDocument: function () {
+            const oDoc = this.getView().getModel("BookingView").getProperty("/NewMemberDraft") || {};
+            this._previewDocument(oDoc);
+        },
+
+        _previewDocument: function (oDoc) {
+            const sRawBase64 = String(oDoc?.File || oDoc?.Document || "").trim();
+
+            if (!sRawBase64) {
+                MessageToast.show("No document to preview.");
+                return;
+            }
+
+            const autoDecodeBase64 = function (sValue) {
+                if (!sValue) {
+                    return "";
+                }
+
+                let sDecoded = String(sValue).replace(/\s/g, "");
+                let sLast = sDecoded;
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (sLast.startsWith("iVB") || sLast.startsWith("/9j") || sLast.startsWith("JVBER")) {
+                            return sLast;
+                        }
+
+                        sLast = atob(sLast);
+                    } catch (e) {
+                        break;
+                    }
+                }
+
+                return sLast;
+            };
+
+            const sBase64 = autoDecodeBase64(sRawBase64);
+            let sMimeType = String(oDoc.FileType || "").toLowerCase();
+
+            if (!sMimeType) {
+                if (sBase64.startsWith("iVB")) {
+                    sMimeType = "image/png";
+                } else if (sBase64.startsWith("/9j")) {
+                    sMimeType = "image/jpeg";
+                } else if (sBase64.startsWith("JVBER")) {
+                    sMimeType = "application/pdf";
+                }
+            }
+
+            if (sMimeType.indexOf("image/") === 0) {
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                const oImage = new sap.m.Image({
+                    densityAware: false,
+                    width: "100%",
+                    height: "100%"
+                });
+
+                const oDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    contentWidth: "50%",
+                    contentHeight: "60%",
+                    draggable: true,
+                    resizable: true,
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [oImage]
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        oDialog.destroy();
+                    }
+                });
+
+                this.getView().addDependent(oDialog);
+                oImage.setSrc(sImageSrc);
+                oDialog.open();
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                const sByteChars = atob(sBase64);
+                const aByteArrays = [];
+
+                for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
+                    const sSlice = sByteChars.slice(iOffset, iOffset + 512);
+                    const aByteNumbers = new Array(sSlice.length);
+
+                    for (let i = 0; i < sSlice.length; i++) {
+                        aByteNumbers[i] = sSlice.charCodeAt(i);
+                    }
+
+                    aByteArrays.push(new Uint8Array(aByteNumbers));
+                }
+
+                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
+
+                if (this._customerPreviewUrl) {
+                    URL.revokeObjectURL(this._customerPreviewUrl);
+                }
+
+                this._customerPreviewUrl = URL.createObjectURL(oBlob);
+
+                const oPdfDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    stretch: true,
+                    draggable: true,
+                    resizable: true,
+                    contentWidth: "60%",
+                    contentHeight: "60%",
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                            <div style="width:100%;height:100%;overflow:hidden;">
+                                <iframe src="${this._customerPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+                            </div>
+                        `
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oPdfDialog.close();
+                        }
+                    }),
+                    afterClose: function () {
+                        if (this._customerPreviewUrl) {
+                            URL.revokeObjectURL(this._customerPreviewUrl);
+                            this._customerPreviewUrl = null;
+                        }
+
+                        oPdfDialog.destroy();
+                    }.bind(this)
+                });
+
+                this.getView().addDependent(oPdfDialog);
+                oPdfDialog.open();
+                return;
+            }
+
+            MessageToast.show("Unsupported document format.");
+        },
+
+        onNewMemberNameChange: function (oEvent) {
+            return utils._LCvalidateName(oEvent);
+        },
+
+        onNewMemberGenderChange: function (oEvent) {
+            return utils._LCstrictValidationComboBox(oEvent);
+        },
+
+        onNewMemberRelationChange: function (oEvent) {
+            return utils._LCstrictValidationComboBox(oEvent);
+        },
+
+        onNewMemberDocumentTypeChange: function (oEvent) {
+            const oComboBox = oEvent.getSource();
+            const sValue = String(oComboBox.getValue() || "").trim();
+
+            if (!sValue) {
+                oComboBox.setSelectedKey("");
+                oComboBox.setValue("");
+                oComboBox.setValueState("None");
+                return true;
+            }
+
+            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+        },
+
         onSaveNewMember: async function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
             const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const oNameInput = this.byId("newMemberNameInput");
+            const oGenderCombo = this.byId("newMemberGenderCombo");
+            const oRelationCombo = this.byId("newMemberRelationCombo");
+            const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
+            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+            const bMandatoryValid =
+                utils._LCvalidateName(oNameInput, "ID") &&
+                utils._LCstrictValidationComboBox(oGenderCombo, "ID") &&
+                utils._LCstrictValidationComboBox(oRelationCombo, "ID");
+            const bDocumentTypeValid = !String(oDocumentTypeCombo.getValue() || "").trim() ||
+                utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID");
 
-            if (!String(oDraft.Name || "").trim()) {
-                MessageToast.show("Please enter full name.");
+            if (!bMandatoryValid || !bDocumentTypeValid) {
+                MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
 
-            if (!String(oDraft.Gender || "").trim()) {
-                MessageToast.show("Please select gender.");
-                return;
-            }
-
-            if (!String(oDraft.Relation || "").trim()) {
-                MessageToast.show("Please select relationship.");
-                return;
-            }
-
-            if (!String(oDraft.DocumentType || "").trim()) {
-                MessageToast.show("Please select document type.");
-                return;
-            }
-
-            if (!String(oDraft.DocumentName || "").trim()) {
-                MessageToast.show("Please upload a document.");
-                return;
-            }
-
+            oDraft.Name = String(oNameInput.getValue() || "").trim();
+            oDraft.Gender = oGenderCombo.getSelectedKey() || String(oGenderCombo.getValue() || "").trim();
+            oDraft.Relation = oRelationCombo.getSelectedKey() || String(oRelationCombo.getValue() || "").trim();
+            oDraft.DocumentType = oDocumentTypeCombo.getSelectedKey() || String(oDocumentTypeCombo.getValue() || "").trim();
             oDraft.id = oDraft.id || ("FM_" + Date.now());
             oDraft.MemberID = "";
-            oDraft.Selected = true;
+            oDraft.Selected = false;
             oDraft.IsNew = false;
-            oDraft.Name = String(oDraft.Name).trim();
 
             oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers, [oDraft])));
-            oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers, [oDraft])).map(function (oMember) {
+            oBookingView.setProperty("/FamilyMembers", this._mergeMembersById(aSelectedMembers).map(function (oMember) {
                 oMember.Selected = true;
                 return oMember;
             }));
@@ -2083,14 +2318,25 @@ sap.ui.define([
 
         _attachDocumentInfoHover: function () {
             const oIcon = this.byId("bookingDocumentInfoIcon");
+            const oNewMemberIcon = this.byId("newMemberDocumentInfoIcon");
 
-            if (!oIcon || oIcon.data("hoverBound")) {
-                return;
+            if (oIcon && !oIcon.data("hoverBound")) {
+                oIcon.data("hoverBound", true);
+                oIcon.attachBrowserEvent("mouseenter", this._openDocumentInfoPopover.bind(this));
+                oIcon.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
             }
 
-            oIcon.data("hoverBound", true);
-            oIcon.attachBrowserEvent("mouseenter", this._openDocumentInfoPopover.bind(this));
-            oIcon.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
+            if (oNewMemberIcon && !oNewMemberIcon.data("hoverBound")) {
+                oNewMemberIcon.data("hoverBound", true);
+                oNewMemberIcon.attachBrowserEvent("mouseenter", this._openNewMemberDocumentInfoPopover.bind(this));
+                oNewMemberIcon.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
+            }
+
+            if ((!oIcon || oIcon.data("hoverBound")) && (!oNewMemberIcon || oNewMemberIcon.data("hoverBound"))) {
+                if (this._getDocumentInfoPopover().data("hoverAfterOpenBound")) {
+                    return;
+                }
+            }
 
             this._getDocumentInfoPopover().attachAfterOpen(function () {
                 const oPopover = this._getDocumentInfoPopover();
@@ -2101,10 +2347,21 @@ sap.ui.define([
                     oPopover.attachBrowserEvent("mouseleave", this._scheduleDocumentInfoPopoverClose.bind(this));
                 }
             }.bind(this));
+            this._getDocumentInfoPopover().data("hoverAfterOpenBound", true);
         },
 
         _openDocumentInfoPopover: function () {
             const oIcon = this.byId("bookingDocumentInfoIcon");
+
+            this._clearDocumentInfoPopoverClose();
+
+            if (oIcon) {
+                this._getDocumentInfoPopover().openBy(oIcon);
+            }
+        },
+
+        _openNewMemberDocumentInfoPopover: function () {
+            const oIcon = this.byId("newMemberDocumentInfoIcon");
 
             this._clearDocumentInfoPopoverClose();
 

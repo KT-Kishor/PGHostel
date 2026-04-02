@@ -257,7 +257,6 @@
                                             <Button
                                                 text="Remove"
                                                 type="Transparent"
-                                                icon="sap-icon://delete"
                                                 press="onDeleteCustomerDocumentRow"
                                                 class="sapUiTinyMarginBegin myUnifiedBtn"
                                             />
@@ -284,7 +283,7 @@
                             <Input
                                 id="memberValueHelpInput"
                                 value="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersSummary'}"
-                                placeholder="Click value help to select members"
+                                placeholder="Click here to select or add members"
                                 showValueHelp="true"
                                 valueHelpOnly="true"
                                 valueHelpRequest="onMemberValueHelpRequest"

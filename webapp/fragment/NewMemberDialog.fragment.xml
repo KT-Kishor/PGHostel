@@ -2,61 +2,147 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:unified="sap.ui.unified"
+    xmlns:f="sap.ui.layout.form"
 >
     <Dialog
         id="newMemberDialog"
-        contentWidth="38rem"
-        stretchOnPhone="true"
+        contentWidth="32rem"
+        stretch="{= ${device>/system/phone} }"
         draggable="true"
-        resizable="true"
+        resizable="false"
+        showHeader="true"
+        horizontalScrolling="false"
+        afterClose="onNewMemberDialogAfterClose"
     >
         <customHeader>
             <OverflowToolbar>
                 <Title text="Add New Member" />
-                <ToolbarSpacer />
-                <Button
-                    icon="sap-icon://decline"
-                    type="Transparent"
-                    press="onCloseNewMemberDialog"
-                />
             </OverflowToolbar>
         </customHeader>
 
         <content>
-            <VBox class="sapUiSmallMargin" >
+            <f:SimpleForm
+                editable="true"
+                layout="ResponsiveGridLayout"
+                width="100%"
+                columnsXL="2"
+                columnsL="2"
+                columnsM="1"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="12"
+                labelSpanS="12"
+                emptySpanXL="1"
+                emptySpanL="1"
+                emptySpanM="0"
+                emptySpanS="0"
+                adjustLabelSpan="false"
+                singleContainerFullSize="true"
+                class="sapUiTinyMargin"
+            >
                 <Label text="Full Name" required="true" />
-                <Input value="{BookingView>/NewMemberDraft/Name}" placeholder="Enter full name" />
+                <Input
+                    id="newMemberNameInput"
+                    value="{BookingView>/NewMemberDraft/Name}"
+                    placeholder="Enter full name"
+                    valueStateText="Please enter a valid full name"
+                    liveChange="onNewMemberNameChange"
+                    change="onNewMemberNameChange"
+                />
 
-                <Label text="Gender" required="true" class="sapUiTinyMarginTop" />
-                <Select selectedKey="{BookingView>/NewMemberDraft/Gender}" items="{BookingView>/GenderOptions}">
+                <Label text="Gender" required="true" />
+                <ComboBox
+                    id="newMemberGenderCombo"
+                    selectedKey="{BookingView>/NewMemberDraft/Gender}"
+                    items="{BookingView>/GenderOptions}"
+                    placeholder="Select gender"
+                    valueStateText="Please select gender"
+                    selectionChange="onNewMemberGenderChange"
+                    change="onNewMemberGenderChange"
+                >
                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
-                </Select>
+                </ComboBox>
 
-                <Label text="Relationship" required="true" class="sapUiTinyMarginTop" />
-                <Select selectedKey="{BookingView>/NewMemberDraft/Relation}" items="{BookingView>/RelationshipOptions}">
+                <Label text="Relationship" required="true" />
+                <ComboBox
+                    id="newMemberRelationCombo"
+                    selectedKey="{BookingView>/NewMemberDraft/Relation}"
+                    items="{BookingView>/RelationshipOptions}"
+                    placeholder="Select relationship"
+                    valueStateText="Please select relationship"
+                    selectionChange="onNewMemberRelationChange"
+                    change="onNewMemberRelationChange"
+                >
                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
-                </Select>
+                </ComboBox>
 
-                <Label text="Document Type" required="true" class="sapUiTinyMarginTop" />
-                <Select selectedKey="{BookingView>/NewMemberDraft/DocumentType}" items="{BookingView>/DocumentTypeOptions}">
-                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
-                </Select>
+                <Label text="Upload Document" />
+                <HBox
+                    width="100%"
+                    fitContainer="true"
+                    wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                    alignItems="Center"
+                >
+                    <core:Icon
+                        id="newMemberDocumentInfoIcon"
+                        src="sap-icon://hint"
+                        size="1rem"
+                        color="#0064d1"
+                        hoverColor="DarkBlue"
+                        press="onNewMemberDocumentInfoPress"
+                        tooltip="Upload info"
+                        class="sapUiTinyMarginEnd"
+                    />
 
-                <Label text="Upload Document" required="true" class="sapUiTinyMarginTop" />
-                <HBox alignItems="Center" wrap="Wrap">
+                    <ComboBox
+                        id="newMemberDocumentTypeCombo"
+                        selectedKey="{BookingView>/NewMemberDraft/DocumentType}"
+                        items="{BookingView>/DocumentTypeOptions}"
+                        placeholder="Select document type"
+                        valueStateText="Please select a valid document type"
+                        selectionChange="onNewMemberDocumentTypeChange"
+                        change="onNewMemberDocumentTypeChange"
+                        width="{= ${device>/system/phone} ? '100%' : '12rem'}"
+                        class="sapUiTinyMarginEnd"
+                    >
+                        <core:Item key="{BookingView>key}" text="{BookingView>text}" />
+                    </ComboBox>
+
                     <unified:FileUploader
-                        width="10rem"
+                        id="newMemberFileUploader"
+                        width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+                        visible="{= !${BookingView>/NewMemberDraft/DocumentName} }"
                         buttonOnly="true"
                         maximumFileSize="2"
                         sameFilenameAllowed="true"
                         change="onNewMemberDocumentChange"
                         buttonText="Upload"
                         fileType="pdf,jpg,jpeg,png,webp"
-                        class="myUnifiedBtn"
+                        class="sapUiTinyMarginEnd myUnifiedBtn"
                     />
-                    <Text text="{BookingView>/NewMemberDraft/DocumentName}" class="sapUiTinyMarginBegin" />
+
+                    <HBox
+                        visible="{= !!${BookingView>/NewMemberDraft/DocumentName} }"
+                        alignItems="Center"
+                        wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                    >
+                        <Link
+                            text="{path: 'BookingView>/NewMemberDraft/DocumentName', formatter: '.formatDocumentFileName'}"
+                            tooltip="{BookingView>/NewMemberDraft/DocumentName}"
+                            press="onPreviewNewMemberDocument"
+                            width="10rem"
+                            class="automatedEllipsis"
+                        />
+                        <Button
+                            text="Remove"
+                            type="Transparent"
+                            icon="sap-icon://delete"
+                            press="onDeleteNewMemberDocument"
+                            class="sapUiTinyMarginBegin myUnifiedBtn"
+                        />
+                    </HBox>
                 </HBox>
-            </VBox>
+            </f:SimpleForm>
         </content>
 
         <beginButton>
