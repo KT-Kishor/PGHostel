@@ -457,50 +457,68 @@ sap.ui.define([
             oTile.addStyleClass("selectedTile");
         },
 
-        onConfirmBooking:async function () {
+        onConfirmBooking: async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
-             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-const oUser = oLoginModel?.getData?.() || {};
-         
+
+            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oUser = oLoginModel?.getData?.() || {};
+
+            // -------------------------
+            // LOGIN CHECK
+            // -------------------------
             if (!bLoggedIn) {
-                MessageBox.information("Please log in to continue booking. You will be redirected to the Hostel page.", {
-                    title: "Login Required",
-                    styleClass: "myUnifiedBtn",
-                    actions: [MessageBox.Action.OK],
-                    emphasizedAction: MessageBox.Action.OK,
-                    onClose: function () {
-                        this.getOwnerComponent().getRouter().navTo("RouteHostel");
-                    }.bind(this)
-                });
+                MessageBox.information(
+                    "Please log in to continue booking. You will be redirected to the Hostel page.",
+                    {
+                        title: "Login Required",
+                        styleClass: "myUnifiedBtn",
+                        actions: [MessageBox.Action.OK],
+                        emphasizedAction: MessageBox.Action.OK,
+                        onClose: function () {
+                            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                        }.bind(this)
+                    }
+                );
                 return;
             }
+
             const oView = this.getView();
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
 
+            let aMember = [];
+            let aUserDocs = [];
 
-             let aMember = [];
-    try {
-        let resp = await this.ajaxReadWithJQuery("HM_Member", {
-            userID: oUser?.UserID   
-        });
+            try {
+                let resp = await this.ajaxReadWithJQuery(
+                    "HM_CustomerAndMemberDocuments",
+                    {
+                        userID: oUser?.UserID
+                    }
+                );
 
-        aMember = resp?.data || [];
-    } catch (error) {
-        console.error("Member fetch failed", error);
-    }
+                aMember = resp?.data?.Members || [];
+                aUserDocs = resp?.data?.UserDocuments || [];
+
+            } catch (error) {
+                console.error("Member fetch failed", error);
+            }
 
             // -------------------------
             // BASIC VALIDATIONS
             // -------------------------
             if (!oData.Visible) {
-                MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
+                MessageToast.show(
+                    this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom")
+                );
                 return;
             }
 
             if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
-                MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
+                MessageToast.show(
+                    this.i18nModel.getText("pleaseselectpricingplanbeforebooking")
+                );
                 return;
             }
 
@@ -546,9 +564,8 @@ const oUser = oLoginModel?.getData?.() || {};
                 GSTIN: oData.GSTIN || "",
                 AvailableDate: oData.AvailableDate,
                 ExtraBed: oData.ExtraBed || 0,
-
-                MemberList:aMember
-
+                MemberList: aMember,
+                UserDocuments: aUserDocs
             };
 
             // -------------------------
@@ -560,12 +577,14 @@ const oUser = oLoginModel?.getData?.() || {};
             };
 
             // -------------------------
-            //  FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
+            // AVAILABLE BEDS LOGIC
             // -------------------------
             const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
 
             if (iAvailableBeds <= 0) {
-                MessageToast.show(this.i18nModel.getText("nobedsavailableforbooking"));
+                MessageToast.show(
+                    this.i18nModel.getText("nobedsavailableforbooking")
+                );
                 return;
             }
 
@@ -579,9 +598,9 @@ const oUser = oLoginModel?.getData?.() || {};
 
             oMergedData.NoOfPersonsList = aPersonsList;
 
-            // Optional: auto-select max available persons
-            oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
-
+            // Default selection = max beds
+            oMergedData.SelectedPerson =
+                aPersonsList[aPersonsList.length - 1]?.key || "1";
             oGlobalModel.setData(oMergedData, true);
 
             if (this._oRoomDetailFragment) {
@@ -596,6 +615,7 @@ const oUser = oLoginModel?.getData?.() || {};
             const oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBooking");
         },
+
         onRoomDetailOpened: function () {
             // Get the branch code from the dialog's model
             if (this._oRoomDetailFragment) {
