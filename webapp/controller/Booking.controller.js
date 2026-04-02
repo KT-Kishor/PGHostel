@@ -812,14 +812,20 @@ sap.ui.define([
                     new sap.m.VBox({
                         width: "93%",
                         items: [
-                            new sap.m.Label({
-                                text: "Price",
-                                design: "Bold"
-                            }).addStyleClass("sapUiTinyMarginBottom"),
-
-                            new sap.m.Label({
-                                text: "{FacilitySelection>/DisplayPrice}",
-                                design: "Bold"
+                            new sap.m.HBox({
+                                width: "100%",
+                                wrap: "Wrap",
+                                alignItems: "Start",
+                                items: [
+                                    new sap.m.Text({
+                                        text: "Price",
+                                        wrapping: true
+                                    }).addStyleClass("sapMTextBold sapUiTinyMarginEnd"),
+                                    new sap.m.Text({
+                                        text: "{FacilitySelection>/DisplayPrice}",
+                                        wrapping: true
+                                    }).addStyleClass("sapUiTinyMarginEnd"),
+                                ]
                             }).addStyleClass("sapUiSmallMarginBottom"),
 
                             new sap.m.VBox({
@@ -830,31 +836,50 @@ sap.ui.define([
                                     }
                                 },
                                 items: [
-                                    new sap.m.Label({
-                                        text: "Billing option",
-                                        design: "Bold"
-                                    }).addStyleClass("sapUiTinyMarginBottom"),
-                                    new sap.m.RadioButtonGroup({
-                                        columns: 1,
-                                        selectedIndex: {
-                                            path: "FacilitySelection>/facilityChargeType",
-                                            formatter: function (sChargeType) {
-                                                return sChargeType === "DAILY" ? 1 : 0;
-                                            }
-                                        },
-                                        select: function (oEvent) {
-                                            const iIndex = oEvent.getParameter("selectedIndex");
-                                            this.getView().getModel("FacilitySelection").setProperty(
-                                                "/facilityChargeType",
-                                                iIndex === 1 ? "DAILY" : "ONCE_PER_BOOKING"
-                                            );
-                                        }.bind(this),
-                                        buttons: [
+                                    new sap.m.HBox({
+                                        width: "100%",
+                                        wrap: "Wrap",
+                                        alignItems: "Center",
+                                        items: [
+                                            new sap.m.Text({
+                                                text: "Billing option",
+                                                wrapping: true
+                                            }).addStyleClass("sapMTextBold sapUiTinyMarginEnd"),
                                             new sap.m.RadioButton({
-                                                text: "Once for entire booking"
-                                            }),
+                                                text: "Once for entire booking",
+                                                groupName: this.getView().getId() + "-facilityChargeType",
+                                                selected: {
+                                                    path: "FacilitySelection>/facilityChargeType",
+                                                    formatter: function (sChargeType) {
+                                                        return sChargeType !== "DAILY";
+                                                    }
+                                                },
+                                                select: function (oEvent) {
+                                                    if (oEvent.getParameter("selected")) {
+                                                        this.getView().getModel("FacilitySelection").setProperty(
+                                                            "/facilityChargeType",
+                                                            "ONCE_PER_BOOKING"
+                                                        );
+                                                    }
+                                                }.bind(this)
+                                            }).addStyleClass("sapUiTinyMarginEnd"),
                                             new sap.m.RadioButton({
-                                                text: "Daily"
+                                                text: "Daily",
+                                                groupName: this.getView().getId() + "-facilityChargeType",
+                                                selected: {
+                                                    path: "FacilitySelection>/facilityChargeType",
+                                                    formatter: function (sChargeType) {
+                                                        return sChargeType === "DAILY";
+                                                    }
+                                                },
+                                                select: function (oEvent) {
+                                                    if (oEvent.getParameter("selected")) {
+                                                        this.getView().getModel("FacilitySelection").setProperty(
+                                                            "/facilityChargeType",
+                                                            "DAILY"
+                                                        );
+                                                    }
+                                                }.bind(this)
                                             })
                                         ]
                                     })
