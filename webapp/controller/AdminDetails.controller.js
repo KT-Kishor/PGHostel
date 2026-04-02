@@ -1098,7 +1098,7 @@ sap.ui.define([
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
 
-         
+
 
             if (!sUnit || !sStartDate) return;
 
@@ -1124,13 +1124,13 @@ sap.ui.define([
             if (sEndDate.includes("/")) {
                 sEndDate = sEndDate.split("/").reverse().join("-");
             }
-            if(sStartDate!=="" && sEndDate!==""){
-               if(sEndDate<=sStartDate){
-                sap.m.MessageToast.show("Please select a valid date");
-                oModel.setProperty("/EndDate", "");
-                return;
+            if (sStartDate !== "" && sEndDate !== "") {
+                if (sEndDate <= sStartDate) {
+                    sap.m.MessageToast.show("Please select a valid date");
+                    oModel.setProperty("/EndDate", "");
+                    return;
+                }
             }
-        }
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
             //   var oEndDatePicker = sap.ui.getCore().byId("editEndDate");
@@ -1282,7 +1282,7 @@ sap.ui.define([
                     return;
                 }
             }
-            if (oPayload.UnitText !== "Unit Price" && oPayload.UnitText !=="") {
+            if (oPayload.UnitText !== "Unit Price" && oPayload.UnitText !== "") {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1410,9 +1410,13 @@ sap.ui.define([
             oPayload.TotalAmount = finalPrice;
             oPayload.TotalMonths = oPayload.TotalUnits || "1"
             oPayload.TotalYears = oPayload.TotalUnits || "1"
-            oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 ? "DAILY" : "ONCE_PER_BOOKING" : ""
+            // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY" : ""
             oPayload.MemberName = sap.ui.getCore().byId("editMembername").getValue() || ""
             oPayload.SelectionMode = this.SelectionMode
+
+            if(this.SelectionMode === "PERSON_QTY"){
+            oPayload.FacilityChargeType =  sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY"
+            }
 
 
 
@@ -2974,7 +2978,7 @@ sap.ui.define([
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                if (sap.ui.getCore().byId("id_Period")?sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 : false) {
+                                if (sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 : false) {
                                     firstMonthAmount = Number(item.TotalAmount) * overlapDays;
                                 } else {
                                     firstMonthAmount = Number(item.TotalAmount)
@@ -3233,12 +3237,12 @@ sap.ui.define([
 
                                     if (unit === "per day") {
                                         let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                        total = days * price;
+                                        total = item.quantity ? item.quantity * days * price : days * price;
                                         item.TotalDays = days;
 
                                     } else if (unit === "per hour") {
                                         let hours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total = hours * price;
+                                        total =item.quantity ? item.quantity * hours * price : hours * price;
 
                                     } else if (unit === "per month") {
 
@@ -3246,14 +3250,21 @@ sap.ui.define([
                                             ? CustomerData.Duration * 12
                                             : CustomerData.Duration;
 
-                                        total = months * price;
+                                        total =item.quantity ? item.quantity * months * price : months * price;
                                         item.TotalMonths = months;
 
                                     } else if (unit === "per year") {
 
                                         let years = CustomerData.Duration;
-                                        total = years * price;
+                                        total =item.quantity ? item.quantity * years * price : years * price;
                                         item.TotalYears = years;
+                                    } else if (unit === "unit price") {
+                                          let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                            total = price;;
+                                        } else {
+                                            total = price * Number(item.quantity) * days;
+                                        }
                                     }
 
                                     item.TotalAmount = total;
@@ -3350,31 +3361,37 @@ sap.ui.define([
                                     let total = 0;
 
                                     if (unit === "per day") {
-                                        total = diffDays * price;
+                                        total =item.quantity ? item.quantity * diffDays * price: diffDays * price;
                                         item.TotalDays = diffDays;
 
                                     } else if (unit === "per hour") {
                                         let diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total = diffHours * price;
+                                        total =item.quantity ? item.quantity * diffHours * price: diffHours * price;
 
                                     }
                                     else if (unit === "per month") {
                                         if (CustomerData.PaymentType === "yearly") {
                                             let months = CustomerData.Duration * 12
-                                            total = months * price;
+                                            total =item.quantity ? item.quantity * months * price: months * price;
                                             item.TotalMonths = months;
 
                                         } else {
                                             let months = CustomerData.Duration
-                                            total = months * price;
+                                            total =item.quantity ? item.quantity * months * price: months * price;
                                             item.TotalMonths = months;
 
                                         }
 
                                     } else if (unit === "per year") {
                                         let years = CustomerData.Duration;
-                                        total = years * price;
+                                        total =item.quantity ? item.quantity * years * price: years * price;
                                         item.TotalYears = years;
+                                    } else if (unit === "unit price") {
+                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                            total = price;;
+                                        } else {
+                                            total = price * Number(item.quantity) * diffDays;
+                                        }
                                     }
 
                                     item.TotalAmount = total;
