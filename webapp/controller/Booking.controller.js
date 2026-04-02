@@ -210,6 +210,10 @@ sap.ui.define([
             return !this._isSinglePersonOnlyPropertyType(sPropertyType);
         },
 
+        _shouldShowFamilySection: function (sPropertyType, iCapacity) {
+            return !this._isSinglePersonOnlyPropertyType(sPropertyType) && Math.max(parseInt(iCapacity, 10) || 1, 1) > 1;
+        },
+
         _validateGSTINField: function (oField) {
             const sValue = String(oField.getValue() || "").trim().toUpperCase();
             const oI18nModel = this.getOwnerComponent().getModel("i18n") || this.getView().getModel("i18n");
@@ -3178,9 +3182,9 @@ sap.ui.define([
             const oModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
             const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
-            const bSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
             const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const iCapacity = Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
+            const bShowFamilySection = this._shouldShowFamilySection(sPropertyType, iCapacity);
             const aOriginalOptions = this._buildKeyTextList(iCapacity);
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
 
@@ -3193,7 +3197,7 @@ sap.ui.define([
                 oBookingView.setProperty("/showBusinessGSTSection", false);
             }
 
-            if (bSinglePersonOnly) {
+            if (!bShowFamilySection) {
                 oBookingView.setProperty("/showFamilySection", false);
                 oBookingView.setProperty("/maxPersons", 1);
                 oModel.setProperty("/NoOfPersonsList", [{ key: "1", text: "1" }]);

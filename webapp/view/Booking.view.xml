@@ -683,7 +683,7 @@
                                     class="sapUiTinyMarginBottom"
                                 /> -->
                                 <MessageStrip
-                                    text="{= 'Security Deposit (Collected in person): ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                    text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
                                     type="Information"
                                     showIcon="true"
                                     showCloseButton="false"
