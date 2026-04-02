@@ -187,9 +187,9 @@
                             </HBox>
                             <Label
                                 text="Upload Document"
-                                visible="{= !!${HostelModel>/UserID} }"
+                                visible="{BookingView>/showCustomerDocumentUpload}"
                             />
-                            <VBox visible="{= !!${HostelModel>/UserID} }">
+                            <VBox visible="{BookingView>/showCustomerDocumentUpload}">
                                 <layoutData>
                                     <l:GridData span="XL8 L8 M8 S12" />
                                 </layoutData>

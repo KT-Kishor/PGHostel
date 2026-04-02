@@ -70,6 +70,7 @@ sap.ui.define([
                 showGSTField: false,
                 showBusinessTravelOption: false,
                 showBusinessGSTSection: false,
+                showCustomerDocumentUpload: false,
                 maxPersons: 1,
                 originalPersonOptions: [],
                 DocumentTypeOptions: [
@@ -2804,6 +2805,7 @@ sap.ui.define([
             const oBookingView = this.getView().getModel("BookingView");
             const oToday = new Date();
             const aPaymentMethods = [];
+            const aUserDocuments = Array.isArray(oData.UserDocuments) ? oData.UserDocuments : [];
             let aOriginalPersonOptions = Array.isArray(oData.NoOfPersonsList) ? oData.NoOfPersonsList.slice() : [];
             const iCapacity = Math.max(parseInt(oData.Capacity, 10) || 1, 1);
             const sPropertyType = String(oData.PropertyType || "").trim();
@@ -2856,8 +2858,17 @@ sap.ui.define([
             oModel.setProperty("/CGST", this._toNumber(oData.CGST));
             oModel.setProperty("/SGST", this._toNumber(oData.SGST));
             oModel.setProperty("/IGST", this._toNumber(oData.IGST));
+            oModel.setProperty("/UserDocuments", aUserDocuments);
             oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
-            this._ensureCustomerDocumentSlot();
+            oBookingView.setProperty("/showCustomerDocumentUpload", aUserDocuments.length === 0);
+            console.log("Booking upload visibility:", {
+                userDocumentsLength: aUserDocuments.length,
+                showCustomerDocumentUpload: aUserDocuments.length === 0
+            });
+
+            if (aUserDocuments.length === 0) {
+                this._ensureCustomerDocumentSlot();
+            }
             oModel.setProperty("/BookingPayload", oData.BookingPayload || null);
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
