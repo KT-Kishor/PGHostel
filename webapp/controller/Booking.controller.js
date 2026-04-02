@@ -384,6 +384,7 @@ sap.ui.define([
             const sPlan = oModel.getProperty("/SelectedPriceType");
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
+            const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
             let oBillingEndDate = null;
 
             if (!oStartDate || !oEndDate || oEndDate <= oStartDate) {
@@ -394,10 +395,10 @@ sap.ui.define([
                 oBillingEndDate = oEndDate;
             } else if (sPlan === "Per Month") {
                 oBillingEndDate = new Date(oStartDate);
-                oBillingEndDate.setMonth(oBillingEndDate.getMonth() + 1);
+                oBillingEndDate.setMonth(oBillingEndDate.getMonth() + iDuration);
             } else if (sPlan === "Per Year") {
                 oBillingEndDate = new Date(oStartDate);
-                oBillingEndDate.setFullYear(oBillingEndDate.getFullYear() + 1);
+                oBillingEndDate.setFullYear(oBillingEndDate.getFullYear() + iDuration);
             } else {
                 oBillingEndDate = oEndDate;
             }
@@ -1234,10 +1235,10 @@ sap.ui.define([
                     return oUnits.days || 1;
                 }
                 if (sPriceType === "Per Month") {
-                    return 1;
+                    return oUnits.months || 1;
                 }
                 if (sPriceType === "Per Year") {
-                    return 1;
+                    return oUnits.years || 1;
                 }
                 if (sPriceType === "Unit Price") {
                     return 1;
@@ -1381,10 +1382,10 @@ sap.ui.define([
                 return oUnits.days + " day(s)";
             }
             if (sSelectedPriceType === "Per Month") {
-                return "1 month";
+                return (oUnits.months || 1) + " month(s)";
             }
             if (sSelectedPriceType === "Per Year") {
-                return "1 year";
+                return (oUnits.years || 1) + " year(s)";
             }
             return "1 unit";
         },
