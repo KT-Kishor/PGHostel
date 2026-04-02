@@ -2920,7 +2920,14 @@ sap.ui.define([
 
             if (paymentType === "Per Day") {
 
-                totalPersonsMonthly = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal || 0;
+                let baseAmount;
+
+
+                baseAmount = CustomerData.GrandTotal || 0;
+
+            
+
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? baseAmount - Number(CustomerData.PaymentPaid || 0)  : baseAmount 
 
             } else {
                 let facilityAmount = 0;
@@ -2969,7 +2976,7 @@ sap.ui.define([
                             if (item.UnitText === "Per Month") {
                                 const totalMonths =
                                     (facilityEnd.getFullYear() - facilityStart.getFullYear()) * 12 +
-                                    (facilityEnd.getMonth() - facilityStart.getMonth() + 1);
+                                    (facilityEnd.getMonth() - facilityStart.getMonth());
 
                                 let monthlyAmount = totalAmount / totalMonths;
 
@@ -3261,20 +3268,29 @@ sap.ui.define([
                                     } else if (unit === "unit price") {
                                           let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = price;;
+                                            total = item.FacilityPrice;
                                         } else {
                                             total = price * Number(item.quantity) * days;
                                         }
                                     }
 
-                                    item.TotalAmount = total;
+                                    item.TotalAmount = item.CouponDiscount !==""? total- Number(item.CouponDiscount):total;
                                     totalFacilityPrice += total;
                                 });
 
                                 CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
+                             if(CustomerData.GSTType==="CGST/SGST"){
+                                  CustomerData.GrandTotal =
+                                    (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
+                                     ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100)*2;
+                                }else if(CustomerData.GSTType==="IGST"){
+                                  CustomerData.GrandTotal =
+                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice +  ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100);
+                                }else{
                                 CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice
+                                };
 
                                 that.getView().getModel("CustomerData").refresh(true);
 
@@ -3388,20 +3404,31 @@ sap.ui.define([
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = price;;
+                                            total = item.FacilityPrice;
                                         } else {
                                             total = price * Number(item.quantity) * diffDays;
                                         }
                                     }
 
-                                    item.TotalAmount = total;
+                                    item.TotalAmount = item.CouponDiscount !==""? total- Number(item.CouponDiscount):total;
                                     totalFacilityPrice += total;
                                 });
 
                                 CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
+                                if(CustomerData.GSTType==="CGST/SGST"){
+                                  CustomerData.GrandTotal =
+                                    (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
+                                     ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100)*2;
+                                }else if(CustomerData.GSTType==="IGST"){
+                                  CustomerData.GrandTotal =
+                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice +  ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100);
+                                }else{
                                 CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice
+                                }
+                               CustomerData.DueAmount=CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid :CustomerData.GrandTotal;
+                             
 
                                 that.getView().getModel("CustomerData").refresh(true);
 

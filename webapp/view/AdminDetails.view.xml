@@ -962,18 +962,29 @@
                                         text="{CustomerData>UnitText}"
                                     />
                   <Text
-    text="{= (${CustomerData>UnitText} === 'Per Month')
-            ? Number(${CustomerData>TotalMonths}) + ' ' + (Number(${CustomerData>TotalMonths}) === 1 ? 'Month' : 'Months')
-        : (${CustomerData>UnitText} === 'Per Year')
-            ? Number(${CustomerData>TotalYears}) + ' ' + (Number(${CustomerData>TotalYears}) === 1 ? 'Year' : 'Years')
-        : (${CustomerData>UnitText} === 'Per Day')
-            ? Number(${CustomerData>TotalDays}) + ' ' + (Number(${CustomerData>TotalDays}) === 1 ? 'Day' : 'Days')
-        : (${CustomerData>UnitText} === 'Per Hour')
-            ? Number(${CustomerData>TotalHour}) + ' ' + (Number(${CustomerData>TotalHour}) === 1 ? 'Hour' : 'Hours')
-        : Number(${CustomerData>quantity}) + ' ' + (Number(${CustomerData>quantity}) === 1 ? 'Qty' : 'Qty')
-        }"
-/>
+  text="{= (${CustomerData>UnitText} === 'Per Month')
+    ? Number(${CustomerData>TotalMonths}) + ' ' + 
+      (Number(${CustomerData>TotalMonths}) === 1 ? 'Month' : 'Months') +
+      (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
 
+    : (${CustomerData>UnitText} === 'Per Year')
+    ? Number(${CustomerData>TotalYears}) + ' ' + 
+      (Number(${CustomerData>TotalYears}) === 1 ? 'Year' : 'Years') +
+      (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
+
+    : (${CustomerData>UnitText} === 'Per Day')
+    ? Number(${CustomerData>TotalDays}) + ' ' + 
+      (Number(${CustomerData>TotalDays}) === 1 ? 'Day' : 'Days') +
+      (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
+
+    : (${CustomerData>UnitText} === 'Per Hour')
+    ? Number(${CustomerData>TotalHour}) + ' ' + 
+      (Number(${CustomerData>TotalHour}) === 1 ? 'Hour' : 'Hours') +
+      (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
+
+    : Number(${CustomerData>quantity}) + ' Qty'
+}"
+/>
 
 
 
