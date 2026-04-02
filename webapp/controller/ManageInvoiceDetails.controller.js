@@ -871,7 +871,6 @@ sap.ui.define([
                 let totalWithoutGST = 0;
 
                 // ---------------- GST MASTER CHECK ----------------
-                const gstin = oCustomerModel.getProperty("/GST");
                 const taxType = oCustomerModel.getProperty("/Type");
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
@@ -901,15 +900,15 @@ sap.ui.define([
                     const finalAmount = baseAmount - discountAmount;
                     item.Total = finalAmount.toFixed(2);
 
-                    // ---------- GST FIX (IMPORTANT) ----------
-                    if (item._isGSTSelected === undefined) {
-                        item._isGSTSelected = item.GSTCalculation === "YES";
+                    // ---------- GST LOGIC (FIXED) ----------
+                    // Force NO only if GST globally disabled
+                    if (!isGSTEnabled) {
+                        item.GSTCalculation = "NO";
                     }
 
-                    const isGSTApplicable = isGSTEnabled && item._isGSTSelected;
+                    const isGSTApplicable = isGSTEnabled && item.GSTCalculation === "YES";
 
                     item.SAC = isGSTApplicable ? "996322" : "-";
-                    item.GSTCalculation = isGSTApplicable ? "YES" : "NO";
 
                     if (isGSTApplicable) {
                         totalWithGST += finalAmount;
@@ -965,7 +964,7 @@ sap.ui.define([
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
-                // ---------------- PAID & BALANCE ----------------
+                // ---------------- PAYMENT ----------------
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
                 const oInvoicePaymentModel = oView.getModel("InvoicePayment");
@@ -999,6 +998,12 @@ sap.ui.define([
             },
 
             Comp_onChangeGSTCalculation: function(oEvent) {
+                const oItem = oEvent.getSource().getBindingContext("ManageInvoiceItemModel").getObject();
+                const selectedKey = oEvent.getSource().getSelectedKey();
+
+                // Update model directly (single source of truth)
+                oItem.GSTCalculation = selectedKey;
+
                 this.totalAmountCalculation();
             },
 

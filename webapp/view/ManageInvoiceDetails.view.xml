@@ -507,7 +507,7 @@
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
-                                                width="6rem"
+                                                width="7rem"
                                             >
 												<m:Text
                                                     text="{i18n>startDate}"
@@ -517,7 +517,7 @@
 											<m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
-                                                width="6rem"
+                                                width="7rem"
                                             >
 												<m:Text
                                                     text="{i18n>endDate}"
@@ -596,14 +596,8 @@
                                                         selectedKey="{ManageInvoiceItemModel>GSTCalculation}"
                                                         change="Comp_onChangeGSTCalculation"
                                                     >
-														<core:Item
-                                                            key="{i18n>yes}"
-                                                            text="{i18n>yes}"
-                                                        />
-														<core:Item
-                                                            key="{i18n>no}"
-                                                            text="{i18n>no}"
-                                                        />
+														<core:Item key="YES" text="{i18n>yes}" />
+                                                        <core:Item key="NO" text="{i18n>no}" />
 													</m:Select>
 												</m:cells>
 												<m:cells>
