@@ -3930,7 +3930,7 @@ sap.ui.define([
                 const iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
 
                 oRow.Quantity = iQty;
-                oRow.FacilitiPrice = (fUnitPrice * iQty).toFixed(2);
+                oRow.FacilitiPrice = this._toNumber(oFacility.TotalAmount).toFixed(2);
                 return [oRow];
             }
 
