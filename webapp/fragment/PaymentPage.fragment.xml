@@ -40,16 +40,19 @@
             <VBox>
                 <!-- ===== GRAND TOTAL ===== -->
                 <HBox>
-                    <!-- <Label
-                        text="{i18n>grandTotal}"
-                        class="sapUiTinyMargin"
+                    <Title
+                        text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.formatCurrency'} {HostelModel>/Currency}"
                     />
-                    <Text
-                        text="{parts: ['HostelModel>/GrandTotal','HostelModel>/Currency'],formatter: '.Formatter.formatCurrency'}"
-                    /> -->
-                     <Title
-                                    text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.formatCurrency'} {HostelModel>/Currency}"
-                                />
+                </HBox>
+                <HBox visible="{= ${PaymentModel>/PaymentType} !== 'PayOnCheckIn' &amp;&amp;  (${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year') &amp;&amp; Number(${HostelModel>/SelectedMonths}) > 1}">
+                    <Title
+                        text="Payable Now: {path: 'PaymentModel>/PayableNow', formatter: '.Formatter.formatCurrency'} {HostelModel>/Currency}"
+                    />
+                </HBox>
+                <HBox visible="{= ${PaymentModel>/PaymentType} !== 'PayOnCheckIn' &amp;&amp; (${HostelModel>/SelectedPriceType} === 'Per Month' || ${HostelModel>/SelectedPriceType} === 'Per Year') &amp;&amp; Number(${HostelModel>/SelectedMonths}) > 1}">
+                    <Title
+                        text="Remaining Balance: {path: 'PaymentModel>/RemainingBalance', formatter: '.Formatter.formatCurrency'} {HostelModel>/Currency}"
+                    />
                 </HBox>
 
                 <!-- ===== PAYMENT TYPE (Radio) ===== -->

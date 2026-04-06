@@ -376,7 +376,7 @@
                          visible="{= ${FacilityModel>/Facilities}.length > 0 }"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
+                    <Panel class="customBookingPanel booking-panel-enhanced facilityBookingPanel" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
                                 text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
@@ -390,7 +390,7 @@
                                 width="100%"
                                 alignItems="Center"
                                 justifyContent="SpaceBetween"
-                                class="facilitiesNavContainer"
+                                class="facilitiesNavContainer facilityCarouselShell"
                             >
                                 <Button
                                     icon="sap-icon://slim-arrow-left"
@@ -420,63 +420,6 @@
                                 />
                             </HBox>
                         </VBox>
-                    </Panel>
-                    <!-- Selected Facilities Summary Section -->
-                    <Title
-                        text="Selected Facilities Summary"
-                        class="booking-section-header"
-                        wrapping="true"
-                           visible="{= ${FacilityModel>/Facilities}.length > 0 }"
-                    />
-
-                    <Panel class="customBookingPanel booking-panel-enhanced" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
-                        <Table
-                            items="{HostelModel>/AllSelectedFacilities}"
-                            noDataText="-- No facilities opted --"
-                            autoPopinMode="true"
-                            class="responsiveTable"
-                        >
-                            <columns>
-                                <Column>
-                                    <Text text="Facility" />
-                                </Column>
-                                <Column
-                                    minScreenWidth="Tablet"
-                                    demandPopin="true"
-                                >
-                                    <Text text="Rate / Unit" />
-                                </Column>
-                                <Column
-                                    minScreenWidth="Desktop"
-                                    demandPopin="true"
-                                    width="45%"
-                                >
-                                    <Text text="Breakdown (Who &amp; Qty)" />
-                                </Column>
-                                <Column hAlign="End">
-                                    <Text text="Total" />
-                                </Column>
-                            </columns>
-                            <items>
-                                <ColumnListItem vAlign="Top">
-                                    <cells>
-                                        <Text
-                                            text="{HostelModel>FacilityName}"
-                                        />
-                                        <Text
-                                            text="{path: 'HostelModel>RateText', formatter:'.Formatter.fromatNumber'}"
-                                        />
-                                        <Text
-                                            text="{HostelModel>BreakdownText}"
-                                            wrapping="true"
-                                        />
-                                        <Text
-                                            text="{parts: [{path: 'HostelModel>TotalAmount'}, {path: 'HostelModel>Currency'}], formatter: '.formatFacilityTotal'}"
-                                        />
-                                    </cells>
-                                </ColumnListItem>
-                            </items>
-                        </Table>
                     </Panel>
                 </VBox>
             </l:content>
@@ -693,6 +636,7 @@
                                 <Title
                                     text="{= ${HostelModel>/AppliedCouponCode} ? 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ') : -' + ${HostelModel>/AppliedDiscount} : 'Coupon : 0'}"
                                     class="sapUiTinyMarginBottom"
+                                    visible="{= !!${HostelModel>/AppliedCouponCode} }"
                                 />
                                 <Title
                                     text="Grand Total: {path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'} {HostelModel>/Currency}"

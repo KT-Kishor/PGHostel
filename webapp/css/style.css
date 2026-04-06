@@ -5032,3 +5032,351 @@ width: 44px !important;
 html, body {
   overflow-x: hidden;
 }
+
+/* Booking facilities panel refresh */
+.facilityBookingPanel {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fcfd 100%);
+  border: 1px solid rgba(0, 122, 135, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(20, 67, 86, 0.08);
+}
+
+.facilityBookingPanel .sapMPanelContent {
+  padding: 1.25rem 1.2rem 1.4rem 1.2rem;
+}
+
+.facilityMessageStrip .sapMMsgStrip {
+  border-radius: 14px;
+  border: 1px solid rgba(66, 153, 225, 0.28);
+  background: linear-gradient(180deg, #eaf6ff 0%, #dff0ff 100%);
+  box-shadow: none;
+}
+
+.facilityCarouselShell {
+  gap: 1rem;
+  position: relative;
+}
+
+.facilityViewport {
+  min-height: 24rem;
+  padding: 0.25rem 0;
+  overflow: hidden !important;
+}
+
+.facilityCardsRow {
+  gap: 1rem;
+  width: 100%;
+  padding: 0 0.25rem;
+  box-sizing: border-box;
+}
+
+.facilityServiceCard,
+.facilityServiceCard.sapMVBox {
+  min-height: 23.5rem;
+  padding: 0.8rem !important;
+  border: 1px solid rgba(0, 122, 135, 0.16) !important;
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fdfe 100%) !important;
+  box-shadow: 0 12px 28px rgba(12, 62, 78, 0.08) !important;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.facilityServiceCard.sapUiSmallMarginEnd {
+  margin-right: 0 !important;
+}
+
+.facilityServiceCard:hover {
+  transform: translateY(-5px) !important;
+  border-color: rgba(0, 122, 135, 0.34) !important;
+  box-shadow: 0 18px 34px rgba(12, 62, 78, 0.14) !important;
+}
+
+.facilityServiceCard.serviceCardSelected,
+.sapMVBox.facilityServiceCard.serviceCardSelected {
+  border-color: #0ea5b7 !important;
+  box-shadow: 0 20px 36px rgba(14, 165, 183, 0.18) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #eefbfd 100%) !important;
+}
+
+.facilityServiceCard.serviceCardSelected .facilityImageContainer,
+.sapMVBox.facilityServiceCard.serviceCardSelected .facilityImageContainer {
+  outline: 1px solid rgba(14, 165, 183, 0.45) !important;
+  outline-offset: -1px !important;
+}
+
+.facilityImageContainer {
+  position: relative;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  background: #dceff2;
+}
+
+.facilityImageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 27, 39, 0.03) 0%, rgba(7, 27, 39, 0.3) 100%);
+  pointer-events: none;
+}
+
+.facilityServiceImage,
+.facilityImageContainer img {
+  width: 100% !important;
+  height: 190px !important;
+  border-radius: 18px !important;
+  object-fit: cover !important;
+}
+
+.facilityTitleOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 1.1rem 0.6rem;
+  z-index: 1;
+}
+
+.facilityCardTitle,
+.facilityOverlayText.facilityCardTitle {
+  position: static !important;
+  display: block;
+  margin: 0;
+  padding: 0.3rem 0.56rem;
+  border-radius: 9px;
+  background: linear-gradient(180deg, rgba(5, 113, 125, 0.18) 0%, rgba(5, 113, 125, 0.56) 100%) !important;
+  color: #ffffff !important;
+  font-size: 0.94rem !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+}
+
+.selectedBadge {
+  top: 0.72rem;
+  left: 0.72rem;
+  z-index: 2;
+  padding: 0.22rem 0.52rem;
+  border-radius: 999px;
+  background: rgba(9, 169, 189, 0.96);
+  box-shadow: 0 10px 18px rgba(9, 169, 189, 0.22);
+}
+
+.selectedBadge .sapMText {
+  color: #ffffff !important;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.selectedBadge::before {
+  margin-right: 0.22rem;
+}
+
+.facilityCardBody {
+  gap: 0.45rem;
+  padding: 1rem 0.45rem 0.15rem;
+  align-items: flex-start !important;
+}
+
+.facilityCardAmount {
+  color: #0b7e8d !important;
+  font-size: 1.32rem !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  text-align: left !important;
+}
+
+.facilityCardMeta {
+  min-height: 2.3rem;
+  color: #315666 !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+}
+
+.facilityCardSummary {
+  color: #4b6671 !important;
+  font-size: 0.84rem !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
+}
+
+.facilityCardTotal {
+  color: #0b7e8d !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+.facilityCardHint {
+  color: #0f8c9b !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left !important;
+}
+
+.facilityNavBtn {
+  min-width: 3rem !important;
+  min-height: 3rem !important;
+  border-radius: 999px !important;
+  opacity: 0.45;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.facilityNavBtn .sapMBtnInner {
+  border-radius: 999px !important;
+  border: 1px solid rgba(14, 165, 183, 0.45) !important;
+  background: linear-gradient(135deg, rgba(14, 165, 183, 0.18) 0%, rgba(8, 123, 136, 0.26) 100%) !important;
+  box-shadow: 0 8px 18px rgba(8, 123, 136, 0.16);
+}
+
+.facilityNavBtn .sapMBtnIcon {
+  color: #0a7b89 !important;
+}
+
+.facilityNavBtn:hover,
+.facilityNavBtn:focus-within {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.facilityNavBtn:hover .sapMBtnInner,
+.facilityNavBtn:focus-within .sapMBtnInner {
+  border-color: rgba(14, 165, 183, 0.95) !important;
+  background: linear-gradient(135deg, #0ea5b7 0%, #087b88 100%) !important;
+  box-shadow: 0 12px 24px rgba(8, 123, 136, 0.24);
+}
+
+.facilityNavBtn:hover .sapMBtnIcon,
+.facilityNavBtn:focus-within .sapMBtnIcon {
+  color: #ffffff !important;
+}
+
+.facilityMobileQtyRow {
+  gap: 0.45rem;
+  padding: 0.35rem 0;
+  width: 95%;
+}
+
+.facilityMobilePersonName {
+  flex: 1 1 auto;
+}
+
+.facilityMobileQtyHeader {
+  gap: 0.45rem;
+  padding: 0.35rem 0 0.45rem;
+  border-bottom: 1px solid rgba(49, 86, 102, 0.18);
+}
+
+.facilityQtyModeStepInput {
+  margin-right: 0.75rem !important;
+}
+
+@media (max-width: 900px) {
+  .facilityViewport {
+    min-height: 22rem;
+  }
+
+  .facilityServiceCard,
+  .facilityServiceCard.sapMVBox {
+    min-height: 22.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .facilityBookingPanel .sapMPanelContent {
+    padding: 1rem 0.9rem 1.15rem 0.9rem;
+  }
+
+  .facilityCarouselShell {
+    gap: 0.6rem;
+  }
+
+  .facilityViewport {
+    min-height: 21.5rem;
+  }
+
+  .facilityCardsRow {
+    gap: 0.75rem;
+    padding: 0 0.15rem;
+  }
+
+  .facilityServiceCard,
+  .facilityServiceCard.sapMVBox {
+    min-height: 21.5rem;
+    border-radius: 18px !important;
+  }
+
+  .facilityServiceImage,
+  .facilityImageContainer img {
+    height: 180px !important;
+  }
+
+  .facilityCardTitle,
+  .facilityOverlayText.facilityCardTitle {
+    font-size: 0.9rem !important;
+    padding: 0.28rem 0.5rem;
+  }
+
+  .facilityCardAmount {
+    font-size: 1.15rem !important;
+  }
+
+  .facilityCardMeta {
+    min-height: auto;
+    font-size: 0.92rem !important;
+  }
+}
+.popbarheader,
+.popbarheader.sapMBar,
+.popbarheader .sapMBar,
+.popbarheader .sapMBarLeft,
+.popbarheader .sapMBarMiddle,
+.popbarheader .sapMBarRight {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+}
+
+.popbarheader.sapMBar {
+  background-color: #00a6b3 !important;
+  box-shadow: inset -32px 0 0 #008b96 !important;
+}
+
+.popbarheader.sapMBar .sapMBarLeft,
+.popbarheader.sapMBar .sapMBarMiddle,
+.popbarheader.sapMBar .sapMBarRight {
+  background: transparent !important;
+}
+
+.popbarheader .sapMTitle,
+.popbarheader .sapMText,
+.popbarheader .sapMLabel,
+.popbarheader .sapMBtnIcon {
+  color: white !important;
+}
+
+.popbarheader .sapMPopoverHeader,
+.popbarheader.sapMPopover .sapMPopoverHeader,
+.sapMPopover.popbarheader .sapMPopoverHeader,
+.sapMPopoverCont.popbarheader .sapMPopoverHeader {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: white !important;
+}
+
+.popbarheader .sapMPopoverHeader .sapMTitle,
+.popbarheader .sapMPopoverHeader .sapMBtnIcon,
+.popbarheader.sapMPopover .sapMPopoverHeader .sapMTitle,
+.popbarheader.sapMPopover .sapMPopoverHeader .sapMBtnIcon,
+.sapMPopover.popbarheader .sapMPopoverHeader .sapMTitle,
+.sapMPopover.popbarheader .sapMPopoverHeader .sapMBtnIcon,
+.sapMPopoverCont.popbarheader .sapMPopoverHeader .sapMTitle,
+.sapMPopoverCont.popbarheader .sapMPopoverHeader .sapMBtnIcon {
+  color: white !important;
+}

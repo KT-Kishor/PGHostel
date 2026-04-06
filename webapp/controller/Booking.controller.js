@@ -139,6 +139,8 @@ sap.ui.define([
         _getPaymentModelInitialData: function () {
             return {
                 Amount: 0,
+                PayableNow: 0,
+                RemainingBalance: 0,
                 PaymentType: "PayOnCheckIn",
                 PaymentDate: "",
                 BankTransactionID: ""
@@ -286,9 +288,7 @@ sap.ui.define([
         },
 
         _isSingleOccupantBooking: function () {
-            return this._isSinglePersonOnlyPropertyType(
-                this.getView().getModel("HostelModel").getProperty("/PropertyType")
-            );
+            return this._getOccupantOptions().length <= 1;
         },
 
         _getPrimaryGuestName: function () {
@@ -551,6 +551,126 @@ sap.ui.define([
             oFacility.SelectionSummary = aParts.join(" | ");
         },
 
+        _getFacilityCardPriceText: function (oFacility) {
+            if (oFacility.Selected && oFacility.SelectedPriceType) {
+                return this._formatFacilityPriceWithUnit(
+                    oFacility.SelectedPrice,
+                    oFacility.Currency || "INR",
+                    oFacility.SelectedPriceType
+                );
+            }
+
+            if (oFacility.DisplayPrice) {
+                return oFacility.DisplayPrice;
+            }
+
+            return this._formatFacilityPriceWithUnit(
+                oFacility.CurrentPrice || oFacility.UnitPrice || 0,
+                oFacility.Currency || "INR",
+                oFacility.CurrentPriceType || "Unit Price"
+            );
+        },
+
+        _getFacilityCardDetailText: function (oFacility) {
+            const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+
+            if (!oFacility.Selected) {
+                return "Customize this facility for your booking.";
+            }
+
+            if (sSelectionMode === "PERSON") {
+                const aSelectedPersonNames = (oFacility.SelectedPersonIds || []).map(function (sPersonId) {
+                    const oPerson = this._getOccupantOptions().find(function (oOption) {
+                        return oOption.id === sPersonId;
+                    });
+
+                    return oPerson ? oPerson.name : sPersonId;
+                }.bind(this)).filter(Boolean);
+
+                return aSelectedPersonNames.length ? "For: " + aSelectedPersonNames.join(", ") : "Added to this booking";
+            }
+
+            if (sSelectionMode === "QTY") {
+                return "Quantity: " + Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+            }
+
+            if (sSelectionMode === "PERSON_QTY") {
+                const aBreakdown = (oFacility.PersonQuantities || []).filter(function (oLine) {
+                    return (parseInt(oLine.qty, 10) || 0) > 0;
+                }).map(function (oLine) {
+                    return (oLine.personName || oLine.personId || "Guest") + " x" + (parseInt(oLine.qty, 10) || 0);
+                });
+                const sChargeType = this._getFacilityChargeTypeLabel(this._getFacilityChargeType(oFacility));
+
+                if (aBreakdown.length > 0) {
+                    return sChargeType + " | " + aBreakdown.join(", ");
+                }
+
+                return sChargeType;
+            }
+
+            return "Added to this booking";
+        },
+
+        _getFacilityCardSummaryText: function (oFacility) {
+            return "";
+        },
+
+        _getFacilityCardTotalAmount: function (oFacility) {
+            if (!oFacility || !oFacility.Selected) {
+                return 0;
+            }
+
+            const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+            const fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+            const oUnits = this._getBookingUnits();
+            const sFacilityChargeType = this._getFacilityChargeType(oFacility);
+            const iChargeableDayCount = this._getFacilityChargeableDayCount();
+            const iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+            const iPersonCount = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds.length : 0;
+            const iPersonQtyTotal = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities.reduce(function (iSum, oLine) {
+                return iSum + (Math.max(parseInt(oLine.qty, 10) || 0, 0));
+            }, 0) : 0;
+
+            let fPeriodMultiplier = 1;
+            let fTotal = 0;
+
+            if (sPriceType === "Per Day") {
+                fPeriodMultiplier = oUnits.days || 1;
+            } else if (sPriceType === "Per Month") {
+                fPeriodMultiplier = oUnits.months || 1;
+            } else if (sPriceType === "Per Year") {
+                fPeriodMultiplier = oUnits.years || 1;
+            }
+
+            if (sSelectionMode === "QTY") {
+                fTotal = fPrice * fPeriodMultiplier * iQuantity;
+            } else if (sSelectionMode === "PERSON") {
+                fTotal = fPrice * fPeriodMultiplier * Math.max(iPersonCount, 1);
+            } else if (sSelectionMode === "PERSON_QTY") {
+                fTotal = sFacilityChargeType === "DAILY"
+                    ? fPrice * iPersonQtyTotal * iChargeableDayCount
+                    : fPrice * iPersonQtyTotal;
+            } else {
+                fTotal = fPrice * fPeriodMultiplier;
+            }
+
+            return Number(fTotal.toFixed(2));
+        },
+
+        _getFacilityCardTotalText: function (oFacility) {
+            if (!oFacility.Selected) {
+                return "";
+            }
+
+            return "Total: " + this._getFacilityCardTotalAmount(oFacility) + " " + (oFacility.Currency || "INR");
+        },
+
+        _getFacilityCardActionText: function (oFacility) {
+            return oFacility.Selected ? "Tap to update" : "Tap to add";
+        },
+
         _loadFacilities: async function () {
             const oHostelModel = this.getView().getModel("HostelModel");
             const sBranchCode = oHostelModel.getProperty("/BranchCode");
@@ -727,7 +847,7 @@ sap.ui.define([
 
 
 
-        _openFacilitySelectionDialog: function (oFacility) {
+        _openFacilitySelectionDialog: function (oFacility, oOpenBy) {
             const oSelectionModel = this.getView().getModel("FacilitySelection");
             const sPlan = oFacility.CurrentPriceType || "Unit Price";
             const fPrice = oFacility.CurrentPrice || oFacility.UnitPrice || 0;
@@ -780,9 +900,17 @@ sap.ui.define([
                 personOptions: Array.isArray(aPersonOptions) ? aPersonOptions : []
             });
 
-            this._getFacilitySelectionDialog().data("facilityRef", oFacility);
+            const oFacilityPopover = this._getFacilitySelectionDialog();
+
+            oFacilityPopover.data("facilityRef", oFacility);
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
-            this._oFacilityDialog.open();
+
+            if (oOpenBy && oFacilityPopover.openBy) {
+                oFacilityPopover.openBy(oOpenBy);
+                return;
+            }
+
+            oFacilityPopover.open();
         },
 
         onLaundryQtyChange: function (oEvent) {
@@ -807,15 +935,21 @@ sap.ui.define([
                 return this._oFacilityDialog;
             }
 
-            const oDialog = new sap.m.Dialog({
-                title: "{FacilitySelection>/title}",
-                contentWidth: "30rem",
-                stretch: false,
+            const oDialog = new sap.m.Popover({
+                contentWidth: sap.ui.Device.system.phone ? "95vw" : "30rem",
+                placement: sap.ui.Device.system.phone ? sap.m.PlacementType.VerticalPreferredBottom : sap.m.PlacementType.Auto,
                 verticalScrolling: true,
                 horizontalScrolling: false,
+                customHeader: new sap.m.Bar({
+                    contentMiddle: [
+                        new sap.m.Title({
+                            text: "{FacilitySelection>/title}"
+                        })
+                    ]
+                }).addStyleClass("popbarheader"),
                 content: [
                     new sap.m.VBox({
-                        width: "93%",
+                        width: sap.ui.Device.system.phone ? "95%" : "100%",
                         items: [
                             new sap.m.HBox({
                                 width: "100%",
@@ -903,7 +1037,7 @@ sap.ui.define([
                             }).addStyleClass("sapUiSmallMargin"),
 
                             new sap.m.StepInput({
-                                width: "93%",
+                                width: sap.ui.Device.system.phone ? "95%" : "92%",
                                 min: 1,
                                 value: "{FacilitySelection>/quantity}",
                                 visible: {
@@ -912,7 +1046,7 @@ sap.ui.define([
                                         return sSelectionMode === "QTY";
                                     }
                                 }
-                            }).addStyleClass("sapUiSmallMargin"),
+                            }).addStyleClass("sapUiSmallMargin facilityQtyModeStepInput"),
 
                             new sap.m.VBox({
                                 visible: {
@@ -933,10 +1067,10 @@ sap.ui.define([
                                     new sap.m.Table({
                                         inset: false,
                                         growing: false,
-                                        width: "96%",
+                                        width: sap.ui.Device.system.phone ? "95%" : "100%",
                                         columns: [
                                             new sap.m.Column({
-                                                width: "5rem",
+                                                width: sap.ui.Device.system.phone ? "2.7rem" : "3.2rem",
                                                 header: new sap.m.Text({ text: "Pick" })
                                             }),
                                             new sap.m.Column({
@@ -999,7 +1133,7 @@ sap.ui.define([
                                         { path: "FacilitySelection>/singleOccupantMode" }
                                     ],
                                     formatter: function (sSelectionMode, bSingleOccupantMode) {
-                                        return sSelectionMode === "PERSON_QTY" && !bSingleOccupantMode;
+                                        return false;
                                     }
                                 },
                                 items: [
@@ -1011,17 +1145,17 @@ sap.ui.define([
                                     new sap.m.Table({
                                         inset: false,
                                         growing: false,
-                                        width: "96%",
+                                        width: sap.ui.Device.system.phone ? "95%" : "100%",
                                         columns: [
                                             new sap.m.Column({
-                                                width: "5rem",
+                                                width: sap.ui.Device.system.phone ? "2.7rem" : "3.2rem",
                                                 header: new sap.m.Text({ text: "Pick" })
                                             }),
                                             new sap.m.Column({
                                                 header: new sap.m.Text({ text: "Person" })
                                             }),
                                             new sap.m.Column({
-                                                width: "10rem",
+                                                width: sap.ui.Device.system.phone ? "7.8rem" : "9.5rem",
                                                 header: new sap.m.Text({ text: "Qty" })
                                             })
                                         ],
@@ -1034,9 +1168,11 @@ sap.ui.define([
                                                         select: this.onFacilityPersonSelect.bind(this)
                                                     }),
                                                     new sap.m.Text({
-                                                        text: "{FacilitySelection>personName}"
+                                                        text: "{FacilitySelection>personName}",
+                                                        wrapping: true
                                                     }),
                                                     new sap.m.StepInput({
+                                                        width: sap.ui.Device.system.phone ? "7.4rem" : "9rem",
                                                         min: 0,
                                                         step: 1,
                                                         value: "{FacilitySelection>qty}",
@@ -1049,6 +1185,78 @@ sap.ui.define([
                                     }).addStyleClass("sapUiSmallMarginEnd"),
                                 ]
                             }),
+
+                            new sap.m.VBox({
+                                visible: {
+                                    parts: [
+                                        { path: "FacilitySelection>/selectionMode" },
+                                        { path: "FacilitySelection>/singleOccupantMode" }
+                                    ],
+                                    formatter: function (sSelectionMode, bSingleOccupantMode) {
+                                        return sSelectionMode === "PERSON_QTY" && !bSingleOccupantMode;
+                                    }
+                                },
+                                items: [
+                                    new sap.m.Label({
+                                        text: "Person-wise quantity breakdown",
+                                        design: "Bold"
+                                    }).addStyleClass("sapUiTinyMarginBottom"),
+                                    new sap.m.HBox({
+                                        width: "95%",
+                                        alignItems: "Center",
+                                        justifyContent: "SpaceBetween",
+                                        items: [
+                                            new sap.m.Text({
+                                                text: "Pick",
+                                                width: "2.7rem"
+                                            }).addStyleClass("sapMTextBold"),
+                                            new sap.m.Text({
+                                                text: "Person",
+                                                width: sap.ui.Device.system.phone ? "6.5rem" : "12rem"
+                                            }).addStyleClass("sapMTextBold"),
+                                            new sap.m.Text({
+                                                text: "Qty",
+                                                width: sap.ui.Device.system.phone ? "7.5rem" : "9rem"
+                                            }).addStyleClass("sapMTextBold")
+                                        ]
+                                    }).addStyleClass("facilityMobileQtyHeader"),
+                                    new sap.m.List({
+                                        showSeparators: "Inner",
+                                        width: "95%",
+                                        items: {
+                                            path: "FacilitySelection>/personQuantities",
+                                            template: new sap.m.CustomListItem({
+                                                content: [
+                                                    new sap.m.HBox({
+                                                        width: "100%",
+                                                        alignItems: "Center",
+                                                        justifyContent: "SpaceBetween",
+                                                        items: [
+                                                            new sap.m.CheckBox({
+                                                                selected: "{FacilitySelection>selected}",
+                                                                select: this.onFacilityPersonSelect.bind(this)
+                                                            }),
+                                                            new sap.m.Text({
+                                                                text: "{FacilitySelection>personName}",
+                                                                wrapping: true,
+                                                                width: sap.ui.Device.system.phone ? "6.5rem" : "12rem"
+                                                            }).addStyleClass("facilityMobilePersonName"),
+                                                            new sap.m.StepInput({
+                                                                width: sap.ui.Device.system.phone ? "7.5rem" : "9rem",
+                                                                min: 0,
+                                                                step: 1,
+                                                                value: "{FacilitySelection>qty}",
+                                                                enabled: "{FacilitySelection>selected}",
+                                                                change: this.onLaundryQtyChange.bind(this)
+                                                            })
+                                                        ]
+                                                    }).addStyleClass("facilityMobileQtyRow")
+                                                ]
+                                            })
+                                        }
+                                    })
+                                ]
+                            }).addStyleClass("sapUiSmallMarginBottom"),
 
                             new sap.m.VBox({
                                 visible: {
@@ -1087,25 +1295,28 @@ sap.ui.define([
                         ]
                     }).addStyleClass("sapUiContentPadding sapUiSmallMargin")
                 ],
-                buttons: [
-                    this._oFacilityRemoveButton = new sap.m.Button({
-                        text: "Remove",
-                        type: "Transparent",
-                        visible: false,
-                        press: this.onFacilityDialogRemove.bind(this)
-                    }).addStyleClass("myUnifiedBtn"),
-                    new sap.m.Button({
-                        text: "Cancel",
-                        press: function () {
-                            oDialog.close();
-                        }
-                    }).addStyleClass("myUnifiedBtn"),
-                    new sap.m.Button({
-                        text: "Confirm",
-                        type: "Emphasized",
-                        press: this.onFacilityDialogConfirm.bind(this)
-                    }).addStyleClass("myUnifiedBtn")
-                ]
+                footer: new sap.m.Toolbar({
+                    content: [
+                        this._oFacilityRemoveButton = new sap.m.Button({
+                            text: "Remove",
+                            type: "Transparent",
+                            visible: false,
+                            press: this.onFacilityDialogRemove.bind(this)
+                        }).addStyleClass("myUnifiedBtn"),
+                        new sap.m.ToolbarSpacer(),
+                        new sap.m.Button({
+                            text: "Cancel",
+                            press: function () {
+                                oDialog.close();
+                            }
+                        }).addStyleClass("myUnifiedBtn"),
+                        new sap.m.Button({
+                            text: "Confirm",
+                            type: "Emphasized",
+                            press: this.onFacilityDialogConfirm.bind(this)
+                        }).addStyleClass("myUnifiedBtn")
+                    ]
+                })
             });
 
             this.getView().addDependent(oDialog);
@@ -1113,7 +1324,7 @@ sap.ui.define([
             return this._oFacilityDialog;
         },
         onFacilityDialogConfirm: function (oEvent) {
-            const oDialog = oEvent.getSource().getParent();
+            const oDialog = this._oFacilityDialog;
             const oFacility = oDialog.data("facilityRef");
             const oSelectionModel = this.getView().getModel("FacilitySelection");
 
@@ -1235,7 +1446,7 @@ sap.ui.define([
 
 
         onFacilityDialogRemove: function (oEvent) {
-            const oDialog = oEvent.getSource().getParent();
+            const oDialog = this._oFacilityDialog;
             const oFacility = oDialog.data("facilityRef");
 
             oFacility.Selected = false;
@@ -3007,52 +3218,87 @@ sap.ui.define([
 
             const oRow = new sap.m.HBox({
                 width: "100%",
-                justifyContent: "Start",
+                justifyContent: "Center",
                 alignItems: "Start",
                 wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
-            }).addStyleClass("sapUiSmallMarginTop");
+            }).addStyleClass("sapUiSmallMarginTop facilityCardsRow");
 
             aVisibleFacilities.forEach(function (oFacility) {
                 const oCard = new sap.m.VBox({
                     width: sap.ui.Device.system.phone ? "100%" : "250px",
-                    alignItems: "Center",
-                    justifyContent: "Center",
+                    alignItems: "Stretch",
+                    justifyContent: "Start",
                     items: [
                         new sap.m.VBox({
                             width: "100%",
-                            height: "178px",
+                            height: "190px",
                             items: [
                                 new sap.m.HBox({
                                     visible: !!oFacility.Selected,
                                     items: [
-                                        new sap.m.Text({ text: "ADDED" })
+                                        new sap.m.Text({ text: "Added" })
                                     ]
                                 }).addStyleClass("selectedBadge"),
                                 new sap.m.Image({
                                     src: oFacility.Image,
-                                    width: "240px",
-                                    height: "178px",
+                                    width: "100%",
+                                    height: "190px",
                                     densityAware: false,
                                     decorative: false
-                                }).addStyleClass("serviceImage"),
-                                new sap.m.Text({
-                                    text: oFacility.FacilityName,
-                                    textAlign: "Center"
-                                }).addStyleClass("facilityOverlayText")
+                                }).addStyleClass("serviceImage facilityServiceImage"),
+                                new sap.m.VBox({
+                                    width: "100%",
+                                    justifyContent: "End",
+                                    items: [
+                                        new sap.m.Text({
+                                            text: oFacility.FacilityName,
+                                            textAlign: "Center",
+                                            wrapping: true
+                                        }).addStyleClass("facilityOverlayText facilityCardTitle")
+                                    ]
+                                }).addStyleClass("facilityTitleOverlay")
                             ]
-                        }).addStyleClass("imageContainer"),
-                        new sap.m.Text({
-                            visible: !!oFacility.Selected,
-                            text: oFacility.SelectionSummary || ""
-                        }).addStyleClass("facilityPriceText")
+                        }).addStyleClass("imageContainer facilityImageContainer"),
+                        new sap.m.VBox({
+                            width: "100%",
+                            items: [
+                                new sap.m.Text({
+                                    text: this._getFacilityCardPriceText(oFacility),
+                                    textAlign: "Begin",
+                                    wrapping: true
+                                }).addStyleClass("facilityCardAmount"),
+                                new sap.m.Text({
+                                    text: this._getFacilityCardDetailText(oFacility),
+                                    textAlign: "Begin",
+                                    wrapping: true
+                                }).addStyleClass("facilityCardMeta"),
+                                new sap.m.Text({
+                                    text: this._getFacilityCardSummaryText(oFacility),
+                                    textAlign: "Begin",
+                                    wrapping: true,
+                                    visible: !!oFacility.Selected
+                                }).addStyleClass("facilityCardSummary"),
+                                new sap.m.Text({
+                                    text: this._getFacilityCardTotalText(oFacility),
+                                    textAlign: "Begin",
+                                    wrapping: true,
+                                    visible: !!oFacility.Selected
+                                }).addStyleClass("facilityCardTotal"),
+                                new sap.m.Text({
+                                    text: this._getFacilityCardActionText(oFacility),
+                                    textAlign: "Begin",
+                                    wrapping: false
+                                }).addStyleClass("facilityCardHint")
+                            ]
+                        }).addStyleClass("facilityCardBody")
                     ]
-                }).addStyleClass("serviceCard sapUiSmallMarginEnd");
+                }).addStyleClass("serviceCard facilityServiceCard sapUiSmallMarginEnd");
 
                 if (oFacility.Selected) {
                     oCard.addStyleClass("serviceCardSelected");
                 }
 
-                oCard.attachBrowserEvent("click", this.onFacilityCardPress.bind(this, oFacility));
+                oCard.attachBrowserEvent("click", this.onFacilityCardPress.bind(this, oFacility, oCard));
                 oRow.addItem(oCard);
             }.bind(this));
 
@@ -3319,8 +3565,8 @@ sap.ui.define([
         },
 
 
-        onFacilityCardPress: function (oFacility, oEvent) {
-            this._openFacilitySelectionDialog(oFacility);
+        onFacilityCardPress: function (oFacility, oCard, oEvent) {
+            this._openFacilitySelectionDialog(oFacility, oCard);
         },
         _getBookingUnits: function () {
             const oModel = this.getView().getModel("HostelModel");
@@ -3700,10 +3946,38 @@ sap.ui.define([
             const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
 
             if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
-                return Number((fRoomPrice / iDuration + fFacilityPrice).toFixed(2));
+                return Number(((fRoomPrice + fFacilityPrice) / iDuration).toFixed(2));
             }
 
             return Number((fRoomPrice + fFacilityPrice).toFixed(2));
+        },
+
+        _shouldSplitOnlinePayment: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sPlan = String(oHostelModel.getProperty("/SelectedPriceType") || "").trim();
+            const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+            return (sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 1;
+        },
+
+        _getOnlinePaymentBaseAmount: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const fSubTotal = this._toNumber(oHostelModel.getProperty("/BookingSubTotal"));
+            const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+            if (this._shouldSplitOnlinePayment()) {
+                return Number((fSubTotal / iDuration).toFixed(2));
+            }
+
+            return fSubTotal;
+        },
+
+        _getOnlinePaymentTaxableAmount: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const fBaseAmount = this._getOnlinePaymentBaseAmount();
+            const fDiscount = this._toNumber(oHostelModel.getProperty("/AppliedDiscount"));
+
+            return Number(Math.max(fBaseAmount - fDiscount, 0).toFixed(2));
         },
 
         _isCouponExpired: function (vEndDate) {
@@ -3863,23 +4137,38 @@ sap.ui.define([
 
         _getPayableNowAmount: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
-            const sPlan = oHostelModel.getProperty("/SelectedPriceType");
             const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
-            const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+            const fTaxableAmount = this._getOnlinePaymentTaxableAmount();
+            const oTaxBreakup = this._calculateTaxBreakup(fTaxableAmount);
+            const fPayableNow = Number(Math.max(
+                fTaxableAmount + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST,
+                0
+            ).toFixed(2));
 
-            if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
-                return Number((fGrandTotal / iDuration).toFixed(2));
+            if (!this._shouldSplitOnlinePayment()) {
+                return fGrandTotal;
             }
 
-            return fGrandTotal;
+            return fPayableNow;
+        },
+
+        _getRemainingBalanceAmount: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const fGrandTotal = this._toNumber(oHostelModel.getProperty("/GrandTotal"));
+            const fPayableNow = this._getPayableNowAmount();
+
+            return Number(Math.max(fGrandTotal - fPayableNow, 0).toFixed(2));
         },
 
         _syncPaymentModel: function (sPaymentType) {
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const sResolvedType = sPaymentType || oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn";
             const fPayableNow = this._getPayableNowAmount();
+            const fRemainingBalance = this._getRemainingBalanceAmount();
 
             oPaymentModel.setProperty("/PaymentType", sResolvedType);
+            oPaymentModel.setProperty("/PayableNow", fPayableNow);
+            oPaymentModel.setProperty("/RemainingBalance", fRemainingBalance);
             oPaymentModel.setProperty("/Amount", sResolvedType === "PayOnCheckIn" ? 0 : fPayableNow);
             oPaymentModel.setProperty("/PaymentDate", sResolvedType === "PayOnCheckIn" ? "" : this._formatDateToDDMMYYYY(new Date()));
 
