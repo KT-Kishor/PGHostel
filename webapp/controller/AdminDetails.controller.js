@@ -1282,7 +1282,9 @@ sap.ui.define([
                     return;
                 }
             }
-            if (oPayload.UnitText !== "Unit Price" && oPayload.UnitText !== "") {
+           var selectionmode= oPayload.SelectionMode ? oPayload.SelectionMode : this.SelectionMode
+            if (oPayload.UnitText !== "Unit Price" &&
+                        oPayload.UnitText !== "" && oPayload.quantity !=="" && selectionmode !== "QTY") {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1294,7 +1296,7 @@ sap.ui.define([
                     return;
                 }
 
-            } else if (this.SelectionMode === "PERSON_QTY" || this.SelectionMode === "PERSON") {
+            } else if ((selectionmode==="PERSON_QTY"|| selectionmode === "PERSON") && oCustomerData.AllMembers.length !== 0) {
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||

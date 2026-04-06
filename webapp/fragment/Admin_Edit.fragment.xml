@@ -92,7 +92,9 @@
                     />
                 </ComboBox>
 
-                <Label text="{i18n>quantity}" />
+                 
+                <Label text="{i18n>quantity}"
+                   required="true" />
                 <Input
                     id="editquantity"
                     value="{edit>/quantity}"
