@@ -1414,8 +1414,8 @@ sap.ui.define([
             oPayload.MemberName = sap.ui.getCore().byId("editMembername").getValue() || ""
             oPayload.SelectionMode = this.SelectionMode
 
-            if(this.SelectionMode === "PERSON_QTY"){
-            oPayload.FacilityChargeType =  sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY"
+            if (this.SelectionMode === "PERSON_QTY") {
+                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY"
             }
 
 
@@ -2094,9 +2094,7 @@ sap.ui.define([
                 var oStart = new Date(sStartDate);
                 var oEnd = new Date(sEndDate);
 
-                    const diffMs = oEnd - oStart;
-
-                    var Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+     
 
                 if (oSelectedData.UnitText === "Per Month") {
                     var iMonths =
@@ -2930,9 +2928,9 @@ sap.ui.define([
 
                 baseAmount = CustomerData.GrandTotal || 0;
 
-            
 
-                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? baseAmount - Number(CustomerData.PaymentPaid || 0)  : baseAmount 
+
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? baseAmount - Number(CustomerData.PaymentPaid || 0) : baseAmount
 
             } else {
                 let facilityAmount = 0;
@@ -2990,7 +2988,12 @@ sap.ui.define([
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                    firstMonthAmount = Number(item.TotalAmount)
+                                if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                    firstMonthAmount = Number(item.TotalAmount);
+
+                                } else {
+                                    firstMonthAmount = Number(item.Price) * Number(item.quantity) * overlapDays;
+                                }
                             }
                             else {
                                 firstMonthAmount = Number(item.Price) * overlapDays * item.TotalHour;
@@ -3031,7 +3034,13 @@ sap.ui.define([
                 }
 
                 let Gst = CGST + SGST + IGST;
-                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? Gst + baseAmount - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount) : Gst + baseAmount - Number(CustomerData.Discount) || 0
+                totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ?
+                    Number(CustomerData.PaymentPaid || 0) > Gst + baseAmount - Number(CustomerData.Discount) ?
+
+                        Number(CustomerData.PaymentPaid || 0) - Gst + baseAmount - Number(CustomerData.Discount) :
+                        Gst + baseAmount - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount)
+
+                    : Gst + baseAmount - Number(CustomerData.Discount) || 0
 
             }
 
@@ -3250,7 +3259,7 @@ sap.ui.define([
 
                                     } else if (unit === "per hour") {
                                         let hours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total =item.quantity ? item.quantity * hours * price : hours * price;
+                                        total = item.quantity ? item.quantity * hours * price : hours * price;
 
                                     } else if (unit === "per month") {
 
@@ -3258,16 +3267,16 @@ sap.ui.define([
                                             ? CustomerData.Duration * 12
                                             : CustomerData.Duration;
 
-                                        total =item.quantity ? item.quantity * months * price : months * price;
+                                        total = item.quantity ? item.quantity * months * price : months * price;
                                         item.TotalMonths = months;
 
                                     } else if (unit === "per year") {
 
                                         let years = CustomerData.Duration;
-                                        total =item.quantity ? item.quantity * years * price : years * price;
+                                        total = item.quantity ? item.quantity * years * price : years * price;
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
-                                          let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                                        let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
                                             total = item.FacilityPrice;
                                         } else {
@@ -3275,24 +3284,24 @@ sap.ui.define([
                                         }
                                     }
 
-                                    item.TotalAmount = item.CouponDiscount !==""? total- Number(item.CouponDiscount):total;
+                                    item.TotalAmount = item.CouponDiscount !== "" ? total - Number(item.CouponDiscount) : total;
                                     totalFacilityPrice += total;
                                 });
 
                                 CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                             if(CustomerData.GSTType==="CGST/SGST"){
-                                  CustomerData.GrandTotal =
-                                    (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
-                                     ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100)*2;
-                                }else if(CustomerData.GSTType==="IGST"){
-                                  CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice +  ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100);
-                                }else{
-                                CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice
+                                if (CustomerData.GSTType === "CGST/SGST") {
+                                    CustomerData.GrandTotal =
+                                        (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
+                                        ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100) * 2;
+                                } else if (CustomerData.GSTType === "IGST") {
+                                    CustomerData.GrandTotal =
+                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice + ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100);
+                                } else {
+                                    CustomerData.GrandTotal =
+                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice
                                 };
-                               CustomerData.DueAmount=CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid :CustomerData.GrandTotal;
+                                CustomerData.DueAmount = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal;
 
 
                                 that.getView().getModel("CustomerData").refresh(true);
@@ -3380,30 +3389,30 @@ sap.ui.define([
                                     let total = 0;
 
                                     if (unit === "per day") {
-                                        total =item.quantity ? item.quantity * diffDays * price: diffDays * price;
+                                        total = item.quantity ? item.quantity * diffDays * price : diffDays * price;
                                         item.TotalDays = diffDays;
 
                                     } else if (unit === "per hour") {
                                         let diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total =item.quantity ? item.quantity * diffHours * price: diffHours * price;
+                                        total = item.quantity ? item.quantity * diffHours * price : diffHours * price;
 
                                     }
                                     else if (unit === "per month") {
                                         if (CustomerData.PaymentType === "yearly") {
                                             let months = CustomerData.Duration * 12
-                                            total =item.quantity ? item.quantity * months * price: months * price;
+                                            total = item.quantity ? item.quantity * months * price : months * price;
                                             item.TotalMonths = months;
 
                                         } else {
                                             let months = CustomerData.Duration
-                                            total =item.quantity ? item.quantity * months * price: months * price;
+                                            total = item.quantity ? item.quantity * months * price : months * price;
                                             item.TotalMonths = months;
 
                                         }
 
                                     } else if (unit === "per year") {
                                         let years = CustomerData.Duration;
-                                        total =item.quantity ? item.quantity * years * price: years * price;
+                                        total = item.quantity ? item.quantity * years * price : years * price;
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
@@ -3413,25 +3422,25 @@ sap.ui.define([
                                         }
                                     }
 
-                                    item.TotalAmount = item.CouponDiscount !==""? total- Number(item.CouponDiscount):total;
+                                    item.TotalAmount = item.CouponDiscount !== "" ? total - Number(item.CouponDiscount) : total;
                                     totalFacilityPrice += total;
                                 });
 
                                 CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                                if(CustomerData.GSTType==="CGST/SGST"){
-                                  CustomerData.GrandTotal =
-                                    (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
-                                     ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100)*2;
-                                }else if(CustomerData.GSTType==="IGST"){
-                                  CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice +  ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice)*Number(CustomerData.GSTValue)/100);
-                                }else{
-                                CustomerData.GrandTotal =
-                                    Number(CustomerData.RentPrice || 0) + totalFacilityPrice
+                                if (CustomerData.GSTType === "CGST/SGST") {
+                                    CustomerData.GrandTotal =
+                                        (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
+                                        ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100) * 2;
+                                } else if (CustomerData.GSTType === "IGST") {
+                                    CustomerData.GrandTotal =
+                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice + ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100);
+                                } else {
+                                    CustomerData.GrandTotal =
+                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice
                                 }
-                               CustomerData.DueAmount=CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid :CustomerData.GrandTotal;
-                             
+                                CustomerData.DueAmount = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal;
+
 
                                 that.getView().getModel("CustomerData").refresh(true);
 
