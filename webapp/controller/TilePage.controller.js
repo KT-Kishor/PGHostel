@@ -684,7 +684,7 @@ sap.ui.define([
     let aTokens = oTokenModel.getProperty("/tokens") || [];
 
     // ✅ Restrict total files to 3
-    if (aAttachments.length >= 3) {
+    if (aAttachments.length + oFiles.length > 3) {
         sap.m.MessageToast.show("You can upload a maximum of 3 files only");
         oEvent.getSource().clear();
         return;
@@ -693,7 +693,7 @@ sap.ui.define([
     Array.from(oFiles).forEach((oFile) => {
 
         // ✅ Check if adding this file exceeds limit
-        if (aAttachments.length >= 3) {
+        if (aAttachments.length + oFiles.length > 3) {
             sap.m.MessageToast.show("Maximum 3 files allowed");
             return;
         }

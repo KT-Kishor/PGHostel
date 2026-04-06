@@ -4958,7 +4958,7 @@ if (aData.length === 0) {
 
     let aAttachments = oUploaderData.getProperty("/attachments") || [];
     let aTokens = oTokenModel.getProperty("/tokens") || [];
-if (aAttachments.length >= 3) {
+if (aAttachments.length + oFiles.length > 3) {
                 MessageToast.show("You can upload maximum 3 images only");
                 return;
             }
@@ -4977,9 +4977,7 @@ if (aAttachments.length >= 3) {
             return;
         }
 
-         
 
-        
         const oReader = new FileReader();
 
         oReader.onload = (e) => {

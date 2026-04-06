@@ -62,7 +62,7 @@
 					id="RB_id_bugDescription"
 					rows="4"
                     liveChange="onBugdescriptionchnages"
-                    valueStateText="{i18n>enterdetails}"
+                    valueStateText="Please describe the issue"
 					placeholder="Enter bug description"
 					value="{RaiseBugModel>/BugDescription}"
 					maxLength="500"/>
