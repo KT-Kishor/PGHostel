@@ -4958,14 +4958,17 @@ if (aData.length === 0) {
 
     let aAttachments = oUploaderData.getProperty("/attachments") || [];
     let aTokens = oTokenModel.getProperty("/tokens") || [];
-
+if (aAttachments.length >= 3) {
+                MessageToast.show("You can upload maximum 3 images only");
+                return;
+            }
 
     Array.from(oFiles).forEach((oFile) => {
 
         // Check duplicate file name
         const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
         if (bDuplicate) {
-            MessageToast.show("This file is more than 2 MB and cannot be uploaded");
+            MessageToast.show("This file is already uploaded and cannot be uploaded again");
             return;
         }
         // File type validation
@@ -4974,8 +4977,9 @@ if (aData.length === 0) {
             return;
         }
 
-        
+         
 
+        
         const oReader = new FileReader();
 
         oReader.onload = (e) => {
@@ -5083,10 +5087,10 @@ if (aData.length === 0) {
                 return;
             }
 
-            if (aAttachments.length > 3) {
-                MessageToast.show("You can upload maximum 3 images only.");
-                return;
-            }
+            // if (aAttachments.length > 3) {
+            //     MessageToast.show("You can upload maximum 3 images only.");
+            //     return;
+            // }
 
             const todayDate = new Date().toISOString().split("T")[0];
 
