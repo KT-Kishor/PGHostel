@@ -2094,6 +2094,9 @@ sap.ui.define([
                 var oStart = new Date(sStartDate);
                 var oEnd = new Date(sEndDate);
 
+                    const diffMs = oEnd - oStart;
+
+                    var Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
                 if (oSelectedData.UnitText === "Per Month") {
                     var iMonths =
@@ -2119,6 +2122,8 @@ sap.ui.define([
             // Load data into edit model
             this.getView().getModel("edit").setData(Object.assign({}, oSelectedData));
             this.getView().getModel("edit").setProperty("/TotalUnits", iMonths)
+            this.getView().getModel("edit").setProperty("/TotalDays", Duration)
+
             this.iCount = iMonths
             // Open dialog
             if (!this.HM_Dialog) {
@@ -2985,11 +2990,7 @@ sap.ui.define([
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                if (sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0 : false) {
-                                    firstMonthAmount = Number(item.TotalAmount) * overlapDays;
-                                } else {
                                     firstMonthAmount = Number(item.TotalAmount)
-                                }
                             }
                             else {
                                 firstMonthAmount = Number(item.Price) * overlapDays * item.TotalHour;
@@ -3291,6 +3292,8 @@ sap.ui.define([
                                 CustomerData.GrandTotal =
                                     Number(CustomerData.RentPrice || 0) + totalFacilityPrice
                                 };
+                               CustomerData.DueAmount=CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid :CustomerData.GrandTotal;
+
 
                                 that.getView().getModel("CustomerData").refresh(true);
 
