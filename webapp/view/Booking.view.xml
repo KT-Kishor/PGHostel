@@ -157,7 +157,6 @@
                                 </layoutData>
                                 <Input
                                     value="{HostelModel>/Salutation}"
-                                    editable="false"
                                 >
                                     <layoutData>
                                         <FlexItemData
@@ -173,7 +172,6 @@
                                     liveChange="onChangeFullname"
                                     valueStateText="Enter your full name (minimum 3 characters)"
                                     class="sapUiTinyMarginBegin"
-                                    editable="false"
                                     placeholder="Enter your full name"
                                     showValueStateMessage="true"
                                 >
@@ -269,7 +267,7 @@
 
                     <!-- Guest Information Section -->
                     <Title
-                        text="Manage Members"
+                        text="Select Members"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{BookingView>/showFamilySection}"
@@ -654,7 +652,6 @@
                 <ToolbarSpacer />
                 <Button
                     text="Continue"
-                    type="Emphasized"
                     class="myUnifiedBtn"
                     press="onContinueBooking"
                 />

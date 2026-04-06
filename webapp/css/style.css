@@ -4836,7 +4836,7 @@ width: 44px !important;
   font-size: 1.5rem !important;
   font-weight: 600 !important;
   color: #005b9f !important;
-  margin: 0.5rem 0 0.5rem 0 !important;
+  margin: 1.5rem 0 0.5rem 0 !important;
   padding-bottom: 0.5rem !important;
   border-bottom: 2px solid #00b7c7 !important;
   width: 100%;
@@ -4882,7 +4882,7 @@ width: 44px !important;
 @media (max-width: 600px) {
   .booking-section-header {
     font-size: 1.25rem !important;
-    margin: 1rem 0 0.5rem 0 !important;
+    margin: 1.5rem 0 0.5rem 0 !important;
   }
   
   .booking-panel-enhanced {

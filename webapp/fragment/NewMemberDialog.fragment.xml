@@ -40,7 +40,10 @@
                 singleContainerFullSize="true"
                 class="sapUiTinyMargin"
             >
-                <Label text="Full Name" required="true" />
+                <Label
+                    text="Full Name"
+                    required="true"
+                />
                 <Input
                     id="newMemberNameInput"
                     value="{BookingView>/NewMemberDraft/Name}"
@@ -50,7 +53,10 @@
                     change="onNewMemberNameChange"
                 />
 
-                <Label text="Gender" required="true" />
+                <Label
+                    text="Gender"
+                    required="true"
+                />
                 <ComboBox
                     id="newMemberGenderCombo"
                     selectedKey="{BookingView>/NewMemberDraft/Gender}"
@@ -60,10 +66,16 @@
                     selectionChange="onNewMemberGenderChange"
                     change="onNewMemberGenderChange"
                 >
-                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
+                    <core:Item
+                        key="{BookingView>key}"
+                        text="{BookingView>text}"
+                    />
                 </ComboBox>
 
-                <Label text="Relationship" required="true" />
+                <Label
+                    text="Relationship"
+                    required="true"
+                />
                 <ComboBox
                     id="newMemberRelationCombo"
                     selectedKey="{BookingView>/NewMemberDraft/Relation}"
@@ -73,7 +85,10 @@
                     selectionChange="onNewMemberRelationChange"
                     change="onNewMemberRelationChange"
                 >
-                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
+                    <core:Item
+                        key="{BookingView>key}"
+                        text="{BookingView>text}"
+                    />
                 </ComboBox>
 
                 <Label text="Upload Document" />
@@ -83,17 +98,6 @@
                     wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
                     alignItems="Center"
                 >
-                    <core:Icon
-                        id="newMemberDocumentInfoIcon"
-                        src="sap-icon://hint"
-                        size="1rem"
-                        color="#0064d1"
-                        hoverColor="DarkBlue"
-                        press="onNewMemberDocumentInfoPress"
-                        tooltip="Upload info"
-                        class="sapUiTinyMarginEnd"
-                    />
-
                     <ComboBox
                         id="newMemberDocumentTypeCombo"
                         selectedKey="{BookingView>/NewMemberDraft/DocumentType}"
@@ -105,8 +109,22 @@
                         width="{= ${device>/system/phone} ? '100%' : '12rem'}"
                         class="sapUiTinyMarginEnd"
                     >
-                        <core:Item key="{BookingView>key}" text="{BookingView>text}" />
+                        <core:Item
+                            key="{BookingView>key}"
+                            text="{BookingView>text}"
+                        />
                     </ComboBox>
+
+                    <core:Icon
+                        id="newMemberDocumentInfoIcon"
+                        src="sap-icon://hint"
+                        size="1rem"
+                        color="#0064d1"
+                        hoverColor="DarkBlue"
+                        press="onNewMemberDocumentInfoPress"
+                        tooltip="Upload info"
+                        class="sapUiTinyMarginEnd"
+                    />
 
                     <unified:FileUploader
                         id="newMemberFileUploader"
@@ -148,7 +166,6 @@
         <beginButton>
             <Button
                 text="Save Member"
-                type="Emphasized"
                 press="onSaveNewMember"
                 class="myUnifiedBtn"
             />
