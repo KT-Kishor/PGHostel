@@ -1617,178 +1617,178 @@ sap.ui.define([
         },
         MS_viewimage: function (oEvent) {
 
-    function autoDecodeBase64(b64) {
-        if (!b64) return "";
-        b64 = b64.replace(/\s/g, "");
-        let last = b64;
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
 
-        for (let i = 0; i < 5; i++) {
-            try {
-                if (
-                    last.startsWith("iVB") ||   // PNG
-                    last.startsWith("/9j") ||   // JPG
-                    last.startsWith("JVBER")   // PDF
-                ) {
-                    return last;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") ||   // PNG
+                            last.startsWith("/9j") ||   // JPG
+                            last.startsWith("JVBER")   // PDF
+                        ) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
                 }
-                last = atob(last);
-            } catch (e) {
-                break;
+                return last;
             }
-        }
-        return last;
-    }
 
-    // ✅ Get clicked row data
-    const oContext = oEvent.getSource().getBindingContext("BookingView");
-    const oData = oContext?.getObject();
+            // ✅ Get clicked row data
+            const oContext = oEvent.getSource().getBindingContext("BookingView");
+            const oData = oContext?.getObject();
 
-    if (!oData || !oData.Document) {
-        sap.m.MessageToast.show("No document found");
-        return;
-    }
+            if (!oData || !oData.Document) {
+                sap.m.MessageToast.show("No document found");
+                return;
+            }
 
-    const sBase64 = autoDecodeBase64(oData.Document);
+            const sBase64 = autoDecodeBase64(oData.Document);
 
-    // ✅ Detect MIME type
-    let sMimeType = "application/octet-stream";
+            // ✅ Detect MIME type
+            let sMimeType = "application/octet-stream";
 
-    if (sBase64.startsWith("iVB")) {
-        sMimeType = "image/png";
-    } else if (sBase64.startsWith("/9j")) {
-        sMimeType = "image/jpeg";
-    } else if (sBase64.startsWith("JVBER")) {
-        sMimeType = "application/pdf";
-    }
+            if (sBase64.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sBase64.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            }
 
-    // ================= IMAGE PREVIEW =================
-    if (sMimeType.startsWith("image/")) {
+            // ================= IMAGE PREVIEW =================
+            if (sMimeType.startsWith("image/")) {
 
-        const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
 
-        if (!this._oPreviewDialog) {
+                if (!this._oPreviewDialog) {
 
-            const oFlex = new sap.m.FlexBox({
-                width: "100%",
-                height: "100%",
-                justifyContent: "Center",
-                alignItems: "Center",
-                items: [
-                    new sap.m.Image(this.createId("previewImage"), {
+                    const oFlex = new sap.m.FlexBox({
                         width: "100%",
                         height: "100%",
-                        densityAware: false
-                    })
-                ]
-            });
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [
+                            new sap.m.Image(this.createId("previewImage"), {
+                                width: "100%",
+                                height: "100%",
+                                densityAware: false
+                            })
+                        ]
+                    });
 
-            this._oPreviewDialog = new sap.m.Dialog({
-                title: oData.DocumentName || "Image Preview",
-                contentWidth: "50%",
-                contentHeight: "60%",
-                draggable: true,
-                resizable: true,
-                contentPadding: "0rem",
-                content: [oFlex],
+                    this._oPreviewDialog = new sap.m.Dialog({
+                        title: oData.DocumentName || "Image Preview",
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        content: [oFlex],
 
-                beginButton: new sap.m.Button({
-                    text: "Close",
-                    press: function () {
-                        this._oPreviewDialog.close();
-                    }.bind(this)
-                }),
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            press: function () {
+                                this._oPreviewDialog.close();
+                            }.bind(this)
+                        }),
 
-                afterClose: function () {
-                    this._oPreviewDialog.destroy();
-                    this._oPreviewDialog = null;
-                }.bind(this)
-            });
+                        afterClose: function () {
+                            this._oPreviewDialog.destroy();
+                            this._oPreviewDialog = null;
+                        }.bind(this)
+                    });
 
-            this.getView().addDependent(this._oPreviewDialog);
-        } else {
-            this._oPreviewDialog.setTitle(oData.DocumentName || "Image Preview");
-        }
+                    this.getView().addDependent(this._oPreviewDialog);
+                } else {
+                    this._oPreviewDialog.setTitle(oData.DocumentName || "Image Preview");
+                }
 
-        this.byId("previewImage").setSrc(sImageSrc);
-        this._oPreviewDialog.open();
-        return;
-    }
-
-    // ================= PDF PREVIEW =================
-    if (sMimeType === "application/pdf") {
-
-        if (!this._oPreviewDialog) {
-            this._oPreviewDialog = new sap.m.Dialog({
-                title: oData.DocumentName || "Document Preview",
-                stretch: true,
-                draggable: true,
-                resizable: true,
-                contentWidth: "50%",
-                contentHeight: "60%",
-                contentPadding: "0rem",
-
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: () => {
-                        if (this._previewUrl) {
-                            URL.revokeObjectURL(this._previewUrl);
-                            this._previewUrl = null;
-                        }
-                        this._oPreviewDialog.close();
-                    }
-                }),
-
-                afterClose: function () {
-                    this._oPreviewDialog.destroy();
-                    this._oPreviewDialog = null;
-                }.bind(this)
-            });
-
-            this.getView().addDependent(this._oPreviewDialog);
-        }
-
-        this._oPreviewDialog.removeAllContent();
-
-        const byteCharacters = atob(sBase64);
-        const byteArrays = [];
-
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
+                this.byId("previewImage").setSrc(sImageSrc);
+                this._oPreviewDialog.open();
+                return;
             }
 
-            byteArrays.push(new Uint8Array(byteNumbers));
-        }
+            // ================= PDF PREVIEW =================
+            if (sMimeType === "application/pdf") {
 
-        const blob = new Blob(byteArrays, { type: sMimeType });
+                if (!this._oPreviewDialog) {
+                    this._oPreviewDialog = new sap.m.Dialog({
+                        title: oData.DocumentName || "Document Preview",
+                        stretch: true,
+                        draggable: true,
+                        resizable: true,
+                        contentWidth: "50%",
+                        contentHeight: "60%",
+                        contentPadding: "0rem",
 
-        if (this._previewUrl) {
-            URL.revokeObjectURL(this._previewUrl);
-        }
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: () => {
+                                if (this._previewUrl) {
+                                    URL.revokeObjectURL(this._previewUrl);
+                                    this._previewUrl = null;
+                                }
+                                this._oPreviewDialog.close();
+                            }
+                        }),
 
-        this._previewUrl = URL.createObjectURL(blob);
+                        afterClose: function () {
+                            this._oPreviewDialog.destroy();
+                            this._oPreviewDialog = null;
+                        }.bind(this)
+                    });
 
-        this._oPreviewDialog.addContent(
-            new sap.ui.core.HTML({
-                sanitizeContent: false,
-                content: `
+                    this.getView().addDependent(this._oPreviewDialog);
+                }
+
+                this._oPreviewDialog.removeAllContent();
+
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: sMimeType });
+
+                if (this._previewUrl) {
+                    URL.revokeObjectURL(this._previewUrl);
+                }
+
+                this._previewUrl = URL.createObjectURL(blob);
+
+                this._oPreviewDialog.addContent(
+                    new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
                     <iframe 
                         src="${this._previewUrl}" 
                         style="width:100%; height:600px; border:none;">
                     </iframe>
                 `
-            })
-        );
+                    })
+                );
 
-        this._oPreviewDialog.open();
-        return;
-    }
+                this._oPreviewDialog.open();
+                return;
+            }
 
-    sap.m.MessageToast.show("Preview not supported.");
-},
+            sap.m.MessageToast.show("Preview not supported.");
+        },
 
         onMemberDialogTableUpdateFinished: function () {
             this._syncMemberDialogSelections();
@@ -4288,7 +4288,7 @@ sap.ui.define([
                 }]
             };
         },
-        
+
         onChangeFullname: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
@@ -4432,7 +4432,7 @@ sap.ui.define([
                         content: pdfBase64
                     }
                 };
-        
+
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
                 let sMessage = "Booking created successfully.";
@@ -4451,6 +4451,7 @@ sap.ui.define([
 
                 MessageBox.success(sMessage, {
                     title: "Success",
+                    styleClass: "myUnifiedBtn",
                     onClose: function () {
                         const sUserID = oHostelModel.getProperty("/UserID");
 
@@ -4461,7 +4462,7 @@ sap.ui.define([
 
                         this.getOwnerComponent().getRouter().navTo("RouteHostel");
                     }.bind(this)
-                });
+                })
             } catch (oError) {
                 let sErrorMessage = "Unable to create booking.";
 

@@ -288,13 +288,14 @@ sap.ui.define([
                     beginButton: new sap.m.Button({
                         text: "Close",
                         press: () => this._oPreviewDialog.close()
-                    })
-                });
+                    }).addStyleClass("myUnifiedBtn")
+                })
                 this.getView().addDependent(this._oPreviewDialog);
             }
             sap.ui.getCore().byId("previewProfileImage").setSrc(sPhoto);
             this._oPreviewDialog.open();
         },
+
         onPressAvatarEdit: function (oEvent) {
             this._oAvatarActionSheet = new sap.m.ActionSheet({
                 buttons: [
@@ -879,21 +880,21 @@ sap.ui.define([
                 const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
                 const aMember = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
 
-               const aMembers = aMember.map(mem => {
-    const oDoc = mem.Documents && mem.Documents.length > 0 ? mem.Documents[0] : {};
+                const aMembers = aMember.map(mem => {
+                    const oDoc = mem.Documents && mem.Documents.length > 0 ? mem.Documents[0] : {};
 
-    return {
-        Name: mem.Name || "",
-        Age: mem.Age || "",
-        Relation: mem.Relation || "",
-        BookingID: mem.BookingID || "",
+                    return {
+                        Name: mem.Name || "",
+                        Age: mem.Age || "",
+                        Relation: mem.Relation || "",
+                        BookingID: mem.BookingID || "",
 
-        // FIXED
-        Attachment: oDoc.File || "",
-        FileName: oDoc.FileName || "",
-        FileType: oDoc.FileType || ""
-    };
-});
+                        // FIXED
+                        Attachment: oDoc.File || "",
+                        FileName: oDoc.FileName || "",
+                        FileType: oDoc.FileType || ""
+                    };
+                });
 
                 oModel.setProperty("/Members", aMembers);
                 this._updateRowCount();
@@ -1885,6 +1886,7 @@ sap.ui.define([
                         content: [oHtml],
                         beginButton: new sap.m.Button({
                             text: "Close",
+                            addstyleClass: "myUnifiedBtn",
                             press: () => this._oComplaintPreviewDialog.close()
                         }),
                         afterClose: () => {
@@ -2018,7 +2020,7 @@ sap.ui.define([
             }
             this._openComplaintDialog(oComplaint);
         },
-        
+
         onComBranch: function (oEvent) {
             const oBranchCombo = oEvent.getSource();
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
@@ -2105,7 +2107,7 @@ sap.ui.define([
                             press: function () {
                                 this._oHFPreviewDialog.close();
                             }.bind(this)
-                        }),
+                        }).addStyleClass("myUnifiedBtn"),
 
                         afterClose: function () {
                             this._oHFPreviewDialog.destroy();
