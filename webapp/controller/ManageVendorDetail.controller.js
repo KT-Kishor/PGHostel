@@ -642,11 +642,6 @@ sap.ui.define([
                     }
                 };
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
-                sap.m.MessageToast.show(
-                    btnText === "Approve" ?
-                        i18n.getText("approveMessageSuccess") :
-                        i18n.getText("resendMessageSuccess")
-                );
                 this.oDialog.close();
                 // Reload latest data
                 await this._loadVendorDetails(oData.UserID);
@@ -658,6 +653,11 @@ sap.ui.define([
                 );
             } finally {
                 this.closeBusyDialog()
+                sap.m.MessageToast.show(
+                    btnText === "Approve" ?
+                        i18n.getText("approveMessageSuccess") :
+                        i18n.getText("resendMessageSuccess")
+                );
             }
         },
 
