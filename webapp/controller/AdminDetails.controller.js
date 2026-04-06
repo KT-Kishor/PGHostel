@@ -2094,7 +2094,8 @@ sap.ui.define([
                 var oStart = new Date(sStartDate);
                 var oEnd = new Date(sEndDate);
 
-     
+                 var diffTime = oEnd - oStart;
+                var Duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
                 if (oSelectedData.UnitText === "Per Month") {
                     var iMonths =
