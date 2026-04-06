@@ -123,7 +123,7 @@
 							<!-- <ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
                             state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
-                            <Button text="{i18n>view}" press="HF_viewroom"/>
+                            <Link text="{i18n>view}" press="HF_viewroom"/>
 						</cells>
 					</ColumnListItem>
 				</items>
