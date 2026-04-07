@@ -2668,7 +2668,6 @@ sap.ui.define([
         },
         _getPaymentSummaryPopover: function () {
             if (!this._oPaymentSummaryPopover) {
-
                 this._oPaymentSummaryPopover = new sap.m.ResponsivePopover({
                     showHeader: false,
                     placement: "Bottom",
@@ -3707,6 +3706,9 @@ sap.ui.define([
         onRoomplane: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent)
         },
+        onSalutationclick:function(oEvent){
+        utils._LCvalidateMandatoryField(oEvent)
+        },
 
         onFamilyMemberSelect: function (oEvent) {
             const oBookingView = this.getView().getModel("BookingView");
@@ -4595,7 +4597,7 @@ sap.ui.define([
                 !!sPropertyType &&
                 utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") &&
                 utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") &&
-                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID")
+                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") &&  utils._LCvalidateMandatoryField(this.getView().byId(("BookSalutation_Id")), "ID") &&  utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
 
             )
             if (!isMandatoryValid) {
