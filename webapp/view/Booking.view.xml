@@ -199,17 +199,7 @@
                                     wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
                                     alignItems="Center"
                                 >
-                                    <core:Icon
-                                        id="bookingDocumentInfoIcon"
-                                        src="sap-icon://hint"
-                                        size="1rem"
-                                        color="#0064d1"
-                                        hoverColor="DarkBlue"
-                                        press="onDocumentInfoPress"
-                                        tooltip="Upload info"
-                                        class="sapUiTinyMarginEnd"
-                                    />
-
+                                   
                                     <ComboBox
                                         selectedKey="{HostelModel>DocumentType}"
                                         width="{= ${device>/system/phone} ? '100%' : '12rem'}"
@@ -224,7 +214,7 @@
                                         />
                                     </ComboBox>
 
-                                    <HBox alignItems="Center">
+                                 
                                         <unified:FileUploader
                                             width="{= ${device>/system/phone} ? '100%' : '8rem'}"
                                             visible="{= !${HostelModel>FileName} }"
@@ -239,6 +229,16 @@
                                             fileType="pdf,jpg,jpeg,png,webp"
                                             class="sapUiTinyMarginEnd myUnifiedBtn"
                                         />
+                                         <core:Icon
+                                        id="bookingDocumentInfoIcon"
+                                        src="sap-icon://hint"
+                                        size="1rem"
+                                        color="#0064d1"
+                                        hoverColor="DarkBlue"
+                                        press="onDocumentInfoPress"
+                                        tooltip="Upload info"
+                                        class="sapUiSmallMarginBegin"
+                                    />
 
                                         <HBox
                                             visible="{= !!${HostelModel>FileName} }"
@@ -259,7 +259,7 @@
                                                 class="sapUiTinyMarginBegin myUnifiedBtn"
                                             />
                                         </HBox>
-                                    </HBox>
+                                
                                 </HBox>
                             </VBox>
                         </f:SimpleForm>

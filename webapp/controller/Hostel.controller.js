@@ -222,9 +222,57 @@ sap.ui.define([
                 }),
                 "tokenModel"
             );
-         
 
+            // -----------------------------
+// HANDLE POST LOGIN REDIRECTION
+// -----------------------------
+// const sRedirectFlag = sessionStorage.getItem("redirectAfterLogin");
+
+// if (sRedirectFlag === "bookingFlow") {
+
+//     // Clear flag
+//     sessionStorage.removeItem("redirectAfterLogin");
+
+//     // Restore booking data
+//     const sData = sessionStorage.getItem("pendingBookingData");
+//     if (sData) {
+//         const oData = JSON.parse(sData);
+
+//         let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
+//         if (!oGlobalModel) {
+//             oGlobalModel = new JSONModel({});
+//             sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
+//         }
+
+//         oGlobalModel.setData(oData, true);
+
+//         // Also restore local model if needed
+//         if (this.oHostelModel) {
+//             this.oHostelModel.setData(oData, true);
+//         }
+//         sessionStorage.removeItem("pendingBookingData");
+//     }
+
+//     // Reopen room detail fragment automatically
+//     setTimeout(() => {
+//         this._reopenRoomDetailAfterLogin();
+//     }, 300);
+// }
+         
         },
+
+        _reopenRoomDetailAfterLogin: function () {
+
+    if (!this._oRoomDetailFragment) {
+        this._oRoomDetailFragment = sap.ui.xmlfragment(
+            "sap.ui.com.project1.fragment.SignInSignup",
+            this
+        );
+        this.getView().addDependent(this._oRoomDetailFragment);
+    }
+    this._oRoomDetailFragment.open();
+},
+
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
                 clearInterval(this._otpValidityInterval);
@@ -1118,15 +1166,18 @@ if (aData.length === 0) {
             this._oSignDialog.open();
         },
 
-        onDialogClose: function () {
-            // The afterClose event will handle removing the blur class
-            this._resetOtpState();
-            if (this._oSignDialog) this._oSignDialog.close();
-            if (this._oSignDialog) {
-                this.getView().removeStyleClass("blur-background");
-                this._oSignDialog.close();
-            }
-        },
+      onDialogClose: function () {
+    this._resetOtpState();
+
+    if (this._oSignDialog) {
+        this.getView().removeStyleClass("blur-background");
+
+        this._oSignDialog.close();   // Close first
+        this._oSignDialog.destroy(); // Destroy
+
+        this._oSignDialog = null;    // 🔥 CRITICAL FIX
+    }
+},
 
         onSwitchToSignIn: function () {
             this.oViewModel.setProperty("/authFlow", "signin");
@@ -3708,7 +3759,11 @@ if (aData.length === 0) {
                 $C("signinPassword").setValue("");
                 $C("signInOTP").setValue("");
                 // Close dialog
-                if (this._oSignDialog) this._oSignDialog.close();
+                if (this._oSignDialog){
+                    this.getView().removeStyleClass("blur-background");
+                    this._oSignDialog.close(),this._oSignDialog.destroy();
+        this._oSignDialog = null;
+                }
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {

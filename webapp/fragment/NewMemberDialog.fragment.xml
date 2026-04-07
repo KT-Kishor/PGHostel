@@ -115,16 +115,7 @@
                         />
                     </ComboBox>
 
-                    <core:Icon
-                        id="newMemberDocumentInfoIcon"
-                        src="sap-icon://hint"
-                        size="1rem"
-                        color="#0064d1"
-                        hoverColor="DarkBlue"
-                        press="onNewMemberDocumentInfoPress"
-                        tooltip="Upload info"
-                        class="sapUiTinyMarginEnd"
-                    />
+                   
 
                     <unified:FileUploader
                         id="newMemberFileUploader"
@@ -137,6 +128,16 @@
                         buttonText="Upload"
                         fileType="pdf,jpg,jpeg,png,webp"
                         class="sapUiTinyMarginEnd myUnifiedBtn"
+                    />
+                     <core:Icon
+                        id="newMemberDocumentInfoIcon"
+                        src="sap-icon://hint"
+                        size="1rem"
+                        color="#0064d1"
+                        hoverColor="DarkBlue"
+                        press="onNewMemberDocumentInfoPress"
+                        tooltip="Upload info"
+                        class="sapUiSmallMarginBegin"
                     />
 
                     <HBox
