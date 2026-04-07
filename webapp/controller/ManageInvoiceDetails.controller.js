@@ -561,7 +561,7 @@ sap.ui.define([
                             GSTCalculation: "YES",
                             Discount: "0.00",
                             GrossPrice: item.BasicFacilityPrice,
-                            Total: parseFloat(item.FacilityPrice),
+                            Total: parseFloat(item.FacilitiPrice),
                             StartDate: this.Formatter.DateFormat(item.StartDate),
                             EndDate: this.Formatter.DateFormat(item.EndDate),
                             Currency: item.Currency,
