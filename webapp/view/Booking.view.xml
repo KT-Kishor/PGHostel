@@ -198,6 +198,7 @@
                                     fitContainer="true"
                                     wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
                                     alignItems="Center"
+                                    class = "ComboBoxFileUploaderContainer"
                                 >
                                    
                                     <ComboBox
