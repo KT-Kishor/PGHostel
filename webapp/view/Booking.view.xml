@@ -258,7 +258,6 @@
                                             />
                                             <Button
                                                 text="Remove"
-                                                type="Transparent"
                                                 press="onDeleteCustomerDocumentRow"
                                                 class="sapUiTinyMarginBegin myUnifiedBtn"
                                             />
@@ -358,7 +357,6 @@
                                                 </HBox> -->
                                             <Button
                                                 icon="sap-icon://delete"
-                                                type="Transparent"
                                                 tooltip="Remove member"
                                                 press="onDeleteFamilyMemberRow"
                                                 class="myUnifiedBtn"
@@ -396,7 +394,6 @@
                             >
                                 <Button
                                     icon="sap-icon://slim-arrow-left"
-                                    type="Transparent"
                                     press="onFacilityPrev"
                                     class="facilityNavBtn sapUiTinyMarginEnd myUnifiedBtn"
                                 />
@@ -416,7 +413,6 @@
 
                                 <Button
                                     icon="sap-icon://slim-arrow-right"
-                                    type="Transparent"
                                     press="onFacilityNext"
                                     class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"
                                 />

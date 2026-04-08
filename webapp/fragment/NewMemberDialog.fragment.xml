@@ -154,7 +154,6 @@
                         />
                         <Button
                             text="Remove"
-                            type="Transparent"
                             icon="sap-icon://delete"
                             press="onDeleteNewMemberDocument"
                             class="sapUiTinyMarginBegin myUnifiedBtn"

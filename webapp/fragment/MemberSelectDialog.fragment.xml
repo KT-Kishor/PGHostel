@@ -72,7 +72,6 @@
         <beginButton>
             <Button
                 text="Add Selected"
-                type="Emphasized"
                 press="onConfirmMemberSelection"
                 class="myUnifiedBtn"
             />
