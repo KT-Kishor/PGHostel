@@ -21,7 +21,18 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._ViewDatePickersReadOnly(["id_DD_year", "id_DD_Date"], this.getView());
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
-                if (!oLogin || !oLogin.BranchCode) return sap.m.MessageToast.show("Login branch not found");
+                if (!oLogin) {
+                    return MessageToast.show("Login data not found");
+                }
+                if (oLogin.Role === "SuperAdmin") {
+                    this._aUserBranches = ["ALL"];
+                }
+                else if (oLogin.BranchCode) {
+                    this._aUserBranches = oLogin.BranchCode.split(",").map(b => b.trim());
+                }
+                else {
+                    return MessageToast.show("Login branch not found");
+                }
                 this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
                 await this._loadUserBranches();
                 this._setDefaultDates();
