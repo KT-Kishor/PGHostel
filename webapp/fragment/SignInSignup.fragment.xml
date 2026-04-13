@@ -23,6 +23,7 @@
                     <Button
                         icon="sap-icon://decline"
                         tooltip="{i18n>close}"
+                        type="Transparent"
                         press="onDialogClose"
                     />
                 </contentRight>
@@ -40,6 +41,7 @@
                     text="{i18n>CapsIGNIN}"
 					tooltip="{i18n>CapsIGNIN}"
                     id="signinvisible"
+                    type="Transparent"
                     class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} "
                     press="onSwitchToSignIn"
                     visible="{= ${LoginViewModel>/authFlow} !== 'signin' }"
@@ -48,6 +50,7 @@
                     id="signupvisible"
                     text="{i18n>CapsIGNUP}"
 					tooltip="{i18n>CapsIGNUP}"
+                    type="Transparent"
                     class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} "
                     press="onSwitchToSignUp"
                     visible="{= ${LoginViewModel>/authFlow} !== 'signup' }"
