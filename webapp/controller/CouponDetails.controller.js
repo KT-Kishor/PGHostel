@@ -702,18 +702,57 @@ sap.ui.define([
             if (sMode === "Add") {
                 oCoupon.Status = "Active";
             }
-            this.getBusyDialog()
+           
             try {
                 if (sMode === "Add") {
-                    oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-                    oCoupon.CreatedBy =
-                        oView.getModel("LoginModel")
-                            ?.getProperty("/EmployeeName") || "system";
-                    await this.ajaxCreateWithJQuery("HM_Coupon", {
-                        data: oCoupon
-                    });
-                    MessageToast.show(this.i18nModel.getText("couponcreatedsuccessfully"));
-                } else {
+
+  // 🔹 Get data from CouponModel
+var oCouponModel = this.getView().getModel("CouponModel");
+var aCoupons =
+    oCouponModel.getProperty("/CouponList") ||
+    oCouponModel.getProperty("/results") ||
+    oCouponModel.getData() ||
+    [];
+
+// Normalize input
+var sNewCode = (oCoupon.CouponCode || "").trim().toLowerCase();
+var dToday = new Date();
+
+// 🔹 Find matching coupons
+var aMatchingCoupons = aCoupons.filter(function (item) {
+    return (item.CouponCode || "").trim().toLowerCase() === sNewCode;
+});
+
+if (aMatchingCoupons.length > 0) {
+
+    var bActiveExists = aMatchingCoupons.some(function (item) {
+        var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
+        return dExistingEnd && !isNaN(dExistingEnd) && dExistingEnd >= dToday;
+    });
+
+    //  Block if active coupon exists
+    if (bActiveExists) {
+        this.closeBusyDialog()
+        MessageBox.error("Coupon code already exists");
+        
+        return;
+        
+    }
+}
+
+// ✅ If no match OR only expired → proceed with your code
+oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+oCoupon.CreatedBy =
+    oView.getModel("LoginModel")
+        ?.getProperty("/EmployeeName") || "system";
+ this.getBusyDialog()
+await this.ajaxCreateWithJQuery("HM_Coupon", {
+    data: oCoupon
+});
+
+MessageToast.show(this.i18nModel.getText("couponcreatedsuccessfully"));
+this.closeBusyDialog()
+}else {
                     if (!oCoupon.CouponId) {
                         MessageBox.error(this.i18nModel.getText("updatefailedCouponIdmissing"));
                         return;
