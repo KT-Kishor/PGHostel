@@ -142,7 +142,7 @@
                                 placeholder="Select end date"
                             />
                             <Label
-                                text="Full Name"
+                                text="Primary Member"
                               
                             />
                             <HBox
@@ -270,7 +270,7 @@
 
                     <!-- Guest Information Section -->
                     <Title
-                        text="Select Members"
+                        text="Select Co-Members"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{BookingView>/showFamilySection}"
