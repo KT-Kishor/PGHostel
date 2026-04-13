@@ -11,13 +11,16 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageVendor").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
-                this.onClearAndSearch("MV_id_FilterbarEmployee");
+                var sPath= oEvent.getParameter("arguments").sPath
+                if(sPath==="TilePage"){
+                   this.onClearAndSearch("MV_id_FilterbarEmployee");
+                }
                 await this._loadBranchCode();
                 await this.Onsearch("true");
             } catch (err) {

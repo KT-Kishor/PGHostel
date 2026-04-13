@@ -76,7 +76,9 @@ sap.ui.define([
 
         TileV_onpressInbox: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteAdmin");
+            oRouter.navTo("RouteAdmin",{
+                sPath:"TilePage"
+            });
         },
 
         Tile_onLogPress: function () {
@@ -90,12 +92,16 @@ sap.ui.define([
 
         TileV_onpressbeddetails: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteBedDetails");
+            oRouter.navTo("RouteBedDetails",{
+                sPath:"Tile Page"
+            });
         },
 
         TileV_onpressextrafacilities: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteFacilitis", { value: "Facilities", });
+            oRouter.navTo("RouteFacilitis", { 
+                value: "Facilities",
+                sPath:"TilePage" });
         },
 
         TileV_onpressBedImages: function () {
@@ -125,7 +131,9 @@ sap.ui.define([
 
         TileV_onpressManageInvoice: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageInvoice");
+            oRouter.navTo("RouteManageInvoice",{
+                sPath:"TilePage"
+            });
         },
 
         TileV_onpressCouponDetails: function () {
@@ -140,7 +148,9 @@ sap.ui.define([
 
         TileV_onpressManageVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageVendor");
+            oRouter.navTo("RouteManageVendor",{
+                sPath:"TilePage"
+            });
         },
 
         TileV_onpressPayment: function () {
@@ -181,7 +191,9 @@ sap.ui.define([
 
         TileV_onpressdamage: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteDamage");
+            oRouter.navTo("RouteDamage",{
+                sPath:"TilePage"
+            });
         },
 
         TileV_onpressdamagedashboard: function () {

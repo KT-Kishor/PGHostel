@@ -14,12 +14,15 @@ sap.ui.define(
                 this.getOwnerComponent().getRouter().getRoute("RouteManageInvoice").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: async function () {
+            _onRouteMatched: async function (oEvent) {
                 try {
                     this.getBusyDialog()
                     var LoginFUnction = await this.commonLoginFunction("ManageInvoice");
-                    if (!LoginFUnction) return;
-                    this.onClearAndSearch("CI_id_InvoiceFilterBar");
+                     if (!LoginFUnction) return;
+                     var sPath = oEvent.getParameter("arguments").sPath;
+                      if(sPath==="TilePage"){
+                        this.onClearAndSearch("CI_id_InvoiceFilterBar");
+                      }
                     this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     this._isClearPressed = false; // ensure full data is not requested'
                     const currentYear = new Date().getFullYear();

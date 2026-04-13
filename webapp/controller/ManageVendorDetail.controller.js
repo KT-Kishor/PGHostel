@@ -221,7 +221,9 @@ sap.ui.define([
 
         BI_onButtonPress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageVendor");
+            oRouter.navTo("RouteManageVendor",{
+                sPath:"Vendordetails"
+            });
         },
 
         onEditOrSavePress: async function () {

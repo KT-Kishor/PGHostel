@@ -268,7 +268,9 @@ sap.ui.define([
                     title: "Warning"
                 });
             } else {
-                this.getOwnerComponent().getRouter().navTo("RouteDamage");
+                this.getOwnerComponent().getRouter().navTo("RouteDamage",{
+                      sPath:"DamageDetails"
+                });
             }
         },
 
@@ -493,7 +495,9 @@ sap.ui.define([
                                     if (oAction === sap.m.MessageBox.Action.OK) {
                                         this.getOwnerComponent()
                                             .getRouter()
-                                            .navTo("RouteDamage");
+                                            .navTo("RouteDamage",{
+                                                sPath:"DamageDetails"
+                                            });
                                     } else {
                                         this.DM_onPressGeneratePDF();
                                     }

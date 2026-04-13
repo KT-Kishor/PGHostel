@@ -160,7 +160,7 @@
         },
         {
           "name": "RouteAdmin",
-          "pattern": "Admin",
+          "pattern": "Admin/{sPath}",
           "target": [
             "TargetAdmin"
           ]
@@ -181,7 +181,7 @@
         },
         {
           "name": "RouteBedDetails",
-          "pattern": "BedDetails",
+          "pattern": "BedDetails/{sPath}",
           "target": [
             "TargetBedDetails"
           ]
@@ -258,7 +258,7 @@
         },
         {
           "name": "RouteManageInvoice",
-          "pattern": "ManageInvoice",
+          "pattern": "ManageInvoice/{sPath}",
           "target": [
             "TargetManageInvoice"
           ]
@@ -286,7 +286,7 @@
         },
         {
           "name": "RouteManageVendor",
-          "pattern": "ManageVendor",
+          "pattern": "ManageVendor/{sPath}",
           "target": [
             "TargetManageVendor"
           ]
@@ -375,7 +375,7 @@
         },
         {
           "name": "RouteDamage",
-          "pattern": "Damage",
+          "pattern": "Damage/{sPath}",
           "target": [
             "targetDamage"
           ]

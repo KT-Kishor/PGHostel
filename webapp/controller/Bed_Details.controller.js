@@ -13,19 +13,23 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
 
                 var oView = this.getView();
                 var oModel = oView.getModel("BedDetails");
+                var sPath = oEvent.getParameter("arguments").sPath;
+
+                if (sPath === "Tile Page") {
+                    this.onClearAndSearch("BD_id_FilterbarEmployee");
+
+                }
 
                 if (!oModel) {
                     oModel = new sap.ui.model.json.JSONModel({});
                     oView.setModel(oModel, "BedDetails");
-                } else {
-                    oModel.setData({});
                 }
 
                 var model = new sap.ui.model.json.JSONModel({
@@ -45,7 +49,6 @@ sap.ui.define([
 
                 this.getView().setModel(oTokenModel, "tokenModel");
                 this.getView().setModel(oUploaderData, "UploaderData");
-                this.onClearAndSearch("BD_id_FilterbarEmployee");
                 await this._loadBranchCode()
                 await this.Onsearch()
                 this.Customerdata()

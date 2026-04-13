@@ -363,7 +363,9 @@ sap.ui.define([
                 } else if (this.sourceView === "PaymentDashboard") {
                     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
                 } else {
-                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
+                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
+                        sPath:"ManageInvoicedetails"
+                    });
                 }
             },
 
@@ -1314,7 +1316,9 @@ sap.ui.define([
                                 class: "myUnifiedBtn",
                                 press: function() {
                                     oDialog.close();
-                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
+                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
+                                        sPath:"TilePage"
+                                    });
                                 }
                             }),
                             endButton: new sap.m.Button({
@@ -1324,7 +1328,9 @@ sap.ui.define([
                                 press: async () => {
                                     oDialog.close();
                                     await that.CID_onPressGeneratePdf();
-                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice");
+                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
+                                        sPath:"ManageInvoicedetails"
+                                    });
                                 }
                             }),
                             afterClose: function() {

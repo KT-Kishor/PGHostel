@@ -218,7 +218,9 @@ sap.ui.define([
 
         BI_onButtonPress: function() {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteBedDetails");
+            oRouter.navTo("RouteBedDetails",{
+                    sPath: "Beddetails"
+            });
         },
 
         onbranchChange: function(oEvent) {

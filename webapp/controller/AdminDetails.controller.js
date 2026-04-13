@@ -327,7 +327,9 @@ sap.ui.define([
                     oUIModel.setProperty("/isLoggedIn", true);
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
                 } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin",{
+                        sPath:"DetailsPage"
+                    });
                 } else {
                     this.getOwnerComponent().getRouter().navTo("RouteHostel");
                 }
@@ -744,27 +746,7 @@ sap.ui.define([
                 });
             });
 
-            // -------------------------------
-            // Final Price Calculation
-            // -------------------------------
-            // const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
-            // let DiscountAmount = Discount || 0;
-            // const SubTotal = FacilityPrice + roomRentPrice - DiscountAmount;
-
-            // let SGST = 0;
-            // let CGST = 0;
-            // let IGST = 0;
-            // let grandTotal = 0;
-            // if(Branch.Type==="IGST"){
-            //  IGST = SubTotal * Branch.Value / 100;
-            //  grandTotal = SubTotal + SGST + CGST;
-
-            // }else{       
-            //  SGST = SubTotal * Branch.Value / 100;
-            //  CGST = SubTotal * Branch.Value / 100;
-            //  grandTotal = SubTotal + SGST + CGST;
-
-            // }
+         
             const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
             this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
 
@@ -1282,7 +1264,11 @@ sap.ui.define([
                     return;
                 }
             }
-           var selectionmode= oPayload.SelectionMode ? oPayload.SelectionMode : this.SelectionMode
+       var oGroup = sap.ui.getCore().byId("id_Period");
+
+var selectionmode = oPayload.SelectionMode 
+    || oGroup?.getButtons()[oGroup.getSelectedIndex()]?.getText() 
+    || this.SelectionMode;
             if (oPayload.UnitText !== "Unit Price" &&
                         oPayload.UnitText !== "" && oPayload.quantity !=="" && selectionmode !== "QTY") {
 
@@ -1414,9 +1400,9 @@ sap.ui.define([
             oPayload.TotalYears = oPayload.TotalUnits || "1"
             // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY" : ""
             oPayload.MemberName = sap.ui.getCore().byId("editMembername").getValue() || ""
-            oPayload.SelectionMode = this.SelectionMode
+            oPayload.SelectionMode = selectionmode
 
-            if (this.SelectionMode === "PERSON_QTY") {
+            if (oPayload.SelectionMode === "PERSON_QTY") {
                 oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY"
             }
 
@@ -3281,13 +3267,13 @@ sap.ui.define([
                                     } else if (unit === "unit price") {
                                         let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = item.FacilityPrice;
+                                            total = price * Number(item.quantity);
                                         } else {
                                             total = price * Number(item.quantity) * days;
                                         }
                                     }
 
-                                    item.TotalAmount = item.CouponDiscount !== "" ? total - Number(item.CouponDiscount) : total;
+                                    item.TotalAmount = item.CouponDiscount !== "" || item.CouponDiscount !== "0.00" ? total - Number(item.CouponDiscount) : total;
                                     totalFacilityPrice += total;
                                 });
 
@@ -3419,13 +3405,13 @@ sap.ui.define([
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = item.FacilityPrice;
+                                            total =  price * Number(item.quantity);
                                         } else {
                                             total = price * Number(item.quantity) * diffDays;
                                         }
                                     }
 
-                                    item.TotalAmount = item.CouponDiscount !== "" ? total - Number(item.CouponDiscount) : total;
+                                    item.TotalAmount = item.CouponDiscount !== "" || item.CouponDiscount !== "0.00" ? total - Number(item.CouponDiscount) : total;
                                     totalFacilityPrice += total;
                                 });
 

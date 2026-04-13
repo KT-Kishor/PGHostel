@@ -25,6 +25,12 @@ sap.ui.define([
                 });
                 this.getView().setModel(oEditableModel, "editable"); // Editable control model
 
+                this.byId("FD_id_RoomType123").setValueState("None");
+                this.byId("FD_id_FacilityName").setValueState("None");
+                this.byId("FD_id_FacilityName1").setValueState("None");
+                this.byId("id_SelectionMode").setValueState("None");
+                this.byId("FD_id_Currency").setValueState("None");
+
                 const oFacilityModel = new JSONModel({
                     BranchCode: "",
                     Type: "",

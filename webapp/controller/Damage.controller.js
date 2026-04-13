@@ -13,7 +13,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteDamage").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
             this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("DamageDashboard");
             if (!LoginFUnction) return;
@@ -39,7 +39,10 @@ sap.ui.define([
             });
             this.getView().setModel(model, "DamageModel");
             this._makeDatePickersReadOnly(["HD_id_DamageDate"]);
+            var sPath = oEvent.getParameter("arguments").sPath;
+            if(sPath==="TilePage"){
             this.onClearAndSearch("HD_id_FilterbarEmployee");
+            }
             var loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.BranchCode = loginModel.getProperty("/BranchCode");
             await this._loadBranchCode()
