@@ -132,6 +132,7 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteFacilitis", {
                 value: "Facilities",
+                sPath: "FacilitiesDetails"
             });
             this.getView().getModel("Facilities").setData({});
             this.getView().getModel("DisplayImagesModel").setData({});

@@ -188,7 +188,7 @@
         },
         {
           "name": "RouteFacilitis",
-          "pattern": "Facilities/{value}",
+          "pattern": "Facilities/{value}/{sPath}",
           "target": [
             "TargetFacilitis"
           ]

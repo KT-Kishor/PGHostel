@@ -40,13 +40,15 @@ sap.ui.define([
 
             this.getView().setModel(oTokenModel, "tokenModel");
             this.getView().setModel(oUploaderData, "UploaderData");
+            if (oEvent.getParameter("arguments").sPath === "TilePage") {
             this.onClearAndSearch("FO_id_FilterbarEmployee");
+            }
             await this._loadBranchCode()
             this.oValue = oEvent.getParameter("arguments").value;
             try {
                 if (this.oValue === "Facilities") {
                     await this.readCallForFacilities("Initial");
-                    this.FC_onPressClear(); // Clear the filter bar
+                    // this.FC_onPressClear(); // Clear the filter bar
                 } else {
                     await this.FC_onSearch(); // Filter function for trainee
                 }
@@ -119,6 +121,10 @@ sap.ui.define([
                     filter.BranchCode = oExistingModel.BranchCode;
                 }
             }
+
+            filter.FacilityName = this.byId("FN_id_FacilityName").getSelectedKey();
+            filter.BranchCode = this.byId("FN_id_BranchCode").getSelectedKey();
+
 
             this.getBusyDialog()
             try {

@@ -100,7 +100,8 @@ sap.ui.define([
         TileV_onpressextrafacilities: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteFacilitis", { 
-                value: "Facilities"
+                value: "Facilities",
+                sPath: "TilePage"
                });
         },
 
