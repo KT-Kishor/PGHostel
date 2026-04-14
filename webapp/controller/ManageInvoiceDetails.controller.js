@@ -543,14 +543,17 @@ sap.ui.define([
                             item.Quantity       
                         );
 
-                        let particulars = ""; // Build Particulars
+                        let particulars = "";
+                        const memberSuffix = item.MemberName ? ` (${item.MemberName})` : "";
+
+                        // Build Particulars
                         if (item.FacilityName === "Penalty Charges") {
-                            particulars = "Penalty Charges";
+                            particulars = `Penalty Charges${memberSuffix}`;
                         } else if (item.UnitText === "Per Hour") {
                             const totalHours = Number(item.TotalHour) || 1;
-                            particulars = `${item.FacilityName} - Facility (${totalHours} Hours)`;
+                            particulars = `${item.FacilityName} - Facility (${totalHours} Hours)${memberSuffix}`;
                         } else {
-                            particulars = `${item.FacilityName} - Facility`;
+                            particulars = `${item.FacilityName} - Facility${memberSuffix}`;
                         }
 
                         finalInvoiceItems.push({
@@ -3595,14 +3598,15 @@ sap.ui.define([
                     const effectiveEnd = fEnd < cycleEnd ? fEnd : cycleEnd;
 
                     let particulars = "";
+                    const memberSuffix = f.MemberName ? ` (${f.MemberName})` : "";
 
                     if (f.FacilityName === "Penalty Charges") {
-                        particulars = "Penalty Charges";
+                        particulars = `Penalty Charges${memberSuffix}`;
                     } else if (f.UnitText === "Per Hour") {
                         const hrs = Number(f.TotalHour) || 1;
-                        particulars = `${f.FacilityName} - Facility (${hrs} Hours)`;
+                        particulars = `${f.FacilityName} - Facility (${hrs} Hours)${memberSuffix}`;
                     } else {
-                        particulars = `${f.FacilityName} - Facility`;
+                        particulars = `${f.FacilityName} - Facility${memberSuffix}`;
                     }
 
                     const startStr = this.Formatter.DateFormat(effectiveStart);
@@ -3632,7 +3636,7 @@ sap.ui.define([
                         ),
 
                         GrossPrice: Number(f.BasicFacilityPrice) || 0,
-                        Total: this._calculateFacilityTotal(f, effectiveStart, effectiveEnd),
+                        Total: this._calculateFacilityTotal(f, cycleStart, cycleEnd, 0),
                         StartDate: startStr,
                         EndDate: endStr,
                         Currency: f.Currency || "INR",
@@ -3664,74 +3668,119 @@ sap.ui.define([
                 return new Date(`${year}-${month}-${day}`);
             },
 
-            _calculateFacilityTotal: function(item, start, end) {
+            _calculateFacilityTotal: function (item, cycleStart, cycleEnd, invoiceIndex = 0) {
 
-                start = new Date(start);
-                end = new Date(end);
+                let sDate = new Date(item.StartDate);
+                let eDate = new Date(item.EndDate);
 
-                start.setHours(0, 0, 0, 0);
-                end.setHours(0, 0, 0, 0);
+                sDate.setHours(0, 0, 0, 0);
+                eDate.setHours(0, 0, 0, 0);
+
+                // Overlap check
+                const overlaps = !(eDate < cycleStart || sDate > cycleEnd);
+                if (!overlaps) return 0;
+
+                const effectiveStart = sDate > cycleStart ? sDate : cycleStart;
+                const effectiveEnd = eDate < cycleEnd ? eDate : cycleEnd;
+
+                const usedDays = this._calculateDays(effectiveStart, effectiveEnd);
+                const useddaysforday = this._calculateDaysForDay(effectiveStart, effectiveEnd);
 
                 const unit = item.UnitText?.toLowerCase();
+                const selectionMode = item.SelectionMode?.toUpperCase();
+                const chargeType = item.FacilityChargeType?.toUpperCase();
 
-                // PER DAY
+                const qty = Number(item.Quantity) || 1;
+                const unitPrice = Number(item.BasicFacilityPrice) || 0;
+                const totalHour = Number(item.TotalHour) || 1;
+                const totalprice = Number(item.FacilitiPrice) || unitPrice;
+
+                let multiplier = 1;
+                let facilityAmount = 0;
+
+                // ================= PERSON_QTY =================
+                if (selectionMode === "PERSON_QTY") {
+
+                    if (chargeType === "DAILY") {
+                        const totalUnits = qty * useddaysforday;
+                        facilityAmount = this._truncate2(totalUnits * unitPrice);
+                    }
+
+                    else if (chargeType === "ONCE_PER_BOOKING") {
+                        if (invoiceIndex > 0) return 0;
+
+                        const totalUnits = qty;
+                        facilityAmount = this._truncate2(totalUnits * unitPrice);
+                    }
+
+                    return facilityAmount;
+                }
+
+                // ================= MULTIPLIER =================
+                if (selectionMode === "QTY" || selectionMode === "PERSON") {
+                    multiplier = qty;
+                } else if (selectionMode === "SINGLE") {
+                    multiplier = 1;
+                }
+
+                // ================= UNIT LOGIC =================
                 if (unit === "per day") {
-                    const price = Number(item.BasicFacilityPrice) || 0;
-                    const days = Math.floor((end - start) / 86400000);
-                    return price * days;
+                    facilityAmount = this._truncate2(multiplier * unitPrice * useddaysforday);
                 }
 
-                // PER HOUR
-                if (unit === "per hour") {
-                    const price = Number(item.BasicFacilityPrice) || 0;
-                    const hrs = Number(item.TotalHour) || 1;
-                    const days = Math.floor((end - start) / 86400000);
-                    return price * hrs * days;
+                else if (unit === "per hour") {
+                    facilityAmount = this._truncate2(multiplier * unitPrice * totalHour * useddaysforday);
                 }
 
-                // PER MONTH
-                if (unit === "per month") {
-                    const price = Number(item.BasicFacilityPrice) || 0;
+                else if (unit === "per month") {
 
-                    let months =
-                        (end.getFullYear() - start.getFullYear()) * 12 +
-                        (end.getMonth() - start.getMonth());
-
-                    if (end.getDate() >= start.getDate()) months += 1;
-
-                    return price * months;
+                    const usedMonths = this._calculateMonths(effectiveStart, effectiveEnd);
+                    facilityAmount = this._truncate2(multiplier * unitPrice * usedMonths);
                 }
 
-                // PER YEAR
-                if (unit === "per year") {
+                else if (unit === "per year") {
 
-                    const totalprice = Number(item.FacilitiPrice || item.BasicFacilityPrice) || 0;
-
-                    const totalDays = Math.floor((end - start) / 86400000) + 1;
-
-                    let totalMonths =
-                        (end.getFullYear() - start.getFullYear()) * 12 +
-                        (end.getMonth() - start.getMonth());
-
-                    if (end.getDate() >= start.getDate()) totalMonths += 1;
-
+                    const totalMonths = this._calculateMonths(sDate, eDate);
                     const years = Math.ceil(totalMonths / 12) || 1;
 
                     const yearlyPrice = totalprice / years;
+                    const overlapDays = usedDays;
 
-                    if (totalDays >= 364) {
-                        return this._round2(yearlyPrice);
+                    if (overlapDays >= 364) {
+                        facilityAmount = this._round2(multiplier * yearlyPrice);
                     } else {
                         const dailyRate = yearlyPrice / 365;
-                        return this._round2(dailyRate * totalDays);
+                        facilityAmount = this._round2(multiplier * dailyRate * overlapDays);
                     }
                 }
 
-                return Number(item.BasicFacilityPrice) || 0;
+                return facilityAmount;
             },
 
-            _round2: function(val) {
-                return Math.round((val + Number.EPSILON) * 100) / 100;
+            _calculateDays: function (start, end) {
+                return Math.floor((end - start) / 86400000) + 1;
+            },
+
+            _calculateDaysForDay: function (start, end) {
+                return Math.floor((end - start) / 86400000);
+            },
+
+            _calculateMonths: function (start, end) {
+                let months =
+                    (end.getFullYear() - start.getFullYear()) * 12 +
+                    (end.getMonth() - start.getMonth());
+
+                if (end.getDate() >= start.getDate()) months += 1;
+
+                return months;
+            },
+
+            _round2: function (value) {
+                return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+            },
+
+            _truncate2: function (value) {
+                return Math.floor(Number(value) * 100) / 100;
             },
         });
     });
