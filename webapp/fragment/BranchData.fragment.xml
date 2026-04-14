@@ -7,30 +7,22 @@
     xmlns:u="sap.ui.unified"
 >
     <Dialog
-        type="Message"
-        class="sapUiContentPadding"
+        title="{i18n>branchDetails}"
         resizable="true"
-        contentWidth="28rem"
-        contentHeight="auto"
         draggable="true"
+        contentWidth="80%"
     >
-        <customHeader>
-            <Bar class="barheader">
-                <contentMiddle>
-                    <Title text="{i18n>branchDetails}" />
-                </contentMiddle>
-            </Bar>
-        </customHeader>
+        
         <f:SimpleForm
             editable="true"
-            layout="ResponsiveGridLayout"
+            layout="ColumnLayout"
             labelSpanXL="4"
             labelSpanL="3"
             labelSpanM="4"
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1"
+            columnsM="2"
         >
             <f:content>
                 <Label
@@ -210,8 +202,8 @@
                     liveChange="onTaxPercentageChange"
                 />
                 <Label text="" />
-                <HBox width="100%">
-                    <VBox width="30%">
+              
+                   
                         <Label
                             text="{i18n>MSisdCode}"
                             required="true"
@@ -232,15 +224,9 @@
                                 additionalText="{CountryModel>code}"
                             />
                         </ComboBox>
-                    </VBox>
-                    <VBox
-                        width="70%"
-                        class="sapUiTinyMarginBegin"
-                    >
-                        <Label
-                            text="{i18n>MSmobileNo}"
-                            required="true"
-                        />
+                   
+                  
+                       
                         <Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
@@ -249,8 +235,8 @@
                             liveChange="onMobileLivechnage"
                             valueStateText="{i18n>enterContactNumber}"
                         />
-                    </VBox>
-                </HBox>
+                  
+              
                 <Label
                     text="{i18n>bdCheckIntime}"
                     required="true"
@@ -320,7 +306,6 @@
                     selectedKey="{MDmodel>/Mode}"
                     valueStateText="{i18n>selectCurrency}"
                     width="100%"
-                    placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
                      visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
                     class="sapUiSmallMarginBottom"
@@ -336,31 +321,28 @@
                         text="Inactive"
                     />
                 </Select>
-                <MessageStrip
+              
+            </f:content>
+        </f:SimpleForm>
+
+         <MessageStrip
                     text="For Logo and Image, files larger than 2 MB are not allowed."
                     type="Warning"
                     showIcon="true"
                     visible="{= !${editableModel>/isEdit}}"
                     enableFormattedText="true"
-                    class="sapUiSmallMarginBottom"
+                    class="sapUiSmallMarginBottom sapUiSmallMarginEnd"
                 />
 
-                <MessageStrip
-                    text="{i18n>Branchdatalogomsg}"
-                    type="Warning"
-                    showIcon="true"
-                    enableFormattedText="true"
-                    visible="{editableModel>/isEdit}"
-                    class="sapUiSmallMarginBottom"
-                />
-                <Label text="{i18n>addLogo}" />
-                <VBox
-                    alignItems="Start"
-                    width="100%"
-                    renderType="Bare"
-                    class="noExtraSpace"
-                >
-                    <u:FileUploader
+                 <Label text=""/>
+<!-- 🔹 SIDE BY SIDE LAYOUT -->
+<HBox width="100%" justifyContent="SpaceBetween">
+
+    <!-- LEFT SIDE (LOGO) -->
+    <VBox width="48%">
+
+        <HBox justifyContent="End" class="sapUiSmallMarginBottom">
+              <u:FileUploader
                         id="BD_id_FileUploader"
                         fileSizeExceed="onFileSizeExceeds"
                         maximumFileSize="2"
@@ -374,36 +356,39 @@
                         multiple="false"
                         uploadOnChange="false"
                         tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                       
                     />
-                    <ScrollContainer
-                        width="100%"
-                        horizontal="false"
-                        vertical="true"
-                    >
-                        <Tokenizer
-                            id="BD_id_TokenList"
-                            width="100%"
-                            tokenDelete="onTokenDelete"
-                            tokens="{tokenModel>/tokens}"
-                        >
-                            <Token
-                                key="{tokenModel>key}"
-                                text="{tokenModel>text}"
-                            />
-                        </Tokenizer>
-                    </ScrollContainer>
-                </VBox>
-                <Label
-                    text="{i18n>branchaddImage}"
-                    required="true"
-                />
-                <VBox
-                    alignItems="Start"
-                    width="100%"
-                    renderType="Bare"
-                    class="noExtraSpace"
-                >
-                    <u:FileUploader
+        </HBox>
+
+        <Table
+            items="{UploaderData>/attachmentslogo}"
+            mode="Delete"
+            delete="onTokenDelete"
+            width="100%"
+        >
+            <columns>
+                <Column demandPopin="true" ><Text text="{i18n>filename}" /></Column>
+                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileType}" /></Column>
+                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileSize}" /></Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{UploaderData>filename}" />
+                        <Text text="{UploaderData>fileType}" />
+                        <Text text="{UploaderData>size}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+    </VBox>
+
+    <!-- RIGHT SIDE (IMAGE) -->
+    <VBox width="48%">
+
+        <HBox justifyContent="End" class="sapUiSmallMarginBottom">
+            <u:FileUploader
                         id="BD_id_FileUploader1"
                         fileSizeExceed="onFileSizeExceeds"
                         maximumFileSize="2"
@@ -417,27 +402,35 @@
                         multiple="false"
                         uploadOnChange="false"
                         tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                        class="sapUiSmallMarginEnd"
                     />
-                    <ScrollContainer
-                        width="100%"
-                        horizontal="false"
-                        vertical="true"
-                    >
-                        <Tokenizer
-                            id="BD_id_TokenList1"
-                            width="100%"
-                            tokenDelete="onTokenImageDelete"
-                            tokens="{tokenImageModel>/imageTokens}"
-                        >
-                            <Token
-                                key="{tokenImageModel>key}"
-                                text="{tokenImageModel>text}"
-                            />
-                        </Tokenizer>
-                    </ScrollContainer>
-                </VBox>
-            </f:content>
-        </f:SimpleForm>
+        </HBox>
+
+        <Table
+            items="{UploaderData>/attachmentimage}"
+            mode="Delete"
+            delete="onTokenImageDelete"
+            width="100%"
+        >
+            <columns>
+                <Column demandPopin="true" ><Text text="{i18n>filename}" /></Column>
+                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileType}" /></Column>
+                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileSize}" /></Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{UploaderData>filename}" />
+                        <Text text="{UploaderData>fileType}" />
+                        <Text text="{UploaderData>size}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+    </VBox>
+
+</HBox>
         <beginButton>
             <Button
                 id="BD_id_saveButoon"

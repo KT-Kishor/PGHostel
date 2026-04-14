@@ -54,6 +54,14 @@ sap.ui.define([
             var oPropertyTypeModel = new sap.ui.model.json.JSONModel();
             oPropertyTypeModel.loadData("model/PropertyType.json");
             this.getView().setModel(oPropertyTypeModel, "PropertyType");
+
+             const oUploaderData = new sap.ui.model.json.JSONModel({
+                    attachmentslogo: [],
+                    attachmentimage: []
+
+                });
+
+                this.getView().setModel(oUploaderData, "UploaderData");
         },
 
         _onRouteMatched: async function () {
@@ -594,26 +602,56 @@ sap.ui.define([
             this.CommonLogoutFunction();
         },
 
-        MD_onCancelButtonPress: function () {
-            var oView = this.getView();
+       MD_onCancelButtonPress: function () {
+    var oView = this.getView();
 
-            if (oView.getModel("MDmodel")) {
-                oView.getModel("MDmodel").setData({
-                    BranchID: "",
-                    Name: "",
-                    Address: "",
-                    LandMark: "",
-                    PropertyType: "",
-                    Pincode: "",
-                    Contact: "",
-                    Penalty: "",
-                });
-            }
-            this._resetFacilityValueStates();
-            var oTable = this.byId("id_MD_Table");
-            oTable.removeSelections();
-            this.oDialog.close();
-        },
+    // 🔹 1. Reset Form Data
+    if (oView.getModel("MDmodel")) {
+        oView.getModel("MDmodel").setData({
+            BranchID: "",
+            Name: "",
+            Address: "",
+            LandMark: "",
+            PropertyType: "",
+            Pincode: "",
+            Contact: "",
+            Penalty: "",
+        });
+    }
+
+    // 🔹 2. Clear Uploaded Table Data (IMPORTANT FIX)
+    var oUploaderModel = oView.getModel("UploaderData");
+    if (oUploaderModel) {
+        oUploaderModel.setProperty("/attachmentimage", []);
+    }
+    if (oUploaderModel) {
+        oUploaderModel.setProperty("/attachmentslogo", []);
+    }
+
+    // 🔹 3. Clear Image Model (optional but recommended)
+    if (oView.getModel("imageModel")) {
+        oView.getModel("imageModel").setData({});
+    }
+
+    // 🔹 4. Clear Token Model (if used)
+    if (oView.getModel("tokenImageModel")) {
+        oView.getModel("tokenImageModel").setData({
+            imageTokens: []
+        });
+    }
+
+    // 🔹 5. Reset Value States
+    this._resetFacilityValueStates();
+
+    // 🔹 6. Clear Table Selection
+    var oTable = this.byId("id_MD_Table");
+    if (oTable) {
+        oTable.removeSelections();
+    }
+
+    // 🔹 7. Close Dialog
+    this.oDialog.close();
+},
 
         onGeoLocationLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
@@ -1235,69 +1273,99 @@ sap.ui.define([
             }
         },
 
-        onFacilityFileChange: function (oEvent) {
-            const oFile = oEvent.getParameter("files")[0];
-            if (!oFile) {
-                return;
-            }
-            const MaxSize = 2 * 1024 * 1024;
-            if (oFile.size > MaxSize) {
-                sap.m.MessageToast.show("Image must be under 2 MB");
-                oEvent.getSource().clear();
-                return;
-            }
-            const oReader = new FileReader();
-            oReader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
-                this.getView().getModel("UploadModel").setData({
-                    Photo1: base64,
-                    Photo1Type: oFile.type,
-                    Photo1Name: oFile.name
-                });
-                this.getView().getModel("tokenModel").setData({
-                    tokens: [{
-                        key: oFile.name,
-                        text: oFile.name
-                    }]
-                });
-                const oVisModel = this.getView().getModel("VisibilityModel");
-                if (oVisModel) {
-                    oVisModel.setProperty("/Logo", base64);
-                }
-                sap.m.MessageToast.show("Logo uploaded successfully");
-            };
-            oReader.readAsDataURL(oFile);
-        },
+ onFacilityFileChange: function (oEvent) {
+    const oFile = oEvent.getParameter("files")[0];
+    if (!oFile) return;
 
-        onImageChange: function (oEvent) {
-            const oFiles = oEvent.getParameter("files")[0];
-            if (!oFiles) {
-                return;
-            }
-            const MaxSize = 2 * 1024 * 1024;
-            if (oFiles.size > MaxSize) {
-                sap.m.MessageToast.show("Image must be under 2 MB");
-                oEvent.getSource().clear();
-                return;
-            }
-            const oReader = new FileReader();
-            oReader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
-                this.getView().getModel("imageModel").setData({
-                    Attachment: base64,
-                    AttachmentType: oFiles.type,
-                    AttachmentName: oFiles.name
-                });
-                this.getView().getModel("tokenImageModel").setData({
-                    imageTokens: [{
-                        key: oFiles.name,
-                        text: oFiles.name
-                    }]
-                });
-                sap.m.MessageToast.show("Image uploaded successfully");
-            };
-            oReader.readAsDataURL(oFiles);
-        },
+    const MaxSize = 2 * 1024 * 1024;
+
+    if (oFile.size > MaxSize) {
+        sap.m.MessageToast.show("Image must be under 2 MB");
+        oEvent.getSource().clear();
+        return;
+    }
+
+    const oReader = new FileReader();
+
+    oReader.onload = (e) => {
+        const base64 = e.target.result.split(",")[1];
+
+        // 🔹 Save in UploadModel
+        this.getView().getModel("UploadModel").setData({
+            Photo1: base64,
+            Photo1Type: oFile.type,
+            Photo1Name: oFile.name
+        });
+
+        // 🔥 ONLY ONE FILE → REPLACE ARRAY
+        const oUploaderModel = this.getView().getModel("UploaderData");
+
+        oUploaderModel.setProperty("/attachmentslogo", [{
+            filename: oFile.name,
+            fileType: oFile.type,
+            size: (oFile.size / 1024).toFixed(2) + " KB",
+            base64: base64
+        }]);
+
+        // 🔹 Optional visibility
+        const oVisModel = this.getView().getModel("VisibilityModel");
+        if (oVisModel) {
+            oVisModel.setProperty("/Logo", base64);
+        }
+
+        sap.m.MessageToast.show("File uploaded successfully");
+    };
+
+    oReader.readAsDataURL(oFile);
+},
+
+ onImageChange: function (oEvent) {
+    const oFile = oEvent.getParameter("files")[0];
+    if (!oFile) return;
+
+    const MaxSize = 2 * 1024 * 1024;
+
+    if (oFile.size > MaxSize) {
+        sap.m.MessageToast.show("Image must be under 2 MB");
+        oEvent.getSource().clear();
+        return;
+    }
+
+    const oReader = new FileReader();
+
+    oReader.onload = (e) => {
+        const base64 = e.target.result.split(",")[1];
+
+        // 🔹 Existing logic
+        this.getView().getModel("imageModel").setData({
+            Attachment: base64,
+            AttachmentType: oFile.type,
+            AttachmentName: oFile.name
+        });
+
+        this.getView().getModel("tokenImageModel").setData({
+            imageTokens: [{
+                key: oFile.name,
+                text: oFile.name
+            }]
+        });
+
+        // 🔥 ONLY ONE IMAGE → REPLACE ARRAY
+        const oUploaderModel = this.getView().getModel("UploaderData");
+
+        oUploaderModel.setProperty("/attachmentimage", [{
+            filename: oFile.name,
+            fileType: oFile.type,
+            size: (oFile.size / 1024).toFixed(2) + " KB",
+            base64: base64,
+            category: "Image"
+        }]);
+
+        sap.m.MessageToast.show("Image uploaded successfully");
+    };
+
+    oReader.readAsDataURL(oFile);
+},
 
         onFileSizeExceeds: function () {
             sap.m.MessageToast.show(
@@ -1305,26 +1373,34 @@ sap.ui.define([
             );
         },
 
-        onTokenDelete: function () {
-            this.getView().getModel("UploadModel").setData({
-                Photo1: "",
-                Photo1Type: "",
-                Photo1Name: ""
-            });
-            this.getView().getModel("tokenModel").setData({
-                tokens: []
-            });
-        },
+       onTokenDelete: function (oEvent) {
+    const oTable = oEvent.getSource();
+    const oItem = oEvent.getParameter("listItem");
 
-        onTokenImageDelete: function () {
-            this.getView().getModel("imageModel").setData({
-                Attachment: "",
-                AttachmentType: "",
-                AttachmentName: ""
-            });
-            this.getView().getModel("tokenImageModel").setData({
-                imageTokens: []
-            });
+    const oModel = this.getView().getModel("UploaderData");
+    let aData = oModel.getProperty("/attachmentslogo");
+    // let aData1 = oModel.getProperty("/attachmentimage");
+
+    const iIndex = oTable.indexOfItem(oItem);
+    if (iIndex > -1) {
+        aData.splice(iIndex, 1);
+        oModel.setProperty("/attachmentslogo", aData);
+        // oModel.setProperty("/attachmentimage", aData1);
+    }
+},
+
+        onTokenImageDelete: function (oEvent) {
+             const oTable = oEvent.getSource();
+    const oItem = oEvent.getParameter("listItem");
+
+    const oModel = this.getView().getModel("UploaderData");
+    let aData = oModel.getProperty("/attachmentimage");
+
+    const iIndex = oTable.indexOfItem(oItem);
+    if (iIndex > -1) {
+        aData.splice(iIndex, 1);
+        oModel.setProperty("/attachmentimage", aData);
+    }
         },
 
         onpressbranchlogo: function (oEvent) {
