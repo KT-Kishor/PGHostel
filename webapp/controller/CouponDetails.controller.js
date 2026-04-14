@@ -730,19 +730,38 @@ var aMatchingCoupons = aCoupons.filter(function (item) {
 
 if (aMatchingCoupons.length > 0) {
 
+    var dNewEnd = new Date(oCoupon.EndDate);
+
+    var bInvalidEndDate = aMatchingCoupons.some(function (item) {
+        var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
+
+        return (
+            dExistingEnd &&
+            !isNaN(dExistingEnd) &&
+            dNewEnd < dExistingEnd //  NEW CONDITION
+        );
+    });
+
+    //  Block if new end date is smaller than any existing
+    if (bInvalidEndDate) {
+        this.closeBusyDialog();
+        MessageBox.error("Coupon end date must be greater than existing coupon end date");
+        return;
+    }
+
+    //  Optional: keep your active check also
+    var dToday = new Date();
     var bActiveExists = aMatchingCoupons.some(function (item) {
         var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
         return dExistingEnd && !isNaN(dExistingEnd) && dExistingEnd >= dToday;
     });
 
-    //  Block if active coupon exists
     if (bActiveExists) {
-        this.closeBusyDialog()
+        this.closeBusyDialog();
         MessageBox.error("Coupon code already exists");
-        
         return;
-        
     }
+
 }
 
 //  If no match OR only expired → proceed with your code
@@ -1098,11 +1117,56 @@ this.closeBusyDialog()
             }
         },
 
-        onDialogClose: function () {
-            if (this._oCouponDialog) {
-                this._oCouponDialog.close();
-            }
-        },
+       onDialogClose: function () {
+    var oView = this.getView();
+
+    // 🔹 1. Clear ValueState for all fields
+    var aControls = [
+        "cbBranchCode",
+        "idCouponcode",
+        "cbDiscountType",
+        "inDiscountValue",
+        "inUptoValue",
+        "inMaxUses",
+        "inMinOrderValue",
+        "cbStatus",
+        "inDescription",
+        "dpStartDate",
+        "dpEndDate"
+    ];
+
+    aControls.forEach(function (sId) {
+        var oControl = sap.ui.getCore().byId(oView.createId(sId));
+        if (oControl) {
+            oControl.setValueState("None");
+        }
+    });
+
+    // 🔹 2. Clear Model Data
+    var oVM = oView.getModel("CouponView");
+    oVM.setProperty("/CurrentCoupon", {
+        CouponCode: "",
+        DiscountType: "",
+        DiscountValue: "",
+        UptoValue: "",
+        MaxUses: "",
+        MinOrderValue: "",
+        Description: "",
+        StartDate: "",
+        EndDate: "",
+        BranchCode: "",
+        Status: ""
+    });
+
+    // 🔹 3. Reset additional flags (important for UI)
+    oVM.setProperty("/isReq", false);
+    oVM.setProperty("/isUptoEnabled", false);
+
+    // 🔹 4. Close Dialog
+    if (this._oCouponDialog) {
+        this._oCouponDialog.close();
+    }
+},
 
         async _loadRecipientContacts() {
             try {

@@ -231,7 +231,7 @@
                                 <Avatar
                                     src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
                                     displayShape="Circle"
-                                    displaySize="S"
+                                    displaySize="L"
                                     press="onpressbranchlogo"
                                     fallbackIcon="sap-icon://attachment-photo"
                                     class="sapUiTinyMarginEnd"
