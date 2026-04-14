@@ -81,7 +81,7 @@ sap.ui.define([
                 if (item.BranchCode && !mBranch.has(item.BranchCode)) {
                     mBranch.set(item.BranchCode, {
                         BranchCode: item.BranchCode,
-                        Name: item.Name
+                        Name: item.BranchName
                     });
                 }
                 if (item.CustomerID && !mCustomer.has(item.CustomerID)) {

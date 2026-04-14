@@ -84,8 +84,8 @@
                             >
 								<core:ListItem
                                     key="{BranchFilterModel>BranchCode}"
-                                    text="{BranchFilterModel>Name}"
-                                    additionalText="{BranchFilterModel>BranchCode}"
+                                    text="{BranchFilterModel>BranchCode}"
+                                    additionalText="{BranchFilterModel>Name}"
                                 />
 							</ComboBox>
 						</fb:control>
