@@ -85,6 +85,7 @@ sap.ui.define([
                     { key: "Other", text: "Other" }
                 ],
                 RelationshipOptions: [
+                    { key: "Self", text: "Self" },
                     { key: "Father", text: "Father" },
                     { key: "Mother", text: "Mother" },
                     { key: "Brother", text: "Brother" },
@@ -104,8 +105,11 @@ sap.ui.define([
                     Document: "",
                     File: "",
                     FileType: "",
-                    DocumentFile: null
+                    DocumentFile: null,
+                    IsEditMode: false
                 },
+                NewMemberDialogTitle: "Add New Member",
+                NewMemberDialogSaveText: "Save Member",
                 FamilyMembers: []
             };
         },
@@ -288,7 +292,7 @@ sap.ui.define([
         },
 
         _isSingleOccupantBooking: function () {
-            return this._getOccupantOptions().length <= 1;
+            return this._getOccupantOptions().length === 1;
         },
 
         _getPrimaryGuestName: function () {
@@ -296,25 +300,44 @@ sap.ui.define([
         },
 
         _getOccupantOptions: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
-            const aOccupants = [{
-                id: "SELF",
-                name: oHostelModel.getProperty("/FullName") || "Primary Guest"
-            }];
+            const aOccupants = [];
 
-            if (oBookingView.getProperty("/showFamilySection")) {
-                (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
-                    return oMember.Selected;
-                }).forEach(function (oMember) {
-                    aOccupants.push({
-                        id: oMember.id,
-                        name: oMember.Name || oMember.Relation || "Family Member"
-                    });
+            (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                return oMember.Selected;
+            }).forEach(function (oMember) {
+                aOccupants.push({
+                    id: oMember.id || oMember.MemberID || "",
+                    name: oMember.Name || oMember.Relation || "Family Member"
                 });
-            }
+            });
 
             return aOccupants;
+        },
+
+        _getSelectedOccupantIds: function () {
+            return this._getOccupantOptions().map(function (oOccupant) {
+                return String(oOccupant.id || "").trim();
+            }).filter(Boolean).sort();
+        },
+
+        _haveOccupantsChanged: function (aPreviousOccupantIds) {
+            const aCurrentOccupantIds = this._getSelectedOccupantIds();
+            const aPrevious = Array.isArray(aPreviousOccupantIds) ? aPreviousOccupantIds.slice().sort() : [];
+
+            if (aPrevious.length !== aCurrentOccupantIds.length) {
+                return true;
+            }
+
+            return aPrevious.some(function (sId, iIndex) {
+                return sId !== aCurrentOccupantIds[iIndex];
+            });
+        },
+
+        _getDefaultOccupant: function () {
+            const aOccupants = this._getOccupantOptions();
+
+            return aOccupants.length ? aOccupants[0] : null;
         },
 
 
@@ -747,6 +770,14 @@ sap.ui.define([
             const aValidOccupants = aOccupants.map(function (oItem) {
                 return oItem.id;
             });
+            const oDefaultOccupant = aOccupants[0] || this._getDefaultOccupant();
+            const fnGetOccupantName = function (sPersonId) {
+                const oMatch = aOccupants.find(function (oOccupant) {
+                    return oOccupant.id === sPersonId;
+                });
+
+                return oMatch ? oMatch.name : sPersonId;
+            };
 
             (this._aAllFacilities || []).forEach(function (oFacility) {
                 const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -759,8 +790,8 @@ sap.ui.define([
                     return aValidOccupants.includes(sId);
                 });
 
-                if (sSelectionMode === "PERSON" && oFacility.Selected && oFacility.SelectedPersonIds.length === 0) {
-                    oFacility.SelectedPersonIds = ["SELF"];
+                if (sSelectionMode === "PERSON" && oFacility.Selected && oFacility.SelectedPersonIds.length === 0 && oDefaultOccupant) {
+                    oFacility.SelectedPersonIds = [oDefaultOccupant.id];
                 }
 
                 if (sSelectionMode === "PERSON_QTY") {
@@ -768,7 +799,21 @@ sap.ui.define([
                         return aValidOccupants.includes(oLine.personId);
                     });
                 }
+
+                if (sSelectionMode !== "PERSON_QTY") {
+                    oFacility.PersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities.map(function (oLine) {
+                        return Object.assign({}, oLine, {
+                            personName: fnGetOccupantName(oLine.personId)
+                        });
+                    }).filter(function (oLine) {
+                        return aValidOccupants.includes(oLine.personId);
+                    }) : [];
+                }
+
+                this._setFacilitySelectionSummary(oFacility);
             }.bind(this));
+
+            this.getView().getModel("FacilityModel").refresh(true);
         },
 
 
@@ -853,15 +898,21 @@ sap.ui.define([
             const fPrice = oFacility.CurrentPrice || oFacility.UnitPrice || 0;
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             const bIsSingleOccupant = this._isSingleOccupantBooking();
-            const sPrimaryGuestName = this._getPrimaryGuestName();
+            const oDefaultOccupant = this._getDefaultOccupant();
+            const sSelectedOccupantName = oDefaultOccupant && oDefaultOccupant.name ? oDefaultOccupant.name : this._getPrimaryGuestName();
 
             let aPersonOptions = this._getOccupantOptions() || [];
             let aPersonQuantities = oFacility.PersonQuantities || [];
             let aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds.slice() : [];
             let iSinglePersonQty = 1;
 
+            if (aPersonOptions.length < 1) {
+                MessageToast.show("Please select at least one occupant before choosing a facility.");
+                return;
+            }
+
             if (bIsSingleOccupant && sSelectionMode === "PERSON") {
-                aSelectedPersonIds = ["SELF"];
+                aSelectedPersonIds = [oDefaultOccupant.id];
             }
 
             if (sSelectionMode === "PERSON_QTY") {
@@ -869,13 +920,13 @@ sap.ui.define([
 
                 if (bIsSingleOccupant) {
                     aPersonQuantities = [{
-                        personId: "SELF",
-                        personName: sPrimaryGuestName,
+                        personId: oDefaultOccupant.id,
+                        personName: oDefaultOccupant.name || sSelectedOccupantName,
                         selected: true,
                         qty: Math.max(parseInt((aPersonQuantities[0] && aPersonQuantities[0].qty) || 0, 10), 0)
                     }];
                     iSinglePersonQty = aPersonQuantities[0].qty || 1;
-                    aSelectedPersonIds = ["SELF"];
+                    aSelectedPersonIds = [oDefaultOccupant.id];
                 }
             }
 
@@ -889,7 +940,7 @@ sap.ui.define([
                 selectionMode: sSelectionMode,
                 selectionModeLabel: oFacility.SelectionModeLabel || this._getFacilitySelectionModeLabel(sSelectionMode),
                 singleOccupantMode: bIsSingleOccupant,
-                primaryGuestName: sPrimaryGuestName,
+                primaryGuestName: sSelectedOccupantName,
                 quantity: oFacility.Quantity || 1,
                 singlePersonQty: iSinglePersonQty,
                 facilityChargeType: this._getFacilityChargeType(oFacility),
@@ -1732,6 +1783,7 @@ sap.ui.define([
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
             const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "ONCE_PER_BOOKING";
+            const oDefaultOccupant = this._getDefaultOccupant();
 
             let aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
             let aPersonQuantities = oSelectionModel.getProperty("/personQuantities") || [];
@@ -1751,14 +1803,14 @@ sap.ui.define([
                 }) : [];
 
             if (bIsSingleOccupant && sSelectionMode === "PERSON") {
-                aSelectedPersonIds = ["SELF"];
+                aSelectedPersonIds = [oDefaultOccupant.id];
             }
 
             if (bIsSingleOccupant && sSelectionMode === "PERSON_QTY") {
-                aSelectedPersonIds = ["SELF"];
+                aSelectedPersonIds = [oDefaultOccupant.id];
                 aPersonQuantities = [{
-                    personId: "SELF",
-                    personName: sPrimaryGuestName,
+                    personId: oDefaultOccupant.id,
+                    personName: oDefaultOccupant.name || sPrimaryGuestName,
                     qty: iSinglePersonQty
                 }];
             }
@@ -2110,7 +2162,8 @@ sap.ui.define([
                 File: "",
                 FileType: "",
                 DocumentFile: null,
-                IsNew: false
+                IsNew: false,
+                IsEditMode: false
             };
         },
 
@@ -2120,6 +2173,7 @@ sap.ui.define([
             return {
                 id: oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex)),
                 MemberID: oMember.MemberID || oMember.ID || "",
+                Salutation: oMember.Salutation || "",
                 Name: oMember.Name || oMember.FullName || "",
                 Relation: oMember.Relation || "Other",
                 Age: oMember.Age || "",
@@ -2131,8 +2185,156 @@ sap.ui.define([
                 File: oMember.File || oMember.Document || oMemberDocument.File || "",
                 FileType: oMember.FileType || oMemberDocument.FileType || "",
                 DocumentFile: null,
-                IsNew: false
+                IsNew: false,
+                IsPrimary: !!oMember.IsPrimary
             };
+        },
+
+        _memberHasUploadedDocument: function (oMember) {
+            const sDocumentName = String(oMember && (oMember.DocumentName || oMember.FileName) || "").trim();
+            const sDocumentFile = String(oMember && (oMember.Document || oMember.File) || "").trim();
+
+            return !!(sDocumentName && sDocumentFile);
+        },
+
+        canEditMemberFromDialog: function (bIsPrimary, sDocumentName, sDocument, sFile) {
+            if (!bIsPrimary) {
+                return true;
+            }
+
+            return !this._memberHasUploadedDocument({
+                DocumentName: sDocumentName,
+                Document: sDocument,
+                File: sFile
+            });
+        },
+
+        _getPrimaryDocumentRecord: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const aUserDocuments = Array.isArray(oHostelModel && oHostelModel.getProperty("/UserDocuments")) ?
+                oHostelModel.getProperty("/UserDocuments") : [];
+            const aBookingDocuments = Array.isArray(oHostelModel && oHostelModel.getProperty("/Documents")) ?
+                oHostelModel.getProperty("/Documents") : [];
+            const aDocumentSources = aUserDocuments.length ? aUserDocuments : aBookingDocuments;
+
+            return (aDocumentSources || []).find(function (oDocument) {
+                if (!oDocument) {
+                    return false;
+                }
+
+                return !!String(oDocument.File || oDocument.Document || "").trim();
+            }) || {};
+        },
+        _getPrimaryMemberRecord: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sName = String(oHostelModel.getProperty("/FullName") || "").trim();
+            const oPrimaryDocument = this._getPrimaryDocumentRecord();
+            return {
+                id: "SELF",
+                MemberID: "",
+                Salutation: oHostelModel.getProperty("/Salutation") || "",
+                Name: sName || "Primary Guest",
+                Relation: "Self",
+                Age: "",
+                Gender: oHostelModel.getProperty("/Gender") || "",
+                Selected: false,
+                DocumentType: oPrimaryDocument.DocumentType || "",
+                DocumentName: oPrimaryDocument.DocumentName || oPrimaryDocument.FileName || "",
+                Document: oPrimaryDocument.Document || oPrimaryDocument.File || "",
+                File: oPrimaryDocument.File || oPrimaryDocument.Document || "",
+                FileType: oPrimaryDocument.FileType || "",
+                DocumentFile: null,
+                IsNew: false,
+                IsPrimary: true
+            };
+        },
+
+        _syncPrimaryMemberInFamilyMembers: function () {
+            const oBookingView = this.getView().getModel("BookingView");
+
+            if (!oBookingView) {
+                return;
+            }
+
+            const oPrimaryMember = this._getPrimaryMemberRecord();
+            const aMasterMembers = (oBookingView.getProperty("/MasterMembers") || []).filter(function (oMember) {
+                return !oMember.IsPrimary && oMember.id !== "SELF";
+            });
+            const aSelectedMembers = (oBookingView.getProperty("/FamilyMembers") || []).map(function (oMember, iIndex) {
+                const oNormalized = this._normalizeMemberRecord(oMember || {}, iIndex);
+
+                if (oNormalized.id === "SELF" || oNormalized.IsPrimary) {
+                    return Object.assign({}, oPrimaryMember, {
+                        Selected: true,
+                        IsPrimary: true
+                    });
+                }
+
+                return oNormalized;
+            }.bind(this));
+            const aMergedMasterMembers = this._mergeMembersById([oPrimaryMember].concat(aMasterMembers, aSelectedMembers)).map(function (oMember) {
+                if (oMember.id === "SELF" || oMember.IsPrimary) {
+                    return Object.assign({}, oPrimaryMember, {
+                        Selected: false,
+                        IsPrimary: true
+                    });
+                }
+
+                return oMember;
+            });
+
+            aMergedMasterMembers.sort(function (oLeft, oRight) {
+                if (oLeft.IsPrimary) {
+                    return -1;
+                }
+
+                if (oRight.IsPrimary) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+            aSelectedMembers.sort(function (oLeft, oRight) {
+                if (oLeft.IsPrimary) {
+                    return -1;
+                }
+
+                if (oRight.IsPrimary) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+            oBookingView.setProperty("/MasterMembers", aMergedMasterMembers);
+            oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+        },
+
+        _persistPrimaryMemberDraft: function (oDraft) {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            let aDocuments = oHostelModel.getProperty("/Documents");
+            const oPrimaryDocument = {
+                id: "DOC_PRIMARY",
+                DocumentType: oDraft.DocumentType || "",
+                File: oDraft.File || oDraft.Document || "",
+                Document: oDraft.Document || oDraft.File || "",
+                FileName: oDraft.DocumentName || "",
+                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
+                IsNew: !(oDraft.DocumentType && (oDraft.File || oDraft.Document) && oDraft.DocumentName)
+            };
+
+            oHostelModel.setProperty("/FullName", oDraft.Name || "");
+            oHostelModel.setProperty("/Gender", oDraft.Gender || "");
+
+            if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
+                aDocuments = [oPrimaryDocument];
+            } else {
+                aDocuments = [Object.assign({}, aDocuments[0], oPrimaryDocument)];
+            }
+
+            oHostelModel.setProperty("/Documents", aDocuments);
+            oHostelModel.refresh(true);
         },
 
         _mergeMembersById: function (aMembers) {
@@ -2179,6 +2381,7 @@ sap.ui.define([
             const aCombined = this._mergeMembersById([].concat(aMasterMembers, aServerMemberList, aSelectedMembers));
 
             oBookingView.setProperty("/MasterMembers", aCombined);
+            this._syncPrimaryMemberInFamilyMembers();
             oBookingView.refresh(true);
         },
 
@@ -2223,6 +2426,11 @@ sap.ui.define([
             oDialog.open();
         },
         MS_viewimage: function (oEvent) {
+            const oPreviewContext = oEvent.getSource().getBindingContext("BookingView");
+            const oPreviewData = oPreviewContext?.getObject();
+
+            this._previewDocument(oPreviewData);
+            return;
 
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
@@ -2437,7 +2645,7 @@ sap.ui.define([
             const aSelectedContexts = oTable.getSelectedContexts("BookingView");
             const oBookingView = this.getView().getModel("BookingView");
             const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
-            const iAllowedFamilyMembers = iMaxPersons - 1; // primary person counts as 1
+            const iAllowedFamilyMembers = iMaxPersons;
 
             // If selection exceeds allowed family members, trim selection
             if (aSelectedContexts.length > iAllowedFamilyMembers) {
@@ -2458,6 +2666,7 @@ sap.ui.define([
         onConfirmMemberSelection: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oTable = this.byId("memberSelectTable");
+            const aPreviousOccupantIds = this._getSelectedOccupantIds();
             const aSelectedContexts = oTable ? oTable.getSelectedContexts("BookingView") : [];
             const aSelectedMembers = aSelectedContexts.map(function (oCtx, iIndex) {
                 const oMember = this._normalizeMemberRecord(oCtx.getObject(), iIndex);
@@ -2465,15 +2674,23 @@ sap.ui.define([
                 return oMember;
             }.bind(this));
 
-            // Capacity validation: total persons (primary + selected family members) must not exceed room capacity
             const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
-            const iTotalPersons = 1 + aSelectedMembers.length;
+            const iTotalPersons = aSelectedMembers.length;
             if (iTotalPersons > iMaxPersons) {
                 MessageToast.show("Selected room capacity does not allow more members.");
                 return;
             }
 
+            if (iTotalPersons < 1) {
+                MessageToast.show("Please select at least one member.");
+                return;
+            }
+
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+            this._syncPrimaryMemberInFamilyMembers();
+            if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
+                this._clearSelectedFacilities();
+            }
             oBookingView.refresh(true);
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
@@ -2493,6 +2710,34 @@ sap.ui.define([
             const oDialog = await this._getNewMemberDialog();
 
             oBookingView.setProperty("/NewMemberDraft", oDraft);
+            oBookingView.setProperty("/NewMemberDialogTitle", "Add New Member");
+            oBookingView.setProperty("/NewMemberDialogSaveText", "Save Member");
+            oBookingView.refresh(true);
+            oDialog.open();
+            this._attachDocumentInfoHover();
+        },
+
+        onEditMemberFromDialog: async function (oEvent) {
+            const oBookingView = this.getView().getModel("BookingView");
+            const oContext = oEvent.getSource().getBindingContext("BookingView");
+            const oMember = oContext ? oContext.getObject() : null;
+            const oDialog = await this._getNewMemberDialog();
+
+            if (!oMember) {
+                return;
+            }
+
+            if (oMember.IsPrimary && this._memberHasUploadedDocument(oMember)) {
+                MessageToast.show("Primary guest details can be edited here only until the document is uploaded.");
+                return;
+            }
+
+            oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(oMember), {
+                IsEditMode: true,
+                IsNew: false
+            }));
+            oBookingView.setProperty("/NewMemberDialogTitle", "Edit Member");
+            oBookingView.setProperty("/NewMemberDialogSaveText", "Update Member");
             oBookingView.refresh(true);
             oDialog.open();
             this._attachDocumentInfoHover();
@@ -2512,6 +2757,8 @@ sap.ui.define([
             const oFileUploader = this.byId("newMemberFileUploader");
 
             oBookingView.setProperty("/NewMemberDraft", this._createMemberDraft());
+            oBookingView.setProperty("/NewMemberDialogTitle", "Add New Member");
+            oBookingView.setProperty("/NewMemberDialogSaveText", "Save Member");
             oBookingView.refresh(true);
 
             [
@@ -2610,12 +2857,25 @@ sap.ui.define([
         },
 
         _previewDocument: function (oDoc) {
-            const sRawBase64 = String(oDoc?.File || oDoc?.Document || "").trim();
+            const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
 
-            if (!sRawBase64) {
+            if (!sRawSource) {
                 MessageToast.show("No document to preview.");
                 return;
             }
+
+            const aDataUrlParts = /^data:([^;]+);base64,(.+)$/i.exec(sRawSource);
+            const sRawBase64 = aDataUrlParts ? aDataUrlParts[2] : sRawSource;
+            const normalizeBase64 = function (sValue) {
+                let sNormalized = String(sValue || "").replace(/\s/g, "").replace(/-/g, "+").replace(/_/g, "/");
+                const iRemainder = sNormalized.length % 4;
+
+                if (iRemainder) {
+                    sNormalized += "=".repeat(4 - iRemainder);
+                }
+
+                return sNormalized;
+            };
 
             const autoDecodeBase64 = function (sValue) {
                 if (!sValue) {
@@ -2640,18 +2900,45 @@ sap.ui.define([
                 return sLast;
             };
 
-            const sBase64 = autoDecodeBase64(sRawBase64);
-            let sMimeType = String(oDoc.FileType || "").toLowerCase();
+            const sBase64 = normalizeBase64(autoDecodeBase64(sRawBase64));
+            let sMimeType = String(oDoc.FileType || oDoc.MimeType || "").toLowerCase().trim();
+
+            if (!sMimeType && aDataUrlParts) {
+                sMimeType = String(aDataUrlParts[1] || "").toLowerCase();
+            }
+
+            if (sMimeType === "pdf" || sMimeType === ".pdf") {
+                sMimeType = "application/pdf";
+            } else if (sMimeType === "jpg" || sMimeType === "jpeg" || sMimeType === ".jpg" || sMimeType === ".jpeg") {
+                sMimeType = "image/jpeg";
+            } else if (sMimeType === "png" || sMimeType === ".png") {
+                sMimeType = "image/png";
+            } else if (sMimeType === "webp" || sMimeType === ".webp") {
+                sMimeType = "image/webp";
+            }
 
             if (!sMimeType) {
                 if (sBase64.startsWith("iVB")) {
                     sMimeType = "image/png";
                 } else if (sBase64.startsWith("/9j")) {
                     sMimeType = "image/jpeg";
+                } else if (sBase64.startsWith("UklGR")) {
+                    sMimeType = "image/webp";
                 } else if (sBase64.startsWith("JVBER")) {
                     sMimeType = "application/pdf";
                 }
             }
+
+            console.log("[Booking] Preview document debug", {
+                fileName: oDoc?.FileName || oDoc?.DocumentName || "",
+                fileType: oDoc?.FileType || oDoc?.MimeType || "",
+                detectedMimeType: sMimeType,
+                rawSourcePrefix: sRawSource.slice(0, 120),
+                rawSourceLength: sRawSource.length,
+                hasDataUrlPrefix: !!aDataUrlParts,
+                normalizedBase64Prefix: sBase64.slice(0, 120),
+                normalizedBase64Length: sBase64.length
+            });
 
             if (sMimeType.indexOf("image/") === 0) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
@@ -2695,7 +2982,24 @@ sap.ui.define([
             }
 
             if (sMimeType === "application/pdf") {
-                const sByteChars = atob(sBase64);
+                let sByteChars = "";
+
+                try {
+                    sByteChars = atob(sBase64);
+                } catch (oError) {
+                    console.error("[Booking] PDF preview decode failed", {
+                        error: oError?.message || oError,
+                        fileName: oDoc?.FileName || oDoc?.DocumentName || "",
+                        fileType: oDoc?.FileType || oDoc?.MimeType || "",
+                        rawSourcePrefix: sRawSource.slice(0, 200),
+                        rawSourceLength: sRawSource.length,
+                        normalizedBase64Prefix: sBase64.slice(0, 200),
+                        normalizedBase64Length: sBase64.length
+                    });
+                    MessageToast.show("PDF content is not valid base64. Check console.");
+                    return;
+                }
+
                 const aByteArrays = [];
 
                 for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
@@ -2812,22 +3116,52 @@ sap.ui.define([
             oDraft.Relation = oRelationCombo.getSelectedKey() || String(oRelationCombo.getValue() || "").trim();
             oDraft.DocumentType = oDocumentTypeCombo.getSelectedKey() || String(oDocumentTypeCombo.getValue() || "").trim();
             oDraft.id = oDraft.id || ("FM_" + Date.now());
-            oDraft.MemberID = "";
-            oDraft.Selected = false;
+            oDraft.MemberID = oDraft.MemberID || "";
             oDraft.IsNew = false;
+            oDraft.IsEditMode = false;
+            oDraft.IsPrimary = !!oDraft.IsPrimary;
 
-            oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers, [oDraft])));
-            oBookingView.setProperty("/FamilyMembers", this._mergeMembersById(aSelectedMembers).map(function (oMember) {
-                oMember.Selected = true;
-                return oMember;
-            }));
+            const bIsEditMode = !!(oBookingView.getProperty("/NewMemberDraft/IsEditMode"));
+            const bIsPrimaryMember = !!oDraft.IsPrimary;
+            const oExistingMasterMember = aMasterMembers.find(function (oMember) {
+                return oMember.id === oDraft.id;
+            });
+            const oExistingSelectedMember = aSelectedMembers.find(function (oMember) {
+                return oMember.id === oDraft.id;
+            });
+
+            oDraft.Selected = bIsEditMode ? !!(oExistingSelectedMember && oExistingSelectedMember.Selected) : true;
+
+            if (bIsPrimaryMember) {
+                oDraft.Relation = "Self";
+                oDraft.Selected = true;
+                this._persistPrimaryMemberDraft(oDraft);
+            } else {
+                oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers.filter(function (oMember) {
+                    return oMember.id !== oDraft.id;
+                }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
+
+                if (oExistingSelectedMember || !bIsEditMode) {
+                    oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
+                        return oMember.id !== oDraft.id;
+                    }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
+                        if (oMember.id === oDraft.id) {
+                            oMember.Selected = oDraft.Selected;
+                        }
+
+                        return oMember;
+                    }));
+                }
+            }
+
+            this._syncPrimaryMemberInFamilyMembers();
             oBookingView.refresh(true);
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
             this._rebuildSelectedFacilities();
             this._recalculateSummary();
 
-            MessageToast.show("Member added successfully.");
+            MessageToast.show(bIsEditMode ? "Member updated successfully." : "Member added successfully.");
             this.onCloseNewMemberDialog();
             this._syncMemberDialogSelections();
         },
@@ -3790,6 +4124,7 @@ sap.ui.define([
 
             oBookingView.setProperty("/MasterMembers", aMasterMembers);
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+            this._syncPrimaryMemberInFamilyMembers();
             this._updateSelectedPersonsFromFamily();
 
             this._applySelectedPlanPrice();
@@ -3817,6 +4152,7 @@ sap.ui.define([
             oHostelModel.setProperty("/State", oUser.State || oHostelModel.getProperty("/State") || "");
             oHostelModel.setProperty("/City", oUser.City || oHostelModel.getProperty("/City") || "");
             oHostelModel.setProperty("/Address", oHostelModel.getProperty("/Address") || oUser.Address || "");
+            this._syncPrimaryMemberInFamilyMembers();
         },
 
         _syncPropertyTypeState: function () {
@@ -3825,9 +4161,7 @@ sap.ui.define([
             const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
             const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const iCapacity = Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
-            const bShowFamilySection = this._shouldShowFamilySection(sPropertyType, iCapacity);
             const aOriginalOptions = this._buildKeyTextList(iCapacity);
-            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
 
             oBookingView.setProperty("/showGSTField", this._shouldShowGSTField(sPropertyType));
             oBookingView.setProperty("/showBusinessTravelOption", bSupportsCustomerGST);
@@ -3838,23 +4172,11 @@ sap.ui.define([
                 oBookingView.setProperty("/showBusinessGSTSection", false);
             }
 
-            if (!bShowFamilySection) {
-                oBookingView.setProperty("/showFamilySection", false);
-                oBookingView.setProperty("/maxPersons", 1);
-                oModel.setProperty("/NoOfPersonsList", [{ key: "1", text: "1" }]);
-                oModel.setProperty("/SelectedPerson", "1");
-                aFamilyMembers.forEach(function (oMember) {
-                    oMember.Selected = false;
-                });
-                oBookingView.refresh(true);
-                this._syncSelectedFacilityPersonsWithOccupants();
-                return;
-            }
-
             oBookingView.setProperty("/showFamilySection", true);
             oBookingView.setProperty("/maxPersons", iCapacity);
             oBookingView.setProperty("/originalPersonOptions", aOriginalOptions);
             oModel.setProperty("/NoOfPersonsList", aOriginalOptions);
+
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
         },
@@ -4108,6 +4430,7 @@ sap.ui.define([
 
         onFamilyMemberSelect: function (oEvent) {
             const oBookingView = this.getView().getModel("BookingView");
+            const aPreviousOccupantIds = this._getSelectedOccupantIds();
             const oMember = oEvent.getSource().getBindingContext("BookingView").getObject();
 
             if (oMember.IsNew) {
@@ -4131,6 +4454,9 @@ sap.ui.define([
             }
 
             oMember.Selected = bSelected;
+            if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
+                this._clearSelectedFacilities();
+            }
             oBookingView.refresh(true);
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
@@ -4139,6 +4465,7 @@ sap.ui.define([
         },
         onDeleteFamilyMemberRow: function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
+            const aPreviousOccupantIds = this._getSelectedOccupantIds();
             const oContext = oEvent.getSource().getBindingContext("BookingView");
             const sPath = oContext.getPath(); // e.g. /FamilyMembers/3
             const aMembers = oModel.getProperty("/FamilyMembers") || [];
@@ -4147,6 +4474,10 @@ sap.ui.define([
             if (!isNaN(iIndex) && iIndex > -1) {
                 aMembers.splice(iIndex, 1);
                 oModel.setProperty("/FamilyMembers", aMembers);
+                this._syncPrimaryMemberInFamilyMembers();
+                if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
+                    this._clearSelectedFacilities();
+                }
                 oModel.refresh(true);
                 this._updateSelectedPersonsFromFamily();
                 this._syncSelectedFacilityPersonsWithOccupants();
@@ -4161,12 +4492,12 @@ sap.ui.define([
         _updateSelectedPersonsFromFamily: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
-            let iSelectedPerson = 1;
+            let iSelectedPerson = (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                return oMember.Selected;
+            }).length;
 
-            if (oBookingView.getProperty("/showFamilySection")) {
-                iSelectedPerson += (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
-                    return oMember.Selected;
-                }).length;
+            if (iSelectedPerson < 1) {
+                iSelectedPerson = 1;
             }
 
             oModel.setProperty("/SelectedPerson", String(iSelectedPerson));
@@ -4652,7 +4983,7 @@ sap.ui.define([
             const mTempMemberIds = this._getTempMemberIdMap();
 
             return (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
-                return !oMember.IsNew && !!oMember.Selected;
+                return !oMember.IsNew && !oMember.IsPrimary && !!oMember.Selected;
             }).map(function (oMember) {
                 return {
                     TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
@@ -4717,7 +5048,7 @@ sap.ui.define([
             let iTempIndex = 1;
 
             aMembers.filter(function (oMember) {
-                return !oMember.IsNew && !!oMember.Selected;
+                return !oMember.IsNew && !oMember.IsPrimary && !!oMember.Selected;
             }).forEach(function (oMember) {
                 const sTempMemberId = String(oMember.TempMemberID || ("TMP" + iTempIndex)).trim();
                 const aKeys = [
@@ -4982,6 +5313,7 @@ sap.ui.define([
 
         _validateBookingBeforePayment: function () {
             const oModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
             const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
             const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const bIsBusinessTravel = !!oModel.getProperty("/IsBusinessTravel");
@@ -4993,11 +5325,18 @@ sap.ui.define([
                 !!sPropertyType &&
                 utils._LCstrictValidationComboBox(this.getView().byId(("BookRoom_ID")), "ID") &&
                 utils._LCvalidateDate(this.getView().byId(("BookStartdate_ID")), "ID") &&
-                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID") &&  utils._LCvalidateMandatoryField(this.getView().byId(("BookSalutation_Id")), "ID") &&  utils._LCvalidateMandatoryField(this.getView().byId(("BookFullname_Id")), "ID")
+                utils._LCvalidateDate(this.getView().byId(("BookEnddate_ID")), "ID")
 
             )
             if (!isMandatoryValid) {
                 MessageToast.show("Please fill mandatory booking details");
+                return false;
+            }
+
+            if ((oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                return !!oMember.Selected;
+            }).length < 1) {
+                MessageToast.show("Please select at least one member from the member list.");
                 return false;
             }
 

@@ -16,7 +16,7 @@
     >
         <customHeader>
             <OverflowToolbar>
-                <Title text="Add New Member" />
+                <Title text="{BookingView>/NewMemberDialogTitle}" />
             </OverflowToolbar>
         </customHeader>
 
@@ -165,7 +165,7 @@
 
         <beginButton>
             <Button
-                text="Save Member"
+                text="{BookingView>/NewMemberDialogSaveText}"
                 press="onSaveNewMember"
                 class="myUnifiedBtn"
             />

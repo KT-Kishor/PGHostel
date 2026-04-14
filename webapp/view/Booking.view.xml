@@ -141,52 +141,7 @@
                                 showValueStateMessage="true"
                                 placeholder="Select end date"
                             />
-                            <Label
-                                text="Primary Member"
-                              
-                            />
-                            <HBox
-                                width="100%"
-                                fitContainer="true"
-                                renderType="Bare"
-                                wrap="NoWrap"
-                                alignItems="Center"
-                            >
-                                <layoutData>
-                                    <l:GridData span="XL8 L8 M8 S12" />
-                                </layoutData>
-                                <Input
-                                id="BookSalutation_Id"
-                                    value="{HostelModel>/Salutation}"
-                                    liveChange="onSalutationclick"
-                                    valueStateText="Select salutation"
-                                >
-                                    <layoutData>
-                                        <FlexItemData
-                                            growFactor="1"
-                                            baseSize="1rem"
-                                        />
-                                    </layoutData>
-                                </Input>
-                                <Input
-                                    value="{HostelModel>/FullName}"
-                                    id="BookFullname_Id"
-                                    change="onChangeFullname"
-                                    liveChange="onChangeFullname"
-                                    valueStateText="Enter your full name (minimum 3 characters)"
-                                    class="sapUiTinyMarginBegin"
-                                    placeholder="Enter your full name"
-                                    showValueStateMessage="true"
-                                >
-                                    <layoutData>
-                                        <FlexItemData
-                                            growFactor="3"
-                                            baseSize="0"
-                                        />
-                                    </layoutData>
-                                </Input>
-                            </HBox>
-                            <Label
+                            <!-- <Label
                                 text="Upload Document"
                                 visible="{BookingView>/showCustomerDocumentUpload}"
                             />
@@ -264,21 +219,19 @@
                                         </HBox>
                                 
                                 </HBox>
-                            </VBox>
+                            </VBox> -->
                         </f:SimpleForm>
                     </Panel>
 
                     <!-- Guest Information Section -->
                     <Title
-                        text="Select Co-Members"
+                        text="Select Occupant"
                         class="booking-section-header"
                         wrapping="true"
-                        visible="{BookingView>/showFamilySection}"
                     />
 
                     <Panel
                         class="customBookingPanel booking-panel-enhanced"
-                        visible="{BookingView>/showFamilySection}"
                     >
                         <VBox class="sapUiTinyMargin">
                             <Input
@@ -329,14 +282,14 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-                                            <Text text="{BookingView>Name}" />
+                                            <Text
+                                                text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
+                                            />
                                             <!-- <Select selectedKey="{BookingView>Gender}" items="{BookingView>/GenderOptions}">
                                                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select> -->
                                             <Text text="{BookingView>Gender}" />
-                                            <Text
-                                                text="{BookingView>Relation}"
-                                            />
+                                            <Text text="{BookingView>Relation}" />
                                             <!-- <Select selectedKey="{BookingView>DocumentType}" items="{BookingView>/DocumentTypeOptions}">
                                                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select>

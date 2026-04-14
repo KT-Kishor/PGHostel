@@ -49,11 +49,12 @@
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Relationship" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
+                        <Column width="5rem"><Text text="Edit" /></Column>
                     </columns>
                     <items>
                         <ColumnListItem>
                             <cells>
-                                <Text text="{BookingView>Name}" />
+                                <Text text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}" />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
                                 <Text text="{BookingView>DocumentType}" />
@@ -62,6 +63,22 @@
                                 text="{BookingView>DocumentName}"
                                 press="MS_viewimage"
                             />
+                                <Button
+                                    icon="sap-icon://edit"
+                                    type="Transparent"
+                                    tooltip="Edit member"
+                                    press="onEditMemberFromDialog"
+                                    visible="{
+                                        parts: [
+                                            { path: 'BookingView>IsPrimary' },
+                                            { path: 'BookingView>DocumentName' },
+                                            { path: 'BookingView>Document' },
+                                            { path: 'BookingView>File' }
+                                        ],
+                                        formatter: '.canEditMemberFromDialog'
+                                    }"
+                                    class="myUnifiedBtn"
+                                />
                             </cells>
                         </ColumnListItem>
                     </items>
