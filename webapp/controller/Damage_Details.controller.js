@@ -260,18 +260,18 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-            var flag = this.getView().getModel("VisibleModel").getProperty("/visible");
-            if (flag === true) {
-                sap.m.MessageBox.show("Please Submit before navigating back?", {
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    styleClass: "myUnifiedBtn",
-                    title: "Warning"
-                });
-            } else {
+            // var flag = this.getView().getModel("VisibleModel").getProperty("/visible");
+            // if (flag === true) {
+            //     sap.m.MessageBox.show("Please Submit before navigating back?", {
+            //         icon: sap.m.MessageBox.Icon.WARNING,
+            //         styleClass: "myUnifiedBtn",
+            //         title: "Warning"
+            //     });
+            // } else {
                 this.getOwnerComponent().getRouter().navTo("RouteDamage",{
                       sPath:"DamageDetails"
                 });
-            }
+            // }
         },
 
         onHome: function () {

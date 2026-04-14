@@ -126,16 +126,15 @@ sap.ui.define([
             let filters = {};
             if (sCustomerID) filters.CustomerID = sCustomerID;
             if (sBookingID) filters.BookingID = sBookingID;
-            if (sBranch) filters.BranchCode = sBranch;
             if (oLogin.Role === "Admin") {
                 filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
                 filters.Role = "Admin";
             }else {
                     filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
             }
+             if (sBranch) filters.BranchCode = sBranch ? sBranch : filters.BranchCode;
 
             if (oLogin.Role === "SuperAdmin" && !filters.StartDate) filters.GetAll = true;
-
             function formatLocalDate(d) {
                 return sap.ui.core.format.DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" }).format(d);
             }

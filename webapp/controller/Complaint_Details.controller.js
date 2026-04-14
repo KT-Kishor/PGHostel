@@ -19,9 +19,10 @@ sap.ui.define([
             this.getView().byId("PCD_id_RoomNo").setSelectedKey("")
             this.getView().byId("CD_id_Status").setSelectedKey("")
             this.commonLoginFunction();
-            await this.CD_read()
+            this._ViewDatePickersReadOnly(["CD_id_EstimatedDate", "CD_id_ResolutionDate"],this.getView());
+
+            await this.CD_read(true)
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this._ViewDatePickersReadOnly(["CD_id_EstimatedDate", "CD_id_ResolutionDate"], sap.ui.getCore());
 
             this.CD_Staff()
 
@@ -60,7 +61,15 @@ sap.ui.define([
             })
             this.closeBusyDialog()
         },
-        CD_read: async function () {
+        CD_Search:function(){
+            if(!this.byId("PCD_id_RoomNo").getSelectedKey() && !this.byId("CD_id_Status").getSelectedKey()){
+
+            this.CD_read(true)
+            }else{
+                this.CD_read(false)
+            }
+        },
+        CD_read: async function (flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -107,7 +116,7 @@ sap.ui.define([
                         BranchName: branch ? branch.Name : complain.BranchID
                     };
                 });
-                if (!this._originalRoomdata) {
+                if (flag===true) {
                     this._originalRoomdata = response;
                 }
                 var model = new JSONModel(response);
@@ -276,7 +285,7 @@ sap.ui.define([
             var Model = selected.getBindingContext("ComplaintModel");
             var data = Model.getObject();
             var Staffs = StaffModel.filter(function (element) {
-                return element.BranchCode === data.BranchCode;
+                return element.BranchCode.includes(data.BranchCode);
             });
             var oFilteredModel = new sap.ui.model.json.JSONModel(Staffs);
             this.getView().setModel(oFilteredModel, "FilteredStaffModel");
@@ -297,6 +306,7 @@ sap.ui.define([
             }
             this.CD_Dialog.open();
             this.byId("CD_id_ResolutionDate").setVisible(false);
+
             if (data.Status === "Pending") {
                 this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("").setValueState("None");
                 this.byId("CD_id_EstimatedDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
@@ -433,7 +443,7 @@ sap.ui.define([
                     ComplaintID: Complaint.ComplaintID
                 },
             });
-            this.CD_read()
+            this.CD_read(true)
             MessageToast.show(this.i18nModel.getText("ComplaintUpdatedSuccessfully"));
 
             var table = this.byId("idPOTable1");

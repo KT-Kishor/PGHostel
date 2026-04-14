@@ -24,7 +24,7 @@
                 useToolbar="false"
                 clear="CD_onPressClear"
                 showClearOnFB="true"
-                search="CD_read"
+                search="CD_Search"
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
