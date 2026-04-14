@@ -18,6 +18,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
                 var sPath= oEvent.getParameter("arguments").sPath
+                this.sPath= oEvent.getParameter("arguments").sPath
                 if(sPath==="TilePage"){
                    this.onClearAndSearch("MV_id_FilterbarEmployee");
                 }
@@ -115,7 +116,7 @@ sap.ui.define([
                     const index = aStatusOrder.indexOf(item.Status);
                     item._StatusPriority = index === -1 ? 999 : index;
                 });
-                if (!this._originalStaffData || flag === "true") {
+                if ((!this._originalStaffData || flag === "true") && this.sPath==="TilePage") {
                     this._originalStaffData = response;
                 }
                 let finalData;

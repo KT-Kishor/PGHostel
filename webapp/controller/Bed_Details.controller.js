@@ -50,7 +50,7 @@ sap.ui.define([
                 this.getView().setModel(oTokenModel, "tokenModel");
                 this.getView().setModel(oUploaderData, "UploaderData");
                 await this._loadBranchCode()
-                await this.Onsearch()
+                await this.Onsearch(true)
                 this.Customerdata()
             } catch (err) {
                 this.closeBusyDialog()

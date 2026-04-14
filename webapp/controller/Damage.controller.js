@@ -40,6 +40,8 @@ sap.ui.define([
             this.getView().setModel(model, "DamageModel");
             this._makeDatePickersReadOnly(["HD_id_DamageDate"]);
             var sPath = oEvent.getParameter("arguments").sPath;
+            this.sPath = oEvent.getParameter("arguments").sPath;
+
             if(sPath==="TilePage"){
             this.onClearAndSearch("HD_id_FilterbarEmployee");
             }
@@ -325,7 +327,13 @@ sap.ui.define([
             }
         },
         DamageOnsearch: function () {
-            this.Onsearch("false");
+              if(!this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey()  && !this.byId("DM_id_Status").getSelectedKey()){
+
+             this.Onsearch("true");
+            }else{
+                this.Onsearch("false")
+            }
+        
         },
 
         onLiveChangeItemName: function (oEvent) {
@@ -469,7 +477,7 @@ sap.ui.define([
                     };
                 });
 
-                if (flag === "true") {
+                if (flag === "true" &&  this.sPath==="TilePage") {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
                 } else if (!this._originalRoomdata) {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));

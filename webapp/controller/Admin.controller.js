@@ -37,6 +37,8 @@ sap.ui.define([
             }
             // this._loadHostelMasterData();
                  var sPath = oEvent.getParameter("arguments").sPath;
+                 this.sPath = oEvent.getParameter("arguments").sPath;
+
             if(sPath==="TilePage"){
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
             this.getView().byId("PO_id_Status").setSelectedKey("")
@@ -258,7 +260,7 @@ sap.ui.define([
                             BranchName: branch ? branch.Name : customer.BranchCode // fallback
                         };
                     });
-                    if (!this._originalRoomdata || flag === true) {
+                    if ((!this._originalRoomdata || flag === true) && this.sPath==="TilePage") {
                         this._originalRoomdata = mappedData;
                     }
 
@@ -298,16 +300,16 @@ sap.ui.define([
 
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
-                // PO_id_BookingId: new Set(),
+                PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
                 PO_id_Status: new Set(),
                 PO_id_CustomerName: new Set()
             };
 
             data.forEach(item => {
-                // if (item.BookingID && item.BookingID.trim()) {
-                //     uniqueValues.PO_id_BookingId.add(item.BookingID.trim());
-                // }
+                if (item.BookingID && item.BookingID.trim()) {
+                    uniqueValues.PO_id_BookingId.add(item.BookingID.trim());
+                }
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
                 }
@@ -321,7 +323,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["PO_id_CompanyName", "PO_id_Status", "PO_id_CustomerName"].forEach(field => {
+            ["PO_id_BookingId","PO_id_CompanyName", "PO_id_Status", "PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 

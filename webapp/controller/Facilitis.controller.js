@@ -40,6 +40,7 @@ sap.ui.define([
 
             this.getView().setModel(oTokenModel, "tokenModel");
             this.getView().setModel(oUploaderData, "UploaderData");
+            this.sPath=oEvent.getParameter("arguments").sPath
             if (oEvent.getParameter("arguments").sPath === "TilePage") {
             this.onClearAndSearch("FO_id_FilterbarEmployee");
             }
@@ -150,7 +151,7 @@ sap.ui.define([
                 });
                 this.getOwnerComponent().setModel(new JSONModel(responseData), "Facilities");
 
-                if (filter.filter === "Initial") {
+                if (filter.filter === "Initial" && this.sPath === "TilePage") {
                     const facilitiesData = [
                         ...new Map(
                             responseData
