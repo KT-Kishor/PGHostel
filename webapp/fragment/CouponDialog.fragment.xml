@@ -5,35 +5,18 @@
     xmlns:f="sap.ui.layout.form"
 >
     <Dialog
-        id="couponDialog"
-        draggable="true"
+         draggable="true"
         resizable="true"
-        afterClose="onDialogAfterClose"
-        contentWidth="28rem"
-        contentHeight="auto"
+         title="{= ${CouponView>/DialogMode} === 'Add' ? 'Add Coupon' : 'Edit Coupon'}"
     >
-        <customHeader>
-            <Bar class="barheader">
-                <contentMiddle>
-                    <Title
-                        text="{= ${CouponView>/DialogMode} === 'Add' ? 'Add Coupon' : 'Edit Coupon'}"
-                    />
-                </contentMiddle>
-            </Bar>
-        </customHeader>
-        <content>
+       
+       
             <f:SimpleForm
                 editable="true"
-                layout="ResponsiveGridLayout"
-                labelSpanXL="3"
-                labelSpanL="3"
-                labelSpanM="3"
-                emptySpanXL="4"
-                emptySpanL="4"
-                emptySpanM="4"
-                columnsXL="2"
-                columnsL="2"
-                columnsM="1"
+                layout="ColumnLayout"
+               labelSpanXL="12" labelSpanL="12" labelSpanM="12"
+         labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2"
+         columnsL="2" columnsM="1"
             >
                 <f:content>
                     <Label
@@ -211,7 +194,7 @@
                     />
                 </f:content>
             </f:SimpleForm>
-        </content>
+  
         <beginButton>
             <Button
                 class="myUnifiedBtn"
