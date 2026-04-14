@@ -8,8 +8,8 @@
          draggable="true"
         resizable="true"
          title="{= ${CouponView>/DialogMode} === 'Add' ? 'Add Coupon' : 'Edit Coupon'}"
+         contentWidth="80%"
     >
-       
        
             <f:SimpleForm
                 editable="true"
@@ -51,6 +51,7 @@
                         placeholder="{i18n>enterCoupon}"
                         maxLength="10"
                         valueStateText="{i18n>pleaseEnterCoupon}"
+                        editable="{= ${CouponView>/DialogMode} === 'Edit' ? false : true}"
                     />
 
                     <Label

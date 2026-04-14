@@ -719,8 +719,13 @@ var sNewCode = (oCoupon.CouponCode || "").trim().toLowerCase();
 var dToday = new Date();
 
 // 🔹 Find matching coupons
+var sNewBranch = (oCoupon.BranchCode || "").trim().toLowerCase();
+
 var aMatchingCoupons = aCoupons.filter(function (item) {
-    return (item.CouponCode || "").trim().toLowerCase() === sNewCode;
+    return (
+        (item.CouponCode || "").trim().toLowerCase() === sNewCode &&
+        (item.BranchCode || "").trim().toLowerCase() === sNewBranch
+    );
 });
 
 if (aMatchingCoupons.length > 0) {
@@ -740,7 +745,7 @@ if (aMatchingCoupons.length > 0) {
     }
 }
 
-// ✅ If no match OR only expired → proceed with your code
+//  If no match OR only expired → proceed with your code
 oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 oCoupon.CreatedBy =
     oView.getModel("LoginModel")
@@ -762,7 +767,7 @@ this.closeBusyDialog()
                             CouponId: oCoupon.CouponId
                         },
                         data: {
-                           
+                            
                             DiscountType: oCoupon.DiscountType,
                             DiscountValue: oCoupon.DiscountValue,
                             UptoValue: oCoupon.UptoValue,

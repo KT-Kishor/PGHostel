@@ -6,29 +6,16 @@
 	xmlns:u="sap.ui.unified"
 	xmlns:mvc="sap.ui.core.mvc">
 	<Dialog id="FacilitiesDialog"
-        type="Message"
-        class="sapUiContentPadding"
-        resizable="true"
-        draggable="true"
-        contentWidth="28rem"
-        contentHeight="auto" >
-		<customHeader>
-			<Bar class="barheader">
-				<contentMiddle>
-					<Title text="{i18n>addfacilities}" />
-				</contentMiddle>
-			</Bar>
-		</customHeader>
+    title="{i18n>addfacilities}"
+    contentWidth="80%"
+        >
+		
 		<f:SimpleForm
             editable="true"
-            layout="ResponsiveGridLayout"
-            labelSpanXL="4"
-            labelSpanL="3"
-            labelSpanM="4"
-            labelSpanS="12"
-            columnsXL="2"
-            columnsL="2"
-            columnsM="1">
+                layout="ColumnLayout"
+               labelSpanXL="12" labelSpanL="12" labelSpanM="12"
+         labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2"
+         columnsL="2" columnsM="1">
 			<f:content>
 				<Label
                     text="{i18n>MSbranchCode}"
@@ -197,7 +184,7 @@
 		<VBox width="100%">
 			<HBox
                 justifyContent="End"
-                width="100%"
+             class="sapUiSmallMarginEnd"
             >
 				<u:FileUploader
                     id="id_fileUploader"
