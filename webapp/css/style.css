@@ -5444,3 +5444,10 @@ html, body {
 .ComboBoxFileUploaderContainer{
     flex-wrap: wrap !important;
 }
+
+.sapUiFormCLWideColumns .sapUiFormCLElement>.sapUiFormCLCellsL5 {
+    width: 21.66666667%;
+}
+.sapUiFormCLWideColumns .sapUiFormCLElement>.sapUiFormCLCellsL4 {
+    width: 53.33333333%;
+}

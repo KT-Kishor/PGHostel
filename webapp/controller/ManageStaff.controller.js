@@ -675,6 +675,9 @@ sap.ui.define([
 
             // Reset value state
             oMobile.setValueState(sap.ui.core.ValueState.None);
+            oSTD.setValueState(sap.ui.core.ValueState.None);
+
+            
             oMobile.setValueStateText("");
 
             // Dynamic maxLength based on STD
