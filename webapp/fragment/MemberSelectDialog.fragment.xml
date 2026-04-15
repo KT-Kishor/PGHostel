@@ -49,7 +49,7 @@
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Relationship" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
-                        <Column width="5rem"><Text text="Edit" /></Column>
+                        <Column width="5rem"><Text text="" /></Column>
                     </columns>
                     <items>
                         <ColumnListItem>

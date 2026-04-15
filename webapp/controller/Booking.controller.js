@@ -20,6 +20,8 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // show 3 cards at once
+            // Initialize primary member tracking for toast notifications
+            this._sLastPrimaryMemberId = "SELF"; // Default to logged-in user
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
                     this._resetBookingPageModels();
@@ -2198,15 +2200,16 @@ sap.ui.define([
         },
 
         canEditMemberFromDialog: function (bIsPrimary, sDocumentName, sDocument, sFile) {
-            if (!bIsPrimary) {
-                return true;
-            }
-
-            return !this._memberHasUploadedDocument({
+            // If member has uploaded a document, hide edit button for both primary and family members
+            if (this._memberHasUploadedDocument({
                 DocumentName: sDocumentName,
                 Document: sDocument,
                 File: sFile
-            });
+            })) {
+                return false;
+            }
+            // Otherwise allow editing
+            return true;
         },
 
         _getPrimaryDocumentRecord: function () {
@@ -2256,59 +2259,137 @@ sap.ui.define([
                 return;
             }
 
-            const oPrimaryMember = this._getPrimaryMemberRecord();
-            const aMasterMembers = (oBookingView.getProperty("/MasterMembers") || []).filter(function (oMember) {
-                return !oMember.IsPrimary && oMember.id !== "SELF";
-            });
+            // Get current selected members
             const aSelectedMembers = (oBookingView.getProperty("/FamilyMembers") || []).map(function (oMember, iIndex) {
-                const oNormalized = this._normalizeMemberRecord(oMember || {}, iIndex);
-
-                if (oNormalized.id === "SELF" || oNormalized.IsPrimary) {
-                    return Object.assign({}, oPrimaryMember, {
-                        Selected: true,
-                        IsPrimary: true
-                    });
-                }
-
-                return oNormalized;
+                return this._normalizeMemberRecord(oMember || {}, iIndex);
             }.bind(this));
-            const aMergedMasterMembers = this._mergeMembersById([oPrimaryMember].concat(aMasterMembers, aSelectedMembers)).map(function (oMember) {
-                if (oMember.id === "SELF" || oMember.IsPrimary) {
-                    return Object.assign({}, oPrimaryMember, {
-                        Selected: false,
-                        IsPrimary: true
+
+            // Track previous primary for toast notification
+            const sPreviousPrimaryId = this._sLastPrimaryMemberId;
+            let sNewPrimaryId = null;
+            let sNewPrimaryName = null;
+
+            // Check if logged-in user (SELF) is selected
+            const bSelfSelected = aSelectedMembers.some(function (oMember) {
+                return oMember.id === "SELF";
+            });
+
+            // Update all selected members with correct IsPrimary flag
+            const aUpdatedSelectedMembers = aSelectedMembers.map(function (oMember, iIndex) {
+                let bIsPrimary = false;
+
+                if (bSelfSelected) {
+                    // If SELF is selected, SELF is primary
+                    bIsPrimary = oMember.id === "SELF";
+                } else if (aSelectedMembers.length > 0) {
+                    // If SELF is not selected, first selected member is primary
+                    bIsPrimary = iIndex === 0;
+                }
+
+                if (bIsPrimary) {
+                    sNewPrimaryId = oMember.id;
+                    sNewPrimaryName = (oMember.Salutation ? oMember.Salutation + " " : "") + (oMember.Name || "");
+                }
+
+                return Object.assign({}, oMember, {
+                    IsPrimary: bIsPrimary
+                });
+            });
+
+            // If SELF is selected but not in the list (shouldn't happen), add it
+            if (bSelfSelected && !aUpdatedSelectedMembers.some(function (oMember) {
+                return oMember.id === "SELF";
+            })) {
+                const oPrimaryMember = this._getPrimaryMemberRecord();
+                oPrimaryMember.Selected = true;
+                oPrimaryMember.IsPrimary = true;
+                sNewPrimaryId = oPrimaryMember.id;
+                sNewPrimaryName = (oPrimaryMember.Salutation ? oPrimaryMember.Salutation + " " : "") + (oPrimaryMember.Name || "");
+                aUpdatedSelectedMembers.unshift(oPrimaryMember);
+            }
+
+            // Sort selected members with primary first (for main booking table)
+            aUpdatedSelectedMembers.sort(function (oLeft, oRight) {
+                if (oLeft.IsPrimary) {
+                    return -1;
+                }
+                if (oRight.IsPrimary) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            // Update MasterMembers (all available members including non-selected)
+            // Preserve original order of MasterMembers, just update IsPrimary flags
+            const aCurrentMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+
+            // Update each member in MasterMembers
+            const aUpdatedMasterMembers = aCurrentMasterMembers.map(function (oMember) {
+                const oNormalized = this._normalizeMemberRecord(oMember);
+
+                // Check if this member is the primary in selected members
+                const oPrimaryInSelected = aUpdatedSelectedMembers.find(function (oSelected) {
+                    return oSelected.id === oNormalized.id && oSelected.IsPrimary;
+                });
+
+                if (oNormalized.id === "SELF") {
+                    // Update SELF member - preserve existing properties but update Selected and IsPrimary
+                    const oSelfMember = this._getPrimaryMemberRecord();
+                    // Merge: existing member properties, then SELF template, then updated flags
+                    return Object.assign({}, oNormalized, oSelfMember, {
+                        Selected: bSelfSelected,
+                        IsPrimary: bSelfSelected
+                    });
+                } else if (oPrimaryInSelected) {
+                    // This member is primary in selected list
+                    return Object.assign({}, oNormalized, {
+                        IsPrimary: true,
+                        Selected: true
+                    });
+                } else {
+                    // Not primary, keep original selection state
+                    const bIsSelected = aUpdatedSelectedMembers.some(function (oSelected) {
+                        return oSelected.id === oNormalized.id;
+                    });
+                    return Object.assign({}, oNormalized, {
+                        IsPrimary: false,
+                        Selected: bIsSelected
                     });
                 }
+            }.bind(this));
 
-                return oMember;
+            // Ensure SELF exists in MasterMembers (add if missing)
+            const bHasSelf = aUpdatedMasterMembers.some(function (oMember) {
+                return oMember.id === "SELF";
             });
+            let aFinalMasterMembers = aUpdatedMasterMembers;
+            if (!bHasSelf) {
+                const oSelfMember = this._getPrimaryMemberRecord();
+                oSelfMember.Selected = bSelfSelected;
+                oSelfMember.IsPrimary = bSelfSelected;
+                aFinalMasterMembers = [oSelfMember].concat(aFinalMasterMembers);
+            }
 
-            aMergedMasterMembers.sort(function (oLeft, oRight) {
-                if (oLeft.IsPrimary) {
-                    return -1;
-                }
-
-                if (oRight.IsPrimary) {
-                    return 1;
-                }
-
-                return 0;
+            // Ensure SELF is at the top of MasterMembers without sorting other members
+            const iSelfIndex = aFinalMasterMembers.findIndex(function (oMember) {
+                return oMember.id === "SELF";
             });
+            if (iSelfIndex > 0) {
+                // Remove SELF from its current position and insert at beginning
+                const [oSelf] = aFinalMasterMembers.splice(iSelfIndex, 1);
+                aFinalMasterMembers.unshift(oSelf);
+            }
 
-            aSelectedMembers.sort(function (oLeft, oRight) {
-                if (oLeft.IsPrimary) {
-                    return -1;
-                }
+            oBookingView.setProperty("/MasterMembers", aFinalMasterMembers);
+            oBookingView.setProperty("/FamilyMembers", aUpdatedSelectedMembers);
 
-                if (oRight.IsPrimary) {
-                    return 1;
-                }
+            // Show toast if primary changed from logged-in user to another person
+            if (sPreviousPrimaryId === "SELF" && sNewPrimaryId && sNewPrimaryId !== "SELF" && sNewPrimaryName) {
+                MessageToast.show("Primary occupant changed to " + sNewPrimaryName + ". Booking will be created under this name.");
+            }
 
-                return 0;
-            });
-
-            oBookingView.setProperty("/MasterMembers", aMergedMasterMembers);
-            oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
+            // Store current primary for next comparison
+            this._sLastPrimaryMemberId = sNewPrimaryId;
         },
 
         _persistPrimaryMemberDraft: function (oDraft) {
@@ -2727,8 +2808,8 @@ sap.ui.define([
                 return;
             }
 
-            if (oMember.IsPrimary && this._memberHasUploadedDocument(oMember)) {
-                MessageToast.show("Primary guest details can be edited here only until the document is uploaded.");
+            if (this._memberHasUploadedDocument(oMember)) {
+                MessageToast.show("Member details cannot be edited after document is uploaded.");
                 return;
             }
 
@@ -3181,6 +3262,19 @@ sap.ui.define([
         formatSelectedMembersCount: function (aMembers) {
             const iCount = Array.isArray(aMembers) ? aMembers.length : 0;
             return iCount + " member(s) selected";
+        },
+
+        formatPrimaryOccupantName: function (aMembers) {
+            if (!Array.isArray(aMembers)) {
+                return "";
+            }
+            const oPrimary = aMembers.find(function (oMember) {
+                return oMember && oMember.IsPrimary === true;
+            });
+            if (!oPrimary) {
+                return "";
+            }
+            return (oPrimary.Salutation ? oPrimary.Salutation + " " : "") + (oPrimary.Name || "");
         },
 
         onAddCustomerDocument: function () {
@@ -4172,8 +4266,13 @@ sap.ui.define([
                 oBookingView.setProperty("/showBusinessGSTSection", false);
             }
 
-            oBookingView.setProperty("/showFamilySection", true);
-            oBookingView.setProperty("/maxPersons", iCapacity);
+            oBookingView.setProperty("/showFamilySection", this._shouldShowFamilySection(sPropertyType, iCapacity));
+
+            // For Hostel/PG, limit to 1 person regardless of room capacity
+            const bIsSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
+            const iMaxPersons = bIsSinglePersonOnly ? 1 : iCapacity;
+            oBookingView.setProperty("/maxPersons", iMaxPersons);
+
             oBookingView.setProperty("/originalPersonOptions", aOriginalOptions);
             oModel.setProperty("/NoOfPersonsList", aOriginalOptions);
 
@@ -4947,9 +5046,11 @@ sap.ui.define([
 
         _getPaymentPayloadDetails: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const sPaymentType = oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn";
-            const sCustomerName = oHostelModel.getProperty("/FullName") || "";
+            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
 
             if (sPaymentType === "PayOnCheckIn") {
                 return {
@@ -4958,7 +5059,7 @@ sap.ui.define([
                     BankTransactionID: "",
                     Date: this._getTodayISODate(),
                     BranchCode: oHostelModel.getProperty("/BranchCode") || "",
-                    CustomerName: sCustomerName,
+                    CustomerName: sPrimaryOccupantName,
                     Currency: oHostelModel.getProperty("/Currency") || "INR",
                     BranchName: this._getBranchName(),
                     BankName: "PayOnCheckIn"
@@ -4971,7 +5072,7 @@ sap.ui.define([
                 BankTransactionID: String(oPaymentModel.getProperty("/BankTransactionID") || "").trim(),
                 Date: this._formatDateToISO(oPaymentModel.getProperty("/PaymentDate")) || this._getTodayISODate(),
                 BranchCode: oHostelModel.getProperty("/BranchCode") || "",
-                CustomerName: sCustomerName,
+                CustomerName: sPrimaryOccupantName,
                 Currency: oHostelModel.getProperty("/Currency") || "INR",
                 BranchName: this._getBranchName(),
                 BankName: sPaymentType
@@ -5247,12 +5348,15 @@ sap.ui.define([
 
         _buildBookingItemsPayload: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
             const bIsBusinessTravel = !!oHostelModel.getProperty("/IsBusinessTravel");
             const sCustomerGSTIN = String(oHostelModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
             const sCompanyName = String(oHostelModel.getProperty("/CompanyName") || "").trim();
             const sCompanyAddress = String(oHostelModel.getProperty("/CompanyAddress") || "").trim();
             const sEffectiveGSTType = oHostelModel.getProperty("/EffectiveGSTType") || oHostelModel.getProperty("/GSTType") || "";
             const sPropertyGSTIN = oHostelModel.getProperty("/PropertyGSTIN") || oHostelModel.getProperty("/GSTIN") || "";
+            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
 
             return [{
                 BookingDate: this._getTodayISODate(),
@@ -5274,7 +5378,7 @@ sap.ui.define([
                 GSTType: sEffectiveGSTType,
                 GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
                 GSTIN: sPropertyGSTIN,
-                CustomerName: oHostelModel.getProperty("/FullName") || "",
+                CustomerName: sPrimaryOccupantName,
                 CustomerGSTIN: bIsBusinessTravel ? sCustomerGSTIN : "",
                 CustCompanyName: bIsBusinessTravel ? sCompanyName : "",
                 CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : ""
@@ -5283,11 +5387,14 @@ sap.ui.define([
 
         _buildBookingCreatePayload: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
+            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
 
             return {
                 data: [{
                     Salutation: oHostelModel.getProperty("/Salutation") || "Mr.",
-                    CustomerName: oHostelModel.getProperty("/FullName") || "",
+                    CustomerName: sPrimaryOccupantName,
                     UserID: oHostelModel.getProperty("/UserID") || "",
                     STDCode: oHostelModel.getProperty("/STDCode") || "+91",
                     MobileNo: oHostelModel.getProperty("/MobileNo") || "",

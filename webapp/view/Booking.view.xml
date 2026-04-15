@@ -242,10 +242,35 @@
                                 valueHelpOnly="true"
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
+<MessageStrip
+    text="If the logged-in user is selected as an occupant, they become the primary occupant automatically. Otherwise, the first selected occupant becomes primary."
+    type="Information"
+    showIcon="true"
+    showCloseButton="false"
+    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+    visible="{BookingView>/showFamilySection}"
+/>
+
                             <Text
                                 text="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersCount'}"
                                 class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                             />
+
+<VBox
+    class="sapUiTinyMarginBottom"
+    visible="{BookingView>/showFamilySection}"
+>
+    <Text
+        text="Primary occupant: {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
+        class="sapUiSmallMarginBottom"
+        visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
+    />
+    <Text
+        text="This name will be used in the booking details."
+        class="sapUiTinyMarginTop"
+        visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
+    />
+</VBox>
 
                             <Table
                                 items="{BookingView>/FamilyMembers}"
@@ -253,6 +278,10 @@
                                 class="responsiveTable"
                             >
                                 <columns>
+<Column width="6rem" visible="{BookingView>/showFamilySection}">
+    <Text text="Primary" />
+</Column>
+
                                     <Column>
                                         <Text text="Full Name" />
                                     </Column>
@@ -282,6 +311,12 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
+<ObjectStatus
+    text="Primary"
+    state="Success"
+    visible="{= ${BookingView>IsPrimary} === true}"
+/>
+
                                             <Text
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
                                             />
