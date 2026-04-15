@@ -225,7 +225,7 @@
 
                     <!-- Guest Information Section -->
                     <Title
-                        text="Select Occupant"
+                        text="Select Occupants"
                         class="booking-section-header"
                         wrapping="true"
                     />
@@ -243,7 +243,7 @@
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
 <MessageStrip
-    text="If the logged-in user is selected as an occupant, they become the primary occupant automatically. Otherwise, the first selected occupant becomes primary."
+    text="If the logged-in user is selected as an occupant, they become the primary occupant. Otherwise, the first selected occupant becomes primary"
     type="Information"
     showIcon="true"
     showCloseButton="false"
@@ -261,15 +261,15 @@
     visible="{BookingView>/showFamilySection}"
 >
     <Text
-        text="Primary occupant: {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
+        text="Primary occupant (Contact Person): {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
         class="sapUiSmallMarginBottom"
         visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
     />
-    <Text
+    <!-- <Text
         text="This name will be used in the booking details."
         class="sapUiTinyMarginTop"
         visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
-    />
+    /> -->
 </VBox>
 
                             <Table

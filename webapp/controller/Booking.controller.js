@@ -2336,10 +2336,21 @@ sap.ui.define([
                     // Update SELF member - preserve existing properties but update Selected and IsPrimary
                     const oSelfMember = this._getPrimaryMemberRecord();
                     // Merge: existing member properties, then SELF template, then updated flags
-                    return Object.assign({}, oNormalized, oSelfMember, {
+                    // But preserve document fields from normalized member
+                    const oMerged = Object.assign({}, oNormalized, oSelfMember, {
                         Selected: bSelfSelected,
                         IsPrimary: bSelfSelected
                     });
+                    // Ensure document fields from normalized member are preserved
+                    // (they might be overridden by oSelfMember if oSelfMember has empty document fields)
+                    if (oNormalized.DocumentName || oNormalized.Document || oNormalized.File) {
+                        oMerged.DocumentName = oNormalized.DocumentName;
+                        oMerged.Document = oNormalized.Document;
+                        oMerged.File = oNormalized.File;
+                        oMerged.FileType = oNormalized.FileType;
+                        oMerged.DocumentType = oNormalized.DocumentType;
+                    }
+                    return oMerged;
                 } else if (oPrimaryInSelected) {
                     // This member is primary in selected list
                     return Object.assign({}, oNormalized, {
@@ -3217,6 +3228,23 @@ sap.ui.define([
                 oDraft.Relation = "Self";
                 oDraft.Selected = true;
                 this._persistPrimaryMemberDraft(oDraft);
+                // Also update the SELF member in MasterMembers to preserve document fields
+                oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers.filter(function (oMember) {
+                    return oMember.id !== oDraft.id;
+                }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
+
+                // Update FamilyMembers for SELF member
+                if (oExistingSelectedMember || !bIsEditMode) {
+                    oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
+                        return oMember.id !== oDraft.id;
+                    }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
+                        if (oMember.id === oDraft.id) {
+                            oMember.Selected = oDraft.Selected;
+                        }
+
+                        return oMember;
+                    }));
+                }
             } else {
                 oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers.filter(function (oMember) {
                     return oMember.id !== oDraft.id;
