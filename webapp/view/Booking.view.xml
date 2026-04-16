@@ -11,7 +11,7 @@
     <Page
         showHeader="true"
         enableScrolling="true"
-        class="defaultBGBlur"
+        class="BookBGBlur"
     >
         <headerContent>
             <core:Fragment
@@ -243,7 +243,7 @@
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
 <MessageStrip
-    text="If the logged-in user is selected as an occupant, they become the primary occupant. Otherwise, the first selected occupant becomes primary"
+    text="Select a primary occupant using the radio button. The primary occupant will be the contact person for the booking."
     type="Information"
     showIcon="true"
     showCloseButton="false"
@@ -311,10 +311,11 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-<ObjectStatus
-    text="Primary"
-    state="Success"
-    visible="{= ${BookingView>IsPrimary} === true}"
+<RadioButton
+    groupName="primaryOccupantGroup"
+    selected="{BookingView>IsPrimary}"
+    select="onPrimaryOccupantRadioSelect"
+    visible="{BookingView>/showFamilySection}"
 />
 
                                             <Text

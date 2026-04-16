@@ -5451,3 +5451,51 @@ html, body {
 .sapUiFormCLWideColumns .sapUiFormCLElement>.sapUiFormCLCellsL4 {
     width: 53.33333333%;
 }
+
+.BookBGBlur {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.BookBGBlur::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../image/BedHostel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  transform: scale(1.08);
+  z-index: 0;
+}
+
+.BookBGBlur::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.375);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.BookBGBlur>footer {
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.BookBGBlur>* {
+  position: relative;
+  z-index: 1;
+}
+
+.BookBGBlur {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

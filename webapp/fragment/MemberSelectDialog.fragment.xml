@@ -68,15 +68,6 @@
                                     type="Transparent"
                                     tooltip="Edit member"
                                     press="onEditMemberFromDialog"
-                                    visible="{
-                                        parts: [
-                                            { path: 'BookingView>IsPrimary' },
-                                            { path: 'BookingView>DocumentName' },
-                                            { path: 'BookingView>Document' },
-                                            { path: 'BookingView>File' }
-                                        ],
-                                        formatter: '.canEditMemberFromDialog'
-                                    }"
                                     class="myUnifiedBtn"
                                 />
                             </cells>

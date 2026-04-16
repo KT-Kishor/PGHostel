@@ -34,10 +34,10 @@ sap.ui.define([
             this._attachPaymentSummaryHover();
         },
         _onRouteMatched: async function () {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
@@ -1037,7 +1037,7 @@ sap.ui.define([
                                                 wrapping: true
                                             }).addStyleClass("sapMTextBold sapUiTinyMarginEnd"),
                                             new sap.m.RadioButton({
-                                                text: "Once for entire booking",
+                                                text: "Entire booking",
                                                 groupName: this.getView().getId() + "-facilityChargeType",
                                                 selected: {
                                                     path: "FacilitySelection>/facilityChargeType",
@@ -1807,15 +1807,7 @@ sap.ui.define([
         },
 
         canEditMemberFromDialog: function (bIsPrimary, sDocumentName, sDocument, sFile) {
-            // If member has uploaded a document, hide edit button for both primary and family members
-            if (this._memberHasUploadedDocument({
-                DocumentName: sDocumentName,
-                Document: sDocument,
-                File: sFile
-            })) {
-                return false;
-            }
-            // Otherwise allow editing
+            // Allow editing even if document is uploaded (requirement changed)
             return true;
         },
 
@@ -1881,16 +1873,30 @@ sap.ui.define([
                 return oMember.id === "SELF";
             });
 
+            // Find if there's already a manually selected primary
+            const aExistingPrimaries = aSelectedMembers.filter(function (oMember) {
+                return oMember.IsPrimary === true;
+            });
+
+            let bHasManualPrimary = aExistingPrimaries.length > 0;
+            let oExistingPrimary = aExistingPrimaries[0];
+
             // Update all selected members with correct IsPrimary flag
             const aUpdatedSelectedMembers = aSelectedMembers.map(function (oMember, iIndex) {
                 let bIsPrimary = false;
 
-                if (bSelfSelected) {
-                    // If SELF is selected, SELF is primary
-                    bIsPrimary = oMember.id === "SELF";
-                } else if (aSelectedMembers.length > 0) {
-                    // If SELF is not selected, first selected member is primary
-                    bIsPrimary = iIndex === 0;
+                if (bHasManualPrimary) {
+                    // Respect manual selection: this member is primary only if it's the existing primary
+                    bIsPrimary = oMember.id === oExistingPrimary.id;
+                } else {
+                // No manual primary selected, apply automatic rules (same as before for backward compatibility)
+                    if (bSelfSelected) {
+                        // If SELF is selected, SELF is primary
+                        bIsPrimary = oMember.id === "SELF";
+                    } else if (aSelectedMembers.length > 0) {
+                        // If SELF is not selected, first selected member is primary
+                        bIsPrimary = iIndex === 0;
+                    }
                 }
 
                 if (bIsPrimary) {
@@ -2449,10 +2455,6 @@ sap.ui.define([
                 return;
             }
 
-            if (this._memberHasUploadedDocument(oMember)) {
-                MessageToast.show("Member details cannot be edited after document is uploaded.");
-                return;
-            }
 
             oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(oMember), {
                 IsEditMode: true,
@@ -2530,7 +2532,16 @@ sap.ui.define([
             oReader.onload = function (oLoadEvent) {
                 const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
 
-                oModel.setProperty("/NewMemberDraft/DocumentName", oFile.name);
+                // Determine new filename based on selected document type
+                const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType") || "document";
+                let sNewName = sDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                if (sExt) {
+                    sNewName += "." + sExt;
+                } else {
+                    sNewName += ".pdf"; // fallback
+                }
+
+                oModel.setProperty("/NewMemberDraft/DocumentName", sNewName);
                 oModel.setProperty("/NewMemberDraft/DocumentFile", oFile);
                 oModel.setProperty("/NewMemberDraft/Document", sBase64);
                 oModel.setProperty("/NewMemberDraft/File", sBase64);
@@ -5752,6 +5763,39 @@ sap.ui.define([
 
             this._oPaymentDialog.open();
         },
+
+        onPrimaryOccupantRadioSelect: function (oEvent) {
+            const oSelectedItem = oEvent.getSource();
+            const oBindingContext = oSelectedItem.getBindingContext("BookingView");
+            if (!oBindingContext) {
+                return;
+            }
+
+            const sPath = oBindingContext.getPath();
+            const oBookingView = this.getView().getModel("BookingView");
+            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+
+            // Update all members: set IsPrimary to false except for the selected one
+            const aUpdatedMembers = aFamilyMembers.map(function (oMember, iIndex) {
+                const bIsPrimary = sPath.endsWith("" + iIndex);
+                return Object.assign({}, oMember, {
+                    IsPrimary: bIsPrimary
+                });
+            });
+
+            oBookingView.setProperty("/FamilyMembers", aUpdatedMembers);
+
+            // Also update MasterMembers to keep them in sync
+            const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+            const aUpdatedMasterMembers = aMasterMembers.map(function (oMember) {
+                const bIsPrimary = oMember.id === aUpdatedMembers.find(m => m.IsPrimary)?.id;
+                return Object.assign({}, oMember, {
+                    IsPrimary: !!bIsPrimary
+                });
+            });
+            oBookingView.setProperty("/MasterMembers", aUpdatedMasterMembers);
+        },
+
         onGSTINChange: function (oEvent) {
             utils._LCvalidateGstNumber(oEvent)
         },
