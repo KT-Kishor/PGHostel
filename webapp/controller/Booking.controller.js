@@ -2821,7 +2821,9 @@ sap.ui.define([
             const oRelationCombo = this.byId("newMemberRelationCombo");
             const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
             const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-            const bIsPrimaryDraft = !(oBookingView.getProperty("/NewMemberDraft/IsPrimary"));
+            // const bIsPrimaryDraft = !(oBookingView.getProperty("/NewMemberDraft/IsPrimary"));
+            const oDraftId = oBookingView.getProperty("/NewMemberDraft/id");
+            const bIsPrimaryDraft = oDraftId === "SELF";
 
             // Always run name validation
             const bNameValid = utils._LCvalidateName(oNameInput, "ID");

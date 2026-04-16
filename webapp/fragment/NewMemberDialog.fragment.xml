@@ -160,7 +160,7 @@
                             text="Remove"
                             icon="sap-icon://delete"
                             press="onDeleteNewMemberDocument"
-                            class="sapUiTinyMarginBegin myUnifiedBtn"
+                            class="myUnifiedBtn"
                         />
                     </HBox>
                 </HBox>
