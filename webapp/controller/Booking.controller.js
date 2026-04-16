@@ -87,7 +87,7 @@ sap.ui.define([
                     { key: "Other", text: "Other" }
                 ],
                 RelationshipOptions: [
-                    { key: "Self", text: "Self" },
+                    // { key: "Self", text: "Self" },
                     { key: "Father", text: "Father" },
                     { key: "Mother", text: "Mother" },
                     { key: "Brother", text: "Brother" },
@@ -1763,6 +1763,7 @@ sap.ui.define([
                 Age: "",
                 Gender: "",
                 Selected: false,
+                IsPrimary: false,
                 DocumentType: "",
                 DocumentName: "",
                 Document: "",
@@ -1782,7 +1783,8 @@ sap.ui.define([
                 MemberID: oMember.MemberID || oMember.ID || "",
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || oMember.FullName || "",
-                Relation: oMember.Relation || "Other",
+                // Relation: oMember.Relation || "Other",
+                Relation: oMember.Relation || (oMember.id === "SELF" ? "Self" : "Other"),
                 Age: oMember.Age || "",
                 Gender: oMember.Gender || "",
                 Selected: !!oMember.Selected,
@@ -2069,13 +2071,33 @@ sap.ui.define([
             });
         },
 
+        // _loadMasterMembersForDialog: function () {
+        //     const oBookingView = this.getView().getModel("BookingView");
+        //     const oHostelModel = this.getView().getModel("HostelModel");
+        //     const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+        //     const aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList")) ? oHostelModel.getProperty("/MemberList") : [];
+        //     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+        //     const aCombined = this._mergeMembersById([].concat(aMasterMembers, aServerMemberList, aSelectedMembers));
+
+        //     oBookingView.setProperty("/MasterMembers", aCombined);
+        //     this._syncPrimaryMemberInFamilyMembers();
+        //     oBookingView.refresh(true);
+        // },
         _loadMasterMembersForDialog: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oHostelModel = this.getView().getModel("HostelModel");
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
-            const aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList")) ? oHostelModel.getProperty("/MemberList") : [];
+            const aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList"))
+                ? oHostelModel.getProperty("/MemberList") : [];
             const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
-            const aCombined = this._mergeMembersById([].concat(aMasterMembers, aServerMemberList, aSelectedMembers));
+
+            // ✅ Always inject a fresh SELF record first — guarantees logged-in user
+            // is always present in the dialog table regardless of prior state or timing.
+            const oSelfRecord = this._getPrimaryMemberRecord();
+
+            const aCombined = this._mergeMembersById(
+                [oSelfRecord].concat(aMasterMembers, aServerMemberList, aSelectedMembers)
+            );
 
             oBookingView.setProperty("/MasterMembers", aCombined);
             this._syncPrimaryMemberInFamilyMembers();
@@ -2119,8 +2141,11 @@ sap.ui.define([
         onMemberValueHelpRequest: async function () {
             this._loadMasterMembersForDialog();
             const oDialog = await this._getMemberSelectionDialog();
-            this._syncMemberDialogSelections();
             oDialog.open();
+            // ✅ Defer sync until after the dialog's table renders
+            setTimeout(function () {
+                this._syncMemberDialogSelections();
+            }.bind(this), 0);
         },
         MS_viewimage: function (oEvent) {
             const oPreviewContext = oEvent.getSource().getBindingContext("BookingView");
@@ -2796,10 +2821,25 @@ sap.ui.define([
             const oRelationCombo = this.byId("newMemberRelationCombo");
             const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
             const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-            const bMandatoryValid =
-                utils._LCvalidateName(oNameInput, "ID") &&
-                utils._LCstrictValidationComboBox(oGenderCombo, "ID") &&
-                utils._LCstrictValidationComboBox(oRelationCombo, "ID");
+            const bIsPrimaryDraft = !(oBookingView.getProperty("/NewMemberDraft/IsPrimary"));
+
+            // Always run name validation
+            const bNameValid = utils._LCvalidateName(oNameInput, "ID");
+
+            // For SELF (primary), Gender and Relation are hardcoded/non-editable — skip their validation
+            // and explicitly clear any error state on those combos
+            let bGenderValid, bRelationValid;
+            if (bIsPrimaryDraft) {
+                oGenderCombo.setValueState("None");
+                oRelationCombo.setValueState("None");
+                bGenderValid = true;
+                bRelationValid = true;
+            } else {
+                bGenderValid = utils._LCstrictValidationComboBox(oGenderCombo, "ID");
+                bRelationValid = utils._LCstrictValidationComboBox(oRelationCombo, "ID");
+            }
+
+            const bMandatoryValid = bNameValid && bGenderValid && bRelationValid;
             const bDocumentTypeValid = !String(oDocumentTypeCombo.getValue() || "").trim() ||
                 utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID");
 
@@ -2827,10 +2867,14 @@ sap.ui.define([
                 return oMember.id === oDraft.id;
             });
 
-            oDraft.Selected = bIsEditMode ? !!(oExistingSelectedMember && oExistingSelectedMember.Selected) : true;
+            // ✅ New members are NOT auto-selected — user must manually check the checkbox
+            // in MemberSelectDialog. In edit mode, preserve the member's existing selection state.
+            oDraft.Selected = bIsEditMode ? !!(oExistingSelectedMember && oExistingSelectedMember.Selected) : false;
 
             if (bIsPrimaryMember) {
-                oDraft.Relation = "Self";
+                if (oDraft.id === "SELF") {
+                    oDraft.Relation = "Self";
+                }
                 oDraft.Selected = true;
                 this._persistPrimaryMemberDraft(oDraft);
                 // Also update the SELF member in MasterMembers to preserve document fields
@@ -2839,7 +2883,9 @@ sap.ui.define([
                 }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
 
                 // Update FamilyMembers for SELF member
-                if (oExistingSelectedMember || !bIsEditMode) {
+                // ✅ Only update FamilyMembers if the member was already in it.
+                // New members go to MasterMembers only; user selects them manually.
+                if (oExistingSelectedMember) {
                     oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
                         return oMember.id !== oDraft.id;
                     }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
@@ -2855,7 +2901,9 @@ sap.ui.define([
                     return oMember.id !== oDraft.id;
                 }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
 
-                if (oExistingSelectedMember || !bIsEditMode) {
+                // ✅ Only update FamilyMembers if the member was already in it.
+                // New members go to MasterMembers only; user selects them manually.
+                if (oExistingSelectedMember) {
                     oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
                         return oMember.id !== oDraft.id;
                     }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
