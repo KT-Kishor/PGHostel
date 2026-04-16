@@ -51,7 +51,7 @@
                     valueStateText="Please enter a valid full name"
                     liveChange="onNewMemberNameChange"
                     change="onNewMemberNameChange"
-                    editable="{= !(${BookingView>/NewMemberDraft/IsPrimary}) }"
+                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
                 />
 
                 <Label
@@ -66,7 +66,7 @@
                     valueStateText="Please select gender"
                     selectionChange="onNewMemberGenderChange"
                     change="onNewMemberGenderChange"
-                    editable="{= !(${BookingView>/NewMemberDraft/IsPrimary}) }"
+                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
                 >
                     <core:Item
                         key="{BookingView>key}"
@@ -87,7 +87,7 @@
                     valueStateText="Please select relationship"
                     selectionChange="onNewMemberRelationChange"
                     change="onNewMemberRelationChange"
-                    editable="{= !(${BookingView>/NewMemberDraft/IsPrimary}) }"
+                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
                 >
                     <core:Item
                         key="{BookingView>key}"
