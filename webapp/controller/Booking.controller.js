@@ -34,10 +34,10 @@ sap.ui.define([
             this._attachPaymentSummaryHover();
         },
         _onRouteMatched: async function () {
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+            if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
@@ -97,8 +97,15 @@ sap.ui.define([
                     { key: "Friend", text: "Friend" },
                     { key: "Other", text: "Other" }
                 ],
+                SalutationOptions: [
+                    { key: "Mr.", text: "Mr." },
+                    { key: "Mrs.", text: "Mrs." },
+                    { key: "Ms.", text: "Ms." },
+                    { key: "Dr.", text: "Dr." }
+                ],
                 MasterMembers: [],
                 NewMemberDraft: {
+                    Salutation: "",
                     Name: "",
                     Relation: "",
                     Gender: "",
@@ -1758,6 +1765,7 @@ sap.ui.define([
             return {
                 id: "FM_" + Date.now(),
                 MemberID: "",
+                Salutation: "",
                 Name: "",
                 Relation: "",
                 Age: "",
@@ -2029,6 +2037,7 @@ sap.ui.define([
                 IsNew: !(oDraft.DocumentType && (oDraft.File || oDraft.Document) && oDraft.DocumentName)
             };
 
+            oHostelModel.setProperty("/Salutation", oDraft.Salutation || "");
             oHostelModel.setProperty("/FullName", oDraft.Name || "");
             oHostelModel.setProperty("/Gender", oDraft.Gender || "");
 
@@ -2800,6 +2809,30 @@ sap.ui.define([
             return utils._LCvalidateName(oEvent);
         },
 
+        onNewMemberSalutationChange: function (oEvent) {
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+            const oGender = this.byId("newMemberGenderCombo");
+            // Clear salutation error immediately
+            oSalutation.setValueState("None");
+            if (!oGender) return;
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+            // Dr. → manual gender selection
+
+            // Strict validation (CONTROL, not event)
+            utils._LCstrictValidationSelect(oSalutation);
+        },
+
         onNewMemberGenderChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
@@ -2828,6 +2861,7 @@ sap.ui.define([
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
             const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
             const oNameInput = this.byId("newMemberNameInput");
+            const oSalutationCombo = this.byId("newMemberSalutationCombo");
             const oGenderCombo = this.byId("newMemberGenderCombo");
             const oRelationCombo = this.byId("newMemberRelationCombo");
             const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
@@ -2836,31 +2870,48 @@ sap.ui.define([
             const oDraftId = oBookingView.getProperty("/NewMemberDraft/id");
             const bIsPrimaryDraft = oDraftId === "SELF";
 
-            // Always run name validation
-            const bNameValid = utils._LCvalidateName(oNameInput, "ID");
-
-            // For SELF (primary), Gender and Relation are hardcoded/non-editable — skip their validation
-            // and explicitly clear any error state on those combos
-            let bGenderValid, bRelationValid;
-            if (bIsPrimaryDraft) {
-                oGenderCombo.setValueState("None");
-                oRelationCombo.setValueState("None");
-                bGenderValid = true;
-                bRelationValid = true;
+            // Validate fields sequentially, stop on first error
+            if (!bIsPrimaryDraft) {
+                // Salutation validation (only for non-primary)
+                if (!utils._LCstrictValidationSelect(oSalutationCombo)) {
+                    MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                    return;
+                }
             } else {
-                bGenderValid = utils._LCstrictValidationComboBox(oGenderCombo, "ID");
-                bRelationValid = utils._LCstrictValidationComboBox(oRelationCombo, "ID");
+                oSalutationCombo.setValueState("None");
             }
 
-            const bMandatoryValid = bNameValid && bGenderValid && bRelationValid;
-            const bDocumentTypeValid = !String(oDocumentTypeCombo.getValue() || "").trim() ||
-                utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID");
-
-            if (!bMandatoryValid || !bDocumentTypeValid) {
+            // Name validation
+            if (!utils._LCvalidateName(oNameInput, "ID")) {
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
 
+            if (!bIsPrimaryDraft) {
+                // Gender validation (only for non-primary)
+                if (!utils._LCstrictValidationComboBox(oGenderCombo, "ID")) {
+                    MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                    return;
+                }
+                // Relation validation (only for non-primary)
+                if (!utils._LCstrictValidationComboBox(oRelationCombo, "ID")) {
+                    MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                    return;
+                }
+            } else {
+            // For primary, clear error states
+                oGenderCombo.setValueState("None");
+                oRelationCombo.setValueState("None");
+            }
+
+            // DocumentType validation (optional field - only validate if value present)
+            const sDocumentTypeValue = String(oDocumentTypeCombo.getValue() || "").trim();
+            if (sDocumentTypeValue && !utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID")) {
+                MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                return;
+            }
+
+            oDraft.Salutation = oSalutationCombo.getSelectedKey() || String(oSalutationCombo.getValue() || "").trim();
             oDraft.Name = String(oNameInput.getValue() || "").trim();
             oDraft.Gender = oGenderCombo.getSelectedKey() || String(oGenderCombo.getValue() || "").trim();
             oDraft.Relation = oRelationCombo.getSelectedKey() || String(oRelationCombo.getValue() || "").trim();
@@ -2968,7 +3019,8 @@ sap.ui.define([
             if (!oPrimary) {
                 return "";
             }
-            return (oPrimary.Salutation ? oPrimary.Salutation + " " : "") + (oPrimary.Name || "");
+            // Return only the name, salutation is sent separately
+            return oPrimary.Name || "";
         },
 
         onAddCustomerDocument: function () {
@@ -4783,6 +4835,7 @@ sap.ui.define([
                 return {
                     TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
                     MemberID: oMember.MemberID || "",
+                    Salutation: oMember.Salutation || "",
                     Name: oMember.Name || "",
                     Age: parseInt(oMember.Age, 10) || 0,
                     Relation: oMember.Relation || "",
@@ -5052,6 +5105,15 @@ sap.ui.define([
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
             const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
 
+            // Find primary occupant's salutation
+            let sPrimarySalutation = oHostelModel.getProperty("/Salutation") || "Mr.";
+            const oPrimary = aFamilyMembers.find(function (oMember) {
+                return oMember && oMember.IsPrimary === true;
+            });
+            if (oPrimary && oPrimary.Salutation) {
+                sPrimarySalutation = oPrimary.Salutation;
+            }
+
             return [{
                 BookingDate: this._getTodayISODate(),
                 RentPrice: this._toNumber(oHostelModel.getProperty("/GrandTotal")).toFixed(2),
@@ -5073,6 +5135,7 @@ sap.ui.define([
                 GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
                 GSTIN: sPropertyGSTIN,
                 CustomerName: sPrimaryOccupantName,
+                // Salutation: sPrimarySalutation,
                 CustomerGSTIN: bIsBusinessTravel ? sCustomerGSTIN : "",
                 CustCompanyName: bIsBusinessTravel ? sCompanyName : "",
                 CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : ""
@@ -5083,12 +5146,15 @@ sap.ui.define([
             const oHostelModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
-            const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
+            // Get logged-in user's name from LoginModel (SELF)
+            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oUser = oLoginModel ? oLoginModel.getData() || {} : {};
+            const sLoggedInUserName = oUser.UserName || oHostelModel.getProperty("/FullName") || "";
 
             return {
                 data: [{
                     Salutation: oHostelModel.getProperty("/Salutation") || "Mr.",
-                    CustomerName: sPrimaryOccupantName,
+                    CustomerName: sLoggedInUserName, // Use logged-in user's name, not primary occupant
                     UserID: oHostelModel.getProperty("/UserID") || "",
                     STDCode: oHostelModel.getProperty("/STDCode") || "+91",
                     MobileNo: oHostelModel.getProperty("/MobileNo") || "",

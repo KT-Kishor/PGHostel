@@ -41,6 +41,26 @@
                 class="sapUiTinyMargin"
             >
                 <Label
+                    text="Salutation"
+                    required="true"
+                />
+                <ComboBox
+                    id="newMemberSalutationCombo"
+                    selectedKey="{BookingView>/NewMemberDraft/Salutation}"
+                    items="{BookingView>/SalutationOptions}"
+                    placeholder="Select salutation"
+                    valueStateText="Please select salutation"
+                    selectionChange="onNewMemberSalutationChange"
+                    change="onNewMemberSalutationChange"
+                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
+                >
+                    <core:Item
+                        key="{BookingView>key}"
+                        text="{BookingView>text}"
+                    />
+                </ComboBox>
+
+                <Label
                     text="Full Name"
                     required="true"
                 />
