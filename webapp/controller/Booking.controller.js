@@ -315,9 +315,12 @@ sap.ui.define([
             (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return oMember.Selected;
             }).forEach(function (oMember) {
+                const sName = oMember.Name || oMember.Relation || "Family Member";
+                const sSalutation = oMember.Salutation || "";
+                const sDisplayName = sSalutation ? sSalutation + " " + sName : sName;
                 aOccupants.push({
                     id: oMember.id || oMember.MemberID || "",
-                    name: oMember.Name || oMember.Relation || "Family Member"
+                    name: sDisplayName
                 });
             });
 
