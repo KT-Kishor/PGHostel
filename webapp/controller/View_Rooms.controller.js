@@ -1947,9 +1947,14 @@ sap.ui.define([
                     };
 
             try {
-                let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
+                let resp = await this.ajaxReadWithJQuery("HM_MemberDocument", filter);
+                // let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
 
-                aMember = resp?.data?.Members || [];
+                // New data structure: data is direct array of members
+                aMember = Array.isArray(resp?.data) ? resp.data : [];
+                console.log("It works 1");
+
+                // UserDocuments remains as before (separate from members)
                 aUserDocs = resp?.data?.UserDocuments || [];
 
             } catch (error) {

@@ -1800,25 +1800,54 @@
         _normalizeMemberRecord: function (oMember, iIndex) {
             const oMemberDocument = Array.isArray(oMember && oMember.Documents) && oMember.Documents.length > 0 ? oMember.Documents[0] : {};
             const aDocuments = Array.isArray(oMember && oMember.Documents) ? oMember.Documents.map(function (oDocument) {
-                return Object.assign({}, oDocument);
+                // Handle Buffer object for File field
+                let sFile = oDocument.File || "";
+                if (sFile && typeof sFile === 'object' && sFile.type === 'Buffer' && Array.isArray(sFile.data)) {
+                    // Convert Buffer array to base64 string
+                    try {
+                        const byteArray = new Uint8Array(sFile.data);
+                        sFile = btoa(String.fromCharCode.apply(null, byteArray));
+                    } catch (e) {
+                        console.warn("[_normalizeMemberRecord] Failed to convert Buffer to base64:", e);
+                        sFile = "";
+                    }
+                }
+                return Object.assign({}, oDocument, { File: sFile });
             }) : [];
+
+            // Extract document fields from first document
+            let sDocumentType = oMember.DocumentType || oMemberDocument.DocumentType || "";
+            let sDocumentName = oMember.DocumentName || oMember.FileName || oMemberDocument.FileName || "";
+            let sFile = oMember.File || oMember.Document || oMemberDocument.File || "";
+            let sFileType = oMember.FileType || oMemberDocument.FileType || "";
+            let sDocumentID = oMember.DocumentID || oMemberDocument.DocumentID || "";
+
+            // Handle Buffer object for File field
+            if (sFile && typeof sFile === 'object' && sFile.type === 'Buffer' && Array.isArray(sFile.data)) {
+                try {
+                    const byteArray = new Uint8Array(sFile.data);
+                    sFile = btoa(String.fromCharCode.apply(null, byteArray));
+                } catch (e) {
+                    console.warn("[_normalizeMemberRecord] Failed to convert Buffer to base64:", e);
+                    sFile = "";
+                }
+            }
 
             return {
                 id: oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex)),
                 MemberID: oMember.MemberID || oMember.ID || "",
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || oMember.FullName || "",
-                // Relation: oMember.Relation || "Other",
                 Relation: oMember.Relation || (oMember.id === "SELF" ? "Self" : "Other"),
                 Age: oMember.Age || "",
                 Gender: oMember.Gender || "",
                 Selected: !!oMember.Selected,
-                DocumentType: oMember.DocumentType || oMemberDocument.DocumentType || "",
-                DocumentName: oMember.DocumentName || oMember.FileName || oMemberDocument.FileName || "",
-                Document: oMember.Document || oMember.File || oMemberDocument.File || "",
-                File: oMember.File || oMember.Document || oMemberDocument.File || "",
-                FileType: oMember.FileType || oMemberDocument.FileType || "",
-                DocumentID: oMember.DocumentID || oMemberDocument.DocumentID || "",
+                DocumentType: sDocumentType,
+                DocumentName: sDocumentName,
+                Document: sFile,
+                File: sFile,
+                FileType: sFileType,
+                DocumentID: sDocumentID,
                 DocumentFile: null,
                 Documents: aDocuments,
                 IsNew: false,
@@ -2986,53 +3015,16 @@
                 }
                 oDraft.Selected = true;
                 this._persistPrimaryMemberDraft(oDraft);
-                // Also update the SELF member in MasterMembers to preserve document fields
-                oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers.filter(function (oMember) {
-                    return oMember.id !== oDraft.id;
-                }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
-
-                // Update FamilyMembers for SELF member
-                // ✅ Only update FamilyMembers if the member was already in it.
-                // New members go to MasterMembers only; user selects them manually.
-                if (oExistingSelectedMember) {
-                    oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
-                        return oMember.id !== oDraft.id;
-                    }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
-                        if (oMember.id === oDraft.id) {
-                            oMember.Selected = oDraft.Selected;
-                        }
-
-                        return oMember;
-                    }));
-                }
+                // Remove local model updates - let _saveMemberToBackend handle everything from backend
+                // The backend response will refresh MasterMembers and FamilyMembers
             } else {
-                oBookingView.setProperty("/MasterMembers", this._mergeMembersById([].concat(aMasterMembers.filter(function (oMember) {
-                    return oMember.id !== oDraft.id;
-                }), [Object.assign({}, oExistingMasterMember || {}, oDraft)])));
-
-                // ✅ Only update FamilyMembers if the member was already in it.
-                // New members go to MasterMembers only; user selects them manually.
-                if (oExistingSelectedMember) {
-                    oBookingView.setProperty("/FamilyMembers", this._mergeMembersById([].concat(aSelectedMembers.filter(function (oMember) {
-                        return oMember.id !== oDraft.id;
-                    }), [Object.assign({}, oExistingSelectedMember || {}, oDraft)])).map(function (oMember) {
-                        if (oMember.id === oDraft.id) {
-                            oMember.Selected = oDraft.Selected;
-                        }
-
-                        return oMember;
-                    }));
-                }
+                // Remove local model updates for non-primary members
+                // _saveMemberToBackend will fetch fresh data from backend and update all models
             }
 
-            console.log("[onSaveNewMember] About to call _syncPrimaryMemberInFamilyMembers");
-            this._syncPrimaryMemberInFamilyMembers();
-            console.log("[onSaveNewMember] After _syncPrimaryMemberInFamilyMembers");
-            oBookingView.refresh(true);
-            this._updateSelectedPersonsFromFamily();
-            this._syncSelectedFacilityPersonsWithOccupants();
-            this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            console.log("[onSaveNewMember] Skipping local model updates - waiting for backend response");
+            // Don't update models locally - wait for backend response
+            // _saveMemberToBackend will fetch fresh data and update all models
 
             console.log("[onSaveNewMember] About to save member to backend, draft data:", oDraft);
 
@@ -3046,6 +3038,11 @@
                 MessageToast.show(bIsEditMode ? "Member updated successfully." : "Member added successfully.");
                 this.onCloseNewMemberDialog();
                 this._syncMemberDialogSelections();
+                // Update UI after backend save
+                this._updateSelectedPersonsFromFamily();
+                this._syncSelectedFacilityPersonsWithOccupants();
+                this._rebuildSelectedFacilities();
+                this._recalculateSummary();
             }).catch((oError) => {
                 console.error("[onSaveNewMember] Error saving member to backend:", oError);
                 MessageToast.show("Failed to save member. Please try again.");
@@ -3188,6 +3185,8 @@
                 return Promise.resolve();
             }
 
+            this.getBusyDialog();
+
             try {
                 const sEndpoint = "HM_MemberDocument";
                 console.log("[_saveMemberToBackend] Calling", sEndpoint, "endpoint...");
@@ -3196,10 +3195,63 @@
                     await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
 
                 console.log("[_saveMemberToBackend] Backend response:", oResponse);
+
+                // Fetch member documents from backend after create/update
+                console.log("[_saveMemberToBackend] Fetching member documents with UserID:", sUserID);
+                const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
+                console.log("[_saveMemberToBackend] Member documents response:", oDocumentsResponse);
+
+                // Update MemberList in HostelModel with fresh data from backend
+                if (oDocumentsResponse && oDocumentsResponse.data) {
+                    const aMemberList = Array.isArray(oDocumentsResponse.data) ? oDocumentsResponse.data : [];
+                    const oHostelModel = this.getView().getModel("HostelModel");
+                    const oBookingView = this.getView().getModel("BookingView");
+
+                    // Update HostelModel's MemberList with fresh backend data
+                    oHostelModel.setProperty("/MemberList", aMemberList);
+
+                    // Get current selection state
+                    const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+                    const aSelectedIds = new Set(aSelectedMembers.map(m => m.id));
+
+                    // Create fresh MasterMembers from backend data + SELF, preserving selection
+                    const oSelfRecord = this._getPrimaryMemberRecord();
+                    const aAllMembers = [oSelfRecord, ...aMemberList];
+
+                    // Normalize all members
+                    const aNormalizedMembers = aAllMembers.map((oMember, iIndex) => {
+                        const oNormalized = this._normalizeMemberRecord(oMember, iIndex);
+                        // Preserve selection if this member was previously selected
+                        if (aSelectedIds.has(oNormalized.id)) {
+                            oNormalized.Selected = true;
+                        }
+                        return oNormalized;
+                    });
+
+                    // Update MasterMembers
+                    oBookingView.setProperty("/MasterMembers", aNormalizedMembers);
+
+                    // Update FamilyMembers with selected members
+                    const aUpdatedSelectedMembers = aNormalizedMembers
+                        .filter(oMember => oMember.Selected)
+                        .map(oMember => Object.assign({}, oMember, { Selected: true }));
+
+                    oBookingView.setProperty("/FamilyMembers", aUpdatedSelectedMembers);
+                    oHostelModel.setProperty("/FamilyMembers", aUpdatedSelectedMembers);
+
+                    // Sync primary member and refresh UI
+                    this._syncPrimaryMemberInFamilyMembers();
+                    oBookingView.refresh(true);
+
+                    console.log("[_saveMemberToBackend] Updated models with", aMemberList.length, "members from backend");
+                }
+
                 return oResponse;
             } catch (oError) {
                 console.error("[_saveMemberToBackend] Error calling backend:", oError);
                 throw oError;
+            } finally {
+                this.closeBusyDialog();
             }
         },
 
