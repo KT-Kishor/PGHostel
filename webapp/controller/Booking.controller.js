@@ -2916,13 +2916,13 @@
             const oRelationCombo = this.byId("newMemberRelationCombo");
             const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
             const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-            // const bIsPrimaryDraft = !(oBookingView.getProperty("/NewMemberDraft/IsPrimary"));
+            // SELF is the logged-in user record. Primary occupant is a separate user choice.
             const oDraftId = oBookingView.getProperty("/NewMemberDraft/id");
-            const bIsPrimaryDraft = oDraftId === "SELF";
+            const bIsSelfDraft = oDraftId === "SELF";
 
             // Validate fields sequentially, stop on first error
-            if (!bIsPrimaryDraft) {
-                // Salutation validation (only for non-primary)
+            if (!bIsSelfDraft) {
+                // Salutation validation (only for non-SELF members)
                 if (!utils._LCstrictValidationSelect(oSalutationCombo)) {
                     console.log("[onSaveNewMember] Validation failed: Salutation");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
@@ -2940,21 +2940,21 @@
             }
             console.log("[onSaveNewMember] Name validation passed");
 
-            if (!bIsPrimaryDraft) {
-                // Gender validation (only for non-primary)
+            if (!bIsSelfDraft) {
+                // Gender validation (only for non-SELF members)
                 if (!utils._LCstrictValidationComboBox(oGenderCombo, "ID")) {
                     console.log("[onSaveNewMember] Validation failed: Gender");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
-                // Relation validation (only for non-primary)
+                // Relation validation (only for non-SELF members)
                 if (!utils._LCstrictValidationComboBox(oRelationCombo, "ID")) {
                     console.log("[onSaveNewMember] Validation failed: Relation");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
             } else {
-            // For primary, clear error states
+            // SELF fields are read-only, so clear any stale validation state.
                 oGenderCombo.setValueState("None");
                 oRelationCombo.setValueState("None");
             }
@@ -2980,14 +2980,14 @@
             const bIsPrimaryMember = !!oDraft.IsPrimary;
 
             // Generate MemberID for new members (not edit mode)
-            if (!bIsEditMode && !oDraft.MemberID && !bIsPrimaryMember) {
+            if (!bIsEditMode && !oDraft.MemberID && !bIsSelfDraft) {
                 oDraft.MemberID = this._generateMemberID(oBookingView);
                 console.log("[onSaveNewMember] Generated new MemberID:", oDraft.MemberID);
-            } else if (!oDraft.MemberID && bIsPrimaryMember) {
-                // For primary member, use UserID
+            } else if (!oDraft.MemberID && bIsSelfDraft) {
+                // SELF maps to the logged-in user.
                 const oHostelModel = this.getView().getModel("HostelModel");
                 oDraft.MemberID = oHostelModel.getProperty("/UserID") || "";
-                console.log("[onSaveNewMember] Primary MemberID set to UserID:", oDraft.MemberID);
+                console.log("[onSaveNewMember] SELF MemberID set to UserID:", oDraft.MemberID);
             }
 
             oDraft.IsNew = false;
@@ -2995,7 +2995,7 @@
             oDraft.IsPrimary = bIsPrimaryMember;
 
             console.log("[onSaveNewMember] Draft object prepared:", oDraft);
-            console.log("[onSaveNewMember] bIsEditMode:", bIsEditMode, "bIsPrimaryMember:", bIsPrimaryMember);
+            console.log("[onSaveNewMember] bIsEditMode:", bIsEditMode, "bIsPrimaryMember:", bIsPrimaryMember, "bIsSelfDraft:", bIsSelfDraft);
 
             const oExistingMasterMember = aMasterMembers.find(function (oMember) {
                 return oMember.id === oDraft.id;
@@ -3009,17 +3009,10 @@
             // in MemberSelectDialog. In edit mode, preserve the member's existing selection state.
             oDraft.Selected = bIsEditMode ? !!(oExistingSelectedMember && oExistingSelectedMember.Selected) : false;
 
-            if (bIsPrimaryMember) {
-                if (oDraft.id === "SELF") {
-                    oDraft.Relation = "Self";
-                }
+            if (bIsSelfDraft) {
+                oDraft.Relation = "Self";
                 oDraft.Selected = true;
                 this._persistPrimaryMemberDraft(oDraft);
-                // Remove local model updates - let _saveMemberToBackend handle everything from backend
-                // The backend response will refresh MasterMembers and FamilyMembers
-            } else {
-                // Remove local model updates for non-primary members
-                // _saveMemberToBackend will fetch fresh data from backend and update all models
             }
 
             console.log("[onSaveNewMember] Skipping local model updates - waiting for backend response");
@@ -3213,6 +3206,9 @@
                     // Get current selection state
                     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
                     const aSelectedIds = new Set(aSelectedMembers.map(m => m.id));
+                    const sCurrentPrimaryId = (aSelectedMembers.find(function (oMember) {
+                        return oMember && oMember.IsPrimary === true;
+                    }) || {}).id;
 
                     // Create fresh MasterMembers from backend data + SELF, preserving selection
                     const oSelfRecord = this._getPrimaryMemberRecord();
@@ -3224,6 +3220,9 @@
                         // Preserve selection if this member was previously selected
                         if (aSelectedIds.has(oNormalized.id)) {
                             oNormalized.Selected = true;
+                        }
+                        if (sCurrentPrimaryId && oNormalized.id === sCurrentPrimaryId) {
+                            oNormalized.IsPrimary = true;
                         }
                         return oNormalized;
                     });

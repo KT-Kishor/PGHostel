@@ -1952,7 +1952,6 @@ sap.ui.define([
 
                 // New data structure: data is direct array of members
                 aMember = Array.isArray(resp?.data) ? resp.data : [];
-                console.log("It works 1");
 
                 // UserDocuments remains as before (separate from members)
                 aUserDocs = resp?.data?.UserDocuments || [];
