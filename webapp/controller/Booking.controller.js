@@ -1880,7 +1880,25 @@
                     return false;
                 }
 
-                return !!String(oDocument.File || oDocument.Document || "").trim();
+                let sFile = oDocument.File || oDocument.Document || "";
+                if (sFile && typeof sFile === "object" && sFile.type === "Buffer" && Array.isArray(sFile.data)) {
+                    try {
+                        const byteArray = new Uint8Array(sFile.data);
+                        sFile = btoa(String.fromCharCode.apply(null, byteArray));
+                    } catch (e) {
+                        console.warn("[_getPrimaryDocumentRecord] Failed to convert Buffer to base64:", e);
+                        sFile = "";
+                    }
+                }
+
+                if (sFile !== (oDocument.File || oDocument.Document || "")) {
+                    oDocument = Object.assign({}, oDocument, {
+                        File: sFile,
+                        Document: sFile
+                    });
+                }
+
+                return !!String(sFile || "").trim();
             }) || {};
         },
         _getPrimaryMemberRecord: function () {
@@ -1901,6 +1919,7 @@
                 Document: oPrimaryDocument.Document || oPrimaryDocument.File || "",
                 File: oPrimaryDocument.File || oPrimaryDocument.Document || "",
                 FileType: oPrimaryDocument.FileType || "",
+                DocumentID: oPrimaryDocument.DocumentID || "",
                 DocumentFile: null,
                 IsNew: false,
                 IsPrimary: true
@@ -2018,6 +2037,7 @@
                         oMerged.File = oNormalized.File;
                         oMerged.FileType = oNormalized.FileType;
                         oMerged.DocumentType = oNormalized.DocumentType;
+                        oMerged.DocumentID = oNormalized.DocumentID;
                     }
                     return oMerged;
                 } else if (oPrimaryInSelected) {
@@ -2082,6 +2102,7 @@
                 Document: oDraft.Document || oDraft.File || "",
                 FileName: oDraft.DocumentName || "",
                 FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
+                DocumentID: oDraft.DocumentID || "",
                 IsNew: !(oDraft.DocumentType && (oDraft.File || oDraft.Document) && oDraft.DocumentName)
             };
 
@@ -2097,6 +2118,107 @@
 
             oHostelModel.setProperty("/Documents", aDocuments);
             oHostelModel.refresh(true);
+        },
+
+        _syncSelfUserDocuments: function (oDraft, oSavedDocument) {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
+            const sDocumentType = String(oDraft && oDraft.DocumentType || "").trim();
+            const sFile = String(oDraft && (oDraft.File || oDraft.Document) || "").trim();
+            const sFileName = String(oDraft && oDraft.DocumentName || "").trim();
+
+            let aUserDocuments = Array.isArray(oHostelModel.getProperty("/UserDocuments")) ?
+                oHostelModel.getProperty("/UserDocuments").slice() : [];
+
+            if (!(sDocumentType && sFile && sFileName)) {
+                oHostelModel.setProperty("/UserDocuments", []);
+                if (oBookingView) {
+                    oBookingView.setProperty("/showCustomerDocumentUpload", true);
+                }
+                oHostelModel.refresh(true);
+                return;
+            }
+
+            const oMergedDocument = Object.assign({}, aUserDocuments[0] || {}, oSavedDocument || {}, {
+                CustomerID: (oSavedDocument && oSavedDocument.CustomerID) || oDraft.CustomerID || oHostelModel.getProperty("/UserID") || "",
+                DocumentType: oDraft.DocumentType || "",
+                File: oDraft.File || oDraft.Document || "",
+                Document: oDraft.Document || oDraft.File || "",
+                FileName: oDraft.DocumentName || "",
+                DocumentName: oDraft.DocumentName || "",
+                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
+                DocumentID: (oSavedDocument && oSavedDocument.DocumentID) || oDraft.DocumentID || (aUserDocuments[0] && aUserDocuments[0].DocumentID) || "",
+                UserID: (oSavedDocument && oSavedDocument.UserID) || oDraft.UserID || oHostelModel.getProperty("/UserID") || ""
+            });
+
+            oHostelModel.setProperty("/UserDocuments", [oMergedDocument]);
+            if (oBookingView) {
+                oBookingView.setProperty("/showCustomerDocumentUpload", false);
+            }
+            oHostelModel.refresh(true);
+        },
+
+        _saveSelfDocumentToBackend: async function (oDraft) {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sUserID = oHostelModel.getProperty("/UserID") || "";
+            const aUserDocuments = Array.isArray(oHostelModel.getProperty("/UserDocuments")) ?
+                oHostelModel.getProperty("/UserDocuments") : [];
+            const oExistingDocument = aUserDocuments.find(function (oDocument) {
+                if (!oDocument) {
+                    return false;
+                }
+
+                if (oDraft.DocumentID && oDocument.DocumentID === oDraft.DocumentID) {
+                    return true;
+                }
+
+                return String(oDocument.DocumentType || "").trim() === String(oDraft.DocumentType || "").trim();
+            }) || aUserDocuments[0] || {};
+            const sDocumentType = String(oDraft && oDraft.DocumentType || "").trim();
+            const sFile = String(oDraft && (oDraft.File || oDraft.Document) || "").trim();
+            const sFileName = String(oDraft && oDraft.DocumentName || "").trim();
+
+            if (!(sDocumentType && sFile && sFileName)) {
+                this._syncSelfUserDocuments(oDraft);
+                return Promise.resolve();
+            }
+
+            const oPayloadData = {
+                CustomerID: sUserID,
+                UserID: sUserID,
+                DocumentType: oDraft.DocumentType || "",
+                File: oDraft.File || oDraft.Document || "",
+                FileName: oDraft.DocumentName || "",
+                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || "")
+            };
+
+            const bHasExistingDocument = aUserDocuments.length >= 1;
+            if (bHasExistingDocument) {
+                oPayloadData.DocumentID = oDraft.DocumentID || oExistingDocument.DocumentID || "";
+            }
+
+            let oPayload;
+            if (bHasExistingDocument) {
+                // For update, include filters with DocumentID
+                oPayload = {
+                    filters: {
+                        DocumentID: oPayloadData.DocumentID
+                    },
+                    data: oPayloadData
+                };
+            } else {
+                // For create, just data
+                oPayload = {
+                    data: oPayloadData
+                };
+            }
+
+            const oResponse = bHasExistingDocument ?
+                await this.ajaxUpdateWithJQuery("HM_CustomerDocument", oPayload) :
+                await this.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
+
+            this._syncSelfUserDocuments(oDraft, oPayloadData);
+            return oResponse;
         },
 
         _mergeMembersById: function (aMembers) {
@@ -3089,6 +3211,24 @@
         _saveMemberToBackend: async function (oMember, bIsEditMode) {
             console.log("[_saveMemberToBackend] Starting save for member:", oMember);
 
+            if (oMember && oMember.id === "SELF") {
+                this.getBusyDialog();
+                try {
+                    const oResponse = await this._saveSelfDocumentToBackend(oMember);
+                    const oBookingView = this.getView().getModel("BookingView");
+                    if (oBookingView) {
+                        this._syncPrimaryMemberInFamilyMembers();
+                        oBookingView.refresh(true);
+                    }
+                    return oResponse;
+                } catch (oError) {
+                    console.error("[_saveMemberToBackend] Error saving SELF document:", oError);
+                    throw oError;
+                } finally {
+                    this.closeBusyDialog();
+                }
+            }
+
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
 
@@ -3197,11 +3337,13 @@
                 // Update MemberList in HostelModel with fresh data from backend
                 if (oDocumentsResponse && oDocumentsResponse.data) {
                     const aMemberList = Array.isArray(oDocumentsResponse.data) ? oDocumentsResponse.data : [];
+                    const aUserDocuments = Array.isArray(oDocumentsResponse.UserDocuments) ? oDocumentsResponse.UserDocuments : [];
                     const oHostelModel = this.getView().getModel("HostelModel");
                     const oBookingView = this.getView().getModel("BookingView");
 
                     // Update HostelModel's MemberList with fresh backend data
                     oHostelModel.setProperty("/MemberList", aMemberList);
+                    oHostelModel.setProperty("/UserDocuments", aUserDocuments);
 
                     // Get current selection state
                     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];

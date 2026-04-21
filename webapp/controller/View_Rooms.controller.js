@@ -1950,11 +1950,11 @@ sap.ui.define([
                 let resp = await this.ajaxReadWithJQuery("HM_MemberDocument", filter);
                 // let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
 
-                // New data structure: data is direct array of members
+                // New response shape:
+                // data -> member documents
+                // UserDocuments -> logged-in customer documents
                 aMember = Array.isArray(resp?.data) ? resp.data : [];
-
-                // UserDocuments remains as before (separate from members)
-                aUserDocs = resp?.data?.UserDocuments || [];
+                aUserDocs = Array.isArray(resp?.UserDocuments) ? resp.UserDocuments : [];
 
             } catch (error) {
                 console.error("Member fetch failed", error);
