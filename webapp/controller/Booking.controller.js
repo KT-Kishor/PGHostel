@@ -5313,7 +5313,6 @@
 
             return aSelectedMembers.map(function (oMember) {
                 return {
-                    TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
                     MemberID: oMember._generatedMemberID || oMember.MemberID || "",
                     Salutation: oMember.Salutation || "",
                     Name: oMember.Name || "",
@@ -5449,18 +5448,15 @@
         _getFacilityMemberIdentity: function (sPersonId, sFallbackName) {
             const oHostelModel = this.getView().getModel("HostelModel");
             const oMember = this._getFacilityMemberRecord(sPersonId);
-            const mTempMemberIds = this._getTempMemberIdMap();
 
             if (sPersonId === "SELF") {
                 return {
-                    TempMemberID: "",
-                    MemberID: "",
+                    MemberID: String(oHostelModel.getProperty("/UserID") || "").trim(),
                     MemberName: String(oHostelModel.getProperty("/FullName") || sFallbackName || "Primary Guest").trim()
                 };
             }
 
             return {
-                TempMemberID: this._getTempMemberIdForMember(oMember, mTempMemberIds),
                 MemberID: String(oMember && oMember.MemberID || "").trim(),
                 MemberName: String(oMember && oMember.Name || sFallbackName || "").trim()
             };
@@ -5500,7 +5496,6 @@
                     EndDate: sEndDate,
                     PaidStatus: "Pending",
                     CustomerID: sCustomerID,
-                    TempMemberID: "",
                     MemberID: "",
                     MemberName: "",
                     SelectionMode: oFacility.SelectionMode || "",
@@ -5510,8 +5505,7 @@
                     Currency: sCurrency,
                     UnitPrice: fUnitPrice.toFixed(2),
                     BasicFacilityPrice: fUnitPrice.toFixed(2),
-                    FacilitiPrice: "0.00",
-                    Flag: ""
+                    FacilitiPrice: "0.00"
                 };
             };
 
@@ -5520,11 +5514,9 @@
                     const oIdentity = this._getFacilityMemberIdentity(sPersonId);
                     const oRow = fnCreateBaseRow();
 
-                    oRow.TempMemberID = oIdentity.TempMemberID;
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.FacilitiPrice = (fUnitPrice * fPeriodMultiplier).toFixed(2);
-                    oRow.Flag = this._getFacilityFlagValue(sPersonId);
                     return oRow;
                 }.bind(this));
             }
@@ -5538,12 +5530,10 @@
                     const oRow = fnCreateBaseRow();
                     const fRowTotal = sChargeType === "DAILY" ? (fUnitPrice * iQty * iChargeableDays) : (fUnitPrice * iQty);
 
-                    oRow.TempMemberID = oIdentity.TempMemberID;
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = iQty;
                     oRow.FacilitiPrice = fRowTotal.toFixed(2);
-                    oRow.Flag = this._getFacilityFlagValue(oLine.personId);
                     return oRow;
                 }.bind(this));
             }
@@ -5630,11 +5620,13 @@
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oUser = oLoginModel ? oLoginModel.getData() || {} : {};
             const sLoggedInUserName = oUser.UserName || oHostelModel.getProperty("/FullName") || "";
+            const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
+
 
             return {
                 data: [{
                     Salutation: oHostelModel.getProperty("/Salutation") || "Mr.",
-                    CustomerName: sLoggedInUserName, // Use logged-in user's name, not primary occupant
+                    CustomerName: sPrimaryOccupantName,
                     UserID: oHostelModel.getProperty("/UserID") || "",
                     STDCode: oHostelModel.getProperty("/STDCode") || "+91",
                     MobileNo: oHostelModel.getProperty("/MobileNo") || "",
@@ -5645,7 +5637,7 @@
                     State: oHostelModel.getProperty("/State") || "",
                     City: oHostelModel.getProperty("/City") || "",
                     PermanentAddress: oHostelModel.getProperty("/Address") || "",
-                    Members: this._buildMembersPayload(),
+                    // Members: this._buildMembersPayload(),
                     Documents: this._buildDocumentsPayload(),
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
