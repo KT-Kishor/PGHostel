@@ -2919,9 +2919,6 @@
                     sMimeType = "application/pdf";
                 }
             }
-
-            // console.log("[Booking] Preview document debug", {
-            //     fileName: oDoc?.FileName || oDoc?.DocumentName || "",
             //     fileType: oDoc?.FileType || oDoc?.MimeType || "",
             //     detectedMimeType: sMimeType,
             //     rawSourcePrefix: sRawSource.slice(0, 120),
@@ -3105,8 +3102,6 @@
         },
 
         onSaveNewMember: async function () {
-            // console.log("[onSaveNewMember] Function called");
-
             const oBookingView = this.getView().getModel("BookingView");
             const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
@@ -3125,7 +3120,6 @@
             if (!bIsSelfDraft) {
                 // Salutation validation (only for non-SELF members)
                 if (!utils._LCstrictValidationSelect(oSalutationCombo)) {
-                    // console.log("[onSaveNewMember] Validation failed: Salutation");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
@@ -3135,22 +3129,17 @@
 
             // Name validation
             if (!utils._LCvalidateName(oNameInput, "ID")) {
-                // console.log("[onSaveNewMember] Validation failed: Name");
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
-            console.log("[onSaveNewMember] Name validation passed");
-
             if (!bIsSelfDraft) {
                 // Gender validation (only for non-SELF members)
                 if (!utils._LCstrictValidationComboBox(oGenderCombo, "ID")) {
-                    console.log("[onSaveNewMember] Validation failed: Gender");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
                 // Relation validation (only for non-SELF members)
                 if (!utils._LCstrictValidationComboBox(oRelationCombo, "ID")) {
-                    console.log("[onSaveNewMember] Validation failed: Relation");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
@@ -3159,16 +3148,13 @@
                 oGenderCombo.setValueState("None");
                 oRelationCombo.setValueState("None");
             }
-            console.log("[onSaveNewMember] Gender/Relation validation passed");
 
             // DocumentType validation (optional field - only validate if value present)
             const sDocumentTypeValue = String(oDocumentTypeCombo.getValue() || "").trim();
             if (sDocumentTypeValue && !utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID")) {
-                console.log("[onSaveNewMember] Validation failed: DocumentType");
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
-            console.log("[onSaveNewMember] DocumentType validation passed");
 
             oDraft.Salutation = oSalutationCombo.getSelectedKey() || String(oSalutationCombo.getValue() || "").trim();
             oDraft.Name = String(oNameInput.getValue() || "").trim();
@@ -3183,20 +3169,15 @@
             // Generate MemberID for new members (not edit mode)
             if (!bIsEditMode && !oDraft.MemberID && !bIsSelfDraft) {
                 oDraft.MemberID = this._generateMemberID(oBookingView);
-                console.log("[onSaveNewMember] Generated new MemberID:", oDraft.MemberID);
             } else if (!oDraft.MemberID && bIsSelfDraft) {
                 // SELF maps to the logged-in user.
                 const oHostelModel = this.getView().getModel("HostelModel");
                 oDraft.MemberID = oHostelModel.getProperty("/UserID") || "";
-                console.log("[onSaveNewMember] SELF MemberID set to UserID:", oDraft.MemberID);
             }
 
             oDraft.IsNew = false;
             oDraft.IsEditMode = false;
             oDraft.IsPrimary = bIsPrimaryMember;
-
-            console.log("[onSaveNewMember] Draft object prepared:", oDraft);
-            console.log("[onSaveNewMember] bIsEditMode:", bIsEditMode, "bIsPrimaryMember:", bIsPrimaryMember, "bIsSelfDraft:", bIsSelfDraft);
 
             const oExistingMasterMember = aMasterMembers.find(function (oMember) {
                 return oMember.id === oDraft.id;
@@ -3204,8 +3185,6 @@
             const oExistingSelectedMember = aSelectedMembers.find(function (oMember) {
                 return oMember.id === oDraft.id;
             });
-            console.log("[onSaveNewMember] Existing members - Master:", !!oExistingMasterMember, "Selected:", !!oExistingSelectedMember);
-
             // ✅ New members are NOT auto-selected — user must manually check the checkbox
             // in MemberSelectDialog. In edit mode, preserve the member's existing selection state.
             oDraft.Selected = bIsEditMode ? !!(oExistingSelectedMember && oExistingSelectedMember.Selected) : false;
@@ -3216,19 +3195,11 @@
                 this._persistPrimaryMemberDraft(oDraft);
             }
 
-            console.log("[onSaveNewMember] Skipping local model updates - waiting for backend response");
-            // Don't update models locally - wait for backend response
+            // Don't update models locally - wait for backend response oLoginModel then fresh
             // _saveMemberToBackend will fetch fresh data and update all models
-
-            console.log("[onSaveNewMember] About to save member to backend, draft data:", oDraft);
-
-            // Check if LoginModel exists
-            const oLoginModel = this.getView().getModel("LoginModel");
-            console.log("[onSaveNewMember] LoginModel:", oLoginModel ? oLoginModel.getData() : "NOT FOUND");
 
             // Send member data to backend
             this._saveMemberToBackend(oDraft, bIsEditMode).then(() => {
-                console.log("[onSaveNewMember] Backend save successful");
                 MessageToast.show(bIsEditMode ? "Member updated successfully." : "Member added successfully.");
                 this.onCloseNewMemberDialog();
                 this._syncMemberDialogSelections();
@@ -3238,8 +3209,7 @@
                 this._rebuildSelectedFacilities();
                 this._recalculateSummary();
             }).catch((oError) => {
-                console.error("[onSaveNewMember] Error saving member to backend:", oError);
-                MessageToast.show("Failed to save member. Please try again.");
+                MessageToast.show("Failed to save member. Please try again.", oError);
             });
         },
 
@@ -3248,15 +3218,11 @@
             const sUserID = oHostelModel.getProperty("/UserID") || "";
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
 
-            console.log("[_generateMemberID] UserID:", sUserID);
-
             // Filter members that match the UserID pattern (e.g., "00013_XX")
             const aUserMembers = aMasterMembers.filter(function (oMember) {
                 if (!oMember.MemberID) return false;
                 return String(oMember.MemberID).startsWith(sUserID + "_");
             });
-
-            console.log("[_generateMemberID] Existing user members:", aUserMembers);
 
             let iMaxSuffix = 0;
 
@@ -3282,14 +3248,10 @@
 
             const sNewMemberID = sUserID + "_" + sFormattedSuffix;
 
-            console.log("[_generateMemberID] Generated MemberID:", sNewMemberID, "from max suffix:", iMaxSuffix);
-
             return sNewMemberID;
         },
 
         _saveMemberToBackend: async function (oMember, bIsEditMode) {
-            console.log("[_saveMemberToBackend] Starting save for member:", oMember);
-
             if (oMember && oMember.id === "SELF") {
                 this.getBusyDialog();
                 try {
@@ -3390,10 +3352,7 @@
                 ]
             };
 
-            console.log("[_saveMemberToBackend] Payload to send:", JSON.stringify(oPayload));
-
             if (aMembers.length === 0) {
-                console.log("[_saveMemberToBackend] No data to send, skipping backend call");
                 return Promise.resolve();
             }
 
@@ -3401,17 +3360,12 @@
 
             try {
                 const sEndpoint = "HM_MemberDocument";
-                console.log("[_saveMemberToBackend] Calling", sEndpoint, "endpoint...");
                 const oResponse = bIsEditMode ?
                     await this.ajaxUpdateWithJQuery(sEndpoint, oPayload) :
                     await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
 
-                console.log("[_saveMemberToBackend] Backend response:", oResponse);
-
                 // Fetch member documents from backend after create/update
-                console.log("[_saveMemberToBackend] Fetching member documents with UserID:", sUserID);
                 const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
-                console.log("[_saveMemberToBackend] Member documents response:", oDocumentsResponse);
 
                 // Update MemberList in HostelModel with fresh data from backend
                 if (oDocumentsResponse && oDocumentsResponse.data) {
@@ -3499,8 +3453,6 @@
                     // Sync primary member and refresh UI
                     this._syncPrimaryMemberInFamilyMembers();
                     oBookingView.refresh(true);
-
-                    console.log("[_saveMemberToBackend] Updated models with", aMemberList.length, "members from backend");
                 }
 
                 return oResponse;
@@ -4457,10 +4409,6 @@
             oModel.setProperty("/UserDocuments", aUserDocuments);
             oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
             oBookingView.setProperty("/showCustomerDocumentUpload", aUserDocuments.length === 0);
-            console.log("Booking upload visibility:", {
-                userDocumentsLength: aUserDocuments.length,
-                showCustomerDocumentUpload: aUserDocuments.length === 0
-            });
 
             if (aUserDocuments.length === 0) {
                 this._ensureCustomerDocumentSlot();
