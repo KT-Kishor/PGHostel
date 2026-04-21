@@ -1833,12 +1833,26 @@
                 }
             }
 
+            // Determine if this member is a Self member (case-insensitive)
+            const sRelationRaw = oMember.Relation || "";
+            const bIsSelfRelation = String(sRelationRaw).trim().toLowerCase() === "self";
+            const bIsSelfId = oMember.id === "SELF";
+
+            // Normalize relation: if relation is "self" (any case) or id is SELF, set to "Self"
+            const sNormalizedRelation = bIsSelfRelation || bIsSelfId ? "Self" : (oMember.Relation || (oMember.id === "SELF" ? "Self" : "Other"));
+
+            // If member is a Self member, force id to "SELF" to ensure merging
+            let sId = oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex));
+            if (bIsSelfRelation && sId !== "SELF") {
+                sId = "SELF";
+            }
+
             return {
-                id: oMember.id || oMember.MemberID || oMember.ID || ("FM_UI_" + (Date.now() + iIndex)),
+                id: sId,
                 MemberID: oMember.MemberID || oMember.ID || "",
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || oMember.FullName || "",
-                Relation: oMember.Relation || (oMember.id === "SELF" ? "Self" : "Other"),
+                Relation: sNormalizedRelation,
                 Age: oMember.Age || "",
                 Gender: oMember.Gender || "",
                 Selected: !!oMember.Selected,
@@ -1903,16 +1917,44 @@
         },
         _getPrimaryMemberRecord: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
-            const sName = String(oHostelModel.getProperty("/FullName") || "").trim();
+            const aMemberList = Array.isArray(oHostelModel.getProperty("/MemberList")) ? oHostelModel.getProperty("/MemberList") : [];
+
+            // Try to find a member with Relation "Self" (case-insensitive) in MemberList (from HM_MemberDocuments)
+            let oSelfMember = null;
+            for (let i = 0; i < aMemberList.length; i++) {
+                const oMember = aMemberList[i];
+                const sRelation = String(oMember.Relation || "").trim().toLowerCase();
+                if (sRelation === "self") {
+                    oSelfMember = oMember;
+                    break;
+                }
+            }
+
+            let sName = "";
+            let sSalutation = "";
+            let sGender = "";
+
+            if (oSelfMember) {
+                // Use the member's details from HM_MemberDocuments
+                sName = String(oSelfMember.Name || oSelfMember.FullName || "").trim();
+                sSalutation = String(oSelfMember.Salutation || "").trim();
+                sGender = String(oSelfMember.Gender || "").trim();
+            } else {
+                // Fallback to HostelModel properties (from LoginModel)
+                sName = String(oHostelModel.getProperty("/FullName") || "").trim();
+                sSalutation = oHostelModel.getProperty("/Salutation") || "";
+                sGender = oHostelModel.getProperty("/Gender") || "";
+            }
+
             const oPrimaryDocument = this._getPrimaryDocumentRecord();
             return {
                 id: "SELF",
                 MemberID: "",
-                Salutation: oHostelModel.getProperty("/Salutation") || "",
+                Salutation: sSalutation,
                 Name: sName || "Primary Guest",
                 Relation: "Self",
                 Age: "",
-                Gender: oHostelModel.getProperty("/Gender") || "",
+                Gender: sGender,
                 Selected: false,
                 DocumentType: oPrimaryDocument.DocumentType || "",
                 DocumentName: oPrimaryDocument.DocumentName || oPrimaryDocument.FileName || "",
@@ -2140,7 +2182,7 @@
             }
 
             const oMergedDocument = Object.assign({}, aUserDocuments[0] || {}, oSavedDocument || {}, {
-                CustomerID: (oSavedDocument && oSavedDocument.CustomerID) || oDraft.CustomerID || oHostelModel.getProperty("/UserID") || "",
+                //CustomerID: (oSavedDocument && oSavedDocument.CustomerID) || oDraft.CustomerID || oHostelModel.getProperty("/UserID") || "",
                 DocumentType: oDraft.DocumentType || "",
                 File: oDraft.File || oDraft.Document || "",
                 Document: oDraft.Document || oDraft.File || "",
@@ -2184,7 +2226,7 @@
             }
 
             const oPayloadData = {
-                CustomerID: sUserID,
+                // CustomerID: sUserID,
                 UserID: sUserID,
                 DocumentType: oDraft.DocumentType || "",
                 File: oDraft.File || oDraft.Document || "",
@@ -2271,14 +2313,51 @@
         _loadMasterMembersForDialog: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oHostelModel = this.getView().getModel("HostelModel");
-            const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
-            const aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList"))
+            let aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
+            let aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList"))
                 ? oHostelModel.getProperty("/MemberList") : [];
-            const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            let aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
+
+            // Helper to check if a member is a Self member (case-insensitive)
+            function isSelfMember(oMember) {
+                const sRelation = String(oMember.Relation || "").trim().toLowerCase();
+                return sRelation === "self";
+            }
+
+            // Before filtering, capture selection state from any existing Self members
+            let bSelfSelected = false;
+            let bSelfIsPrimary = false;
+
+            // Check all arrays for Self members and capture their flags
+            const allArrays = [aMasterMembers, aServerMemberList, aSelectedMembers];
+            allArrays.forEach(arr => {
+                arr.forEach(oMember => {
+                    if (isSelfMember(oMember)) {
+                        bSelfSelected = bSelfSelected || oMember.Selected === true;
+                        bSelfIsPrimary = bSelfIsPrimary || oMember.IsPrimary === true;
+                    }
+                });
+            });
+
+            // Filter out any member with Relation "Self" from all lists to avoid duplication
+            // because we will inject a fresh SELF record based on HM_MemberDocuments
+            aMasterMembers = aMasterMembers.filter(function (oMember) {
+                return !isSelfMember(oMember);
+            });
+            aServerMemberList = aServerMemberList.filter(function (oMember) {
+                return !isSelfMember(oMember);
+            });
+            aSelectedMembers = aSelectedMembers.filter(function (oMember) {
+                return !isSelfMember(oMember);
+            });
 
             // ✅ Always inject a fresh SELF record first — guarantees logged-in user
             // is always present in the dialog table regardless of prior state or timing.
             const oSelfRecord = this._getPrimaryMemberRecord();
+
+            // Apply captured selection state to the fresh SELF record
+            oSelfRecord.Selected = bSelfSelected;
+            oSelfRecord.IsPrimary = bSelfIsPrimary;
 
             const aCombined = this._mergeMembersById(
                 [oSelfRecord].concat(aMasterMembers, aServerMemberList, aSelectedMembers)
@@ -2841,16 +2920,16 @@
                 }
             }
 
-            console.log("[Booking] Preview document debug", {
-                fileName: oDoc?.FileName || oDoc?.DocumentName || "",
-                fileType: oDoc?.FileType || oDoc?.MimeType || "",
-                detectedMimeType: sMimeType,
-                rawSourcePrefix: sRawSource.slice(0, 120),
-                rawSourceLength: sRawSource.length,
-                hasDataUrlPrefix: !!aDataUrlParts,
-                normalizedBase64Prefix: sBase64.slice(0, 120),
-                normalizedBase64Length: sBase64.length
-            });
+            // console.log("[Booking] Preview document debug", {
+            //     fileName: oDoc?.FileName || oDoc?.DocumentName || "",
+            //     fileType: oDoc?.FileType || oDoc?.MimeType || "",
+            //     detectedMimeType: sMimeType,
+            //     rawSourcePrefix: sRawSource.slice(0, 120),
+            //     rawSourceLength: sRawSource.length,
+            //     hasDataUrlPrefix: !!aDataUrlParts,
+            //     normalizedBase64Prefix: sBase64.slice(0, 120),
+            //     normalizedBase64Length: sBase64.length
+            // });
 
             if (sMimeType.indexOf("image/") === 0) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
@@ -3026,7 +3105,7 @@
         },
 
         onSaveNewMember: async function () {
-            console.log("[onSaveNewMember] Function called");
+            // console.log("[onSaveNewMember] Function called");
 
             const oBookingView = this.getView().getModel("BookingView");
             const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
@@ -3046,7 +3125,7 @@
             if (!bIsSelfDraft) {
                 // Salutation validation (only for non-SELF members)
                 if (!utils._LCstrictValidationSelect(oSalutationCombo)) {
-                    console.log("[onSaveNewMember] Validation failed: Salutation");
+                    // console.log("[onSaveNewMember] Validation failed: Salutation");
                     MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                     return;
                 }
@@ -3056,7 +3135,7 @@
 
             // Name validation
             if (!utils._LCvalidateName(oNameInput, "ID")) {
-                console.log("[onSaveNewMember] Validation failed: Name");
+                // console.log("[onSaveNewMember] Validation failed: Name");
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
@@ -3347,14 +3426,51 @@
 
                     // Get current selection state
                     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
-                    const aSelectedIds = new Set(aSelectedMembers.map(m => m.id));
-                    const sCurrentPrimaryId = (aSelectedMembers.find(function (oMember) {
+                    
+                    // Helper to check if a member is a Self member (case-insensitive)
+                    function isSelfMember(oMember) {
+                        const sRelation = String(oMember.Relation || "").trim().toLowerCase();
+                        return sRelation === "self";
+                    }
+                    
+                    // Normalize selected members' ids: if a member is a Self member, treat its id as "SELF"
+                    // This ensures selection mapping works correctly after normalization
+                    const aNormalizedSelectedMembers = aSelectedMembers.map(oMember => {
+                        if (isSelfMember(oMember)) {
+                            return Object.assign({}, oMember, { id: "SELF" });
+                        }
+                        return oMember;
+                    });
+                    
+                    const aSelectedIds = new Set(aNormalizedSelectedMembers.map(m => m.id));
+                    const oCurrentPrimary = aNormalizedSelectedMembers.find(function (oMember) {
                         return oMember && oMember.IsPrimary === true;
-                    }) || {}).id;
+                    }) || {};
+                    const sCurrentPrimaryId = oCurrentPrimary.id;
 
                     // Create fresh MasterMembers from backend data + SELF, preserving selection
                     const oSelfRecord = this._getPrimaryMemberRecord();
-                    const aAllMembers = [oSelfRecord, ...aMemberList];
+
+                    // Filter out any Self members from backend data to avoid duplication
+                    // (the backend may already have a Self member with Relation "Self")
+                    // Also capture selection state from any Self member before filtering
+                    let bSelfSelectedFromBackend = false;
+                    
+                    const aFilteredMemberList = aMemberList.filter(function (oMember) {
+                        if (isSelfMember(oMember)) {
+                            // Capture selection state before filtering (Selected is a UI field that might be present)
+                            bSelfSelectedFromBackend = bSelfSelectedFromBackend || oMember.Selected === true;
+                            return false; // filter out
+                        }
+                        return true;
+                    });
+
+                    // Apply captured selection state to the fresh SELF record
+                    if (bSelfSelectedFromBackend) {
+                        oSelfRecord.Selected = true;
+                    }
+
+                    const aAllMembers = [oSelfRecord, ...aFilteredMemberList];
 
                     // Normalize all members
                     const aNormalizedMembers = aAllMembers.map((oMember, iIndex) => {
