@@ -31,7 +31,6 @@
         },
         onAfterRendering: function () {
             this._attachDocumentInfoHover();
-            this._attachPaymentSummaryHover();
         },
         _onRouteMatched: async function () {
             if (performance.navigation && performance.navigation.type === 1) {
@@ -3684,215 +3683,6 @@
             }
         },
 
-        // payment icon
-        _attachPaymentSummaryHover: function () {
-            const oIcon = this.byId("PaymentSummaryInfoIcon");
-
-            if (!oIcon || oIcon.data("hoverBound")) {
-                return;
-            }
-
-            oIcon.data("hoverBound", true);
-
-            oIcon.attachBrowserEvent("mouseenter", this._openPaymentSummaryPopover.bind(this));
-            oIcon.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
-
-            this._getPaymentSummaryPopover().attachAfterOpen(function () {
-                const oPopover = this._getPaymentSummaryPopover();
-
-                if (!oPopover.data("hoverBound")) {
-                    oPopover.data("hoverBound", true);
-
-                    oPopover.attachBrowserEvent("mouseenter", this._clearPaymentPopoverClose.bind(this));
-                    oPopover.attachBrowserEvent("mouseleave", this._schedulePaymentPopoverClose.bind(this));
-                }
-            }.bind(this));
-        },
-        _getPaymentSummaryPopover: function () {
-            if (!this._oPaymentSummaryPopover) {
-                this._oPaymentSummaryPopover = new sap.m.ResponsivePopover({
-                    showHeader: false,
-                    placement: "Bottom",
-                    contentWidth: "22rem",
-                    content: [
-                        new sap.m.VBox({
-                            items: [
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/RoomPrice" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.getView().getController().Formatter.fromatNumber(price);
-                                            return "Room: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: "{HostelModel>/RoomBreakdownText}",
-                                    wrapping: true
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/TotalFacilityPrice" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.Formatter.fromatNumber(price);
-                                            return "Facilities: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/BookingSubTotal" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.Formatter.fromatNumber(price);
-                                            return "Sub Total: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        path: "HostelModel>/PropertyGSTIN",
-                                        formatter: function (gst) {
-                                            return "Property GSTIN: " + gst;
-                                        }
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        path: "HostelModel>/CustomerGSTIN",
-                                        formatter: function (gst) {
-                                            return "Customer GSTIN: " + gst;
-                                        }
-                                    },
-                                    visible: {
-                                        path: "HostelModel>/CustomerGSTIN",
-                                        formatter: function (gst) {
-                                            return !!gst;
-                                        }
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/CGST" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.Formatter.fromatNumber(price);
-                                            return "CGST: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    },
-                                    visible: {
-                                        path: "HostelModel>/CGST",
-                                        formatter: function (price) {
-                                            return price > 0;
-                                        }
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/SGST" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.Formatter.fromatNumber(price);
-                                            return "SGST: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    },
-                                    visible: {
-                                        path: "HostelModel>/SGST",
-                                        formatter: function (price) {
-                                            return price > 0;
-                                        }
-                                    }
-                                }),
-
-                                new sap.m.Text({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/IGST" },
-                                            { path: "HostelModel>/Currency" }
-                                        ],
-                                        formatter: function (price, currency) {
-                                            const formatted = this.Formatter.fromatNumber(price);
-                                            return "IGST: " + formatted + " " + currency;
-                                        }.bind(this)
-                                    },
-                                    visible: {
-                                        path: "HostelModel>/IGST",
-                                        formatter: function (price) {
-                                            return price > 0;
-                                        }
-                                    }
-                                }),
-                                ,
-
-                                new sap.m.MessageStrip({
-                                    text: {
-                                        parts: [
-                                            { path: "HostelModel>/EffectiveGSTType" },
-                                            { path: "HostelModel>/EffectiveGSTValue" }
-                                        ],
-                                        formatter: function (sType, sValue) {
-                                            return sType
-                                                ? "Applied Tax: " + sType + " (" + sValue + "%)"
-                                                : "No GST applied";
-                                        }
-                                    },
-                                    type: "Information",
-                                    showIcon: true,
-                                    showCloseButton: false
-                                }).addStyleClass("sapUiTinyMarginTop sapUiTinyMarginBottom")
-
-                            ]
-                        }).addStyleClass("sapUiSmallMargin")
-                    ]
-                });
-
-                this.getView().addDependent(this._oPaymentSummaryPopover);
-            }
-
-            return this._oPaymentSummaryPopover;
-        },
-        _openPaymentSummaryPopover: function () {
-            const oIcon = this.byId("PaymentSummaryInfoIcon");
-
-            this._clearPaymentPopoverClose();
-
-            if (oIcon) {
-                this._getPaymentSummaryPopover().openBy(oIcon);
-            }
-        },
-
-        _schedulePaymentPopoverClose: function () {
-            this._paymentPopoverTimer = setTimeout(function () {
-                this._getPaymentSummaryPopover().close();
-            }.bind(this), 300);
-        },
-
-        _clearPaymentPopoverClose: function () {
-            if (this._paymentPopoverTimer) {
-                clearTimeout(this._paymentPopoverTimer);
-                this._paymentPopoverTimer = null;
-            }
-        },
 
         onCustomerDocumentChange: function (oEvent) {
             const oFileUploader = oEvent.getSource();
@@ -5047,7 +4837,23 @@
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
             let fRoomPrice = fBasePrice;
             let iDays = 0;
-            let sRoomBreakdown = fBasePrice + " " + (oModel.getProperty("/Currency") || "");
+            // let sRoomBreakdown = fBasePrice + " " + (oModel.getProperty("/Currency") || "");
+            // let fSubTotal = 0;
+            // let fDiscountedSubTotal = 0;
+            // let oTaxBreakup;
+
+            // if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
+            //     iDays = Math.floor((oEndDate - oStartDate) / 86400000);
+            //     fRoomPrice = fBasePrice * iDays;
+            //     sRoomBreakdown = fBasePrice + " x " + iDays + " day(s)";
+            // } else if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
+            //     fRoomPrice = fBasePrice * iDuration;
+            //     sRoomBreakdown = fBasePrice + " x " + iDuration + (sPlan === "Per Month" ? " month(s)" : " year(s)");
+            // }
+
+            // oModel.setProperty("/TotalDays", iDays);
+            // oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
+            let sRoomBreakdown = String(fBasePrice);
             let fSubTotal = 0;
             let fDiscountedSubTotal = 0;
             let oTaxBreakup;
@@ -5055,14 +4861,16 @@
             if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
                 iDays = Math.floor((oEndDate - oStartDate) / 86400000);
                 fRoomPrice = fBasePrice * iDays;
-                sRoomBreakdown = fBasePrice + " x " + iDays + " day(s)";
+                sRoomBreakdown = `${fBasePrice} x ${iDays} day(s)`;
             } else if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
                 fRoomPrice = fBasePrice * iDuration;
-                sRoomBreakdown = fBasePrice + " x " + iDuration + (sPlan === "Per Month" ? " month(s)" : " year(s)");
+                sRoomBreakdown = `${fBasePrice} x ${iDuration} ${sPlan === "Per Month" ? "month(s)" : "year(s)"}`;
+            } else {
+                fRoomPrice = fBasePrice;
             }
 
             oModel.setProperty("/TotalDays", iDays);
-            oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
+            oModel.setProperty("/RoomBreakdownText", sRoomBreakdown);
             oModel.setProperty("/RoomPrice", Number(fRoomPrice.toFixed(2)));
 
             fSubTotal = Number((fRoomPrice + fFacilityPrice).toFixed(2));
