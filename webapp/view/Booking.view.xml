@@ -158,7 +158,7 @@
                                     alignItems="Center"
                                     class = "ComboBoxFileUploaderContainer"
                                 >
-                                   
+
                                     <ComboBox
                                         selectedKey="{HostelModel>DocumentType}"
                                         width="{= ${device>/system/phone} ? '100%' : '12rem'}"
@@ -173,7 +173,7 @@
                                         />
                                     </ComboBox>
 
-                                 
+
                                         <unified:FileUploader
                                             width="{= ${device>/system/phone} ? '100%' : '8rem'}"
                                             visible="{= !${HostelModel>FileName} }"
@@ -186,7 +186,7 @@
                                             fileSizeExceed="onDocumentUploadSizeExceed"
                                             buttonText="Upload"
                                             fileType="pdf,jpg,jpeg,png,webp"
-                                            class="sapUiTinyMarginEnd myUnifiedBtn"
+                                            class="myUnifiedBtn sapUiTinyMarginEnd"
                                         />
                                          <core:Icon
                                         id="bookingDocumentInfoIcon"
@@ -214,7 +214,7 @@
                                             <Button
                                                 text="Remove"
                                                 press="onDeleteCustomerDocumentRow"
-                                                class="sapUiTinyMarginBegin myUnifiedBtn"
+                                                class="myUnifiedBtn sapUiTinyMarginBegin"
                                             />
                                         </HBox>
                                 
@@ -567,7 +567,8 @@
         text="GSTIN: {HostelModel>/PropertyGSTIN}"
                     level="H5"
             class="sapUiSmallMarginTop sapUiTinyMarginBottom"
-        
+              visible="{= !!${HostelModel>/EffectiveGSTType} }"
+
     />
 
         <Table
@@ -631,6 +632,7 @@
         </VBox>
     </cells>
 </ColumnListItem>
+
 
 
 
@@ -714,7 +716,10 @@
                     visible="{= ${HostelModel>/CGST} > 0}"
                 >
                     <cells>
-                        <Text text="CGST" />
+<Text
+    text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} / 2 : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
+/>
+
                         <HBox
                             justifyContent="End"
                             alignItems="Center"
@@ -734,7 +739,10 @@
                     visible="{= ${HostelModel>/SGST} > 0}"
                 >
                     <cells>
-                        <Text text="SGST" />
+<Text
+    text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} / 2 : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
+/>
+
                         <HBox
                             justifyContent="End"
                             alignItems="Center"
@@ -754,7 +762,10 @@
                     visible="{= ${HostelModel>/IGST} > 0}"
                 >
                     <cells>
-                        <Text text="IGST" />
+<Text
+    text="{= ${HostelModel>/IGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'IGST (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'IGST'}"
+/>
+
                         <HBox
                             justifyContent="End"
                             alignItems="Center"
@@ -776,6 +787,7 @@
             type="Information"
             showIcon="true"
             showCloseButton="false"
+              visible="{= !!${HostelModel>/EffectiveGSTType} }"
             class="sapUiTinyMarginBottom"
         />
 
