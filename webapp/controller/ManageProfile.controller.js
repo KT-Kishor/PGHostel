@@ -884,6 +884,7 @@ sap.ui.define([
                     const oDoc = mem.Documents && mem.Documents.length > 0 ? mem.Documents[0] : {};
 
                     return {
+                        Salutation: mem.Salutation || "",
                         Name: mem.Name || "",
                         Age: mem.Age || "",
                         Relation: mem.Relation || "",

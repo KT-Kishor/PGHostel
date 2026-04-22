@@ -370,6 +370,8 @@
 
             <columns>
                 <Column demandPopin="true">
+                <Text text="{i18n>MSsalutation}"/></Column>
+                <Column demandPopin="true">
                 <Text text="{i18n>Studentname}"/></Column>
                 <Column demandPopin="true"><Text text="{i18n>age}"/></Column>
                 <Column demandPopin="true"><Text text="{i18n>relation}"/></Column>
@@ -380,8 +382,8 @@
             <items>
                 <ColumnListItem  press="">
                     <cells>
-                        <Text
-                            text="{profileData>Name}"/>
+                        <Text text="{profileData>Salutation}"/>
+                        <Text text="{profileData>Name}"/>
                         <Text text="{profileData>Age}"/>
                         <Text text="{profileData>Relation}"/>
                         <Link
