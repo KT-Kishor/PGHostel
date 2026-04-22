@@ -707,6 +707,32 @@
     </cells>
 </ColumnListItem>
 
+<ColumnListItem
+    vAlign="Middle"
+    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+>
+    <cells>
+        <Title
+            text="Discounted Total"
+            level="H6"
+        />
+        <HBox
+            justifyContent="End"
+            alignItems="Center"
+            renderType="Bare"
+        >
+            <Text
+                text="{path: 'HostelModel>/BookingNetSubTotal', formatter: '.Formatter.fromatNumber'}"
+                class="sapUiTinyMarginEnd sapUiStrongText"
+            />
+            <Text
+                text="{HostelModel>/Currency}"
+                class="sapUiStrongText"
+            />
+        </HBox>
+    </cells>
+</ColumnListItem>
+
 <!-- <ColumnListItem
     vAlign="Middle"
     visible="{= !!${HostelModel>/AppliedCouponCode} }"
@@ -858,7 +884,7 @@
         >
             <Title
                 text="Grand Total"
-                level="H4"
+                 level="H1"
             />
             <HBox
                 justifyContent="End"
@@ -867,12 +893,12 @@
             >
                 <Title
                     text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
-                    level="H2"
+                     level="H1"
                     class="sapUiTinyMarginEnd"
                 />
                 <Title
                     text="{HostelModel>/Currency}"
-                    level="H4"
+                     level="H1"
                 />
             </HBox>
         </HBox>
