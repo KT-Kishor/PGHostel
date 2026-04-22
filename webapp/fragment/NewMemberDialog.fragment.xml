@@ -84,8 +84,6 @@
     />
 </ComboBox>
 
-
-
                     </VBox>
                     <VBox
                         width="65%"
@@ -183,8 +181,6 @@
                         />
                     </ComboBox>
 
-                   
-
                     <unified:FileUploader
                         id="newMemberFileUploader"
                         width="{= ${device>/system/phone} ? '100%' : '8rem'}"
@@ -197,7 +193,7 @@
                         fileType="pdf,jpg,jpeg,png,webp"
                         class="sapUiTinyMarginEnd myUnifiedBtn"
                     />
-                     <core:Icon
+                    <core:Icon
                         id="newMemberDocumentInfoIcon"
                         src="sap-icon://hint"
                         size="1rem"
@@ -205,6 +201,7 @@
                         hoverColor="DarkBlue"
                         press="onNewMemberDocumentInfoPress"
                         tooltip="Upload info"
+                        visible="{= !${BookingView>/NewMemberDraft/DocumentName} }"
                         class="sapUiSmallMarginBegin"
                     />
 

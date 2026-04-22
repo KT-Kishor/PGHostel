@@ -2971,6 +2971,14 @@
                 return;
             }
 
+            // Check if document type is selected
+            const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType");
+            if (!sDocType) {
+                sap.m.MessageToast.show("Please select document type first");
+                oFileUploader.clear();
+                return;
+            }
+
             if (oFile.size > iMaxSize) {
                 this._showDocumentUploadSizeError();
                 oFileUploader.clear();
@@ -3015,6 +3023,7 @@
             oBookingView.setProperty("/NewMemberDraft/Document", "");
             oBookingView.setProperty("/NewMemberDraft/File", "");
             oBookingView.setProperty("/NewMemberDraft/FileType", "");
+            oBookingView.setProperty("/NewMemberDraft/DocumentType", "");
             oBookingView.refresh(true);
 
             if (oFileUploader) {
