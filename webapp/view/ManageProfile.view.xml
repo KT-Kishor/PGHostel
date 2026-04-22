@@ -358,10 +358,7 @@
             noDataText="No Member history found"
             items="{
                     path: 'profileData>/Members',
-                   sorter: [
-                        { path: 'BookingID', descending: false, group: true }
-                      
-                    ]
+                   sorter: []
                 }"
                  width="auto" 
            class="sapUiSmallMargin customRoundedTable"
