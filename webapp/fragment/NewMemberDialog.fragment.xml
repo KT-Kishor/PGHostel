@@ -97,6 +97,7 @@
                             valueStateText="Please enter a valid full name"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
+                            maxLength="35"
                             editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
                         />
                     </VBox>

@@ -32,6 +32,7 @@
         onAfterRendering: function () {
             this._attachDocumentInfoHover();
             this._startAllCarouselsAutoSlide(3000);
+            this._makeDatePickersReadOnly(["BookStartdate_ID"]);
         },
 
         onExit: function () {
@@ -70,6 +71,7 @@
             this._rebuildSelectedFacilities();
             await this._loadAdvertisements();
             this._recalculateSummary();
+            this._makeDatePickersReadOnly(["BookStartdate_ID"]);
             oHostelModel.refresh(true);
         },
         _getBookingViewInitialData: function () {
