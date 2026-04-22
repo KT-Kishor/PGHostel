@@ -2877,7 +2877,7 @@
             }
 
             // Make date picker read-only
-            this._FragmentDatePickersReadOnly(["newMemberDOB"]);
+            this._ViewDatePickersReadOnly(["newMemberDOB"], this.getView());
 
             oDialog.open();
             this._attachDocumentInfoHover();
@@ -2915,7 +2915,7 @@
             }
 
             // Make date picker read-only
-            this._FragmentDatePickersReadOnly(["newMemberDOB"]);
+            this._ViewDatePickersReadOnly(["newMemberDOB"], this.getView());
 
             oDialog.open();
             this._attachDocumentInfoHover();
