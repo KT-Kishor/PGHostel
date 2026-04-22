@@ -681,6 +681,66 @@
                         </HBox>
                     </cells>
                 </ColumnListItem>
+                <ColumnListItem
+    vAlign="Middle"
+    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+>
+    <cells>
+  
+            <Title
+                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
+             level="H6"/>
+            <HBox
+                justifyContent="End"
+                alignItems="Center"
+                renderType="Bare"
+            >
+                <Title
+                    text="-{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
+                   level="H6" class="sapUiTinyMarginEnd"
+                />
+                <Title
+                    text="{HostelModel>/Currency}"
+                    level="H6"
+                />
+        </HBox>
+    </cells>
+</ColumnListItem>
+
+<!-- <ColumnListItem
+    vAlign="Middle"
+    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+>
+    <cells>
+        <HBox
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            class="couponSummaryRow"
+        >
+            <Text
+                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
+            />
+            <HBox
+                justifyContent="End"
+                alignItems="Center"
+                renderType="Bare"
+            >
+                <Text
+                    text="-"
+                    class="sapUiTinyMarginEnd"
+                />
+                <Text
+                    text="{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
+                    class="sapUiTinyMarginEnd sapUiStrongText"
+                />
+                <Text
+                    text="{HostelModel>/Currency}"
+                    class="sapUiStrongText"
+                />
+            </HBox>
+        </HBox>
+    </cells>
+</ColumnListItem> -->
 
                     <!-- <ColumnListItem vAlign="Middle">
                         <cells>
@@ -717,7 +777,7 @@
                 >
                     <cells>
 <Text
-    text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} / 2 : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
+    text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue}  : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
 />
 
                         <HBox
@@ -740,7 +800,7 @@
                 >
                     <cells>
 <Text
-    text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} / 2 : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
+    text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
 />
 
                         <HBox
@@ -782,43 +842,14 @@
             </items>
         </Table>
 
-        <MessageStrip
+        <!-- <MessageStrip
             text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
             type="Information"
             showIcon="true"
             showCloseButton="false"
               visible="{= !!${HostelModel>/EffectiveGSTType} }"
             class="sapUiTinyMarginBottom"
-        />
-
-        <HBox
-            justifyContent="SpaceBetween"
-            alignItems="Center"
-            visible="{= !!${HostelModel>/AppliedCouponCode} }"
-            class="sapUiTinyMarginBottom couponSummaryRow"
-        >
-            <Text
-                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
-            />
-            <HBox
-                justifyContent="End"
-                alignItems="Center"
-                renderType="Bare"
-            >
-                <Text
-                    text="-"
-                    class="sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
-                    class="sapUiTinyMarginEnd sapUiStrongText"
-                />
-                <Text
-                    text="{HostelModel>/Currency}"
-                    class="sapUiStrongText"
-                />
-            </HBox>
-        </HBox>
+        /> -->
 
         <HBox
             justifyContent="SpaceBetween"
@@ -852,7 +883,7 @@
             showIcon="true"
             showCloseButton="false"
             visible="{= ${HostelModel>/Deposit} > 0}"
-            class="sapUiSmallMarginBottom"
+            class="sapUiSmallMarginBottom sapUiLargeMarginTop"
         />
     </VBox>
 </Panel>
