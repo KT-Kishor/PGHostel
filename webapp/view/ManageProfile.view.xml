@@ -6,21 +6,20 @@
     xmlns:l="sap.ui.layout"
     xmlns:f="sap.ui.layout.form"
     xmlns:u="sap.ui.unified"
-    xmlns:uxap="sap.uxap">
-
+    xmlns:uxap="sap.uxap"
+>
     <Page
         id="id_profilePage"
         title="{i18n>myAccount}"
         showNavButton="true"
         navButtonPress="onNavBack"
         class="defaultBGBlur"
-        >
-
-          <customHeader>
+    >
+        <customHeader>
             <Bar class="barheader">
-            <contentLeft>
+                <contentLeft>
                     <Button
-                      icon="sap-icon://nav-back"
+                        icon="sap-icon://nav-back"
                         class="btnGradientHoverOnly"
                         tooltip="{i18n>back}"
                         press="onNavBack"
@@ -45,57 +44,85 @@
                         tooltip="{i18n>logout}"
                         press="onlogout"
                     />
-                    
                 </contentRight>
             </Bar>
         </customHeader>
 
         <!-- ================= PROFILE HEADER ================= -->
-<FlexBox direction="Row" justifyContent="Center" alignItems="Center" class="sapUiSmallMargin profileFlex">
-	<VBox class="avatarContainer sapUiSmallMarginEnd">
-		<Avatar src="{profileData>/photo}" initials="{profileData>/initials}" displayShape="Square" displaySize="XL" press="onPreviewProfilePhoto" class="customLargeAvatar "/>
-		<Button icon="sap-icon://camera" press="onPressAvatarEdit" class="avatarEditBtnOverlay"/>
-		<u:FileUploader id="id_fileUploaderAvatar1" uploadOnChange="false" change="onAvatarFileSelected" fileType="png,jpg,jpeg" class="hiddenUploader" buttonOnly="true" />
-	</VBox>
+        <FlexBox
+            direction="Row"
+            justifyContent="Center"
+            alignItems="Center"
+            class="sapUiSmallMargin profileFlex"
+        >
+            <VBox class="avatarContainer sapUiSmallMarginEnd">
+                <Avatar
+                    src="{profileData>/photo}"
+                    initials="{profileData>/initials}"
+                    displayShape="Square"
+                    displaySize="XL"
+                    press="onPreviewProfilePhoto"
+                    class="customLargeAvatar "
+                />
+                <Button
+                    icon="sap-icon://camera"
+                    press="onPressAvatarEdit"
+                    class="avatarEditBtnOverlay"
+                />
+                <u:FileUploader
+                    id="id_fileUploaderAvatar1"
+                    uploadOnChange="false"
+                    change="onAvatarFileSelected"
+                    fileType="png,jpg,jpeg"
+                    class="hiddenUploader"
+                    buttonOnly="true"
+                />
+            </VBox>
 
             <!-- Profile Forms -->
             <VBox>
-
                 <!-- DISPLAY MODE -->
                 <f:SimpleForm
                     layout="ColumnLayout"
                     columnsM="3"
                     columnsL="4"
                     class="sapUiTinyMarginTop"
-                    visible="{= !${profileData>/isEditMode}}">
-
+                    visible="{= !${profileData>/isEditMode}}"
+                >
                     <f:content>
-                        <Label text="{i18n>fullname}"/>
-                        <Text text="{= ${profileData>/Salutation} + ' ' + ${profileData>/name}}"/>
+                        <Label text="{i18n>fullname}" />
+                        <Text
+                            text="{= ${profileData>/Salutation} + ' ' + ${profileData>/name}}"
+                        />
 
-                        <Label text="{i18n>email}"/>
-                        <Text text="{profileData>/email}"/>
+                        <Label text="{i18n>email}" />
+                        <Text text="{profileData>/email}" />
 
-                        <Label text="{i18n>MVDDOB}"/>
-                        <Text text="{profileData>/dob}"/>
+                        <Label text="{i18n>MVDDOB}" />
+                        <Text text="{profileData>/dob}" />
 
-                        <Label text="{i18n>MVDcountry}"/>
-                        <Text text="{profileData>/Country}"/>
+                        <Label text="{i18n>MVDcountry}" />
+                        <Text text="{profileData>/Country}" />
 
-                        <Label text="{i18n>MVDstate}"/>
-                        <Text text="{profileData>/State}"/>
+                        <Label text="{i18n>MVDstate}" />
+                        <Text text="{profileData>/State}" />
 
-                        <Label text="{i18n>city}"/>
-                        <Text text="{profileData>/City}"/>
+                        <Label text="{i18n>city}" />
+                        <Text text="{profileData>/City}" />
 
-                        <Label text="{i18n>MSmobileNo}"/>
-                        <Text text="{= ${profileData>/STDCode} + ' ' + ${profileData>/phone}}"/>
+                        <Label text="{i18n>MSmobileNo}" />
+                        <Text
+                            text="{= ${profileData>/STDCode} + ' ' + ${profileData>/phone}}"
+                        />
 
-                        <Label text="{i18n>MVgender}"/>
-                        <Text text="{profileData>/gender}"/>
+                        <Label text="{i18n>MVgender}" />
+                        <Text text="{profileData>/gender}" />
 
-                        <Label text="{i18n>address}"/>
-                        <Text text="{profileData>/address}" wrapping="true"/>
+                        <Label text="{i18n>address}" />
+                        <Text
+                            text="{profileData>/address}"
+                            wrapping="true"
+                        />
                     </f:content>
                 </f:SimpleForm>
 
@@ -105,44 +132,69 @@
                     columnsM="3"
                     columnsL="4"
                     class="sapUiTinyMarginTop"
-                    visible="{profileData>/isEditMode}">
-
+                    visible="{profileData>/isEditMode}"
+                >
                     <f:content>
-
-                        <Label text="{i18n>fullname}"  required="{profileData>/isEditMode}"/>
+                        <Label
+                            text="{i18n>fullname}"
+                            required="{profileData>/isEditMode}"
+                        />
                         <Select selectedKey="{profileData>/Salutation}">
-                            <core:Item key="Mr." text="Mr."/>
-                            <core:Item key="Mrs." text="Mrs."/>
-                            <core:Item key="Miss" text="Miss"/>
+                            <core:Item
+                                key="Mr."
+                                text="Mr."
+                            />
+                            <core:Item
+                                key="Mrs."
+                                text="Mrs."
+                            />
+                            <core:Item
+                                key="Miss"
+                                text="Miss"
+                            />
                         </Select>
 
-                        <Input id="id_Name1"
-                             maxLength="20"
+                        <Input
+                            id="id_Name1"
+                            maxLength="20"
                             placeholder="{i18n>enterFullName}"
                             value="{profileData>/name}"
                             valueStateText="{i18n>enterFullName}"
-                            liveChange="onNameInputLiveChange"/>
+                            liveChange="onNameInputLiveChange"
+                        />
 
-                        <Label text="{i18n>email}" required="true"/>
-                        <Input id="id_mail1"
+                        <Label
+                            text="{i18n>email}"
+                            required="true"
+                        />
+                        <Input
+                            id="id_mail1"
                             placeholder="{i18n>enterEmailId}"
                             value="{profileData>/email}"
                             type="Email"
                             maxLength="30"
                             valueStateText="{i18n>enterEmailId}"
-                            liveChange="onEmailliveChange"/>
+                            liveChange="onEmailliveChange"
+                        />
 
-                        <Label text="{i18n>MVDDOB}" required="true"/>
+                        <Label
+                            text="{i18n>MVDDOB}"
+                            required="true"
+                        />
                         <DatePicker
                             id="id_dob1"
                             value="{profileData>/dob}"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="dd/MM/yyyy"
                             valueStateText="{i18n>enterDateofBirth}"
-                            change="onChangeDOB"/>
+                            change="onChangeDOB"
+                        />
 
-                        <Label text="{i18n>MVDcountry}" required="true"/>
-                       <ComboBox
+                        <Label
+                            text="{i18n>MVDcountry}"
+                            required="true"
+                        />
+                        <ComboBox
                             id="id_country1"
                             items="{path:'CountryModel>/',length:1000}"
                             selectedKey="{profileData>/Country}"
@@ -157,9 +209,12 @@
                                 text="{CountryModel>countryName}"
                                 additionalText="{CountryModel>code}"
                             />
-</ComboBox>
-                        <Label text="{i18n>MVDstate}" required="true"/>
-                         <ComboBox
+                        </ComboBox>
+                        <Label
+                            text="{i18n>MVDstate}"
+                            required="true"
+                        />
+                        <ComboBox
                             id="id_state1"
                             change="CC_onChangeState"
                             placeholder="{i18n>enterState}"
@@ -174,7 +229,10 @@
                             />
                         </ComboBox>
 
-                        <Label text="{i18n>city}" required="true"/>
+                        <Label
+                            text="{i18n>city}"
+                            required="true"
+                        />
                         <ComboBox
                             id="id_city1"
                             change="onChange"
@@ -192,8 +250,11 @@
                             />
                         </ComboBox>
 
-                        <Label text="{i18n>MSmobileNo}" required="true"/>
-                         <ComboBox
+                        <Label
+                            text="{i18n>MSmobileNo}"
+                            required="true"
+                        />
+                        <ComboBox
                             change="_onProfileSTDChange"
                             id="id_std1"
                             placeholder="{i18n>code}"
@@ -209,37 +270,56 @@
                                 additionalText="{CountryModel>code}"
                             />
                         </ComboBox>
-                        <Input  
+                        <Input
                             id="id_phone1"
                             value="{profileData>/phone}"
                             placeholder="{i18n>enterContactNumber}"
                             maxLength="18"
                             liveChange="MPonMobileLivechnage"
-                            valueStateText="{i18n>enterContactNumber}"/>
+                            valueStateText="{i18n>enterContactNumber}"
+                        />
 
-                        <Label text="{i18n>MVgender}" required="true"/>
-                        <ComboBox id="id_gender1"  placeholder="{i18n>selectGender}"
+                        <Label
+                            text="{i18n>MVgender}"
+                            required="true"
+                        />
+                        <ComboBox
+                            id="id_gender1"
+                            placeholder="{i18n>selectGender}"
                             selectedKey="{profileData>/gender}"
                             valueStateText="{i18n>pleaseselectGender}"
-                            change="onChange">
-                            <core:Item key="Male" text="Male"/>
-                            <core:Item key="Female" text="Female"/>
-                            <core:Item key="Other" text="Other"/>
+                            change="onChange"
+                        >
+                            <core:Item
+                                key="Male"
+                                text="Male"
+                            />
+                            <core:Item
+                                key="Female"
+                                text="Female"
+                            />
+                            <core:Item
+                                key="Other"
+                                text="Other"
+                            />
                         </ComboBox>
 
-                        <Label text="{i18n>address}" required="true"/>
-                        <TextArea id="id_address1"
+                        <Label
+                            text="{i18n>address}"
+                            required="true"
+                        />
+                        <TextArea
+                            id="id_address1"
                             placeholder="{i18n>enterAddress}"
                             value="{profileData>/address}"
                             rows="3"
                             maxLength="120"
                             liveChange="MPonAddressChange"
                             growing="false"
-                            width="100%"/>
-
+                            width="100%"
+                        />
                     </f:content>
                 </f:SimpleForm>
-
             </VBox>
         </FlexBox>
 
@@ -250,13 +330,14 @@
             justifyContent="SpaceBetween"
             alignItems="Center"
             wrap="Wrap"
-           class="responsiveFlex sapUiSmallMargin customRoundedFlex">
-
+            class="responsiveFlex sapUiSmallMargin customRoundedFlex"
+        >
             <IconTabHeader
                 id="id_tabBar1"
                 mode="Standard"
-                select="onTableSelect" class="sapUiSmallMarginBottom" >
-                
+                select="onTableSelect"
+                class="sapUiSmallMarginBottom"
+            >
                 <layoutData>
                     <FlexItemData maxWidth="100%" />
                 </layoutData>
@@ -264,40 +345,47 @@
                 <items>
                     <IconTabFilter
                         key="Booking History"
-                        text="{= ${profileData>/bookingCount} > 0 ? 'Booking History (' + ${profileData>/bookingCount} + ')' : 'Booking History' }"/>
+                        text="{= ${profileData>/bookingCount} > 0 ? 'Booking History (' + ${profileData>/bookingCount} + ')' : 'Booking History' }"
+                    />
                     <IconTabFilter
                         key="Members"
-                        text="{= ${profileData>/memberCount} > 0 ? 'Members (' + ${profileData>/memberCount} + ')' : 'Members' }"/>
+                        text="{= ${profileData>/memberCount} > 0 ? 'Members (' + ${profileData>/memberCount} + ')' : 'Members' }"
+                    />
 
                     <IconTabFilter
                         key="Payment"
-                        text="{= ${profileData>/paymentCount} > 0 ? 'Payment (' + ${profileData>/paymentCount} + ')' : 'Payment' }"/>
+                        text="{= ${profileData>/paymentCount} > 0 ? 'Payment (' + ${profileData>/paymentCount} + ')' : 'Payment' }"
+                    />
                     <IconTabFilter
                         key="Complaints"
                         text="{= ${profileData>/complainCount} > 0 ? 'Complaints (' + ${profileData>/complainCount} + ')' : 'Complaints' }"
-                      />
+                    />
                     <IconTabFilter
                         key="Damage"
                         text="{= ${profileData>/damageCount} > 0 ? 'Damage (' + ${profileData>/damageCount} + ')' : 'Damage' }"
-                      />
+                    />
                 </items>
             </IconTabHeader>
 
-            <ToolbarSpacer/>
-        <HBox alignItems="Center" justifyContent="Start" class="customActionBox">
-            <Button 
-            text="Raise Complaint"
-            press="onPressRaiseComplaint"
-            class="myUnifiedBtn sapUiSmallMarginEnd"
-              enabled="{profileData>/hasAssignedBooking}"
-           
-            />
+            <ToolbarSpacer />
+            <HBox
+                alignItems="Center"
+                justifyContent="Start"
+                class="customActionBox"
+            >
+                <Button
+                    text="Raise Complaint"
+                    press="onPressRaiseComplaint"
+                    class="myUnifiedBtn sapUiSmallMarginEnd"
+                    enabled="{profileData>/hasAssignedBooking}"
+                />
 
-            <SearchField
-                width="auto"
-                liveChange="onGlobalSearch"
-                placeholder="{i18n>search}"/>
-          </HBox> 
+                <SearchField
+                    width="auto"
+                    liveChange="onGlobalSearch"
+                    placeholder="{i18n>search}"
+                />
+            </HBox>
         </FlexBox>
 
         <!-- ================= BOOKING HISTORY TABLE ================= -->
@@ -316,35 +404,54 @@
                         { path: 'BookingDate', descending: true }
                     ]
                 }"
-                 width="auto" 
-           class="sapUiSmallMargin customRoundedTable"
-           
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
         >
-
             <columns>
                 <Column demandPopin="true">
-                <Text text="{i18n>customerName}"/></Column>
-                <Column demandPopin="true"><Text text="{i18n>bookingDate}"/></Column>
-                <Column demandPopin="true"><Text text="{i18n>room}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>amount}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column>
+                    <Text text="{i18n>customerName}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>bookingDate}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>room}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>amount}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>status}" />
+                </Column>
             </columns>
 
             <items>
-                <ColumnListItem type="Navigation" press="onPressBookingRow">
+                <ColumnListItem
+                    type="Navigation"
+                    press="onPressBookingRow"
+                >
                     <cells>
                         <ObjectIdentifier
                             title="{profileData>CustomerName}"
-                            text="{profileData>BookingID}"/>
-                        <Text text="{profileData>BookingDate}"/>
-                        <Text text="{profileData>room}"/>
+                            text="{profileData>BookingID}"
+                        />
+                        <Text text="{profileData>BookingDate}" />
+                        <Text text="{profileData>room}" />
                         <Text
                             text="{ parts:['profileData>amount','profileData>currency'],
-                                    formatter:'.Formatter.formatCurrency'}"/>
+                                    formatter:'.Formatter.formatCurrency'}"
+                        />
                         <ObjectStatus
                             text="{profileData>status}"
                             state="{ path:'profileData>status',
-                                     formatter:'.Formatter.formatObjectStatus'}"/>
+                                     formatter:'.Formatter.formatObjectStatus'}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
@@ -360,33 +467,45 @@
                     path: 'profileData>/Members',
                    sorter: []
                 }"
-                 width="auto" 
-           class="sapUiSmallMargin customRoundedTable"
-           
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
         >
-
             <columns>
                 <Column demandPopin="true">
-                <Text text="{i18n>MSsalutation}"/></Column>
+                    <Text text="{i18n>MSsalutation}" />
+                </Column>
                 <Column demandPopin="true">
-                <Text text="{i18n>Studentname}"/></Column>
-                <Column demandPopin="true"><Text text="{i18n>age}"/></Column>
-                <Column demandPopin="true"><Text text="{i18n>relation}"/></Column>
-             <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>document}"/></Column>
+                    <Text text="{i18n>Studentname}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>age}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>relation}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>document}" />
+                </Column>
                 <!-- <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
             </columns>
 
             <items>
-                <ColumnListItem  press="">
+                <ColumnListItem press="">
                     <cells>
-                        <Text text="{profileData>Salutation}"/>
-                        <Text text="{profileData>Name}"/>
-                        <Text text="{profileData>Age}"/>
-                        <Text text="{profileData>Relation}"/>
+                        <Text text="{profileData>Salutation}" />
+                        <Text text="{profileData>Name}" />
+                        <Text
+                            text="{path: 'profileData>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                        />
+
+                        <Text text="{profileData>Relation}" />
                         <Link
-                                text="{i18n>view}"
-                                press="HF_viewimage"
-                            />
+                            text="{i18n>view}"
+                            press="HF_viewimage"
+                        />
                         <!--  <ObjectStatus
                             text="{profileData>status}"
                             state="{ path:'profileData>status',
@@ -406,80 +525,160 @@
                 path:'profileData>/Payments',
                 sorter:[{ path:'PaymentGroup', group:true }]
             }"
-            width="auto" 
-          class="sapUiSmallMargin customRoundedTable">
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
+        >
             <columns>
-                <Column demandPopin="true" ><Text text="{i18n>bookingID}"/></Column>
-                <Column demandPopin="true"><Text text="{i18n>customerName}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>invoiceDate}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>invoiceNo}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>totalAmount}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>invoiceDueAmount}"/></Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>bookingID}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>customerName}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>invoiceDate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>invoiceNo}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>totalAmount}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>invoiceDueAmount}" />
+                </Column>
             </columns>
 
             <items>
-                <ColumnListItem type="Navigation" press="onPressManageInvoice">
+                <ColumnListItem
+                    type="Navigation"
+                    press="onPressManageInvoice"
+                >
                     <cells>
-                        <Text text="{profileData>BookingID}"/>
-                        <Text text="{profileData>CustomerName}"/>
-                        <Text text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"/>
-                        <Text text="{profileData>InvNo}"/>
-                        <Text text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
-                        <Text text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>curremcy}"/>
+                        <Text text="{profileData>BookingID}" />
+                        <Text text="{profileData>CustomerName}" />
+                        <Text
+                            text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"
+                        />
+                        <Text text="{profileData>InvNo}" />
+                        <Text
+                            text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
+                        />
+                        <Text
+                            text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>curremcy}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
-                <Table
-    id="Id_CompmaintTable"
-    visible="{= ${profileData>/selectedTab} === 'Complaints' }"
-    busy="{profileData>/isTableBusy}"
-    updateFinished="onTableUpdateFinished"
-    busyIndicatorDelay="0"
-    noDataText="No complaints found"
-    width="auto"
-    class="sapUiSmallMargin customRoundedTable"
-    items="{
+        <Table
+            id="Id_CompmaintTable"
+            visible="{= ${profileData>/selectedTab} === 'Complaints' }"
+            busy="{profileData>/isTableBusy}"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No complaints found"
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
+            items="{
         path: 'profileData>/complain',
         sorter: [
             { path: 'ComplaintStatus', descending: false, group: true },
             { path: 'ComplaintRaisedDate', descending: true }
         ]
-    }"> 
+    }"
+        >
             <columns>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>complainType}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Phone"><Text text="Branch"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>roomNo}"/></Column>
-                <Column demandPopin="true" ><Text text="{i18n>description}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>complainDate}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>expectedResolveddate}"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet" ><Text text="{i18n>AssignedBy}"/></Column>
-                <Column hAlign="Center" width="3rem"><Text text=""/></Column>
-                   </columns>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>complainType}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Phone"
+                >
+                    <Text text="Branch" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>roomNo}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>description}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>complainDate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>expectedResolveddate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>AssignedBy}" />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    width="3rem"
+                >
+                    <Text text="" />
+                </Column>
+            </columns>
 
             <items>
                 <ColumnListItem type="Inactive">
                     <cells>
-                        <Text text="{profileData>ComplaintType}"/>
+                        <Text text="{profileData>ComplaintType}" />
                         <Text text="{profileData>BranchName}" />
-                        <Text text="{profileData>RoomNo}"/>
-                        <ExpandableText  text="{profileData>ComplaintDescription}" maxCharacters="20"/>
-                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
-                        <Text  text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
+                        <Text text="{profileData>RoomNo}" />
+                        <ExpandableText
+                            text="{profileData>ComplaintDescription}"
+                            maxCharacters="20"
+                        />
+                        <Text
+                            text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"
+                        />
+                        <Text
+                            text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
                                 path: 'profileData>ExpectedResolvedDate',
                                 formatter: '.Formatter.formatDate'
-                            }}"/>
-                         <Text text="{profileData>AssignedTo}"/>
-                      
-<Button
-    icon="sap-icon://edit"
-    type="Transparent"
-    press="onPressComplaintRow"
-    tooltip="Edit Complaint"
-    visible="{
+                            }}"
+                        />
+                        <Text text="{profileData>AssignedTo}" />
+
+                        <Button
+                            icon="sap-icon://edit"
+                            type="Transparent"
+                            press="onPressComplaintRow"
+                            tooltip="Edit Complaint"
+                            visible="{
         path: 'profileData>ComplaintStatus',
         formatter: '.Formatter.canEditComplaint'
-    }"/>
+    }"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
@@ -488,44 +687,82 @@
             id="Id_DamageTable"
             visible="{= ${profileData>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
-            width="auto" 
-          class="sapUiSmallMargin customRoundedTable"
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
             items="{
         path: 'profileData>/damage',
         sorter: [
             { path: 'Status', descending: false, group: true }
            
         ]
-    }">
+    }"
+        >
             <columns>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Damage ID"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Branch"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Room No"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Item"/></Column>
-                <Column demandPopin="true" minScreenWidth="Phone"><Text text="Type"/></Column>
-                <Column demandPopin="true" minScreenWidth="Desktop"><Text text="Description"/></Column>
-                <Column demandPopin="true"><Text text="Qty"/></Column>
-                <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Cost"/></Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Damage ID" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Branch" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Room No" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Item" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Phone"
+                >
+                    <Text text="Type" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="Description" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="Qty" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Cost" />
+                </Column>
                 <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column> -->
             </columns>
             <items>
                 <ColumnListItem>
                     <cells>
-                        <Text text="{profileData>DamageID}"/>
-                        <Text text="{profileData>BranchName}"/>
-                        <Text text="{profileData>RoomNo}"/>
-                        <Text text="{profileData>ItemName}"/>
-                        <Text text="{profileData>Type}"/>
-                        <Text text="{profileData>Description}"/>
-                        <Text text="{profileData>Quantity}"/>
-                        <Text text="{profileData>Cost}"/>
+                        <Text text="{profileData>DamageID}" />
+                        <Text text="{profileData>BranchName}" />
+                        <Text text="{profileData>RoomNo}" />
+                        <Text text="{profileData>ItemName}" />
+                        <Text text="{profileData>Type}" />
+                        <Text text="{profileData>Description}" />
+                        <Text text="{profileData>Quantity}" />
+                        <Text text="{profileData>Cost}" />
                         <!-- <Text text="{profileData>TotalCost}"/> -->
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
-       <footer>
-         <core:Fragment
+        <footer>
+            <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />
