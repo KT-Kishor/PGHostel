@@ -40,39 +40,68 @@
                 singleContainerFullSize="true"
                 class="sapUiTinyMargin"
             >
-                <Label
-                    text="Salutation"
-                    required="true"
-                />
-                <ComboBox
-                    id="newMemberSalutationCombo"
-                    selectedKey="{BookingView>/NewMemberDraft/Salutation}"
-                    items="{BookingView>/SalutationOptions}"
-                    placeholder="Select salutation"
-                    valueStateText="Please select salutation"
-                    selectionChange="onNewMemberSalutationChange"
-                    change="onNewMemberSalutationChange"
-                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
+                <HBox
+                    width="100%"
+                    justifyContent="Start"
+                    alignItems="Center"
                 >
-                    <core:Item
-                        key="{BookingView>key}"
-                        text="{BookingView>text}"
-                    />
-                </ComboBox>
+                    <VBox width="35%">
+<Label
+    text="Salutation"
+    required="true"
+/>
 
-                <Label
-                    text="Full Name"
-                    required="true"
-                />
-                <Input
-                    id="newMemberNameInput"
-                    value="{BookingView>/NewMemberDraft/Name}"
-                    placeholder="Enter full name"
-                    valueStateText="Please enter a valid full name"
-                    liveChange="onNewMemberNameChange"
-                    change="onNewMemberNameChange"
-                    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
-                />
+                    </VBox>
+                    <VBox
+                        width="65%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Label
+                            text="Full Name"
+                            required="true"
+                        />
+                    </VBox>
+                </HBox>
+                <HBox
+                    width="100%"
+                    justifyContent="Start"
+                    alignItems="Center"
+                >
+                    <VBox width="35%">
+<ComboBox
+    id="newMemberSalutationCombo"
+    selectedKey="{BookingView>/NewMemberDraft/Salutation}"
+    items="{BookingView>/SalutationOptions}"
+    placeholder="Select salutation"
+    valueStateText="Please select salutation"
+    selectionChange="onNewMemberSalutationChange"
+    change="onNewMemberSalutationChange"
+    editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
+>
+    <core:Item
+        key="{BookingView>key}"
+        text="{BookingView>text}"
+    />
+</ComboBox>
+
+
+
+                    </VBox>
+                    <VBox
+                        width="65%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Input
+                            id="newMemberNameInput"
+                            value="{BookingView>/NewMemberDraft/Name}"
+                            placeholder="Enter full name"
+                            valueStateText="Please enter a valid full name"
+                            liveChange="onNewMemberNameChange"
+                            change="onNewMemberNameChange"
+                            editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
+                        />
+                    </VBox>
+                </HBox>
 
                 <Label
                     text="Date of Birth"
