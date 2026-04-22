@@ -4842,11 +4842,7 @@ width: 44px !important;
   border-left: 6px solid #007984 !important;
   border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
 
-  background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.4),
-      rgba(255, 255, 255, 0.1)
-  ) !important;
+  background: rgba(255, 255, 255, 0.77) !important;
 
   backdrop-filter: blur(20px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
