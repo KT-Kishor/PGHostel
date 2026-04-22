@@ -910,7 +910,7 @@
 
         <MessageStrip
             text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
-            type="Information"
+            type="Success"
             showIcon="true"
             showCloseButton="false"
             visible="{= ${HostelModel>/Deposit} > 0}"
