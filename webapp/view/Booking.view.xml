@@ -425,6 +425,43 @@
                     <layoutData>
                         <l:GridData span="XL4 L4 M12 S12" />
                     </layoutData>
+                    <!-- Advertisement Carousel Section -->
+                    <Title
+                        text="Advertisement"
+                        class="booking-section-header"
+                        wrapping="true"
+                        visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
+                    />
+
+                    <Panel
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                        visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
+                    >
+                        <VBox class="sapUiTinyMargin">
+                            <Carousel
+                                id="AdvertisementCarousel"
+                                visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
+                                showPageIndicator="true"
+                                arrowsPlacement="Content"
+                                loop="true"
+                                pages="{
+                                    path: 'AdvertisementModel>/Advertisements',
+                                    templateShareable: false
+                                }"
+                            >
+                                <pages>
+                                    <Image
+                                        src="{AdvertisementModel>image}"
+                                        alt="{AdvertisementModel>title}"
+                                        width="100%"
+                                        height="300px"
+                                        press="onAdvertisementImagePress"
+                                    />
+                                </pages>
+                            </Carousel>
+                        </VBox>
+                    </Panel>
+
                     <!-- Coupon Section -->
                     <Title
                         text="Have a Coupon?"

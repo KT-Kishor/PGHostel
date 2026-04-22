@@ -31,6 +31,16 @@
         },
         onAfterRendering: function () {
             this._attachDocumentInfoHover();
+            this._startAllCarouselsAutoSlide(3000);
+        },
+
+        onExit: function () {
+            this._clearAllCarouselTimers();
+            if (this._adCarouselInterval) {
+                clearInterval(this._adCarouselInterval);
+                this._adCarouselInterval = null;
+            }
+            BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
             if (performance.navigation && performance.navigation.type === 1) {
@@ -58,6 +68,7 @@
             this._syncPlanState();
             await this._loadFacilities();
             this._rebuildSelectedFacilities();
+            await this._loadAdvertisements();
             this._recalculateSummary();
             oHostelModel.refresh(true);
         },
@@ -203,6 +214,157 @@
         onHome: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHostel");
+        },
+
+        _loadAdvertisements: async function () {
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_Advertisement");
+                const aAdvertisements = oResponse?.data || [];
+
+                // Transform the data to match our carousel structure
+                const aCarouselItems = this._transformAdvertisementData(aAdvertisements);
+                this._setupAdvertisementModel(aCarouselItems);
+            } catch (oError) {
+                this._setupAdvertisementModel([]);
+            }
+        },
+
+        _transformAdvertisementData: function (aAdvertisements) {
+            const aCarouselItems = [];
+            const that = this;
+
+            aAdvertisements.forEach(function (oAd) {
+                // Extract photos from Photo1, Photo2, Photo3, etc.
+                // Assuming Photo1, Photo2, Photo3 fields exist
+                for (let i = 1; i <= 3; i++) {
+                    const sPhotoField = `Photo${i}`;
+                    const sNameField = `Photo${i}Name`;
+                    const sTypeField = `Photo${i}Type`;
+
+                    if (oAd[sPhotoField]) {
+                        // Clean and prepare image data
+                        const sImageSrc = that._prepareImageData(oAd[sPhotoField], oAd[sTypeField]);
+
+                        if (sImageSrc) {
+                            aCarouselItems.push({
+                                id: oAd.ID + '-' + i,
+                                image: sImageSrc,
+                                title: oAd[sNameField] || `Advertisement ${i}`,
+                                url: oAd.URL,
+                                originalAd: oAd
+                            });
+                        }
+                    }
+                }
+            });
+
+            return aCarouselItems;
+        },
+
+        _prepareImageData: function (sImageData, sImageType) {
+            if (!sImageData) {
+                return null;
+            }
+            
+            // Clean the data - remove whitespace
+            const sCleanData = sImageData.replace(/\s/g, '');
+            
+            // Check if already has data URL prefix
+            if (sCleanData.startsWith('data:')) {
+                return sCleanData;
+            }
+            
+            // Determine image type - default to PNG if not specified
+            let sType = sImageType || 'image/png';
+            
+            // Ensure valid MIME type
+            if (!sType.startsWith('image/')) {
+                sType = 'image/png';
+            }
+            
+            // Construct proper data URL
+            return `data:${sType};base64,${sCleanData}`;
+        },
+
+        _setupAdvertisementModel: function (aCarouselItems) {
+            const oAdvertisementModel = new JSONModel({
+                Advertisements: aCarouselItems,
+                currentPage: 0,
+                itemsPerPage: 1
+            });
+            this.getView().setModel(oAdvertisementModel, "AdvertisementModel");
+            
+            // Start carousel auto‑slide if there are advertisements
+            if (aCarouselItems.length > 1) {
+                this._startAdvertisementCarouselAutoSlide();
+            }
+        },
+
+        _startAdvertisementCarouselAutoSlide: function () {
+            const oCarousel = this.byId("AdvertisementCarousel");
+            if (!oCarousel || oCarousel.getPages().length <= 1) {
+                // Carousel not ready, retry after a short delay
+                setTimeout(() => this._startAdvertisementCarouselAutoSlide(), 300);
+                return;
+            }
+
+            // Clear any existing interval
+            if (this._adCarouselInterval) {
+                clearInterval(this._adCarouselInterval);
+                this._adCarouselInterval = null;
+            }
+
+            // Start new interval
+            this._adCarouselInterval = setInterval(() => {
+                if (oCarousel && !oCarousel.bIsDestroyed) {
+                    oCarousel.next();
+                } else {
+                    clearInterval(this._adCarouselInterval);
+                    this._adCarouselInterval = null;
+                }
+            }, 3000);
+
+            // Pause on user interaction
+            const PAUSE_AND_RESUME = () => {
+                if (this._adCarouselInterval) {
+                    clearInterval(this._adCarouselInterval);
+                    this._adCarouselInterval = null;
+                }
+                // Resume after 3 seconds of inactivity
+                setTimeout(() => {
+                    if (oCarousel && !oCarousel.bIsDestroyed) {
+                        this._startAdvertisementCarouselAutoSlide();
+                    }
+                }, 3000);
+            };
+
+            oCarousel.attachBrowserEvent("touchstart", PAUSE_AND_RESUME);
+            oCarousel.attachBrowserEvent("mousedown", PAUSE_AND_RESUME);
+        },
+
+        onAdvertisementCarouselChange: function (oEvent) {
+            const iNewPage = oEvent.getParameter("currentPage");
+            const oAdvertisementModel = this.getView().getModel("AdvertisementModel");
+            if (oAdvertisementModel) {
+                oAdvertisementModel.setProperty("/currentPage", iNewPage);
+            }
+        },
+
+        onAdvertisementImagePress: function (oEvent) {
+            const oImage = oEvent.getSource();
+            const oBindingContext = oImage.getBindingContext("AdvertisementModel");
+
+            if (oBindingContext) {
+                const oAdItem = oBindingContext.getObject();
+                if (oAdItem && oAdItem.url) {
+                    // Open the URL in a new tab
+                    window.open(oAdItem.url, "_blank");
+                } else {
+                    sap.m.MessageToast.show("Advertisement clicked");
+                }
+            } else {
+                sap.m.MessageToast.show("Advertisement clicked");
+            }
         },
 
         _isSinglePersonOnlyPropertyType: function (sPropertyType) {
