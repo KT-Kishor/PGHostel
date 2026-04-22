@@ -659,7 +659,7 @@
                     </cells>
                 </ColumnListItem>
 
-                <ColumnListItem vAlign="Middle">
+                <ColumnListItem vAlign="Middle" class="grandTotalBar">
                     <cells>
                         <Title
                             text="Sub Total"
@@ -683,7 +683,7 @@
                 </ColumnListItem>
                 <ColumnListItem
     vAlign="Middle"
-    visible="{= !!${HostelModel>/AppliedCouponCode} }"
+    visible="{= !!${HostelModel>/AppliedCouponCode} }" class="grandTotalBar"
 >
     <cells>
   
@@ -710,6 +710,7 @@
 <ColumnListItem
     vAlign="Middle"
     visible="{= !!${HostelModel>/AppliedCouponCode} }"
+    class="grandTotalBar"
 >
     <cells>
         <Title
