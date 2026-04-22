@@ -289,6 +289,12 @@
                                         minScreenWidth="Tablet"
                                         demandPopin="true"
                                     >
+                                        <Text text="Age" />
+                                    </Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                    >
                                         <Text text="Gender" />
                                     </Column>
                                     <Column
@@ -321,6 +327,7 @@
                                             <Text
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
                                             />
+                                            <Text text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
                                             <!-- <Select selectedKey="{BookingView>Gender}" items="{BookingView>/GenderOptions}">
                                                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select> -->
