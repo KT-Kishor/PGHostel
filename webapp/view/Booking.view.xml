@@ -641,7 +641,7 @@
                     visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
                 >
                     <cells>
-                        <Title text="Facilities Total" level='H6'/>
+                        <Title text="Facilities" level='H6'/>
                         <HBox
                             justifyContent="End"
                             alignItems="Center"
@@ -884,7 +884,9 @@
         >
             <Title
                 text="Grand Total"
-                 level="H1"
+                 level="H3"
+                 titleStyle="H3"
+                 class="sapUiSmallMarginBegin"
             />
             <HBox
                 justifyContent="End"
@@ -893,12 +895,15 @@
             >
                 <Title
                     text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
-                     level="H1"
+                     level="H3"
+                     titleStyle="H3"
                     class="sapUiTinyMarginEnd"
                 />
                 <Title
                     text="{HostelModel>/Currency}"
-                     level="H1"
+                     level="H3"
+                     titleStyle="H3"
+                     class="sapUiTinyMarginEnd"
                 />
             </HBox>
         </HBox>
