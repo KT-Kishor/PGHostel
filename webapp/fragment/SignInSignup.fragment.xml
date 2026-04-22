@@ -10,7 +10,7 @@
         draggable="true"
         resizable="true"
         class="authDialog"
-        contentWidth="28rem"
+        contentWidth="{= ${LoginViewModel>/authFlow} === 'signup' ? '65rem' : '28rem' }"
         contentHeight="auto"
     >
         <!--stretch="{= ${device>/system/phone} }"-->
@@ -39,7 +39,7 @@
             >
                 <Button
                     text="{i18n>CapsIGNIN}"
-					tooltip="{i18n>CapsIGNIN}"
+                    tooltip="{i18n>CapsIGNIN}"
                     id="signinvisible"
                     type="Transparent"
                     class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} "
@@ -49,7 +49,7 @@
                 <Button
                     id="signupvisible"
                     text="{i18n>CapsIGNUP}"
-					tooltip="{i18n>CapsIGNUP}"
+                    tooltip="{i18n>CapsIGNUP}"
                     type="Transparent"
                     class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} "
                     press="onSwitchToSignUp"
@@ -88,12 +88,13 @@
                         submit="onSignIn"
                     />
                     <Label text="{i18n>loginwith}" />
-<FlexBox
-    class="aleftMargin loginOptionsRow"
-    direction="Row"
-    wrap="Wrap"
-    alignItems="Center"
-    justifyContent="Start">
+                    <FlexBox
+                        class="aleftMargin loginOptionsRow"
+                        direction="Row"
+                        wrap="Wrap"
+                        alignItems="Center"
+                        justifyContent="Start"
+                    >
                         <RadioButton
                             text="{i18n>password}"
                             groupName="loginType"
@@ -159,7 +160,7 @@
                 >
                     <Button
                         text="{i18n>setForgotPassword}"
-						tooltip="{i18n>setForgotPassword}"
+                        tooltip="{i18n>setForgotPassword}"
                         type="Transparent"
                         press="onForgotPassword"
                         visible="{= ${LoginViewModel>/isOTPAllowed} }"
@@ -167,7 +168,7 @@
                     <Button
                         class="myUnifiedBtn"
                         text="{i18n>signIn}"
-						tooltip="{i18n>signIn}"
+                        tooltip="{i18n>signIn}"
                         width="100px"
                         enabled="true"
                         press="onSignIn"
@@ -242,7 +243,7 @@
                             <Button
                                 id="btnOtpVerify"
                                 text="{i18n>verifyOTP}"
-								tooltip="{i18n>verifyOTP}"
+                                tooltip="{i18n>verifyOTP}"
                                 press="_onVerifyOTP"
                                 enabled="{= ${LoginViewModel>/forgotStep} === 2 }"
                                 class="myUnifiedBtn sapUiSmallMarginTop"
@@ -279,7 +280,6 @@
                             maxLength="50"
                             valueHelpRequest=".SM_onTogglePasswordVisibility"
                             enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
-
                         />
                         <HBox
                             width="100%"
@@ -291,7 +291,7 @@
                             />
                             <Button
                                 text="{i18n>MSgeneratePassword}"
-								tooltip="{i18n>MSgeneratePassword}"
+                                tooltip="{i18n>MSgeneratePassword}"
                                 type="Transparent"
                                 icon="sap-icon://refresh"
                                 press="SM_onGenerateForgotPassword"
@@ -328,42 +328,51 @@
                     <HBox alignContent="Start">
                         <Button
                             text="{i18n>backtoLogin}"
-							tooltip="{i18n>backtoLogin}"
+                            tooltip="{i18n>backtoLogin}"
                             type="Transparent"
                             press="onBackToLogin"
                         />
                     </HBox>
                 </f:SimpleForm>
             </Panel>
-            <!-- Sign Up Panel -->
-            <Panel
-                id="signUpPanel"
-                visible="{= ${LoginViewModel>/authFlow} === 'signup' }"
-            >
-                <content>
-                    <f:SimpleForm
-                        id="signUpForm"
-                        editable="true"
-                        layout="ResponsiveGridLayout"
-                        labelSpanL="3"
-                        labelSpanM="3"
-                        emptySpanL="1"
-                        emptySpanM="1"
-                        columnsL="2"
-                        columnsM="1"
-                        class="sapUiNoContentPadding"
-                    >
-                        <!-- <Label text=""/> -->
+ <Panel
+    id="signUpPanel"
+    visible="{= ${LoginViewModel>/authFlow} === 'signup' }"
+>
+    <content>
+
+                <f:SimpleForm
+                    id="signUpLeftForm"
+                editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="4"
+            labelSpanM="4"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="0"
+            emptySpanL="0"
+            emptySpanM="0"
+            emptySpanS="0"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="2"
+            singleContainerFullSize="false"
+                    class="sapUiNoContentPadding"
+                >
+                    <f:content>
+                        <core:Title text="Personal Details" />
+
+                        <Label
+                            text="{i18n>fullname}"
+                            required="true"
+                        />
                         <HBox
                             width="100%"
+                            justifyContent="Start"
                             alignItems="Center"
-                            class="isdMobileRow"
                         >
-                            <VBox width="25%">
-                                <Label
-                                    text="{i18n>MSsalutation}"
-                                    required="true"
-                                />
+                            <VBox width="35%">
                                 <ComboBox
                                     id="signUpSalutation"
                                     selectedKey=""
@@ -387,22 +396,12 @@
                                         key="Dr."
                                         text="Dr."
                                     />
-                                    <layoutData>
-                                        <FlexItemData
-                                            baseSize="30%"
-                                            growFactor="0"
-                                        />
-                                    </layoutData>
                                 </ComboBox>
                             </VBox>
                             <VBox
-                                width="75%"
+                                width="65%"
                                 class="sapUiTinyMarginBegin"
                             >
-                                <Label
-                                    text="{i18n>fullname}"
-                                    required="true"
-                                />
                                 <Input
                                     id="signUpName"
                                     value="{LoginMode>/fullname}"
@@ -412,26 +411,22 @@
                                     valueStateText="{i18n>MSenterValidName}"
                                     maxLength="50"
                                 />
-                                <layoutData>
-                                    <FlexItemData
-                                        baseSize="70%"
-                                        growFactor="1"
-                                    />
-                                </layoutData>
                             </VBox>
                         </HBox>
+
                         <Label
                             text="{i18n>MVDDOB}"
                             required="true"
                         />
                         <DatePicker
                             id="signUpDOB"
-                            value ="{LoginMode>/DateOfBirth}"
+                            value="{LoginMode>/DateOfBirth}"
                             displayFormat="dd/MM/yyyy"
                             valueFormat="yyyy-MM-dd"
                             change="onChangeDOB"
-                             initialFocusedDateValue="{LoginMode>/minDate}"
+                            initialFocusedDateValue="{LoginMode>/minDate}"
                         />
+
                         <Label
                             text="{i18n>MVgender}"
                             required="true"
@@ -458,11 +453,72 @@
                                 text="Other"
                             />
                         </Select>
-                        <!-- ================== 2) CONTACT DETAILS ================== -->
+                           <core:Title text=""  />
+
+                        <Label
+                            text="{i18n>MSmobileNo}"
+                            required="true"
+                        />
+                        <HBox
+                            width="100%"
+                            justifyContent="Start"
+                            alignItems="Center"
+                        >
+                            <VBox width="35%">
+                                <ComboBox
+                                    change="onSTDChange"
+                                    id="signUpSTD"
+                                    value="{LoginMode>/STDCode}"
+                                    placeholder="+91"
+                                    valueStateText="{i18n>MSselectCode}"
+                                    showSecondaryValues="true"
+                                    items="{path:'CountryModel>/', length:1000}"
+                                    filterSecondaryValues="true"
+                                >
+                                    <core:ListItem
+                                        key="{CountryModel>stdCode}"
+                                        text="{CountryModel>stdCode}"
+                                        additionalText="{CountryModel>code}"
+                                    />
+                                </ComboBox>
+                            </VBox>
+                            <VBox
+                                width="65%"
+                                class="sapUiTinyMarginBegin"
+                            >
+                                <Input
+                                    id="signUpPhone"
+                                    type="Tel"
+                                    value="{LoginMode>/Mobileno}"
+                                    placeholder="{i18n>enterMobileNumber}"
+                                    maxLength="18"
+                                    liveChange="onMobileLivechnage"
+                                    valueStateText="{i18n>MSmobileNoValueState}"
+                                />
+                            </VBox>
+                        </HBox>
+
+                        <Label
+                            text="{i18n>address}"
+                            required="true"
+                        />
+                        <TextArea
+                            id="signUpAddress"
+                            rows="3"
+                            value="{LoginMode>/Address}"
+                            liveChange="onAddressChange"
+                            placeholder="{i18n>placeHolderAddress}"
+                            maxLength="120"
+                        />
+
+                     
+
+            
+                      <core:Title text="Contact Details" />
+
                         <Label
                             text="{i18n>email}"
                             required="true"
-                            class="sapUiTinyMarginTop"
                         />
                         <Input
                             id="signUpEmail"
@@ -474,6 +530,7 @@
                             valueStateText="{i18n>MSenterValidEmail}"
                             maxLength="50"
                         />
+
                         <Label
                             text="{i18n>MVDcountry}"
                             required="true"
@@ -494,6 +551,7 @@
                                 additionalText="{CountryModel>code}"
                             />
                         </ComboBox>
+
                         <Label
                             text="{i18n>MVDstate}"
                             required="true"
@@ -513,6 +571,7 @@
                                 text="{StateModel>stateName}"
                             />
                         </ComboBox>
+
                         <Label
                             text="{i18n>city}"
                             required="true"
@@ -533,97 +592,21 @@
                                 additionalText="{CityModel>branchCode}"
                             />
                         </ComboBox>
-                        <Label text="" />
-                        <HBox
-                            width="100%"
-                            alignItems="Center"
-                            class="isdMobileRow"
-                        >
-                            <VBox width="25%">
-                                <Label
-                                    text="{i18n>MSisdCode}"
-                                    required="true"
-                                />
-                                <ComboBox
-                                    change="onSTDChange"
-                                    id="signUpSTD"
-                                    value="{LoginMode>/STDCode}"
-                                    placeholder="+91"
-                                    valueStateText="{i18n>MSselectCode}"
-                                    showSecondaryValues="true"
-                                    items="{path:'CountryModel>/', length:1000}"
-                                    filterSecondaryValues="true"
-                                >
-                                    <core:ListItem
-                                        key="{CountryModel>stdCode}"
-                                        text="{CountryModel>stdCode}"
-                                        additionalText="{CountryModel>code}"
-                                    />
-                                    <layoutData>
-                                        <FlexItemData
-                                            baseSize="30%"
-                                            growFactor="0"
-                                        />
-                                    </layoutData>
-                                </ComboBox>
-                            </VBox>
-                            <VBox
-                                width="75%"
-                                class="sapUiTinyMarginBegin"
-                            >
-                                <Label
-                                    text="{i18n>MSmobileNo}"
-                                    required="true"
-                                />
-                                <Input
-                                    id="signUpPhone"
-                                    type="Tel"
-                                    value="{LoginMode>/Mobileno}"
-                                    placeholder="{i18n>enterMobileNumber}"
-                                    maxLength="18"
-                                    liveChange="onMobileLivechnage"
-                                    valueStateText="{i18n>MSmobileNoValueState}"
-                                />
-                                <layoutData>
-                                    <FlexItemData
-                                        baseSize="70%"
-                                        growFactor="1"
-                                    />
-                                </layoutData>
-                            </VBox>
-                        </HBox>
-                        <Label
-                            text="{i18n>address}"
-                            required="true"
-                        />
-                        <TextArea
-                            id="signUpAddress"
-                            rows="3"
-                            value="{LoginMode>/Address}"
-                            liveChange="onAddressChange"
-                            placeholder="{i18n>placeHolderAddress}"
-                            maxLength="120"
-                        />
-                        <HBox width="100%">
-                            <Label
-                                text="{i18n>MSaccountSecurity}"
-                                design="Bold"
-                                class="sapUiSmallMarginTop"
-                            />
-                        </HBox>
-                        <!-- <Title text="Account Security" /> -->
-                        <!-- <MessageStrip id="passwordHelpStrip" type="Information" showIcon="false" text="Password must be 6+ characters: upper/lowercase letters, a number, and a special character" /> -->
+<core:Title text="Create Password" />
+
                         <MessageStrip
                             id="passwordHelpStrip"
                             type="Information"
                             showIcon="false"
                             text="{i18n>msgStrip}"
+                            class="sapUiSmallMarginBottom"
                         />
+
                         <Label
                             text="{i18n>MScreatePassword}"
                             required="true"
                         />
-                        <HBox width="100%">
+                        <VBox width="100%">
                             <Input
                                 showValueStateMessage="false"
                                 id="signUpPassword"
@@ -636,28 +619,26 @@
                                 valueHelpIconSrc="sap-icon://show"
                                 valueHelpRequest="SM_onTogglePasswordVisibility"
                                 maxLength="50"
+                            />
+                            <HBox
+                                width="100%"
+                                justifyContent="SpaceBetween"
+                                class=""
                             >
-                                <layoutData>
-                                    <FlexItemData growFactor="1" />
-                                </layoutData>
-                            </Input>
-                        </HBox>
-                        <HBox
-                            width="100%"
-                            justifyContent="SpaceBetween"
-                        >
-                            <Text
-                                id="passwordStrengthText"
-                                class="pwdMinFail"
-                            />
-                            <Button
-                                text="{i18n>MSgeneratePassword}"
-								tooltip="{i18n>MSgeneratePassword}"
-                                type="Transparent"
-                                icon="sap-icon://refresh"
-                                press="SM_onGeneratePassword"
-                            />
-                        </HBox>
+                                <Text
+                                    id="passwordStrengthText"
+                                    class="pwdMinFail"
+                                />
+                                <Button
+                                    text="{i18n>MSgeneratePassword}"
+                                    tooltip="{i18n>MSgeneratePassword}"
+                                    type="Transparent"
+                                    icon="sap-icon://refresh"
+                                    press="SM_onGeneratePassword"
+                                />
+                            </HBox>
+                        </VBox>
+
                         <Label
                             text="{i18n>MSconfirmPassword}"
                             required="true"
@@ -676,21 +657,25 @@
                             maxLength="50"
                             submit="onSignUp"
                         />
-                    </f:SimpleForm>
-                    <HBox
-                        justifyContent="End"
-                        class="sapUiSmallMargin"
-                    >
-                        <Button
-                            text="{i18n>MSsignUp}"
-							tooltip="{i18n>MSsignUp}"
-                            class="myUnifiedBtn sapUiSmallMarginEnd"
-                            width="120px"
-                            press="onSignUp"
-                        />
-                    </HBox>
-                </content>
-            </Panel>
+                    </f:content>
+                </f:SimpleForm>
+     
+        <!-- BUTTON AT BOTTOM -->
+        <HBox
+            justifyContent="End"
+            class="sapUiSmallMargin"
+        >
+            <Button
+                text="{i18n>MSsignUp}"
+                tooltip="{i18n>MSsignUp}"
+                class="myUnifiedBtn sapUiSmallMarginEnd"
+                width="120px"
+                press="onSignUp"
+            />
+        </HBox>
+    </content>
+</Panel>
+
         </VBox>
     </Dialog>
 </core:FragmentDefinition>
