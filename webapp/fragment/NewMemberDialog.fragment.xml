@@ -75,6 +75,20 @@
                 />
 
                 <Label
+                    text="Date of Birth"
+                    required="true"
+                />
+                <DatePicker
+                    id="newMemberDOB"
+                    value="{BookingView>/NewMemberDraft/Age}"
+                    placeholder="DD/MM/YYYY"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onNewMemberDOBChange"
+                    valueStateText="Age must be between 0 and 100 years"
+                />
+
+                <Label
                     text="Gender"
                     required="true"
                 />

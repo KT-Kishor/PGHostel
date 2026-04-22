@@ -45,6 +45,7 @@
                 >
                     <columns>
                         <Column><Text text="Full Name" /></Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Age" /></Column>
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Relationship" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
@@ -55,6 +56,7 @@
                         <ColumnListItem>
                             <cells>
                                 <Text text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}" />
+                                <Text text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
                                 <Text text="{BookingView>DocumentType}" />

@@ -494,6 +494,70 @@ canEditComplaint: function (sStatus) {
     return status !== "in progress" && status !== "resolved";
 },
 
+formatAgeFromDOBOrAge: function (sDateValue) {
+    // sDateValue is the value from BookingView>Age field, which contains a date string like "2016-04-19"
+    if (!sDateValue || sDateValue === "") {
+        return "";
+    }
+
+    // First, check if it's already a numeric age (like "25")
+    const ageNum = parseInt(sDateValue, 10);
+    if (!isNaN(ageNum) && ageNum.toString() === sDateValue.trim()) {
+        // It's a plain number, treat as already calculated age
+        if (ageNum === 0) {
+            return "0 years";
+        } else if (ageNum === 1) {
+            return "1 year";
+        } else {
+            return ageNum + " years";
+        }
+    }
+
+    // Otherwise, it's a date string - parse it
+    let birthDate;
+    if (typeof sDateValue === 'string') {
+        // Handle YYYY-MM-DD format from backend (e.g., "2016-04-19")
+        const parts = sDateValue.split("-");
+        if (parts.length === 3) {
+            birthDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        } else {
+            // Try parsing as-is (could be other format)
+            birthDate = new Date(sDateValue);
+        }
+    } else if (sDateValue instanceof Date) {
+        birthDate = sDateValue;
+    } else {
+        return "";
+    }
+
+    // Check if date is valid
+    if (isNaN(birthDate.getTime())) {
+        return sDateValue; // Return raw value if can't parse
+    }
+
+    // Calculate age
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    // Adjust age if birthday hasn't occurred yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+    }
+
+    // Format with "year" or "years"
+    if (age < 0) {
+        return "";
+    } else if (age === 0) {
+        return "0 years";
+    } else if (age === 1) {
+        return "1 year";
+    } else {
+        return age + " years";
+    }
+},
+
         
     }
 });

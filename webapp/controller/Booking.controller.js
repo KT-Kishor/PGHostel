@@ -2698,6 +2698,22 @@
             oBookingView.setProperty("/NewMemberDialogTitle", "Add New Member");
             oBookingView.setProperty("/NewMemberDialogSaveText", "Save Member");
             oBookingView.refresh(true);
+
+            // Configure date picker for DOB
+            const oDatePicker = this.byId("newMemberDOB");
+            if (oDatePicker) {
+                const now = new Date();
+                const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+
+                oDatePicker.setMaxDate(now);
+                oDatePicker.setMinDate(minDate);
+                oDatePicker.setInitialFocusedDateValue(focusDate);
+            }
+
+            // Make date picker read-only
+            this._FragmentDatePickersReadOnly(["newMemberDOB"]);
+
             oDialog.open();
             this._attachDocumentInfoHover();
         },
@@ -2720,6 +2736,22 @@
             oBookingView.setProperty("/NewMemberDialogTitle", "Edit Member");
             oBookingView.setProperty("/NewMemberDialogSaveText", "Update Member");
             oBookingView.refresh(true);
+
+            // Configure date picker for DOB
+            const oDatePicker = this.byId("newMemberDOB");
+            if (oDatePicker) {
+                const now = new Date();
+                const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+
+                oDatePicker.setMaxDate(now);
+                oDatePicker.setMinDate(minDate);
+                oDatePicker.setInitialFocusedDateValue(focusDate);
+            }
+
+            // Make date picker read-only
+            this._FragmentDatePickersReadOnly(["newMemberDOB"]);
+
             oDialog.open();
             this._attachDocumentInfoHover();
         },
@@ -3086,6 +3118,32 @@
             return utils._LCstrictValidationComboBox(oEvent);
         },
 
+        onNewMemberDOBChange: function (oEvent) {
+            const oDatePicker = oEvent.getSource();
+            const sValue = oDatePicker.getValue();
+
+            // Clear any previous validation
+            oDatePicker.setValueState("None");
+
+            if (!sValue) {
+                return true; // Allow empty
+            }
+
+            // Validate date is within allowed range (0-100 years)
+            const now = new Date();
+            const selectedDate = new Date(sValue);
+            const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+            const maxDate = now;
+
+            if (selectedDate < minDate || selectedDate > maxDate) {
+                oDatePicker.setValueState("Error");
+                oDatePicker.setValueStateText("Date must be within last 100 years");
+                return false;
+            }
+
+            return true;
+        },
+
         onNewMemberDocumentTypeChange: function (oEvent) {
             const oComboBox = oEvent.getSource();
             const sValue = String(oComboBox.getValue() || "").trim();
@@ -3110,6 +3168,7 @@
             const oGenderCombo = this.byId("newMemberGenderCombo");
             const oRelationCombo = this.byId("newMemberRelationCombo");
             const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
+            const oDOBPicker = this.byId("newMemberDOB");
             const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
             // SELF is the logged-in user record. Primary occupant is a separate user choice.
             const oDraftId = oBookingView.getProperty("/NewMemberDraft/id");
@@ -3130,6 +3189,37 @@
             if (!utils._LCvalidateName(oNameInput, "ID")) {
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
+            }
+
+            if (!bIsSelfDraft) {
+                // DOB validation (required field for non-SELF members)
+                if (oDOBPicker) {
+                    const sDOBValue = oDOBPicker.getValue() || "";
+                    if (!sDOBValue.trim()) {
+                        oDOBPicker.setValueState("Error");
+                        oDOBPicker.setValueStateText("Date of Birth is required");
+                        MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                        return;
+                    }
+                    // Validate date range
+                    const now = new Date();
+                    const selectedDate = new Date(sDOBValue);
+                    const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+                    const maxDate = now;
+
+                    if (selectedDate < minDate || selectedDate > maxDate) {
+                        oDOBPicker.setValueState("Error");
+                        oDOBPicker.setValueStateText("Date must be within last 100 years");
+                        MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
+                        return;
+                    }
+                    oDOBPicker.setValueState("None");
+                }
+            } else {
+                // SELF fields are read-only, so clear any stale validation state.
+                if (oDOBPicker) {
+                    oDOBPicker.setValueState("None");
+                }
             }
             if (!bIsSelfDraft) {
                 // Gender validation (only for non-SELF members)
@@ -3160,6 +3250,7 @@
             oDraft.Gender = oGenderCombo.getSelectedKey() || String(oGenderCombo.getValue() || "").trim();
             oDraft.Relation = oRelationCombo.getSelectedKey() || String(oRelationCombo.getValue() || "").trim();
             oDraft.DocumentType = oDocumentTypeCombo.getSelectedKey() || String(oDocumentTypeCombo.getValue() || "").trim();
+            oDraft.Age = oDOBPicker ? oDOBPicker.getValue() || "" : "";
             oDraft.id = oDraft.id || ("FM_" + Date.now());
 
             const bIsEditMode = !!(oBookingView.getProperty("/NewMemberDraft/IsEditMode"));
