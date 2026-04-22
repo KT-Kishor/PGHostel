@@ -37,7 +37,7 @@
                         wrapping="true"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced">
+                    <Panel class="customBookingPanel booking-panel-enhanced panelbracket">
                         <MessageStrip
                             text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
                             showIcon="true"
@@ -231,7 +231,7 @@
                     />
 
                     <Panel
-                        class="customBookingPanel booking-panel-enhanced"
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
                     >
                         <VBox class="sapUiTinyMargin">
                             <Input
@@ -365,7 +365,7 @@
                          visible="{= ${FacilityModel>/Facilities}.length > 0 }"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced facilityBookingPanel" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
+                    <Panel class="customBookingPanel booking-panel-enhanced facilityBookingPanel panelbracket" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
                                 text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
@@ -426,7 +426,7 @@
                     />
 
                         <Panel
-                            class="customBookingPanel booking-panel-enhanced"
+                            class="customBookingPanel booking-panel-enhanced panelbracket"
                         >
                             <!-- <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center"> -->
                             <HBox
@@ -480,7 +480,7 @@
 />
 
 
-      <Panel class="customBookingPanel booking-panel-enhanced">
+      <Panel class="customBookingPanel booking-panel-enhanced panelbracket">
     <VBox class="sapUiTinyMargin">
         <HBox
             justifyContent="SpaceBetween"

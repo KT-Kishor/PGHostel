@@ -5495,3 +5495,7 @@ html, body {
   flex-direction: column;
   min-height: 100vh;
 }
+.panelbracket {
+  border-radius: 12px !important ;
+    border-left: 6px solid #00b7c7 !important;
+}

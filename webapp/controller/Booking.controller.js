@@ -4853,7 +4853,8 @@
 
             // oModel.setProperty("/TotalDays", iDays);
             // oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
-            let sRoomBreakdown = String(fBasePrice);
+            const formattedBasePrice = this.Formatter.fromatNumber(fBasePrice);
+            let sRoomBreakdown = formattedBasePrice;
             let fSubTotal = 0;
             let fDiscountedSubTotal = 0;
             let oTaxBreakup;
@@ -4861,10 +4862,10 @@
             if (sPlan === "Per Day" && oStartDate && oEndDate && oEndDate > oStartDate) {
                 iDays = Math.floor((oEndDate - oStartDate) / 86400000);
                 fRoomPrice = fBasePrice * iDays;
-                sRoomBreakdown = `${fBasePrice} x ${iDays} day(s)`;
+                sRoomBreakdown = `${formattedBasePrice} x ${iDays} day(s)`;
             } else if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
                 fRoomPrice = fBasePrice * iDuration;
-                sRoomBreakdown = `${fBasePrice} x ${iDuration} ${sPlan === "Per Month" ? "month(s)" : "year(s)"}`;
+                sRoomBreakdown = `${formattedBasePrice} x ${iDuration} ${sPlan === "Per Month" ? "month(s)" : "year(s)"}`;
             } else {
                 fRoomPrice = fBasePrice;
             }
