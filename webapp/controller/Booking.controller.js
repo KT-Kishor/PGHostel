@@ -1932,17 +1932,20 @@
             let sName = "";
             let sSalutation = "";
             let sGender = "";
+            let sAgeOrDOB = "";
 
             if (oSelfMember) {
                 // Use the member's details from HM_MemberDocuments
                 sName = String(oSelfMember.Name || oSelfMember.FullName || "").trim();
                 sSalutation = String(oSelfMember.Salutation || "").trim();
                 sGender = String(oSelfMember.Gender || "").trim();
+                sAgeOrDOB = String(oSelfMember.Age || oSelfMember.DateOfBirth || oSelfMember.DateofBirth || "").trim();
             } else {
                 // Fallback to HostelModel properties (from LoginModel)
                 sName = String(oHostelModel.getProperty("/FullName") || "").trim();
                 sSalutation = oHostelModel.getProperty("/Salutation") || "";
                 sGender = oHostelModel.getProperty("/Gender") || "";
+                sAgeOrDOB = String(oHostelModel.getProperty("/DateOfBirth") || "").trim();
             }
 
             const oPrimaryDocument = this._getPrimaryDocumentRecord();
@@ -1952,7 +1955,7 @@
                 Salutation: sSalutation,
                 Name: sName || "Primary Guest",
                 Relation: "Self",
-                Age: "",
+                Age: sAgeOrDOB,
                 Gender: sGender,
                 Selected: false,
                 DocumentType: oPrimaryDocument.DocumentType || "",
