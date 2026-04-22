@@ -13,6 +13,7 @@
         showHeader="true"
         horizontalScrolling="false"
         afterClose="onNewMemberDialogAfterClose"
+        escapeHandler=".onNewMemberDialogEscape"
     >
         <customHeader>
             <OverflowToolbar>

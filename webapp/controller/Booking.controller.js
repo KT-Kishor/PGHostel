@@ -2930,6 +2930,17 @@
             this._resetNewMemberDialogState();
         },
 
+        onNewMemberDialogEscape: function (oEvent) {
+            // Clear errors first
+            this._resetNewMemberDialogState();
+            // Close the dialog using the same method as Cancel button
+            this.onCloseNewMemberDialog();
+            // Prevent default ESC behavior (optional)
+            if (oEvent) {
+                oEvent.preventDefault();
+            }
+        },
+
         _resetNewMemberDialogState: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oFileUploader = this.byId("newMemberFileUploader");
@@ -2940,7 +2951,9 @@
             oBookingView.refresh(true);
 
             [
+                this.byId("newMemberSalutationCombo"),
                 this.byId("newMemberNameInput"),
+                this.byId("newMemberDOB"),
                 this.byId("newMemberGenderCombo"),
                 this.byId("newMemberRelationCombo"),
                 this.byId("newMemberDocumentTypeCombo")
