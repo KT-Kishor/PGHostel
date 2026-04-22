@@ -472,10 +472,8 @@
         >
             <columns>
                 <Column demandPopin="true">
-                    <Text text="{i18n>MSsalutation}" />
-                </Column>
-                <Column demandPopin="true">
-                    <Text text="{i18n>Studentname}" />
+<Text text="{i18n>fullname}" />
+
                 </Column>
                 <Column demandPopin="true">
                     <Text text="{i18n>age}" />
@@ -495,8 +493,7 @@
             <items>
                 <ColumnListItem press="">
                     <cells>
-                        <Text text="{profileData>Salutation}" />
-                        <Text text="{profileData>Name}" />
+                        <Text text="{= ${profileData>Salutation} + ' ' + ${profileData>Name}}" />
                         <Text
                             text="{path: 'profileData>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
                         />
