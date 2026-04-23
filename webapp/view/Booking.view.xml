@@ -245,7 +245,7 @@
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
                             <MessageStrip
-                                text="Select a primary occupant using the radio button. The primary occupant will be the contact person for the booking."
+                                text="You can change any occupant as the primary occupant; they will be the contact person"
                                 type="Information"
                                 showIcon="true"
                                 showCloseButton="false"
