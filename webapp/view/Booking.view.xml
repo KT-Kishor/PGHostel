@@ -641,13 +641,13 @@
                                 class="pricingDetailsTable sapUiTinyMarginBottom"
                             >
                                 <columns>
-                                    <Column width="70%">
+                                    <Column width="60%">
                                         <header>
                                             <Text text="Item" />
                                         </header>
                                     </Column>
                                     <Column
-                                        width="30%"
+                                        width="40%"
                                         hAlign="End"
                                     >
                                         <header>
