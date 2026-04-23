@@ -3569,7 +3569,7 @@
                 const oDocumentData = {
                     DocumentType: oDocument.DocumentType || "",
                     FileName: oDocument.FileName || oDocument.DocumentName || "",
-                    FileType: oDocument.FileType || "",
+                    FileType: (oDocument.File || oDocument.Document) ? (oDocument.FileType || "") : "",
                     MemberID: oDocument.MemberID || sMemberID,
                     UserID: oDocument.UserID || sUserID,
                     File: oDocument.File || oDocument.Document || ""
@@ -3581,15 +3581,15 @@
 
                 return oDocumentData;
             }).filter(function (oDocument) {
-                return !!(oDocument.DocumentType || oDocument.File || oDocument.FileName);
+                return !!(oDocument.File || oDocument.FileName);
             });
 
             // Merge the document currently shown in the dialog into the payload.
-            if (oMember.DocumentType || oMember.File || oMember.DocumentName) {
+            if (oMember.File || oMember.DocumentName) {
                 const oCurrentDocument = {
                     DocumentType: oMember.DocumentType || "",
                     FileName: oMember.DocumentName || "",
-                    FileType: oMember.FileType || "",
+                    FileType: (oMember.File || oMember.Document) ? (oMember.FileType || "") : "",
                     MemberID: sMemberID,
                     UserID: sUserID,
                     File: oMember.File || oMember.Document || ""
