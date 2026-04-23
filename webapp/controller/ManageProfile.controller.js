@@ -877,11 +877,41 @@ sap.ui.define([
                     return;
                 }
 
-                const resp = await this.ajaxReadWithJQuery("HM_Member", { UserID: sUserID });
-                const aMember = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
+                const resp = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
+                // New structure: { success: true, data: [...], UserDocuments: [...] }
+                const aMemberData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
+                const aUserDocuments = Array.isArray(resp?.UserDocuments) ? resp.UserDocuments : [];
 
-                const aMembers = aMember.map(mem => {
-                    const oDoc = mem.Documents && mem.Documents.length > 0 ? mem.Documents[0] : {};
+                const aMembers = aMemberData.map(mem => {
+                    // Handle Documents array - could be empty
+                    let oDoc = {};
+                    let sAttachment = "";
+
+                    // First check member's own documents
+                    if (mem.Documents && mem.Documents.length > 0) {
+                        // Take first document
+                        oDoc = mem.Documents[0];
+                    }
+                    // If member is SELF and has no documents, check user documents
+                    else if ((mem.Relation || "").toUpperCase() === "SELF" && aUserDocuments.length > 0) {
+                        // Take first user document
+                        oDoc = aUserDocuments[0];
+                    }
+
+                    // Convert Buffer to base64 if needed
+                    if (oDoc.File) {
+                        if (oDoc.File.type === "Buffer" && Array.isArray(oDoc.File.data)) {
+                            // Convert byte array to base64
+                            const byteArray = new Uint8Array(oDoc.File.data);
+                            let binary = "";
+                            for (let i = 0; i < byteArray.length; i++) {
+                                binary += String.fromCharCode(byteArray[i]);
+                            }
+                            sAttachment = btoa(binary);
+                        } else if (typeof oDoc.File === "string") {
+                            sAttachment = oDoc.File;
+                        }
+                    }
 
                     return {
                         Salutation: mem.Salutation || "",
@@ -890,8 +920,7 @@ sap.ui.define([
                         Relation: mem.Relation || "",
                         BookingID: mem.BookingID || "",
 
-                        // FIXED
-                        Attachment: oDoc.File || "",
+                        Attachment: sAttachment,
                         FileName: oDoc.FileName || "",
                         FileType: oDoc.FileType || ""
                     };
