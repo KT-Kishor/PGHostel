@@ -37,7 +37,9 @@
                         wrapping="true"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced panelbracket">
+                    <Panel
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                    >
                         <MessageStrip
                             text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
                             showIcon="true"
@@ -242,35 +244,35 @@
                                 valueHelpOnly="true"
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
-<MessageStrip
-    text="Select a primary occupant using the radio button. The primary occupant will be the contact person for the booking."
-    type="Information"
-    showIcon="true"
-    showCloseButton="false"
-    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-    visible="{BookingView>/showFamilySection}"
-/>
+                            <MessageStrip
+                                text="Select a primary occupant using the radio button. The primary occupant will be the contact person for the booking."
+                                type="Information"
+                                showIcon="true"
+                                showCloseButton="false"
+                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                visible="{BookingView>/showFamilySection}"
+                            />
 
                             <Text
                                 text="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersCount'}"
                                 class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                             />
 
-<VBox
-    class="sapUiTinyMarginBottom"
-    visible="{BookingView>/showFamilySection}"
->
-    <Text
-        text="Primary occupant (Contact Person): {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
-        class="sapUiSmallMarginBottom"
-        visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
-    />
-    <!-- <Text
+                            <VBox
+                                class="sapUiTinyMarginBottom"
+                                visible="{BookingView>/showFamilySection}"
+                            >
+                                <Text
+                                    text="Primary occupant (Contact Person): {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
+                                    class="sapUiSmallMarginBottom"
+                                    visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
+                                />
+                                <!-- <Text
         text="This name will be used in the booking details."
         class="sapUiTinyMarginTop"
         visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
     /> -->
-</VBox>
+                            </VBox>
 
                             <Table
                                 items="{BookingView>/FamilyMembers}"
@@ -278,9 +280,12 @@
                                 class="responsiveTable"
                             >
                                 <columns>
-<Column width="6rem" visible="{BookingView>/showFamilySection}">
-    <Text text="Primary" />
-</Column>
+                                    <Column
+                                        width="6rem"
+                                        visible="{BookingView>/showFamilySection}"
+                                    >
+                                        <Text text="Primary" />
+                                    </Column>
 
                                     <Column>
                                         <Text text="Full Name" />
@@ -317,22 +322,28 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-<RadioButton
-    groupName="primaryOccupantGroup"
-    selected="{BookingView>IsPrimary}"
-    select="onPrimaryOccupantRadioSelect"
-    visible="{BookingView>/showFamilySection}"
-/>
+                                            <RadioButton
+                                                groupName="primaryOccupantGroup"
+                                                selected="{BookingView>IsPrimary}"
+                                                select="onPrimaryOccupantRadioSelect"
+                                                visible="{BookingView>/showFamilySection}"
+                                            />
 
                                             <Text
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
                                             />
-                                            <Text text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
+                                            <Text
+                                                text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                                            />
+
                                             <!-- <Select selectedKey="{BookingView>Gender}" items="{BookingView>/GenderOptions}">
                                                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select> -->
                                             <Text text="{BookingView>Gender}" />
-                                            <Text text="{BookingView>Relation}" />
+                                            <Text
+                                                text="{BookingView>Relation}"
+                                            />
+
                                             <!-- <Select selectedKey="{BookingView>DocumentType}" items="{BookingView>/DocumentTypeOptions}">
                                                     <core:Item key="{BookingView>key}" text="{BookingView>text}" />
                                                 </Select>
@@ -369,10 +380,13 @@
                         text="Facilities"
                         class="booking-section-header"
                         wrapping="true"
-                         visible="{= ${FacilityModel>/Facilities}.length > 0 }"
+                        visible="{= ${FacilityModel>/Facilities}.length > 0 }"
                     />
 
-                    <Panel class="customBookingPanel booking-panel-enhanced facilityBookingPanel panelbracket" visible="{= ${FacilityModel>/Facilities}.length > 0 }">
+                    <Panel
+                        class="customBookingPanel booking-panel-enhanced facilityBookingPanel panelbracket"
+                        visible="{= ${FacilityModel>/Facilities}.length > 0 }"
+                    >
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
                                 text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
@@ -426,15 +440,15 @@
                         <l:GridData span="XL4 L4 M12 S12" />
                     </layoutData>
                     <!-- Advertisement Carousel Section -->
-                    <Title
+                    <!-- <Title
                         text="Advertisement"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
-                    />
+                    /> -->
 
                     <Panel
-                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                        class="customBookingPanel booking-panel-enhanced panelbracket sapUiMediumMarginTop "
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
                     >
                         <VBox class="sapUiTinyMargin">
@@ -469,504 +483,472 @@
                         wrapping="true"
                     />
 
-                        <Panel
-                            class="customBookingPanel booking-panel-enhanced panelbracket"
+                    <Panel
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                    >
+                        <!-- <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center"> -->
+                        <HBox
+                            width="100%"
+                            alignItems="Center"
+                            justifyContent="Start"
+                            wrap="NoWrap"
+                            class="sapUiTinyMarginTop"
                         >
-                            <!-- <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center"> -->
-                            <HBox
-    width="100%"
-    alignItems="Center"
-    justifyContent="Start"
-    wrap="NoWrap"
-    class="sapUiTinyMarginTop"
->
-                                <Input
-                                    value="{HostelModel>/CouponCode}"
-                                    placeholder="Enter coupon code"
-                                    liveChange="onCouponLiveChange"
-                                    class="sapUiSmallMarginEnd couponInput"
-                                    width="100%"
-                                >
-
-                                    <layoutData>
-                                        <FlexItemData growFactor="1"  shrinkFactor="1"/>
-                                    </layoutData>
-                                </Input>
-                                <Button
-                                    text="Apply Coupon"
-                                    press="onApplyCoupon"
-                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
-                                    visible="{= !${HostelModel>/AppliedCouponCode} }"
-                                >
+                            <Input
+                                value="{HostelModel>/CouponCode}"
+                                placeholder="Enter coupon code"
+                                liveChange="onCouponLiveChange"
+                                class="sapUiSmallMarginEnd couponInput"
+                                width="100%"
+                            >
                                 <layoutData>
-        <FlexItemData growFactor="0" shrinkFactor="0"/>
-    </layoutData>
-                                
-                                </Button>
-                                <Button
-                                    text="Remove"
-                                    press="onRemoveCoupon"
-                                    class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
-                                    visible="{= !!${HostelModel>/AppliedCouponCode} }"
-                                >
+                                    <FlexItemData
+                                        growFactor="1"
+                                        shrinkFactor="1"
+                                    />
+                                </layoutData>
+                            </Input>
+                            <Button
+                                text="Apply Coupon"
+                                press="onApplyCoupon"
+                                class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
+                                visible="{= !${HostelModel>/AppliedCouponCode} }"
+                            >
                                 <layoutData>
-        <FlexItemData growFactor="0"/>
-    </layoutData>
-                                </Button>
-                            </HBox>
-                        </Panel>
+                                    <FlexItemData
+                                        growFactor="0"
+                                        shrinkFactor="0"
+                                    />
+                                </layoutData>
+                            </Button>
+                            <Button
+                                text="Remove"
+                                press="onRemoveCoupon"
+                                class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
+                                visible="{= !!${HostelModel>/AppliedCouponCode} }"
+                            >
+                                <layoutData>
+                                    <FlexItemData growFactor="0" />
+                                </layoutData>
+                            </Button>
+                        </HBox>
+                    </Panel>
 
                     <!-- Payment Summary Section -->
-<Title
-    text="Pricing Details"
-    class="booking-section-header"
-    wrapping="true"
-/>
+                    <Title
+                        text="Pricing Details"
+                        class="booking-section-header"
+                        wrapping="true"
+                    />
 
+                    <Panel
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                    >
+                        <VBox class="sapUiTinyMargin">
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                alignItems="Center"
+                                visible="{BookingView>/showBusinessTravelOption}"
+                                class="sapUiTinyMarginBottom"
+                            >
+                                <Text text="GST Details(optional)" />
+                                <Switch
+                                    state="{HostelModel>/IsBusinessTravel}"
+                                    change="onBusinessTravelToggle"
+                                    enabled="{BookingView>/showBusinessTravelOption}"
+                                />
+                            </HBox>
 
-      <Panel class="customBookingPanel booking-panel-enhanced panelbracket">
-    <VBox class="sapUiTinyMargin">
-        <HBox
-            justifyContent="SpaceBetween"
-            alignItems="Center"
-            visible="{BookingView>/showBusinessTravelOption}"
-            class="sapUiTinyMarginBottom"
-        >
-            <Text text="GST Details(optional)" />
-            <Switch
-                state="{HostelModel>/IsBusinessTravel}"
-                change="onBusinessTravelToggle"
-                enabled="{BookingView>/showBusinessTravelOption}"
-            />
-        </HBox>
+                            <Label
+                                required="true"
+                                text="GSTIN"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <Input
+                                id="BookGst_ID"
+                                value="{HostelModel>/CustomerGSTIN}"
+                                placeholder="Enter GSTIN"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                liveChange="onGSTINLiveChange"
+                                change="onGSTINChange"
+                                class="sapUiTinyMarginBottom"
+                                valueStateText="{i18n>gstError}"
+                                width="100%"
+                            />
 
-        <Label
-            required="true"
-            text="GSTIN"
-            visible="{BookingView>/showBusinessGSTSection}"
-            class="sapUiTinyMarginBottom"
-        />
-        <Input
-            id="BookGst_ID"
-            value="{HostelModel>/CustomerGSTIN}"
-            placeholder="Enter GSTIN"
-            visible="{BookingView>/showBusinessGSTSection}"
-            liveChange="onGSTINLiveChange"
-            change="onGSTINChange"
-            class="sapUiTinyMarginBottom"
-            valueStateText="{i18n>gstError}"
-            width="100%"
-        />
+                            <Label
+                                required="true"
+                                text="Company Name"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                class="required-field-label sapUiTinyMarginBottom"
+                            />
+                            <Input
+                                id="BookCompanyname_ID"
+                                value="{HostelModel>/CompanyName}"
+                                placeholder="Enter company name (minimum 3 characters)"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                class="sapUiTinyMarginBottom"
+                                width="100%"
+                                change="onchangeCompanyname"
+                                liveChange="onchangeCompanyname"
+                                valueStateText="Please enter a valid company name"
+                                showValueStateMessage="true"
+                                maxLength="100"
+                            />
 
-        <Label
-            required="true"
-            text="Company Name"
-            visible="{BookingView>/showBusinessGSTSection}"
-            class="required-field-label sapUiTinyMarginBottom"
-        />
-        <Input
-            id="BookCompanyname_ID"
-            value="{HostelModel>/CompanyName}"
-            placeholder="Enter company name (minimum 3 characters)"
-            visible="{BookingView>/showBusinessGSTSection}"
-            class="sapUiTinyMarginBottom"
-            width="100%"
-            change="onchangeCompanyname"
-            liveChange="onchangeCompanyname"
-            valueStateText="Please enter a valid company name"
-            showValueStateMessage="true"
-            maxLength="100"
-        />
+                            <Label
+                                required="true"
+                                text="Company Address"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                class="required-field-label sapUiTinyMarginBottom"
+                            />
+                            <TextArea
+                                value="{HostelModel>/CompanyAddress}"
+                                placeholder="Enter complete company address"
+                                visible="{BookingView>/showBusinessGSTSection}"
+                                rows="3"
+                                class="sapUiTinyMarginBottom"
+                                width="100%"
+                                change="onchangeConpanyAddress"
+                                liveChange="onchangeConpanyAddress"
+                                valueStateText="Please enter a valid company address (minimum 10 characters)"
+                                showValueStateMessage="true"
+                                id="BookconpanyAddress_ID"
+                                maxLength="500"
+                                growing="true"
+                                growingMaxLines="5"
+                            />
 
-        <Label
-            required="true"
-            text="Company Address"
-            visible="{BookingView>/showBusinessGSTSection}"
-            class="required-field-label sapUiTinyMarginBottom"
-        />
-        <TextArea
-            value="{HostelModel>/CompanyAddress}"
-            placeholder="Enter complete company address"
-            visible="{BookingView>/showBusinessGSTSection}"
-            rows="3"
-            class="sapUiTinyMarginBottom"
-            width="100%"
-            change="onchangeConpanyAddress"
-            liveChange="onchangeConpanyAddress"
-            valueStateText="Please enter a valid company address (minimum 10 characters)"
-            showValueStateMessage="true"
-            id="BookconpanyAddress_ID"
-            maxLength="500"
-            growing="true"
-            growingMaxLines="5"
-        />
-
-    <!-- <HBox
+                            <!-- <HBox
             justifyContent="SpaceBetween"
             alignItems="Center"
             visible="{BookingView>/showBusinessTravelOption}"
             class="sapUiTinyMarginBottom"
         > -->
-    <Title
-        text="GSTIN: {HostelModel>/PropertyGSTIN}"
-                    level="H5"
-            class="sapUiSmallMarginTop sapUiTinyMarginBottom"
-              visible="{= !!${HostelModel>/EffectiveGSTType} }"
-
-    />
-
-        <Table
-            width="100%"
-            inset="false"
-            fixedLayout="Strict"
-            showSeparators="Inner"
-            class="pricingDetailsTable sapUiTinyMarginBottom"
-        >
-            <columns>
-                <Column width="70%">
-                    <header>
-                        <Text text="Item" />
-                    </header>
-                </Column>
-                <Column
-                    width="30%"
-                    hAlign="End"
-                >
-                    <header>
-                        <Text
-                            text="{= 'Amount (' + ${HostelModel>/Currency} + ')' }"
-                        />
-                    </header>
-                </Column>
-            </columns>
-
-            <items>
-<ColumnListItem vAlign="Bottom">
-    <cells>
-        <VBox class="sapUiTinyMarginTop sapUiTinyMarginBottom">
-            <Title
-                text="Room"
-                level="H6"
-            />
-            <Text
-                text="{HostelModel>/RoomBreakdownText}"
-                wrapping="true"
-                class="sapThemeBaseText sapUiTinyMarginTop"
-            />
-        </VBox>
-
-        <VBox
-            alignItems="End"
-            justifyContent="End"
-            class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-        >
-            <HBox
-                renderType="Bare"
-                justifyContent="End"
-            >
-                <Text
-                    text="{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}"
-                    class="sapUiTinyMarginEnd sapUiStrongText"
-                />
-                <Text
-                    text="{HostelModel>/Currency}"
-                    class="sapUiStrongText"
-                />
-            </HBox>
-        </VBox>
-    </cells>
-</ColumnListItem>
-
-
-
-
-                <ColumnListItem
-                    vAlign="Middle"
-                    visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
-                >
-                    <cells>
-                        <Title text="Facilities" level='H6'/>
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text
-                                text="{path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.fromatNumber'}"
-                                class="sapUiTinyMarginEnd sapUiStrongText"
+                            <Title
+                                text="GSTIN: {HostelModel>/PropertyGSTIN}"
+                                level="H5"
+                                class="sapUiSmallMarginTop sapUiTinyMarginBottom"
+                                visible="{= !!${HostelModel>/EffectiveGSTType} }"
                             />
-                            <Text
-                                text="{HostelModel>/Currency}"
-                                class="sapUiStrongText"
-                            />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
 
-                <ColumnListItem vAlign="Middle" class="grandTotalBar">
-                    <cells>
-                        <Title
-                            text="Sub Total"
-                            level="H6"
-                        />
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text
-                                text="{path: 'HostelModel>/BookingSubTotal', formatter: '.Formatter.fromatNumber'}"
-                                class="sapUiTinyMarginEnd sapUiStrongText"
-                            />
-                            <Text
-                                text="{HostelModel>/Currency}"
-                                class="sapUiStrongText"
-                            />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
-                <ColumnListItem
-    vAlign="Middle"
-    visible="{= !!${HostelModel>/AppliedCouponCode} }" class="grandTotalBar"
->
-    <cells>
-  
-            <Title
-                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
-             level="H6"/>
-            <HBox
-                justifyContent="End"
-                alignItems="Center"
-                renderType="Bare"
-            >
-                <Title
-                    text="-{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
-                   level="H6" class="sapUiTinyMarginEnd"
-                />
-                <Title
-                    text="{HostelModel>/Currency}"
-                    level="H6"
-                />
-        </HBox>
-    </cells>
-</ColumnListItem>
-
-<ColumnListItem
-    vAlign="Middle"
-    visible="{= !!${HostelModel>/AppliedCouponCode} }"
-    class="grandTotalBar"
->
-    <cells>
-        <Title
-            text="Discounted Total"
-            level="H6"
-        />
-        <HBox
-            justifyContent="End"
-            alignItems="Center"
-            renderType="Bare"
-        >
-            <Text
-                text="{path: 'HostelModel>/BookingNetSubTotal', formatter: '.Formatter.fromatNumber'}"
-                class="sapUiTinyMarginEnd sapUiStrongText"
-            />
-            <Text
-                text="{HostelModel>/Currency}"
-                class="sapUiStrongText"
-            />
-        </HBox>
-    </cells>
-</ColumnListItem>
-
-<!-- <ColumnListItem
-    vAlign="Middle"
-    visible="{= !!${HostelModel>/AppliedCouponCode} }"
->
-    <cells>
-        <HBox
-            justifyContent="SpaceBetween"
-            alignItems="Center"
-            class="couponSummaryRow"
-        >
-            <Text
-                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
-            />
-            <HBox
-                justifyContent="End"
-                alignItems="Center"
-                renderType="Bare"
-            >
-                <Text
-                    text="-"
-                    class="sapUiTinyMarginEnd"
-                />
-                <Text
-                    text="{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
-                    class="sapUiTinyMarginEnd sapUiStrongText"
-                />
-                <Text
-                    text="{HostelModel>/Currency}"
-                    class="sapUiStrongText"
-                />
-            </HBox>
-        </HBox>
-    </cells>
-</ColumnListItem> -->
-
-                    <!-- <ColumnListItem vAlign="Middle">
-                        <cells>
-                            <Text text="Property GSTIN" />
-                            <HBox
-                                justifyContent="End"
-                                alignItems="Center"
-                                renderType="Bare"
+                            <Table
+                                width="100%"
+                                inset="false"
+                                fixedLayout="Strict"
+                                showSeparators="Inner"
+                                class="pricingDetailsTable sapUiTinyMarginBottom"
                             >
-                                <Text text="{HostelModel>/PropertyGSTIN}" />
+                                <columns>
+                                    <Column width="70%">
+                                        <header>
+                                            <Text text="Item" />
+                                        </header>
+                                    </Column>
+                                    <Column
+                                        width="30%"
+                                        hAlign="End"
+                                    >
+                                        <header>
+                                            <Text
+                                                text="{= 'Amount (' + ${HostelModel>/Currency} + ')' }"
+                                            />
+                                        </header>
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem vAlign="Bottom">
+                                        <cells>
+                                            <VBox
+                                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                            >
+                                                <Title
+                                                    text="Room"
+                                                    level="H6"
+                                                />
+                                                <Text
+                                                    text="{HostelModel>/RoomBreakdownText}"
+                                                    wrapping="true"
+                                                    class="sapThemeBaseText sapUiTinyMarginTop"
+                                                />
+                                            </VBox>
+
+                                            <VBox
+                                                alignItems="End"
+                                                justifyContent="End"
+                                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                            >
+                                                <HBox
+                                                    renderType="Bare"
+                                                    justifyContent="End"
+                                                >
+                                                    <Text
+                                                        text="{path: 'HostelModel>/RoomPrice', formatter: '.Formatter.fromatNumber'}"
+                                                        class="sapUiTinyMarginEnd sapUiStrongText"
+                                                    />
+                                                    <Text
+                                                        text="{HostelModel>/Currency}"
+                                                        class="sapUiStrongText"
+                                                    />
+                                                </HBox>
+                                            </VBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
+                                    >
+                                        <cells>
+                                            <Title
+                                                text="Facilities"
+                                                level='H6'
+                                            />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Text
+                                                    text="{path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd sapUiStrongText"
+                                                />
+                                                <Text
+                                                    text="{HostelModel>/Currency}"
+                                                    class="sapUiStrongText"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        class="grandTotalBar"
+                                    >
+                                        <cells>
+                                            <Title
+                                                text="Sub Total"
+                                                level="H6"
+                                            />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Title
+                                                    text="{path: 'HostelModel>/BookingSubTotal', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd"
+                                                    level="H6"
+                                                />
+                                                <Title
+                                                    text="{HostelModel>/Currency}"
+                                                    level="H6"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= !!${HostelModel>/AppliedCouponCode} }"
+                                        class="grandTotalBar"
+                                    >
+                                        <cells>
+                                            <Title
+                                                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
+                                                level="H6"
+                                            />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Title
+                                                    text="-{path: 'HostelModel>/AppliedDiscount', formatter: '.Formatter.fromatNumber'}"
+                                                    level="H6"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Title
+                                                    text="{HostelModel>/Currency}"
+                                                    level="H6"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= !!${HostelModel>/AppliedCouponCode} }"
+                                        class="grandTotalBar"
+                                    >
+                                        <cells>
+                                            <Title
+                                                text="Discounted Total"
+                                                level="H6"
+                                            />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Title
+                                                    text="{path: 'HostelModel>/BookingNetSubTotal', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd"
+                                                    level="H6"
+                                                />
+                                                <Title
+                                                    text="{HostelModel>/Currency}"
+                                                    level="H6"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= !!${HostelModel>/CustomerGSTIN} }"
+                                    >
+                                        <cells>
+                                            <Text text="Customer GSTIN" />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Text
+                                                    text="{HostelModel>/CustomerGSTIN}"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= ${HostelModel>/CGST} > 0}"
+                                        class="greyGST"
+                                    >
+                                        <cells>
+                                            <Text
+                                                text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue}  : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
+                                            />
+
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                                class="greyGST"
+                                            >
+                                                <Text
+                                                    text="{path: 'HostelModel>/CGST', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Text
+                                                    text="{HostelModel>/Currency}"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= ${HostelModel>/SGST} > 0}"
+                                        class="greyGST"
+                                    >
+                                        <cells>
+                                            <Text
+                                                text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
+                                            />
+
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                                class="greyGST"
+                                            >
+                                                <Text
+                                                    text="{path: 'HostelModel>/SGST', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Text
+                                                    text="{HostelModel>/Currency}"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+
+                                    <ColumnListItem
+                                        vAlign="Middle"
+                                        visible="{= ${HostelModel>/IGST} > 0}"
+                                        class="greyGST"
+                                    >
+                                        <cells>
+                                            <Text
+                                                text="{= ${HostelModel>/IGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'IGST (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'IGST'}"
+                                            />
+
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                                class="greyGST"
+                                            >
+                                                <Text
+                                                    text="{path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'}"
+                                                    class="sapUiTinyMarginEnd"
+                                                />
+                                                <Text
+                                                    text="{HostelModel>/Currency}"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                alignItems="Center"
+                                class="sapUiTinyMarginBottom grandTotalBar"
+                            >
+                                <Title
+                                    text="Grand Total"
+                                    level="H3"
+                                    titleStyle="H3"
+                                    class="sapUiSmallMarginBegin"
+                                />
+                                <HBox
+                                    justifyContent="End"
+                                    alignItems="Center"
+                                    renderType="Bare"
+                                >
+                                    <Title
+                                        text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
+                                        level="H3"
+                                        titleStyle="H3"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Title
+                                        text="{HostelModel>/Currency}"
+                                        level="H3"
+                                        titleStyle="H3"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                </HBox>
                             </HBox>
-                        </cells>
-                    </ColumnListItem> -->
 
-                <ColumnListItem
-                    vAlign="Middle"
-                    visible="{= !!${HostelModel>/CustomerGSTIN} }"
-                >
-                    <cells>
-                        <Text text="Customer GSTIN" />
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text text="{HostelModel>/CustomerGSTIN}" />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
-
-                <ColumnListItem
-                    vAlign="Middle"
-                    visible="{= ${HostelModel>/CGST} > 0}"
-                >
-                    <cells>
-<Text
-    text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue}  : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
-/>
-
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text
-                                text="{path: 'HostelModel>/CGST', formatter: '.Formatter.fromatNumber'}"
-                                class="sapUiTinyMarginEnd"
+                            <MessageStrip
+                                text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                type="Success"
+                                showIcon="true"
+                                showCloseButton="false"
+                                visible="{= ${HostelModel>/Deposit} > 0}"
+                                class="sapUiSmallMarginBottom sapUiLargeMarginTop"
                             />
-                            <Text text="{HostelModel>/Currency}" />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
-
-                <ColumnListItem
-                    vAlign="Middle"
-                    visible="{= ${HostelModel>/SGST} > 0}"
-                >
-                    <cells>
-<Text
-    text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
-/>
-
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text
-                                text="{path: 'HostelModel>/SGST', formatter: '.Formatter.fromatNumber'}"
-                                class="sapUiTinyMarginEnd"
-                            />
-                            <Text text="{HostelModel>/Currency}" />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
-
-                <ColumnListItem
-                    vAlign="Middle"
-                    visible="{= ${HostelModel>/IGST} > 0}"
-                >
-                    <cells>
-<Text
-    text="{= ${HostelModel>/IGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'IGST (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'IGST'}"
-/>
-
-                        <HBox
-                            justifyContent="End"
-                            alignItems="Center"
-                            renderType="Bare"
-                        >
-                            <Text
-                                text="{path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'}"
-                                class="sapUiTinyMarginEnd"
-                            />
-                            <Text text="{HostelModel>/Currency}" />
-                        </HBox>
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-
-        <!-- <MessageStrip
-            text="{= ${HostelModel>/EffectiveGSTType} ? 'Applied Tax: ' + ${HostelModel>/EffectiveGSTType} + ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'No GST applied'}"
-            type="Information"
-            showIcon="true"
-            showCloseButton="false"
-              visible="{= !!${HostelModel>/EffectiveGSTType} }"
-            class="sapUiTinyMarginBottom"
-        /> -->
-
-        <HBox
-            justifyContent="SpaceBetween"
-            alignItems="Center"
-            class="sapUiTinyMarginBottom grandTotalBar"
-        >
-            <Title
-                text="Grand Total"
-                 level="H3"
-                 titleStyle="H3"
-                 class="sapUiSmallMarginBegin"
-            />
-            <HBox
-                justifyContent="End"
-                alignItems="Center"
-                renderType="Bare"
-            >
-                <Title
-                    text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
-                     level="H3"
-                     titleStyle="H3"
-                    class="sapUiTinyMarginEnd"
-                />
-                <Title
-                    text="{HostelModel>/Currency}"
-                     level="H3"
-                     titleStyle="H3"
-                     class="sapUiTinyMarginEnd"
-                />
-            </HBox>
-        </HBox>
-
-        <MessageStrip
-            text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
-            type="Success"
-            showIcon="true"
-            showCloseButton="false"
-            visible="{= ${HostelModel>/Deposit} > 0}"
-            class="sapUiSmallMarginBottom sapUiLargeMarginTop"
-        />
-    </VBox>
-</Panel>
-
                         </VBox>
-                    </l:content>
-
+                    </Panel>
+                </VBox>
+            </l:content>
         </l:Grid>
 
         <footer>

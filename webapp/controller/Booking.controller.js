@@ -2569,6 +2569,14 @@
         },
 
         onMemberValueHelpRequest: async function () {
+            // Check if start date is selected
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sStartDate = oHostelModel?.getProperty("/StartDate") || "";
+            if (!sStartDate || sStartDate.trim() === "") {
+                sap.m.MessageToast.show("Please select a start date from booking details before selecting occupants.");
+                return;
+            }
+
             this._loadMasterMembersForDialog();
             const oDialog = await this._getMemberSelectionDialog();
             oDialog.open();

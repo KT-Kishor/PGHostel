@@ -2751,6 +2751,11 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 .grandTotalBar .sapMText {
   color: #0b7e8d !important;
 }
+.greyGST .sapMTitle,
+.greyGST .sapMText {
+  color: #7f7f7fce !important;
+  
+}
 
 /* force-round the actual rendered image element(s)
    - target plain <img>, UI5 img class, and any nested img-like element */
