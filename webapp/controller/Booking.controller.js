@@ -2564,9 +2564,9 @@
             return this._pNewMemberDialog;
         },
 
-        onAddFamilyMember: function () {
-            this.onMemberValueHelpRequest();
-        },
+        // onAddFamilyMember: function () {
+        //     this.onMemberValueHelpRequest();
+        // },
 
         onMemberValueHelpRequest: async function () {
             // Check if start date is selected
@@ -2750,8 +2750,8 @@
                     new sap.ui.core.HTML({
                         sanitizeContent: false,
                         content: `
-                    <iframe 
-                        src="${this._previewUrl}" 
+                    <iframe
+                        src="${this._previewUrl}"
                         style="width:100%; height:600px; border:none;">
                     </iframe>
                 `
@@ -3782,37 +3782,37 @@
             return oPrimary.Name || "";
         },
 
-        onAddCustomerDocument: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const aDocuments = oHostelModel.getProperty("/Documents") || [];
+        // onAddCustomerDocument: function () {
+        //     const oHostelModel = this.getView().getModel("HostelModel");
+        //     const aDocuments = oHostelModel.getProperty("/Documents") || [];
 
-            if (aDocuments.length >= 1) {
-                MessageToast.show("Only one document can be added.");
-                return;
-            }
+        //     if (aDocuments.length >= 1) {
+        //         MessageToast.show("Only one document can be added.");
+        //         return;
+        //     }
 
-            const bHasPendingRow = aDocuments.some(function (oDocument) {
-                return oDocument && oDocument.IsNew;
-            });
+        //     const bHasPendingRow = aDocuments.some(function (oDocument) {
+        //         return oDocument && oDocument.IsNew;
+        //     });
 
-            if (bHasPendingRow) {
-                MessageToast.show("Please complete the current new document row first.");
-                return;
-            }
+        //     if (bHasPendingRow) {
+        //         MessageToast.show("Please complete the current new document row first.");
+        //         return;
+        //     }
 
-            aDocuments.push({
-                id: "DOC" + Date.now(),
-                DocumentType: "",
-                File: "",
-                Document: "",
-                FileName: "",
-                FileType: "",
-                IsNew: true
-            });
+        //     aDocuments.push({
+        //         id: "DOC" + Date.now(),
+        //         DocumentType: "",
+        //         File: "",
+        //         Document: "",
+        //         FileName: "",
+        //         FileType: "",
+        //         IsNew: true
+        //     });
 
-            oHostelModel.setProperty("/Documents", aDocuments);
-            oHostelModel.refresh(true);
-        },
+        //     oHostelModel.setProperty("/Documents", aDocuments);
+        //     oHostelModel.refresh(true);
+        // },
 
         _getEmptyCustomerDocument: function () {
             return {
@@ -4023,38 +4023,38 @@
             oReader.readAsDataURL(oFile);
         },
 
-        onSaveCustomerDocumentRow: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("HostelModel");
-            const sPath = oContext.getPath();
-            const oModel = this.getView().getModel("HostelModel");
-            const oDocument = Object.assign({}, oModel.getProperty(sPath));
-            const aDocuments = oModel.getProperty("/Documents") || [];
+        // onSaveCustomerDocumentRow: function (oEvent) {
+        //     const oContext = oEvent.getSource().getBindingContext("HostelModel");
+        //     const sPath = oContext.getPath();
+        //     const oModel = this.getView().getModel("HostelModel");
+        //     const oDocument = Object.assign({}, oModel.getProperty(sPath));
+        //     const aDocuments = oModel.getProperty("/Documents") || [];
 
-            if (!oDocument.DocumentType) {
-                MessageToast.show("Please select document type.");
-                return;
-            }
+        //     if (!oDocument.DocumentType) {
+        //         MessageToast.show("Please select document type.");
+        //         return;
+        //     }
 
-            if (!oDocument.FileName) {
-                MessageToast.show("Please upload a document.");
-                return;
-            }
+        //     if (!oDocument.FileName) {
+        //         MessageToast.show("Please upload a document.");
+        //         return;
+        //     }
 
-            const bDuplicateType = aDocuments.some(function (oItem, iIndex) {
-                const bSameRow = ("/Documents/" + iIndex) === sPath;
-                return !bSameRow && !oItem.IsNew && (oItem.DocumentType || "") === (oDocument.DocumentType || "");
-            });
+        //     const bDuplicateType = aDocuments.some(function (oItem, iIndex) {
+        //         const bSameRow = ("/Documents/" + iIndex) === sPath;
+        //         return !bSameRow && !oItem.IsNew && (oItem.DocumentType || "") === (oDocument.DocumentType || "");
+        //     });
 
-            if (bDuplicateType) {
-                MessageToast.show("Document type is already uploaded.");
-                return;
-            }
+        //     if (bDuplicateType) {
+        //         MessageToast.show("Document type is already uploaded.");
+        //         return;
+        //     }
 
-            oDocument.IsNew = false;
-            oModel.setProperty(sPath, oDocument);
-            oModel.refresh(true);
-            MessageToast.show("Document added successfully.");
-        },
+        //     oDocument.IsNew = false;
+        //     oModel.setProperty(sPath, oDocument);
+        //     oModel.refresh(true);
+        //     MessageToast.show("Document added successfully.");
+        // },
 
         onDeleteCustomerDocumentRow: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("HostelModel");
@@ -4267,49 +4267,49 @@
             oReader.readAsDataURL(oFile);
         },
 
-        onSaveFamilyMember: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("BookingView");
-            const sPath = oContext.getPath();
-            const oModel = this.getView().getModel("BookingView");
+        // onSaveFamilyMember: function (oEvent) {
+        //     const oContext = oEvent.getSource().getBindingContext("BookingView");
+        //     const sPath = oContext.getPath();
+        //     const oModel = this.getView().getModel("BookingView");
 
-            const oMember = Object.assign({}, oModel.getProperty(sPath));
+        //     const oMember = Object.assign({}, oModel.getProperty(sPath));
 
-            if (!oMember.Name || !oMember.Name.trim()) {
-                MessageToast.show("Please enter member name.");
-                return;
-            }
+        //     if (!oMember.Name || !oMember.Name.trim()) {
+        //         MessageToast.show("Please enter member name.");
+        //         return;
+        //     }
 
-            if (!oMember.Relation || !oMember.Relation.trim()) {
-                MessageToast.show("Please enter relation.");
-                return;
-            }
+        //     if (!oMember.Relation || !oMember.Relation.trim()) {
+        //         MessageToast.show("Please enter relation.");
+        //         return;
+        //     }
 
-            if (!oMember.Age || isNaN(parseInt(oMember.Age, 10))) {
-                MessageToast.show("Please enter valid age.");
-                return;
-            }
+        //     if (!oMember.Age || isNaN(parseInt(oMember.Age, 10))) {
+        //         MessageToast.show("Please enter valid age.");
+        //         return;
+        //     }
 
-            if (!oMember.Gender) {
-                MessageToast.show("Please select gender.");
-                return;
-            }
+        //     if (!oMember.Gender) {
+        //         MessageToast.show("Please select gender.");
+        //         return;
+        //     }
 
-            if (!oMember.DocumentType) {
-                MessageToast.show("Please select document type.");
-                return;
-            }
+        //     if (!oMember.DocumentType) {
+        //         MessageToast.show("Please select document type.");
+        //         return;
+        //     }
 
-            if (!oMember.DocumentName) {
-                MessageToast.show("Please upload a document.");
-                return;
-            }
+        //     if (!oMember.DocumentName) {
+        //         MessageToast.show("Please upload a document.");
+        //         return;
+        //     }
 
-            oMember.IsNew = false;
-            oModel.setProperty(sPath, oMember);
-            oModel.refresh(true);
+        //     oMember.IsNew = false;
+        //     oModel.setProperty(sPath, oMember);
+        //     oModel.refresh(true);
 
-            MessageToast.show("Member added successfully.");
-        },
+        //     MessageToast.show("Member added successfully.");
+        // },
 
         _renderFacilityCards: function () {
             const oContainer = this.byId("facilityCardsContainer");
@@ -4809,51 +4809,51 @@
             this._rebuildSelectedFacilities();
             this._recalculateSummary();
         },
-        onPropertyChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent)
-        },
+        // onPropertyChange: function (oEvent) {
+        //     utils._LCstrictValidationComboBox(oEvent)
+        // },
         onRoomplane: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent)
         },
-        onSalutationclick:function(oEvent){
-        utils._LCvalidateMandatoryField(oEvent)
-        },
+        // onSalutationclick:function(oEvent){
+        //     utils._LCvalidateMandatoryField(oEvent)
+        // },
 
-        onFamilyMemberSelect: function (oEvent) {
-            const oBookingView = this.getView().getModel("BookingView");
-            const aPreviousOccupantIds = this._getSelectedOccupantIds();
-            const oMember = oEvent.getSource().getBindingContext("BookingView").getObject();
+        // onFamilyMemberSelect: function (oEvent) {
+        //     const oBookingView = this.getView().getModel("BookingView");
+        //     const aPreviousOccupantIds = this._getSelectedOccupantIds();
+        //     const oMember = oEvent.getSource().getBindingContext("BookingView").getObject();
 
-            if (oMember.IsNew) {
-                MessageToast.show("Please add the member first.");
-                oEvent.getSource().setSelected(false);
-                return;
-            }
+        //     if (oMember.IsNew) {
+        //         MessageToast.show("Please add the member first.");
+        //         oEvent.getSource().setSelected(false);
+        //         return;
+        //     }
 
-            const bSelected = oEvent.getSource().getSelected();
-            const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
-            const iOtherSelected = (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oItem) {
-                return oItem.id !== oMember.id && oItem.Selected;
-            }).length;
-            const iNewTotal = 1 + iOtherSelected + (bSelected ? 1 : 0);
+        //     const bSelected = oEvent.getSource().getSelected();
+        //     const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
+        //     const iOtherSelected = (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oItem) {
+        //         return oItem.id !== oMember.id && oItem.Selected;
+        //     }).length;
+        //     const iNewTotal = 1 + iOtherSelected + (bSelected ? 1 : 0);
 
-            if (bSelected && iNewTotal > iMaxPersons) {
-                MessageToast.show("Selected room capacity does not allow more members.");
-                oEvent.getSource().setSelected(false);
-                oMember.Selected = false;
-                return;
-            }
+        //     if (bSelected && iNewTotal > iMaxPersons) {
+        //         MessageToast.show("Selected room capacity does not allow more members.");
+        //         oEvent.getSource().setSelected(false);
+        //         oMember.Selected = false;
+        //         return;
+        //     }
 
-            oMember.Selected = bSelected;
-            if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
-                this._clearSelectedFacilities();
-            }
-            oBookingView.refresh(true);
-            this._updateSelectedPersonsFromFamily();
-            this._syncSelectedFacilityPersonsWithOccupants();
-            this._rebuildSelectedFacilities();
-            this._recalculateSummary();
-        },
+        //     oMember.Selected = bSelected;
+        //     if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
+        //         this._clearSelectedFacilities();
+        //     }
+        //     oBookingView.refresh(true);
+        //     this._updateSelectedPersonsFromFamily();
+        //     this._syncSelectedFacilityPersonsWithOccupants();
+        //     this._rebuildSelectedFacilities();
+        //     this._recalculateSummary();
+        // },
         onDeleteFamilyMemberRow: function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
             const aPreviousOccupantIds = this._getSelectedOccupantIds();
@@ -5743,9 +5743,9 @@
             };
         },
 
-        onChangeFullname: function (oEvent) {
-            utils._LCvalidateMandatoryField(oEvent)
-        },
+        // onChangeFullname: function (oEvent) {
+        //     utils._LCvalidateMandatoryField(oEvent)
+        // },
 
         _validateBookingBeforePayment: function () {
             const oModel = this.getView().getModel("HostelModel");
