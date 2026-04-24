@@ -5421,7 +5421,83 @@
             }.bind(this));
         },
 
+        _getSelectedMemberIDs: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
+            const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
+            const sUserID = oHostelModel.getProperty("/UserID") || "";
 
+            // UserID cannot be empty - if empty, return empty array
+            if (!sUserID) {
+                return [];
+            }
+
+            // Find primary member and collect other selected members
+            let oPrimaryMember = null;
+            const aOtherSelected = [];
+
+            aFamilyMembers.forEach(function (oMember) {
+                if (oMember.Selected) {
+                    if (oMember.IsPrimary) {
+                        oPrimaryMember = oMember;
+                    } else {
+                        aOtherSelected.push(oMember);
+                    }
+                }
+            });
+
+            // Build MemberID array
+            const aMemberIDs = [];
+
+            // Determine if primary is SELF
+            let bPrimaryIsSelf = false;
+            if (oPrimaryMember) {
+                const sRelation = String(oPrimaryMember.Relation || "").trim().toLowerCase();
+                bPrimaryIsSelf = sRelation === "self" || oPrimaryMember.id === "SELF";
+            }
+
+            // 1. Primary member at index 0 (if exists)
+            if (oPrimaryMember) {
+                if (bPrimaryIsSelf) {
+                    // Primary is SELF - use UserID
+                    aMemberIDs.push(sUserID);
+                } else {
+                    // Primary is not SELF - use their MemberID (or empty string)
+                    const sPrimaryMemberID = oPrimaryMember.MemberID || "";
+                    aMemberIDs.push(sPrimaryMemberID);
+                }
+            }
+
+            // 2. Always include UserID for SELF (cannot be empty)
+            // If primary is SELF, UserID already added at index 0
+            // If primary is not SELF, add UserID now (at index 1 if primary exists, index 0 if no primary)
+            if (!bPrimaryIsSelf) {
+                if (aMemberIDs.length > 0) {
+                    // Insert UserID after primary
+                    aMemberIDs.splice(1, 0, sUserID);
+                } else {
+                    // No primary, UserID at index 0
+                    aMemberIDs.push(sUserID);
+                }
+            }
+
+            // 3. Add other selected members in original order
+            aOtherSelected.forEach(function (oMember) {
+                // Skip if this member is SELF (already included as UserID)
+                const sRelation = String(oMember.Relation || "").trim().toLowerCase();
+                const bIsSelf = sRelation === "self" || oMember.id === "SELF";
+                if (bIsSelf) {
+                    return;
+                }
+                // Use generated MemberID if available, otherwise use existing MemberID
+                const sMemberID = oMember._generatedMemberID || oMember.MemberID || "";
+                if (sMemberID) {
+                    aMemberIDs.push(sMemberID);
+                }
+            });
+
+            return aMemberIDs;
+        },
 
         _buildSingleMemberDocumentsPayload: function (oMember) {
             const sType = String(oMember && oMember.DocumentType || "").trim();
@@ -5705,7 +5781,8 @@
                 // Salutation: sPrimarySalutation,
                 CustomerGSTIN: bIsBusinessTravel ? sCustomerGSTIN : "",
                 CustCompanyName: bIsBusinessTravel ? sCompanyName : "",
-                CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : ""
+                CustCompanyAddress: bIsBusinessTravel ? sCompanyAddress : "",
+                MemberID: this._getSelectedMemberIDs()
             }];
         },
 
@@ -5894,7 +5971,6 @@
                         content: pdfBase64
                     }
                 };
-
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
                 let sMessage = "Booking created successfully.";
