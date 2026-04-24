@@ -161,6 +161,17 @@
                         <ImageContent src="sap-icon://message-error"/>
                     </TileContent>
                 </GenericTile>
+                <GenericTile
+                    id="idmanageAds"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>manageAds}"
+                    press="TileV_onpressManageAds"
+                >
+                    <TileContent unit="{i18n>managebugs}">
+                        <ImageContent src="sap-icon://manager-insight"/>
+                    </TileContent>
+                </GenericTile>
             </FlexBox>
         </VBox>
 

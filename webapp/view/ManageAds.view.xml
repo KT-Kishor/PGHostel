@@ -1,0 +1,90 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.ManageAds"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:m="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+    height="100%"
+    busyIndicatorDelay="0"
+>
+    <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <content>
+           
+            <Table
+                id="MA_id_ManageadsTable"
+                sticky="ColumnHeaders,HeaderToolbar"
+                mode="SingleSelectLeft"
+                width="auto"
+                busyIndicatorDelay="0"
+                items="{path:'NewAdsModel>/'}"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title
+                            text="{i18n>manageAds} ({= ${NewAdsModel>/}.length})"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            text="{i18n>addnewads}"
+                            tooltip="{i18n>addnewads}"
+                            press="MA_AddnewAds"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
+                        />
+                        <Button
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>MSedit}"
+                            press="MA_EditHostelFeature"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
+                        />
+                        <Button
+                            text="{i18n>MSdelete}"
+                            tooltip="{i18n>MSdelete}"
+                            press="MA_DeleteHostelFeature"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
+                        />
+                       
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column demandPopin="true">
+                        <Text
+                            text="URL"
+                            tooltip="URL"
+                        />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text
+                            text="image"
+                            tooltip="{i18n>image}"
+                        />
+                    </Column>
+                   
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Link text="{NewAdsModel>URL}" href="{NewAdsModel>URL}" target="_blank"/>
+                           
+                            <Button text="{i18n>view}" press="MA_viewAd" visible="{= !!${NewAdsModel>Photo1} }"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+         <core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+        </footer>
+    </Page>
+</mvc:View>

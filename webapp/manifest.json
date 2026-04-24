@@ -421,6 +421,13 @@
           "target": [
             "targetUploadDocs"
           ]
+        },
+           {
+          "name": "RouteManageAds",
+          "pattern": "ManageAds",
+          "target": [
+            "targetManageAds"
+          ]
         }
       ],
       "targets": {
@@ -710,6 +717,13 @@
           "clearControlAggregation": false,
           "viewId": "Document",
           "viewName": "Document"
+        },
+         "targetManageAds": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "ManageAds",
+          "viewName": "ManageAds"
         }
       }
     },

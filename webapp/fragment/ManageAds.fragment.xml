@@ -1,0 +1,90 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified"
+	xmlns:mvc="sap.ui.core.mvc">
+	<Dialog  type="Message" class="sapUiContentPadding"    contentWidth="28rem"
+        contentHeight="auto"
+    resizable="true" draggable="true">
+	    <customHeader>
+            <Bar class="barheader">
+                    <contentMiddle>
+                <Title text="{i18n>manageAds}" />
+            </contentMiddle>
+              
+            </Bar>
+        </customHeader>
+		  
+		<f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1">
+			<f:content>
+				<!-- Branch Code -->
+				<!-- <Label text="{i18n>MSbranchCode}" required="true"/>
+				<ComboBox id="MA_id_BranchCode" placeholder="{i18n>placeSelectBranchCode}" selectedKey="{>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
+                valueStateText="{i18n>selectBranchCode}">
+					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID}" additionalText="{BranchModel>Name}"/>
+				</ComboBox> -->
+				<!--  Name -->
+				<!-- <Label text="{i18n>NameofAdvertisement}" required="true"/>
+				<Input id="MA_id_AdName" value="{>/FacilityName}"
+                placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterAmenitiesName}"/>-->
+				<Label
+                    text="{i18n>adURL}"
+                    required="true"
+                /> 
+                <Input id="MA_id_Url" value="{EditAdsModel>/URL}"
+                placeholder="{i18n>enterurl}"  liveChange=".onUrlChange" valueStateText="{i18n>enterAmenitiesName}"/>
+				
+				<!-- Upload -->
+				<Label text="{i18n>addImage}" />
+				<VBox alignItems="Start" width="100%" renderType="Bare">
+					<HBox width="25%">
+						<u:FileUploader
+                            id="MA_id_FileUploader"
+                            fileSizeExceed="onFileSizeExceeds"
+                            maximumFileSize="5MB"
+                            typeMissmatch="onFileTypeMissmatch"
+                            fileType="jpg,jpeg,png"
+                            change="onFacilityFileChange"
+                            buttonOnly="true"
+                            sameFilenameAllowed="true"
+                            iconFirst="true"
+                            buttonText="Upload Images"
+                            multiple="true"
+                            uploadOnChange="false"
+                            tooltip="{i18n>allowedSize}"/>
+					</HBox>
+					<!-- Tokenizer -->
+					<HBox width="75%">
+						<ScrollContainer height="60px" width="100%" horizontal="false" vertical="true">
+							<Tokenizer id="MA_id_TokenList" width="100%" tokenDelete="onTokenDelete"
+                            tokens="{tokenModel>/tokens}">
+								<Token key="{tokenModel>key}" text="{tokenModel>text}"/>
+							</Tokenizer>
+						</ScrollContainer>
+					</HBox>
+				</VBox>
+			</f:content>
+		</f:SimpleForm>
+		
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer />
+				<Button text="{i18n>save}" tooltip="{i18n>save}" press="MA_onsavebuttonpress"
+                id="MA_id_saveButton" class="marginRight myUnifiedBtn"/>
+				<Button text="{i18n>CancelButton}" tooltip="{i18n>CancelButton}" press="MA_onCancelButtonPress"
+                id="MA_id_CancelButton" class="marginRight myUnifiedBtn"/>
+			</Toolbar>
+		</footer>
+	</Dialog>
+</c:FragmentDefinition>
