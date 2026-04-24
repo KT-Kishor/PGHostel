@@ -440,15 +440,15 @@
                         <l:GridData span="XL4 L4 M12 S12" />
                     </layoutData>
                     <!-- Advertisement Carousel Section -->
-                    <!-- <Title
-                        text="Advertisement"
+                    <Title
+                        text="Developed by"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
-                    /> -->
+                    />
 
                     <Panel
-                        class="customBookingPanel booking-panel-enhanced panelbracket sapUiMediumMarginTop "
+                        class="customBookingPanel booking-panel-enhanced panelbracket"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
                     >
                         <VBox class="sapUiTinyMargin">
