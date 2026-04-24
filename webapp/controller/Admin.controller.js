@@ -1126,16 +1126,13 @@ sap.ui.define([
         },
 
         AD_onPressEditDetails: function (oEvent) {
-            var sCustomerID = oEvent
-                .getSource()
-                .getBindingContext("HostelModel")
-                .getObject()
-                .CustomerID;
-
+            var sCustomerID = oEvent.getSource().getBindingContext("HostelModel").getObject().BookingID;
             var sEncodedID = btoa(sCustomerID.toString());
+            var sMemberID =  oEvent.getSource().getBindingContext("HostelModel").getObject().MemberID;
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
+                xPath : sMemberID,
                 from: "Customerdetails"
             });
         },

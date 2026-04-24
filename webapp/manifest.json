@@ -167,7 +167,7 @@
         },
         {
           "name": "RouteAdminDetails",
-          "pattern": "AdminDetails/{sPath}/{from}",
+          "pattern": "AdminDetails/{sPath}/{xPath}{from}",
           "target": [
             "TargetAdminDetails"
           ]

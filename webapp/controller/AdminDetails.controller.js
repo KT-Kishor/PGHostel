@@ -88,6 +88,8 @@ sap.ui.define([
 
             var sPath = oEvent.getParameter("arguments").sPath;
             this.decodedPath = atob(decodeURIComponent(sPath));
+            var xPath = oEvent.getParameter("arguments").xPath;
+            this.MemberID = xPath
             this.valuestate()
             this.getBusyDialog()
 
