@@ -5427,9 +5427,9 @@
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
             const sUserID = oHostelModel.getProperty("/UserID") || "";
 
-            // UserID cannot be empty - if empty, return empty array
+            // UserID cannot be empty - if empty, return empty string
             if (!sUserID) {
-                return [];
+                return "";
             }
 
             // Find primary member and collect other selected members
@@ -5496,7 +5496,8 @@
                 }
             });
 
-            return aMemberIDs;
+            // Filter out empty strings and join with commas
+            return aMemberIDs.filter(function (s) { return s && s.trim(); }).join(",");
         },
 
         _buildSingleMemberDocumentsPayload: function (oMember) {
