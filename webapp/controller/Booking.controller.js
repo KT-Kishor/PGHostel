@@ -2016,7 +2016,7 @@
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || oMember.FullName || "",
                 Relation: sNormalizedRelation,
-                Age: oMember.Age || "",
+                Age: oMember.Age || oMember.DateOfBirth || oMember.DateofBirth || "",
                 Gender: oMember.Gender || "",
                 Selected: !!oMember.Selected,
                 DocumentType: sDocumentType,
@@ -3564,7 +3564,7 @@
                 MemberID: oMember.MemberID || oMember.id || "",
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || "",
-                Age: oMember.Age || "",
+                DateOfBirth: oMember.Age || "",
                 Relation: oMember.Relation || "",
                 Gender: oMember.Gender || "",
                 // IsPrimary: !!oMember.IsPrimary,
@@ -5413,7 +5413,7 @@
                     MemberID: oMember._generatedMemberID || oMember.MemberID || "",
                     Salutation: oMember.Salutation || "",
                     Name: oMember.Name || "",
-                    Age: parseInt(oMember.Age, 10) || 0,
+                    DateOfBirth: oMember.Age || "",
                     Relation: oMember.Relation || "",
                     Gender: oMember.Gender || "",
                     Documents: this._buildSingleMemberDocumentsPayload(oMember)
@@ -5563,7 +5563,7 @@
             const sSelectionMode = String(oFacility.SelectionMode || "").toUpperCase().trim();
             const sStartDate = this._formatDateToISO(oHostelModel.getProperty("/StartDate"));
             const sEndDate = this._formatDateToISO(oHostelModel.getProperty("/EndDate"));
-            const sCustomerID = oHostelModel.getProperty("/CustomerID") || "";
+            // const sCustomerID = oHostelModel.getProperty("/CustomerID") || "";
             const sCurrency = oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR";
             const sUnitText = oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "";
             const fUnitPrice = this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0);
@@ -5592,7 +5592,7 @@
                     StartDate: sStartDate,
                     EndDate: sEndDate,
                     PaidStatus: "Pending",
-                    CustomerID: sCustomerID,
+                    // CustomerID: sCustomerID,
                     MemberID: "",
                     MemberName: "",
                     SelectionMode: oFacility.SelectionMode || "",
