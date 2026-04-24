@@ -552,7 +552,7 @@ sap.ui.define([
                 vm.setProperty("/isOtpEntered", false);
                 vm.setProperty("/isOtpSelected", false);
                 vm.setProperty("/isPasswordSelected", true);
-                vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                vm.setProperty("/dialogTitle", "Sign In");
 
                 this._resetAllAuthFields?.();
                 this._clearAllAuthFields?.();
@@ -807,7 +807,7 @@ sap.ui.define([
                                                 }
 
                                                 // Reset dialog title
-                                                vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                                                vm.setProperty("/dialogTitle", "Sign In");
 
 
                                                 that._oLoginAlertDialog.open();
@@ -3571,7 +3571,7 @@ sap.ui.define([
                         sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "authDialog")
                             .getCustomHeader()
                             .getContentMiddle()[0]
-                            .setText("Hostel Access Portal");
+                            .setText("Sign In");
 
                         // switch flow back to signin
                         const vm = this.getView().getModel("LoginViewModel");
@@ -3580,7 +3580,7 @@ sap.ui.define([
                         // show login panel
                         vm.setProperty("/authFlow", "signin");
                         vm.setProperty("/forgotStep", 1);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                        vm.setProperty("/dialogTitle", "Sign In");
                     }
                 });
 
@@ -3954,7 +3954,7 @@ sap.ui.define([
 
             vm.setProperty("/authFlow", "signin");
             vm.setProperty("/forgotStep", 1);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            vm.setProperty("/dialogTitle", "Sign In");
             this._resetOtpState();
 
         },
@@ -4077,7 +4077,7 @@ sap.ui.define([
                         vm.setProperty("/loginMode", "password");
                         vm.setProperty("/showOTPField", false);
                         vm.setProperty("/isOtpEntered", false);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                        vm.setProperty("/dialogTitle", "Sign In");
                         vm.setProperty("/forgotStep", 1);
 
                         // Clear form fields + ui states
@@ -4547,7 +4547,7 @@ sap.ui.define([
             vm.setProperty("/authFlow", "signin");
             vm.setProperty("/loginMode", "password");
             vm.setProperty("/forgotStep", 0);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            vm.setProperty("/dialogTitle", "Sign In");
 
             // -------------------------
             // RESET OTP + TIMER
@@ -4605,7 +4605,7 @@ sap.ui.define([
             sap.ui.getCore().byId("authDialog")
                 ?.getCustomHeader()
                 ?.getContentMiddle()[0]
-                ?.setText("Hostel Access Portal");
+                ?.setText("Sign In");
         },
 
         onSwitchToSignUp: function () {
@@ -4618,7 +4618,7 @@ sap.ui.define([
             oSignUpPanel?.setVisible(true);
 
             vm.setProperty("/authFlow", "signup");
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            vm.setProperty("/dialogTitle", "Sign Up");
             // Set min and max dates for the Date of Birth picker
             const oDOBpicker = sap.ui.getCore().byId("signUpDOB");
             if (oDOBpicker) {

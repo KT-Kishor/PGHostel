@@ -10,7 +10,7 @@ sap.ui.define([
 ], function (BaseController, Formatter, JSONModel, MessageToast, MessageBox, utils, Filter, FilterOperator) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
-     this._otpResendInterval = null;
+    this._otpResendInterval = null;
     this._otpValidityInterval = null;
     return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
         Formatter: Formatter,
@@ -499,7 +499,7 @@ sap.ui.define([
 
             this.oViewModel.setProperty("/authFlow", "signin");
             this.oViewModel.setProperty("/forgotStep", 1);
-            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+            this.oViewModel.setProperty("/dialogTitle", "Sign In");
             this._resetOtpState();
         },
            onpressLogin: function () {
@@ -542,7 +542,7 @@ sap.ui.define([
             }
 
             // Reset dialog title
-            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+            this.oViewModel.setProperty("/dialogTitle", "Sign In");
             // this.getView().addStyleClass("blur-background");
             this._oSignDialog.open();
         },
@@ -561,7 +561,7 @@ sap.ui.define([
             this.oViewModel.setProperty("/authFlow", "signin");
             this.oViewModel.setProperty("/loginMode", "password");
             this.oViewModel.setProperty("/forgotStep", 0);
-            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+            this.oViewModel.setProperty("/dialogTitle", "Sign In");
 
             // RESET OTP + TIMER
             this._resetOtpState();
@@ -642,7 +642,7 @@ sap.ui.define([
             $C("authDialog")
                 ?.getCustomHeader()
                 ?.getContentMiddle()[0]
-                ?.setText("Hostel Access Portal");
+                ?.setText("Sign In");
         },
         _resetAllAuthFields: function () {
             ["signInEmail", "signinPassword", "fpEmailId", "fpOTP", "newPass", "confPass", "loginOTP"]
@@ -1130,7 +1130,7 @@ sap.ui.define([
             // 🔒 DOB Read-only and Titles
             this._FragmentDatePickersReadOnly(["signUpDOB"]);
             this.oViewModel.setProperty("/authFlow", "signup");
-            this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal"); // Added back
+            this.oViewModel.setProperty("/dialogTitle", "Sign Up"); // Added back
 
             oSignInPanel?.setVisible(false);
             oSignUpPanel?.setVisible(true);
@@ -1395,7 +1395,7 @@ sap.ui.define([
                         oCtrl.oViewModel.setProperty("/loginMode", "password");
                         oCtrl.oViewModel.setProperty("/showOTPField", false);
                         oCtrl.oViewModel.setProperty("/isOtpEntered", false);
-                        oCtrl.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+                        oCtrl.oViewModel.setProperty("/dialogTitle", "Sign In");
                         oCtrl.oViewModel.setProperty("/forgotStep", 1);
 
                         oCtrl._resetAllAuthFields?.();
@@ -1880,13 +1880,13 @@ sap.ui.define([
                         this._clearForgotFlow?.();
 
                         // reset dialog title
-                        $C("authDialog").getCustomHeader().getContentMiddle()[0].setText("Hostel Access Portal");
+                        $C("authDialog").getCustomHeader().getContentMiddle()[0].setText("Sign In");
 
                         this.oViewModel.setProperty("/authFlow", "signin");
                         // show login panel
                         this.oViewModel.setProperty("/authFlow", "signin");
                         this.oViewModel.setProperty("/forgotStep", 1);
-                        this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
+                        this.oViewModel.setProperty("/dialogTitle", "Sign In");
                     }
                 });
 

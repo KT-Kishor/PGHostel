@@ -4792,7 +4792,7 @@ var selectionmode = oPayload.SelectionMode
                         sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "authDialog")
                             .getCustomHeader()
                             .getContentMiddle()[0]
-                            .setText("Hostel Access Portal");
+                            .setText("Sign In");
 
                         // switch flow back to signin
                         const vm = this.getView().getModel("LoginViewModel");
@@ -4801,7 +4801,7 @@ var selectionmode = oPayload.SelectionMode
                         // show login panel
                         vm.setProperty("/authFlow", "signin");
                         vm.setProperty("/forgotStep", 1);
-                        vm.setProperty("/dialogTitle", "Hostel Access Portal");
+                        vm.setProperty("/dialogTitle", "Sign In");
                     }
                 });
 
@@ -5184,7 +5184,7 @@ var selectionmode = oPayload.SelectionMode
 
             vm.setProperty("/authFlow", "signin");
             vm.setProperty("/forgotStep", 1);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            vm.setProperty("/dialogTitle", "Sign In");
             this._resetOtpState();
 
         },
@@ -5699,7 +5699,7 @@ var selectionmode = oPayload.SelectionMode
             vm.setProperty("/authFlow", "signin");
             vm.setProperty("/loginMode", "password");
             vm.setProperty("/forgotStep", 0);
-            vm.setProperty("/dialogTitle", "Hostel Access Portal");
+            vm.setProperty("/dialogTitle", "Sign In");
 
             // -------------------------
             // RESET OTP + TIMER
@@ -5757,7 +5757,7 @@ var selectionmode = oPayload.SelectionMode
             sap.ui.getCore().byId("authDialog")
                 ?.getCustomHeader()
                 ?.getContentMiddle()[0]
-                ?.setText("Hostel Access Portal");
+                ?.setText("Sign In");
         },
 
         // onSwitchToSignUp: function () {
