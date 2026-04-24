@@ -2356,7 +2356,8 @@
                 DocumentName: oDraft.DocumentName || "",
                 FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
                 DocumentID: (oSavedDocument && oSavedDocument.DocumentID) || oDraft.DocumentID || (aUserDocuments[0] && aUserDocuments[0].DocumentID) || "",
-                UserID: (oSavedDocument && oSavedDocument.UserID) || oDraft.UserID || oHostelModel.getProperty("/UserID") || ""
+                UserID: (oSavedDocument && oSavedDocument.UserID) || oDraft.UserID || oHostelModel.getProperty("/UserID") || "",
+                MemberID: (oSavedDocument && oSavedDocument.MemberID) || oDraft.MemberID || oHostelModel.getProperty("/UserID") || ""
             });
 
             oHostelModel.setProperty("/UserDocuments", [oMergedDocument]);
@@ -2394,6 +2395,7 @@
             const oPayloadData = {
                 // CustomerID: sUserID,
                 UserID: sUserID,
+                MemberID: sUserID,
                 DocumentType: oDraft.DocumentType || "",
                 File: oDraft.File || oDraft.Document || "",
                 FileName: oDraft.DocumentName || "",
@@ -2427,6 +2429,7 @@
 
             this._syncSelfUserDocuments(oDraft, oPayloadData);
             return oResponse;
+            oHostelModel.refresh(true);
         },
 
         _mergeMembersById: function (aMembers) {
@@ -3653,6 +3656,7 @@
 
                 // Fetch member documents from backend after create/update
                 const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
+                // print oDocumentsResponse on console
 
                 // Update MemberList in HostelModel with fresh data from backend
                 if (oDocumentsResponse && oDocumentsResponse.data) {
