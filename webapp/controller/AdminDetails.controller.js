@@ -357,7 +357,8 @@ sap.ui.define([
             try {
                 this.getBusyDialog()
                 const filter = {
-                    CustomerID: this.decodedPath
+                    CustomerID: this.decodedPath,
+                    MemberID : this.MemberID
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
