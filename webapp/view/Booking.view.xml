@@ -101,6 +101,7 @@
                             />
                             <Select
                                 id="BookDuration_ID"
+                                class="boldSelectItems"
                                 selectedKey="{HostelModel>/SelectedMonths}"
                                 items="{BookingView>/DurationOptions}"
                                 visible="{BookingView>/showDurationSelector}"
@@ -448,7 +449,7 @@
                     />
 
                     <Panel
-                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                        class="adPanel"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
                     >
                         <VBox class="sapUiTinyMargin">
@@ -484,9 +485,8 @@
                     />
 
                     <Panel
-                        class="customBookingPanel booking-panel-enhanced panelbracket"
+                        class="couponPanel"
                     >
-                        <!-- <HBox class="sapUiTinyMarginTop couponContainer" alignItems="Center"> -->
                         <HBox
                             width="100%"
                             alignItems="Center"

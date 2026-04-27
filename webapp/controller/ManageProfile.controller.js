@@ -916,7 +916,7 @@ sap.ui.define([
                     return {
                         Salutation: mem.Salutation || "",
                         Name: mem.Name || "",
-                        Age: mem.Age || "",
+                        DateOfBirth: mem.DateOfBirth || "",
                         Relation: mem.Relation || "",
                         BookingID: mem.BookingID || "",
 

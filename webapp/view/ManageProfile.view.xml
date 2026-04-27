@@ -495,7 +495,7 @@
                     <cells>
                         <Text text="{= ${profileData>Salutation} + ' ' + ${profileData>Name}}" />
                         <Text
-                            text="{path: 'profileData>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                            text="{path: 'profileData>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
                         />
 
                         <Text text="{profileData>Relation}" />

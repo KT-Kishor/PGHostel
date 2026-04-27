@@ -4,6 +4,7 @@
 >
     <Dialog
         id="memberSelectDialog"
+        class="memberSelectDialog"
         contentWidth="64rem"
         contentHeight="32rem"
         stretchOnPhone="true"
@@ -64,6 +65,7 @@
                                 <Link
                                 text="{BookingView>DocumentName}"
                                 press="MS_viewimage"
+                                class="documentLink"
                             />
                                 <Button
                                     icon="sap-icon://edit"

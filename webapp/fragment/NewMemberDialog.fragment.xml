@@ -6,6 +6,7 @@
 >
     <Dialog
         id="newMemberDialog"
+        class="newMemberDialog"
         contentWidth="32rem"
         stretch="{= ${device>/system/phone} }"
         draggable="true"
@@ -217,7 +218,7 @@
                             tooltip="{BookingView>/NewMemberDraft/DocumentName}"
                             press="onPreviewNewMemberDocument"
                             width="10rem"
-                            class="automatedEllipsis"
+                            class="automatedEllipsis documentLink"
                         />
                         <Button
                             text="Remove"
