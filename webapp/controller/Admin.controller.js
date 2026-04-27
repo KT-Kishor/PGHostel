@@ -773,7 +773,6 @@ sap.ui.define([
             if (ID.Status === "Assigned") {
                 Payload = {
                     CustomerEmail: ID.CustomerEmail,
-                    CustomerID: ID.CustomerID,
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
                     Status: "Assigned"
@@ -788,8 +787,8 @@ sap.ui.define([
                 };
             } else if (DepositAmount) {
                 Payload = {
-                    CustomerID: ID.CustomerID,
                     CustomerEmail: ID.CustomerEmail,
+                    UserID:ID.UserID,
                     CustomerName: ID.CustomerName,
                     DepositAmount: parseInt(DepositAmount),
                     DepositCurrency: "INR",
@@ -811,10 +810,10 @@ sap.ui.define([
                 };
             } else {
                 Payload = {
-                    CustomerID: ID.CustomerID,
                     CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
+                    UserID:ID.UserID,
                     Status: "Assigned"
                 };
 

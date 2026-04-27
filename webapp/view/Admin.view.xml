@@ -49,7 +49,6 @@
                                 <core:ListItem
                                     key="{HostelModel>BookingID}"
                                     text="{HostelModel>BookingID}"
-                                    additionalText="{HostelModel>CustomerID}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -267,13 +266,8 @@
                         press="AD_onPressEditDetails"
                     >
                         <cells>
-                            <VBox>
-                                <Text
-                                    text="{HostelModel>CustomerID}"
-                                    class="sapUiTinyMarginBottom"
-                                />
-                                <Text text="{HostelModel>CustomerName}" />
-                            </VBox>
+                             
+                          <Text text="{HostelModel>CustomerName}" />
                             <Text text="{HostelModel>BookingID}" />
                             <Text text="{HostelModel>PaymentType}" />
 

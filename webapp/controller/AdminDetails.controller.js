@@ -357,7 +357,7 @@ sap.ui.define([
             try {
                 this.getBusyDialog()
                 const filter = {
-                    CustomerID: this.decodedPath,
+                    BookingID: this.decodedPath,
                     MemberID : this.MemberID
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
@@ -440,7 +440,7 @@ sap.ui.define([
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
-                    AllSelectedFacilities: oCustomer.FaciltyItems || [],
+                    AllSelectedFacilities: oCustomer.FacilityItems || [],
                     AllMembers: oCustomer.Members || [],
 
                     Documents: oCustomer.Documents || []
@@ -458,7 +458,7 @@ sap.ui.define([
                 const aPersons = [{
                     FullName: oCustomer.CustomerName,
                     Facilities: {
-                        SelectedFacilities: oCustomer.FaciltyItems || []
+                        SelectedFacilities: oCustomer.FacilityItems || []
                     }
                 }];
 
@@ -3567,7 +3567,6 @@ var selectionmode = oPayload.SelectionMode
                         MemberName: item.MemberName || "",
                         TotalHour: item.TotalHour,
                         BookingID: CustomerData.BookingID,
-                        CustomerID: CustomerData.CustomerID,
                         Currency: item.Currency,
                         StartTime: item.StartTime,
                         EndTime: item.EndTime,
@@ -3581,7 +3580,6 @@ var selectionmode = oPayload.SelectionMode
                     return {
                         DocumentID: item.DocumentID,
                         DocumentType: item.DocumentType,
-                        CustomerID: CustomerData.CustomerID,
                         FileName: item.FileName,
                         FileType: item.FileType,
                         File: item.File
@@ -3599,7 +3597,6 @@ var selectionmode = oPayload.SelectionMode
                     "Amount": oHostelModel.getProperty("/PerMonthNoPerson"),
                     "PaymentType": oHostelModel.getProperty("/PaymentType"), // fallback to original if mapping not found
                     "BankTransactionID": sap.ui.getCore().byId("idTransactionID1").getValue() || "",
-                    "CustomerID": CustomerData.CustomerID,
                     "Currency": CustomerData.Currency || "INR",
                     "BranchCode": CustomerData.BranchCode || "",
                     "BranchName": CustomerData.BranchName || "",
@@ -3618,7 +3615,7 @@ var selectionmode = oPayload.SelectionMode
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
-                    CustomerID: CustomerData.CustomerID
+                  BookingID: CustomerData.BookingID
                 }
             })
                 .then(async () => {
