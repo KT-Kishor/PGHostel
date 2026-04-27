@@ -139,8 +139,8 @@ sap.ui.define([
 
                         status: booking.Status,
                         currency: booking.Currency,
-                        customerID: booking.CustomerID,
                         BookingID: booking.BookingID?.toString() || "",
+                        MemberID: booking.MemberID || ""  ,
                         CustomerName: booking.CustomerName || "",
                     }
 
@@ -176,13 +176,19 @@ sap.ui.define([
                     bookings: aBookingData,
                     bookingCount: aBookingData.length,
                     selectedTab: "Booking History",
-                    aCustomers: aBookingData.map(booking => ({ customerID: booking.customerID || CustomerID, customerName: booking.customerName })),
+                    aCustomers: aBookingData.map(booking => ({ BookingID: booking.BookingID, customerName: booking.customerName })),
                     facility: [],
                     isTableBusy: false
                 });
                 this.getView().setModel(oProfileModel, "profileData");
+                oProfileModel.refresh(true);
                 // this._prepareBranchComboData()
                 this._applyCountryStateCityFilters();
+
+                setTimeout(() => {
+                    this._updateRowCount();
+                }, 0);
+
                 oProfileModel.setProperty("/isEditMode", false);
                 oProfileModel.setProperty("/isTableBusy", false);
 
@@ -647,46 +653,54 @@ sap.ui.define([
             var oBookingData = oContext.getObject();
             // Now reuse your logic exactly as in onEditBooking
             var oProfileModel = this.getView().getModel("profileData");
-            var aCustomers = oProfileModel.getProperty("/aCustomers");
-            var aFacilities = oProfileModel.getProperty("/facility");
-            var sCustomerID = oBookingData.customerID || oBookingData.CustomerID || "";
-            if (!sCustomerID) {
-                MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking"));
+            var aBookings = oProfileModel.getProperty("/bookings") || [];
+            var aFacilities = oProfileModel.getProperty("/facility") || [];
+
+            var sBookingID = oBookingData.BookingID || "";
+            var sMemberID = oBookingData.MemberID  || "";
+             
+            if (!sBookingID) {
+                sap.m.MessageToast.show("BookingID not found for this booking");
                 return;
             }
-            var oCustomer = aCustomers.find(cust => cust.customerID === sCustomerID);
-            if (!oCustomer) {
-                MessageToast.show(this.i18nModel.getText("noCustomerDetailsfoundforthisBooking"));
+
+            //Find booking using BookingID
+            const oBooking = aBookings.find(b => b.BookingID === sBookingID);
+
+            if (!oBooking) {
+                sap.m.MessageToast.show("No booking details found");
                 return;
             }
-            var aCustomerFacilities = aFacilities.filter(fac => fac.customerid === sCustomerID);
-            // Calculate totals
-            var oTotals = this.calculateTotals(
+
+            //  Filter facilities using BookingID
+            const aBookingFacilities = aFacilities.filter(fac => fac.BookingID === sBookingID);
+
+            //  Calculate totals
+            const oTotals = this.calculateTotals(
                 [{
-                    FullName: oCustomer.customerName,
+                    FullName: oBooking.CustomerName,
                     Facilities: {
-                        SelectedFacilities: aCustomerFacilities
+                        SelectedFacilities: aBookingFacilities
                     }
                 }],
                 oBookingData.Startdate,
                 oBookingData.EndDate,
                 oBookingData.RoomPrice
             );
-            if (!oTotals) {
-                return;
-            }
-            // Prepare data for details view
+
+            if (!oTotals) return;
+             // Prepare data for details view
             var oFullCustomerData = {
-                salutation: oCustomer.salutation,
-                FullName: oCustomer.customerName,
-                Gender: oCustomer.gender,
-                stdcode: oCustomer.stdCode,
-                MobileNo: oCustomer.mobileno,
-                CustomerEmail: oCustomer.customerEmail,
-                Country: oCustomer.country,
-                State: oCustomer.state,
-                City: oCustomer.city,
-                DateOfBirth: oCustomer.DOB,
+                salutation: oBooking.Salutation,
+                FullName: oBooking.CustomerName,
+                Gender: oBooking.gender,
+                stdcode: oBooking.stdCode,
+                MobileNo: oBooking.mobileno,
+                CustomerEmail: oBooking.customerEmail,
+                Country: oBooking.country,
+                State: oBooking.state,
+                City: oBooking.city,
+                DateOfBirth: oBooking.DOB,
                 RoomType: oBookingData.room,
                 Price: oBookingData.amount,
                 noofperson: oBookingData.noofperson,
@@ -694,18 +708,24 @@ sap.ui.define([
                 PaymentType: oBookingData.paymenytype,
                 StartDate: oBookingData.Startdate,
                 EndDate: oBookingData.EndDate || "",
-                CustomerId: oBookingData.cutomerid,
+                BookingID: sBookingID,
                 TotalDays: oTotals.TotalDays,
                 AllSelectedFacilities: oTotals.AllSelectedFacilities,
                 TotalFacilityPrice: oTotals.TotalFacilityPrice,
-                GrandTotal: oTotals.GrandTotal
+                GrandTotal: oTotals.GrandTotal,
+                MemberID : sMemberID
             };
-            // Set model for next screen
-            var oHostelModel = new JSONModel(oFullCustomerData);
+
+            //  Set model
+            const oHostelModel = new sap.ui.model.json.JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
-            // Navigate
+
+            var bookID =  btoa(sBookingID.toString());
+
+            //  Navigate using BookingID
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: btoa(encodeURIComponent(sCustomerID)),
+                sPath: encodeURIComponent(bookID),
+                xPath : sMemberID,
                 from: "ManageProfile"
             });
         },
@@ -1029,7 +1049,7 @@ sap.ui.define([
 
                     mHeaderByDamageId.set(sDamageID, {
                         DamageID: sDamageID,
-                        CustomerID: h.CustomerID || "",
+                        BookingID: h.BookingID || "",
                         UserID: h.UserID || "",
                         CustomerName: h.CustomerName || "",
                         CustomerEmail: h.CustomerEmail || "",
