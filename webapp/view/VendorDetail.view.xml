@@ -315,7 +315,7 @@
                                             tooltip="{i18n>uploadDocuments}"
                                             press="onUploadDocumentFile"
                                             class="myUnifiedBtn"
-                                             enabled="{editable>/Edit}"
+                                            enabled="{= ${editable>/Edit} &amp;&amp; ${editable>/hasSelection} }"
                                                  id="V_id_UploadButton"
                                           />
                                             
@@ -325,7 +325,7 @@
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>MSdelete}"
                                                     press="onAdminDeleteFiles"
-                                                    enabled="{editable>/Edit}"
+                                                   enabled="{= ${editable>/Edit} &amp;&amp; ${editable>/hasSelection} }"
                                                 />
                                                 <m:Button
                                                     id="V_id_AdminDownloadButton"
@@ -334,7 +334,7 @@
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>download}"
                                                     press="onAdminDownloadFiles"
-                                                    enabled="{editable>/Edit}"
+                                                   enabled="{= ${editable>/Edit} &amp;&amp; ${editable>/hasSelection} }"
                                                 />
                                             </m:OverflowToolbar>
                                         </m:headerToolbar>

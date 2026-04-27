@@ -33,7 +33,8 @@ sap.ui.define([
                 // Editable control model
                 const oEditableModel = new sap.ui.model.json.JSONModel({
                     Edit: false,
-                    Save: false
+                    Save: false,
+                    hasSelection: false
                 });
                 this.getView().setModel(oEditableModel, "editable");
                 this._initAdminSignupModel();
@@ -189,11 +190,12 @@ sap.ui.define([
                     const sBase64 = e.target.result.split(",")[1];
                     const oPayload = {
                         data: {
-                            CustomerID: oModel.getProperty("/UserID"),
+                            UserID: oModel.getProperty("/UserID"),
                             DocumentType: sDocType,
                             File: sBase64,
                             FileName: oFile.name,
-                            FileType: oFile.type
+                            FileType: oFile.type,
+                            MemberID : oModel.getProperty("/UserID")
                         }
                     };
                     this.getBusyDialog()
@@ -317,9 +319,11 @@ sap.ui.define([
             }
         },
 
-        onAdminSelectionChange: function () {
-            this.byId("AdminDeleteButton").setEnabled(true);
-            this.byId("AdminDownloadButton").setEnabled(true);
+        onAdminSelectionChange: function (oEvent) {
+            const oTable = oEvent.getSource();
+            const bHasSelection = oTable.getSelectedItems().length > 0;
+
+            this.getView().getModel("editable").setProperty("/hasSelection", bHasSelection);
         },
 
         onAdminDeleteFiles: function () {
@@ -348,7 +352,7 @@ sap.ui.define([
                         await this.ajaxDeleteWithJQuery("/HM_CustomerDocument", {
                             filters: {
                                 DocumentID: oContext.getProperty("DocumentID"),
-                                CustomerID: sUserID
+                                UserID: sUserID
                             }
                         });
                         this._loadVendorDetails(sUserID); // refresh attachment list
@@ -900,11 +904,12 @@ sap.ui.define([
                     const sBase64 = e.target.result.split(",")[1];
                     const oPayload = {
                         data: {
-                            CustomerID: oAdminModel.getProperty("/UserID"),
+                            UserID: oAdminModel.getProperty("/UserID"),
                             DocumentType: sDocType,
                             File: sBase64,
                             FileName: oFile.name,
                             FileType: oFile.type,
+                            MemberID:oAdminModel.getProperty("/UserID"),
                         }
                     };
                     that.getBusyDialog()
