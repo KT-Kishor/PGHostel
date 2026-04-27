@@ -1940,7 +1940,6 @@ sap.ui.define([
             const oData = oLocalModel?.getData?.() || {};
 
             let aMember = [];
-            let aUserDocs = [];
 
             var filter = {
                         UserID: oUser?.UserID
@@ -1950,11 +1949,8 @@ sap.ui.define([
                 let resp = await this.ajaxReadWithJQuery("HM_MemberDocument", filter);
                 // let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
 
-                // New response shape:
-                // data -> member documents
-                // UserDocuments -> logged-in customer documents
+                // New response shape: data contains SELF and family members.
                 aMember = Array.isArray(resp?.data) ? resp.data : [];
-                aUserDocs = Array.isArray(resp?.UserDocuments) ? resp.UserDocuments : [];
 
             } catch (error) {
                 console.error("Member fetch failed", error);
@@ -2019,8 +2015,7 @@ sap.ui.define([
                 GSTIN: oData.GSTIN || "",
                 AvailableDate: oData.AvailableDate,
                 ExtraBed: oData.ExtraBed || 0,
-                MemberList: aMember,
-                UserDocuments: aUserDocs
+                MemberList: aMember
             };
 
             // -------------------------

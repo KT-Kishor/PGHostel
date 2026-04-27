@@ -1955,28 +1955,39 @@
                 DocumentID: "",
                 DocumentFile: null,
                 Documents: [],
-                IsNew: false,
                 IsEditMode: false
             };
+        },
+
+        _bufferToBase64: function (oFileBuffer) {
+            if (!(oFileBuffer && typeof oFileBuffer === "object" && oFileBuffer.type === "Buffer" && Array.isArray(oFileBuffer.data))) {
+                return oFileBuffer || "";
+            }
+
+            try {
+                const aBytes = oFileBuffer.data;
+                const iChunkSize = 0x8000;
+                let sBinary = "";
+
+                for (let i = 0; i < aBytes.length; i += iChunkSize) {
+                    const aChunk = aBytes.slice(i, i + iChunkSize);
+                    sBinary += String.fromCharCode.apply(null, aChunk);
+                }
+
+                return btoa(sBinary);
+            } catch (e) {
+                console.warn("[_bufferToBase64] Failed to convert Buffer to base64:", e);
+                return "";
+            }
         },
 
         _normalizeMemberRecord: function (oMember, iIndex) {
             const oMemberDocument = Array.isArray(oMember && oMember.Documents) && oMember.Documents.length > 0 ? oMember.Documents[0] : {};
             const aDocuments = Array.isArray(oMember && oMember.Documents) ? oMember.Documents.map(function (oDocument) {
                 // Handle Buffer object for File field
-                let sFile = oDocument.File || "";
-                if (sFile && typeof sFile === 'object' && sFile.type === 'Buffer' && Array.isArray(sFile.data)) {
-                    // Convert Buffer array to base64 string
-                    try {
-                        const byteArray = new Uint8Array(sFile.data);
-                        sFile = btoa(String.fromCharCode.apply(null, byteArray));
-                    } catch (e) {
-                        console.warn("[_normalizeMemberRecord] Failed to convert Buffer to base64:", e);
-                        sFile = "";
-                    }
-                }
+                const sFile = this._bufferToBase64(oDocument.File || "");
                 return Object.assign({}, oDocument, { File: sFile });
-            }) : [];
+            }.bind(this)) : [];
 
             // Extract document fields from first document
             let sDocumentType = oMember.DocumentType || oMemberDocument.DocumentType || "";
@@ -1986,15 +1997,7 @@
             let sDocumentID = oMember.DocumentID || oMemberDocument.DocumentID || "";
 
             // Handle Buffer object for File field
-            if (sFile && typeof sFile === 'object' && sFile.type === 'Buffer' && Array.isArray(sFile.data)) {
-                try {
-                    const byteArray = new Uint8Array(sFile.data);
-                    sFile = btoa(String.fromCharCode.apply(null, byteArray));
-                } catch (e) {
-                    console.warn("[_normalizeMemberRecord] Failed to convert Buffer to base64:", e);
-                    sFile = "";
-                }
-            }
+            sFile = this._bufferToBase64(sFile);
 
             // Determine if this member is a Self member (case-insensitive)
             const sRelationRaw = oMember.Relation || "";
@@ -2027,7 +2030,6 @@
                 DocumentID: sDocumentID,
                 DocumentFile: null,
                 Documents: aDocuments,
-                IsNew: false,
                 IsPrimary: !!oMember.IsPrimary
             };
         },
@@ -2046,27 +2048,20 @@
 
         _getPrimaryDocumentRecord: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
-            const aUserDocuments = Array.isArray(oHostelModel && oHostelModel.getProperty("/UserDocuments")) ?
-                oHostelModel.getProperty("/UserDocuments") : [];
-            const aBookingDocuments = Array.isArray(oHostelModel && oHostelModel.getProperty("/Documents")) ?
-                oHostelModel.getProperty("/Documents") : [];
-            const aDocumentSources = aUserDocuments.length ? aUserDocuments : aBookingDocuments;
+            const aMemberList = Array.isArray(oHostelModel && oHostelModel.getProperty("/MemberList")) ?
+                oHostelModel.getProperty("/MemberList") : [];
+            const oSelfMember = aMemberList.find(function (oMember) {
+                return String(oMember && oMember.Relation || "").trim().toLowerCase() === "self";
+            }) || {};
+            const aDocumentSources = Array.isArray(oSelfMember.Documents) ? oSelfMember.Documents : [];
 
-            return (aDocumentSources || []).find(function (oDocument) {
+            for (let i = 0; i < aDocumentSources.length; i += 1) {
+                let oDocument = aDocumentSources[i];
                 if (!oDocument) {
-                    return false;
+                    continue;
                 }
 
-                let sFile = oDocument.File || oDocument.Document || "";
-                if (sFile && typeof sFile === "object" && sFile.type === "Buffer" && Array.isArray(sFile.data)) {
-                    try {
-                        const byteArray = new Uint8Array(sFile.data);
-                        sFile = btoa(String.fromCharCode.apply(null, byteArray));
-                    } catch (e) {
-                        console.warn("[_getPrimaryDocumentRecord] Failed to convert Buffer to base64:", e);
-                        sFile = "";
-                    }
-                }
+                let sFile = this._bufferToBase64(oDocument.File || oDocument.Document || "");
 
                 if (sFile !== (oDocument.File || oDocument.Document || "")) {
                     oDocument = Object.assign({}, oDocument, {
@@ -2075,8 +2070,12 @@
                     });
                 }
 
-                return !!String(sFile || "").trim();
-            }) || {};
+                if (String(sFile || "").trim()) {
+                    return oDocument;
+                }
+            }
+
+            return {};
         },
         _getPrimaryMemberRecord: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
@@ -2115,7 +2114,7 @@
             const oPrimaryDocument = this._getPrimaryDocumentRecord();
             return {
                 id: "SELF",
-                MemberID: "",
+                MemberID: oSelfMember && oSelfMember.MemberID || oHostelModel.getProperty("/UserID") || "",
                 Salutation: sSalutation,
                 Name: sName || "Primary Guest",
                 Relation: "Self",
@@ -2129,7 +2128,6 @@
                 FileType: oPrimaryDocument.FileType || "",
                 DocumentID: oPrimaryDocument.DocumentID || "",
                 DocumentFile: null,
-                IsNew: false,
                 IsPrimary: true
             };
         },
@@ -2300,138 +2298,6 @@
             this._sLastPrimaryMemberId = sNewPrimaryId;
         },
 
-        _persistPrimaryMemberDraft: function (oDraft) {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            let aDocuments = oHostelModel.getProperty("/Documents");
-            const oPrimaryDocument = {
-                id: "DOC_PRIMARY",
-                DocumentType: oDraft.DocumentType || "",
-                File: oDraft.File || oDraft.Document || "",
-                Document: oDraft.Document || oDraft.File || "",
-                FileName: oDraft.DocumentName || "",
-                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
-                DocumentID: oDraft.DocumentID || "",
-                IsNew: !(oDraft.DocumentType && (oDraft.File || oDraft.Document) && oDraft.DocumentName)
-            };
-
-            oHostelModel.setProperty("/Salutation", oDraft.Salutation || "");
-            oHostelModel.setProperty("/FullName", oDraft.Name || "");
-            oHostelModel.setProperty("/Gender", oDraft.Gender || "");
-
-            if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
-                aDocuments = [oPrimaryDocument];
-            } else {
-                aDocuments = [Object.assign({}, aDocuments[0], oPrimaryDocument)];
-            }
-
-            oHostelModel.setProperty("/Documents", aDocuments);
-            oHostelModel.refresh(true);
-        },
-
-        _syncSelfUserDocuments: function (oDraft, oSavedDocument) {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const oBookingView = this.getView().getModel("BookingView");
-            const sDocumentType = String(oDraft && oDraft.DocumentType || "").trim();
-            const sFile = String(oDraft && (oDraft.File || oDraft.Document) || "").trim();
-            const sFileName = String(oDraft && oDraft.DocumentName || "").trim();
-
-            let aUserDocuments = Array.isArray(oHostelModel.getProperty("/UserDocuments")) ?
-                oHostelModel.getProperty("/UserDocuments").slice() : [];
-
-            if (!(sDocumentType && sFile && sFileName)) {
-                oHostelModel.setProperty("/UserDocuments", []);
-                if (oBookingView) {
-                    oBookingView.setProperty("/showCustomerDocumentUpload", true);
-                }
-                oHostelModel.refresh(true);
-                return;
-            }
-
-            const oMergedDocument = Object.assign({}, aUserDocuments[0] || {}, oSavedDocument || {}, {
-                //CustomerID: (oSavedDocument && oSavedDocument.CustomerID) || oDraft.CustomerID || oHostelModel.getProperty("/UserID") || "",
-                DocumentType: oDraft.DocumentType || "",
-                File: oDraft.File || oDraft.Document || "",
-                Document: oDraft.Document || oDraft.File || "",
-                FileName: oDraft.DocumentName || "",
-                DocumentName: oDraft.DocumentName || "",
-                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || ""),
-                DocumentID: (oSavedDocument && oSavedDocument.DocumentID) || oDraft.DocumentID || (aUserDocuments[0] && aUserDocuments[0].DocumentID) || "",
-                UserID: (oSavedDocument && oSavedDocument.UserID) || oDraft.UserID || oHostelModel.getProperty("/UserID") || "",
-                MemberID: (oSavedDocument && oSavedDocument.MemberID) || oDraft.MemberID || oHostelModel.getProperty("/UserID") || ""
-            });
-
-            oHostelModel.setProperty("/UserDocuments", [oMergedDocument]);
-            if (oBookingView) {
-                oBookingView.setProperty("/showCustomerDocumentUpload", false);
-            }
-            oHostelModel.refresh(true);
-        },
-
-        _saveSelfDocumentToBackend: async function (oDraft) {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const sUserID = oHostelModel.getProperty("/UserID") || "";
-            const aUserDocuments = Array.isArray(oHostelModel.getProperty("/UserDocuments")) ?
-                oHostelModel.getProperty("/UserDocuments") : [];
-            const oExistingDocument = aUserDocuments.find(function (oDocument) {
-                if (!oDocument) {
-                    return false;
-                }
-
-                if (oDraft.DocumentID && oDocument.DocumentID === oDraft.DocumentID) {
-                    return true;
-                }
-
-                return String(oDocument.DocumentType || "").trim() === String(oDraft.DocumentType || "").trim();
-            }) || aUserDocuments[0] || {};
-            const sDocumentType = String(oDraft && oDraft.DocumentType || "").trim();
-            const sFile = String(oDraft && (oDraft.File || oDraft.Document) || "").trim();
-            const sFileName = String(oDraft && oDraft.DocumentName || "").trim();
-
-            if (!(sDocumentType && sFile && sFileName)) {
-                this._syncSelfUserDocuments(oDraft);
-                return Promise.resolve();
-            }
-
-            const oPayloadData = {
-                // CustomerID: sUserID,
-                UserID: sUserID,
-                MemberID: sUserID,
-                DocumentType: oDraft.DocumentType || "",
-                File: oDraft.File || oDraft.Document || "",
-                FileName: oDraft.DocumentName || "",
-                FileType: oDraft.DocumentFile && oDraft.DocumentFile.type ? oDraft.DocumentFile.type : (oDraft.FileType || "")
-            };
-
-            const bHasExistingDocument = aUserDocuments.length >= 1;
-            if (bHasExistingDocument) {
-                oPayloadData.DocumentID = oDraft.DocumentID || oExistingDocument.DocumentID || "";
-            }
-
-            let oPayload;
-            if (bHasExistingDocument) {
-                // For update, include filters with DocumentID
-                oPayload = {
-                    filters: {
-                        DocumentID: oPayloadData.DocumentID
-                    },
-                    data: oPayloadData
-                };
-            } else {
-                // For create, just data
-                oPayload = {
-                    data: oPayloadData
-                };
-            }
-
-            const oResponse = bHasExistingDocument ?
-                await this.ajaxUpdateWithJQuery("HM_CustomerDocument", oPayload) :
-                await this.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
-
-            this._syncSelfUserDocuments(oDraft, oPayloadData);
-            return oResponse;
-            oHostelModel.refresh(true);
-        },
-
         _mergeMembersById: function (aMembers) {
             const oMap = {};
 
@@ -2572,11 +2438,13 @@
         // },
 
         onMemberValueHelpRequest: async function () {
-            // Check if start date is selected
+            // Check if booking dates are selected
             const oHostelModel = this.getView().getModel("HostelModel");
             const sStartDate = oHostelModel?.getProperty("/StartDate") || "";
-            if (!sStartDate || sStartDate.trim() === "") {
-                sap.m.MessageToast.show("Please select a start date from booking details before selecting occupants.");
+            const sEndDate = oHostelModel?.getProperty("/EndDate") || "";
+
+            if (!String(sStartDate).trim() || !String(sEndDate).trim()) {
+                sap.m.MessageToast.show("Please select start date and end date from booking details before selecting occupants.");
                 return;
             }
 
@@ -2909,7 +2777,6 @@
 
             oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(oMember), {
                 IsEditMode: true,
-                IsNew: false
             }));
             oBookingView.setProperty("/NewMemberDialogTitle", "Edit Member");
             oBookingView.setProperty("/NewMemberDialogSaveText", "Update Member");
@@ -3465,13 +3332,9 @@
                 oDraft.MemberID = oHostelModel.getProperty("/UserID") || "";
             }
 
-            oDraft.IsNew = false;
             oDraft.IsEditMode = false;
             oDraft.IsPrimary = bIsPrimaryMember;
 
-            const oExistingMasterMember = aMasterMembers.find(function (oMember) {
-                return oMember.id === oDraft.id;
-            });
             const oExistingSelectedMember = aSelectedMembers.find(function (oMember) {
                 return oMember.id === oDraft.id;
             });
@@ -3482,7 +3345,6 @@
             if (bIsSelfDraft) {
                 oDraft.Relation = "Self";
                 oDraft.Selected = true;
-                this._persistPrimaryMemberDraft(oDraft);
             }
 
             // Don't update models locally - wait for backend response oLoginModel then fresh
@@ -3542,39 +3404,22 @@
         },
 
         _saveMemberToBackend: async function (oMember, bIsEditMode) {
-            if (oMember && oMember.id === "SELF") {
-                this.getBusyDialog();
-                try {
-                    const oResponse = await this._saveSelfDocumentToBackend(oMember);
-                    const oBookingView = this.getView().getModel("BookingView");
-                    if (oBookingView) {
-                        this._syncPrimaryMemberInFamilyMembers();
-                        oBookingView.refresh(true);
-                    }
-                    return oResponse;
-                } catch (oError) {
-                    console.error("[_saveMemberToBackend] Error saving SELF document:", oError);
-                    throw oError;
-                } finally {
-                    this.closeBusyDialog();
-                }
-            }
-
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
+            const bIsSelfMember = oMember && (oMember.id === "SELF" || String(oMember.Relation || "").trim().toLowerCase() === "self");
+            const sMemberID = bIsSelfMember ? (oMember.MemberID || sUserID) : (oMember.MemberID || oMember.id || "");
 
             const oMemberData = {
-                MemberID: oMember.MemberID || oMember.id || "",
+                MemberID: sMemberID,
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || "",
                 DateOfBirth: oMember.Age || "",
-                Relation: oMember.Relation || "",
+                Relation: bIsSelfMember ? "Self" : (oMember.Relation || ""),
                 Gender: oMember.Gender || "",
                 // IsPrimary: !!oMember.IsPrimary,
                 UserID: sUserID
             };
 
-            const sMemberID = oMember.MemberID || oMember.id || "";
             const aExistingDocuments = Array.isArray(oMember.Documents) ? oMember.Documents : [];
             const aDocuments = aExistingDocuments.map(function (oDocument) {
                 const oDocumentData = {
@@ -3661,13 +3506,11 @@
                 // Update MemberList in HostelModel with fresh data from backend
                 if (oDocumentsResponse && oDocumentsResponse.data) {
                     const aMemberList = Array.isArray(oDocumentsResponse.data) ? oDocumentsResponse.data : [];
-                    const aUserDocuments = Array.isArray(oDocumentsResponse.UserDocuments) ? oDocumentsResponse.UserDocuments : [];
                     const oHostelModel = this.getView().getModel("HostelModel");
                     const oBookingView = this.getView().getModel("BookingView");
 
                     // Update HostelModel's MemberList with fresh backend data
                     oHostelModel.setProperty("/MemberList", aMemberList);
-                    oHostelModel.setProperty("/UserDocuments", aUserDocuments);
 
                     // Get current selection state
                     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
@@ -3784,64 +3627,6 @@
             }
             // Return only the name, salutation is sent separately
             return oPrimary.Name || "";
-        },
-
-        // onAddCustomerDocument: function () {
-        //     const oHostelModel = this.getView().getModel("HostelModel");
-        //     const aDocuments = oHostelModel.getProperty("/Documents") || [];
-
-        //     if (aDocuments.length >= 1) {
-        //         MessageToast.show("Only one document can be added.");
-        //         return;
-        //     }
-
-        //     const bHasPendingRow = aDocuments.some(function (oDocument) {
-        //         return oDocument && oDocument.IsNew;
-        //     });
-
-        //     if (bHasPendingRow) {
-        //         MessageToast.show("Please complete the current new document row first.");
-        //         return;
-        //     }
-
-        //     aDocuments.push({
-        //         id: "DOC" + Date.now(),
-        //         DocumentType: "",
-        //         File: "",
-        //         Document: "",
-        //         FileName: "",
-        //         FileType: "",
-        //         IsNew: true
-        //     });
-
-        //     oHostelModel.setProperty("/Documents", aDocuments);
-        //     oHostelModel.refresh(true);
-        // },
-
-        _getEmptyCustomerDocument: function () {
-            return {
-                id: "DOC" + Date.now(),
-                DocumentType: "",
-                File: "",
-                Document: "",
-                FileName: "",
-                FileType: "",
-                IsNew: true
-            };
-        },
-
-        _ensureCustomerDocumentSlot: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            let aDocuments = oHostelModel.getProperty("/Documents");
-
-            if (!Array.isArray(aDocuments) || aDocuments.length === 0) {
-                aDocuments = [this._getEmptyCustomerDocument()];
-            } else {
-                aDocuments = [Object.assign(this._getEmptyCustomerDocument(), aDocuments[0])];
-            }
-
-            oHostelModel.setProperty("/Documents", aDocuments);
-            oHostelModel.refresh(true);
         },
 
         _getDocumentInfoPopover: function () {
@@ -3976,258 +3761,6 @@
         },
 
 
-        onCustomerDocumentChange: function (oEvent) {
-            const oFileUploader = oEvent.getSource();
-            const oContext = oFileUploader.getBindingContext("HostelModel");
-            const sPath = oContext && oContext.getPath ? oContext.getPath() : "";
-            const oModel = this.getView().getModel("HostelModel");
-            const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
-            const oReader = new FileReader();
-            const iMaxSize = 2 * 1024 * 1024;
-            const sFileName = String(oFile && oFile.name || "");
-            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
-            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
-            const sMimeType = String(oFile && oFile.type || "").toLowerCase();
-            const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
-            const sDocumentType = String(oModel.getProperty(sPath + "/DocumentType") || "").trim();
-
-            if (!oFile || !sPath) {
-                return;
-            }
-
-            if (!sDocumentType) {
-                MessageToast.show("Please select document type first.");
-                oFileUploader.clear();
-                return;
-            }
-
-            if (oFile.size > iMaxSize) {
-                this._showDocumentUploadSizeError();
-                oFileUploader.clear();
-                return;
-            }
-
-            if (!bAllowedMime && !bAllowedExt) {
-                this._showDocumentUploadTypeError();
-                oFileUploader.clear();
-                return;
-            }
-
-            oReader.onload = function (oLoadEvent) {
-                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
-
-                oModel.setProperty(sPath + "/FileName", oFile.name);
-                oModel.setProperty(sPath + "/FileType", oFile.type || "");
-                oModel.setProperty(sPath + "/Document", sBase64);
-                oModel.setProperty(sPath + "/File", sBase64);
-                oModel.setProperty(sPath + "/IsNew", false);
-                oModel.refresh(true);
-            };
-
-            oReader.readAsDataURL(oFile);
-        },
-
-        // onSaveCustomerDocumentRow: function (oEvent) {
-        //     const oContext = oEvent.getSource().getBindingContext("HostelModel");
-        //     const sPath = oContext.getPath();
-        //     const oModel = this.getView().getModel("HostelModel");
-        //     const oDocument = Object.assign({}, oModel.getProperty(sPath));
-        //     const aDocuments = oModel.getProperty("/Documents") || [];
-
-        //     if (!oDocument.DocumentType) {
-        //         MessageToast.show("Please select document type.");
-        //         return;
-        //     }
-
-        //     if (!oDocument.FileName) {
-        //         MessageToast.show("Please upload a document.");
-        //         return;
-        //     }
-
-        //     const bDuplicateType = aDocuments.some(function (oItem, iIndex) {
-        //         const bSameRow = ("/Documents/" + iIndex) === sPath;
-        //         return !bSameRow && !oItem.IsNew && (oItem.DocumentType || "") === (oDocument.DocumentType || "");
-        //     });
-
-        //     if (bDuplicateType) {
-        //         MessageToast.show("Document type is already uploaded.");
-        //         return;
-        //     }
-
-        //     oDocument.IsNew = false;
-        //     oModel.setProperty(sPath, oDocument);
-        //     oModel.refresh(true);
-        //     MessageToast.show("Document added successfully.");
-        // },
-
-        onDeleteCustomerDocumentRow: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("HostelModel");
-            const oModel = this.getView().getModel("HostelModel");
-            const sPath = oContext.getPath(); // /Documents/<index>
-            const aMatch = /\/Documents\/(\d+)/.exec(sPath);
-            const iIndex = aMatch ? parseInt(aMatch[1], 10) : -1;
-            const aDocuments = oModel.getProperty("/Documents") || [];
-
-            if (iIndex < 0 || iIndex >= aDocuments.length) {
-                return;
-            }
-
-            aDocuments[iIndex] = this._getEmptyCustomerDocument();
-            oModel.setProperty("/Documents", aDocuments);
-            oModel.refresh(true);
-        },
-
-        onPreviewCustomerDocument: function (oEvent) {
-            const oDoc = oEvent.getSource().getBindingContext("HostelModel")?.getObject();
-            const sRawBase64 = String(oDoc?.File || oDoc?.Document || "").trim();
-
-            if (!sRawBase64) {
-                MessageToast.show("No document to preview.");
-                return;
-            }
-
-            const autoDecodeBase64 = function (sValue) {
-                if (!sValue) {
-                    return "";
-                }
-
-                let sDecoded = String(sValue).replace(/\s/g, "");
-                let sLast = sDecoded;
-
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        if (sLast.startsWith("iVB") || sLast.startsWith("/9j") || sLast.startsWith("JVBER")) {
-                            return sLast;
-                        }
-
-                        sLast = atob(sLast);
-                    } catch (e) {
-                        break;
-                    }
-                }
-
-                return sLast;
-            };
-
-            const sBase64 = autoDecodeBase64(sRawBase64);
-            let sMimeType = String(oDoc.FileType || "").toLowerCase();
-
-            if (!sMimeType) {
-                if (sBase64.startsWith("iVB")) {
-                    sMimeType = "image/png";
-                } else if (sBase64.startsWith("/9j")) {
-                    sMimeType = "image/jpeg";
-                } else if (sBase64.startsWith("JVBER")) {
-                    sMimeType = "application/pdf";
-                }
-            }
-
-            if (sMimeType.indexOf("image/") === 0) {
-                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-                const oImage = new sap.m.Image({
-                    densityAware: false,
-                    width: "100%",
-                    height: "100%"
-                });
-
-                const oDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || "Document Preview",
-                    contentWidth: "50%",
-                    contentHeight: "60%",
-                    draggable: true,
-                    resizable: true,
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-                    contentPadding: "0rem",
-                    content: [new sap.m.FlexBox({
-                        width: "100%",
-                        height: "100%",
-                        justifyContent: "Center",
-                        alignItems: "Center",
-                        items: [oImage]
-                    })],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            oDialog.close();
-                        }
-                    }),
-                    afterClose: function () {
-                        oDialog.destroy();
-                    }
-                });
-
-                this.getView().addDependent(oDialog);
-                oImage.setSrc(sImageSrc);
-                oDialog.open();
-                return;
-            }
-
-            if (sMimeType === "application/pdf") {
-                const sByteChars = atob(sBase64);
-                const aByteArrays = [];
-
-                for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
-                    const sSlice = sByteChars.slice(iOffset, iOffset + 512);
-                    const aByteNumbers = new Array(sSlice.length);
-
-                    for (let i = 0; i < sSlice.length; i++) {
-                        aByteNumbers[i] = sSlice.charCodeAt(i);
-                    }
-
-                    aByteArrays.push(new Uint8Array(aByteNumbers));
-                }
-
-                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
-
-                if (this._customerPreviewUrl) {
-                    URL.revokeObjectURL(this._customerPreviewUrl);
-                }
-
-                this._customerPreviewUrl = URL.createObjectURL(oBlob);
-
-                const oPdfDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || "Document Preview",
-                    stretch: true,
-                    draggable: true,
-                    resizable: true,
-                    contentWidth: "60%",
-                    contentHeight: "60%",
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-                    contentPadding: "0rem",
-                    content: [new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-                            <div style="width:100%;height:100%;overflow:hidden;">
-                                <iframe src="${this._customerPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
-                            </div>
-                        `
-                    })],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            oPdfDialog.close();
-                        }
-                    }),
-                    afterClose: function () {
-                        if (this._customerPreviewUrl) {
-                            URL.revokeObjectURL(this._customerPreviewUrl);
-                            this._customerPreviewUrl = null;
-                        }
-
-                        oPdfDialog.destroy();
-                    }.bind(this)
-                });
-
-                this.getView().addDependent(oPdfDialog);
-                oPdfDialog.open();
-                return;
-            }
-
-            MessageToast.show("Preview not supported for this file type.");
-        },
-
         onFamilyDocumentChange: function (oEvent) {
             const oFileUploader = oEvent.getSource();
             const oContext = oFileUploader.getBindingContext("BookingView");
@@ -4270,50 +3803,6 @@
 
             oReader.readAsDataURL(oFile);
         },
-
-        // onSaveFamilyMember: function (oEvent) {
-        //     const oContext = oEvent.getSource().getBindingContext("BookingView");
-        //     const sPath = oContext.getPath();
-        //     const oModel = this.getView().getModel("BookingView");
-
-        //     const oMember = Object.assign({}, oModel.getProperty(sPath));
-
-        //     if (!oMember.Name || !oMember.Name.trim()) {
-        //         MessageToast.show("Please enter member name.");
-        //         return;
-        //     }
-
-        //     if (!oMember.Relation || !oMember.Relation.trim()) {
-        //         MessageToast.show("Please enter relation.");
-        //         return;
-        //     }
-
-        //     if (!oMember.Age || isNaN(parseInt(oMember.Age, 10))) {
-        //         MessageToast.show("Please enter valid age.");
-        //         return;
-        //     }
-
-        //     if (!oMember.Gender) {
-        //         MessageToast.show("Please select gender.");
-        //         return;
-        //     }
-
-        //     if (!oMember.DocumentType) {
-        //         MessageToast.show("Please select document type.");
-        //         return;
-        //     }
-
-        //     if (!oMember.DocumentName) {
-        //         MessageToast.show("Please upload a document.");
-        //         return;
-        //     }
-
-        //     oMember.IsNew = false;
-        //     oModel.setProperty(sPath, oMember);
-        //     oModel.refresh(true);
-
-        //     MessageToast.show("Member added successfully.");
-        // },
 
         _renderFacilityCards: function () {
             const oContainer = this.byId("facilityCardsContainer");
@@ -4435,7 +3924,6 @@
             const oBookingView = this.getView().getModel("BookingView");
             const oToday = new Date();
             const aPaymentMethods = [];
-            const aUserDocuments = Array.isArray(oData.UserDocuments) ? oData.UserDocuments : [];
             let aOriginalPersonOptions = Array.isArray(oData.NoOfPersonsList) ? oData.NoOfPersonsList.slice() : [];
             const iCapacity = Math.max(parseInt(oData.Capacity, 10) || 1, 1);
             const sPropertyType = String(oData.PropertyType || "").trim();
@@ -4488,13 +3976,8 @@
             oModel.setProperty("/CGST", this._toNumber(oData.CGST));
             oModel.setProperty("/SGST", this._toNumber(oData.SGST));
             oModel.setProperty("/IGST", this._toNumber(oData.IGST));
-            oModel.setProperty("/UserDocuments", aUserDocuments);
             oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
-            oBookingView.setProperty("/showCustomerDocumentUpload", aUserDocuments.length === 0);
-
-            if (aUserDocuments.length === 0) {
-                this._ensureCustomerDocumentSlot();
-            }
+            oBookingView.setProperty("/showCustomerDocumentUpload", false);
             oModel.setProperty("/BookingPayload", oData.BookingPayload || null);
 
             if (!oData.SelectedPriceType && aPaymentMethods.length > 0) {
@@ -4823,41 +4306,6 @@
         //     utils._LCvalidateMandatoryField(oEvent)
         // },
 
-        // onFamilyMemberSelect: function (oEvent) {
-        //     const oBookingView = this.getView().getModel("BookingView");
-        //     const aPreviousOccupantIds = this._getSelectedOccupantIds();
-        //     const oMember = oEvent.getSource().getBindingContext("BookingView").getObject();
-
-        //     if (oMember.IsNew) {
-        //         MessageToast.show("Please add the member first.");
-        //         oEvent.getSource().setSelected(false);
-        //         return;
-        //     }
-
-        //     const bSelected = oEvent.getSource().getSelected();
-        //     const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
-        //     const iOtherSelected = (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oItem) {
-        //         return oItem.id !== oMember.id && oItem.Selected;
-        //     }).length;
-        //     const iNewTotal = 1 + iOtherSelected + (bSelected ? 1 : 0);
-
-        //     if (bSelected && iNewTotal > iMaxPersons) {
-        //         MessageToast.show("Selected room capacity does not allow more members.");
-        //         oEvent.getSource().setSelected(false);
-        //         oMember.Selected = false;
-        //         return;
-        //     }
-
-        //     oMember.Selected = bSelected;
-        //     if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
-        //         this._clearSelectedFacilities();
-        //     }
-        //     oBookingView.refresh(true);
-        //     this._updateSelectedPersonsFromFamily();
-        //     this._syncSelectedFacilityPersonsWithOccupants();
-        //     this._rebuildSelectedFacilities();
-        //     this._recalculateSummary();
-        // },
         onDeleteFamilyMemberRow: function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
             const aPreviousOccupantIds = this._getSelectedOccupantIds();
@@ -5394,37 +4842,6 @@
             };
         },
 
-        _buildMembersPayload: function () {
-            const oBookingView = this.getView().getModel("BookingView");
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const mTempMemberIds = this._getTempMemberIdMap();
-            const sUserID = String(oHostelModel.getProperty("/UserID") || "").trim();
-
-            // Get selected members that need MemberIDs (excluding IsNew and IsPrimary)
-            const aSelectedMembers = (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
-                return !oMember.IsNew && !oMember.IsPrimary && !!oMember.Selected;
-            });
-
-            // Generate MemberIDs based on logged-in UserID
-            aSelectedMembers.forEach(function (oMember, iIndex) {
-                const iSeqNum = iIndex + 1;
-                const sSeqNumStr = iSeqNum < 10 ? "0" + iSeqNum : String(iSeqNum);
-                oMember._generatedMemberID = sUserID ? (sUserID + "_" + sSeqNumStr) : "";
-            }.bind(this));
-
-            return aSelectedMembers.map(function (oMember) {
-                return {
-                    MemberID: oMember._generatedMemberID || oMember.MemberID || "",
-                    Salutation: oMember.Salutation || "",
-                    Name: oMember.Name || "",
-                    DateOfBirth: oMember.Age || "",
-                    Relation: oMember.Relation || "",
-                    Gender: oMember.Gender || "",
-                    Documents: this._buildSingleMemberDocumentsPayload(oMember)
-                };
-            }.bind(this));
-        },
-
         _getSelectedMemberIDs: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
@@ -5493,8 +4910,7 @@
                 if (bIsSelf) {
                     return;
                 }
-                // Use generated MemberID if available, otherwise use existing MemberID
-                const sMemberID = oMember._generatedMemberID || oMember.MemberID || "";
+                const sMemberID = oMember.MemberID || "";
                 if (sMemberID) {
                     aMemberIDs.push(sMemberID);
                 }
@@ -5502,92 +4918,6 @@
 
             // Filter out empty strings and join with commas
             return aMemberIDs.filter(function (s) { return s && s.trim(); }).join(",");
-        },
-
-        _buildSingleMemberDocumentsPayload: function (oMember) {
-            const sType = String(oMember && oMember.DocumentType || "").trim();
-            const sFile = String(oMember && (oMember.File || oMember.Document) || "").trim();
-            const sName = String(oMember && (oMember.DocumentName || oMember.FileName) || "").trim();
-
-            if (!(sType && sFile && sName)) {
-                return [];
-            }
-
-            return [{
-                DocumentType: oMember.DocumentType || "",
-                File: oMember.File || oMember.Document || "",
-                FileName: oMember.DocumentName || oMember.FileName || "",
-                FileType: oMember.DocumentFile && oMember.DocumentFile.type ? oMember.DocumentFile.type : (oMember.FileType || "")
-            }];
-        },
-
-        _buildDocumentsPayload: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const aCustomerDocuments = (oHostelModel.getProperty("/Documents") || []).filter(function (oDocument) {
-                if (!oDocument) {
-                    return false;
-                }
-
-                const sType = String(oDocument.DocumentType || "").trim();
-                const sFile = String(oDocument.File || oDocument.Document || "").trim();
-                const sName = String(oDocument.FileName || oDocument.DocumentName || "").trim();
-
-                return !!(sType && sFile && sName) && !oDocument.IsNew;
-            }).map(function (oDocument) {
-                return {
-                    DocumentType: oDocument.DocumentType || "",
-                    File: oDocument.File || oDocument.Document || "",
-                    FileName: oDocument.FileName || oDocument.DocumentName || "",
-                    FileType: oDocument.FileType || "",
-                    MemberID: ""
-                };
-            });
-
-            return aCustomerDocuments;
-        },
-
-        _getTempMemberIdMap: function () {
-            const oBookingView = this.getView().getModel("BookingView");
-            const aMembers = oBookingView ? (oBookingView.getProperty("/FamilyMembers") || []) : [];
-            const mTempMemberIds = {};
-            let iTempIndex = 1;
-
-            aMembers.filter(function (oMember) {
-                return !oMember.IsNew && !oMember.IsPrimary && !!oMember.Selected;
-            }).forEach(function (oMember) {
-                const sTempMemberId = String(oMember.TempMemberID || ("TMP" + iTempIndex)).trim();
-                const aKeys = [
-                    oMember.id,
-                    oMember.MemberID,
-                    oMember.ID
-                ].filter(Boolean);
-
-                aKeys.forEach(function (sKey) {
-                    mTempMemberIds[String(sKey).trim()] = sTempMemberId;
-                });
-
-                iTempIndex += 1;
-            });
-
-            return mTempMemberIds;
-        },
-
-        _getTempMemberIdForMember: function (oMember, mTempMemberIds) {
-            const aKeys = [
-                oMember && oMember.id,
-                oMember && oMember.MemberID,
-                oMember && oMember.ID
-            ].filter(Boolean);
-
-            for (let i = 0; i < aKeys.length; i += 1) {
-                const sKey = String(aKeys[i]).trim();
-
-                if (sKey && mTempMemberIds && mTempMemberIds[sKey]) {
-                    return mTempMemberIds[sKey];
-                }
-            }
-
-            return String(oMember && oMember.TempMemberID || "").trim();
         },
 
         _getFacilityMemberIdValue: function (oFacility) {
@@ -5816,8 +5146,7 @@
                     State: oHostelModel.getProperty("/State") || "",
                     City: oHostelModel.getProperty("/City") || "",
                     PermanentAddress: oHostelModel.getProperty("/Address") || "",
-                    // Members: this._buildMembersPayload(),
-                    Documents: this._buildDocumentsPayload(),
+                    Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
                     PaymentDetails: [this._getPaymentPayloadDetails()]
