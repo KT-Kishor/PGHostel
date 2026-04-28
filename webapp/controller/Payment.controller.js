@@ -74,7 +74,6 @@ sap.ui.define([
 
         prepareMasterFilterData: function (aData) {
             const mBranch = new Map();
-            const mCustomer = new Map();
             const mBooking = new Map();
 
             aData.forEach(item => {
@@ -82,12 +81,6 @@ sap.ui.define([
                     mBranch.set(item.BranchCode, {
                         BranchCode: item.BranchCode,
                         Name: item.BranchName
-                    });
-                }
-                if (item.CustomerID && !mCustomer.has(item.CustomerID)) {
-                    mCustomer.set(item.CustomerID, {
-                        CustomerID: item.CustomerID,
-                        CustomerName: item.CustomerName
                     });
                 }
                 if (item.BookingID && !mBooking.has(item.BookingID)) {
@@ -98,7 +91,6 @@ sap.ui.define([
             });
 
             this.getView().setModel(new JSONModel([...mBranch.values()]), "BranchFilterModel");
-            this.getView().setModel(new JSONModel([...mCustomer.values()]), "CustomerFilterModel");
             this.getView().setModel(new JSONModel([...mBooking.values()]), "BookingFilterModel");
         },
 
@@ -106,7 +98,6 @@ sap.ui.define([
             const oView = this.getView();
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
             const oDateRange = this.byId("P_id_Date");
-            const sCustomerID = oView.byId("P_id_CustomerID").getSelectedKey() || oView.byId("P_id_CustomerID").getValue();
             const sBookingID = oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
             let sBranch = "";
             const oBranchCombo = oView.byId("P_id_BranchCode");
@@ -124,7 +115,6 @@ sap.ui.define([
                 }
             }
             let filters = {};
-            if (sCustomerID) filters.CustomerID = sCustomerID;
             if (sBookingID) filters.BookingID = sBookingID;
             if (oLogin.Role === "Admin") {
                 filters.BranchCode = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(c => c.trim()) : [];
@@ -224,7 +214,7 @@ sap.ui.define([
 
         FC_onPressClear: function () {
             const oView = this.getView();
-            oView.byId("P_id_CustomerID").setSelectedKey("");
+            oView.byId("P_id_BookingID").setSelectedKey("");
             oView.byId("P_id_BookingID").setSelectedKey("");
             oView.byId("P_id_BranchCode").setSelectedKey("");
             const oDate = oView.byId("P_id_Date");

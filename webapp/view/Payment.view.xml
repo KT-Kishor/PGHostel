@@ -26,28 +26,6 @@
 				class="filterBarTheme">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
-                        name="CustomerID"
-                        label="{i18n>customerID}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-						<fb:control>
-							<ComboBox
-                                id="P_id_CustomerID"
-                                showSecondaryValues="true"
-                                filterSecondaryValues="true"
-                                items="{path:'CustomerFilterModel>/', sorter:{path:'CustomerID', descending:false}}"
-                                showClearIcon="true"
-                            >
-								<core:ListItem
-                                    key="{CustomerFilterModel>CustomerID}"
-                                    text="{CustomerFilterModel>CustomerID}"
-                                    additionalText="{CustomerFilterModel>CustomerName}"
-                                />
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-					<fb:FilterGroupItem
                         name="BookingID"
                         label="{i18n>bookingID}"
                         groupName="Group"
