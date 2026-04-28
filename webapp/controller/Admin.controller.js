@@ -836,7 +836,6 @@ sap.ui.define([
 
                 this.getOwnerComponent().setModel(
                     new sap.ui.model.json.JSONModel({
-                        CustomerID: ID.CustomerID,
                         BookingID: ID.BookingID,
                         Status: "Assigned",
                         CustomerName: ID.CustomerName

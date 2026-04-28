@@ -54,7 +54,6 @@ sap.ui.define([
                 }
 
                 oView.setModel(new JSONModel({
-                    CustomerID: "",
                     BookingID: "",
                     CustomerName: "",
                     InvNo: "",
@@ -143,25 +142,24 @@ sap.ui.define([
                 this.Update = false;
                 if (sArg === "X") {
                     const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
-                    const sCustomerID = oNavCtx?.getProperty("/CustomerID");
                     const sBookingID = oNavCtx?.getProperty("/BookingID");
                     const sCustomerName = oNavCtx?.getProperty("/CustomerName");
 
                     const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
                     const oBookingCombo = this.byId("CID_id_AddBooking");
 
-                    if (sCustomerID && sBookingID) {
+                    if (sCustomerName && sBookingID) {
                         oCustomerCombo.setSelectedKey(null);
                         oBookingCombo.setSelectedKey(null);
                         sap.ui.getCore().applyChanges();
 
-                        oCustomerCombo.setSelectedKey(sCustomerID); // Set selected keys
+                        oCustomerCombo.setSelectedKey(sCustomerName); // Set selected keys
                         oBookingCombo.setSelectedKey(sBookingID);
-                        this.SelectKey = sCustomerID; // Store customer for booking 
+                        this.SelectKey = sCustomerName; // Store customer for booking 
                         oCustomerCombo.setEditable(false); // Lock customer selection
 
                         const customerData = [{
-                            CustomerID: sCustomerID,
+                            BookingID: sBookingID,
                             CustomerName: sCustomerName
                         }];
                         this.getView().setModel(new sap.ui.model.json.JSONModel(customerData), "ManageCustomerModel");
@@ -182,12 +180,12 @@ sap.ui.define([
                         });
 
                         // Clear navigation context
-                        oNavCtx.setProperty("/CustomerID", "");
+                        oNavCtx.setProperty("/CustomerName", "");
                         oNavCtx.setProperty("/BookingID", "");
                     } else {
                         const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
                         if (oNavCtx) {
-                            oNavCtx.setProperty("/CustomerID", "");
+                            oNavCtx.setProperty("/CustomerName", "");
                             oNavCtx.setProperty("/BookingID", "");
                         }
 
@@ -359,7 +357,9 @@ sap.ui.define([
                 if (this.sourceView === "Customerinvoice") {
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
                 } else if (this.sourceView === "AdminPage") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin");
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin",{
+                        sPath:"ManageInvoice"
+                    });
                 } else if (this.sourceView === "PaymentDashboard") {
                     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
                 } else {
@@ -381,11 +381,11 @@ sap.ui.define([
                     const allData = this.getView().getModel("ManageCustomerModel").getData();
 
                     // Filter selected customer record
-                    const SelectedData = allData.find(item => item.CustomerID === this.SelectKey);
+                    const SelectedData = allData.find(item => item.CustomerName === this.SelectKey);
                     if (!SelectedData) return;
 
                     // Filter booking list for selected customer
-                    const bookingList = allData.filter(item => item.CustomerID === this.SelectKey).map(i => ({
+                    const bookingList = allData.filter(item => item.CustomerName === this.SelectKey).map(i => ({
                         BookingID: i.BookingID,
                         Status: i.Status
                     }));
@@ -408,15 +408,15 @@ sap.ui.define([
             onChangeBookingID: async function(oEvent) {
                 try {
                     const bookingID = oEvent.getSource().getSelectedKey();
-                    const customerID = this.SelectKey;
+                    const customerName = this.SelectKey;
 
-                    if (!bookingID && !customerID) return;
+                    if (!bookingID && !customerName) return;
 
                     this.getBusyDialog()
 
                     const oData = await this.ajaxCreateWithJQuery("HM_getAllInvoiceData", {
                         data: {
-                            CustomerID: customerID,
+                            CustomerName: customerName,
                             BookingID: bookingID
                         }
                     });
@@ -452,7 +452,7 @@ sap.ui.define([
                             RoomNo: bookingDetails.RoomNo || "",
                             BranchCode: bookingDetails.BranchCode || "",
                             CouponDiscount: bookingDetails.Discount || "",
-                            CustomerID: customerID,
+                            CustomerName: customerName,
                             BookingID: bookingID,
                             UserID: bookingDetails.UserID || "",
                             PaidAmount: oData.data.PerMonthTotalRent || "0.00",
@@ -1194,7 +1194,6 @@ sap.ui.define([
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: (oSelectedCustomerModel.LUT) || "",
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
-                    CustomerID: oSelectedCustomerModel.CustomerID || "",
                     BookingID: oSelectedCustomerModel.BookingID || "",
                     BranchCode: oSelectedCustomerModel.BranchCode || "",
                     RoomNo: oSelectedCustomerModel.RoomNo || "",
@@ -1610,7 +1609,6 @@ sap.ui.define([
                     AmountInINR: "",
                     FlagVisCompany: "Company Invoice",
                     CustomerName: oNavigationModel.CustomerName,
-                    CustomerID: oNavigationModel.CustomerID,
                     BookingID: oNavigationModel.BookingID,
                     BranchCode: oNavigationModel.BranchCode
                 });
@@ -1782,7 +1780,6 @@ sap.ui.define([
                     ConversionRate: paymentModel.Currency !== "INR" ? String(paymentModel.ConversionRate) : "",
                     AmountInINR: paymentModel.Currency !== "INR" ? String(paymentModel.AmountInINR) : "",
                     CustomerName: paymentModel.CustomerName,
-                    CustomerID: paymentModel.CustomerID,
                     BookingID: paymentModel.BookingID,
                     BranchCode: paymentModel.BranchCode,
                     PaymentType: "UPI"
@@ -3027,7 +3024,7 @@ sap.ui.define([
                     const filterData = oView.getModel("SelectedCustomerModel").getData();
 
                     const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
-                        CustomerID: [filterData.CustomerID]
+                        BookingID: [filterData.BookingID]
                     });
 
                     const invoices = response.data || [];
@@ -3045,7 +3042,7 @@ sap.ui.define([
 
                     // ================= PAYMENT HISTORY (COMMON) =================
                     const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
-                        CustomerID: [filterData.CustomerID]
+                        BookingID: [filterData.BookingID]
                     });
 
                     // ================= PDF INIT =================
@@ -3438,7 +3435,6 @@ sap.ui.define([
                     RefundAmount: oNavigationModel.RefundAmount,
                     Currency: oNavigationModel.Currency,
                     CustomerName: oNavigationModel.CustomerName,
-                    CustomerID: oNavigationModel.CustomerID,
                     BookingID: oNavigationModel.BookingID,
                     BranchCode: oNavigationModel.BranchCode
                 });
@@ -3466,7 +3462,6 @@ sap.ui.define([
                     Amount: (RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
-                    CustomerID: RefundModel.CustomerID,
                     BookingID: RefundModel.BookingID,
                     BranchCode: RefundModel.BranchCode,
                     PaymentType: RefundModel.PaymentMode,
@@ -3540,7 +3535,7 @@ sap.ui.define([
                     this.getBusyDialog();
 
                     const oData = await this.ajaxReadWithJQuery("HM_BookingFacilityItems", {
-                        CustomerID: oModel.CustomerID,
+                        BookingID: oModel.BookingID,
                     });
 
                     const finalItems = this._prepareInvoiceItems(oData);

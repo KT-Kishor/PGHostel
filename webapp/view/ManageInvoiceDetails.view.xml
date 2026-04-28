@@ -40,7 +40,7 @@
 									<f:content>
 										<m:Label
                                             visible="{visiablityPlay>/createVisi}"
-                                            text="{i18n>customerID}"
+                                            text="{i18n>customerName}"
                                             required="true"
                                         />
 										<m:ComboBox
@@ -50,14 +50,14 @@
                                             showButton="true"
                                             visible="{visiablityPlay>/createVisi}"
                                             items="{ManageCustomerModel>/}"
-                                            value="{ManageCustomerModel>/CustomerID}"
+                                            value="{ManageCustomerModel>/CustomerName}"
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
                                         >
 											<core:ListItem
-                                                key="{ManageCustomerModel>CustomerID}"
-                                                text="{ManageCustomerModel>CustomerID}"
-                                                additionalText="{ManageCustomerModel>CustomerName}"
+                                                key="{ManageCustomerModel>CustomerName}"
+                                                text="{ManageCustomerModel>CustomerName}"
+                                                additionalText="{ManageCustomerModel>BookingID}"
                                             />
 										</m:ComboBox>
 										<m:Label
@@ -109,15 +109,6 @@
                                             visible="{visiablityPlay>/editVisi}"
                                             id="CID_id_Custmer"
                                             value="{SelectedCustomerModel>/CustomerName}"
-                                            editable="false"
-                                        />
-										<m:Label
-                                            visible="{visiablityPlay>/editVisi}"
-                                            text="{i18n>customerID}"
-                                        />
-										<m:Input
-                                            visible="{visiablityPlay>/editVisi}"
-                                            value="{SelectedCustomerModel>/CustomerID}"
                                             editable="false"
                                         />
 										<m:Label
