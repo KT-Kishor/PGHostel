@@ -29,11 +29,11 @@
             columnsM="2"
             singleContainerFullSize="false">
 			<f:content>
-				<!-- Customer ID -->
-				<Label text="Customer ID" required="true"/>
-				<ComboBox id="HD_id_CustomerID" width="100%" change="onChangeAddCustomer"
-                    items="{CustomerModel>/}" showSecondaryValues="true" editable="{DamageModel>/CustomerIDEditable}" selectedKey="{DamageModel>/CustomerID}" valueStateText="{i18n>customerIDValueState}">
-					<core:ListItem key="{CustomerModel>CustomerID}" text="{CustomerModel>CustomerID}"
+				<!-- Booking ID -->
+				<Label text="Booking ID" required="true"/>
+				<ComboBox id="HD_id_BookingID" width="100%" change="onChangeAddCustomer"
+                    items="{CustomerModel>/}" showSecondaryValues="true" editable="{DamageModel>/BookingIDEditable}" selectedKey="{DamageModel>/BookingID}" valueStateText="{i18n>bookingIDValueState}">
+					<core:ListItem key="{CustomerModel>BookingID}" text="{CustomerModel>BookingID}"
                 additionalText="{CustomerModel>CustomerName}"/>
 				</ComboBox>
 				<!-- Customer Name -->

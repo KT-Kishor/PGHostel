@@ -58,21 +58,21 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Customer ID"
+                                            text="Booking ID"
                                             required="true"
                                         />
                                         <m:ComboBox
-                                            id="HD_id_CustomerID1"
+                                            id="HD_id_BookingID1"
                                             width="100%"
                                             change="onChangeAddCustomer"
                                             items="{CustomerModel>/}"
                                             showSecondaryValues="true"
-                                            selectedKey="{DamageModel>/CustomerID}"
-                                            valueStateText="{i18n>customerIDValueState}"
+                                            selectedKey="{DamageModel>/BookingID}"
+                                            valueStateText="{i18n>bookingIDValueState}"
                                         >
                                             <core:ListItem
-                                                key="{CustomerModel>CustomerID}"
-                                                text="{CustomerModel>CustomerID}"
+                                                key="{CustomerModel>BookingID}"
+                                                text="{CustomerModel>BookingID}"
                                                 additionalText="{CustomerModel>CustomerName}"
                                             />
                                         </m:ComboBox>

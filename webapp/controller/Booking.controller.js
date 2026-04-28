@@ -5095,7 +5095,7 @@
             return [{
                 BookingDate: this._getTodayISODate(),
                 RentPrice: this._toNumber(oHostelModel.getProperty("/GrandTotal")).toFixed(2),
-                RoomPrice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
+                RoomPrice: this._toNumber(oHostelModel.getProperty("/FinalPrice")).toFixed(2),
                 NoOfPersons: this._getSelectedPersonCount(),
                 StartDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
                 EndDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),

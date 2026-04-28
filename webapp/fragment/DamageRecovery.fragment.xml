@@ -29,8 +29,8 @@
                 singleContainerFullSize="false">
 
                 <!-- Customer ID -->
-                <Label text="Customer ID"/>
-                <Text text="{DamageModel>/CustomerID}"/>
+                <Label text="Booking ID"/>
+                <Text text="{DamageModel>/BookingID}"/>
                 <!-- Customer Name -->
                 <Label text="Customer Name"/>
                 <Text text="{DamageModel>/CustomerName}"/>

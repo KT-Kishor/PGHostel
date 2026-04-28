@@ -20,7 +20,7 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.commonLoginFunction();
             var model = new JSONModel({
-                CustomerID: "",
+                BookingID: "",
                 CustomerName: "",
                 RoomNo: "",
                 BedTypeName: "",
@@ -116,11 +116,11 @@ sap.ui.define([
             this.SelectKey = oEvent.getSource().getSelectedKey();
             const allData = this.getView().getModel("CustomerModel").getData();
 
-            const SelectedData = allData.find(item => item.CustomerID === this.SelectKey);
+            const SelectedData = allData.find(item => item.BookingID === this.SelectKey);
             if (!SelectedData) return;
 
             var oDamageModel = this.getView().getModel("DamageModel");
-            oDamageModel.setProperty("/CustomerID", SelectedData.CustomerID);
+            oDamageModel.setProperty("/BookingID", SelectedData.BookingID);
             oDamageModel.setProperty("/CustomerName", SelectedData.CustomerName);
             oDamageModel.setProperty("/RoomNo", SelectedData.RoomNo);
             oDamageModel.setProperty("/BedTypeName", SelectedData.BedType);
@@ -148,7 +148,7 @@ sap.ui.define([
             var oDamageModel = oView.getModel("DamageModel");
             if (oDamageModel) {
                 oDamageModel.setData({
-                    CustomerID: "",
+                    BookingID: "",
                     CustomerName: "",
                     RoomNo: "",
                     BedTypeName: "",
@@ -163,7 +163,7 @@ sap.ui.define([
                     CustomerEmail: "",
                     Type: "",
                     UserID: "",
-                    CustomerIDEditable: true
+                    BookingIDEditable: true
                 });
             }
 
@@ -210,7 +210,7 @@ sap.ui.define([
             }
 
             oData.Date = this.Formatter.formatDate(oData.Date); // Format date for input field
-            oData.CustomerIDEditable = false;
+            oData.BookingIDEditable = false;
 
             // Create dialog if not already initialized
             if (!this.AR_Dialog) {
@@ -261,7 +261,7 @@ sap.ui.define([
             // Mandatory Validation
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("HD_id_Type")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_CustomerID")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_BookingID")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_ItemName")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("HD_id_Description")), "ID") &&
                 utils._LCvalidateAmount(sap.ui.getCore().byId(oView.createId("HD_id_Cost")), "ID") &&
@@ -275,7 +275,7 @@ sap.ui.define([
 
             // Build DATA Object
             var oData = {
-                CustomerID: Payload.CustomerID,
+                BookingID: Payload.BookingID,
                 CustomerName: Payload.CustomerName,
                 CustomerEmail: Payload.CustomerEmail,
                 RoomNo: Payload.RoomNo,
@@ -291,7 +291,7 @@ sap.ui.define([
                 UserID: Payload.UserID
             };
 
-            delete Payload.CustomerIDEditable;
+            delete Payload.BookingIDEditable;
             try {
                 this.getBusyDialog()
 
@@ -570,7 +570,7 @@ sap.ui.define([
         createDamageExcelColumns: function () {
             return [
                 { label: "Property Name", property: "BranchName", type: "string" },
-                { label: "Customer ID", property: "CustomerID", type: "string" },
+                { label: "Booking ID", property: "BookingID", type: "string" },
                 { label: "Customer Name", property: "CustomerName", type: "string" },
                 { label: "Room No", property: "RoomNo", type: "string" },
                 { label: "Cost", property: "TotalCost", type: "string" },
@@ -926,8 +926,8 @@ sap.ui.define([
                     value: NA(oData.RoomNo)
                 },
                 {
-                    label: "Customer ID :",
-                    value: NA(oData.CustomerID)
+                    label: "Booking ID :",
+                    value: NA(oData.BookingID)
                 }
                 ];
 

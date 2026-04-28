@@ -118,7 +118,7 @@
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="{i18n>customerID}" tooltip="{i18n>customer}"/>
+						<Text text="{i18n>BookingID}" tooltip="{i18n>customer}"/>
 					</Column>
 					<Column demandPopin="true">
 						<Text text="{i18n>customerName}" tooltip="{i18n>customerName}"/>
@@ -145,7 +145,7 @@
 						press="DM_onPressEditDetails"
 					>
 						<cells>
-							<Text text="{Damage>CustomerID}" />
+							<Text text="{Damage>BookingID}" />
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
 							<Text text="{parts: ['Damage>TotalCost','Damage>Currency'], formatter: '.Formatter.formatCurrency'}"/>

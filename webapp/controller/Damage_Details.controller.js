@@ -29,7 +29,7 @@ sap.ui.define([
                 this.decodedPath = sDamageID;
 
                 var oDamageModel = new JSONModel({
-                    CustomerID: "",
+                    BookingID: "",
                     CustomerName: "",
                     RoomNo: "",
                     BedTypeName: "",
@@ -101,7 +101,7 @@ sap.ui.define([
 
                     var DamageModel = {
                         DamageID: Damage.DamageID,
-                        CustomerID: Damage.CustomerID,
+                        BookingID: Damage.BookingID,
                         CustomerName: Damage.CustomerName,
                         RoomNo: Damage.RoomNo,
                         BedTypeName: Damage.BedTypeName,
@@ -136,20 +136,20 @@ sap.ui.define([
                 if (this.decodedPath === "Damage") {
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", true);
-                    this.getView().byId("HD_id_CustomerID1").setEditable(true);
+                    this.getView().byId("HD_id_BookingID1").setEditable(true);
 
                 } else if (
                     this.getView().getModel("DamageModel").getProperty("/Status") === "Damage Claimed"
                 ) {
 
                     this.getView().byId("idEditButton").setVisible(false);
-                    this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                    this.getView().byId("HD_id_BookingID1").setEditable(false);
                     this.getView().byId("HD_id_DamageDate1").setEditable(false);
 
                 } else {
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
-                    this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                    this.getView().byId("HD_id_BookingID1").setEditable(false);
                 }
 
             } catch (err) {
@@ -160,10 +160,10 @@ sap.ui.define([
         DM_onPressEdit: function () {
             this.getView().getModel("VisibleModel").setProperty("/visible", true);
             if (this.decodedPath === "Damage") {
-                this.getView().byId("HD_id_CustomerID1").setEditable(true);
+                this.getView().byId("HD_id_BookingID1").setEditable(true);
 
             } else {
-                this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                this.getView().byId("HD_id_BookingID1").setEditable(false);
 
             }
         },
@@ -338,7 +338,7 @@ sap.ui.define([
 
             if (this.decodedPath === "Damage") {
                 if (
-                    !utils._LCstrictValidationComboBox(this.getView().byId("HD_id_CustomerID1"), "ID") ||
+                    !utils._LCstrictValidationComboBox(this.getView().byId("HD_id_BookingID1"), "ID") ||
                     !utils._LCvalidateMandatoryField(this.getView().byId("HD_id_DamageDate1"), "ID")
                 ) {
                     sap.m.MessageToast.show(
@@ -393,7 +393,7 @@ sap.ui.define([
             }
             var Payload = {
                 data: {
-                    CustomerID: oData.CustomerID,
+                    BookingID: oData.BookingID,
                     UserID: oData.UserID,
                     CustomerName: oData.CustomerName,
                     CustomerEmail: oData.CustomerEmail,
@@ -480,7 +480,7 @@ sap.ui.define([
                         this.closeBusyDialog()
                         this.OnSearch();
                         this.getView().getModel("VisibleModel").setProperty("/visible", false);
-                        this.getView().byId("HD_id_CustomerID1").setEditable(false);
+                        this.getView().byId("HD_id_BookingID1").setEditable(false);
                         sap.m.MessageBox.confirm(
                             "Damage Created Successfully",
                             {
@@ -549,11 +549,11 @@ sap.ui.define([
             this.SelectKey = oEvent.getSource().getSelectedKey();
             const allData = this.getView().getModel("CustomerModel").getData();
 
-            const SelectedData = allData.find(item => item.CustomerID === this.SelectKey);
+            const SelectedData = allData.find(item => item.BookingID === this.SelectKey);
             if (!SelectedData) return;
 
             var oDamageModel = this.getView().getModel("DamageModel");
-            oDamageModel.setProperty("/CustomerID", SelectedData.CustomerID);
+            oDamageModel.setProperty("/BookingID", SelectedData.BookingID);
             oDamageModel.setProperty("/CustomerName", SelectedData.CustomerName);
             oDamageModel.setProperty("/RoomNo", SelectedData.RoomNo);
             oDamageModel.setProperty("/BedTypeName", SelectedData.BedType);
@@ -664,7 +664,7 @@ sap.ui.define([
                 doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
                 currentY += 6;
 
-                // doc.text(`Customer ID : ${oModel.CustomerID}`, margin, currentY);
+                // doc.text(`Customer ID : ${oModel.BookingID}`, margin, currentY);
                 // currentY += 6;
 
                 doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
