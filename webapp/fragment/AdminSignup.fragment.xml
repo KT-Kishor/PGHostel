@@ -51,7 +51,7 @@
 
                 <Label
                     required="true"
-                    text="Name"
+                    text="Full Name"
                 />
                 <HBox
                     width="100%"

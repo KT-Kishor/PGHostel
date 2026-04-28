@@ -315,7 +315,7 @@
                                             tooltip="{i18n>uploadDocuments}"
                                             press="onUploadDocumentFile"
                                             class="myUnifiedBtn"
-                                            enabled="{= ${editable>/Edit} &amp;&amp; ${editable>/hasSelection} }"
+                                              enabled="{editable>/Edit}"
                                                  id="V_id_UploadButton"
                                           />
                                             
