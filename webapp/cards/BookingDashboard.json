@@ -8,7 +8,7 @@
 
     "header": {
       "title": "Booking ID: {data>/BookingID}",
-      "subTitle": "Customer Name: {data>/CustomerName} ({data>/CustomerID})"
+      "subTitle": "Customer Name: {data>/CustomerName} ({data>/BookingID})"
     },
 
     "content": {
@@ -37,7 +37,8 @@
             {
               "type": "Custom",
               "parameters": {
-                "CustomerID": "{data>/CustomerID}"
+                "BookingID": "{data>/BookingID}",
+                "MemberID" : "{data>/MemberID}"
               }
             }
           ]

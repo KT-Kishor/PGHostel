@@ -90,12 +90,12 @@ sap.ui.define([
                 aCards.push({
                     BookingID: oBooking.BookingID,
                     BookingDate: this.Formatter.formatDate(oBooking.BookingDate),
-                    CustomerName: this._mCustomerMap[oBooking.CustomerID],
-                    CustomerID: oBooking.CustomerID,
+                    CustomerName: this._mCustomerMap[oBooking.BookingID],
                     RoomNo: oBooking.RoomNo,
                     Status: oBooking.Status,
                     StartDate: this.Formatter.formatDate(oBooking.StartDate),
-                    EndDate: this.Formatter.formatDate(oBooking.EndDate)
+                    EndDate: this.Formatter.formatDate(oBooking.EndDate),
+                    MemberID : oBooking.MemberID
                 });
             });
             this.dashboardModels(aCards);
@@ -155,7 +155,6 @@ sap.ui.define([
         //                 //     BookingID: oBooking.BookingID,
         //                 //     BookingDate: oBooking.BookingDate,
         //                 //     CustomerName: oBooking.CustomerName,
-        //                 //     CustomerID: oBooking.CustomerID,
         //                 //     StartDate: oBooking.StartDate,
         //                 //     EndDate: oBooking.EndDate
         //                 // }
@@ -228,10 +227,12 @@ sap.ui.define([
         },
 
         onBookingCardPress: function (oEvent) {
-            var sCustomerID = oEvent.getSource().getBindingContext("todayModel").getObject().CustomerID;
-            var sEncodedID = btoa(sCustomerID.toString());
+            var sBookingID = oEvent.getSource().getBindingContext("todayModel").getObject().BookingID;
+            var sMemberID = oEvent.getSource().getBindingContext("todayModel").getObject().MemberID;
+            var sEncodedID = btoa(sBookingID.toString());
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
+                xPath : sMemberID,
                 from: "Dashboard"
             });
         },
@@ -544,7 +545,7 @@ sap.ui.define([
             return this.ajaxReadWithJQuery("HM_Customer", {}).then((oData) => {
                 const aCustomers = Array.isArray(oData.Customers) ? oData.Customers : [];
                 const mCustomerMap = {};
-                aCustomers.forEach(c => { mCustomerMap[c.CustomerID] = c.CustomerName || c.Name });
+                aCustomers.forEach(c => { mCustomerMap[c.BookingID] = c.CustomerName || c.Name });
                 this._mCustomerMap = mCustomerMap;
             })
                 .catch(() => {
@@ -752,11 +753,14 @@ sap.ui.define([
 
         onCardAction: function (oEvent) {
             const oParams = oEvent.getParameter("parameters");
-            const sCustomerID = oParams.CustomerID;
-            const sEncodedID = btoa(String(sCustomerID));
+            const sBookingID = oParams.BookingID;
+            const sEncodedID = btoa(String(sBookingID));
+            const sMemberID = oParams.MemberID;
+
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
+                xPath : sMemberID,
                 from: "Dashboard"
             });
 
