@@ -150,10 +150,7 @@
                     valueStateText="Please select relationship"
                     change="onNewMemberRelationChange"
                 >
-                    <core:Item
-                        key="Self"
-                        text="Self"
-                    />
+                 
                     <core:Item
                         key="Spouse"
                         text="Spouse"
@@ -163,16 +160,28 @@
                         text="Child"
                     />
                     <core:Item
-                        key="Parent"
-                        text="Parent"
+                        key="Father"
+                        text="Father"
                     />
                     <core:Item
-                        key="Sibling"
-                        text="Sibling"
+                        key="Mother"
+                        text="Mother"
                     />
-                    <core:Item
+                     <core:Item
                         key="Friend"
                         text="Friend"
+                    />
+                    <core:Item
+                        key="Brother"
+                        text="Brother"
+                    />
+                    <core:Item
+                        key="Sister"
+                        text="Sister"
+                    />
+                       <core:Item
+                        key="Other"
+                        text="Other"
                     />
                 </ComboBox>
                 <Label

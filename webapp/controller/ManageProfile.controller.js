@@ -651,6 +651,7 @@ sap.ui.define([
                 Relation: oData.Relation || "",
                 MemberID: oData.MemberID || "",
                 UserID: oData.UserID || "",
+                Salutation: oData.Salutation 
             };
 
             sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "");
@@ -727,10 +728,10 @@ sap.ui.define([
                             Members: [
                                 {
                                     MemberID: this._existingFileData.MemberID,
-                                    Salutation: oMember.Salutation,
+                                    Salutation: oMember.Salutation ? oMember.Salutation : this._existingFileData.Salutation,
                                     Name: oMember.Name,
-                                    Relation: oMember.Relation,
-                                    Gender: oMember.Gender,
+                                    Relation: oMember.Relation ? oMember.Relation : this._existingFileData.Relation,
+                                    Gender: oMember.Gender ? oMember.Gender : this._existingFileData.Gender,
                                     UserID: this._existingFileData.UserID,
                                     DateOfBirth: dob,
                                     Documents: [
@@ -765,11 +766,11 @@ sap.ui.define([
                         Members: [
                             {
                                 MemberID: this._existingFileData.MemberID,
-                                Salutation: oMember.Salutation,
+                                Salutation: oMember.Salutation ? oMember.Salutation : this._existingFileData.Salutation,
                                 Name: oMember.Name,
-                                Relation: oMember.Relation,
-                                Gender: oMember.Gender,
-                                DateOfBirth: oMember.DateOfBirth.split('/').reverse().join('-') || "",
+                                Relation: oMember.Relation ? oMember.Relation : this._existingFileData.Relation,
+                                Gender: oMember.Gender ? oMember.Gender : this._existingFileData.Gender,
+                                DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split('/').reverse().join('-') : this._existingFileData.DateOfBirth,
                                 UserID: this._existingFileData.UserID,
                                 Documents: [
                                     {
@@ -1215,6 +1216,7 @@ sap.ui.define([
                         UserID: oDoc.UserID || "",
                         Attachment: sAttachment,
                         FileName: oDoc.FileName || "",
+                        Salutation: mem.Salutation || "",
                         FileType: oDoc.FileType || ""
                     };
                 });
