@@ -123,8 +123,7 @@ sap.ui.define([
                 }
             }
 
-            filter.FacilityName = this.byId("FN_id_FacilityName").getSelectedKey();
-            filter.BranchCode = this.byId("FN_id_BranchCode").getSelectedKey();
+
 
 
             this.getBusyDialog()

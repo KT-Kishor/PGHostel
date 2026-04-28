@@ -237,7 +237,7 @@ sap.ui.define([
             await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
-                    CustomerID: oCustomerModel.CustomerID
+                    BookingID: oCustomerModel.BookingID
                 }
             })
                 .then(() => {
@@ -329,8 +329,8 @@ sap.ui.define([
                     oUIModel.setProperty("/isLoggedIn", true);
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
                 } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin",{
-                        sPath:"DetailsPage"
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                        sPath: "DetailsPage"
                     });
                 } else {
                     this.getOwnerComponent().getRouter().navTo("RouteHostel");
@@ -358,7 +358,7 @@ sap.ui.define([
                 this.getBusyDialog()
                 const filter = {
                     BookingID: this.decodedPath,
-                    MemberID : this.MemberID
+                    MemberID: this.MemberID
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
@@ -374,11 +374,15 @@ sap.ui.define([
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
 
                 var Paymentpaid = aPayment
-                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used !== "Y")
+                    .filter(item => item.
+                        BookingID === oCustomer.
+                            BookingID && item.Used !== "Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
                 var RefundPaymentpaid = aPayment
-                    .filter(item => item.CustomerID === oCustomer.CustomerID && item.Used === "Y")
+                    .filter(item => item.
+                        BookingID === oCustomer.
+                            BookingID && item.Used === "Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
 
 
@@ -400,7 +404,6 @@ sap.ui.define([
 
                 const oCustomerData = {
                     CustomerName: oCustomer.CustomerName,
-                    CustomerID: oCustomer.CustomerID,
                     Gender: oCustomer.Gender,
                     MobileNo: oCustomer.MobileNo,
                     DateOfBirth: this.Formatter.DateFormat(oCustomer.DateOfBirth),
@@ -749,7 +752,7 @@ sap.ui.define([
                 });
             });
 
-         
+
             const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
             this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
 
@@ -811,7 +814,6 @@ sap.ui.define([
 
                     // Construct payload for update
                     const oPayload = {
-                        CustomerID: this.decodedPath,
                         CustomerName: oCustomerData.CustomerName,
                         Gender: oCustomerData.Gender,
                         MobileNo: oCustomerData.MobileNo,
@@ -1267,13 +1269,13 @@ sap.ui.define([
                     return;
                 }
             }
-       var oGroup = sap.ui.getCore().byId("id_Period");
+            var oGroup = sap.ui.getCore().byId("id_Period");
 
-var selectionmode = oPayload.SelectionMode 
-    || oGroup?.getButtons()[oGroup.getSelectedIndex()]?.getText() 
-    || this.SelectionMode;
+            var selectionmode = oPayload.SelectionMode
+                || oGroup?.getButtons()[oGroup.getSelectedIndex()]?.getText()
+                || this.SelectionMode;
             if (oPayload.UnitText !== "Unit Price" &&
-                        oPayload.UnitText !== "" && oPayload.quantity !=="" && selectionmode !== "QTY") {
+                oPayload.UnitText !== "" && oPayload.quantity !== "" && selectionmode !== "QTY") {
 
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -1285,7 +1287,7 @@ var selectionmode = oPayload.SelectionMode
                     return;
                 }
 
-            } else if ((selectionmode==="PERSON_QTY"|| selectionmode === "PERSON") && oCustomerData.AllMembers.length !== 0) {
+            } else if ((selectionmode === "PERSON_QTY" || selectionmode === "PERSON") && oCustomerData.AllMembers.length !== 0) {
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||
@@ -1568,7 +1570,7 @@ var selectionmode = oPayload.SelectionMode
                 }).length;
 
                 var customerHasThisBed = oCustomer.some(function (cust) {
-                    return cust.CustomerID === data.CustomerID &&
+                    return cust.BookingID === data.BookingID &&
                         cust.BedType === bed.BedTypeName &&
                         (cust.Status === "Assigned" || cust.Status === "New");
                 });
@@ -2085,7 +2087,7 @@ var selectionmode = oPayload.SelectionMode
                 var oStart = new Date(sStartDate);
                 var oEnd = new Date(sEndDate);
 
-                 var diffTime = oEnd - oStart;
+                var diffTime = oEnd - oStart;
                 var Duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
                 if (oSelectedData.UnitText === "Per Month") {
@@ -3408,7 +3410,7 @@ var selectionmode = oPayload.SelectionMode
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total =  price * Number(item.quantity);
+                                            total = price * Number(item.quantity);
                                         } else {
                                             total = price * Number(item.quantity) * diffDays;
                                         }
@@ -3615,7 +3617,7 @@ var selectionmode = oPayload.SelectionMode
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
-                  BookingID: CustomerData.BookingID
+                    BookingID: CustomerData.BookingID
                 }
             })
                 .then(async () => {
@@ -3676,7 +3678,7 @@ var selectionmode = oPayload.SelectionMode
             this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
-                    CustomerID: CustomerData.CustomerID
+                    BookingID: CustomerData.BookingID
                 }
             })
                 .then(() => {
@@ -3720,7 +3722,6 @@ var selectionmode = oPayload.SelectionMode
                             RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
                             RoomPrice: oData.RoomPrice || "0",
                             NoOfPersons: oData.noofperson || 1,
-                            Customerid: oData.CustomerId,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
                             EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
                             Status: "Cancelled", // UPDATED
@@ -3749,7 +3750,6 @@ var selectionmode = oPayload.SelectionMode
                             Salutation: oData.Salutation || "",
                             CustomerName: oData.FullName || "",
                             UserID: oData.UserID || "",
-                            CustomerID: oData.CustomerID || "",
                             STDCode: oData.STDCode || "",
                             MobileNo: oData.MobileNo || "",
                             Gender: oData.Gender || "",
@@ -4553,7 +4553,7 @@ var selectionmode = oPayload.SelectionMode
                 this.ajaxUpdateWithJQuery("HM_Booking", {
                     data: Payload,
                     filters: {
-                        CustomerID: CustData.CustomerID
+                        BookingID: CustData.BookingID
                     }
                 })
                     .then(async () => {

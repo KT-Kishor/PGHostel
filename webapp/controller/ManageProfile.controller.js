@@ -54,6 +54,12 @@ sap.ui.define([
             this.commonLoginFunction()
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
+            var model = new JSONModel({
+
+
+            });
+            this.getView().setModel(model, "Member")
+
         },
 
         ManageData: async function () {
@@ -140,7 +146,7 @@ sap.ui.define([
                         status: booking.Status,
                         currency: booking.Currency,
                         BookingID: booking.BookingID?.toString() || "",
-                        MemberID: booking.MemberID || ""  ,
+                        MemberID: booking.MemberID || "",
                         CustomerName: booking.CustomerName || "",
                     }
 
@@ -586,6 +592,268 @@ sap.ui.define([
                 oRoomType.setEnabled(true);
             }
         },
+        onProfileDialogClose: function () {
+            const oModel = this.getView().getModel("profileData");
+
+            if (this._originalProfileData) {
+                oModel.setData(this._originalProfileData);
+            }
+
+            oModel.setProperty("/isEditMode", false);
+
+            // ✅ IMPORTANT: clear old backup
+            this._originalProfileData = null;
+        },
+        _resetValidationStates: function () {
+            const aControls = [
+                "id_Name1",
+                "id_mail1",
+                "id_dob1",
+                "id_country1",
+                "id_state1",
+                "id_city1",
+                "id_phone1",
+                "id_gender1",
+                "id_address1"
+            ];
+
+            aControls.forEach((sId) => {
+                const oControl = this.byId(sId);
+
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState("None");
+                }
+
+                if (oControl && oControl.setValueStateText) {
+                    oControl.setValueStateText("");
+                }
+            });
+        },
+        onEditMemberFromDialog: function (oEvent) {
+            if (!this.UD_Dialog) {
+                var oView = this.getView();
+                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Memberedit", this);
+                oView.addDependent(this.UD_Dialog);
+            }
+
+            var oContext = oEvent.getSource().getBindingContext("profileData");
+            var oData = oContext.getObject();
+
+            // ✅ store existing file data
+            this._existingFileData = {
+                FileName: oData.FileName,
+                FileType: oData.FileType,
+                File: oData.Attachment, // already base64
+                DocumentID: oData.DocumentID,
+                DocumentType: oData.DocumentType || "",
+                DateOfBirth: oData.DateOfBirth || "",
+                Gender: oData.Gender || "",
+                Relation: oData.Relation || "",
+                MemberID: oData.MemberID || "",
+                UserID: oData.UserID || "",
+            };
+
+            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "");
+            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "");
+            sap.ui.getCore().byId("MemberDOB").setValue(oData.DateOfBirth.split('-').reverse().join('/') || "");
+
+            sap.ui.getCore().byId("MemberGenderCombo").setValue(oData.Gender || "");
+
+            sap.ui.getCore().byId("MemberRelationCombo").setValue(oData.Relation || "");
+            sap.ui.getCore().byId("MM_id_MemberName").setValue(oData.Name || "");
+            sap.ui.getCore().byId("idSelect").setValue(oData.Salutation || "");
+
+
+
+
+            this.UD_Dialog.open();
+        },
+
+        onCloseDialog: function () {
+            this.UD_Dialog.close();
+
+        },
+        onFacilityFileChange: function (oEvent) {
+            var aFiles = oEvent.getParameter("files");
+
+            if (!aFiles || aFiles.length === 0) return;
+
+            // ✅ store selected file globally (or in model)
+            this._selectedFile = aFiles[0];
+        },
+        savepress: function () {
+            var oView = sap.ui.getCore()
+            var DocumentType = sap.ui.getCore().byId("idDocumentType").getSelectedKey();
+            var oMember = this.getView().getModel("Member").getData(); // adjust index if needed
+
+
+            if (
+                utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"), "ID") &&
+                utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("idDocumentType"), "ID")
+            ) {
+
+
+                if (!DocumentType) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
+                    return;
+                }
+
+                const MAX_SIZE = 2 * 1024 * 1024;
+
+                // ✅ Case 1: New file selected
+                if (this._selectedFile) {
+                    var file = this._selectedFile;
+
+                    if (file.size > MAX_SIZE) {
+                        sap.m.MessageToast.show("File " + file.name + " exceeds 2 MB limit.");
+                        return;
+                    }
+
+                    var reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        var sBase64 = e.target.result.split(",")[1];
+
+                        // ✅ Safe Date Conversion
+                        var dob = oMember.DateOfBirth
+                            ? oMember.DateOfBirth.split('/').reverse().join('-')
+                            : "";
+
+                        var oPayload = {
+                            Members: [
+                                {
+                                    MemberID: this._existingFileData.MemberID,
+                                    Salutation: oMember.Salutation,
+                                    Name: oMember.Name,
+                                    Relation: oMember.Relation,
+                                    Gender: oMember.Gender,
+                                    UserID: this._existingFileData.UserID,
+                                    DateOfBirth: dob,
+                                    Documents: [
+                                        {
+                                            DocumentID: this._existingFileData.DocumentID,
+                                            MemberID: this._existingFileData.MemberID,
+                                            UserID: this._existingFileData.UserID,
+                                            DocumentType: DocumentType,
+                                            FileName: file.name,
+                                            FileType: file.type,
+                                            File: sBase64
+                                        }
+                                    ]
+                                }
+                            ]
+                        };
+
+                        // ✅ Call inside onload (VERY IMPORTANT)
+                        this._uploadDocument(oPayload);
+                    };
+
+                    // ✅ Trigger file read
+                    reader.readAsDataURL(file);
+                }
+
+                // ✅ Case 2: No new file → use existing file
+                else if (this._existingFileData) {
+
+
+                    var oPayload = {
+
+                        Members: [
+                            {
+                                MemberID: this._existingFileData.MemberID,
+                                Salutation: oMember.Salutation,
+                                Name: oMember.Name,
+                                Relation: oMember.Relation,
+                                Gender: oMember.Gender,
+                                DateOfBirth: oMember.DateOfBirth.split('/').reverse().join('-') || "",
+                                UserID: this._existingFileData.UserID,
+                                Documents: [
+                                    {
+                                        DocumentID: this._existingFileData.DocumentID,
+                                        MemberID: this._existingFileData.MemberID,
+                                        UserID: this._existingFileData.UserID,
+                                        DocumentType: DocumentType,
+                                        FileName: this._existingFileData.FileName,
+                                        FileType: this._existingFileData.FileType,
+                                        File: this._existingFileData.File
+                                    }
+                                ]
+                            }
+                        ]
+
+                    };
+
+                    this._uploadDocument(oPayload);
+                }
+
+                else {
+                    sap.m.MessageToast.show("Please select a file");
+                }
+            } else {
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+
+            }
+        },
+        _uploadDocument: function (oDoc) {
+            this.getBusyDialog();
+            this.ajaxUpdateWithJQuery("HM_MemberDocument", {
+                data: [oDoc],
+                filters: {
+                    DocumentID: this._existingFileData.DocumentID
+                }
+            }).then(() => {
+                this.onTableSelect(); // ✅ correct refresh
+                sap.m.MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
+                this.UD_Dialog.close();
+
+                this._selectedFile = null;
+                this._existingFileData = null;
+
+            }).catch(() => {
+                sap.m.MessageToast.show(this.i18nModel.getText("Error Uploading Documents"));
+            });
+        },
+        onNewMemberSalutationChange: function (oEvent) {
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+            const oGender = this.byId("idSelect");
+            // Clear salutation error immediately
+            oSalutation.setValueState("None");
+            if (!oGender) return;
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+            // Dr. → manual gender selection
+
+            // Strict validation (CONTROL, not event)
+            utils._LCstrictValidationSelect(oSalutation);
+        },
+        onNewMemberNameChange: function (oEvent) {
+            return utils._LCvalidateName(oEvent);
+        },
+        onNewMemberDOBChange: function (oEvent) {
+            utils._LCvalidateDate(oEvent);
+
+        },
+        onNewMemberGenderChange: function (oEvent) {
+            return utils._LCstrictValidationComboBox(oEvent);
+        },
+        onNewMemberRelationChange: function (oEvent) {
+            return utils._LCstrictValidationComboBox(oEvent);
+        },
+
         onEditSaveProfile: async function () {
             const oModel = this.getView().getModel("profileData");
             var data = oModel.getData()
@@ -657,8 +925,8 @@ sap.ui.define([
             var aFacilities = oProfileModel.getProperty("/facility") || [];
 
             var sBookingID = oBookingData.BookingID || "";
-            var sMemberID = oBookingData.MemberID  || "";
-             
+            var sMemberID = oBookingData.MemberID || "";
+
             if (!sBookingID) {
                 sap.m.MessageToast.show("BookingID not found for this booking");
                 return;
@@ -689,7 +957,7 @@ sap.ui.define([
             );
 
             if (!oTotals) return;
-             // Prepare data for details view
+            // Prepare data for details view
             var oFullCustomerData = {
                 salutation: oBooking.Salutation,
                 FullName: oBooking.CustomerName,
@@ -713,19 +981,19 @@ sap.ui.define([
                 AllSelectedFacilities: oTotals.AllSelectedFacilities,
                 TotalFacilityPrice: oTotals.TotalFacilityPrice,
                 GrandTotal: oTotals.GrandTotal,
-                MemberID : sMemberID
+                MemberID: sMemberID
             };
 
             //  Set model
             const oHostelModel = new sap.ui.model.json.JSONModel(oFullCustomerData);
             this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
 
-            var bookID =  btoa(sBookingID.toString());
+            var bookID = btoa(sBookingID.toString());
 
             //  Navigate using BookingID
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(bookID),
-                xPath : sMemberID,
+                xPath: sMemberID,
                 from: "ManageProfile"
             });
         },
@@ -842,7 +1110,7 @@ sap.ui.define([
             }
         },
         onTableSelect: async function (oEvent) {
-            const sKey = oEvent.getParameter("key");
+            const sKey = oEvent ? oEvent.getParameter("key") : "Members";
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
 
@@ -901,7 +1169,7 @@ sap.ui.define([
                 const resp = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
                 // New structure: { success: true, data: [...], UserDocuments: [...] }
                 const aMemberData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
-                const aUserDocuments = Array.isArray(resp?.UserDocuments) ? resp.UserDocuments : [];
+                const aUserDocuments = resp.data[0].Documents;
 
                 const aMembers = aMemberData.map(mem => {
                     // Handle Documents array - could be empty
@@ -938,9 +1206,13 @@ sap.ui.define([
                         Salutation: mem.Salutation || "",
                         Name: mem.Name || "",
                         DateOfBirth: mem.DateOfBirth || "",
+                        Gender: mem.Gender || "",
                         Relation: mem.Relation || "",
                         BookingID: mem.BookingID || "",
-
+                        DocumentType: oDoc.DocumentType || "",
+                        MemberID: mem.MemberID || "",
+                        DocumentID: oDoc.DocumentID || "",
+                        UserID: oDoc.UserID || "",
                         Attachment: sAttachment,
                         FileName: oDoc.FileName || "",
                         FileType: oDoc.FileType || ""

@@ -487,6 +487,11 @@
                 >
                     <Text text="{i18n>document}" />
                 </Column>
+                    <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                </Column>
                 <!-- <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
             </columns>
 
@@ -503,6 +508,13 @@
                             text="{i18n>view}"
                             press="HF_viewimage"
                         />
+                            <Button
+        icon="sap-icon://edit"
+        type="Transparent"
+        tooltip="Upload Document"
+        press="onEditMemberFromDialog"
+        class="myUnifiedBtn"
+    />
                         <!--  <ObjectStatus
                             text="{profileData>status}"
                             state="{ path:'profileData>status',

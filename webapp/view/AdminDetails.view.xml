@@ -145,7 +145,7 @@
             </content>
             <VBox class="sapUiMediumMarginBottom">
                 <Panel
-                    headerText="{= 'Booking Information - ' + ${CustomerData>/CustomerID} }"
+                    headerText="{= 'Booking Information - ' + ${CustomerData>/BookingID} }"
                     expandable="false"
                     class="customPanelHeader"
                 >
