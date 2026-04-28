@@ -5,7 +5,7 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../utils/validation",
     "sap/m/MessageToast",
-    "sap/ui/export/Spreadsheet",
+    "sap/ui/export/Spreadsheet"
 ], function (
     BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast, Spreadsheet) {
     "use strict";
