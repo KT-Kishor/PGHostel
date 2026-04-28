@@ -824,6 +824,7 @@ sap.ui.define([
                 oTable = this.byId("Id_MemberTable");
             }
 
+            if (!oTable) return;
 
             const oBinding = oTable.getBinding("items");
             const length = oBinding ? oBinding.getLength() : 0;
