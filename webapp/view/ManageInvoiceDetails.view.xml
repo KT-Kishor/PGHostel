@@ -82,7 +82,7 @@
                                                 additionalText="{BookingModel>Status}"
                                             />
 										</m:ComboBox>
-										<m:Label
+										<!-- <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>customerName}"
                                         />
@@ -90,7 +90,7 @@
                                             visible="{visiablityPlay>/createVisi}"
                                             id="MI_id_Cname"
                                             value="{SelectedCustomerModel>/CustomerName}"
-                                        />
+                                        /> -->
 										<m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>invoiceNo}"
