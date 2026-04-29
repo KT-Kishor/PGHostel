@@ -139,6 +139,7 @@
                                 id="idRooms"
                                 showHeader="false"
                                 enableScrolling="true"
+                                class="RoomsPage"
                             >
                                 <VBox
                                     height="100%"
@@ -313,15 +314,19 @@
                                                                         <VBox
                                                                             class="imageWrapper"
                                                                         >
-                                                                          <HBox class="areaTagBox">
-                                        <core:Icon
-                                            src="sap-icon://building"
-                                            size="0.9rem"
-                                            color="black"
-                                            class="sapUiTinyMarginEnd"
-                                        />
-                                        <Text text="{VisibilityModel>PropertyType}" />
-                                    </HBox>
+                                                                            <HBox
+                                                                                class="areaTagBox"
+                                                                            >
+                                                                                <core:Icon
+                                                                                    src="sap-icon://building"
+                                                                                    size="0.9rem"
+                                                                                    color="black"
+                                                                                    class="sapUiTinyMarginEnd"
+                                                                                />
+                                                                                <Text
+                                                                                    text="{VisibilityModel>PropertyType}"
+                                                                                />
+                                                                            </HBox>
                                                                             <!-- Image -->
                                                                             <Image
                                                                                 src="{VisibilityModel>Image}"
@@ -343,6 +348,7 @@
                                                                         class="BranchCardTitle"
                                                                     />
                                                                     <!-- ? Rating row EXACT like screenshot -->
+                                                                    <VBox alignItems="Center">
                                                                     <List
                                                                         class="ratingList"
                                                                         showSeparators="None"
@@ -364,7 +370,7 @@
                                                                                     maxValue="5"
                                                                                     enabled="true"
                                                                                     editable="false"
-                                                                                    iconSize="1.65rem"
+                                                                                    iconSize="1.35rem"
                                                                                     class="ratingStars"
                                                                                 />
                                                                                 <Text
@@ -374,6 +380,15 @@
                                                                             </HBox>
                                                                         </CustomListItem>
                                                                     </List>
+                                                                 
+                                <Text
+        text="{
+            parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
+            formatter: '.Formatter.formatStartingPrice'
+        }"
+        class="branchCardPrice"
+    />
+                            </VBox>
                                                                     <HBox
                                                                         justifyContent="Center"
                                                                         alignItems="Center"

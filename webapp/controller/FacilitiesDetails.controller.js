@@ -377,7 +377,9 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
             ) {
                 if (bIsUnit) {
-                    if (!utils._LCvalidateMandatoryField(oView.byId("FD_id_UnitPrice"), "ID")) {
+                    if (!utils._LCvalidateMandatoryField(oView.byId("ideditMinimumQuantity"), "ID") ||
+                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("ideditMinimumPrice")), "ID") ||
+                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID")) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
@@ -385,7 +387,11 @@ sap.ui.define([
                     if (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0) {
                         MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
                         return;
+                    } if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
+                        MessageToast.show(this.i18nModel.getText("pleaseFillMinimumQty"));
+                        return;
                     }
+                  
                 } else {
                     if (
                         (Payload.PerHourPrice === "" || Number(Payload.PerHourPrice) === 0) &&
@@ -455,6 +461,8 @@ sap.ui.define([
                             Type: Payload.Type,
                             SelectionMode: Payload.SelectionMode,
                             UnitPrice: bIsUnit ? (Payload.UnitPrice || 0) : 0,
+                            MinimumQty: bIsUnit ? (Number(Payload.MinimumQty) || 0) : 0,
+                            MinimumPrice: bIsUnit ? (Number(Payload.MinimumPrice) || 0) : 0,
                             PerHourPrice: bIsUnit ? 0 : (Payload.PerHourPrice || 0),
                             PerDayPrice: bIsUnit ? 0 : (Payload.PerDayPrice || 0),
                             PerMonthPrice: bIsUnit ? 0 : (Payload.PerMonthPrice || 0),

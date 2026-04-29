@@ -654,15 +654,15 @@ sap.ui.define([
                 Salutation: oData.Salutation 
             };
 
-            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "");
-            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "");
-            sap.ui.getCore().byId("MemberDOB").setValue(oData.DateOfBirth.split('-').reverse().join('/') || "");
+            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "").setValueState("None");
+            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "").setValueState("None");
+            sap.ui.getCore().byId("MemberDOB").setValue(oData.DateOfBirth.split('-').reverse().join('/') || "").setValueState("None");
 
-            sap.ui.getCore().byId("MemberGenderCombo").setValue(oData.Gender || "");
+            sap.ui.getCore().byId("MemberGenderCombo").setValue(oData.Gender || "").setValueState("None");
 
-            sap.ui.getCore().byId("MemberRelationCombo").setValue(oData.Relation || "");
-            sap.ui.getCore().byId("MM_id_MemberName").setValue(oData.Name || "");
-            sap.ui.getCore().byId("idSelect").setValue(oData.Salutation || "");
+            sap.ui.getCore().byId("MemberRelationCombo").setValue(oData.Relation || "").setValueState("None");
+            sap.ui.getCore().byId("MM_id_MemberName").setValue(oData.Name || "").setValueState("None");
+            sap.ui.getCore().byId("idSelect").setValue(oData.Salutation || "").setValueState("None");
 
 
 
