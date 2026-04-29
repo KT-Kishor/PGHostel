@@ -1,19 +1,18 @@
 <c:FragmentDefinition
-    xmlns:odata="sap.ui.comp.odata"
-    xmlns="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
-    xmlns:u="sap.ui.unified"
+	xmlns:odata="sap.ui.comp.odata"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified"
 >
-    <Dialog
+	<Dialog
         title="{i18n>branchDetails}"
         resizable="true"
         draggable="true"
         contentWidth="80%"
     >
-        
-        <f:SimpleForm
+		<f:SimpleForm
             editable="true"
             layout="ColumnLayout"
             labelSpanXL="4"
@@ -24,12 +23,12 @@
             columnsL="2"
             columnsM="2"
         >
-            <f:content>
-                <Label
+			<f:content>
+				<Label
                     text="{i18n>branchName}"
                     required="true"
                 />
-                <Input
+				<Input
                     id="BD_idBName"
                     value="{MDmodel>/Name}"
                     placeholder="{i18n>enterBranchName}"
@@ -37,12 +36,11 @@
                     liveChange="onNameInputLiveChange"
                     valueStateText="{i18n>enterBranchName}"
                 />
-
-                <Label
+				<Label
                     text="{i18n>branchProperty}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="BD_id_Type"
                     required="true"
                     placeholder="{i18n>enterBranchType}"
@@ -51,16 +49,16 @@
                     items="{PropertyType>/}"
                     change="onPropertyTypeChange"
                 >
-                    <core:Item
+					<core:Item
                         key="{PropertyType>PropertyType}"
                         text="{PropertyType>PropertyType}"
                     />
-                </ComboBox>
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>address}"
                     required="true"
                 />
-                <TextArea
+				<TextArea
                     id="BD_idAddress"
                     value="{MDmodel>/Address}"
                     placeholder="{i18n>enterAddress}"
@@ -70,11 +68,11 @@
                     liveChange="onAddressInputLiveChange"
                     valueStateText="{i18n>enterAddress}"
                 />
-                <Label
+				<Label
                     text="Landmark"
                     required="true"
                 />
-                <Input
+				<Input
                     id="BD_idLandmark"
                     value="{MDmodel>/LandMark}"
                     placeholder="Enter landmark"
@@ -82,23 +80,22 @@
                     liveChange="onLandmarkInputLiveChange"
                     valueStateText="Enter Landmark"
                 />
-
-                <Label
+				<Label
                     text="{i18n>MapLink}"
                     required="true"
                 />
-                <Input
+				<Input
                     id="BD_idGeoLocation"
                     value="{MDmodel>/GeoLocation}"
                     placeholder="{i18n>GL_placeHolder}"
                     liveChange="onGeoLocationLiveChange"
                     valueStateText="{i18n>GL_error}"
                 />
-                <Label
+				<Label
                     text="{i18n>pinCode}"
                     required="true"
                 />
-                <Input
+				<Input
                     id="BD_idPin"
                     value="{MDmodel>/Pincode}"
                     placeholder="{i18n>enterPincode}"
@@ -106,11 +103,11 @@
                     liveChange="onPinInputLiveChange"
                     valueStateText="{i18n>enterPincode}"
                 />
-                <Label
+				<Label
                     text="{i18n>MVDcountry}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="MC_id_Country"
                     change="MC_onChangeCountry"
                     placeholder="{i18n>enterCountry}"
@@ -119,17 +116,17 @@
                     selectedKey="{MDmodel>/country}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{CountryModel>countryName}"
                         text="{CountryModel>countryName}"
                         additionalText="{CountryModel>code}"
                     />
-                </ComboBox>
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>MVDstate}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="MC_id_State"
                     change="MC_onChangeState"
                     placeholder="{i18n>enterState}"
@@ -138,16 +135,16 @@
                     selectedKey="{MDmodel>/state}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{StateModel>stateName}"
                         text="{StateModel>stateName}"
                     />
-                </ComboBox>
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>city}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="MC_id_City"
                     change="MC_onChangeCity"
                     valueStateText="{i18n>cityValueText}"
@@ -156,17 +153,17 @@
                     value="{MDmodel>/baseLocation}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{CityModel>cityName}"
                         text="{CityModel>cityName}"
                         additionalText="{CityModel>branchCode}"
                     />
-                </ComboBox>
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>gstNo}"
                     visible="{visiblePlay>/isIndia}"
                 />
-                <Input
+				<Input
                     value="{MDmodel>/GSTIN}"
                     maxLength="15"
                     placeholder="{i18n>enterGSTNo}"
@@ -175,11 +172,11 @@
                     valueStateText="{i18n>gstError}"
                     visible="{visiblePlay>/isIndia}"
                 />
-                <Label
+				<Label
                     text="{i18n>type}"
                     labelFor="groupC"
                 />
-                <RadioButtonGroup
+				<RadioButtonGroup
                     visible="{visiblePlay>/CC_id_CustInput}"
                     select="onRadioButtonChange"
                     selectedIndex="{visiblePlay>/selectedIndex}"
@@ -187,28 +184,26 @@
                     columns="2"
                     editable="true"
                 >
-                    <RadioButton text="{i18n>cgst}" />
-                    <RadioButton text="{i18n>igst}" />
-                </RadioButtonGroup>
-                <Label
+					<RadioButton text="{i18n>cgst}" />
+					<RadioButton text="{i18n>igst}" />
+				</RadioButtonGroup>
+				<Label
                     visible="{visiblePlay>/CC_id_CustInput}"
                     text="{i18n>taxPercentage}"
                 />
-                <Input
+				<Input
                     visible="{visiblePlay>/CC_id_CustInput}"
                     id="CC_id_custValue"
                     value="{MDmodel>/Value}"
                     maxLength="2"
                     liveChange="onTaxPercentageChange"
                 />
-                <Label text="" />
-              
-                   
-                        <Label
+				<Label text="" />
+				<Label
                             text="{i18n>MSisdCode}"
                             required="true"
                         />
-                        <ComboBox
+				<ComboBox
                             change="onSTDChange"
                             id="MC_id_codeModel"
                             placeholder="{i18n>code}"
@@ -218,16 +213,13 @@
                             selectedKey="{MDmodel>/stdCode}"
                             filterSecondaryValues="true"
                         >
-                            <core:ListItem
+					<core:ListItem
                                 key="{CountryModel>stdCode}"
                                 text="{CountryModel>stdCode}"
                                 additionalText="{CountryModel>code}"
                             />
-                        </ComboBox>
-                   
-                  
-                       
-                        <Input
+				</ComboBox>
+				<Input
                             value="{MDmodel>/Contact}"
                             id="BD_idPhone"
                             placeholder="{i18n>enterContactNumber}"
@@ -235,13 +227,11 @@
                             liveChange="onMobileLivechnage"
                             valueStateText="{i18n>enterContactNumber}"
                         />
-                  
-              
-                <Label
+				<Label
                     text="{i18n>bdCheckIntime}"
                     required="true"
                 />
-                <TimePicker
+				<TimePicker
                     id="BD_id_CheckInTime"
                     value="{MDmodel>/CheckinTime}"
                     change="onCheckInTimeChange"
@@ -250,11 +240,11 @@
                     valueFormat="hh a"
                     valueStateText="Please select Check-In Time"
                 />
-                <Label
+				<Label
                     text="{i18n>bdCheckouttime}"
                     required="true"
                 />
-                <TimePicker
+				<TimePicker
                     id="BD_id_CheckOutTime"
                     value="{MDmodel>/CheckoutTime}"
                     change="onCheckOutTimeChange"
@@ -263,11 +253,11 @@
                     placeholder="e.g. 10 AM"
                     valueStateText="Please select Check-Out Time"
                 />
-                <Label
+				<Label
                     text="{i18n>currency}"
                     required="true"
                 />
-                <ComboBox
+				<ComboBox
                     id="Bd_id_DepositCurrency"
                     selectedKey="{MDmodel>/Currency}"
                     items="{path:'CountryModel>/',length:1000}"
@@ -277,17 +267,17 @@
                     placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
                 >
-                    <core:ListItem
+					<core:ListItem
                         key="{CountryModel>currency}"
                         text="{CountryModel>currency}"
                         additionalText="{CountryModel>countryName}"
                     />
-                </ComboBox>
-                <Label
+				</ComboBox>
+				<Label
                     text="{i18n>penalty}"
                     required="true"
                 />
-                <Input
+				<Input
                     id="BD_idPenalty"
                     value="{MDmodel>/Penalty}"
                     placeholder="{i18n>enterPenalty}"
@@ -295,37 +285,33 @@
                     liveChange="onPenaltyInputLiveChange"
                     valueStateText="{i18n>enterPenalty}"
                 />
-                 <Label
+				<Label
                  id="Bd_id_Mode_Label"
                     text="Mode"
                     required="true"
                     visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
                 />
-                 <Select
+				<Select
                     id="Bd_id_Active"
                     selectedKey="{MDmodel>/Mode}"
                     valueStateText="{i18n>selectCurrency}"
                     width="100%"
                     showSecondaryValues="true"
-                     visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
+                    visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
                     class="sapUiSmallMarginBottom"
-
-
                 >
-                    <core:Item
+					<core:Item
                         key="Active"
                         text="Active"
                     />
-                    <core:Item
+					<core:Item
                         key="Inactive"
                         text="Inactive"
                     />
-                </Select>
-              
-            </f:content>
-        </f:SimpleForm>
-
-         <MessageStrip
+				</Select>
+			</f:content>
+		</f:SimpleForm>
+		<MessageStrip
                     text="For Logo and Image, files larger than 2 MB are not allowed."
                     type="Warning"
                     showIcon="true"
@@ -333,16 +319,13 @@
                     enableFormattedText="true"
                     class="sapUiSmallMarginBottom sapUiSmallMarginEnd"
                 />
-
-                 <Label text=""/>
-<!-- 🔹 SIDE BY SIDE LAYOUT -->
-<HBox width="100%" justifyContent="SpaceBetween">
-
-    <!-- LEFT SIDE (LOGO) -->
-    <VBox width="48%">
-
-        <HBox justifyContent="End" class="sapUiSmallMarginBottom">
-              <u:FileUploader
+		<Label text=""/>
+		<!-- 🔹 SIDE BY SIDE LAYOUT -->
+		<HBox width="100%" justifyContent="SpaceBetween">
+			<!-- LEFT SIDE (LOGO) -->
+			<VBox width="48%">
+				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
+					<u:FileUploader
                         id="BD_id_FileUploader"
                         fileSizeExceed="onFileSizeExceeds"
                         maximumFileSize="2"
@@ -355,40 +338,41 @@
                         buttonText="Upload Logo"
                         multiple="false"
                         uploadOnChange="false"
-                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
-                       
+                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"      
                     />
-        </HBox>
-
-        <Table
-            items="{UploaderData>/attachmentslogo}"
-            mode="Delete"
-            delete="onTokenDelete"
-            width="100%"
-        >
-            <columns>
-                <Column demandPopin="true" ><Text text="{i18n>filename}" /></Column>
-                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileType}" /></Column>
-                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileSize}" /></Column>
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{UploaderData>filename}" />
-                        <Text text="{UploaderData>fileType}" />
-                        <Text text="{UploaderData>size}" />
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-
-    </VBox>
-
-    <!-- RIGHT SIDE (IMAGE) -->
-    <VBox width="48%">
-
-        <HBox justifyContent="End" class="sapUiSmallMarginBottom">
-            <u:FileUploader
+				</HBox>
+				<Table
+                    items="{UploaderData>/attachmentslogo}"
+                    mode="Delete"
+                    delete="onTokenDelete"
+                    width="100%"
+                >
+					<columns>
+						<Column demandPopin="true" >
+							<Text text="{i18n>filename}" />
+						</Column>
+						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
+							<Text text="{i18n>FileType}" />
+						</Column>
+						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
+							<Text text="{i18n>FileSize}" />
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{UploaderData>filename}" />
+								<Text text="{UploaderData>fileType}" />
+								<Text text="{path: 'UploaderData>size', formatter: '.Formatter.formatFileSize'}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+			<!-- RIGHT SIDE (IMAGE) -->
+			<VBox width="48%">
+				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
+					<u:FileUploader
                         id="BD_id_FileUploader1"
                         fileSizeExceed="onFileSizeExceeds"
                         maximumFileSize="2"
@@ -404,49 +388,52 @@
                         tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
                         class="sapUiSmallMarginEnd"
                     />
-        </HBox>
-
-        <Table
-            items="{UploaderData>/attachmentimage}"
-            mode="Delete"
-            delete="onTokenImageDelete"
-            width="100%"
-        >
-            <columns>
-                <Column demandPopin="true" ><Text text="{i18n>filename}" /></Column>
-                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileType}" /></Column>
-                <Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" ><Text text="{i18n>FileSize}" /></Column>
-            </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <Text text="{UploaderData>filename}" />
-                        <Text text="{UploaderData>fileType}" />
-                        <Text text="{UploaderData>size}" />
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
-
-    </VBox>
-
-</HBox>
-        <beginButton>
-            <Button
+				</HBox>
+				<Table
+                    items="{UploaderData>/attachmentimage}"
+                    mode="Delete"
+                    delete="onTokenImageDelete"
+                    width="100%"
+                >
+					<columns>
+						<Column demandPopin="true" >
+							<Text text="{i18n>filename}" />
+						</Column>
+						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
+							<Text text="{i18n>FileType}" />
+						</Column>
+						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
+							<Text text="{i18n>FileSize}" />
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{UploaderData>filename}" />
+								<Text text="{UploaderData>fileType}" />
+								<Text text="{path: 'UploaderData>size', formatter: '.Formatter.formatFileSize'}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</HBox>
+		<beginButton>
+			<Button
                 id="BD_id_saveButoon"
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
                 class="myUnifiedBtn"
                 press="MD_onSaveButtonPress"
             />
-        </beginButton>
-        <endButton>
-            <Button
+		</beginButton>
+		<endButton>
+			<Button
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 class="myUnifiedBtn"
                 press="MD_onCancelButtonPress"
             />
-        </endButton>
-    </Dialog>
+		</endButton>
+	</Dialog>
 </c:FragmentDefinition>

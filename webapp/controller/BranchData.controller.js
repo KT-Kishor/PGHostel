@@ -5,11 +5,11 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../utils/validation",
     "../model/formatter"
-], function (BaseController, MessageBox, Spreadsheet, MessageToast, utils, Formatter) {
+], function(BaseController, MessageBox, Spreadsheet, MessageToast, utils, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Branch", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteBranchData").attachMatched(this._onRouteMatched, this);
             const oMDmodel = new sap.ui.model.json.JSONModel({
                 BranchID: "",
@@ -55,23 +55,29 @@ sap.ui.define([
             oPropertyTypeModel.loadData("model/PropertyType.json");
             this.getView().setModel(oPropertyTypeModel, "PropertyType");
 
-             const oUploaderData = new sap.ui.model.json.JSONModel({
-                    attachmentslogo: [],
-                    attachmentimage: []
+            const oUploaderData = new sap.ui.model.json.JSONModel({
+                attachmentslogo: [],
+                attachmentimage: []
 
-                });
+            });
 
-                this.getView().setModel(oUploaderData, "UploaderData");
+            this.getView().setModel(oUploaderData, "UploaderData");
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             try {
                 this.getBusyDialog()
                 var LoginFUnction = await this.commonLoginFunction("ManageBranch");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ Attachment: "", AttachmentType: "", AttachmentName: "" }), "imageModel");
-                this.getView().setModel(new sap.ui.model.json.JSONModel({ imageTokens: [] }), "tokenImageModel");
+                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                    Attachment: "",
+                    AttachmentType: "",
+                    AttachmentName: ""
+                }), "imageModel");
+                this.getView().setModel(new sap.ui.model.json.JSONModel({
+                    imageTokens: []
+                }), "tokenImageModel");
                 this.onClearAndSearch("MD_id_Filterbar");
                 await this.Onsearch();
                 await this.Customerdata()
@@ -82,7 +88,7 @@ sap.ui.define([
             }
         },
 
-        Customerdata: function () {
+        Customerdata: function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -112,7 +118,7 @@ sap.ui.define([
             });
         },
 
-        Onsearch: async function () {
+        Onsearch: async function() {
             const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
             var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey()
 
@@ -132,8 +138,7 @@ sap.ui.define([
                 filters.Role = "Admin"
             } else if (oExistingModel.Role === "SuperAdmin") {
                 filters.BranchID = "";
-            }
-            else {
+            } else {
                 filters.BranchID = oLoginmodel.BranchCode;
             }
 
@@ -157,12 +162,12 @@ sap.ui.define([
             this.getOwnerComponent().setModel(model, "mainModel")
         },
 
-        MD_onPressClear: function () {
+        MD_onPressClear: function() {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
             this.getView().byId("MD_id_SearchField").setValue("");
         },
 
-        MD_onSearch: async function () {
+        MD_onSearch: async function() {
             this.getBusyDialog()
             try {
                 await this.Onsearch();
@@ -206,7 +211,7 @@ sap.ui.define([
             }
         },
 
-        onGlobalSearch: function (oEvent) {
+        onGlobalSearch: function(oEvent) {
             const sQuery = oEvent.getParameter("newValue");
             const oTable = this.byId("id_MD_Table");
             const oBinding = oTable.getBinding("items");
@@ -220,73 +225,73 @@ sap.ui.define([
             this._updateRowCount();
         },
 
-        _updateRowCount: function () {
+        _updateRowCount: function() {
             const oTable = this.byId("id_MD_Table");
             const oBinding = oTable.getBinding("items");
             const iLength = oBinding.getLength();
             this.getView().getModel("mainModel").setProperty("/count", iLength);
         },
 
-        onTableUpdateFinished: function () {
+        onTableUpdateFinished: function() {
             this._updateRowCount();
         },
 
-        createTableSheet: function () {
+        createTableSheet: function() {
             return [{
-                label: "Branch Code",
-                property: "BranchID",
-                type: "string"
-            },
-            {
-                label: "Hostel Name",
-                property: "Name",
-                type: "string"
-            },
-            {
-                label: "Property Type",
-                property: "PropertyType",
-                type: "string"
-            },
-            {
-                label: "GSTIN",
-                property: "GSTIN",
-                type: "string"
-            },
-            {
-                label: "Type",
-                property: "Type",
-                type: "string"
-            },
-            {
-                label: "Tax Percentage",
-                property: "Value",
-                type: "string"
-            },
+                    label: "Branch Code",
+                    property: "BranchID",
+                    type: "string"
+                },
+                {
+                    label: "Hostel Name",
+                    property: "Name",
+                    type: "string"
+                },
+                {
+                    label: "Property Type",
+                    property: "PropertyType",
+                    type: "string"
+                },
+                {
+                    label: "GSTIN",
+                    property: "GSTIN",
+                    type: "string"
+                },
+                {
+                    label: "Type",
+                    property: "Type",
+                    type: "string"
+                },
+                {
+                    label: "Tax Percentage",
+                    property: "Value",
+                    type: "string"
+                },
 
-            {
-                label: "Late Penalty Amount",
-                property: "Penalty",
-                type: "string"
-            },
-            {
-                label: "Address",
-                property: "Address",
-                type: "string"
-            },
-            {
-                label: "Pincode",
-                property: "Pincode",
-                type: "string"
-            },
-            {
-                label: "Contact Number",
-                property: "Contact",
-                type: "string"
-            },
+                {
+                    label: "Late Penalty Amount",
+                    property: "Penalty",
+                    type: "string"
+                },
+                {
+                    label: "Address",
+                    property: "Address",
+                    type: "string"
+                },
+                {
+                    label: "Pincode",
+                    property: "Pincode",
+                    type: "string"
+                },
+                {
+                    label: "Contact Number",
+                    property: "Contact",
+                    type: "string"
+                },
             ]
         },
 
-        MD_onDownload: function () {
+        MD_onDownload: function() {
             const oModel = this.byId("id_MD_Table").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
@@ -297,7 +302,7 @@ sap.ui.define([
                 Pincode: item.Pincode ? String(item.Pincode) : "",
                 Contact: item.Contact ? String(item.Contact) : "",
                 Penalty: item.Penalty + " " + item.Currency,
-                Contact: item.STD+ " "+ item.Contact
+                Contact: item.STD + " " + item.Contact
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -322,7 +327,7 @@ sap.ui.define([
             });
         },
 
-        setDefaultTimesOnCreate: function () {
+        setDefaultTimesOnCreate: function() {
             var oEditModel = this.getView().getModel("editableModel");
             var oMDModel = this.getView().getModel("MDmodel");
             if (!oEditModel.getProperty("/isEdit")) {
@@ -337,7 +342,7 @@ sap.ui.define([
             }
         },
 
-        convert24ToAmPm: function (sTime) {
+        convert24ToAmPm: function(sTime) {
             if (!sTime) return "";
 
             const hour24 = parseInt(sTime.split(":")[0], 10);
@@ -347,7 +352,7 @@ sap.ui.define([
             return hour12 + ampm;
         },
 
-        MD_AddButtonPress: function () {
+        MD_AddButtonPress: function() {
             this.byId("id_MD_Table").removeSelections();
             var oView = this.getView();
             oView.getModel("editableModel").setProperty("/isEdit", false);
@@ -406,28 +411,25 @@ sap.ui.define([
             });
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
-              if(this.getView().getModel("LoginModel").getProperty("/Role")==="SuperAdmin")
-            {
-            this.getView().byId("Bd_id_Active").setVisible(true)
-            this.getView().byId("Bd_id_Mode_Label").setVisible(true)
+            if (this.getView().getModel("LoginModel").getProperty("/Role") === "SuperAdmin") {
+                this.getView().byId("Bd_id_Active").setVisible(true)
+                this.getView().byId("Bd_id_Mode_Label").setVisible(true)
             }
-
-
 
             this.setDefaultTimesOnCreate();
             this.isEdit = false;
             this.oDialog.open();
         },
 
-        onDepositCurrency: function (oEvent) {
+        onDepositCurrency: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        onPropertyTypeChange: function (oEvent) {
+        onPropertyTypeChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        MD_onSaveButtonPress: async function () {
+        MD_onSaveButtonPress: async function() {
             var oView = this.getView();
             const oUpload = oView.getModel("UploadModel").getData();
             const oImage = oView.getModel("imageModel").getData();
@@ -593,77 +595,77 @@ sap.ui.define([
             }
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
         },
 
-       MD_onCancelButtonPress: function () {
-    var oView = this.getView();
+        MD_onCancelButtonPress: function() {
+            var oView = this.getView();
 
-    // 🔹 1. Reset Form Data
-    if (oView.getModel("MDmodel")) {
-        oView.getModel("MDmodel").setData({
-            BranchID: "",
-            Name: "",
-            Address: "",
-            LandMark: "",
-            PropertyType: "",
-            Pincode: "",
-            Contact: "",
-            Penalty: "",
-        });
-    }
+            //  1. Reset Form Data
+            if (oView.getModel("MDmodel")) {
+                oView.getModel("MDmodel").setData({
+                    BranchID: "",
+                    Name: "",
+                    Address: "",
+                    LandMark: "",
+                    PropertyType: "",
+                    Pincode: "",
+                    Contact: "",
+                    Penalty: "",
+                });
+            }
 
-    // 🔹 2. Clear Uploaded Table Data (IMPORTANT FIX)
-    var oUploaderModel = oView.getModel("UploaderData");
-    if (oUploaderModel) {
-        oUploaderModel.setProperty("/attachmentimage", []);
-    }
-    if (oUploaderModel) {
-        oUploaderModel.setProperty("/attachmentslogo", []);
-    }
+            //  2. Clear Uploaded Table Data (IMPORTANT FIX)
+            var oUploaderModel = oView.getModel("UploaderData");
+            if (oUploaderModel) {
+                oUploaderModel.setProperty("/attachmentimage", []);
+            }
+            if (oUploaderModel) {
+                oUploaderModel.setProperty("/attachmentslogo", []);
+            }
 
-    // 🔹 3. Clear Image Model (optional but recommended)
-    if (oView.getModel("imageModel")) {
-        oView.getModel("imageModel").setData({});
-    }
+            //  3. Clear Image Model (optional but recommended)
+            if (oView.getModel("imageModel")) {
+                oView.getModel("imageModel").setData({});
+            }
 
-    // 🔹 4. Clear Token Model (if used)
-    if (oView.getModel("tokenImageModel")) {
-        oView.getModel("tokenImageModel").setData({
-            imageTokens: []
-        });
-    }
+            //  4. Clear Token Model (if used)
+            if (oView.getModel("tokenImageModel")) {
+                oView.getModel("tokenImageModel").setData({
+                    imageTokens: []
+                });
+            }
 
-    // 🔹 5. Reset Value States
-    this._resetFacilityValueStates();
+            //  5. Reset Value States
+            this._resetFacilityValueStates();
 
-    // 🔹 6. Clear Table Selection
-    var oTable = this.byId("id_MD_Table");
-    if (oTable) {
-        oTable.removeSelections();
-    }
+            //  6. Clear Table Selection
+            var oTable = this.byId("id_MD_Table");
+            if (oTable) {
+                oTable.removeSelections();
+            }
 
-    // 🔹 7. Close Dialog
-    this.oDialog.close();
-},
+            //  7. Close Dialog
+            this.oDialog.close();
+        },
 
-        onGeoLocationLiveChange: function (oEvent) {
+        onGeoLocationLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        _resetFacilityValueStates: function () {
+        _resetFacilityValueStates: function() {
             var oView = this.getView();
             var aFields = ["idBranch", "idBName", "idAddress", "BD_idGeoLocation", "idPin", "idPhone", "idPenalty"];
 
-            aFields.forEach(function (sId) {
+            aFields.forEach(function(sId) {
                 var oField = sap.ui.getCore().byId(oView.createId(sId));
                 if (oField && oField.setValueState) {
                     oField.setValueState("None");
@@ -671,13 +673,13 @@ sap.ui.define([
             });
         },
 
-        onPinInputLiveChange: function (oEvent) {
+        onPinInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidatePinCode(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onPenaltyInputLiveChange: function (oEvent) {
+        onPenaltyInputLiveChange: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
             sValue = sValue.replace(/[^0-9.]/g, "");
@@ -712,31 +714,31 @@ sap.ui.define([
             oInput.setValueStateText("");
         },
 
-        onAddressInputLiveChange: function (oEvent) {
+        onAddressInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onNameInputLiveChange: function (oEvent) {
+        onNameInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onLandmarkInputLiveChange: function (oEvent) {
+        onLandmarkInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onBNameInputLiveChange: function (oEvent) {
+        onBNameInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onCheckOutTimeChange: function (oEvent) {
+        onCheckOutTimeChange: function(oEvent) {
             const oTP = oEvent.getSource();
             if (oTP.getDateValue()) {
                 oTP.setValueState("None");
@@ -744,7 +746,7 @@ sap.ui.define([
             }
         },
 
-        onCheckInTimeChange: function (oEvent) {
+        onCheckInTimeChange: function(oEvent) {
             const oTP = oEvent.getSource();
             if (oTP.getDateValue()) {
                 oTP.setValueState("None");
@@ -752,7 +754,7 @@ sap.ui.define([
             }
         },
 
-        _validateCheckInOut: function () {
+        _validateCheckInOut: function() {
             const oView = this.getView();
             const oCheckIn = sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime"));
             const oCheckOut = sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime"));
@@ -778,7 +780,7 @@ sap.ui.define([
             return true;
         },
 
-        MD_DeleteRow: function () {
+        MD_DeleteRow: function() {
             var oTable = this.byId("id_MD_Table");
             var aSelectedItems = oTable.getSelectedItems();
             var CustData = this.getView().getModel("HostelModel").getData();
@@ -820,8 +822,7 @@ sap.ui.define([
             }
             var sBranchIds = aDeletableBranches.map(b => b.branchId).join(", ");
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the following branches: ${sBranchIds}?`,
-                {
+                `Are you sure you want to delete the following branches: ${sBranchIds}?`, {
                     icon: sap.m.MessageBox.Icon.WARNING,
                     title: "Confirm Deletion",
                     actions: [
@@ -860,11 +861,13 @@ sap.ui.define([
             );
         },
 
-        MD_UpdateTableRow: function () {
+        MD_UpdateTableRow: function() {
             var oView = this.getView();
             var oTable = this.byId("id_MD_Table");
             var oSelected = oTable.getSelectedItems();
+
             oView.getModel("editableModel").setProperty("/isEdit", true);
+
             if (oSelected.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSediterr"));
                 return;
@@ -874,18 +877,24 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
                 return;
             }
+
             const oSelectedItem = oSelected[0];
             var oContext = oSelectedItem.getBindingContext("mainModel");
             var oData = oContext.getObject();
+
+            // ------------------ STATE FILTER ------------------
             const aAllStates = this.getOwnerComponent().getModel("StateModel").getData();
             const aFilteredStates = aAllStates.filter(s => s.countryCode === oData.countryCode);
             this.getView().setModel(new sap.ui.model.json.JSONModel(aFilteredStates), "FilteredStateModel");
 
+            // ------------------ CITY FILTER ------------------
             const aAllCities = this.getOwnerComponent().getModel("CityModel").getData();
             const aFilteredCities = aAllCities.filter(c =>
                 c.stateName === oData.state && c.countryCode === oData.countryCode
             );
             this.getView().setModel(new sap.ui.model.json.JSONModel(aFilteredCities), "FilteredCityModel");
+
+            // ------------------ FILE MODELS ------------------
             this.getView().getModel("UploadModel").setData({
                 Photo1: oData.Photo1 || "",
                 Photo1Type: oData.Photo1Type || "",
@@ -898,30 +907,56 @@ sap.ui.define([
                 AttachmentName: oData.AttachmentName || ""
             });
 
-            const aTokenImages = oData.AttachmentName ? [{
-                key: oData.AttachmentName,
-                text: oData.AttachmentName
-            }] : [];
+            // ------------------ TOKEN MODELS ------------------
             const aTokens = oData.Photo1Name ? [{
                 key: oData.Photo1Name,
                 text: oData.Photo1Name
             }] : [];
 
+            const aTokenImages = oData.AttachmentName ? [{
+                key: oData.AttachmentName,
+                text: oData.AttachmentName
+            }] : [];
+
             this.getView().getModel("tokenModel").setData({
                 tokens: aTokens
             });
+
             this.getView().getModel("tokenImageModel").setData({
                 imageTokens: aTokenImages
             });
+
+            // ------------------ UploaderData MODEL ------------------
+            const aLogoData = oData.Photo1Name ? [{
+                filename: oData.Photo1Name,
+                fileType: oData.Photo1Type || "",
+                size: oData.Photo1 ? atob(oData.Photo1).length : 0,
+            }] : [];
+
+            const aImageData = oData.AttachmentName ? [{
+                filename: oData.AttachmentName,
+                fileType: oData.AttachmentType || "",
+                size: oData.Attachment ? atob(oData.Attachment).length : 0,
+            }] : [];
+
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                attachmentslogo: aLogoData,
+                attachmentimage: aImageData
+            }), "UploaderData");
+
+            // ------------------ DIALOG ------------------
             if (!this.oDialog) {
                 this.oDialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.BranchData", this);
                 oView.addDependent(this.oDialog);
             }
-            if(this.getView().getModel("LoginModel").getProperty("/Role")==="SuperAdmin")
-            {
-            this.getView().byId("Bd_id_Active").setVisible(true)
-            this.getView().byId("Bd_id_Mode_Label").setVisible(true)
+
+            // ------------------ ROLE VISIBILITY ------------------
+            if (this.getView().getModel("LoginModel").getProperty("/Role") === "SuperAdmin") {
+                this.getView().byId("Bd_id_Active").setVisible(true);
+                this.getView().byId("Bd_id_Mode_Label").setVisible(true);
             }
+
+            // ------------------ MAIN MODEL ------------------
             var oMDmodel = oView.getModel("MDmodel");
 
             oMDmodel.setData({
@@ -940,28 +975,29 @@ sap.ui.define([
                 GSTIN: oData.GSTIN,
                 Type: oData.Type,
                 Value: oData.Value,
-                Mode:oData.Status,
+                Mode: oData.Status,
                 Currency: oData.Currency,
                 CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
                 Penalty: oData.Penalty
             });
+
             this.isEdit = true;
+
             const oVisible = this.getView().getModel("visiblePlay");
-            // After setting GST validation, ensure tax percentage is preserved
+
             setTimeout(() => {
                 this.MC_ValidateGstNumber();
 
-                // Force update of tax percentage field
                 const taxInput = this.byId("CC_id_custValue");
                 if (taxInput && oData.Value) {
                     taxInput.setValue(oData.Value.toString());
                 }
             }, 0);
+
             const bIsIndia = oData.Country === "India";
             oVisible.setProperty("/isIndia", bIsIndia);
 
-            // GST present or not
             const bHasGST = !!oData.GSTIN;
             oVisible.setProperty("/CC_id_CustInput", bHasGST);
 
@@ -978,7 +1014,7 @@ sap.ui.define([
             this.oDialog.open();
         },
 
-        _resetBranchValueStates: function () {
+        _resetBranchValueStates: function() {
             const oView = this.getView();
             const get = (id) => sap.ui.getCore().byId(oView.createId(id));
 
@@ -1014,7 +1050,7 @@ sap.ui.define([
             });
         },
 
-        _applyCountryStateCityFilters: function () {
+        _applyCountryStateCityFilters: function() {
             const oModel = this.getView().getModel("MDmodel");
             const oCountryCB = this.byId("MC_id_Country");
             const oStateCB = this.byId("MC_id_State");
@@ -1058,7 +1094,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-        MC_onChangeCountry: function (oEvent) {
+        MC_onChangeCountry: function(oEvent) {
             const oCountry = oEvent.getSource();
             const oView = this.getView();
             const oModel = oView.getModel("MDmodel");
@@ -1137,7 +1173,7 @@ sap.ui.define([
             }
         },
 
-        MC_onChangeState: function (oEvent) {
+        MC_onChangeState: function(oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
 
@@ -1175,7 +1211,7 @@ sap.ui.define([
             ]);
         },
 
-        MC_onChangeCity: function (oEvent) {
+        MC_onChangeCity: function(oEvent) {
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
 
@@ -1193,14 +1229,16 @@ sap.ui.define([
             if (!hasCountry || !hasState) {
                 oCity.setValue("");
                 oCity.setSelectedKey(null);
-                oCity.getBinding("items")?.filter([new sap.ui.model.Filter("cityName", "EQ", "__NONE__")]); oCity.setValueState("None"); return;
+                oCity.getBinding("items")?.filter([new sap.ui.model.Filter("cityName", "EQ", "__NONE__")]);
+                oCity.setValueState("None");
+                return;
             }
 
             utils._LCvalidateMandatoryField(oEvent);
             oModel.setProperty("/baseLocation", sValue);
         },
 
-        onSTDChange: function () {
+        onSTDChange: function() {
             const oSTD = this.byId("MC_id_codeModel");
             const oMobile = this.byId("BD_idPhone");
             const sKey = oSTD.getSelectedKey();
@@ -1219,7 +1257,7 @@ sap.ui.define([
             }
         },
 
-        onMobileLivechnage: function (oEvent) {
+        onMobileLivechnage: function(oEvent) {
             const taxInput = this.byId("CC_id_custValue");
             const currentTaxValue = taxInput ? taxInput.getValue() : "";
             const oInput = oEvent.getSource();
@@ -1244,8 +1282,7 @@ sap.ui.define([
                     oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
                     return;
                 }
-            }
-            else {
+            } else {
                 if (sValue.length < 4) {
                     oInput.setValueState("Error");
                     oInput.setValueStateText("Mobile number must be at least 4 digits");
@@ -1261,7 +1298,7 @@ sap.ui.define([
             oInput.setValueStateText("");
         },
 
-        onAfterRendering: function () {
+        onAfterRendering: function() {
             const oCombo = this.byId("MD_id_BranchCode");
             if (oCombo) {
                 oCombo.setFilterFunction((sTerm, oItem) => {
@@ -1273,137 +1310,137 @@ sap.ui.define([
             }
         },
 
- onFacilityFileChange: function (oEvent) {
-    const oFile = oEvent.getParameter("files")[0];
-    if (!oFile) return;
+        onFacilityFileChange: function(oEvent) {
+            const oFile = oEvent.getParameter("files")[0];
+            if (!oFile) return;
 
-    const MaxSize = 2 * 1024 * 1024;
+            const MaxSize = 2 * 1024 * 1024;
 
-    if (oFile.size > MaxSize) {
-        sap.m.MessageToast.show("Image must be under 2 MB");
-        oEvent.getSource().clear();
-        return;
-    }
+            if (oFile.size > MaxSize) {
+                sap.m.MessageToast.show("Image must be under 2 MB");
+                oEvent.getSource().clear();
+                return;
+            }
 
-    const oReader = new FileReader();
+            const oReader = new FileReader();
 
-    oReader.onload = (e) => {
-        const base64 = e.target.result.split(",")[1];
+            oReader.onload = (e) => {
+                const base64 = e.target.result.split(",")[1];
 
-        // 🔹 Save in UploadModel
-        this.getView().getModel("UploadModel").setData({
-            Photo1: base64,
-            Photo1Type: oFile.type,
-            Photo1Name: oFile.name
-        });
+                // Save in UploadModel
+                this.getView().getModel("UploadModel").setData({
+                    Photo1: base64,
+                    Photo1Type: oFile.type,
+                    Photo1Name: oFile.name
+                });
 
-        // 🔥 ONLY ONE FILE → REPLACE ARRAY
-        const oUploaderModel = this.getView().getModel("UploaderData");
+                // ONLY ONE FILE → REPLACE ARRAY
+                const oUploaderModel = this.getView().getModel("UploaderData");
 
-        oUploaderModel.setProperty("/attachmentslogo", [{
-            filename: oFile.name,
-            fileType: oFile.type,
-            size: (oFile.size / 1024).toFixed(2) + " KB",
-            base64: base64
-        }]);
+                oUploaderModel.setProperty("/attachmentslogo", [{
+                    filename: oFile.name,
+                    fileType: oFile.type,
+                    size: oFile.size,
+                    base64: base64
+                }]);
 
-        // 🔹 Optional visibility
-        const oVisModel = this.getView().getModel("VisibilityModel");
-        if (oVisModel) {
-            oVisModel.setProperty("/Logo", base64);
-        }
+                // Optional visibility
+                const oVisModel = this.getView().getModel("VisibilityModel");
+                if (oVisModel) {
+                    oVisModel.setProperty("/Logo", base64);
+                }
 
-        sap.m.MessageToast.show("File uploaded successfully");
-    };
+                sap.m.MessageToast.show("File uploaded successfully");
+            };
 
-    oReader.readAsDataURL(oFile);
-},
+            oReader.readAsDataURL(oFile);
+        },
 
- onImageChange: function (oEvent) {
-    const oFile = oEvent.getParameter("files")[0];
-    if (!oFile) return;
+        onImageChange: function(oEvent) {
+            const oFile = oEvent.getParameter("files")[0];
+            if (!oFile) return;
 
-    const MaxSize = 2 * 1024 * 1024;
+            const MaxSize = 2 * 1024 * 1024;
 
-    if (oFile.size > MaxSize) {
-        sap.m.MessageToast.show("Image must be under 2 MB");
-        oEvent.getSource().clear();
-        return;
-    }
+            if (oFile.size > MaxSize) {
+                sap.m.MessageToast.show("Image must be under 2 MB");
+                oEvent.getSource().clear();
+                return;
+            }
 
-    const oReader = new FileReader();
+            const oReader = new FileReader();
 
-    oReader.onload = (e) => {
-        const base64 = e.target.result.split(",")[1];
+            oReader.onload = (e) => {
+                const base64 = e.target.result.split(",")[1];
 
-        // 🔹 Existing logic
-        this.getView().getModel("imageModel").setData({
-            Attachment: base64,
-            AttachmentType: oFile.type,
-            AttachmentName: oFile.name
-        });
+                //  Existing logic
+                this.getView().getModel("imageModel").setData({
+                    Attachment: base64,
+                    AttachmentType: oFile.type,
+                    AttachmentName: oFile.name
+                });
 
-        this.getView().getModel("tokenImageModel").setData({
-            imageTokens: [{
-                key: oFile.name,
-                text: oFile.name
-            }]
-        });
+                this.getView().getModel("tokenImageModel").setData({
+                    imageTokens: [{
+                        key: oFile.name,
+                        text: oFile.name
+                    }]
+                });
 
-        // 🔥 ONLY ONE IMAGE → REPLACE ARRAY
-        const oUploaderModel = this.getView().getModel("UploaderData");
+                // ONLY ONE IMAGE → REPLACE ARRAY
+                const oUploaderModel = this.getView().getModel("UploaderData");
 
-        oUploaderModel.setProperty("/attachmentimage", [{
-            filename: oFile.name,
-            fileType: oFile.type,
-            size: (oFile.size / 1024).toFixed(2) + " KB",
-            base64: base64,
-            category: "Image"
-        }]);
+                oUploaderModel.setProperty("/attachmentimage", [{
+                    filename: oFile.name,
+                    fileType: oFile.type,
+                    size: oFile.size,
+                    base64: base64,
+                    category: "Image"
+                }]);
 
-        sap.m.MessageToast.show("Image uploaded successfully");
-    };
+                sap.m.MessageToast.show("Image uploaded successfully");
+            };
 
-    oReader.readAsDataURL(oFile);
-},
+            oReader.readAsDataURL(oFile);
+        },
 
-        onFileSizeExceeds: function () {
+        onFileSizeExceeds: function() {
             sap.m.MessageToast.show(
                 "This file is more than 2 MB and cannot be uploaded"
             );
         },
 
-       onTokenDelete: function (oEvent) {
-    const oTable = oEvent.getSource();
-    const oItem = oEvent.getParameter("listItem");
+        onTokenDelete: function(oEvent) {
+            const oTable = oEvent.getSource();
+            const oItem = oEvent.getParameter("listItem");
 
-    const oModel = this.getView().getModel("UploaderData");
-    let aData = oModel.getProperty("/attachmentslogo");
-    // let aData1 = oModel.getProperty("/attachmentimage");
+            const oModel = this.getView().getModel("UploaderData");
+            let aData = oModel.getProperty("/attachmentslogo");
+            // let aData1 = oModel.getProperty("/attachmentimage");
 
-    const iIndex = oTable.indexOfItem(oItem);
-    if (iIndex > -1) {
-        aData.splice(iIndex, 1);
-        oModel.setProperty("/attachmentslogo", aData);
-        // oModel.setProperty("/attachmentimage", aData1);
-    }
-},
-
-        onTokenImageDelete: function (oEvent) {
-             const oTable = oEvent.getSource();
-    const oItem = oEvent.getParameter("listItem");
-
-    const oModel = this.getView().getModel("UploaderData");
-    let aData = oModel.getProperty("/attachmentimage");
-
-    const iIndex = oTable.indexOfItem(oItem);
-    if (iIndex > -1) {
-        aData.splice(iIndex, 1);
-        oModel.setProperty("/attachmentimage", aData);
-    }
+            const iIndex = oTable.indexOfItem(oItem);
+            if (iIndex > -1) {
+                aData.splice(iIndex, 1);
+                oModel.setProperty("/attachmentslogo", aData);
+                // oModel.setProperty("/attachmentimage", aData1);
+            }
         },
 
-        onpressbranchlogo: function (oEvent) {
+        onTokenImageDelete: function(oEvent) {
+            const oTable = oEvent.getSource();
+            const oItem = oEvent.getParameter("listItem");
+
+            const oModel = this.getView().getModel("UploaderData");
+            let aData = oModel.getProperty("/attachmentimage");
+
+            const iIndex = oTable.indexOfItem(oItem);
+            if (iIndex > -1) {
+                aData.splice(iIndex, 1);
+                oModel.setProperty("/attachmentimage", aData);
+            }
+        },
+
+        onpressbranchlogo: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
             var oData = oContext.getObject();
 
@@ -1434,11 +1471,11 @@ sap.ui.define([
                 content: [oImage],
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function () {
+                    press: function() {
                         oDialog.close();
                     }
                 }).addStyleClass("myUnifiedBtn"),
-                afterClose: function () {
+                afterClose: function() {
                     oDialog.destroy();
                 }
             }).addStyleClass("barheader");
@@ -1447,7 +1484,7 @@ sap.ui.define([
             oDialog.open();
         },
 
-        HF_viewimage: function (oEvent) {
+        HF_viewimage: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
             var oData = oContext.getObject();
 
@@ -1478,11 +1515,11 @@ sap.ui.define([
                 content: [oImage],
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function () {
+                    press: function() {
                         oDialog.close();
                     }
                 }).addStyleClass("myUnifiedBtn"),
-                afterClose: function () {
+                afterClose: function() {
                     oDialog.destroy();
                 }
             }).addStyleClass("barheader");
@@ -1491,14 +1528,13 @@ sap.ui.define([
             oDialog.open();
         },
 
-        HF_viewroom: function (oEvent) {
+        HF_viewroom: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
                 sap.m.MessageBox.information(
-                    "No logo is uploaded.",
-                    {
+                    "No logo is uploaded.", {
                         title: "Information",
                         styleClass: "myUnifiedBtn"
                     }
@@ -1527,11 +1563,11 @@ sap.ui.define([
                 content: [oImage],
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function () {
+                    press: function() {
                         oDialog.close();
                     }
                 }).addStyleClass("myUnifiedBtn"),
-                afterClose: function () {
+                afterClose: function() {
                     oDialog.destroy();
                 }
             }).addStyleClass("barheader");
@@ -1539,7 +1575,7 @@ sap.ui.define([
             oDialog.open();
         },
 
-        MC_ValidateGstNumber: function (oEvent) {
+        MC_ValidateGstNumber: function(oEvent) {
             const oInput = oEvent ? oEvent.getSource() : sap.ui.getCore().byId(this.getView().createId("MC_id_CustomGst"));
             const sValue = oInput.getValue().trim();
             const dataModel = this.getView().getModel("MDmodel");
@@ -1588,7 +1624,7 @@ sap.ui.define([
             return true;
         },
 
-        onTaxPercentageChange: function (oEvent) {
+        onTaxPercentageChange: function(oEvent) {
             const oInput = oEvent.getSource();
             const sValue = oInput.getValue();
             const dataModel = this.getView().getModel("MDmodel");
@@ -1620,7 +1656,7 @@ sap.ui.define([
             }
         },
 
-        onRadioButtonChange: function (oEvent) {
+        onRadioButtonChange: function(oEvent) {
             const oButtonGroup = oEvent.getSource();
             const selectedIndex = oButtonGroup.getSelectedIndex();
             const dataModel = this.getView().getModel("MDmodel");
