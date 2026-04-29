@@ -31,6 +31,7 @@ sap.ui.define([
                 CheckinTime: "",
                 CheckoutTime: "",
                 Penalty: "",
+                StartingPrice : "",
             });
             this.getView().setModel(oMDmodel, "MDmodel");
             var oeditable = new sap.ui.model.json.JSONModel({
@@ -288,6 +289,11 @@ sap.ui.define([
                     property: "Contact",
                     type: "string"
                 },
+                {
+                    label: "Starting Price",
+                    property: "StartingPrice",
+                    type: "string"
+                }
             ]
         },
 
@@ -406,6 +412,7 @@ sap.ui.define([
                 Type: "",
                 Value: "",
                 Penalty: "",
+                StartingPrice : "",
                 CheckinTime: "",
                 CheckoutTime: ""
             });
@@ -530,6 +537,19 @@ sap.ui.define([
                 return;
             }
 
+            const oStartingPrice = sap.ui.getCore().byId(oView.createId("BD_id_StartingPrice"));
+            if (!oStartingPrice.getValue() && oStartingPrice.getValue() !== "0") {
+                oStartingPrice.setValueState("Error");
+                oStartingPrice.setValueStateText(this.i18nModel.getText("enterStartingPrice"));
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            if (oStartingPrice.getValueState() === "Error") {
+                oStartingPrice.focus();
+                sap.m.MessageToast.show("Please correct the staring price amount");
+                return;
+            }
+
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
                 sap.m.MessageToast.show("Please upload Hostel image");
@@ -551,6 +571,7 @@ sap.ui.define([
                 State: Payload.state,
                 City: Payload.baseLocation,
                 Penalty: Payload.Penalty,
+                StartingPrice: Payload.StartingPrice,
                 Currency: Payload.Currency,
                 Photo1: oUpload.Photo1,
                 Attachment: oImage.Attachment,
@@ -618,6 +639,7 @@ sap.ui.define([
                     Pincode: "",
                     Contact: "",
                     Penalty: "",
+                    StartingPrice : ""
                 });
             }
 
@@ -663,7 +685,7 @@ sap.ui.define([
 
         _resetFacilityValueStates: function() {
             var oView = this.getView();
-            var aFields = ["idBranch", "idBName", "idAddress", "BD_idGeoLocation", "idPin", "idPhone", "idPenalty"];
+            var aFields = ["idBranch", "idBName", "idAddress", "BD_idGeoLocation", "idPin", "idPhone", "idPenalty", "BD_id_StartingPrice"];
 
             aFields.forEach(function(sId) {
                 var oField = sap.ui.getCore().byId(oView.createId(sId));
@@ -707,6 +729,41 @@ sap.ui.define([
             if (parseFloat(sValue) < 0) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText("Penalty cannot be negative");
+                return;
+            }
+
+            oInput.setValueState("None");
+            oInput.setValueStateText("");
+        },
+
+        onPriceInputLiveChange : function(oEvent) {
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue();
+            sValue = sValue.replace(/[^0-9.]/g, "");
+            if (sValue.startsWith(".")) {
+                oInput.setValue("");
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Starting price cannot start with dot");
+                return;
+            }
+
+            const aParts = sValue.split(".");
+            if (aParts.length > 2) {
+                sValue = aParts[0] + "." + aParts[1];
+            }
+            if (aParts[1] && aParts[1].length > 2) {
+                sValue = aParts[0] + "." + aParts[1].substring(0, 2);
+            }
+
+            oInput.setValue(sValue);
+            if (!sValue) {
+                oInput.setValueState("None");
+                oInput.setValueStateText("");
+                return;
+            }
+            if (parseFloat(sValue) < 0) {
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Price cannot be negative");
                 return;
             }
 
@@ -979,7 +1036,8 @@ sap.ui.define([
                 Currency: oData.Currency,
                 CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
-                Penalty: oData.Penalty
+                Penalty: oData.Penalty,
+                StartingPrice : oData.StartingPrice
             });
 
             this.isEdit = true;
@@ -1033,7 +1091,9 @@ sap.ui.define([
                 BD_idPhone: "enterContactNumber",
                 BD_id_CheckInTime: "enterCheckInTime",
                 BD_id_CheckOutTime: "enterCheckOutTime",
-                BD_idPenalty: "enterPenalty"
+                BD_idPenalty: "enterPenalty",
+                BD_id_StartingPrice : "enterStartingPrice"
+
             };
 
             Object.keys(mControls).forEach((sId) => {
