@@ -62,7 +62,7 @@
                     id="BD_idAddress"
                     value="{MDmodel>/Address}"
                     placeholder="{i18n>enterAddress}"
-                    rows="3"
+                    rows="2"
                     width="100%"
                     maxLength="120"
                     liveChange="onAddressInputLiveChange"
@@ -309,6 +309,19 @@
                         text="Inactive"
                     />
 				</Select>
+
+                <Label
+                    text="{i18n>startingPrice}"
+                    required="true"
+                />
+				<Input
+                    id="BD_id_StartingPrice"
+                    value="{MDmodel>/StartingPrice}"
+                    placeholder="{i18n>enterStartingPrice}"
+                    maxLength="10"
+                    liveChange="onPriceInputLiveChange"
+                    valueStateText="{i18n>enterStartingPrice}"
+                />
 			</f:content>
 		</f:SimpleForm>
 		<MessageStrip
