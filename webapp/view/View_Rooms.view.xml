@@ -13,7 +13,6 @@
     <Page
         showHeader="true"
         enableScrolling="true"
-        class="RoomsPage"
     >
         <headerContent>
             <core:Fragment

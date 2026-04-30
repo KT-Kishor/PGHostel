@@ -23,12 +23,12 @@
                 />
 				<ComboBox
                     id="idRoomType123"
-                    placeholder="Select Property Name"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKey="{FacilitiesModel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     change=".onFacilitybranchChange"
-                    valueStateText="Select Property Name"
+                    valueStateText="{i18n>selectBranchCode}"
                 >
 					<core:ListItem
                         key="{BranchModel>BranchID}"
@@ -54,15 +54,15 @@
                 />
 				<ComboBox
                     id="idFacilityName1"
-                    items="{FacilityTypeModel>/}"
+                    items="{FacilityType>/}"
                     value="{FacilitiesModel>/Type}"
                     placeholder="{i18n>enterType}"
                     valueStateText="{i18n>enterType}"
                     change="onFacilityTypeChange"
                 >
 					<core:Item
-                        key="{FacilityTypeModel>ID}"
-                        text="{FacilityTypeModel>FacilityName}"
+                        key="{FacilityType>ID}"
+                        text="{FacilityType>FacilityName}"
                     />
 				</ComboBox>
 				<Label
@@ -82,32 +82,6 @@
                         text="{SelectionModeModel>text}"
                     />
 				</ComboBox>
-                	<Label
-                    text="Minimum Quantity"
-                    required="true"
-                />
-				<Input
-                    id="idMinimumQuantity"
-                    value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Minimum Quantity"
-                    valueStateText="Enter Minimum Quantity"
-                    liveChange="onPriceChange"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
-                    maxLength="2"
-                />
-                	<Label
-                    text="Minimum Price"
-                    required="true"
-                />
-				<Input
-                    id="idMinimumPrice"
-                    value="{FacilitiesModel>/MinimumPrice}"
-                    placeholder="Enter Minimum Price"
-                    valueStateText="Enter Minimum Price"
-                    liveChange="onPriceChange"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
-                    maxLength="10"
-                />
 				<Label
                     text="{i18n>unitPrice}"
                     required="true"

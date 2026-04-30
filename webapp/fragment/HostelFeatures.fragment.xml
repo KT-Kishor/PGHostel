@@ -30,8 +30,8 @@
 			<f:content>
 				<!-- Branch Code -->
 				<Label text="{i18n>MSbranchCode}" required="true"/>
-				<ComboBox id="HFF_id_BranchCode" placeholder="Select Property Name" selectedKey="{HostelFeaturesModel>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
-                valueStateText="Select Property Name">
+				<ComboBox id="HFF_id_BranchCode" placeholder="{i18n>placeSelectBranchCode}" selectedKey="{HostelFeaturesModel>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
+                valueStateText="{i18n>selectBranchCode}">
 					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID}" additionalText="{BranchModel>Name}"/>
 				</ComboBox>
 				<!-- Facility Name -->
@@ -44,15 +44,15 @@
                 />
 				<ComboBox
                     id="HFF_id_Amenities"
-                    items="{AmenityNameModel>/}"
+                    items="{AmenitiType>/}"
                     value="{HostelFeaturesModel>/Type}"
                     placeholder="{i18n>enterType}"
                     valueStateText="{i18n>enterType}"
                     change="onAmenitieTypeChange"
                 >
 				<core:Item
-                        key="{AmenityNameModel>ID}"
-                        text="{AmenityNameModel>AmenitiName}"
+                        key="{AmenitiType>ID}"
+                        text="{AmenitiType>AmenitiName}"
                     />
 				</ComboBox>
 				<!-- Description -->

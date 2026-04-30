@@ -312,9 +312,7 @@ sap.ui.define([
             }
 
             if (bIsUnit) {
-                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumQuantity")), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumPrice")), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idUnitPrice")), "ID")){
+                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idUnitPrice")), "ID")) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
@@ -323,10 +321,6 @@ sap.ui.define([
                     MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
                     return;
                 }
-                 if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
-                        MessageToast.show(this.i18nModel.getText("pleaseFillMinimumQty"));
-                        return;
-                    }
 
             } else {
                 if (
@@ -373,8 +367,6 @@ sap.ui.define([
                     Type: Payload.Type,
                     SelectionMode: Payload.SelectionMode,
                     UnitPrice: bIsUnit ? (Number(Payload.UnitPrice) || 0) : 0,
-                    MinimumQty: bIsUnit ? (Number(Payload.MinimumQty) || 0) : 0,
-                    MinimumPrice: bIsUnit ? (Number(Payload.MinimumPrice) || 0) : 0,
                     PerHourPrice: bIsUnit ? 0 : (Number(Payload.PerHourPrice) || 0),
                     PerDayPrice: bIsUnit ? 0 : (Number(Payload.PerDayPrice) || 0),
                     PerMonthPrice: bIsUnit ? 0 : (Number(Payload.PerMonthPrice) || 0),
@@ -503,9 +495,9 @@ sap.ui.define([
                 return;
             }
 
-            // var sFacilityID = oSelectedItem.getKey();
-            // sFacilityID = parseInt(sFacilityID, 10);
-            // this._filterSelectionModes(sFacilityID);
+            var sFacilityID = oSelectedItem.getKey();
+            sFacilityID = parseInt(sFacilityID, 10);
+            this._filterSelectionModes(sFacilityID);
             this._syncFacilityPricingFields();
         },
 
