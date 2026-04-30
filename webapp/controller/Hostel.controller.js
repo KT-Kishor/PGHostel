@@ -2854,7 +2854,9 @@ if (aData.length === 0) {
                         GeoLocation: branch.GeoLocation,
                         Image: sImage,
                         TotalFeedbacks: branch.TotalFeedbacks,
-                        AverageRating: branch.AverageRating
+                        AverageRating: branch.AverageRating,
+                        StartingPrice:branch.StartingPrice,
+                        Currency:branch.Currency
                     };
                 });
                 this.Scity = Scity

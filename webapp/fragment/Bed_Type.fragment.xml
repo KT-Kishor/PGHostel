@@ -28,8 +28,8 @@
                     items="{BranchModel>/}"
                     change="onbranchChange"
                     showSecondaryValues="true"
-                    placeholder="{i18n>placeSelectBranchCode}"
-                    valueStateText="{i18n>selectBranchCode}"
+                    placeholder="Select Property Name"
+                    valueStateText="Select Property Name"
                    
                 >
                     <core:ListItem
