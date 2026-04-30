@@ -53,6 +53,7 @@
                                             value="{ManageCustomerModel>/CustomerName}"
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
+                                            selectedKey="{SelectedCustomerModel>/CustomerName}"
                                         >
 											<core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
@@ -75,6 +76,7 @@
                                             value="{BookingModel>/BookingID}"
                                             valueStateText="{i18n>selectBookingID}"
                                             showSecondaryValues="true"
+                                            selectedKey="{SelectedCustomerModel>/BookingID}"
                                         >
 											<core:ListItem
                                                 key="{BookingModel>BookingID}"
@@ -82,7 +84,7 @@
                                                 additionalText="{BookingModel>Status}"
                                             />
 										</m:ComboBox>
-										<m:Label
+										<!-- <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>customerName}"
                                         />
@@ -90,7 +92,7 @@
                                             visible="{visiablityPlay>/createVisi}"
                                             id="MI_id_Cname"
                                             value="{SelectedCustomerModel>/CustomerName}"
-                                        />
+                                        /> -->
 										<m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>invoiceNo}"
