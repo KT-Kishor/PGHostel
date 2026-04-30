@@ -381,14 +381,14 @@
                                                                         </CustomListItem>
                                                                     </List>
                                                                  
-                                <Text
-        text="{
-            parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
-            formatter: '.Formatter.formatStartingPrice'
-        }"
-        class="branchCardPrice"
-    />
-                            </VBox>
+                                                                          <Text
+                                                                              text="{
+                                                                                  parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
+                                                                                  formatter: '.Formatter.formatStartingPrice'
+                                                                                    }"
+                                                                                   class="branchCardPrice"
+                                                                                 />
+                                                                       </VBox>
                                                                     <HBox
                                                                         justifyContent="Center"
                                                                         alignItems="Center"
