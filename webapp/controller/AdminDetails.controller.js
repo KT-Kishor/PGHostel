@@ -1418,7 +1418,18 @@ sap.ui.define([
                         finalPrice = basePrice * iquantity * iDays;
                     }
                 } else {
-                    finalPrice = basePrice * iquantity;
+                    if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
+                        && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
+                        finalPrice = this.SelectedFacility.MinimumPrice
+
+
+                    } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
+                        var Quantity = iquantity - this.SelectedFacility.MinimumQty
+                        finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * Quantity)
+                    } else {
+                        finalPrice = basePrice * iquantity;
+
+                    }
                 }
 
             }
@@ -3270,8 +3281,19 @@ sap.ui.define([
                                         let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
                                             total = price * Number(item.quantity);
+
+                                         if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
+                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
+                                                total = oSelectedFacility.MinimumPrice
+                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
+                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
+                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
+                                            } else {
+                                                total = price * Number(item.quantity);
+
+                                            }
                                         } else {
-                                             if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
+                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
                                                 && item.SelectionMode === "PERSON_QTY") {
                                                 if (diffDays === 1) {
                                                     total = Number(oSelectedFacility.MinimumPrice)
@@ -3423,7 +3445,19 @@ sap.ui.define([
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = price * Number(item.quantity);
+                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
+                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
+                                                total = oSelectedFacility.MinimumPrice
+
+
+                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
+                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
+                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
+                                            } else {
+                                                total = price * Number(item.quantity);
+
+                                            }
+
                                         } else {
                                             if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
                                                 && item.SelectionMode === "PERSON_QTY") {
@@ -3614,7 +3648,7 @@ sap.ui.define([
                         FileType: item.FileType,
                         File: item.File,
                         UserID: CustomerData.UserID,
-                        MemberID:CustomerData.UserID
+                        MemberID: CustomerData.UserID
                     };
                 })
             };
