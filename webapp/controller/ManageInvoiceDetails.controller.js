@@ -155,7 +155,7 @@ sap.ui.define([
 
                         oCustomerCombo.setSelectedKey(sCustomerName); // Set selected keys
                         oBookingCombo.setSelectedKey(sBookingID);
-                        this.SelectKey = sBookingID; // Store customer for booking 
+                        this.SelectKey = sCustomerName; // Store customer for booking 
                         oCustomerCombo.setEditable(false); // Lock customer selection
 
                         const customerData = [{
@@ -377,15 +377,15 @@ sap.ui.define([
                 try {
                     utils._LCvalidateMandatoryField(oEvent);
 
-                    this.SelectKey =  oEvent.getSource().getSelectedItem().getAdditionalText()
+                    this.SelectKey = oEvent.getSource().getSelectedKey();
                     const allData = this.getView().getModel("ManageCustomerModel").getData();
 
                     // Filter selected customer record
-                    const SelectedData = allData.find(item => item.BookingID === this.SelectKey);
+                    const SelectedData = allData.find(item => item.CustomerName === this.SelectKey);
                     if (!SelectedData) return;
 
                     // Filter booking list for selected customer
-                    const bookingList = allData.filter(item => item.BookingID === this.SelectKey).map(i => ({
+                    const bookingList = allData.filter(item => item.CustomerName === this.SelectKey).map(i => ({
                         BookingID: i.BookingID,
                         Status: i.Status
                     }));
@@ -395,9 +395,6 @@ sap.ui.define([
 
                     // Reset booking combo
                     this.byId("CID_id_AddBooking").setSelectedKey("");
-                    
-                    // Reset selected key properly
-                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", "");
 
                     // Reset invoice model
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
@@ -411,14 +408,15 @@ sap.ui.define([
             onChangeBookingID: async function(oEvent) {
                 try {
                     const bookingID = oEvent.getSource().getSelectedKey();
-                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingID);
+                    const customerName = this.SelectKey;
 
-                    if (!bookingID) return;
+                    if (!bookingID && !customerName) return;
 
                     this.getBusyDialog()
 
                     const oData = await this.ajaxCreateWithJQuery("HM_getAllInvoiceData", {
                         data: {
+                            CustomerName: customerName,
                             BookingID: bookingID
                         }
                     });

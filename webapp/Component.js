@@ -55,10 +55,6 @@ sap.ui.define([
                 this._fetchCommonData("State", "StateModel");
                 this._fetchCommonData("Country", "CountryModel");
                 this._fetchCommonData("Currency", "CurrencyModel");
-                this._fetchCommonData("HM_FacilityType", "FacilityTypeModel");
-                this._fetchCommonData("HM_AmenitiName", "AmenityNameModel");
-
-
                 await this._fetchCommonData("HM_BranchData", "sBRModel");
                 this.getRootControl().setBusy(false);
 

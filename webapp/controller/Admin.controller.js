@@ -497,7 +497,7 @@ sap.ui.define([
             });
 
             sap.ui.getCore().byId("idCustomerNameText")
-                .setText(this.data.CustomerName + " (" + this.data.BookingID + ")");
+                .setText(this.data.CustomerName + " (" + this.data.CustomerID + ")");
 
             sap.ui.getCore().byId("id_DepositTypeLabel").setRequired(true);
 

@@ -130,34 +130,6 @@
                                                 text="{SelectionModeModel>text}"
                                             />
                                         </m:ComboBox>
-                                        	<m:Label
-                    text="Minimum Quantity"
-                    required="true"
-                />
-				<m:Input
-                    id="ideditMinimumQuantity"
-                    value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Minimum Quantity"
-                    valueStateText="Enter Minimum Quantity"
-                    editable="{editable>/Edit}"
-                    liveChange="onPriceChange"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
-                    maxLength="2"
-                />
-                	<m:Label
-                    text="Minimum Price"
-                    required="true"
-                />
-				<m:Input
-                    id="ideditMinimumPrice"
-                    value="{FacilitiesModel>/MinimumPrice}"
-                    placeholder="Enter Minimum Price"
-                    valueStateText="Enter Minimum Price"
-                    editable="{editable>/Edit}"
-                    liveChange="onPriceChange"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
-                    maxLength="10"
-                />
                                         <m:Label
                                             text="{i18n>unitPrice}"
                                             required="true"

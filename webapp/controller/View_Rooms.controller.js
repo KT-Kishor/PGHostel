@@ -93,29 +93,6 @@ sap.ui.define([
             const oCustomerModel = new JSONModel(aCustomers);
             this.getView().setModel(oCustomerModel, "CustomerModel");
         },
-         onChangeSalutation: function (oEvent) {
-            const oSalutation = oEvent.getSource();
-            const sKey = oSalutation.getSelectedKey();
-            const oGender =sap.ui.getCore().byId("signUpGender");
-            // 🔥 Clear salutation error immediately
-            oSalutation.setValueState("None");
-            if (!oGender) return;
-            // Reset gender first
-            oGender.setSelectedKey("");
-            oGender.setEnabled(true);
-            // Auto-map gender
-            if (sKey === "Mr.") {
-                oGender.setSelectedKey("Male");
-                oGender.setEnabled(false);
-            } else if (sKey === "Ms." || sKey === "Mrs.") {
-                oGender.setSelectedKey("Female");
-                oGender.setEnabled(false);
-            }
-            // Dr. → manual gender selection
-
-            // ✅ Strict validation (CONTROL, not event)
-            utils._LCstrictValidationSelect(oSalutation);
-        },
 
         Bookingdatepress: async function () {
 

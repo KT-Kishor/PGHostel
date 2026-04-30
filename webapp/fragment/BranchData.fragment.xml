@@ -395,7 +395,7 @@
                         buttonOnly="true"
                         sameFilenameAllowed="true"
                         iconFirst="true"
-                        buttonText="Upload Home Image"
+                        buttonText="Upload Image"
                         multiple="false"
                         uploadOnChange="false"
                         tooltip="Only JPG, PNG, or PDF files under 5MB allowed"

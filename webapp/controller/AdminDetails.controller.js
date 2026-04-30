@@ -728,8 +728,6 @@ sap.ui.define([
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
                         FacilityName: f.FacilityName,
                         FacilityID: f.FacilityID,
-                        MinimumQty: f.MinimumQty,
-                        MinimumPrice: f.MinimumPrice,
                         UnitText: unit,
                         Price: FacilityBasicprice,
                         StartDate: this.Formatter.DateFormat(f.StartDate),
@@ -917,8 +915,6 @@ sap.ui.define([
             // 3. Get RateType Model
             // 4. Get selected facility data
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
-            this.SelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
-
             if (!oSelectedFacility) return;
 
             if (this.getView().getModel("CustomerData").getProperty("/PropertyType") === "Hotel" && Data.AllMembers.length !== 0 && (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "PERSON")) {
@@ -1240,12 +1236,6 @@ sap.ui.define([
             var oCustomerModel = this.getView().getModel("CustomerData");
             var oCustomerData = oCustomerModel.getData();
             var oPayload = this.getView().getModel("edit").getData();
-            var oFacilitiesModel = this.getView().getModel("Facilities");
-            var aFacilities = oFacilitiesModel.getData();
-
-            // 3. Get RateType Model
-            // 4. Get selected facility data
-            // var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
 
             oPayload.CouponCode = oPayload.CouponCode ? oPayload.CouponCode : sap.ui.getCore().byId("ID_editCouponCode").getValue() || "";
 
@@ -1282,6 +1272,7 @@ sap.ui.define([
             var oGroup = sap.ui.getCore().byId("id_Period");
 
             var selectionmode = oPayload.SelectionMode
+                || oGroup?.getButtons()[oGroup.getSelectedIndex()]?.getText()
                 || this.SelectionMode;
             if (oPayload.UnitText !== "Unit Price" &&
                 oPayload.UnitText !== "" && oPayload.quantity !== "" && selectionmode !== "QTY") {
@@ -1400,45 +1391,16 @@ sap.ui.define([
             } else if ((oPayload.UnitText === "Per Hour" && oPayload.UnitText !== "Unit Price")) {
                 finalPrice = iquantity !== "" ? basePrice * iHours * iDays * iquantity : basePrice * iHours * iDays;
             } else if (oPayload.UnitText === "Unit Price") {
-
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                    if (this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
-                        && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
-                        if (iDays === 1) {
-                            finalPrice = this.SelectedFacility.MinimumPrice
-                        } else {
-                            var DisDays = iDays - 1
-                            finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * DisDays * iquantity)
-                        }
-                    } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
-                        var Disqty = iquantity - this.SelectedFacility.MinimumQty
-                        finalPrice = Number(this.SelectedFacility.MinimumPrice) + (Disqty * basePrice * iDays)
-
-                    } else {
-                        finalPrice = basePrice * iquantity * iDays;
-                    }
+                    finalPrice = basePrice * iquantity * iDays;
                 } else {
-                    if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
-                        && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
-                        finalPrice = this.SelectedFacility.MinimumPrice
-
-
-                    } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
-                        var Quantity = iquantity - this.SelectedFacility.MinimumQty
-                        finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * Quantity)
-                    } else {
-                        finalPrice = basePrice * iquantity;
-
-                    }
+                    finalPrice = basePrice * iquantity;
                 }
-
             }
             if (oPayload.CouponDiscount !== "") {
                 finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
             }
             oPayload.TotalAmount = finalPrice;
-
-
             oPayload.TotalMonths = oPayload.TotalUnits || "1"
             oPayload.TotalYears = oPayload.TotalUnits || "1"
             // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY" : ""
@@ -1476,7 +1438,49 @@ sap.ui.define([
 
             oCustomerData.TotalFacilityPrice = total;
 
+            // if (oCustomerData.CouponCode || this.Code) {
+            //     var oCouponData = this.getView().getModel("CouponModel").getData();
+            //     var sEnteredCode = this.Code || oCustomerData.CouponCode; // user entered code
+            //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
+            //     if (oMatchedCoupon.MinOrderValue <= (total + (oCustomerData.RentPrice || 0))) {
+
+            //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && oCustomerData.Discount) {
+            //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+            //             oCustomerData.Discount = (total + (oCustomerData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
+            //                 if (oMatchedCoupon.UptoValue > 0 &&  oCustomerData.Discount > oMatchedCoupon.UptoValue) {
+            //                            oCustomerData.Discount = Number(oMatchedCoupon.UptoValue);
+            //                              }
+            //          } else {
+            //             oCustomerData.Discount = this.CouponDiscount || oCustomerData.Discount || "0.00";
+            //         }
+
+            //     } else {
+            //         oCustomerData.Discount = "0.00";
+            //         this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+            //         this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
+            //         var oInput = this.getView().byId("couponInput");
+            //         this.Code = ""
+            //         oInput.setValue("");
+            //         oInput.setShowValueHelp(false);
+            //     }
+            // }
+
+            // oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
+            // oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0) - Number(oCustomerData.Discount));
+
+            // if(oCustomerData.GSTType==="IGST"){
+            // oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100;
+            // oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST;
+
+            // }else{
+            // oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100 ;
+            // oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue /100 ;
+            // oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
+
+            // }
+
+            // oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid;
 
             oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
             oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
@@ -2167,8 +2171,6 @@ sap.ui.define([
             // 3. Get RateType Model
             // 4. Get selected facility data
             var oSelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
-            this.SelectedFacility = aFacilities.find(f => f.FacilityName === sSelectedFacility);
-
             if (!oSelectedFacility) return;
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("Bookingmodel");
@@ -3130,11 +3132,6 @@ sap.ui.define([
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
-            var oFacilitiesModel = this.getView().getModel("Facilities");
-            var aFacilities = oFacilitiesModel.getData();
-
-
-
 
             const oHostelModel = this.getView().getModel("HostelModel");
 
@@ -3237,9 +3234,6 @@ sap.ui.define([
 
                                 facilityItems.forEach(item => {
 
-
-                                    var oSelectedFacility = aFacilities.find(f => f.FacilityName === item.FacilityName);
-
                                     item.StartDate = Bookingdata.StartDate;
                                     item.EndDate = Bookingdata.EndDate;
 
@@ -3247,8 +3241,6 @@ sap.ui.define([
                                     const endDate = bookingEnd;
 
                                     let diffTime = endDate - startDate;
-                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
 
                                     let unit = item.UnitText?.toLowerCase();
                                     let price = Number(item.Price || 0);
@@ -3281,33 +3273,8 @@ sap.ui.define([
                                         let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
                                             total = price * Number(item.quantity);
-
-                                         if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
-                                                total = oSelectedFacility.MinimumPrice
-                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
-                                            } else {
-                                                total = price * Number(item.quantity);
-
-                                            }
                                         } else {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && item.SelectionMode === "PERSON_QTY") {
-                                                if (diffDays === 1) {
-                                                    total = Number(oSelectedFacility.MinimumPrice)
-                                                } else {
-                                                    var DisDays = diffDays - 1
-                                                    total = Number(oSelectedFacility.MinimumPrice) + (price * DisDays * Number(item.quantity))
-                                                }
-                                            } else if (item.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Disqty = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (Disqty * price * diffDays)
-
-                                            } else {
-                                                total = price * Number(item.quantity) * diffDays;
-                                            }
+                                            total = price * Number(item.quantity) * days;
                                         }
                                     }
 
@@ -3404,8 +3371,6 @@ sap.ui.define([
                                 facilityItems.forEach(item => {
 
                                     const startDate = that._parseDate(item.StartDate);
-                                    var oSelectedFacility = aFacilities.find(f => f.FacilityName === item.FacilityName);
-
 
                                     item.EndDate = Bookingdata.EndDate;
 
@@ -3445,38 +3410,11 @@ sap.ui.define([
                                         item.TotalYears = years;
                                     } else if (unit === "unit price") {
                                         if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
-                                                total = oSelectedFacility.MinimumPrice
-
-
-                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
-                                            } else {
-                                                total = price * Number(item.quantity);
-
-                                            }
-
+                                            total = price * Number(item.quantity);
                                         } else {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && item.SelectionMode === "PERSON_QTY") {
-                                                if (diffDays === 1) {
-                                                    total = Number(oSelectedFacility.MinimumPrice)
-                                                } else {
-                                                    var DisDays = diffDays - 1
-                                                    total = Number(oSelectedFacility.MinimumPrice) + (price * DisDays * Number(item.quantity))
-                                                }
-                                            } else if (item.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Disqty = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (Disqty * price * diffDays)
-
-                                            } else {
-                                                total = price * Number(item.quantity) * diffDays;
-                                            }
+                                            total = price * Number(item.quantity) * diffDays;
                                         }
                                     }
-
 
                                     item.TotalAmount = item.CouponDiscount !== "" || item.CouponDiscount !== "0.00" ? total - Number(item.CouponDiscount) : total;
                                     totalFacilityPrice += total;
@@ -3626,7 +3564,7 @@ sap.ui.define([
                         EndDate: item.EndDate.split('/').reverse().join('-'),
                         UnitText: paymentMap[itemUnit] || item.UnitText,
                         Quantity: item.quantity,
-                        SelectionMode: item.SelectionMode || "",
+                        SelectionMode: item.quantity !== "" ? "QTY" : "",
                         FacilityChargeType: item.FacilityChargeType,
                         MemberName: item.MemberName || "",
                         TotalHour: item.TotalHour,
@@ -3646,9 +3584,7 @@ sap.ui.define([
                         DocumentType: item.DocumentType,
                         FileName: item.FileName,
                         FileType: item.FileType,
-                        File: item.File,
-                        UserID: CustomerData.UserID,
-                        MemberID: CustomerData.UserID
+                        File: item.File
                     };
                 })
             };
