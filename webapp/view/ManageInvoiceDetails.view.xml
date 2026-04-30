@@ -53,6 +53,7 @@
                                             value="{ManageCustomerModel>/CustomerName}"
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
+                                            selectedKey="{SelectedCustomerModel>/CustomerName}"
                                         >
 											<core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
@@ -75,6 +76,7 @@
                                             value="{BookingModel>/BookingID}"
                                             valueStateText="{i18n>selectBookingID}"
                                             showSecondaryValues="true"
+                                            selectedKey="{SelectedCustomerModel>/BookingID}"
                                         >
 											<core:ListItem
                                                 key="{BookingModel>BookingID}"
