@@ -1,24 +1,24 @@
 <mvc:View
     controllerName="sap.ui.com.project1.controller.Admin"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:m="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
     busyIndicatorDelay="0"
 >
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
             />
-        </headerContent>
-        <content>
-            <fb:FilterBar
+		</headerContent>
+		<content>
+			<fb:FilterBar
                 id="PO_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -31,115 +31,112 @@
                 filterContainerWidth="auto"
                 class="filterBarTheme"
             >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Booking ID"
                         label="{i18n>BCustomerID}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="PO_id_BookingId"
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                                 filterSecondaryValues="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{HostelModel>BookingID}"
                                     text="{HostelModel>BookingID}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-
-                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Customer Name"
                         label="Customer Name"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="PO_id_CustomerName"
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{HostelModel>CustomerName}"
                                     text="{HostelModel>CustomerName}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Room No"
                         label="{i18n>roomNo}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="PO_id_CompanyName"
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{HostelModel>RoomNo}"
                                     text="{HostelModel>RoomNo}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Status"
                         label="{i18n>status}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <ComboBox
+						<fb:control>
+							<ComboBox
                                 id="PO_id_Status"
                                 items="{HostelModel>/}"
                                 showClearIcon="true"
                             >
-                                <core:ListItem
+								<core:ListItem
                                     key="{HostelModel>Status}"
                                     text="{HostelModel>Status}"
                                 />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="StartDate"
                         label="{i18n>date}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
-                        <fb:control>
-                            <DateRangeSelection
+						<fb:control>
+							<DateRangeSelection
                                 id="PO_id_Date"
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
                             />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table
                 id="idPOTable"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
@@ -152,164 +149,161 @@
 					    { path: 'BookingDate', descending: true },
 						 { path: 'CustomerID', descending: true }]}"
             >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title text="{i18n>bookingList} ({HostelModel>/count})" />
-                        <ToolbarSpacer />
-                        <Button
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>bookingList} ({HostelModel>/count})" />
+						<ToolbarSpacer />
+						<Button
                             text="{i18n>assignRoom}"
                             tooltip="{i18n>assignRoom}"
                             press="HM_AssignRoom"
                             class="myUnifiedBtn"
                         />
-                         <Button
+						<Button
                             text="Unassign Room"
                             tooltip="Unassign Room"
                             press="HM_UnassignRoom"
                             class="myUnifiedBtn"
                         />
-                        <Button
+						<Button
                             text="{i18n>download}"
                             icon="sap-icon://excel-attachment"
                             tooltip="{i18n>downloadAdminData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
                         />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text
                             text="{i18n>customer}"
                             tooltip="{i18n>customer}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>bookingID}"
                             tooltip="{i18n>bookingID}"
                         />
-                    </Column>
-                      <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>bookingtype}"
                             tooltip="{i18n>bookingtype}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>bookingDate}"
                             tooltip="{i18n>bookingDate}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>MVgender}"
                             tooltip="{i18n>MVgender}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>contactInformation}"
                             tooltip="{i18n>contactInformation}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>startEndDate}"
                             tooltip="{i18n>startEndDate}"
                         />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
+					</Column>
+					<Column demandPopin="true">
+						<Text
                             text="{i18n>roomNumber}"
                             tooltip="{i18n>roomNumber}"
                         />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
+					</Column>
+					<Column demandPopin="true">
+						<Text
                             text="{i18n>bedType}"
                             tooltip="{i18n>bedType}"
                         />
-                    </Column>
-                    <Column
+					</Column>
+					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
-                        <Text
+						<Text
                             text="{i18n>status}"
                             tooltip="{i18n>status}"
                         />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem
                         type="Navigation"
                         press="AD_onPressEditDetails"
                     >
-                        <cells>
-                             
-                          <Text text="{HostelModel>CustomerName}" />
-                            <Text text="{HostelModel>BookingID}" />
-                            <Text text="{HostelModel>PaymentType}" />
-
-                            <Text
+						<cells>
+							<Text text="{HostelModel>CustomerName}" />
+							<Text text="{HostelModel>BookingID}" />
+							<Text text="{HostelModel>PaymentType}" />
+							<Text
                                 text="{path:'HostelModel>BookingDate',formatter: '.Formatter.formatDate'}"
                             />
-                            <Text text="{HostelModel>Gender}" />
-                            <VBox>
-                                <Text
+							<Text text="{HostelModel>Gender}" />
+							<VBox>
+								<Text
                                     text="{= ${HostelModel>STDCode} + ' ' + ${HostelModel>MobileNo} }"
                                     class="sapUiTinyMarginBottom"
                                 />
-                                <Text text="{HostelModel>CustomerEmail}" />
-                            </VBox>
-
-                            <VBox>
-                                <Text
+								<Text text="{HostelModel>CustomerEmail}" />
+							</VBox>
+							<VBox>
+								<Text
                                     text="{path:'HostelModel>StartDate',formatter: '.Formatter.formatDate'}"
                                     class="sapUiTinyMarginBottom"
                                 />
-                                <Text
+								<Text
                                     text="{path:'HostelModel>EndDate',formatter: '.Formatter.formatDate'}"
                                 />
-                            </VBox>
-                            <Text text="{HostelModel>RoomNo}" />
-                            <Text text="{HostelModel>BedType}" />
-                            <ObjectStatus
+							</VBox>
+							<Text text="{HostelModel>RoomNo}" />
+							<Text text="{HostelModel>BedType}" />
+							<ObjectStatus
                                 inverted="false"
                                 text="{HostelModel>Status}"
                                 state="{ path: 'HostelModel>Status', formatter: '.Formatter.formatObjectStatus'}"
                                 class="sapUiTinyMarginBottom"
                             />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-         <core:Fragment
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.AppFooter"
                 type="XML"
             />
-        </footer>
-    </Page>
+		</footer>
+	</Page>
 </mvc:View>
