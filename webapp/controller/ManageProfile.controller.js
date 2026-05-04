@@ -138,9 +138,12 @@ sap.ui.define([
                         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
                         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
                         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
+                        // amount: (
+                        //     (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
+                        //     ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
+                        // ).toString() || "",
                         amount: (
-                            (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
-                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
+                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) - Number(booking.Discount || 0)) * (1 + GSTValue)
                         ).toString() || "",
 
                         status: booking.Status,
@@ -920,11 +923,6 @@ sap.ui.define([
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-            // Now reuse your logic exactly as in onEditBooking
-            var oProfileModel = this.getView().getModel("profileData");
-            var aBookings = oProfileModel.getProperty("/bookings") || [];
-            var aFacilities = oProfileModel.getProperty("/facility") || [];
-
             var sBookingID = oBookingData.BookingID || "";
             var sMemberID = oBookingData.MemberID || "";
 
@@ -933,69 +931,10 @@ sap.ui.define([
                 return;
             }
 
-            //Find booking using BookingID
-            const oBooking = aBookings.find(b => b.BookingID === sBookingID);
-
-            if (!oBooking) {
-                sap.m.MessageToast.show("No booking details found");
-                return;
-            }
-
-            //  Filter facilities using BookingID
-            const aBookingFacilities = aFacilities.filter(fac => fac.BookingID === sBookingID);
-
-            //  Calculate totals
-            const oTotals = this.calculateTotals(
-                [{
-                    FullName: oBooking.CustomerName,
-                    Facilities: {
-                        SelectedFacilities: aBookingFacilities
-                    }
-                }],
-                oBookingData.Startdate,
-                oBookingData.EndDate,
-                oBookingData.RoomPrice
-            );
-
-            if (!oTotals) return;
-            // Prepare data for details view
-            var oFullCustomerData = {
-                salutation: oBooking.Salutation,
-                FullName: oBooking.CustomerName,
-                Gender: oBooking.gender,
-                stdcode: oBooking.stdCode,
-                MobileNo: oBooking.mobileno,
-                CustomerEmail: oBooking.customerEmail,
-                Country: oBooking.country,
-                State: oBooking.state,
-                City: oBooking.city,
-                DateOfBirth: oBooking.DOB,
-                RoomType: oBookingData.room,
-                Price: oBookingData.amount,
-                noofperson: oBookingData.noofperson,
-                RoomPrice: oBookingData.RoomPrice,
-                PaymentType: oBookingData.paymenytype,
-                StartDate: oBookingData.Startdate,
-                EndDate: oBookingData.EndDate || "",
-                BookingID: sBookingID,
-                TotalDays: oTotals.TotalDays,
-                AllSelectedFacilities: oTotals.AllSelectedFacilities,
-                TotalFacilityPrice: oTotals.TotalFacilityPrice,
-                GrandTotal: oTotals.GrandTotal,
-                MemberID: sMemberID
-            };
-
-            //  Set model
-            const oHostelModel = new sap.ui.model.json.JSONModel(oFullCustomerData);
-            this.getOwnerComponent().setModel(oHostelModel, "HostelModel");
-
-            var bookID = btoa(sBookingID.toString());
-
-            //  Navigate using BookingID
-            this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
-                sPath: encodeURIComponent(bookID),
-                xPath: sMemberID,
-                from: "ManageProfile"
+            // Navigate to EditBooking page with BookingID and MemberID
+            this.getOwnerComponent().getRouter().navTo("RouteEditBooking", {
+                BookingID: encodeURIComponent(sBookingID),
+                MemberID: encodeURIComponent(sMemberID)
             });
         },
 
