@@ -552,7 +552,7 @@ sap.ui.define([
 
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
-                sap.m.MessageToast.show("Please upload Hostel image");
+                sap.m.MessageToast.show("Please upload Home image");
                 return;
             }
             var oData = {
@@ -606,6 +606,23 @@ sap.ui.define([
                     });
                 }
                 await this.Onsearch();
+
+                const oUploaderModel = this.getView().getModel("UploaderData");
+                oUploaderModel.setProperty("/attachmentimage", []);
+                oUploaderModel.setProperty("/attachmentslogo", []);
+                oUploaderModel.refresh(true);
+
+                oView.getModel("UploadModel").setData({
+                  Photo1: "",
+                  Photo1Type: "",
+                  Photo1Name: ""
+                 });
+
+                oView.getModel("imageModel").setData({
+                     Attachment: "",
+                     AttachmentType: "",
+                     AttachmentName: ""
+                   });
                 this.oDialog.close();
                 sap.m.MessageToast.show(
                     this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
