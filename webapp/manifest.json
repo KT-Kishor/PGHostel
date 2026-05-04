@@ -222,6 +222,13 @@
           ]
         },
         {
+          "name": "RouteEditBooking",
+          "pattern": "editBooking/{BookingID}/{MemberID}",
+          "target": [
+            "TargetEditBookingView"
+          ]
+        },
+        {
           "name": "RouteRoomImages",
           "pattern": "RoomImages/{sPath}",
           "target": [
@@ -528,6 +535,13 @@
           "clearControlAggregation": false,
           "viewId": "EditBookingDetails",
           "viewName": "EditBookingDetails"
+        },
+        "TargetEditBookingView": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "EditBooking",
+          "viewName": "EditBooking"
         },
         "TargetRoomImages": {
           "viewType": "XML",

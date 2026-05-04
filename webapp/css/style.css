@@ -1,30 +1,10 @@
 /* Premium Card Styling - Isse depth aayegi */
 .adPanel, .couponPanel {
     background: #ffffff !important;
-    border: none !important;
-    /* Thick Left Border - Original Look */
-    border-left: 6px solid #008b96 !important;
-    border-radius: 12px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
     margin-bottom: 1rem !important;
     padding: 10px !important;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-/* Hover effect - Uthta hua dikhega */
-.adPanel:hover, .couponPanel:hover {
-    border-color: #008b96 !important;
-    box-shadow: 0 6px 15px rgba(0, 139, 150, 0.1) !important;
-}
-
-/* Panel Header ko highlight karo */
-.adPanel .sapMPanelHdr, .couponPanel .sapMPanelHdr {
-    background: transparent !important;
-    color: #1a5f6b !important;
-    font-weight: 800 !important;
-    font-size: 1.1rem !important;
-    border-bottom: 2px solid #e0f2f4 !important;
-    margin-bottom: 10px !important;
 }
 
 /* Document Link Styling */

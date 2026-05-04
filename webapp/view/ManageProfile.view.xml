@@ -438,7 +438,7 @@
                 >
                     <cells>
                         <ObjectIdentifier
-                            title="{profileData>CustomerName}"
+                            title="{profileData>customerName}"
                             text="{profileData>BookingID}"
                         />
                         <Text text="{profileData>BookingDate}" />
