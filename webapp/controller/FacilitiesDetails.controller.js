@@ -36,15 +36,15 @@ sap.ui.define([
                     Type: "",
                     SelectionMode: "",
                     FacilityName: "",
-                    RequiresUnitPrice: false,
                     UnitPrice: "",
                     PerHourPrice: "",
                     PerDayPrice: "",
                     PerMonthPrice: "",
                     PerYearPrice: "",
                     Currency: "",
+                    FacilityChargeType: ""
                 });
-                this.getView().setModel(oFacilityModel, "FacilitiesModel");  // Reset facility model
+                this.getView().setModel(oFacilityModel, "FacilitiesModel"); // Reset facility model
 
                 this.getBusyDialog()
                 this.BedID = oEvent.getParameter("arguments").sPath;
@@ -125,7 +125,7 @@ sap.ui.define([
                 });
             }
 
-            oModel.setProperty("/DisplayImages", aImages);  // Update the model
+            oModel.setProperty("/DisplayImages", aImages); // Update the model
         },
 
         BI_onButtonPress: function() {
@@ -235,8 +235,6 @@ sap.ui.define([
             var oModel = this.getView().getModel("FacilitiesModel");
             var sMode = oModel.getProperty("/SelectionMode");
 
-            var bIsUnit = String(sMode).toUpperCase() === "PERSON_QTY";
-            oModel.setProperty("/RequiresUnitPrice", bIsUnit);
             this._syncFacilityPricingFields();
         },
 
@@ -245,9 +243,6 @@ sap.ui.define([
             if (!oModel) return;
 
             var sSelectionMode = oModel.getProperty("/SelectionMode");
-
-            var bIsUnit = String(sSelectionMode).toUpperCase() === "PERSON_QTY";
-            oModel.setProperty("/RequiresUnitPrice", bIsUnit);
 
             if (bIsUnit) {
                 oModel.setProperty("/PerHourPrice", "");
@@ -363,6 +358,18 @@ sap.ui.define([
             })
         },
 
+        onPeriodTypeSelect: function(oEvent) {
+            var selectedIndex = oEvent.getParameter("selectedIndex");
+            var oFacilityModel = this.getView().getModel("FacilitiesModel");
+            var selectedSession = selectedIndex === 0 ? "Daily" : selectedIndex === 1 ? "ONCE_PER_BOOKING" : "";
+            oFacilityModel.setProperty("/FacilityChargeType", selectedSession); // Set selected session in model
+            // Clear value state if a session is selected
+            var oRadioGroup = this.getView().byId("id_PeriodSelection");
+            if (selectedSession !== "") {
+                oRadioGroup.setValueState("None");
+            }
+        },
+
         BT_onsavebuttonpress: async function() {
             var oView = this.getView();
             var Payload = oView.getModel("FacilitiesModel").getData();
@@ -376,28 +383,57 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_SelectionMode")), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
             ) {
+
+                //  UNIT PRICE VALIDATION 
+                if (!bIsUnit && (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
+                    if (!utils._LCvalidateMandatoryField(oView.byId("FD_id_UnitPrice"), "ID")) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+                }
+
                 if (bIsUnit) {
-                    if (!utils._LCvalidateMandatoryField(oView.byId("ideditMinimumQuantity"), "ID") ||
-                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("ideditMinimumPrice")), "ID") ||
-                        !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID")) {
+                    //  PERSON_QTY FLOW
+                    if (!utils._LCvalidateMandatoryField(oView.byId("ideditMinimumQuantity"), "ID")) {
                         MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                         return;
                     }
 
-                    if (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0) {
-                        MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
-                        return;
-                    } if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
+                    if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
                         MessageToast.show(this.i18nModel.getText("pleaseFillMinimumQty"));
                         return;
                     }
-                  
+
+                    var oRadioGroup = sap.ui.getCore().byId(oView.createId("id_PeriodSelection"));
+                    if (!Payload.FacilityChargeType || Payload.FacilityChargeType === "") {
+                        if (oRadioGroup) oRadioGroup.setValueState("Error");
+                        MessageToast.show("Please select Daily or ONCE_PER_BOOKING facility Type.");
+                        return;
+                    } else {
+                        if (oRadioGroup) oRadioGroup.setValueState("None");
+                    }
+
+                    if (!utils._LCvalidateMandatoryField(oView.byId("ideditMinimumPrice"), "ID")) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
+
+                    if (!Payload.MinimumPrice || Number(Payload.MinimumPrice) === 0) {
+                        MessageToast.show(this.i18nModel.getText("pleaseFillMinimumPrice"));
+                        return;
+                    }
+
                 } else {
+                    const isLaundryOrIroning =
+                        Payload.Type === "Laundry Service" ||
+                        Payload.Type === "Ironing Service";
+
                     if (
-                        (Payload.PerHourPrice === "" || Number(Payload.PerHourPrice) === 0) &&
-                        (Payload.PerDayPrice === "" || Number(Payload.PerDayPrice) === 0) &&
-                        (Payload.PerMonthPrice === "" || Number(Payload.PerMonthPrice) === 0) &&
-                        (Payload.PerYearPrice === "" || Number(Payload.PerYearPrice) === 0)
+                        !isLaundryOrIroning &&
+                        (!Payload.PerHourPrice || Number(Payload.PerHourPrice) === 0) &&
+                        (!Payload.PerDayPrice || Number(Payload.PerDayPrice) === 0) &&
+                        (!Payload.PerMonthPrice || Number(Payload.PerMonthPrice) === 0) &&
+                        (!Payload.PerYearPrice || Number(Payload.PerYearPrice) === 0)
                     ) {
                         MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                         return;
@@ -460,7 +496,7 @@ sap.ui.define([
                             FacilityName: Payload.FacilityName,
                             Type: Payload.Type,
                             SelectionMode: Payload.SelectionMode,
-                            UnitPrice: bIsUnit ? (Payload.UnitPrice || 0) : 0,
+                            UnitPrice: (Payload.UnitPrice || 0),
                             MinimumQty: bIsUnit ? (Number(Payload.MinimumQty) || 0) : 0,
                             MinimumPrice: bIsUnit ? (Number(Payload.MinimumPrice) || 0) : 0,
                             PerHourPrice: bIsUnit ? 0 : (Payload.PerHourPrice || 0),
@@ -468,6 +504,7 @@ sap.ui.define([
                             PerMonthPrice: bIsUnit ? 0 : (Payload.PerMonthPrice || 0),
                             PerYearPrice: bIsUnit ? 0 : (Payload.PerYearPrice || 0),
                             Currency: Payload.Currency,
+                            FacilityChargeType: Payload.FacilityChargeType
                         },
                         Attachment: {
                             FacilityName: Payload.FacilityName,
@@ -522,8 +559,6 @@ sap.ui.define([
                 }
 
                 const bIsUnit = String(oFacilityDetails.SelectionMode).toUpperCase() === "PERSON_QTY";
-
-                oFacilityDetails.RequiresUnitPrice = bIsUnit;
 
                 this.getView().getModel("FacilitiesModel").setData(oFacilityDetails);
 

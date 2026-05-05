@@ -1,24 +1,19 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.Room_Details"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:m="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
+<mvc:View controllerName="sap.ui.com.project1.controller.Room_Details"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
-    busyIndicatorDelay="0"
->
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
+    busyIndicatorDelay="0">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
                 id="RD_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -29,172 +24,118 @@
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
-                class="filterBarTheme"
-            >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Room Number"
                         label="{i18n>roomNumber}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="RD_id_CustomerName1"
                                 items="{RoomDetailsModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{RoomDetailsModel>RoomNo}"
-                                    text="{RoomDetailsModel>RoomNo}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                                showClearIcon="true">
+								<core:Item key="{RoomDetailsModel>RoomNo}" text="{RoomDetailsModel>RoomNo}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Bed Type"
                         label="{i18n>bedType}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="RD_id_CompanyName1"
                                 items="{RoomDetailsModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:ListItem
-                                    key="{RoomDetailsModel>BedTypeName}"
-                                    text="{RoomDetailsModel>BedTypeName}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
+                                showClearIcon="true">
+								<core:ListItem key="{RoomDetailsModel>BedTypeName}" text="{RoomDetailsModel>BedTypeName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table
                 id="id_ARD_Table"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
                 class="sapUiResponsiveMargin"
-                items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true}}"
-            >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title
-                            text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"
-                        />
-                        <ToolbarSpacer />
-                        <Button
+                items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true}}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"/>
+						<ToolbarSpacer />
+						<Button
                             text="{i18n>createRoom}"
                             press="HM_AddRoom"
                             tooltip="{i18n>createRoom}"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="HM_EditRoom"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>MSdelete}"
                             press="HM_DeleteRoom"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button
                             text="{i18n>download}"
                             tooltip="{i18n>download}"
                             press="RD_onDownload"
                             class="myUnifiedBtn"
                             icon="sap-icon://excel-attachment"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>roomNo}"
-                            tooltip="{i18n>roomNo}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>bedType}"
-                            tooltip="{i18n>bedType}"
-                        />
-                    </Column>
-                    <!-- <Column demandPopin="true">
-                        <Text
-                            text="{i18n>extraBed}"
-                            tooltip="{i18n>extraBed}"
-                        />
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>roomNo}" tooltip="{i18n>roomNo}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>bedType}" tooltip="{i18n>bedType}"/>
+					</Column>
+					<!-- <Column demandPopin="true">
+                    <Text text="{i18n>extraBed}" tooltip="{i18n>extraBed}"/>
                     </Column> -->
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>dailyPrice}"
-                            tooltip="{i18n>dailyPrice}"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>monthPrice}"
-                            tooltip="{i18n>monthPrice}"
-                        />
-                    </Column>
-                    <Column
-                        minScreenWidth="Tablet"
-                        demandPopin="true"
-                    >
-                        <Text
-                            text="{i18n>yearPrice}"
-                            tooltip="{i18n>yearPrice}"
-                        />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <Text text="{RoomDetailsModel>RoomNo}" />
-                            <Text text="{RoomDetailsModel>BedTypeName}" />
-                            <!-- <Text text="{RoomDetailsModel>ExtraBed}" /> -->
-                            <Text
-                                text="{parts: ['RoomDetailsModel>Price','RoomDetailsModel>Currency'],
-									formatter: '.Formatter.formatPrice'}"
-                            />
-                            <Text
-                                text="{parts: ['RoomDetailsModel>MonthPrice','RoomDetailsModel>Currency'],
-									formatter: '.Formatter.formatPrice'}"
-                            />
-                            <Text
-                                text="{parts: ['RoomDetailsModel>YearPrice','RoomDetailsModel>Currency'],
-									formatter: '.Formatter.formatPrice'}"
-                            />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-         <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
-        </footer>
-    </Page>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>dailyPrice}" tooltip="{i18n>dailyPrice}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>monthPrice}" tooltip="{i18n>monthPrice}" />
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>yearPrice}" tooltip="{i18n>yearPrice}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{RoomDetailsModel>RoomNo}" />
+							<Text text="{RoomDetailsModel>BedTypeName}" />
+							<!-- <Text text="{RoomDetailsModel>ExtraBed}" /> -->
+							<Text text="{parts: ['RoomDetailsModel>Price','RoomDetailsModel>Currency'], 
+                            formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{parts: ['RoomDetailsModel>MonthPrice','RoomDetailsModel>Currency'],
+							formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{parts: ['RoomDetailsModel>YearPrice','RoomDetailsModel>Currency'],
+							formatter: '.Formatter.formatPrice'}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
 </mvc:View>

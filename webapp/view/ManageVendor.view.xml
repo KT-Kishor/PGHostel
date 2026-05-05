@@ -1,21 +1,18 @@
 <mvc:View controllerName="sap.ui.com.project1.controller.ManageVendor"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
     busyIndicatorDelay="0">
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
                 id="MV_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -26,173 +23,104 @@
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
-                class="filterBarTheme"
-            >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="UserID"
                         label="{i18n>MVUserID}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="MV_id_UserID"
                                 items="{mainModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{mainModel>UserID}"
-                                    text="{mainModel>UserID}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
+                                showClearIcon="true">
+								<core:Item key="{mainModel>UserID}" text="{mainModel>UserID}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="UserName"
                         label="{i18n>MVusername}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="MV_id_UserName"
                                 items="{mainModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{mainModel>UserName}"
-                                    text="{mainModel>UserName}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
+                                showClearIcon="true">
+								<core:Item key="{mainModel>UserName}" text="{mainModel>UserName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="Status"
                         label="{i18n>status}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="MV_id_Status"
                                 items="{mainModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{mainModel>Status}"
-                                    text="{mainModel>Status}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
+                                showClearIcon="true">
+								<core:Item key="{mainModel>Status}" text="{mainModel>Status}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table
                 id="MV_id_ManageVendor"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'mainModel>/'}"
-            >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title
-                            text="{i18n>MVDtitle} ({= ${mainModel>/}.length})"
-                        />
-                        <ToolbarSpacer />
-                        <Button
-                            text="{i18n>download}"
-                            icon="sap-icon://excel-attachment"
-                            tooltip="{i18n>download}"
-                            press="MS_onDownload"
-                            class="myUnifiedBtn"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>MVUserID}"
-                            tooltip="{i18n>MVUserID}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>MVVendorName}"
-                            tooltip="{i18n>MVVendorName}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>MVrole}"
-                            tooltip="{i18n>MVrole}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>emailId}"
-                            tooltip="{i18n>emailId}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet" 
-                    >
-                        <Text
-                            text="{i18n>MVgender}"
-                            tooltip="{i18n>MVgender}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>MSmobileNo}"
-                            tooltip="{i18n>MSmobileNo}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet" width="20%"
-                        hAlign="Center"
-                    >
-                        <Text
-                            text="{i18n>address}"
-                            tooltip="{i18n>address}"  textAlign="Center"
-                            width="100%"
-                        />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem
-                        type="Navigation"
-                        press="HM_OnPressManageStaffItem"
-                    >
-                        <cells>
-                            <Text text="{mainModel>UserID}" />
-                            <Text
-                                text="{mainModel>Salutation} {mainModel>UserName}"
-                            />
-                            <Text text="{mainModel>Role}" />
-                            <Text text="{mainModel>EmailID}" />
-                            <Text text="{mainModel>Gender}" />
-                            <Text
-                                text="{mainModel>STDCode} {mainModel>MobileNo}"
-                            />
-                            <Text
-                                text="{mainModel>Address}"
-                                wrapping="true"
-                            />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-    </Page>
+                items="{path: 'mainModel>/'}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>MVDtitle} ({= ${mainModel>/}.length})"/>
+						<ToolbarSpacer />
+						<Button text="{i18n>download}" icon="sap-icon://excel-attachment" tooltip="{i18n>download}"
+                        press="MS_onDownload" class="myUnifiedBtn"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>MVUserID}" tooltip="{i18n>MVUserID}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>MVVendorName}" tooltip="{i18n>MVVendorName}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>MVrole}" tooltip="{i18n>MVrole}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>emailId}" tooltip="{i18n>emailId}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>MVgender}" tooltip="{i18n>MVgender}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>MSmobileNo}" tooltip="{i18n>MSmobileNo}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
+						<Text text="{i18n>address}" tooltip="{i18n>address}"  textAlign="Center" width="100%"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="HM_OnPressManageStaffItem">
+						<cells>
+							<Text text="{mainModel>UserID}" />
+							<Text text="{mainModel>Salutation} {mainModel>UserName}"/>
+							<Text text="{mainModel>Role}" />
+							<Text text="{mainModel>EmailID}" />
+							<Text text="{mainModel>Gender}" />
+							<Text text="{mainModel>STDCode} {mainModel>MobileNo}"/>
+							<Text text="{mainModel>Address}" wrapping="true"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Page>
 </mvc:View>
