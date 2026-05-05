@@ -283,11 +283,22 @@ sap.ui.define([
             oRouter.navTo("RouteHostel");
         },
         onPreviewProfilePhoto: function () {
-            const sPhoto = this.getView().getModel("profileData").getProperty("/photo");
+            const oProfileModel = this.getView().getModel("profileData");
+             const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
+              let sPhoto = oProfileModel.getProperty("/photo");
             if (!sPhoto) {
                 sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
                 return;
             }
+
+             if (!sPhoto.startsWith("data:image")) {
+        sPhoto = "data:image/png;base64," + sPhoto;
+    }
+
+    // ✅ 1) Update global model (this is the key line)
+    oLoginModel.setProperty("/Photo", sPhoto);
+
+      oProfileModel.setProperty("/photo", sPhoto);
             if (!this._oPreviewDialog) {
                 this._oPreviewDialog = new sap.m.Dialog({
                     title: "Profile Photo",
@@ -390,7 +401,9 @@ sap.ui.define([
                 const base64 = fullDataURL.split(",")[1]; // remove prefix
 
                 const oModel = this.getView().getModel("profileData");
+                  const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 oModel.setProperty("/photo", fullDataURL);
+                 oLoginModel.setProperty("/Photo", fullDataURL);
                 await this.updateUserPhoto({
                     fileName: file.name,
                     fileType: file.type,
@@ -401,10 +414,13 @@ sap.ui.define([
         },
         onRemovePhoto: async function () {
             const oModel = this.getView().getModel("profileData");
+             const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
             const initials = oModel.getProperty("/initials");
 
             oModel.setProperty("/photo", "");
             oModel.setProperty("/initials", initials);
+
+              oLoginModel.setProperty("/Photo", "");
             await this.updateUserPhoto({
                 fileName: "",
                 fileType: "",
@@ -491,12 +507,14 @@ sap.ui.define([
             var rawBase64 = base64Image.replace(`data:${mimeType};base64,`, "");
 
             var oModel = this.getView().getModel("profileData");
+            const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
             oModel.setProperty("/fileName", imageName);
             oModel.setProperty("/fileType", mimeType);
             oModel.setProperty("/fileContent", rawBase64);
 
             // Add this to update UI avatar
             oModel.setProperty("/photo", base64Image);
+             oLoginModel.setProperty("/Photo", base64Image);
 
             // Upload to backend
             this.updateUserPhoto({
