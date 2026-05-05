@@ -365,17 +365,16 @@ sap.ui.define([
                 }
             }
 
-            const matchCount = aFacilitiesData.filter(function(facility) {
+            const isDuplicate = aFacilitiesData.some(function (facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false;
 
                 return (
                     facility.BranchCode === Payload.BranchCode &&
                     facility.FacilityName.trim().toLowerCase() === Payload.FacilityName.trim().toLowerCase()
                 );
-            }).length;
+            });
 
-            // Allow max 2 entries (1 original + 2 duplicate)
-            if (matchCount >= 2) {
+            if (isDuplicate) {
                 MessageToast.show(this.i18nModel.getText("facilitywiththesameratetypealreadyexistsforthisbranch"));
                 return;
             }
