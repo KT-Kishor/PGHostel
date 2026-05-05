@@ -604,7 +604,7 @@ sap.ui.define([
 
             oModel.setProperty("/isEditMode", false);
 
-            // ✅ IMPORTANT: clear old backup
+            //  IMPORTANT: clear old backup
             this._originalProfileData = null;
         },
         _resetValidationStates: function () {
@@ -632,6 +632,48 @@ sap.ui.define([
                 }
             });
         },
+        onPressAddMember: function () {
+            if (!this.UD_Dialog) {
+                var oView = this.getView();
+                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Memberedit", this);
+                oView.addDependent(this.UD_Dialog);
+            }
+
+            this._mode = "CREATE";
+
+            const oBookingView = this.getView().getModel("profileData"); // adjust if needed
+            const sNewMemberID = this._generateMemberID(oBookingView);
+            const sUserID = this.getView().getModel("profileData").getData().UserID 
+
+            //  Empty model for new member
+            const oNewMember = {
+                MemberID: sNewMemberID,
+                UserID: sUserID,
+                Salutation: "",
+                Name: "",
+                Relation: "",
+                Gender: "",
+                DateOfBirth: "",
+                DocumentType: ""
+            };
+
+            this.getView().setModel(new sap.ui.model.json.JSONModel(oNewMember), "Member");
+
+            //  Clear existing file data
+            this._existingFileData = null;
+            this._selectedFile = null;
+
+            //  Reset UI fields
+            sap.ui.getCore().byId("idSelect").setSelectedKey("").setValueState("None");
+            sap.ui.getCore().byId("MM_id_MemberName").setValue("").setValueState("None");
+            sap.ui.getCore().byId("MemberDOB").setValue("").setValueState("None");
+            sap.ui.getCore().byId("MemberGenderCombo").setSelectedKey("").setValueState("None");
+            sap.ui.getCore().byId("MemberRelationCombo").setSelectedKey("").setValueState("None");
+            sap.ui.getCore().byId("idDocumentType").setSelectedKey("").setValueState("None");
+            sap.ui.getCore().byId("MM_id_FileUploader").setValue("").setValueState("None");
+
+            this.UD_Dialog.open();
+        },
         onEditMemberFromDialog: function (oEvent) {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -639,10 +681,12 @@ sap.ui.define([
                 oView.addDependent(this.UD_Dialog);
             }
 
+            this._mode = "UPDATE";
+
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oData = oContext.getObject();
 
-            // ✅ store existing file data
+            //  store existing file data
             this._existingFileData = {
                 FileName: oData.FileName,
                 FileType: oData.FileType,
@@ -666,10 +710,6 @@ sap.ui.define([
             sap.ui.getCore().byId("MemberRelationCombo").setValue(oData.Relation || "").setValueState("None");
             sap.ui.getCore().byId("MM_id_MemberName").setValue(oData.Name || "").setValueState("None");
             sap.ui.getCore().byId("idSelect").setValue(oData.Salutation || "").setValueState("None");
-
-
-
-
             this.UD_Dialog.open();
         },
 
@@ -682,7 +722,7 @@ sap.ui.define([
 
             if (!aFiles || aFiles.length === 0) return;
 
-            // ✅ store selected file globally (or in model)
+            //  store selected file globally (or in model)
             this._selectedFile = aFiles[0];
         },
         savepress: function () {
@@ -708,7 +748,7 @@ sap.ui.define([
 
                 const MAX_SIZE = 2 * 1024 * 1024;
 
-                // ✅ Case 1: New file selected
+                //  Case 1: New file selected
                 if (this._selectedFile) {
                     var file = this._selectedFile;
 
@@ -722,26 +762,28 @@ sap.ui.define([
                     reader.onload = (e) => {
                         var sBase64 = e.target.result.split(",")[1];
 
-                        // ✅ Safe Date Conversion
+                        //  Safe Date Conversion
                         var dob = oMember.DateOfBirth
                             ? oMember.DateOfBirth.split('/').reverse().join('-')
                             : "";
 
+                        const isCreate = this._mode === "CREATE";
+
                         var oPayload = {
                             Members: [
                                 {
-                                    MemberID: this._existingFileData.MemberID,
-                                    Salutation: oMember.Salutation ? oMember.Salutation : this._existingFileData.Salutation,
+                                    MemberID: isCreate ? oMember.MemberID : this._existingFileData.MemberID,
+                                    Salutation: oMember.Salutation,
                                     Name: oMember.Name,
-                                    Relation: oMember.Relation ? oMember.Relation : this._existingFileData.Relation,
-                                    Gender: oMember.Gender ? oMember.Gender : this._existingFileData.Gender,
-                                    UserID: this._existingFileData.UserID,
+                                    Relation: oMember.Relation,
+                                    Gender: oMember.Gender,
+                                    UserID: isCreate ? oMember.UserID : this._existingFileData.UserID,
                                     DateOfBirth: dob,
                                     Documents: [
                                         {
-                                            DocumentID: this._existingFileData.DocumentID,
-                                            MemberID: this._existingFileData.MemberID,
-                                            UserID: this._existingFileData.UserID,
+                                            DocumentID: isCreate ? "" : this._existingFileData.DocumentID,
+                                            MemberID: isCreate ? oMember.MemberID : this._existingFileData.MemberID,
+                                            UserID: isCreate ? oMember.UserID : this._existingFileData.UserID,
                                             DocumentType: DocumentType,
                                             FileName: file.name,
                                             FileType: file.type,
@@ -752,28 +794,34 @@ sap.ui.define([
                             ]
                         };
 
-                        // ✅ Call inside onload (VERY IMPORTANT)
+                        //  Call inside onload (VERY IMPORTANT)
                         this._uploadDocument(oPayload);
                     };
 
-                    // ✅ Trigger file read
+                    //  Trigger file read
                     reader.readAsDataURL(file);
                 }
 
-                // ✅ Case 2: No new file → use existing file
+                //  Case 2: No new file → use existing file
                 else if (this._existingFileData) {
 
 
-                    var oPayload = {
+                    const isCreate = this._mode === "CREATE";
 
+                    if (isCreate) {
+                        sap.m.MessageToast.show("Please upload a file");
+                        return;
+                    }
+
+                    var oPayload = {
                         Members: [
                             {
                                 MemberID: this._existingFileData.MemberID,
-                                Salutation: oMember.Salutation ? oMember.Salutation : this._existingFileData.Salutation,
+                                Salutation: oMember.Salutation,
                                 Name: oMember.Name,
-                                Relation: oMember.Relation ? oMember.Relation : this._existingFileData.Relation,
-                                Gender: oMember.Gender ? oMember.Gender : this._existingFileData.Gender,
-                                DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split('/').reverse().join('-') : this._existingFileData.DateOfBirth,
+                                Relation: oMember.Relation,
+                                Gender: oMember.Gender,
+                                DateOfBirth: oMember.DateOfBirth.split('/').reverse().join('-'),
                                 UserID: this._existingFileData.UserID,
                                 Documents: [
                                     {
@@ -788,7 +836,6 @@ sap.ui.define([
                                 ]
                             }
                         ]
-
                     };
 
                     this._uploadDocument(oPayload);
@@ -804,22 +851,66 @@ sap.ui.define([
         },
         _uploadDocument: function (oDoc) {
             this.getBusyDialog();
-            this.ajaxUpdateWithJQuery("HM_MemberDocument", {
-                data: [oDoc],
-                filters: {
-                    DocumentID: this._existingFileData.DocumentID
-                }
-            }).then(() => {
-                this.onTableSelect(); // ✅ correct refresh
+
+            const isCreate = this._mode === "CREATE";
+
+            const oPromise = isCreate
+                ? this.ajaxCreateWithJQuery("HM_MemberDocument", { data: [oDoc] })
+                : this.ajaxUpdateWithJQuery("HM_MemberDocument", {
+                    data: [oDoc],
+                    filters: {
+                        DocumentID: this._existingFileData.DocumentID
+                    }
+                });
+
+            oPromise.then(() => {
+                this.onTableSelect();
                 sap.m.MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
                 this.UD_Dialog.close();
 
                 this._selectedFile = null;
                 this._existingFileData = null;
-
             }).catch(() => {
                 sap.m.MessageToast.show(this.i18nModel.getText("Error Uploading Documents"));
             });
+        },
+
+        _generateMemberID: function (oBookingView) {
+            const sUserID = this.getView().getModel("profileData").getData().UserID || ""
+            const aMasterMembers = this.getView().getModel("profileData").getData().Members || [];
+
+
+            // Filter members that match the UserID pattern (e.g., "00013_XX")
+            const aUserMembers = aMasterMembers.filter(function (oMember) {
+                if (!oMember.MemberID) return false;
+                return String(oMember.MemberID).startsWith(sUserID + "_");
+            });
+
+            let iMaxSuffix = 0;
+
+            if (aUserMembers.length > 0) {
+                // Extract suffixes and find the maximum
+                aUserMembers.forEach(function (oMember) {
+                    const sMemberID = String(oMember.MemberID || "");
+                    const aParts = sMemberID.split("_");
+                    if (aParts.length === 2) {
+                        const iSuffix = parseInt(aParts[1], 10);
+                        if (!isNaN(iSuffix) && iSuffix > iMaxSuffix) {
+                            iMaxSuffix = iSuffix;
+                        }
+                    }
+                });
+            }
+
+            // Increment by 1
+            const iNewSuffix = iMaxSuffix + 1;
+
+            // Format with leading zeros (2 digits)
+            const sFormattedSuffix = iNewSuffix < 10 ? "0" + iNewSuffix : String(iNewSuffix);
+
+            const sNewMemberID = sUserID + "_" + sFormattedSuffix;
+
+            return sNewMemberID;
         },
         onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
@@ -849,7 +940,6 @@ sap.ui.define([
         },
         onNewMemberDOBChange: function (oEvent) {
             utils._LCvalidateDate(oEvent);
-
         },
         onNewMemberGenderChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);

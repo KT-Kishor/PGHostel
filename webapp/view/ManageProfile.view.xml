@@ -373,6 +373,14 @@
                 justifyContent="Start"
                 class="customActionBox"
             >
+
+            <Button
+                    text="Add Members"
+                    press="onPressAddMember"
+                    class="myUnifiedBtn sapUiSmallMarginEnd"
+                    visible="{= ${profileData>/selectedTab} === 'Members' }"
+                />
+
                 <Button
                     text="Raise Complaint"
                     press="onPressRaiseComplaint"
