@@ -1173,6 +1173,17 @@
                         return oLine.personId;
                     });
 
+                if (bIsSingleOccupant && oDefaultOccupant) {
+                    aPersonQuantities = [{
+                        personId: oDefaultOccupant.id,
+                        personName: oDefaultOccupant.name || sSelectedOccupantName,
+                        selected: true,
+                        qty: iFixedPackageQty,
+                        fixedQty: iFixedPackageQty
+                    }];
+                    aSelectedPersonIds = [oDefaultOccupant.id];
+                }
+
                 iSinglePersonQty = iFixedPackageQty;
             }
 
@@ -1213,7 +1224,12 @@
 
             const oFacilityPopover = this._getFacilitySelectionDialog();
 
-            var sPopoverWidth = (sSelectionMode === "QTY" || sSelectionMode === "SINGLE") ? "18rem" : "30rem";
+            var sPopoverWidth = "20rem";
+            if (sSelectionMode === "QTY" || sSelectionMode === "SINGLE") {
+                sPopoverWidth = "18rem";
+            } else if (sSelectionMode === "PERSON_QTY") {
+                sPopoverWidth = "26rem";
+            }
             if (sap.ui.Device.system.phone) {
                 sPopoverWidth = "95vw";
             }
@@ -1291,7 +1307,7 @@
                                         wrapping: true
                                     }).addStyleClass("sapUiTinyMarginEnd"),
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                                    }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                             // Informational MessageStrip for PERSON_QTY facilities with valid minimum offer
                             new sap.m.VBox({
@@ -1332,18 +1348,21 @@
                                         type: "Information",
                                         showIcon: true,
                                         showCloseButton: false
-                                    }).addStyleClass("sapUiSmallMarginBottom")
+                                    }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd")
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                             new sap.m.HBox({
                                 width: "100%",
                                 wrap: "Wrap",
                                 alignItems: "Center",
                                 visible: {
-                                    path: "FacilitySelection>/selectionMode",
-                                    formatter: function (sSelectionMode) {
-                                        return sSelectionMode === "PERSON_QTY";
+                                    parts: [
+                                        { path: "FacilitySelection>/selectionMode" },
+                                        { path: "FacilitySelection>/singleOccupantMode" }
+                                    ],
+                                    formatter: function (sSelectionMode, bSingleOccupantMode) {
+                                        return sSelectionMode === "PERSON_QTY" && !bSingleOccupantMode;
                                     }
                                 },
                                 items: [
@@ -1362,7 +1381,7 @@
                                         }
                                     })
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                             new sap.m.HBox({
                                 alignItems: "Center",
@@ -1376,7 +1395,7 @@
                                     new sap.m.Label({
                                         text: "Quantity",
                                         design: "Bold"
-                                    }).addStyleClass("sapUiSmallMarginEnd"),
+                                    }).addStyleClass("sapUiTinyMarginEnd"),
                                     new sap.m.StepInput({
                                         width: "7rem",
                                         min: 1,
@@ -1404,7 +1423,7 @@
                                     new sap.m.Table({
                                         inset: false,
                                         growing: false,
-                                        width: sap.ui.Device.system.phone ? "95%" : "95%",
+                                        width: sap.ui.Device.system.phone ? "95%" : "97%",
                                         columns: [
                                             new sap.m.Column({
                                                 width: sap.ui.Device.system.phone ? "2.7rem" : "3.2rem",
@@ -1434,9 +1453,9 @@
                                                 ]
                                             })
                                         }
-                                    }).addStyleClass("sapUiSmallMarginEnd"),
+                                    }).addStyleClass("sapUiNoMargin"),
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                             new sap.m.VBox({
                                 visible: {
@@ -1459,14 +1478,17 @@
                                         type: "Information",
                                         showIcon: true,
                                         showCloseButton: false
-                                    }).addStyleClass("sapUiSmallMarginEnd"),
+                                    }).addStyleClass("sapUiTinyMarginEnd"),
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginEnd"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
                             new sap.m.VBox({
                                 visible: {
-                                    path: "FacilitySelection>/selectionMode",
-                                    formatter: function (sSelectionMode) {
-                                        return sSelectionMode === "PERSON_QTY";
+                                    parts: [
+                                        { path: "FacilitySelection>/selectionMode" },
+                                        { path: "FacilitySelection>/singleOccupantMode" }
+                                    ],
+                                    formatter: function (sSelectionMode, bSingleOccupantMode) {
+                                        return sSelectionMode === "PERSON_QTY" && !bSingleOccupantMode;
                                     }
                                 },
                                 items: [
@@ -1477,7 +1499,7 @@
 
                                     new sap.m.Table({
                                         inset: false,
-                                        width: "100%",
+                                        width: sap.ui.Device.system.phone ? "100%" : "90%",
                                         fixedLayout: "Strict",
                                         showSeparators: "Inner",
                                         columns: [
@@ -1530,43 +1552,33 @@
                                                 ]
                                             })
                                         }
-                                    }).addStyleClass("facilityPersonQtyTable")
+                                    }).addStyleClass("facilityPersonQtyTable sapUiTinyMarginEnd")
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                        
                             new sap.m.VBox({
-                                visible: false,
+                                visible: {
+                                    parts: [
+                                        { path: "FacilitySelection>/selectionMode" },
+                                        { path: "FacilitySelection>/singleOccupantMode" }
+                                    ],
+                                    formatter: function (sSelectionMode, bSingleOccupantMode) {
+                                        return sSelectionMode === "PERSON_QTY" && bSingleOccupantMode;
+                                    }
+                                },
                                 items: [
-                                    new sap.m.MessageStrip({
+                                    new sap.m.Title({
                                         text: {
                                             path: "FacilitySelection>/primaryGuestName",
                                             formatter: function (sPrimaryGuestName) {
                                                 return "Facility will be applied to " + (sPrimaryGuestName || "Primary Guest");
                                             }
                                         },
-                                        type: "Information",
-                                        showIcon: true,
-                                        showCloseButton: false
-                                    }).addStyleClass("sapUiSmallMarginEnd"),
-                                    new sap.m.HBox({
-                                        alignItems: "Center",
-                                        items: [
-                                            new sap.m.Label({
-                                                text: "Quantity",
-                                                design: "Bold"
-                                            }).addStyleClass("sapUiSmallMarginEnd"),
-                                            new sap.m.StepInput({
-                                                width: "100%",
-                                                min: 0,
-                                                step: 1,
-                                                value: "{FacilitySelection>/singlePersonQty}",
-                                                change: this.onSinglePersonQtyChange.bind(this)
-                                            })
-                                        ]
-                                    }).addStyleClass("sapUiSmallMarginTop")
+                                        level: "H6"
+                                    }).addStyleClass("sapUiTinyMarginEnd")
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom")
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd")
                         ]
                     }).addStyleClass("sapUiContentPadding sapUiSmallMargin")
                 ],
@@ -4708,7 +4720,7 @@
                 }
 
                 if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
-                    MessageToast.show("This coupon has already been used");
+                    MessageToast.show("This coupon cannot be applied to this booking");
                     return;
                 }
 
@@ -5363,17 +5375,24 @@
             }
 
             if (sSelectionMode === "PERSON_QTY") {
+                const fPackagePrice = this._toNumber(
+                    oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice || fUnitPrice
+                );
+
                 return aPersonQuantities.filter(function (oLine) {
                     return (parseInt(oLine.qty, 10) || 0) > 0;
                 }).map(function (oLine) {
                     const iQty = Math.max(parseInt(oLine.qty, 10) || 0, 0);
                     const oIdentity = this._getFacilityMemberIdentity(oLine.personId, oLine.personName);
                     const oRow = fnCreateBaseRow();
-                    const fRowTotal = sChargeType === "DAILY" ? (fUnitPrice * iQty * iChargeableDays) : (fUnitPrice * iQty);
+                    const fRowTotal = sChargeType === "DAILY"
+                        ? (fPackagePrice * iChargeableDays)
+                        : fPackagePrice;
 
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
                     oRow.Quantity = iQty;
+                    oRow.BasicFacilityPrice = fPackagePrice.toFixed(2);
                     oRow.FacilitiPrice = fRowTotal.toFixed(2);
                     return oRow;
                 }.bind(this));
