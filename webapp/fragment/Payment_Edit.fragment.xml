@@ -62,7 +62,7 @@
                     class="paymentTypeGroup"
                 >
                     <RadioButton text="{i18n>payatcheckintime}" />
-                    <RadioButton text="{i18n>uPI}" />
+                    <!-- <RadioButton text="{i18n>uPI}" /> -->
                     <!-- <RadioButton text="{i18n>creditDebitCard}" /> -->
                 </RadioButtonGroup>
 
