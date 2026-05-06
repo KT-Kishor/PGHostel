@@ -454,7 +454,7 @@ sap.ui.define([
                             RoomNo: bookingDetails.RoomNo || "",
                             BranchCode: bookingDetails.BranchCode || "",
                             CouponDiscount: bookingDetails.Discount || "",
-                            CustomerName: customerName,
+                            CustomerName: bookingDetails.CustomerName,
                             BookingID: bookingID,
                             UserID: bookingDetails.UserID || "",
                             PaidAmount: oData.data.PerMonthTotalRent || "0.00",
@@ -698,7 +698,7 @@ sap.ui.define([
 
                 if (mode === "PERSON_QTY") {
 
-                    if (unit === "unit price") {
+                    if (unit === "unit price"  || unit === "package price") {
                         return `${qty} Units`;
                     }
 

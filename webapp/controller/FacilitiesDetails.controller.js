@@ -384,13 +384,24 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
             ) {
 
-                //  UNIT PRICE VALIDATION 
-                if (!bIsUnit && (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
-                    if (!utils._LCvalidateMandatoryField(oView.byId("FD_id_UnitPrice"), "ID")) {
-                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                        return;
-                    }
+            const sSelectionMode = String(Payload.SelectionMode || "").toUpperCase().trim();
+            const isPersonQty = sSelectionMode === "PERSON_QTY";
+
+            const isLaundryOrIroning =
+                Payload.Type === "Laundry Service" ||
+                Payload.Type === "Ironing Service";
+
+            // Require UnitPrice only when NOT PERSON_QTY and is Laundry/Ironing
+            if (!isPersonQty && isLaundryOrIroning &&
+                (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
+
+                const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID");
+
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
                 }
+            }
 
                 if (bIsUnit) {
                     //  PERSON_QTY FLOW

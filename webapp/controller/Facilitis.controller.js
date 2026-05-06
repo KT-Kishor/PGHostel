@@ -306,8 +306,21 @@ sap.ui.define([
                 return;
             }
 
-            if (!bIsUnit && (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
-                const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idUnitPrice")), "ID");
+            const sSelectionMode = String(Payload.SelectionMode || "").toUpperCase().trim();
+            const isPersonQty = sSelectionMode === "PERSON_QTY";
+
+            const isLaundryOrIroning =
+                Payload.Type === "Laundry Service" ||
+                Payload.Type === "Ironing Service";
+
+            // Require UnitPrice only when NOT PERSON_QTY and is Laundry/Ironing
+            if (!isPersonQty && isLaundryOrIroning &&
+                (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
+
+                const isValid = utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId(oView.createId("idUnitPrice")),
+                    "ID"
+                );
 
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
