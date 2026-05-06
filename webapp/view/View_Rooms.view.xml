@@ -1,29 +1,26 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.View_Rooms"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:l="sap.ui.layout"
-    xmlns:core="sap.ui.core"
+<mvc:View controllerName="sap.ui.com.project1.controller.View_Rooms"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:l="sap.ui.layout"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
     busyIndicatorDelay="0"
-    xmlns:fb="sap.ui.comp.filterbar"
->
-    <Page
+	xmlns:fb="sap.ui.comp.filterbar">
+	<Page
         showHeader="true"
         enableScrolling="true"
         class="RoomsPage"
     >
-        <headerContent>
-            <core:Fragment
+		<headerContent>
+			<core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
             />
-        </headerContent>
-
-        <content>
-         <!-- <fb:FilterBar
+		</headerContent>
+		<content>
+			<!-- <fb:FilterBar
                 id="PO_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -35,67 +32,48 @@
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
                 class="filterBarTheme"
-            >
-                <fb:filterGroupItems>   
-                    <fb:FilterGroupItem
+            ><fb:filterGroupItems><fb:FilterGroupItem
                         name="Check-in Date"
                         label="Check-in Date"
                         groupName="Group"
                         visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <DatePicker
+                    ><fb:control><DatePicker
                                 id="VR_id_JoiningDate"
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
-                            />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-
-                  <fb:filterGroupItems>   
-                    <fb:FilterGroupItem
+                            /></fb:control></fb:FilterGroupItem></fb:filterGroupItems><fb:filterGroupItems><fb:FilterGroupItem
                         name="Check-out Date"
                         label="Check-out Date"
                         groupName="Group"
                         visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <DatePicker
+                    ><fb:control><DatePicker
                                 id="VR_id_CheckoutDate"
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
-                            />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-
-            </fb:FilterBar> -->
-            <VBox
+                            /></fb:control></fb:FilterGroupItem></fb:filterGroupItems></fb:FilterBar> -->
+			<VBox
                 height="600px"
                 justifyContent="Center"
                 alignItems="Center"
                 visible="{VisibilityModel>/ShowGlobalNoData}"
             >
-                <Text
+				<Text
                     text="{i18n>noRoomsFound}"
                     class="cssNoDataMessage"
                 />
-                <Text
+				<Text
                     text="{i18n>pleaseselectanotherCity}"
                     class="cssNoDataSubMessage"
                 />
-            </VBox>
-
-            <Title
+			</VBox>
+			<Title
                 text="AC Rooms"
                 level="H2"
                 class="roomHeaderTitle sapUiMediumMarginBeginEnd"
                 visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}"
             />
-
-            <VBox class="sapUiTinyMarginTop">
-                <l:Grid
+			<VBox class="sapUiTinyMarginTop">
+				<l:Grid
                     id="idBedTypeFlex2"
                     defaultSpan="XL3 L4 M6 S12"
                     containerQuery="true"
@@ -103,8 +81,8 @@
                     vSpacing="2"
                     content="{path: 'VisibilityModel>/ACRooms'}"
                 >
-                    <VBox class="bedCard">
-                        <Carousel
+					<VBox class="bedCard">
+						<Carousel
                             height="300px"
                             width="100%"
                             loop="true"
@@ -112,116 +90,102 @@
                             backgroundDesign="Transparent"
                             pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                         >
-                            <pages>
-                                <VBox class="imageWrapper">
-                                    <HBox class="areaTagBox">
-                                        <core:Icon
+							<pages>
+								<VBox class="imageWrapper">
+									<HBox class="areaTagBox">
+										<core:Icon
                                             src="sap-icon://building"
                                             size="0.9rem"
                                             color="black"
                                             class="sapUiTinyMarginEnd"
                                         />
-                                        <Text text="{VisibilityModel>Area}" />
-                                    </HBox>
-
-                                    <Image
+										<Text text="{VisibilityModel>Area}" />
+									</HBox>
+									<Image
                                         src="{VisibilityModel>src}"
                                         width="100%"
                                         height="300px"
                                         class="bedCardImage"
                                         decorative="false"
                                     />
-
-                                    <!-- <CustomListItem
+									<!-- <CustomListItem
                                         type="Active"
                                         press=".onRatingPress"
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                         tooltip="Tap to See Reviews"
-                                    >
-                                        <HBox
+                                    ><HBox
                                             class="ratingOverlay"
                                             alignItems="Center"
-                                        >
-                                            <RatingIndicator
+                                        ><RatingIndicator
                                                 value="{VisibilityModel>AverageRating}"
                                                 maxValue="5"
                                                 enabled="false"
                                                 iconSize="0.8rem"
-                                            />
-                                            <Text
+                                            /><Text
                                                 text="({VisibilityModel>TotalFeedbacks})"
                                                 class="ratingCountText"
-                                            />
-                                        </HBox>
-                                    </CustomListItem> -->
-                                </VBox>
-                            </pages>
-                        </Carousel>
-
-                        <VBox class="bedCardContent">
-                            <Text
+                                            /></HBox></CustomListItem> -->
+								</VBox>
+							</pages>
+						</Carousel>
+						<VBox class="bedCardContent">
+							<Text
                                 text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
                                 class="bedCardTitle"
                             />
-
-                            <Text
+							<Text
                                 text="{VisibilityModel>Description}"
                                 class="bedCardDesc"
                                 maxLines="4"
                                 wrapping="true"
                             />
-
-                            <Text
+							<Text
                                 text="{
                                     parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
                                     formatter: '.Formatter.formatStartingPrice'
                                 }"
                                 class="bedCardPrice"
                             />
-
-                            <HBox
+							<HBox
                                 justifyContent="Center"
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                    <Link
+								<Link
                                         text="Book Room"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-                                    <Link
+								<Link
                                         text="Enquiry"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
-                            </HBox>
-                        </VBox>
-                    </VBox>
-                </l:Grid>
-                <VBox
+							</HBox>
+						</VBox>
+					</VBox>
+				</l:Grid>
+				<VBox
                     alignItems="Center"
                     class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                     visible="{VisibilityModel>/ShowViewMore}"
                 >
-                    <!-- <Link
+					<!-- <Link
                         id="idViewMoreBusy2"
                         text="{i18n>viewmorerooms}"
                         press="onViewMoreRooms"
                         class="btnViewDetails"
                     /> -->
-                    <VBox height="2rem" />
-                </VBox>
-            </VBox>
-
-            <Title
+					<VBox height="2rem" /></VBox>
+			</VBox>
+			<Title
                 text="Non-AC Rooms"
                 level="H2"
                 class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
                 visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}"
             />
-
-            <VBox class="sapUiTinyMarginTop">
-                <l:Grid
+			<VBox class="sapUiTinyMarginTop">
+				<l:Grid
                     id="idBedTypeFlex1"
                     defaultSpan="XL3 L4 M6 S12"
                     containerQuery="true"
@@ -229,8 +193,8 @@
                     vSpacing="2"
                     content="{path: 'VisibilityModel>/NonACRooms'}"
                 >
-                    <VBox class="bedCard">
-                        <Carousel
+					<VBox class="bedCard">
+						<Carousel
                             height="300px"
                             width="100%"
                             loop="true"
@@ -238,107 +202,94 @@
                             backgroundDesign="Transparent"
                             pages="{path: 'VisibilityModel>Images', templateShareable: false}"
                         >
-                            <pages>
-                                <VBox class="imageWrapper">
-                                    <HBox class="areaTagBox">
-                                        <core:Icon
+							<pages>
+								<VBox class="imageWrapper">
+									<HBox class="areaTagBox">
+										<core:Icon
                                             src="sap-icon://building"
                                             size="0.9rem"
                                             color="black"
                                             class="sapUiTinyMarginEnd"
                                         />
-                                        <Text text="{VisibilityModel>Area}" />
-                                    </HBox>
-
-                                    <Image
+										<Text text="{VisibilityModel>Area}" />
+									</HBox>
+									<Image
                                         src="{VisibilityModel>src}"
                                         width="100%"
                                         height="300px"
                                         class="bedCardImage"
                                         decorative="false"
                                     />
-
-                                    <!-- <CustomListItem
+									<!-- <CustomListItem
                                         type="Active"
                                         press=".onRatingPress"
                                         visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
                                         tooltip="Tap to See Reviews"
-                                    >
-                                        <HBox
+                                    ><HBox
                                             class="ratingOverlay"
                                             alignItems="Center"
-                                        >
-                                            <RatingIndicator
+                                        ><RatingIndicator
                                                 value="{VisibilityModel>AverageRating}"
                                                 maxValue="5"
                                                 enabled="false"
                                                 iconSize="0.8rem"
-                                            />
-                                            <Text
+                                            /><Text
                                                 text="({VisibilityModel>TotalFeedbacks})"
                                                 class="ratingCountText"
-                                            />
-                                        </HBox>
-                                    </CustomListItem> -->
-                                </VBox>
-                            </pages>
-                        </Carousel>
-
-                        <VBox class="bedCardContent">
-                            <Text
+                                            /></HBox></CustomListItem> -->
+								</VBox>
+							</pages>
+						</Carousel>
+						<VBox class="bedCardContent">
+							<Text
                                 text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
                                 class="bedCardTitle"
                             />
-
-                            <Text
+							<Text
                                 text="{VisibilityModel>Description}"
                                 class="bedCardDesc"
                                 maxLines="4"
                                 wrapping="true"
                             />
-
-                            <Text
+							<Text
                                 text="{
                                     parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
                                     formatter: '.Formatter.formatStartingPrice'
                                 }"
                                 class="bedCardPrice"
                             />
-
-                            <HBox
+							<HBox
                                 justifyContent="Center"
                                 alignItems="Center"
                                 class="sapUiTinyMarginTop"
                             >
-                                    <Link
+								<Link
                                         text="Book Room"
                                         press="onViewDetailsPress"
                                         class="pillActionBtn pillLeft"
                                     />
-                                    <Link
+								<Link
                                         text="Enquiry"
                                         press="onEnquiryPress"
                                         class="pillActionBtn pillRight"
                                     />
-                            </HBox>
-                        </VBox>
-                    </VBox>
-                </l:Grid>
-
-                <VBox
+							</HBox>
+						</VBox>
+					</VBox>
+				</l:Grid>
+				<VBox
                     alignItems="Center"
                     class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                     visible="{VisibilityModel>/ShowViewMore}"
                 >
-                    <!-- <Link
+					<!-- <Link
                         id="idViewMoreBusy1"
                         text="{i18n>viewmorerooms}"
                         press="onViewMoreRooms"
                         class="btnViewDetails"
                     /> -->
-                    <VBox height="2rem" />
-                </VBox>
-            </VBox>
-        </content>
-    </Page>
+					<VBox height="2rem" /></VBox>
+			</VBox>
+		</content>
+	</Page>
 </mvc:View>

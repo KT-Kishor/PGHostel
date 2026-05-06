@@ -121,7 +121,7 @@ sap.ui.define([
                 }
                 let finalData;
                 if (Object.keys(filters).length === 1 && filters.Type === "Vendor") {
-                    finalData = this._originalStaffData;
+                    finalData = response;
                 } else {
                     finalData = response;
                 }
@@ -131,7 +131,7 @@ sap.ui.define([
                     this._applyStatusGrouping();
                 }.bind(this));
                 this.getView().setModel(model, "mainModel");
-                this._populateUniqueFilterValues(this._originalStaffData);
+                this._populateUniqueFilterValues(finalData);
             }).catch((err) => {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);

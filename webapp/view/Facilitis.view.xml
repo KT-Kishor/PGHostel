@@ -75,11 +75,20 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>yearlyPrice}" tooltip="{i18n>yearlyPrice}"/>
 					</Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>selectionMode}" tooltip="{i18n>selectionMode}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>unitPrice}" tooltip="{i18n>unitPrice}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>minimumQuantity}" tooltip="{i18n>minimumQuantity}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>minimumPrice}" tooltip="{i18n>minimumPrice}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>facilityChargeType}" tooltip="{i18n>facilityChargeType}"/>
 					</Column>
 				</columns>
 				<items>
@@ -93,6 +102,9 @@
 							<Text text="{parts: ['Facilities>PerYearPrice','Facilities>Currency'], formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{Facilities>SelectionMode}" />
 							<Text text="{parts: ['Facilities>UnitPrice','Facilities>Currency'], formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{Facilities>MinimumQty}" />
+							<Text text="{parts: ['Facilities>MinimumPrice','Facilities>Currency'], formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{= ${Facilities>FacilityChargeType} ? ${Facilities>FacilityChargeType} : '-' }"/>
 						</cells>
 					</ColumnListItem>
 				</items>

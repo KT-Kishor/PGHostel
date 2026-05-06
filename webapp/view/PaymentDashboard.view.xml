@@ -1,13 +1,13 @@
-<mvc:View controllerName="sap.ui.com.project1.controller.PaymentDashboard" 
-	xmlns:mvc="sap.ui.core.mvc" 
-	xmlns="sap.m" 
-	xmlns:core="sap.ui.core" 
-	xmlns:fb="sap.ui.comp.filterbar" 
-	xmlns:layout="sap.ui.layout" 
-	xmlns:viz="sap.viz.ui5.controls" 
-	xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds" 
-	xmlns:vizData="sap.viz.ui5.data" 
-	xmlns:f="sap.f" 
+<mvc:View controllerName="sap.ui.com.project1.controller.PaymentDashboard"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:layout="sap.ui.layout"
+	xmlns:viz="sap.viz.ui5.controls"
+	xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vizData="sap.viz.ui5.data"
+	xmlns:f="sap.f"
 	xmlns:com="sap.suite.ui.commons" displayBlock="true" height="100%" busyIndicatorDelay="0">
 	<Page id="hostelDashboardPage" showHeader="true">
 		<headerContent>
@@ -56,7 +56,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-                                <Title text="Invoice Status Distribution {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
+									<Title text="Invoice Status Distribution {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
 									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart" />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart" />
@@ -133,8 +133,7 @@
 							<f:header>
 								<Toolbar class="customdashboard">
 									<Title text="Invoice Value by Customer {headerModel>/filterSuffix}" level="H5"
-									
-wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="Vertical Chart" />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressCustomerBar" tooltip="Bar Chart" />
@@ -216,11 +215,9 @@ wrapping="false" class="Dashboardtitle automatedEllipsis" />
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-
 									<Title 
 									text="Payment Breakdown {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
-									
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="Bar Chart" />
 									<Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="Stacked Horizontal" />

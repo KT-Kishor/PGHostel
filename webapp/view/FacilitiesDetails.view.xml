@@ -1,42 +1,42 @@
 <mvc:View
     controllerName="sap.ui.com.project1.controller.FacilitiesDetails"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:m="sap.m"
-    xmlns:suite="sap.suite.ui.commons"
-    xmlns="sap.uxap"
-    xmlns:uxap="sap.uxap"
-    xmlns:richtexteditor="sap.ui.richtexteditor"
-    xmlns:layout="sap.ui.layout"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:c="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:m="sap.m"
+	xmlns:suite="sap.suite.ui.commons"
+	xmlns="sap.uxap"
+	xmlns:uxap="sap.uxap"
+	xmlns:richtexteditor="sap.ui.richtexteditor"
+	xmlns:layout="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:c="sap.ui.core"
     displayBlock="true"
     height="100%"
-    xmlns:core="sap.ui.core"
+	xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
-    xmlns:u="sap.ui.unified"
+	xmlns:u="sap.ui.unified"
 >
-    <m:Page
+	<m:Page
         navButtonPress="BI_onButtonPress"
         showNavButton="true"
         title="{i18n>facilityDetails}"
     >
-        <m:headerContent>
-            <core:Fragment
+		<m:headerContent>
+			<core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
             />
-        </m:headerContent>
-        <ObjectPageLayout id="FD_id_ObjectPageLayout">
-            <sections>
-                <ObjectPageSection
+		</m:headerContent>
+		<ObjectPageLayout id="FD_id_ObjectPageLayout">
+			<sections>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="FD_id_OrderHeaderSection1"
                     title="{i18n>facilityInformation}"
                 >
-                    <subSections>
-                        <ObjectPageSubSection id="FD_id_dsd1">
-                            <blocks>
-                                <f:SimpleForm
+					<subSections>
+						<ObjectPageSubSection id="FD_id_dsd1">
+							<blocks>
+								<f:SimpleForm
                                     id="FD_id_simpleCompanyDetails"
                                     busyIndicatorDelay="0"
                                     editable="true"
@@ -55,13 +55,13 @@
                                     columnsM="2"
                                     singleContainerFullSize="false"
                                 >
-                                    <f:content>
-                                        <!-- Branch Code -->
-                                        <m:Label
+									<f:content>
+										<!-- Branch Code -->
+										<m:Label
                                             text="Branch Name"
                                             required="true"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             id="FD_id_RoomType123"
                                             placeholder="{i18n>placeSelectBranchCode}"
                                             selectedKey="{FacilitiesModel>/BranchCode}"
@@ -71,18 +71,18 @@
                                             valueStateText="{i18n>selectBranchCode}"
                                             editable="{editable>/Edit}"
                                         >
-                                            <core:ListItem
+											<core:ListItem
                                                 key="{BranchModel>BranchID}"
                                                 text="{BranchModel>Name}"
                                                 additionalText="{BranchModel>BranchID}"
                                             />
-                                        </m:ComboBox>
-                                        <!-- Facility Name -->
-                                        <m:Label
+										</m:ComboBox>
+										<!-- Facility Name -->
+										<m:Label
                                             text="{i18n>facilityname}"
                                             required="true"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_FacilityName"
                                             value="{FacilitiesModel>/FacilityName}"
                                             placeholder="{i18n>placeEnterFacilityName}"
@@ -91,12 +91,12 @@
                                             valueStateText="{i18n>enterFacilityName}"
                                             editable="{editable>/Edit}"
                                         />
-                                        <!-- Type -->
-                                        <m:Label
+										<!-- Type -->
+										<m:Label
                                             text="{i18n>type}"
                                             required="true"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             id="FD_id_FacilityName1"
                                             items="{FacilityType>/}"
                                             placeholder="{i18n>enterType}"
@@ -106,17 +106,16 @@
                                             valueStateText="{i18n>enterFacilityType}"
                                             editable="{editable>/Edit}"
                                         >
-                                            <core:Item
+											<core:Item
                                                 key="{FacilityType>ID}"
                                                 text="{FacilityType>FacilityName}"
                                             />
-                                        </m:ComboBox>
-
-                                        <m:Label
+										</m:ComboBox>
+										<m:Label
                                             text="Selection Mode"
                                             required="true"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             id="id_SelectionMode"
                                             selectedKey="{FacilitiesModel>/SelectionMode}"
                                             items="{SelectionModeModel>/}"
@@ -125,30 +124,45 @@
                                             change="onSelectionModeChange"
                                             editable="{editable>/Edit}"
                                         >
-                                            <core:Item
+											<core:Item
                                                 key="{SelectionModeModel>key}"
                                                 text="{SelectionModeModel>text}"
                                             />
-                                        </m:ComboBox>
-                                        	<m:Label
-                    text="Minimum Quantity"
+										</m:ComboBox>
+										<m:Label
+                    text="Maximum Quantity"
                     required="true"
                 />
-				<m:Input
+										<m:Input
                     id="ideditMinimumQuantity"
                     value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Minimum Quantity"
-                    valueStateText="Enter Minimum Quantity"
+                    placeholder="Enter Maximum Quantity"
+                    valueStateText="Enter Maximum Quantity"
                     editable="{editable>/Edit}"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="2"
                 />
-                	<m:Label
+										<m:Label 
+                        text="Billing Frequency" 
+                        visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }" 
+                        required="true"/>
+										<m:RadioButtonGroup 
+                        id="id_PeriodSelection" 
+                        columns="2" 
+                        select=".onPeriodTypeSelect" 
+                        visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
+                        selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'ONCE_PER_BOOKING' ? 1 : -1) }" editable="{editable>/Edit}">
+											<m:buttons>
+												<m:RadioButton text="Daily" />
+												<m:RadioButton text="ONCE_PER_BOOKING" />
+											</m:buttons>
+										</m:RadioButtonGroup>
+										<m:Label
                     text="Minimum Price"
-                    required="true"
+                    required="true" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                 />
-				<m:Input
+										<m:Input
                     id="ideditMinimumPrice"
                     value="{FacilitiesModel>/MinimumPrice}"
                     placeholder="Enter Minimum Price"
@@ -158,12 +172,12 @@
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="10"
                 />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>unitPrice}"
                                             required="true"
-                                            visible="{FacilitiesModel>/RequiresUnitPrice}"
+                                             visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_UnitPrice"
                                             placeholder="{i18n>enterUnitPrice}"
                                             value="{FacilitiesModel>/UnitPrice}"
@@ -171,66 +185,66 @@
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
                                             valueStateText="{i18n>enterUnitPrice}"
-                                            visible="{FacilitiesModel>/RequiresUnitPrice}"
+                                               visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>hourlyPrice}"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_PerHourPrice"
                                             placeholder="{i18n>enterPerHourPrice}"
                                             value="{FacilitiesModel>/PerHourPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>dailyPrice}"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_PerDayPrice"
                                             placeholder="{i18n>enterPerDayPrice}"
                                             value="{FacilitiesModel>/PerDayPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>monthlyPrice}"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_PerMonthPrice"
                                             placeholder="{i18n>enterPerMonthPrice}"
                                             value="{FacilitiesModel>/PerMonthPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Label
+										<m:Label
                                             text="{i18n>yearlyPrice}"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <m:Input
+										<m:Input
                                             id="FD_id_PerYearPrice"
                                             placeholder="{i18n>enterPerYearPrice}"
                                             value="{FacilitiesModel>/PerYearPrice}"
                                             maxLength="10"
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
-                                            visible="{= !${FacilitiesModel>/RequiresUnitPrice} }"
+                                            visible="{= !(${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service') }"
                                         />
-                                        <!-- Currency -->
-                                        <m:Label
+										<!-- Currency -->
+										<m:Label
                                             text="{i18n>currency}"
                                             required="true"
                                         />
-                                        <m:ComboBox
+										<m:ComboBox
                                             id="FD_id_Currency"
                                             selectedKey="{FacilitiesModel>/Currency}"
                                             items="{CurrencyModel>/}"
@@ -240,38 +254,38 @@
                                             placeholder="{i18n>selectCurrency}"
                                             editable="{editable>/Edit}"
                                         >
-                                            <c:Item
+											<c:Item
                                                 key="{CurrencyModel>currency}"
                                                 text="{CurrencyModel>currency}"
                                             />
-                                        </m:ComboBox>
-                                    </f:content>
-                                </f:SimpleForm>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-                <ObjectPageSection
+										</m:ComboBox>
+									</f:content>
+								</f:SimpleForm>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+				<ObjectPageSection
                     titleUppercase="false"
                     id="FD_id_rderSection"
                     title="{i18n>images}"
                 >
-                    <subSections>
-                        <ObjectPageSubSection id="FD_id_ordersection">
-                            <blocks>
-                                <m:VBox>
-                                    <m:HBox
+					<subSections>
+						<ObjectPageSubSection id="FD_id_ordersection">
+							<blocks>
+								<m:VBox>
+									<m:HBox
                                         width="100%"
                                         visible="{=${editable>/Edit}}"
                                     >
-                                        <m:MessageStrip
+										<m:MessageStrip
                                             text="Only JPG, JPEG and PNG image formats are allowed."
                                             type="Warning"
                                             showIcon="true"
                                             class="sapUiSmallMarginBottom"
                                         />
-                                    </m:HBox>
-                                    <m:HBox
+									</m:HBox>
+									<m:HBox
                                         id="FD_id_ImagesContainer"
                                         wrap="Wrap"
                                         justifyContent="Start"
@@ -279,22 +293,22 @@
                                         class="sapUiSmallMargin"
                                         items="{DisplayImagesModel>/DisplayImages}"
                                     >
-                                        <m:VBox
+										<m:VBox
                                             class="sapUiSmallMarginEnd sapUiSmallMarginBottom"
                                             width="150px"
                                             alignItems="Center"
                                             justifyContent="Center"
                                         >
-                                            <!-- Normal Image Display -->
-                                            <m:Image
+											<!-- Normal Image Display -->
+											<m:Image
                                                 src="{DisplayImagesModel>src}"
                                                 width="120px"
                                                 height="120px"
                                                 press="onImagePress"
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === false }"
                                             />
-                                            <!-- Placeholder Box (visible only when no image) -->
-                                            <m:VBox
+											<!-- Placeholder Box (visible only when no image) -->
+											<m:VBox
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
                                                 width="120px"
                                                 height="120px"
@@ -302,7 +316,7 @@
                                                 justifyContent="Center"
                                                 class="placeholderBox"
                                             >
-                                                <u:FileUploader
+												<u:FileUploader
                                                     icon="sap-icon://add"
                                                     width="120px"
                                                     style="Transparent"
@@ -314,9 +328,9 @@
                                                     visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
                                                     change=".onFileSelected"
                                                 />
-                                            </m:VBox>
-                                            <!-- Delete icon -->
-                                            <m:Button
+											</m:VBox>
+											<!-- Delete icon -->
+											<m:Button
                                                 icon="sap-icon://delete"
                                                 visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
                                                 press=".onDeleteImage"
@@ -324,27 +338,27 @@
                                                 tooltip="{i18n>deleteImage}"
                                                 width="100%"
                                             />
-                                        </m:VBox>
-                                    </m:HBox>
-                                </m:VBox>
-                            </blocks>
-                        </ObjectPageSubSection>
-                    </subSections>
-                </ObjectPageSection>
-            </sections>
-        </ObjectPageLayout>
-        <m:footer>
-            <m:Bar id="FD_id_FooterBar">
-                <m:contentLeft>
-                    <m:Link
+										</m:VBox>
+									</m:HBox>
+								</m:VBox>
+							</blocks>
+						</ObjectPageSubSection>
+					</subSections>
+				</ObjectPageSection>
+			</sections>
+		</ObjectPageLayout>
+		<m:footer>
+			<m:Bar id="FD_id_FooterBar">
+				<m:contentLeft>
+					<m:Link
                         text="{i18n>devlopby}"
                         href="https://kalpavrikshatechnologies.com/"
                         target="_blank"
                         class="customLinkWhiteBg"
                     />
-                </m:contentLeft>
-                <m:contentRight>
-                    <m:Button
+				</m:contentLeft>
+				<m:contentRight>
+					<m:Button
                         id="FD_id_editButton"
                         visible="{= !${editable>/Edit} &amp;&amp; ${LoginModel>/Role} !== 'Front Office Employee' }"
                         text="{i18n>MSedit}"
@@ -352,7 +366,7 @@
                         class="myUnifiedBtn"
                         press="BI_onEditButtonPress"
                     />
-                    <m:Button
+					<m:Button
                         id="FD_id_SaveButton"
                         visible="{=${editable>/Edit}}"
                         text="{i18n>save}"
@@ -360,8 +374,8 @@
                         class="myUnifiedBtn"
                         press="BT_onsavebuttonpress"
                     />
-                </m:contentRight>
-            </m:Bar>
-        </m:footer>
-    </m:Page>
+				</m:contentRight>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
 </mvc:View>

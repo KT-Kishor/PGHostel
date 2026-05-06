@@ -9,7 +9,6 @@
     title="{i18n>addfacilities}"
     contentWidth="80%"
         >
-		
 		<f:SimpleForm
             editable="true"
                 layout="ColumnLayout"
@@ -82,20 +81,27 @@
                         text="{SelectionModeModel>text}"
                     />
 				</ComboBox>
-                	<Label
-                    text="Minimum Quantity"
+				<Label
+                    text="Maximum Quantity"
                     required="true"
                 />
 				<Input
                     id="idMinimumQuantity"
                     value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Minimum Quantity"
-                    valueStateText="Enter Minimum Quantity"
+                    placeholder="Enter Maximum Quantity"
+                    valueStateText="Enter Maximum Quantity"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="2"
                 />
-                	<Label
+				<Label text="Billing Frequency" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY }" required="true"/>
+				<RadioButtonGroup id="id_PeriodSelect" columns="2" select=".onPeriodTypeSelect" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY'}" selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'ONCE_PER_BOOKING' ? 1 : -1) }">
+					<buttons >
+						<RadioButton text="Daily" />
+						<RadioButton text="ONCE_PER_BOOKING" />
+					</buttons>
+				</RadioButtonGroup>
+				<Label
                     text="Minimum Price"
                     required="true"
                 />
@@ -111,7 +117,7 @@
 				<Label
                     text="{i18n>unitPrice}"
                     required="true"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' }"
+                    visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
                 />
 				<Input
                     id="idUnitPrice"
@@ -120,7 +126,7 @@
                     maxLength="7"
                     liveChange="onPriceChange"
                     valueStateText="{i18n>enterUnitPrice}"
-                    visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' || ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' }"
+                    visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
                 />
 				<Label
                     text="{i18n>hourlyPrice}"

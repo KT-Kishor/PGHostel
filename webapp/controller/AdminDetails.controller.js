@@ -636,8 +636,8 @@ sap.ui.define([
                         FacilityBasicprice = FacilityBasicprice.PerYearPrice
                     } else if (f.UnitText === "Per Hour") {
                         FacilityBasicprice = FacilityBasicprice.PerHourPrice
-                    } else if (f.UnitText === "Unit Price") {
-                        FacilityBasicprice = FacilityBasicprice.UnitPrice
+                    } else if (f.UnitText === "Unit Price" || f.UnitText === "Package Price") {
+                        FacilityBasicprice = FacilityBasicprice.UnitPrice !== "0" ? FacilityBasicprice.UnitPrice : FacilityBasicprice.MinimumPrice
 
                     }
 
@@ -717,7 +717,7 @@ sap.ui.define([
                         const totalHours = f.TotalHour || 0;
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
-                    } else if (unit === "Unit Price") {
+                    } else if (unit === "Unit Price" || unit === "Package Price") {
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
@@ -875,7 +875,7 @@ sap.ui.define([
             sap.ui.getCore().byId("editStartTime").setVisible(false).setValueState("None")
             sap.ui.getCore().byId("editEndTime").setVisible(false).setValueState("None")
             sap.ui.getCore().byId("editHours").setVisible(false)
-            sap.ui.getCore().byId("editFacilityName").setValueState("None")
+            sap.ui.getCore().byId("editFacilityName").setValueState("None").setSelectedKey("")
             sap.ui.getCore().byId("editStartDate").setValueState("None").setEditable(true)
             sap.ui.getCore().byId("editEndDate").setValueState("None")
             sap.ui.getCore().byId("editquantity").setValueState("None")
@@ -952,7 +952,14 @@ sap.ui.define([
 
             if (oSelectedFacility.SelectionMode === "PERSON_QTY") {
                 aAllowedRateTypes = ["Unit Price"];
+                sap.ui.getCore().byId("idUnitType").setVisible(false)
+                sap.ui.getCore().byId("editquantity").setEditable(false)
 
+                this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
+                this.UnitTextChange()
+            } else {
+                oUnitType.setSelectedKey("").setVisible(true);
+                sap.ui.getCore().byId("editquantity").setEditable(true)
             }
             var _aOriginalRateTypes = [
                 { "RateType": "Per Day" },
@@ -970,7 +977,7 @@ sap.ui.define([
                 if (rt.RateType === "Per Month") return Number(oSelectedFacility.PerMonthPrice) !== 0;
                 if (rt.RateType === "Per Year") return Number(oSelectedFacility.PerYearPrice) !== 0;
                 if (rt.RateType === "Per Hour") return Number(oSelectedFacility.PerHourPrice) !== 0;
-                if (rt.RateType === "Unit Price") return Number(oSelectedFacility.UnitPrice) !== 0;
+                if (rt.RateType === "Unit Price") return Number(oSelectedFacility.UnitPrice) !== 0 || Number(oSelectedFacility.MinimumPrice) !== 0;
 
                 return true;
             });
@@ -980,7 +987,6 @@ sap.ui.define([
             oRateTypeModel.setData(aFilteredRateTypes);
 
             // 9. Show UnitType dropdown
-            oUnitType.setSelectedKey("").setVisible(true);
         },
         onPeriodTypeSelect: function (oEvent) {
             var selectedKey = oEvent.getSource().getSelectedIndex();
@@ -1017,15 +1023,71 @@ sap.ui.define([
         },
         onMemberNameChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            if (this.getView().getModel("edit").getProperty("/UnitText") === "Package Price" || this.getView().getModel("edit").getProperty("/UnitText") === "Unit Price") {
+                this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
+            }
         },
-        onUnitTextChange: function (oEvent) {
+        UnitTextChange: function () {
+            sap.ui.getCore().byId("idMonthYearSelectFragment").setVisible(false);
+
+            var editdata = this.getView().getModel("edit")
+            var data = this.getView().getModel("Facilities").getData()
+            var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
+            var SAdditionalText = sap.ui.getCore().byId("editFacilityName").getSelectedItem().getAdditionalText()
+
+
+
+            var Duration = "Unit Price";
+
+            var FPrice = data.find((item) => {
+                return item.FacilityName === Sfacilityname && item.FacilityChargeType === SAdditionalText
+            })
+            editdata.setProperty("/Currency", FPrice.Currency)
+
+
+
+            if (Duration === "Unit Price") {
+                editdata.setProperty("/Price", FPrice.MinimumPrice)
+                sap.ui.getCore().byId("editquantity").setVisible(true).setValue(FPrice.MinimumQty)
+                if (FPrice.FacilityChargeType === "Daily") {
+                    sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(0)
+                } else {
+                    sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(1)
+                }
+
+
+                var Bookingdata = this.getView().getModel("Bookingmodel").getData();
+                if (FPrice.FacilityChargeType !== "Daily") {
+                    sap.ui.getCore().byId("editStartDate").setEditable(false)
+                    sap.ui.getCore().byId("editEndDate").setEditable(false)
+                    var oEditModel = this.getView().getModel("edit");
+
+                    oEditModel.setProperty("/StartDate", Bookingdata.StartDate);
+                    oEditModel.setProperty("/EndDate", Bookingdata.EndDate);
+                    sap.ui.getCore().byId("editDays").setVisible(false)
+
+                } else {
+                    sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                    sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
+                    sap.ui.getCore().byId("editDays").setVisible(true)
+
+                }
+
+            }
+
+
+
+        },
+
+        onUnitTextChange: function (oEvent, flag) {
 
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             var editdata = this.getView().getModel("edit")
             var data = this.getView().getModel("Facilities").getData()
             var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
 
-            var Duration = sap.ui.getCore().byId("idUnitType").getSelectedKey();
+
+            var Duration = sap.ui.getCore().byId("idUnitType")?.getSelectedKey();
 
             var FPrice = data.find((item) => {
                 return item.FacilityName === Sfacilityname
@@ -1045,17 +1107,43 @@ sap.ui.define([
             }
             if (Duration === "Per Month") {
                 editdata.setProperty("/Price", FPrice.PerMonthPrice)
+                sap.ui.getCore().byId("editEndDate").setEditable(false)
+
             }
             if (Duration === "Per Year") {
                 editdata.setProperty("/Price", FPrice.PerYearPrice)
+                sap.ui.getCore().byId("editEndDate").setEditable(false)
+
             }
             if (Duration === "Unit Price") {
-                editdata.setProperty("/Price", FPrice.UnitPrice)
-                sap.ui.getCore().byId("editquantity").setVisible(true).setValue("")
-                sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(0)
-                sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
-                sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
-                sap.ui.getCore().byId("editDays").setVisible(true)
+                editdata.setProperty("/Price", FPrice.MinimumPrice)
+                sap.ui.getCore().byId("editquantity").setVisible(true).setValue(FPrice.MinimumQty)
+                if (FPrice.FacilityChargeType === "Daily") {
+                    sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(0)
+                } else {
+                    sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(1)
+                }
+
+
+                var Bookingdata = this.getView().getModel("Bookingmodel").getData();
+                if (FPrice.FacilityChargeType !== "Daily") {
+                    sap.ui.getCore().byId("editStartDate").setEditable(false)
+                    sap.ui.getCore().byId("editEndDate").setEditable(false)
+                    var oEditModel = this.getView().getModel("edit");
+
+                    oEditModel.setProperty("/StartDate", Bookingdata.StartDate);
+                    oEditModel.setProperty("/EndDate", Bookingdata.EndDate);
+                    sap.ui.getCore().byId("editDays").setVisible(false)
+
+                } else {
+                    sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                    sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
+                    sap.ui.getCore().byId("editDays").setVisible(true)
+
+                }
+
+
+
 
 
             } else if (FPrice.SelectionMode === "QTY") {
@@ -1069,11 +1157,10 @@ sap.ui.define([
                 sap.ui.getCore().byId("editquantity").setVisible(false)
                 sap.ui.getCore().byId("id_Period").setVisible(false)
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
-                sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editDays").setVisible(true)
             }
-            editdata.setProperty("/StartDate", "")
-            editdata.setProperty("/EndDate", "")
+            // editdata.setProperty("/StartDate", "")
+            // editdata.setProperty("/EndDate", "")
 
             editdata.setProperty("/TotalDays", "")
             editdata.setProperty("/CouponCode", "")
@@ -1085,11 +1172,14 @@ sap.ui.define([
         onEditDateChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oModel = this.getView().getModel("edit");
-            const sUnit = oModel.getProperty("/UnitText");
+            let sUnit = oModel.getProperty("/UnitText") || "Unit Price";
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
 
 
+            if (sUnit === "Package Price") {
+                sUnit = "Unit Price"
+            }
 
             if (!sUnit || !sStartDate) return;
 
@@ -1119,6 +1209,9 @@ sap.ui.define([
                 if (sEndDate <= sStartDate) {
                     sap.m.MessageToast.show("Please select a valid date");
                     oModel.setProperty("/EndDate", "");
+                    if (sUnit === "Unit Price") {
+                        oModel.setProperty("/UnitText", sUnit);
+                    }
                     return;
                 }
             }
@@ -1172,6 +1265,20 @@ sap.ui.define([
                     oEnd = null;
                     iDays = 0;
                 }
+            } else if (sUnit === "Unit Price") {
+                if (oStart && oEnd) {
+                    let iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
+
+                    if (iDays >= 0) {
+                        // valid case
+                    } else {
+                        iDays = 0; // or handle error
+                    }
+                } else {
+                    iDays = 0; // when end date not selected
+                }
+                oModel.setProperty("/UnitText", sUnit);
+                oModel.refresh(true);
             }
             if (oEnd && iDays === 0) {
                 iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
@@ -1283,7 +1390,19 @@ sap.ui.define([
 
             var selectionmode = oPayload.SelectionMode
                 || this.SelectionMode;
-            if (oPayload.UnitText !== "Unit Price" &&
+            if (selectionmode === "PERSON_QTY") {
+                if (
+                    !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
+                    !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editquantity"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editStartDate"), "ID") ||
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editEndDate"), "ID")
+                ) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    return;
+                }
+            }
+            else if (oPayload.UnitText !== "Unit Price" &&
                 oPayload.UnitText !== "" && oPayload.quantity !== "" && selectionmode !== "QTY") {
 
                 if (
@@ -1296,12 +1415,11 @@ sap.ui.define([
                     return;
                 }
 
-            } else if ((selectionmode === "PERSON_QTY" || selectionmode === "PERSON") && oCustomerData.AllMembers.length !== 0) {
+            } else if ((selectionmode === "PERSON") && oCustomerData.AllMembers.length !== 0) {
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editMembername"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idUnitType"), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editquantity"), "ID") ||
                     !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editStartDate"), "ID") ||
                     !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editEndDate"), "ID")
                 ) {
@@ -1315,7 +1433,6 @@ sap.ui.define([
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idUnitType"), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editquantity"), "ID") ||
                     !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editStartDate"), "ID") ||
                     !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("editEndDate"), "ID")
                 ) {
@@ -1402,34 +1519,38 @@ sap.ui.define([
             } else if (oPayload.UnitText === "Unit Price") {
 
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                    if (this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
-                        && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
-                        if (iDays === 1) {
-                            finalPrice = this.SelectedFacility.MinimumPrice
-                        } else {
-                            var DisDays = iDays - 1
-                            finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * DisDays * iquantity)
-                        }
-                    } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
-                        var Disqty = iquantity - this.SelectedFacility.MinimumQty
-                        finalPrice = Number(this.SelectedFacility.MinimumPrice) + (Disqty * basePrice * iDays)
+                    // if (this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
+                    //     && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
+                    //     if (iDays === 1) {
+                    //         finalPrice = this.SelectedFacility.MinimumPrice
+                    //     } else {
+                    //         var DisDays = iDays - 1
+                    //         finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * DisDays * iquantity)
+                    //     }
+                    // } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
+                    //     var Disqty = iquantity - this.SelectedFacility.MinimumQty
+                    //     finalPrice = Number(this.SelectedFacility.MinimumPrice) + (Disqty * basePrice * iDays)
 
-                    } else {
-                        finalPrice = basePrice * iquantity * iDays;
-                    }
+                    // } else {
+                    //     finalPrice = basePrice * iquantity * iDays;
+                    // }
+                    finalPrice = basePrice * iDays;
+
                 } else {
-                    if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
-                        && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
-                        finalPrice = this.SelectedFacility.MinimumPrice
+                    // if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
+                    //     && this.SelectedFacility.SelectionMode === "PERSON_QTY") {
+                    //     finalPrice = this.SelectedFacility.MinimumPrice
 
 
-                    } else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
-                        var Quantity = iquantity - this.SelectedFacility.MinimumQty
-                        finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * Quantity)
-                    } else {
-                        finalPrice = basePrice * iquantity;
+                    // } 
+                    // else if (this.SelectedFacility.SelectionMode === "PERSON_QTY" && iquantity > this.SelectedFacility.MinimumQty) {
+                    //     var Quantity = iquantity - this.SelectedFacility.MinimumQty
+                    //     finalPrice = Number(this.SelectedFacility.MinimumPrice) + (basePrice * Quantity)
+                    // } else {
+                    //     finalPrice = basePrice * iquantity;
 
-                    }
+                    // }
+                    finalPrice = this.SelectedFacility.MinimumPrice
                 }
 
             }
@@ -1450,13 +1571,50 @@ sap.ui.define([
             }
 
 
-
+            if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
+                oPayload.UnitText = "Package Price"
+            }
             // Remove unwanted fields
 
             // Ensure array exists
             if (!oCustomerData.AllSelectedFacilities) {
                 oCustomerData.AllSelectedFacilities = [];
             }
+
+            const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
+                item.FacilityName === oPayload.FacilityName &&
+                item.FacilityChargeType === "ONCE_PER_BOOKING" && item.MemberName === oPayload.MemberName
+            );
+
+            if (oDuplicate) {
+                sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
+                return;
+            }
+      if(oPayload.UnitText === "Package Price"){
+            const newStart = this._parseDate(oPayload.StartDate);
+const newEnd = this._parseDate(oPayload.EndDate);
+
+const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+    // ✅ Only check for SAME member
+    if (item.MemberName !== oPayload.MemberName) {
+        return false;
+    }
+
+    const oldStart = this._parseDate(item.StartDate);
+    const oldEnd = this._parseDate(item.EndDate);
+
+    // ✅ Block ONLY if dates overlap
+    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityChargeType === "DAILY" ;
+
+    return isOverlap;
+});
+
+if (oDuplicatedates) {
+    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+    return;
+}
+      }
 
             // UPDATE existing OR ADD new
             if (this._editIndex !== undefined) {
@@ -2069,6 +2227,10 @@ sap.ui.define([
             var oContext = oSelectedItem.getBindingContext("CustomerData");
             var oSelectedData = oContext.getObject();
 
+            if (oSelectedData.UnitText === "Package Price") {
+                sap.m.MessageToast.show(this.i18nModel.getText("wecannoteditthePackagePricefacility"));
+                return;
+            }
             var editCouponCode = sap.ui.getCore().byId("ID_editCouponCode");
 
             if (editCouponCode) {
@@ -2140,10 +2302,12 @@ sap.ui.define([
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
                 sap.ui.getCore().byId("editDays").setVisible(false)
             } else if (oSelectedData.SelectionMode === "QTY" || (oSelectedData.quantity !== undefined && oSelectedData.quantity !== "")) {
-                sap.ui.getCore().byId("editquantity").setVisible(true)
+                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
+                sap.ui.getCore().byId("id_Period").setVisible(false)
+
             } else {
                 sap.ui.getCore().byId("editquantity").setVisible(false)
 
@@ -2171,7 +2335,7 @@ sap.ui.define([
 
             if (!oSelectedFacility) return;
             // 5. Get booking unitText
-            var oBookingModel = this.getView().getModel("Bookingmodel");
+            var oBookingModel = this.getView().getModel("edit");
             var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
@@ -2183,6 +2347,10 @@ sap.ui.define([
 
             // 6. Define allowed rate types based on booking unitText
             var aAllowedRateTypes = [];
+              if (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "QTY") {
+                aAllowedRateTypes = ["Unit Price"];
+
+            }
             if (sUnitText === "Per Month" || sUnitText === "monthly") {
                 aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
             } else if (sUnitText === "Per Day" || sUnitText === "daily") {
@@ -2192,10 +2360,7 @@ sap.ui.define([
             } else {
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
-            if (oSelectedFacility.SelectionMode === "PERSON_QTY") {
-                aAllowedRateTypes = ["Unit Price"];
-
-            }
+          
             var _aOriginalRateTypes = [
                 { "RateType": "Per Day" },
                 { "RateType": "Per Hour" },
@@ -2272,6 +2437,7 @@ sap.ui.define([
                         if (oAction === sap.m.MessageBox.Action.OK) {
 
                             // Backend call
+                            that.getBusyDialog()
                             that.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
                                 filters: {
                                     FacilityID: sFacilityID
@@ -2284,6 +2450,7 @@ sap.ui.define([
                                     }
 
                                     that._recalculateFacilityTotals(oCustomerData);
+                                    that.closeBusyDialog()
 
                                     // Force UI update
                                     oCustomerModel.refresh(true);
@@ -2308,6 +2475,7 @@ sap.ui.define([
             }
 
             this._recalculateFacilityTotals(oCustomerData);
+            this.closeBusyDialog()
 
             oCustomerModel.refresh(true);
             oTable.removeSelections(true);
@@ -3225,117 +3393,160 @@ sap.ui.define([
                         actions: ["Change", "Cancel"],
                         emphasizedAction: "Change",
                         styleClass: "myUnifiedBtn",
+    onClose: function (oAction) {
 
-                        onClose: function (oAction) {
+    if (oAction === "Change") {
 
-                            if (oAction === "Change") {
+        let bookingStart = that._parseDate(Bookingdata.StartDate);
+        let bookingEnd = that._parseDate(Bookingdata.EndDate);
 
-                                const bookingStart = that._parseDate(Bookingdata.StartDate);
-                                const bookingEnd = that._parseDate(Bookingdata.EndDate);
+        // ✅ Safety: prevent negative dates
+        if (bookingEnd < bookingStart) {
+            sap.m.MessageToast.show("End date cannot be before start date");
+            return;
+        }
 
-                                let totalFacilityPrice = 0;
+        // ✅ IMPORTANT: make sure this is LET (not const)
+        let facilityItems = CustomerData.AllSelectedFacilities || [];
 
-                                facilityItems.forEach(item => {
+        // ✅ Remove duplicate Package Price items
+        facilityItems = facilityItems.filter((item, index, self) => {
 
+            if (item.UnitText?.toLowerCase() !== "package price") {
+                return true;
+            }
 
-                                    var oSelectedFacility = aFacilities.find(f => f.FacilityName === item.FacilityName);
+            const firstIndex = self.findIndex(x =>
+                x.FacilityName === item.FacilityName &&
+                x.MemberName === item.MemberName &&
+                x.UnitText?.toLowerCase() === "package price"
+            );
 
-                                    item.StartDate = Bookingdata.StartDate;
-                                    item.EndDate = Bookingdata.EndDate;
+            return index === firstIndex;
+        });
 
-                                    const startDate = bookingStart;
-                                    const endDate = bookingEnd;
+        let totalFacilityPrice = 0;
 
-                                    let diffTime = endDate - startDate;
-                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        facilityItems.forEach(item => {
 
+            let oSelectedFacility = aFacilities.find(f =>
+                f.FacilityName === item.FacilityName
+            );
 
-                                    let unit = item.UnitText?.toLowerCase();
-                                    let price = Number(item.Price || 0);
-                                    let total = 0;
+            // ✅ Update dates
+            item.StartDate = Bookingdata.StartDate;
+            item.EndDate = Bookingdata.EndDate;
 
-                                    if (unit === "per day") {
-                                        let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                        total = item.quantity ? item.quantity * days * price : days * price;
-                                        item.TotalDays = days;
+            let diffTime = bookingEnd - bookingStart;
 
-                                    } else if (unit === "per hour") {
-                                        let hours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total = item.quantity ? item.quantity * hours * price : hours * price;
+            // ✅ Always at least 1 day
+            let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-                                    } else if (unit === "per month") {
+            let unit = item.UnitText?.toLowerCase();
+            let price = Number(item.Price || 0);
+            let total = 0;
 
-                                        let months = CustomerData.PaymentType === "yearly"
-                                            ? CustomerData.Duration * 12
-                                            : CustomerData.Duration;
+            if (unit === "per day") {
 
-                                        total = item.quantity ? item.quantity * months * price : months * price;
-                                        item.TotalMonths = months;
+                total = item.quantity
+                    ? item.quantity * diffDays * price
+                    : diffDays * price;
 
-                                    } else if (unit === "per year") {
+                item.TotalDays = diffDays;
 
-                                        let years = CustomerData.Duration;
-                                        total = item.quantity ? item.quantity * years * price : years * price;
-                                        item.TotalYears = years;
-                                    } else if (unit === "unit price") {
-                                        let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            total = price * Number(item.quantity);
+            } else if (unit === "per hour") {
 
-                                         if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
-                                                total = oSelectedFacility.MinimumPrice
-                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
-                                            } else {
-                                                total = price * Number(item.quantity);
+                let hours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
-                                            }
-                                        } else {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && item.SelectionMode === "PERSON_QTY") {
-                                                if (diffDays === 1) {
-                                                    total = Number(oSelectedFacility.MinimumPrice)
-                                                } else {
-                                                    var DisDays = diffDays - 1
-                                                    total = Number(oSelectedFacility.MinimumPrice) + (price * DisDays * Number(item.quantity))
-                                                }
-                                            } else if (item.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Disqty = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (Disqty * price * diffDays)
+                total = item.quantity
+                    ? item.quantity * hours * price
+                    : hours * price;
 
-                                            } else {
-                                                total = price * Number(item.quantity) * diffDays;
-                                            }
-                                        }
-                                    }
+            } else if (unit === "per month") {
 
-                                    item.TotalAmount = item.CouponDiscount !== "" || item.CouponDiscount !== "0.00" ? total - Number(item.CouponDiscount) : total;
-                                    totalFacilityPrice += total;
-                                });
+                let months = CustomerData.PaymentType === "yearly"
+                    ? CustomerData.Duration * 12
+                    : CustomerData.Duration;
 
-                                CustomerData.TotalFacilityPrice = totalFacilityPrice;
+                total = item.quantity
+                    ? item.quantity * months * price
+                    : months * price;
 
-                                if (CustomerData.GSTType === "CGST/SGST") {
-                                    CustomerData.GrandTotal =
-                                        (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
-                                        ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100) * 2;
-                                } else if (CustomerData.GSTType === "IGST") {
-                                    CustomerData.GrandTotal =
-                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice + ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100);
-                                } else {
-                                    CustomerData.GrandTotal =
-                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice
-                                };
-                                CustomerData.DueAmount = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal;
+                item.TotalMonths = months;
 
+            } else if (unit === "per year") {
 
-                                that.getView().getModel("CustomerData").refresh(true);
+                let years = CustomerData.Duration;
 
-                                that.onSaveBooking();
-                            }
-                        }
+                total = item.quantity
+                    ? item.quantity * years * price
+                    : years * price;
+
+                item.TotalYears = years;
+
+            } else if (unit === "unit price" || unit === "package price") {
+
+                if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+
+                    total = price;
+
+                } else {
+
+                    if (oSelectedFacility?.MinimumQty &&
+                        item.SelectionMode === "PERSON_QTY") {
+
+                        total = price * diffDays;
+
+                    } else {
+
+                        total = price * Number(item.quantity || 1) * diffDays;
+                    }
+                }
+            }
+
+            // ✅ Fixed coupon logic
+            item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00")
+                ? total - Number(item.CouponDiscount)
+                : total;
+
+            totalFacilityPrice += item.TotalAmount;
+        });
+
+        // ✅ Update totals
+        CustomerData.TotalFacilityPrice = totalFacilityPrice;
+
+        let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+
+        if (CustomerData.GSTType === "CGST/SGST") {
+
+            CustomerData.GrandTotal =
+                baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+
+        } else if (CustomerData.GSTType === "IGST") {
+
+            CustomerData.GrandTotal =
+                baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
+
+        } else {
+
+            CustomerData.GrandTotal = baseAmount;
+        }
+
+        // ✅ Due amount
+        CustomerData.DueAmount = CustomerData.PaymentPaid
+            ? CustomerData.GrandTotal - CustomerData.PaymentPaid
+            : CustomerData.GrandTotal;
+
+        // ✅ Assign back (important)
+        CustomerData.AllSelectedFacilities = facilityItems;
+
+        // ✅ Refresh model
+        that.getView().getModel("CustomerData").refresh(true);
+
+        // ✅ Save
+        that.onSaveBooking();
+    }
+}
                     }
                 );
 
@@ -3395,120 +3606,153 @@ sap.ui.define([
                         emphasizedAction: sap.m.MessageBox.Action.OK,
                         styleClass: "myUnifiedBtn",
 
-                        onClose: function (sAction) {
-                            if (sAction === "Extend Now") {
+                       onClose: function (sAction) {
 
-                                const bookingEndDate = that._parseDate(Bookingdata.EndDate);
-                                let totalFacilityPrice = 0;
+    if (sAction === "Extend Now") {
 
-                                facilityItems.forEach(item => {
+        let bookingEndDate = that._parseDate(Bookingdata.EndDate);
 
-                                    const startDate = that._parseDate(item.StartDate);
-                                    var oSelectedFacility = aFacilities.find(f => f.FacilityName === item.FacilityName);
+        if (!bookingEndDate) {
+            sap.m.MessageToast.show("Invalid End Date");
+            return;
+        }
 
+        // ✅ IMPORTANT: use LET (not const)
+        let facilityItems = CustomerData.AllSelectedFacilities || [];
 
-                                    item.EndDate = Bookingdata.EndDate;
+        let totalFacilityPrice = 0;
 
-                                    let diffTime = bookingEndDate - startDate;
-                                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        facilityItems.forEach(item => {
 
-                                    let unit = item.UnitText?.toLowerCase();
+            let startDate = that._parseDate(item.StartDate);
 
-                                    let price = Number(item.Price || 0);
-                                    let total = 0;
+            if (!startDate) {
+                return;
+            }
 
-                                    if (unit === "per day") {
-                                        total = item.quantity ? item.quantity * diffDays * price : diffDays * price;
-                                        item.TotalDays = diffDays;
+            let oSelectedFacility = aFacilities.find(f =>
+                f.FacilityName === item.FacilityName
+            );
 
-                                    } else if (unit === "per hour") {
-                                        let diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                                        total = item.quantity ? item.quantity * diffHours * price : diffHours * price;
+            // ✅ Update End Date
+            item.EndDate = Bookingdata.EndDate;
 
-                                    }
-                                    else if (unit === "per month") {
-                                        if (CustomerData.PaymentType === "yearly") {
-                                            let months = CustomerData.Duration * 12
-                                            total = item.quantity ? item.quantity * months * price : months * price;
-                                            item.TotalMonths = months;
+            let diffTime = bookingEndDate - startDate;
 
-                                        } else {
-                                            let months = CustomerData.Duration
-                                            total = item.quantity ? item.quantity * months * price : months * price;
-                                            item.TotalMonths = months;
+            // ✅ Prevent negative / zero
+            let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-                                        }
+            let unit = item.UnitText?.toLowerCase();
+            let price = Number(item.Price || 0);
+            let total = 0;
 
-                                    } else if (unit === "per year") {
-                                        let years = CustomerData.Duration;
-                                        total = item.quantity ? item.quantity * years * price : years * price;
-                                        item.TotalYears = years;
-                                    } else if (unit === "unit price") {
-                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && oSelectedFacility.SelectionMode === "PERSON_QTY") {
-                                                total = oSelectedFacility.MinimumPrice
+            if (unit === "per day") {
 
+                total = item.quantity
+                    ? item.quantity * diffDays * price
+                    : diffDays * price;
 
-                                            } else if (oSelectedFacility.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Quantity = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (price * Quantity)
-                                            } else {
-                                                total = price * Number(item.quantity);
+                item.TotalDays = diffDays;
 
-                                            }
+            } else if (unit === "per hour") {
 
-                                        } else {
-                                            if (oSelectedFacility.MinimumQty && Number(item.quantity) <= oSelectedFacility.MinimumQty
-                                                && item.SelectionMode === "PERSON_QTY") {
-                                                if (diffDays === 1) {
-                                                    total = Number(oSelectedFacility.MinimumPrice)
-                                                } else {
-                                                    var DisDays = diffDays - 1
-                                                    total = Number(oSelectedFacility.MinimumPrice) + (price * DisDays * Number(item.quantity))
-                                                }
-                                            } else if (item.SelectionMode === "PERSON_QTY" && Number(item.quantity) > oSelectedFacility.MinimumQty) {
-                                                var Disqty = Number(item.quantity) - oSelectedFacility.MinimumQty
-                                                total = Number(oSelectedFacility.MinimumPrice) + (Disqty * price * diffDays)
+                let diffHours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
-                                            } else {
-                                                total = price * Number(item.quantity) * diffDays;
-                                            }
-                                        }
-                                    }
+                total = item.quantity
+                    ? item.quantity * diffHours * price
+                    : diffHours * price;
 
+            } else if (unit === "per month") {
 
-                                    item.TotalAmount = item.CouponDiscount !== "" || item.CouponDiscount !== "0.00" ? total - Number(item.CouponDiscount) : total;
-                                    totalFacilityPrice += total;
-                                });
+                let months = CustomerData.PaymentType === "yearly"
+                    ? CustomerData.Duration * 12
+                    : CustomerData.Duration;
 
-                                CustomerData.TotalFacilityPrice = totalFacilityPrice;
+                total = item.quantity
+                    ? item.quantity * months * price
+                    : months * price;
 
-                                if (CustomerData.GSTType === "CGST/SGST") {
-                                    CustomerData.GrandTotal =
-                                        (Number(CustomerData.RentPrice || 0) + totalFacilityPrice) +
-                                        ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100) * 2;
-                                } else if (CustomerData.GSTType === "IGST") {
-                                    CustomerData.GrandTotal =
-                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice + ((Number(CustomerData.RentPrice || 0) + totalFacilityPrice) * Number(CustomerData.GSTValue) / 100);
-                                } else {
-                                    CustomerData.GrandTotal =
-                                        Number(CustomerData.RentPrice || 0) + totalFacilityPrice
-                                }
-                                CustomerData.DueAmount = CustomerData.PaymentPaid ? CustomerData.GrandTotal - CustomerData.PaymentPaid : CustomerData.GrandTotal;
+                item.TotalMonths = months;
 
+            } else if (unit === "per year") {
 
-                                that.getView().getModel("CustomerData").refresh(true);
+                let years = CustomerData.Duration;
 
-                                that.call = false;
+                total = item.quantity
+                    ? item.quantity * years * price
+                    : years * price;
 
-                                that.onSaveBooking();
+                item.TotalYears = years;
 
-                            } else {
-                                that.call = true;
-                                that.onSaveBooking();
-                            }
-                        }
+            } else if (unit === "unit price" || unit === "package price") {
+
+                if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+
+                    total = price;
+
+                } else {
+
+                    if (oSelectedFacility?.MinimumQty &&
+                        item.SelectionMode === "PERSON_QTY") {
+
+                        total = price * diffDays;
+
+                    } else {
+
+                        total = price * Number(item.quantity || 1) * diffDays;
+                    }
+                }
+            }
+
+            // ✅ FIXED coupon logic (important)
+            item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00")
+                ? total - Number(item.CouponDiscount)
+                : total;
+
+            totalFacilityPrice += item.TotalAmount;
+        });
+
+        // ✅ Update totals
+        CustomerData.TotalFacilityPrice = totalFacilityPrice;
+
+        let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+
+        if (CustomerData.GSTType === "CGST/SGST") {
+
+            CustomerData.GrandTotal =
+                baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+
+        } else if (CustomerData.GSTType === "IGST") {
+
+            CustomerData.GrandTotal =
+                baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
+
+        } else {
+
+            CustomerData.GrandTotal = baseAmount;
+        }
+
+        // ✅ Due
+        CustomerData.DueAmount = CustomerData.PaymentPaid
+            ? CustomerData.GrandTotal - CustomerData.PaymentPaid
+            : CustomerData.GrandTotal;
+
+        // ✅ Assign back (important)
+        CustomerData.AllSelectedFacilities = facilityItems;
+
+        // ✅ Refresh
+        that.getView().getModel("CustomerData").refresh(true);
+
+        that.call = false;
+
+        that.onSaveBooking();
+
+    } else {
+
+        that.call = true;
+        that.onSaveBooking();
+    }
+}
                     }
                 );
 
@@ -4357,9 +4601,9 @@ sap.ui.define([
                 var subtotal = edit.Price * edit.TotalHour * edit.TotalDays * Number(edit.quantity)
             } else if (edit.UnitText === "Unit Price") {
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                    var subtotal = edit.Price * Number(edit.quantity) * (edit.TotalDays || 1);
+                    var subtotal = edit.Price  * (edit.TotalDays || 1);
                 } else {
-                    var subtotal = edit.Price * Number(edit.quantity);
+                    var subtotal = edit.Price ;
                 }
             }
 

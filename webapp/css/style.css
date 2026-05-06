@@ -5586,3 +5586,10 @@ html, body {
   position: relative;
   z-index: 1;
 }
+.facilityPersonQtyTable .sapMListTblCell {
+    vertical-align: middle;
+}
+
+.facilityPersonQtyTable .sapMListTblHeaderCell {
+    vertical-align: middle;
+}

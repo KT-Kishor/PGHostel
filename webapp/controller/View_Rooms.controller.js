@@ -2225,11 +2225,18 @@ sap.ui.define([
                     // Price logic
                     let price = 0;
                     let unit = "";
-                    const bHasUnitPrice = parseFloat(f.UnitPrice) > 0;
 
-                    if (bHasUnitPrice) {
+                    const hasUnitPrice = parseFloat(f.UnitPrice) > 0;
+                    const hasMinimumPrice = parseFloat(f.MinimumPrice) > 0;
+
+                    if (hasUnitPrice) {
                         price = f.UnitPrice;
                         unit = "Unit Price";
+                    } else if (hasMinimumPrice) {
+                        price = f.MinimumPrice;
+                        unit = f.FacilityChargeType
+                            ? `Minimum / ${f.FacilityChargeType}`
+                            : "Minimum Price";
                     } else if (parseFloat(f.PerHourPrice) > 0) {
                         price = f.PerHourPrice;
                         unit = "Per Hour";
@@ -2248,13 +2255,17 @@ sap.ui.define([
 
                     const hasImage = !!(f.Photo1 && f.Photo1.trim());
                     const name = (f.Type || f.FacilityName || "").trim();
-
                     return {
                         FacilityID: f.ID,
                         FacilityName: f.FacilityName || name,
                         Price: price,
                         UnitText: unit,
                         Currency: f.Currency || "INR",
+
+                        UnitPrice: f.UnitPrice || "0",
+                        MinimumPrice: f.MinimumPrice || "0.00",
+                        MinimumQty: f.MinimumQty || 0,
+                        FacilityChargeType: f.FacilityChargeType || "",
 
                         Image: hasImage
                             ? `data:${f.Photo1Type || "image/jpeg"};base64,${f.Photo1}`

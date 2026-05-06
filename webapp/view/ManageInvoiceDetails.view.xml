@@ -87,8 +87,7 @@
 										<!-- <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>customerName}"
-                                        />
-										<m:Input
+                                        /><m:Input
                                             visible="{visiablityPlay>/createVisi}"
                                             id="MI_id_Cname"
                                             value="{SelectedCustomerModel>/CustomerName}"
@@ -590,7 +589,7 @@
                                                         change="Comp_onChangeGSTCalculation"
                                                     >
 														<core:Item key="YES" text="{i18n>yes}" />
-                                                        <core:Item key="NO" text="{i18n>no}" />
+														<core:Item key="NO" text="{i18n>no}" />
 													</m:Select>
 												</m:cells>
 												<m:cells>

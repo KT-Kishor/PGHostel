@@ -80,7 +80,7 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-                    <Column demandPopin="true">
+					<Column demandPopin="true">
 						<Text text="{i18n>TicketID}" tooltip="{i18n>TicketID}"/>
 					</Column>
 					<Column demandPopin="true">
@@ -101,20 +101,18 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
 					</Column>
-					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
-					</Column> -->
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>Status}" tooltip="{i18n>Status}"/></Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
 					</Column>
-                    <Column demandPopin="true" minScreenWidth="Tablet">
-                        <Text text="{i18n>image}" tooltip="{i18n>image}"/>
-                    </Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
 						<cells>
-                            <Text text="{SupportModel>TicketID}" />
+							<Text text="{SupportModel>TicketID}" />
 							<Text text="{SupportModel>IssueName}" />
 							<Text text="{SupportModel>IssueType}" />
 							<ExpandableText text="{SupportModel>IssueDescription}" maxCharacters="20"/>
@@ -124,7 +122,7 @@
 							<!-- <ObjectStatus inverted="false" text="{SupportModel>Status}"
                             state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${SupportModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${SupportModel>ResolvedDate} === null ? '' : ${path: 'SupportModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
-                            <Button text="{i18n>view}" press="HF_viewroom"/>
+							<Button text="{i18n>view}" press="HF_viewroom"/>
 						</cells>
 					</ColumnListItem>
 				</items>

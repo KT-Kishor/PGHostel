@@ -339,8 +339,8 @@ sap.ui.define([
             // Common UI reset logic (used for confirm & cancel)
             const fnResetSelection = () => {
                 oTable.removeSelections(true);
-                this.byId("AdminDeleteButton").setEnabled(false);
-                this.byId("AdminDownloadButton").setEnabled(false);
+                // this.byId("AdminDeleteButton").setEnabled(false);
+                // this.byId("AdminDownloadButton").setEnabled(false);
             };
             this.showConfirmationDialog(
                 "Confirm",
@@ -844,6 +844,10 @@ sap.ui.define([
         },
 
         onUploadDocumentFile: function () {
+            if (this.UD_Dialog) {
+                this.UD_Dialog.destroy();
+                this.UD_Dialog = null;
+            }
             if (!this.UD_Dialog) {
                 var oView = this.getView();
                 this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.VenderUpload", this);
