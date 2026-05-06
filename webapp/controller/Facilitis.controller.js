@@ -5,15 +5,15 @@ sap.ui.define([
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
-], function (BaseController, utils, Formatter, Spreadsheet, MessageToast, JSONModel) {
+], function(BaseController, utils, Formatter, Spreadsheet, MessageToast, JSONModel) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Facilitis", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteFacilitis").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             var LoginFUnction = await this.commonLoginFunction("ManageFacility");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
@@ -27,7 +27,8 @@ sap.ui.define([
                 PerDayPrice: "",
                 PerMonthPrice: "",
                 PerYearPrice: "",
-                FacilityName: ""
+                FacilityName: "",
+                FacilityChargeType: ""
             });
             this.getView().setModel(model, "FacilitiesModel")
 
@@ -40,9 +41,9 @@ sap.ui.define([
 
             this.getView().setModel(oTokenModel, "tokenModel");
             this.getView().setModel(oUploaderData, "UploaderData");
-            this.sPath=oEvent.getParameter("arguments").sPath
+            this.sPath = oEvent.getParameter("arguments").sPath
             if (oEvent.getParameter("arguments").sPath === "TilePage") {
-            this.onClearAndSearch("FO_id_FilterbarEmployee");
+                this.onClearAndSearch("FO_id_FilterbarEmployee");
             }
             await this._loadBranchCode()
             this.oValue = oEvent.getParameter("arguments").value;
@@ -61,11 +62,11 @@ sap.ui.define([
             }
         },
 
-        FC_onSearch: async function () {
+        FC_onSearch: async function() {
             var aFilterItems = this.byId("FO_id_FilterbarEmployee").getFilterGroupItems();
             var params = {};
 
-            aFilterItems.forEach(function (oItem) {
+            aFilterItems.forEach(function(oItem) {
                 var oControl = oItem.getControl();
                 if (!oControl) return;
 
@@ -90,7 +91,7 @@ sap.ui.define([
             });
         },
 
-        readCallForFacilities: async function (filter) {
+        readCallForFacilities: async function(filter) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -98,9 +99,7 @@ sap.ui.define([
             if (Array.isArray(omainModel) && omainModel.length) {
                 aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode
-                    .split(",")
-                    .map(code => code.trim());
+                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
             }
 
             // Normalize filter
@@ -122,9 +121,6 @@ sap.ui.define([
                     filter.BranchCode = oExistingModel.BranchCode;
                 }
             }
-
-
-
 
             this.getBusyDialog()
             try {
@@ -154,17 +150,13 @@ sap.ui.define([
                     const facilitiesData = [
                         ...new Map(
                             responseData
-                                .filter(item => item.FacilityName)
-                                .map(item => [item.FacilityName.trim(), item])
+                            .filter(item => item.FacilityName)
+                            .map(item => [item.FacilityName.trim(), item])
                         ).values()
                     ];
 
-                    this.getView().setModel(
-                        new JSONModel(facilitiesData),
-                        "facilitiesDataModelInitial"
-                    );
+                    this.getView().setModel(new JSONModel(facilitiesData), "facilitiesDataModelInitial");
                 }
-
             } catch (error) {
                 MessageToast.show(error.message || error.responseText);
             } finally {
@@ -172,18 +164,14 @@ sap.ui.define([
             }
         },
 
-        _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
 
             if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel
-                    .map(item => item.BranchID)
-                    .flat()
-                    .filter(Boolean)
-                    .join(",");
+                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
@@ -192,8 +180,8 @@ sap.ui.define([
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
                 filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
@@ -209,7 +197,7 @@ sap.ui.define([
             }
         },
 
-        FD_RoomDetails: async function (oEvent) {
+        FD_RoomDetails: async function(oEvent) {
             if (this.ARD_Dialog) {
                 this.ARD_Dialog.destroy();
                 this.ARD_Dialog = null;
@@ -249,18 +237,24 @@ sap.ui.define([
                     PerDayPrice: "",
                     PerMonthPrice: "",
                     PerYearPrice: "",
+                    FacilityChargeType: ""
                 });
             }
 
             // Clear tokens and upload data for new record
-            oView.getModel("tokenModel").setData({ tokens: [] });
-            oView.getModel("UploaderData").setData({ attachments: [], isFileUploaded: false });
+            oView.getModel("tokenModel").setData({
+                tokens: []
+            });
+            oView.getModel("UploaderData").setData({
+                attachments: [],
+                isFileUploaded: false
+            });
             // Reset input value states
             this._resetFacilityValueStates();
             this.ARD_Dialog.open();
         },
 
-        FD_onCancelButtonPress: function () {
+        FD_onCancelButtonPress: function() {
             var oView = this.getView();
             // Clear all data on close
             if (oView.getModel("FacilitiesModel")) {
@@ -275,6 +269,7 @@ sap.ui.define([
                     PerDayPrice: "",
                     PerMonthPrice: "",
                     PerYearPrice: "",
+                    FacilityChargeType: ""
                 });
             }
             // Clear file uploader and reset value states
@@ -288,7 +283,7 @@ sap.ui.define([
             }
         },
 
-        FD_onsavebuttonpress: async function () {
+        FD_onsavebuttonpress: async function() {
             const oView = this.getView();
             const oFacilitiesModel = oView.getModel("FacilitiesModel");
             const oUploaderData = oView.getModel("UploaderData");
@@ -311,25 +306,68 @@ sap.ui.define([
                 return;
             }
 
+            const sSelectionMode = String(Payload.SelectionMode || "").toUpperCase().trim();
+            const isPersonQty = sSelectionMode === "PERSON_QTY";
+
+            const isLaundryOrIroning =
+                Payload.Type === "Laundry Service" ||
+                Payload.Type === "Ironing Service";
+
+            // Require UnitPrice only when NOT PERSON_QTY and is Laundry/Ironing
+            if (!isPersonQty && isLaundryOrIroning &&
+                (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
+
+                const isValid = utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId(oView.createId("idUnitPrice")),
+                    "ID"
+                );
+
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+            }
+
             if (bIsUnit) {
-                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumQuantity")), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumPrice")), "ID") ||
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idUnitPrice")), "ID")){
+                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumQuantity")), "ID")) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
                 }
 
-                if (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0) {
-                    MessageToast.show(this.i18nModel.getText("pleaseFillUnitPrice"));
+                if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
+                    MessageToast.show(this.i18nModel.getText("pleaseFillMinimumQty"));
                     return;
                 }
-                 if (!Payload.MinimumQty || Number(Payload.MinimumQty) === 0) {
-                        MessageToast.show(this.i18nModel.getText("pleaseFillMinimumQty"));
-                        return;
-                    }
 
+                var oRadioGroup = sap.ui.getCore().byId(oView.createId("id_PeriodSelect"));
+                if (!Payload.FacilityChargeType || Payload.FacilityChargeType === "") {
+                    if (oRadioGroup) {
+                        oRadioGroup.setValueState("Error");
+                    }
+                    MessageToast.show("Please select Daily or ONCE_PER_BOOKING facility Type.");
+                    return;
+                } else {
+                    if (oRadioGroup) {
+                        oRadioGroup.setValueState("None");
+                    }
+                }
+
+                if (!utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idMinimumPrice")), "ID")) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
+                if (!Payload.MinimumPrice || Number(Payload.MinimumPrice) === 0) {
+                    MessageToast.show(this.i18nModel.getText("pleaseFillMinimumPrice"));
+                    return;
+                }
             } else {
+                const isLaundryOrIroning =
+                    Payload.Type === "Laundry Service" ||
+                    Payload.Type === "Ironing Service";
+
                 if (
+                    !isLaundryOrIroning &&
                     (!Payload.PerHourPrice || Number(Payload.PerHourPrice) === 0) &&
                     (!Payload.PerDayPrice || Number(Payload.PerDayPrice) === 0) &&
                     (!Payload.PerMonthPrice || Number(Payload.PerMonthPrice) === 0) &&
@@ -340,7 +378,7 @@ sap.ui.define([
                 }
             }
 
-            var bDuplicate = aFacilitiesData.some(function (facility) {
+            const isDuplicate = aFacilitiesData.some(function (facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false;
 
                 return (
@@ -349,7 +387,7 @@ sap.ui.define([
                 );
             });
 
-            if (bDuplicate) {
+            if (isDuplicate) {
                 MessageToast.show(this.i18nModel.getText("facilitywiththesameratetypealreadyexistsforthisbranch"));
                 return;
             }
@@ -372,15 +410,15 @@ sap.ui.define([
                     FacilityName: Payload.FacilityName,
                     Type: Payload.Type,
                     SelectionMode: Payload.SelectionMode,
-                    UnitPrice: bIsUnit ? (Number(Payload.UnitPrice) || 0) : 0,
+                    UnitPrice: (Number(Payload.UnitPrice) || 0),
                     MinimumQty: bIsUnit ? (Number(Payload.MinimumQty) || 0) : 0,
                     MinimumPrice: bIsUnit ? (Number(Payload.MinimumPrice) || 0) : 0,
                     PerHourPrice: bIsUnit ? 0 : (Number(Payload.PerHourPrice) || 0),
                     PerDayPrice: bIsUnit ? 0 : (Number(Payload.PerDayPrice) || 0),
                     PerMonthPrice: bIsUnit ? 0 : (Number(Payload.PerMonthPrice) || 0),
                     PerYearPrice: bIsUnit ? 0 : (Number(Payload.PerYearPrice) || 0),
-
-                    Currency: Payload.Currency
+                    Currency: Payload.Currency,
+                    FacilityChargeType: Payload.FacilityChargeType
                 },
                 Attachment: {}
             };
@@ -407,8 +445,12 @@ sap.ui.define([
                 await this.ajaxCreateWithJQuery("HM_ExtraFacilities", {
                     data: oData
                 });
-                oView.getModel("UploaderData").setData({ attachments: [] });
-                oView.getModel("tokenModel").setData({ tokens: [] });
+                oView.getModel("UploaderData").setData({
+                    attachments: []
+                });
+                oView.getModel("tokenModel").setData({
+                    tokens: []
+                });
                 this.ARD_Dialog.close();
                 if (this.ARD_Dialog) {
                     this.ARD_Dialog.destroy();
@@ -423,12 +465,10 @@ sap.ui.define([
             }
         },
 
-        _resetFacilityValueStates: function () {
+        _resetFacilityValueStates: function() {
             var oView = this.getView();
-            var aFields = ["idRoomType123", "idFacilityName", "idFacilityName1", "idSelectionMode", "FL_id_Currency", "idUnitPrice", "idPerHourPrice",
-                "idPerDayPrice", "idPerMonthPrice", "idPerYearPrice"
-            ];
-            aFields.forEach(function (sId) {
+            var aFields = ["idRoomType123", "idFacilityName", "idFacilityName1", "idSelectionMode", "FL_id_Currency", "idUnitPrice", "idPerHourPrice", "idPerDayPrice", "idPerMonthPrice", "idPerYearPrice"];
+            aFields.forEach(function(sId) {
                 var oField = sap.ui.getCore().byId(oView.createId(sId));
                 if (oField && oField.setValueState) {
                     oField.setValueState("None");
@@ -436,7 +476,7 @@ sap.ui.define([
             });
         },
 
-        onFacilitybranchChange: function (oEvent) {
+        onFacilitybranchChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
@@ -456,40 +496,52 @@ sap.ui.define([
             this.getView().getModel("FacilitiesModel").setProperty("/Currency", Currency.currency);
         },
 
-        onChangeCurrency: function (oEvent) {
+        onChangeCurrency: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function (oEvent) {
+        onFacilityNameChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        _getFacilitySelectionModeMap: function () {
+        onPeriodTypeSelect: function(oEvent) {
+            var selectedIndex = oEvent.getParameter("selectedIndex");
+            var oFacilityModel = this.getView().getModel("FacilitiesModel");
+            var selectedSession = selectedIndex === 0 ? "Daily" : selectedIndex === 1 ? "ONCE_PER_BOOKING" : "";
+            oFacilityModel.setProperty("/FacilityChargeType", selectedSession); // Set selected session in model
+            // Clear value state if a session is selected
+            var oRadioGroup = this.getView().byId("id_PeriodSelect");
+            if (selectedSession !== "") {
+                oRadioGroup.setValueState("None");
+            }
+        },
+
+        _getFacilitySelectionModeMap: function() {
             return {
-                1: ["SINGLE"],                 // High-Speed Wi-Fi
-                2: ["PERSON_QTY"],             // Laundry Service
-                3: ["PERSON_QTY"],             // Ironing Service
-                4: ["SINGLE"],                 // Housekeeping
-                5: ["PERSON"],                 // Meals / Food Subscription
-                6: ["PERSON"],                 // Gym Membership
-                7: ["SINGLE"],                 // Two-Wheeler Parking
-                8: ["SINGLE"],                 // Four-Wheeler Parking
-                9: ["SINGLE"],                 // Locker / Storage
-                10: ["SINGLE"],                // Power Backup
-                11: ["SINGLE"],                // AC
-                12: ["SINGLE"],                // Heater
-                13: ["PERSON"],                // Study Room
-                14: ["QTY"],                   // Extra Bed
-                15: ["QTY"],                   // Extra Pillow
+                1: ["SINGLE"], // High-Speed Wi-Fi
+                2: ["PERSON_QTY"], // Laundry Service
+                3: ["PERSON_QTY"], // Ironing Service
+                4: ["SINGLE"], // Housekeeping
+                5: ["PERSON"], // Meals / Food Subscription
+                6: ["PERSON"], // Gym Membership
+                7: ["SINGLE"], // Two-Wheeler Parking
+                8: ["SINGLE"], // Four-Wheeler Parking
+                9: ["SINGLE"], // Locker / Storage
+                10: ["SINGLE"], // Power Backup
+                11: ["SINGLE"], // AC
+                12: ["SINGLE"], // Heater
+                13: ["PERSON"], // Study Room
+                14: ["QTY"], // Extra Bed
+                15: ["QTY"], // Extra Pillow
                 16: ["SINGLE", "QTY", "PERSON", "PERSON_QTY"] // Others (all allowed)
             };
         },
 
-        onFacilityTypeChange: function (oEvent) {
+        onFacilityTypeChange: function(oEvent) {
             var oComboBox = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
 
@@ -509,7 +561,7 @@ sap.ui.define([
             this._syncFacilityPricingFields();
         },
 
-        _filterSelectionModes: function (sFacilityID) {
+        _filterSelectionModes: function(sFacilityID) {
             var oMap = this._getFacilitySelectionModeMap();
             var aAllowedKeys = oMap[sFacilityID] || [];
 
@@ -524,7 +576,7 @@ sap.ui.define([
                     key: "{SelectionModeModel>key}",
                     text: "{SelectionModeModel>text}"
                 }),
-                filters: aAllowedKeys.map(function (sKey) {
+                filters: aAllowedKeys.map(function(sKey) {
                     return new sap.ui.model.Filter(
                         "key",
                         sap.ui.model.FilterOperator.EQ,
@@ -542,20 +594,20 @@ sap.ui.define([
             }
         },
 
-        onSelectionModeChange: function (oEvent) {
+        onSelectionModeChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
             this._syncFacilityPricingFields();
         },
 
-        onPriceChange: function (oEvent) {
+        onPriceChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateAmount(oEvent.getSource(), "ID");
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        _syncFacilityPricingFields: function () {
+        _syncFacilityPricingFields: function() {
             var oModel = this.getView().getModel("FacilitiesModel");
             if (!oModel) return;
 
@@ -573,11 +625,11 @@ sap.ui.define([
             }
         },
 
-        onFileSizeExceeds: function () {
+        onFileSizeExceeds: function() {
             MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
         },
 
-        onTokenDelete: function (oEvent) {
+        onTokenDelete: function(oEvent) {
             const oView = this.getView();
             const oTokenModel = oView.getModel("tokenModel");
             const oUploaderData = oView.getModel("UploaderData");
@@ -606,7 +658,7 @@ sap.ui.define([
             this.byId("id_fileUploader").clear();
         },
 
-        onFacilityFileChange: function (oEvent) {
+        onFacilityFileChange: function(oEvent) {
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -656,27 +708,29 @@ sap.ui.define([
             oEvent.getSource().clear();
         },
 
-        _formatFileSize: function (bytes) {
+        _formatFileSize: function(bytes) {
             if (!bytes) return "0 Bytes";
             const sizes = ["Bytes", "KB", "MB", "GB"];
             let i = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
         },
 
-        FC_onPressClear: function () {
+        FC_onPressClear: function() {
             this.getView().byId("FN_id_FacilityName").setSelectedKey("")
             this.getView().byId("FN_id_BranchCode").setSelectedKey("")
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("Facilities").setData({});
         },
 
-        onHome: function () { this.CommonLogoutFunction() },
+        onHome: function() {
+            this.CommonLogoutFunction()
+        },
 
-        FD_onFacilityRowPress: function (oEvent) {
+        FD_onFacilityRowPress: function(oEvent) {
             var ofacilityID = oEvent.getSource().getBindingContext("Facilities").getObject().ID;
             var onav = this.getOwnerComponent().getRouter()
             onav.navTo("RouteFacilitiesDetails", {
@@ -684,7 +738,7 @@ sap.ui.define([
             });
         },
 
-        HM_DeleteDetails: async function () {
+        HM_DeleteDetails: async function() {
             var oTable = this.byId("id_facilityTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -698,82 +752,82 @@ sap.ui.define([
 
             sap.m.MessageBox.confirm(
                 `Are you sure you want to delete the selected facilities: ${sNames}?`, {
-                icon: sap.m.MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
-                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                emphasizedAction: sap.m.MessageBox.Action.NO,
-                styleClass: "myUnifiedBtn",
-                onClose: async function (sAction) {
-                    if (sAction === sap.m.MessageBox.Action.YES) {
-                        try {
-                            that.getBusyDialog()
-                            const aDeletePromises = aSelectedItems.map(async (item) => {
-                                var oData = item.getBindingContext("Facilities").getObject();
-                                await that.ajaxDeleteWithJQuery("HM_ExtraFacilities", {
-                                    filters: {
-                                        ID: oData.ID
-                                    }
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    title: "Confirm Deletion",
+                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                    emphasizedAction: sap.m.MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
+                    onClose: async function(sAction) {
+                        if (sAction === sap.m.MessageBox.Action.YES) {
+                            try {
+                                that.getBusyDialog()
+                                const aDeletePromises = aSelectedItems.map(async (item) => {
+                                    var oData = item.getBindingContext("Facilities").getObject();
+                                    await that.ajaxDeleteWithJQuery("HM_ExtraFacilities", {
+                                        filters: {
+                                            ID: oData.ID
+                                        }
+                                    });
                                 });
-                            });
 
-                            await Promise.all(aDeletePromises);
-                            return that.readCallForFacilities("Initial");
-                        } catch (err) {
-                            that.closeBusyDialog()
-                            MessageToast.show(err.message || err.responseText);
-                        } finally {
-                            that.closeBusyDialog()
-                            
-                            MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
+                                await Promise.all(aDeletePromises);
+                                return that.readCallForFacilities("Initial");
+                            } catch (err) {
+                                that.closeBusyDialog()
+                                MessageToast.show(err.message || err.responseText);
+                            } finally {
+                                that.closeBusyDialog()
+
+                                MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
+                                oTable.removeSelections(true);
+                            }
+                        } else {
                             oTable.removeSelections(true);
                         }
-                    } else {
-                        oTable.removeSelections(true);
                     }
-                }
-            });
+                });
         },
 
-        createTableSheet: function () {
+        createTableSheet: function() {
             return [{
-                label: "Hostel Name",
-                property: "BranchName",
-                type: "string"
-            },
-            {
-                label: "Facility Name",
-                property: "FacilityName",
-                type: "string"
-            },
-            {
-                label: "Type",
-                property: "Type",
-                type: "string"
-            },
-            {
-                label: "Hourly Price",
-                property: "PerHourPrice",
-                type: "string"
-            },
-            {
-                label: "Daily Price",
-                property: "PerDayPrice",
-                type: "string"
-            },
-            {
-                label: "Monthly Price",
-                property: "PerMonthPrice",
-                type: "string"
-            },
-            {
-                label: "Yearly Price",
-                property: "PerYearPrice",
-                type: "string"
-            }
+                    label: "Hostel Name",
+                    property: "BranchName",
+                    type: "string"
+                },
+                {
+                    label: "Facility Name",
+                    property: "FacilityName",
+                    type: "string"
+                },
+                {
+                    label: "Type",
+                    property: "Type",
+                    type: "string"
+                },
+                {
+                    label: "Hourly Price",
+                    property: "PerHourPrice",
+                    type: "string"
+                },
+                {
+                    label: "Daily Price",
+                    property: "PerDayPrice",
+                    type: "string"
+                },
+                {
+                    label: "Monthly Price",
+                    property: "PerMonthPrice",
+                    type: "string"
+                },
+                {
+                    label: "Yearly Price",
+                    property: "PerYearPrice",
+                    type: "string"
+                }
             ]
         },
 
-        MD_onDownload: function () {
+        MD_onDownload: function() {
             const oTable = this.byId("id_facilityTable");
             const oModel = oTable.getModel("Facilities")?.getData();
             // No data validation
@@ -781,7 +835,7 @@ sap.ui.define([
             // Show busy indicator during download
             this.getBusyDialog()
             // Adjust data (price + currency)
-            const adjustedData = oModel.map(function (item) {
+            const adjustedData = oModel.map(function(item) {
                 return {
                     ...item,
                     PerHourPrice: item.PerHourPrice + " " + item.Currency,
@@ -797,8 +851,8 @@ sap.ui.define([
                     columns: aCols,
                     hierarchyLevel: "Level",
                     context: {
-            sheetName: "Facilities Details"
-        }
+                        sheetName: "Facilities Details"
+                    }
                 },
                 dataSource: adjustedData,
                 fileName: "Facilities_Details.xlsx",

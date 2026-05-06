@@ -1,19 +1,17 @@
 <mvc:View
     controllerName="sap.ui.com.project1.controller.NotFound"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
     displayBlock="true">
-
-    <Page
+	<Page
         title="Page Not Found"
         showNavButton="true"
         navButtonPress="onNavBack">
-
-        <content>
-            <IllustratedMessage
+		<content>
+			<IllustratedMessage
                 illustrationType="sapIllus-ErrorScreen"
                 title="Page Not Found"
                 description="The link you followed is invalid or expired." />
-        </content>
-    </Page>
+		</content>
+	</Page>
 </mvc:View>

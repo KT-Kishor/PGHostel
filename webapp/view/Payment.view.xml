@@ -29,19 +29,14 @@
                         name="BookingID"
                         label="{i18n>bookingID}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
+                        visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
                                 id="P_id_BookingID"
                                 filterSecondaryValues="true"
                                 items="{path:'BookingFilterModel>/', sorter:{path:'BookingID', descending:false}}"
-                                showClearIcon="true"
-                            >
-								<core:Item
-                                    key="{BookingFilterModel>BookingID}"
-                                    text="{BookingFilterModel>BookingID}"
-                                />
+                                showClearIcon="true">
+								<core:Item key="{BookingFilterModel>BookingID}" text="{BookingFilterModel>BookingID}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -50,21 +45,16 @@
                         label="{i18n>MSbranchCode}"
                         groupName="Group"
                         visible="{RoleModel>/isSuperAdmin}"
-                        visibleInFilterBar="true"
-                    >
+                        visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
                                 id="P_id_BranchCode"
                                 items="{BranchFilterModel>/}"
                                 showClearIcon="true"
                                 filterSecondaryValues="true"
-                                showSecondaryValues="true"
-                            >
-								<core:ListItem
-                                    key="{BranchFilterModel>BranchCode}"
-                                    text="{BranchFilterModel>BranchCode}"
-                                    additionalText="{BranchFilterModel>Name}"
-                                />
+                                showSecondaryValues="true">
+								<core:ListItem key="{BranchFilterModel>BranchCode}" text="{BranchFilterModel>BranchCode}"
+                                    additionalText="{BranchFilterModel>Name}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -72,14 +62,12 @@
                         name="StartDate"
                         label="{i18n>date}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
+                        visibleInFilterBar="true">
 						<fb:control>
 							<DateRangeSelection
                                 id="P_id_Date"
                                 valueFormat="yyyy-MM-dd"
-                                displayFormat="dd/MM/yyyy"
-                            />
+                                displayFormat="dd/MM/yyyy"/>
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
@@ -136,10 +124,7 @@
 			</Table>
 		</content>
 		<footer>
-         <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
-        </footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
 	</Page>
 </mvc:View>

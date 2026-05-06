@@ -41,13 +41,15 @@
                     placeholder="{i18n>selectFacility}"
                     items="{Facilities>/}"
                     value="{edit>/FacilityName}"
-                    change="onFacilityChange"
+                    selectionChange="onFacilityChange"
                     width="100%"
                     valueStateText="{i18n>pleaseSelectFacilityName}"
+                    showSecondaryValues="true"
                 >
-                    <core:Item
+                    <core:ListItem
                         key="{Facilities>FacilityName}"
                         text="{Facilities>FacilityName}"
+                        additionalText="{Facilities>FacilityChargeType}"
                     />
                 </ComboBox>
 
@@ -64,6 +66,8 @@
                     width="100%"
                     visible="{= ${CustomerData>/PropertyType}==='Hotel'}"
                     valueStateText="Please Select Name"
+
+                    
                 >
                     <core:Item
                         key="{CustomerData>Name}"
@@ -100,7 +104,6 @@
                     value="{edit>/quantity}"
                     maxLength="2"
                     visible="{= ${edit>/UnitText} === 'Unit Price' }"
-
                     placeholder="Enter Quantity"
                     valueStateText="Enter Quantity"
                     liveChange=".onQuantityLiveChange"
@@ -108,6 +111,7 @@
                 />
                     <RadioButtonGroup id="id_Period" columns="2" select=".onPeriodTypeSelect" 
                         visible="{= ${edit>/UnitText} === 'Unit Price' }"
+                        editable="false"
 
                   >
                                 <buttons>

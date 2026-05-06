@@ -289,7 +289,7 @@
                     >
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
-                                text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
+                                text="Add only the facilities you need. Package charge type is fixed by setup: Daily or Once per booking."
                                 type="Information"
                                 showIcon="true"
                                 showCloseButton="false"

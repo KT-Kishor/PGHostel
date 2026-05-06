@@ -307,7 +307,16 @@ sap.ui.define([
             var aRawFacilities = oCustomer.FacilityItems || [];
             var oFacilityMap = {};
             aRawFacilities.forEach(function (oItem) {
-                var sKey = fnNormalizeFacilityKey(oItem.FacilityName || oItem.Type || oItem.FacilityID || oItem.ID || "");
+                var sKey = fnNormalizeFacilityKey(
+                    oItem.FacilityID ||
+                    oItem.ID ||
+                    [
+                        oItem.FacilityName || oItem.Type || "",
+                        oItem.SelectionMode || "",
+                        oItem.FacilityChargeType || "",
+                        oItem.UnitText || ""
+                    ].join("|")
+                );
                 if (!sKey) { return; }
 
                 var sSelectionMode = fnNormalizeSelectionMode(oItem.SelectionMode);
@@ -331,7 +340,7 @@ sap.ui.define([
                         SelectedPriceType: sUnitText,
                         UnitPrice: fUnitPrice,
                         BasicFacilityPrice: fnToNumber(oItem.BasicFacilityPrice),
-                        FacilityChargeType: oItem.FacilityChargeType || "ONCE_PER_BOOKING",
+                        FacilityChargeType: oItem.FacilityChargeType || "",
                         Quantity: sSelectionMode === "QTY" ? 0 : 1,
                         Currency: oItem.Currency || "",
                         Image: oItem.Image || "",
@@ -349,7 +358,7 @@ sap.ui.define([
                 oAgg.UnitText = oAgg.UnitText || sUnitText;
                 oAgg.SelectedPriceType = oAgg.SelectedPriceType || sUnitText;
                 oAgg.Currency = oAgg.Currency || oItem.Currency || "";
-                oAgg.FacilityChargeType = oAgg.FacilityChargeType || oItem.FacilityChargeType || "ONCE_PER_BOOKING";
+                oAgg.FacilityChargeType = oAgg.FacilityChargeType || oItem.FacilityChargeType || "";
                 oAgg.SavedTotalAmount = Number((fnToNumber(oAgg.SavedTotalAmount) + fRowTotal).toFixed(2));
 
                 if (fUnitPrice > 0) {
@@ -1389,6 +1398,8 @@ sap.ui.define([
 
             var sFacilityId = String(oFacility.ID || oFacility.FacilityID || "").trim();
             var sFacilityNameKey = this._normalizeEditFacilityKey(oFacility.FacilityName || oFacility.Type || "");
+            var sSelectionMode = String(oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility) || "").trim().toUpperCase();
+            var sChargeType = this._normalizeFacilityChargeType(oFacility.FacilityChargeType);
 
             if (sFacilityId) {
                 var oById = aSelectedFacilities.find(function (oSelected) {
@@ -1401,7 +1412,11 @@ sap.ui.define([
 
             return aSelectedFacilities.find(function (oSelected) {
                 var sSelectedNameKey = this._normalizeEditFacilityKey(oSelected.FacilityName || oSelected.Type || "");
-                return sFacilityNameKey && sSelectedNameKey &&
+                var sSelectedSelectionMode = String(oSelected.SelectionMode || "").trim().toUpperCase();
+                var sSelectedChargeType = this._normalizeFacilityChargeType(oSelected.FacilityChargeType || oSelected.ApiFacilityChargeType);
+                var bMatchingMode = !sSelectionMode || !sSelectedSelectionMode || sSelectedSelectionMode === sSelectionMode;
+                var bMatchingChargeType = sSelectionMode !== "PERSON_QTY" || !sSelectedChargeType || sSelectedChargeType === sChargeType;
+                return sFacilityNameKey && sSelectedNameKey && bMatchingMode && bMatchingChargeType &&
                     (sSelectedNameKey === sFacilityNameKey ||
                         sSelectedNameKey.indexOf(sFacilityNameKey) >= 0 ||
                         sFacilityNameKey.indexOf(sSelectedNameKey) >= 0);
@@ -1555,6 +1570,16 @@ sap.ui.define([
         },
 
         _deriveEditFacilitySelectedPrice: function (oSelectedFacility, oFacility, sSelectionMode) {
+            if (sSelectionMode === "PERSON_QTY") {
+                return this._toNumber(
+                    oFacility.MinimumPrice ||
+                    oSelectedFacility.MinimumPrice ||
+                    oSelectedFacility.PackagePrice ||
+                    oSelectedFacility.SelectedPrice ||
+                    oSelectedFacility.Price
+                );
+            }
+
             var fSelectedPrice = this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price || oSelectedFacility.UnitPrice || oSelectedFacility.BasicFacilityPrice);
             var fSavedTotal = this._toNumber(oSelectedFacility.SavedTotalAmount);
             var iQuantity = Math.max(parseInt(oSelectedFacility.Quantity || oSelectedFacility.SavedQuantity, 10) || 0, 0);
@@ -1598,7 +1623,7 @@ sap.ui.define([
                 var oMatchedOption = aPriceOptions.find(function (oOption) {
                     return oOption.key === sPlan;
                 }) || aPriceOptions.find(function (oOption) {
-                    return oOption.key === "Unit Price";
+                    return oOption.key === "Unit Price" || oOption.key === "Package Price";
                 });
 
                 oFacility.SelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -1607,6 +1632,16 @@ sap.ui.define([
                 if (oFacility.Selected) {
                     var fSavedPrice = this._toNumber(oFacility.SelectedPrice || oFacility.Price || oFacility.UnitPrice || oFacility.CurrentPrice);
                     var sSavedPriceType = oFacility.SelectedPriceType || oFacility.UnitText || (oMatchedOption && oMatchedOption.key) || "Unit Price";
+
+                    if (oFacility.SelectionMode === "PERSON_QTY") {
+                        fSavedPrice = this._toNumber(
+                            oFacility.MinimumPrice ||
+                            oFacility.PackagePrice ||
+                            fSavedPrice ||
+                            (oMatchedOption && oMatchedOption.price)
+                        );
+                        sSavedPriceType = "Package Price";
+                    }
 
                     if (!fSavedPrice && oMatchedOption) {
                         fSavedPrice = this._toNumber(oMatchedOption.price);
@@ -1622,7 +1657,7 @@ sap.ui.define([
                         sSavedPriceType
                     );
                     oFacility.FacilityChargeType = this._supportsFacilityChargeType(oFacility.SelectionMode)
-                        ? (oFacility.FacilityChargeType || "ONCE_PER_BOOKING")
+                        ? this._getFacilityChargeType(oFacility)
                         : "";
                     this._setFacilitySelectionSummary(oFacility);
                     aVisibleFacilities.push(oFacility);
@@ -1696,6 +1731,18 @@ sap.ui.define([
                         var bIsSelected = !!(oSelectedFacility.FacilityName || oSelectedFacility.FacilityID || oSelectedFacility.ID);
                         var bIsPersonQty = sSelectionMode === "PERSON_QTY";
                         var bIsPerson = sSelectionMode === "PERSON";
+                        var iMinimumQty = bIsPersonQty
+                            ? (parseInt(oFacility.MinimumQty, 10) || 0)
+                            : 0;
+                        var fMinimumPrice = bIsPersonQty
+                            ? (parseFloat(oFacility.MinimumPrice) || 0)
+                            : 0;
+                        var sApiFacilityChargeType = bIsPersonQty
+                            ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
+                            : "";
+                        var sSavedFacilityChargeType = bIsPersonQty
+                            ? this._normalizeFacilityChargeType(oSelectedFacility.FacilityChargeType || sApiFacilityChargeType)
+                            : "";
                         var aPersonQuantities = bIsPersonQty
                             ? this._buildEditFacilityPersonQuantities(oSelectedFacility)
                             : (Array.isArray(oSelectedFacility.PersonQuantities)
@@ -1711,11 +1758,15 @@ sap.ui.define([
                         var aSelectedPersonIds = (bIsPersonQty || bIsPerson)
                             ? this._buildEditFacilitySelectedPersonIds(oSelectedFacility, aPersonQuantities)
                             : (Array.isArray(oSelectedFacility.SelectedPersonIds) ? oSelectedFacility.SelectedPersonIds.slice() : []);
-                        var fSelectedPrice = this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
-                        var sSelectedPriceType = oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price";
+                        var fSelectedPrice = bIsPersonQty
+                            ? fMinimumPrice
+                            : this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
+                        var sSelectedPriceType = bIsPersonQty
+                            ? "Package Price"
+                            : (oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price");
 
                         return {
-                            FacilityID: oSelectedFacility.FacilityID || "",
+                            FacilityID: oSelectedFacility.FacilityID || oFacility.ID,
                             CatalogFacilityID: oFacility.ID,
                             FacilityName: oFacility.FacilityName || oFacility.Type,
                             Type: oFacility.Type,
@@ -1732,7 +1783,8 @@ sap.ui.define([
                             SelectedPrice: fSelectedPrice,
                             SelectedPriceType: sSelectedPriceType,
                             UnitText: sSelectedPriceType,
-                            FacilityChargeType: oSelectedFacility.FacilityChargeType || "ONCE_PER_BOOKING",
+                            ApiFacilityChargeType: sApiFacilityChargeType,
+                            FacilityChargeType: sSavedFacilityChargeType,
                             Quantity: Math.max(parseInt(oSelectedFacility.Quantity, 10) || parseInt(oSelectedFacility.SavedQuantity, 10) || 1, 1),
                             SelectedPersonIds: aSelectedPersonIds,
                             PersonQuantities: aPersonQuantities,
@@ -1744,8 +1796,10 @@ sap.ui.define([
                             SavedTotalAmount: this._toNumber(oSelectedFacility.SavedTotalAmount),
                             SavedQuantity: Math.max(parseInt(oSelectedFacility.SavedQuantity, 10) || 0, 0),
                             SelectionModeLabel: this._getFacilitySelectionModeLabel(sSelectionMode),
-                            MinimumQty: bIsPersonQty ? (parseInt(oFacility.MinimumQty, 10) || 0) : 0,
-                            MinimumPrice: bIsPersonQty ? (parseFloat(oFacility.MinimumPrice) || 0) : 0
+                            MinimumQty: iMinimumQty,
+                            MinimumPrice: fMinimumPrice,
+                            PackageQty: iMinimumQty,
+                            PackagePrice: fMinimumPrice
                         };
                     }.bind(this));
 
