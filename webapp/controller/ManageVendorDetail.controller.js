@@ -339,8 +339,8 @@ sap.ui.define([
             // Common UI reset logic (used for confirm & cancel)
             const fnResetSelection = () => {
                 oTable.removeSelections(true);
-                this.byId("AdminDeleteButton").setEnabled(false);
-                this.byId("AdminDownloadButton").setEnabled(false);
+                // this.byId("AdminDeleteButton").setEnabled(false);
+                // this.byId("AdminDownloadButton").setEnabled(false);
             };
             this.showConfirmationDialog(
                 "Confirm",
