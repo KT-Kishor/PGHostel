@@ -607,17 +607,25 @@
                                         visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
                                     >
                                         <cells>
-                                            <VBox>
+                                            <HBox
+                                                alignItems="Center"
+                                                wrap="NoWrap"
+                                            >
                                                 <Title
                                                     text="Facilities"
                                                     level='H6'
                                                 />
-                                                <Text
-                                                    text="{path: 'HostelModel>/AllSelectedFacilities', formatter: '.formatSelectedFacilitiesBreakdown'}"
-                                                    wrapping="true"
-                                                    class="sapThemeBaseText sapUiTinyMarginTop"
+                                                <core:Icon
+                                                    id="editFacilitiesBreakdownIcon"
+                                                    src="sap-icon://hint"
+                                                    size="1rem"
+                                                    color="#1a5f6b"
+                                                    hoverColor="DarkBlue"
+                                                    press="onFacilitiesBreakdownPress"
+                                                    tooltip="View facilities breakdown"
+                                                    class="sapUiTinyMarginBegin"
                                                 />
-                                            </VBox>
+                                            </HBox>
                                             <HBox
                                                 justifyContent="End"
                                                 alignItems="Center"

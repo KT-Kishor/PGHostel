@@ -702,10 +702,26 @@
                                         visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
                                     >
                                         <cells>
-                                            <Title
-                                                text="Facilities"
-                                                level='H6'
-                                            />
+                                            <HBox
+                                                alignItems="Center"
+                                                wrap="NoWrap"
+                                            >
+<Title
+    text="Facilities"
+    level='H6'
+/>
+
+                                                <core:Icon
+                                                    id="facilitiesBreakdownIcon"
+                                                    src="sap-icon://hint"
+                                                    size="1rem"
+                                                    color="#1a5f6b"
+                                                    hoverColor="DarkBlue"
+                                                    press="onFacilitiesBreakdownPress"
+                                                    tooltip="View facilities breakdown"
+                                                    class="sapUiTinyMarginBegin"
+                                                />
+                                            </HBox>
                                             <HBox
                                                 justifyContent="End"
                                                 alignItems="Center"
