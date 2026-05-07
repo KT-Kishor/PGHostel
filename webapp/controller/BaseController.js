@@ -226,7 +226,7 @@ sap.ui.define([
 
     _carouselTimers: new Map(),
 
-    /* Start auto-slide + interaction handling */
+    /* Start auto-slide + interaction handling using native SAP UI5 Carousel properties */
     _startAllCarouselsAutoSlide: function (iDelay = 3000) {
       try {
         const oView = this.getView();
@@ -240,26 +240,18 @@ sap.ui.define([
           const pages = carousel.getPages();
           if (!pages || pages.length <= 1) return;
 
-          /* Stop any old timers for this carousel */
+          /* Stop any old timers for this carousel (for backward compatibility) */
           this._clearCarouselTimer(carousel.getId());
 
-          /* Safe current index */
-          let index = carousel.indexOfPage(carousel.getActivePage());
-
-          /* Start interval autoplay */
-          const autoTimer = setInterval(() => {
-            if (carousel.bIsDestroyed) return;
-            index = (index + 1) % pages.length;
-            carousel.setActivePage(pages[index]);
-          }, iDelay);
-
-          this._carouselTimers.set(carousel.getId(), autoTimer);
+          /* Use native SAP UI5 Carousel auto-play properties instead of manual setInterval */
+          carousel.setAutoPlay(true);
+          carousel.setAutoPlayDelay(iDelay);
 
           /* ------------ USER INTERACTION LOGIC ------------- */
 
           /* Pause immediately when user touches/clicks */
           const fnPause = () => {
-            this._pauseCarouselAutoSlide(carousel);
+            carousel.setAutoPlay(false);
             carousel._userTouched = true;
           };
 
@@ -275,7 +267,9 @@ sap.ui.define([
               clearTimeout(carousel._resumeTimer);
 
               carousel._resumeTimer = setTimeout(() => {
-                this._resumeCarouselAutoSlide(carousel, iDelay);
+                if (carousel && !carousel.bIsDestroyed && pages.length > 1) {
+                  carousel.setAutoPlay(true);
+                }
               }, 2000); // resume 2 sec after swipe
             };
           }
@@ -284,7 +278,9 @@ sap.ui.define([
           const fnEnd = () => {
             clearTimeout(carousel._resumeTimer);
             carousel._resumeTimer = setTimeout(() => {
-              this._resumeCarouselAutoSlide(carousel, iDelay);
+              if (carousel && !carousel.bIsDestroyed && pages.length > 1) {
+                carousel.setAutoPlay(true);
+              }
             }, 3000); // resume after 3 sec idle
           };
 
@@ -299,8 +295,10 @@ sap.ui.define([
       }
     },
 
-    /* Stop autoplay for one carousel */
+    /* Stop autoplay for one carousel - using native auto-play properties */
     _pauseCarouselAutoSlide: function (carousel) {
+      carousel.setAutoPlay(false);
+      // Also clear any manual timer for backward compatibility
       const id = carousel.getId();
       if (this._carouselTimers.has(id)) {
         clearInterval(this._carouselTimers.get(id));
@@ -308,22 +306,16 @@ sap.ui.define([
       }
     },
 
-    /* Resume autoplay safely */
+    /* Resume autoplay safely - using native auto-play properties */
     _resumeCarouselAutoSlide: function (carousel, iDelay = 3000) {
       if (!carousel || carousel.bIsDestroyed) return;
 
       const pages = carousel.getPages();
       if (!pages || pages.length <= 1) return;
 
-      let index = carousel.indexOfPage(carousel.getActivePage());
-
-      const interval = setInterval(() => {
-        if (carousel.bIsDestroyed) return;
-        index = (index + 1) % pages.length;
-        carousel.setActivePage(pages[index]);
-      }, iDelay);
-
-      this._carouselTimers.set(carousel.getId(), interval);
+      // Use native auto-play
+      carousel.setAutoPlayDelay(iDelay);
+      carousel.setAutoPlay(true);
     },
 
     /* Kill all autoplay timers */

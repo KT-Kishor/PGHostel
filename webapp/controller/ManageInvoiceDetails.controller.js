@@ -619,6 +619,13 @@ sap.ui.define([
 
             _getDurationText: function(sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity) {
 
+                const qty = Number(quantity) || 1;
+                const mode = selectionMode?.toUpperCase();
+                const unit = sUnit?.toLowerCase();
+
+                // -------------------------
+                // VALIDATE DATES
+                // -------------------------
                 if (!sStartDate || !sEndDate) return "";
 
                 const start = new Date(sStartDate);
@@ -627,12 +634,7 @@ sap.ui.define([
                 const diffTime = end - start;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                const qty = Number(quantity) || 1;
-                const mode = selectionMode?.toUpperCase();
-                const unit = sUnit?.toLowerCase();
-
                 let baseDuration = "";
-                let result = "";
 
                 // -------------------------
                 // BASE DURATION CALCULATION
@@ -642,16 +644,20 @@ sap.ui.define([
                 }
 
                 else if (unit === "per month") {
+
                     let months =
                         (end.getFullYear() - start.getFullYear()) * 12 +
                         (end.getMonth() - start.getMonth());
 
-                    if (end.getDate() >= start.getDate()) months += 1;
+                    if (end.getDate() >= start.getDate()) {
+                        months += 1;
+                    }
 
                     baseDuration = months + (months === 1 ? " Month" : " Months");
                 }
 
                 else if (unit === "per year") {
+
                     if (diffDays < 364) {
                         baseDuration = diffDays + " Days";
                     } else {
@@ -661,49 +667,106 @@ sap.ui.define([
                 }
 
                 else if (unit === "per hour") {
+
                     const hoursPerDay = Number(totalHour) || 1;
                     const totalHours = hoursPerDay * diffDays;
+
                     baseDuration = totalHours + (totalHours === 1 ? " Hour" : " Hours");
                 }
 
-                else if (unit === "unit price") {
-                    baseDuration = ""; // handled below
+                else if (unit === "unit price" || unit === "package price") {
+                    baseDuration = "";
                 }
 
                 else if (unit === "fix") {
                     return "-";
                 }
 
+                if (mode === "SINGLE") {
+
+                    if (unit === "per day") {
+                        return diffDays + (diffDays === 1 ? " Day" : " Days");
+                    }
+
+                    if (unit === "per month") {
+
+                        let months =
+                            (end.getFullYear() - start.getFullYear()) * 12 +
+                            (end.getMonth() - start.getMonth());
+
+                        if (end.getDate() >= start.getDate()) {
+                            months += 1;
+                        }
+
+                        return months + (months === 1 ? " Month" : " Months");
+                    }
+
+                    if (unit === "per year") {
+
+                        if (diffDays < 364) {
+                            return diffDays + " Days";
+                        }
+
+                        const years = Math.round(diffDays / 365);
+
+                        return years + (years === 1 ? " Year" : " Years");
+                    }
+
+                    if (unit === "per hour") {
+
+                        const hoursPerDay = Number(totalHour) || 1;
+                        const totalHours = hoursPerDay * diffDays;
+
+                        return totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                    }
+
+                    if (unit === "unit price") {
+                        return "Unit Price";
+                    }
+
+                    if (unit === "package price") {
+                        return "Package Price";
+                    }
+
+                    if (unit === "fix") {
+                        return "-";
+                    }
+
+                    return sUnit;
+                }
+
                 // -------------------------
                 // SELECTION MODE HANDLING
                 // -------------------------
 
-                if (mode === "SINGLE") {
-                    return "-";
-                }
-
                 if (mode === "QTY") {
-                    if (unit === "unit price") {
+
+                    if (unit === "unit price" || unit === "package price") {
                         return `${qty} Qty`;
                     }
+
                     return `${qty} Qty × ${baseDuration}`;
                 }
 
                 if (mode === "PERSON") {
-                    if (unit === "unit price") {
+
+                    if (unit === "unit price" || unit === "package price") {
                         return `${qty} Persons`;
                     }
+
                     return `${qty} Persons × ${baseDuration}`;
                 }
 
                 if (mode === "PERSON_QTY") {
 
-                    if (unit === "unit price"  || unit === "package price") {
+                    if (unit === "unit price" || unit === "package price") {
                         return `${qty} Units`;
                     }
 
                     if (unit === "per day") {
+
                         const totalUnits = qty * diffDays;
+
                         return `${totalUnits} Units (${qty} × ${diffDays} Days)`;
                     }
 

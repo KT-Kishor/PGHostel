@@ -64,10 +64,7 @@
                     value="{edit>/MemberName}"
                     change="onMemberNameChange"
                     width="100%"
-                    visible="{= ${CustomerData>/PropertyType}==='Hotel'}"
                     valueStateText="Please Select Name"
-
-                    
                 >
                     <core:Item
                         key="{CustomerData>Name}"

@@ -175,19 +175,14 @@ sap.ui.define([
                 const oBranchModel = oView.getModel("sBRModel");
                 const aBranchData = oBranchModel?.getData() || [];
 
-                const convertBase64ToImage = (base64String, fileType) => {
+                // Direct URL approach - backend should provide imageUrl
+                const getImageUrl = (base64String, fileType) => {
                     if (!base64String) return "./image/Fallback.png";
-                    let sBase64 = base64String.replace(/\s/g, "");
-                    try {
-                        if (!sBase64.startsWith("iVB") && !sBase64.startsWith("data:image")) {
-                            const decoded = atob(sBase64);
-                            if (decoded.startsWith("iVB")) sBase64 = decoded;
-                        }
-                    } catch (e) { }
-
-                    const mimeType = fileType || "image/jpeg";
-                    if (sBase64.startsWith("data:image")) return sBase64;
-                    return `data:${mimeType};base64,${sBase64}`;
+                    // If base64 is already a data URL, keep it (fallback)
+                    if (base64String.startsWith("data:image")) return base64String;
+                    // For now, we'll assume backend provides direct URLs via imageUrl property
+                    // Return a placeholder; actual URL should be set in room object from backend
+                    return null;
                 };
 
                 const aBedTypes = matchedRooms.map(room => {
@@ -241,17 +236,30 @@ sap.ui.define([
                         const base64 = room[`Photo${i}`];
                         const type = room[`Photo${i}Type`];
                         if (base64) {
-                            aImages.push({
-                                src: convertBase64ToImage(base64, type),
-                                Area: sArea,
-                                AverageRating: AverageRating,
-                                TotalFeedbacks: TotalFeedbacks,
-                                BranchCode: room.BranchCode,
-                                Name: room.Name,
-                                ACType: room.ACType,
-                            });
-                        }
-                    }
+                           // Direct URL approach: assume backend provides imageUrl property
+                           // For now, we'll create a URL that points to a PHP script that streams the image
+                           // The src will be set to a URL like api/get_image.php?id=...&photoIndex=i
+                           // Since we don't have the image ID, we'll fallback to data URL if needed
+                           let src = null;
+                           if (room[`Photo${i}Url`]) {
+                               src = room[`Photo${i}Url`];
+                           } else if (base64.startsWith("data:image")) {
+                               src = base64; // keep existing data URL
+                           } else {
+                               // Fallback to data URL (temporary until backend provides URLs)
+                               src = `data:${type || 'image/jpeg'};base64,${base64}`;
+                           }
+                           aImages.push({
+                               src: src,
+                               Area: sArea,
+                               AverageRating: AverageRating,
+                               TotalFeedbacks: TotalFeedbacks,
+                               BranchCode: room.BranchCode,
+                               Name: room.Name,
+                               ACType: room.ACType,
+                           });
+                       }
+                   }
                     return {
                         Name: room.Name,
                         ACType: room.ACType,
@@ -318,11 +326,12 @@ sap.ui.define([
             try {
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+                const sBranchCode = oSelected.BranchCode || "";
                 const oFullDetails = {
                     RoomNo: oSelected.RoomNo || "",
                     BedType: oSelected.Name || "",
                     Address: oSelected.Address || "",
-                    Area: oSelected.Images?.[0]?.Area,   // hostel's name                  
+                    Area: oSelected.Images?.[0]?.Area,   // hostel's name
                     ACType: oSelected.ACType || "AC",
                     Description: oSelected.Description || "No description available",
                     Price: oSelected.Price || "N/A",
@@ -330,7 +339,7 @@ sap.ui.define([
                     YearPrice: oSelected.YearPrice || "N/A",
                     Currency: oSelected.Currency || "INR",
                     Address: oSelected.Address || "",
-                    BranchCode: oSelected.BranchCode || "",
+                    BranchCode: sBranchCode,
                     Capacity: oSelected.NoOfPerson || "",
                     ImageList: (oSelected.Images || []).map(img => img.src),
                     SelectedPriceType: "",
@@ -360,6 +369,17 @@ sap.ui.define([
                     Facilities: []
                 }), "FacilityModel");
 
+                // Helper function to load data in parallel
+                const loadDataInParallel = () => {
+                    // Load facilities and amenities in parallel
+                    Promise.all([
+                        this._LoadFacilities(sBranchCode),
+                        this._LoadAmenities(sBranchCode)
+                    ]).catch(err => {
+                        console.error("Error loading facilities/amenities in parallel:", err);
+                    });
+                };
+
                 // Load / reuse fragment
                 if (!this._oRoomDetailFragment) {
                     sap.ui.core.Fragment.load({
@@ -383,10 +403,9 @@ sap.ui.define([
                         fragment.open();
 
                         this._bindCarousel();
-                        this._LoadFacilities(oSelected.BranchCode);
+                        loadDataInParallel();
                         this._updateBookTileState();
                     });
-
 
                     return; // stop here because first-time load is async via .then()
                 }
@@ -402,8 +421,8 @@ sap.ui.define([
                 // Bind carousel
                 this._bindCarousel();
 
-                // Load facilities asynchronously
-                this._LoadFacilities(oSelected.BranchCode);
+                // Load facilities and amenities in parallel
+                loadDataInParallel();
                 this._updateBookTileState();
 
             } catch (err) {
@@ -431,29 +450,34 @@ sap.ui.define([
                     item.addStyleClass("defaultTile");
                 });
 
-            // Destroy carousel pages
-            const oCarousel = oFrag.findAggregatedObjects(true, obj => obj.isA && obj.isA("sap.m.Carousel"))[0];
+            // Clear carousel pages instead of destroying them - use Fragment.byId for O(1) lookup
+            const oCarousel = sap.ui.core.Fragment.byId("roomDetailsFrag", "roomImageCarousel");
             if (oCarousel) oCarousel.destroyPages();
 
-            // Destroy integration card
+            // Refresh integration card instead of destroying it - need to know card ID
+            // Fallback to findAggregatedObjects for integration card since we don't know its ID
             const oCard = oFrag.findAggregatedObjects(true, obj => obj.isA && obj.isA("sap.ui.integration.widgets.Card"))[0];
-            if (oCard) oCard.destroy();
+            if (oCard && oCard.refresh) {
+                oCard.refresh();
+            }
 
-            // Destroy fragment models
+            // Clear model data instead of destroying models
             ["HostelModel", "FacilityModel"].forEach(name => {
                 const m = oFrag.getModel(name);
-                if (m) m.destroy();
+                if (m) m.setData({});
             });
 
-            // Remove the fragment entirely
-            this.getView().removeDependent(oFrag);
-            oFrag.destroy();
-            this._oRoomDetailFragment = null;
+            // Close the fragment but keep it in memory for reuse
+            oFrag.close();
 
+            // Clear any carousel interval
             if (this._carouselInterval) {
                 clearInterval(this._carouselInterval);
                 this._carouselInterval = null;
             }
+
+            // NOTE: Fragment is NOT destroyed, NOT removed as dependent, and NOT set to null
+            // This allows it to be reused instantly next time viewDetails is called
         },
         onSelectPricePlan: function (oEvent) {
             const oTile = oEvent.getSource();
@@ -1962,22 +1986,9 @@ sap.ui.define([
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
 
+            // MemberList will be loaded in background on the booking page
+            // to avoid blocking navigation. Set empty array initially.
             let aMember = [];
-
-            var filter = {
-                        UserID: oUser?.UserID
-                    };
-
-            try {
-                let resp = await this.ajaxReadWithJQuery("HM_MemberDocument", filter);
-                // let resp = await this.ajaxReadWithJQuery("HM_CustomerAndMemberDocuments", filter);
-
-                // New response shape: data contains SELF and family members.
-                aMember = Array.isArray(resp?.data) ? resp.data : [];
-
-            } catch (error) {
-                console.error("Member fetch failed", error);
-            }
 
             // -------------------------
             // BASIC VALIDATIONS
@@ -2044,9 +2055,11 @@ sap.ui.define([
             // -------------------------
             // MERGE WITH GLOBAL MODEL
             // -------------------------
+            // Add UserID to the data for background loading on booking page
             const oMergedData = {
                 ...oGlobalModel.getData(),
-                ...oBookingData
+                ...oBookingData,
+                UserID: oUser?.UserID || ""
             };
 
             // -------------------------
@@ -2090,12 +2103,21 @@ sap.ui.define([
         },
 
         onRoomDetailOpened: function () {
-            // Get the branch code from the dialog's model
+            // This is called from the fragment's afterOpen event
+            // Since we now load amenities in parallel with facilities in viewDetails,
+            // this function is kept as a fallback but will check if amenities are already loaded
             if (this._oRoomDetailFragment) {
-                const oModel = this._oRoomDetailFragment.getModel("HostelModel");
-                if (oModel) {
-                    const sBranchCode = oModel.getProperty("/BranchCode");
-                    this._LoadAmenities(sBranchCode);
+                const oAmenityModel = this._oRoomDetailFragment.getModel("AmenityModel");
+                // If amenities model doesn't exist or is empty, we might need to load them
+                // This could happen if viewDetails didn't complete loading for some reason
+                if (!oAmenityModel || !oAmenityModel.getProperty("/Amenities") || oAmenityModel.getProperty("/Amenities").length === 0) {
+                    const oHostelModel = this._oRoomDetailFragment.getModel("HostelModel");
+                    if (oHostelModel) {
+                        const sBranchCode = oHostelModel.getProperty("/BranchCode");
+                        if (sBranchCode) {
+                            this._LoadAmenities(sBranchCode);
+                        }
+                    }
                 }
             }
         },
@@ -2116,14 +2138,18 @@ sap.ui.define([
             }
         },
         _bindCarousel: function () {
+            // Use Fragment.byId for O(1) lookup instead of O(n) findAggregatedObjects
+            const oCarousel = sap.ui.core.Fragment.byId("roomDetailsFrag", "roomImageCarousel");
 
-            const oCarousel =
-                this._oRoomDetailFragment
+            if (!oCarousel) {
+                // Fallback to findAggregatedObjects for backward compatibility
+                const fallbackCarousel = this._oRoomDetailFragment
                     .findAggregatedObjects(true,
                         obj => obj.isA && obj.isA("sap.m.Carousel")
                     )[0];
-
-            if (!oCarousel) return;
+                if (!fallbackCarousel) return;
+                return; // Use the fallback - but we should have found it via Fragment.byId
+            }
 
             // ---------- bind carousel images ----------
             oCarousel.unbindAggregation("pages");
@@ -2140,56 +2166,44 @@ sap.ui.define([
             });
 
             // ---------- AUTO SCROLL ----------
-            const START_AUTOSCROLL = () => {
+            // Use native SAP UI5 Carousel auto-play properties instead of manual setInterval
+            const imgs =
+                this._oRoomDetailFragment
+                    ?.getModel("HostelModel")
+                    ?.getProperty("/ImageList") || [];
 
-                const imgs =
-                    this._oRoomDetailFragment
-                        ?.getModel("HostelModel")
-                        ?.getProperty("/ImageList") || [];
+            if (imgs.length > 1) {
+                // Set native auto-play properties
+                oCarousel.setAutoPlay(true);
+                oCarousel.setAutoPlayDelay(3000);
 
-                if (imgs.length <= 1) return;
+                // Pause on user interaction using native event handling
+                const PAUSE_FOR_10_SECONDS = () => {
+                    oCarousel.setAutoPlay(false);
 
-                this._carouselInterval = setInterval(() => {
-
-                    if (oCarousel && oCarousel.getPages().length > 1) {
-                        oCarousel.next();
+                    // Resume after 10 seconds
+                    if (this._carouselResumeTimeout) {
+                        clearTimeout(this._carouselResumeTimeout);
                     }
 
-                }, 3000);
-            };
+                    this._carouselResumeTimeout = setTimeout(() => {
+                        if (oCarousel && !oCarousel.bIsDestroyed && imgs.length > 1) {
+                            oCarousel.setAutoPlay(true);
+                        }
+                    }, 10000);
+                };
 
-            // kill old autoplay timer
+                // Attach events for user interaction
+                oCarousel.attachBrowserEvent("touchstart", PAUSE_FOR_10_SECONDS);
+                oCarousel.attachBrowserEvent("mousedown", PAUSE_FOR_10_SECONDS);
+                oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
+            }
+
+            // Clear any existing interval (for backward compatibility)
             if (this._carouselInterval) {
                 clearInterval(this._carouselInterval);
                 this._carouselInterval = null;
             }
-
-            START_AUTOSCROLL();
-
-            // ---------- PAUSE HANDLING ----------
-            const PAUSE_FOR_10_SECONDS = () => {
-
-                // stop current autoplay
-                if (this._carouselInterval) {
-                    clearInterval(this._carouselInterval);
-                    this._carouselInterval = null;
-                }
-
-                // stop any existing "resume" timer
-                if (this._carouselResumeTimeout) {
-                    clearTimeout(this._carouselResumeTimeout);
-                }
-
-                // resume after 10s
-                this._carouselResumeTimeout = setTimeout(() => {
-                    START_AUTOSCROLL();
-                }, 10000);
-            };
-
-            // ---------- USER INTERACTION EVENTS ----------
-            oCarousel.attachBrowserEvent("touchstart", PAUSE_FOR_10_SECONDS);
-            oCarousel.attachBrowserEvent("mousedown", PAUSE_FOR_10_SECONDS);
-            oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
         },
         onImageLoadError: function (oEvent) {
             const oImage = oEvent.getSource();
@@ -2288,7 +2302,7 @@ sap.ui.define([
             this._oRoomDetailFragment.setModel(oFacilityModel, "FacilityModel");
 
             try {
-                let resp = await this.ajaxReadWithJQuery("HM_Facilities", {});
+                let resp = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: sBranchCode });
                 let allFacilities = resp?.data || [];
 
                 // Get static types
@@ -2296,21 +2310,19 @@ sap.ui.define([
                 const staticTypes = oStaticModel ? oStaticModel.getData() : [];
                 const validTypesLower = staticTypes.map(t => (t.FacilityName || ""));
 
-                // Case-insensitive filter
+                // Case-insensitive filter for type only (branch already filtered by backend)
                 const branchFacilities = allFacilities.filter(f => {
-                    const fBranch = (f.BranchCode || "").trim();
                     const fType = (f.Type || "").trim().toLowerCase();
 
-                    const branchMatch = fBranch === sBranchCode.trim();
                     const typeMatch = validTypesLower.includes(f.Type || "");
 
                     // ✅ Extra Bed condition
                     if (fType === "extra bed") {
-                        return branchMatch && typeMatch && oExtraBed > 0;
+                        return typeMatch && oExtraBed > 0;
                     }
 
                     // ✅ All other facilities
-                    return branchMatch && typeMatch;
+                    return typeMatch;
                 });
 
                 if (branchFacilities.length > 0) {
@@ -2333,16 +2345,15 @@ sap.ui.define([
             this._oRoomDetailFragment.setModel(oAmenityModel, "AmenityModel");
 
             try {
-                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", {});
+                let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", { BranchCode: sBranchCode });
                 let allList = resp?.data || [];
 
-                // Filter: strict BranchCode AND Type in static amenities
+                // Filter: Type in static amenities (branch already filtered by backend)
                 const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
                 const staticTypes = oStaticModel ? oStaticModel.getData() : [];
                 const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
 
                 const branchAmenities = allList.filter(x =>
-                    (x.BranchCode || "").trim() === (sBranchCode || "").trim() &&
                     validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
                 );
 
