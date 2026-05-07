@@ -1129,6 +1129,8 @@ sap.ui.define([
 
             if (Duration === "Per Day") {
                 editdata.setProperty("/Price", FPrice.PerDayPrice)
+                sap.ui.getCore().byId("editEndDate").setValue("")
+
             }
             if (Duration === "Per Hour") {
                 editdata.setProperty("/Price", FPrice.PerHourPrice)
@@ -1136,6 +1138,8 @@ sap.ui.define([
                 // sap.ui.getCore().byId("editEndTime").setVisible(true)
                 // sap.ui.getCore().byId("editHours").setVisible(true)
                 editdata.setProperty("/UnitText", Duration)
+                sap.ui.getCore().byId("editEndDate").setValue("")
+
 
             }
             if (Duration === "Per Month") {
@@ -2405,13 +2409,10 @@ sap.ui.define([
                 aAllowedRateTypes = ["Unit Price"];
 
             }
-            if (sUnitText === "Per Month" || sUnitText === "monthly") {
-                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
-            } else if (sUnitText === "Per Day" || sUnitText === "daily") {
-                aAllowedRateTypes = ["Per Day", "Per Hour"];
-            } else if (sUnitText === "Per Hour") {
-                aAllowedRateTypes = ["Per Hour"];
-            } else if (sUnitText === "Per Year" || sUnitText === "yearly") {
+            if (sUnitText === "Per Month" || sUnitText === "monthly" || sUnitText === "Per Day" || sUnitText === "daily" || sUnitText === "Per Hour" || sUnitText === "hourly"
+               || sUnitText === "Per Year" || sUnitText === "yearly"
+            ) {
+              
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
 
