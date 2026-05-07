@@ -453,7 +453,7 @@ sap.ui.define([
                 // 2. Map through documents to inject the Member Name
                 const Documents = (oCustomer.Documents || []).map(doc => {
                     // Find the member object where IDs match
-                    const oMember = AllMembers.find(member => member.Memberid === doc.Memberid);
+                    const oMember = AllMembers.find(member => member.MemberID === doc.MemberID);
 
                     return {
                         ...doc,
@@ -989,6 +989,10 @@ sap.ui.define([
 
                 // this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
                 // this.UnitTextChange()
+            }else if(oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice ==="0"){
+                sap.ui.getCore().byId("idUnitType").setVisible(true)
+                sap.ui.getCore().byId("editquantity").setEditable(true)
+                sap.ui.getCore().byId("id_Period").setVisible(false)
             }
             else {
                 oUnitType.setSelectedKey("").setVisible(true);
@@ -1120,7 +1124,9 @@ sap.ui.define([
             var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
 
 
-            var Duration = sap.ui.getCore().byId("idUnitType")?.getSelectedKey();
+            // var Duration = sap.ui.getCore().byId("idUnitType")?.getSelectedKey();
+            var Duration =editdata.getProperty("/UnitText")
+
 
             var FPrice = data.find((item) => {
                 return item.FacilityName === Sfacilityname
@@ -1192,7 +1198,15 @@ sap.ui.define([
                 sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editDays").setVisible(true)
 
-            } else {
+            }else if (FPrice.SelectionMode === "QTY" && FPrice.UnitPrice === "0") {
+
+                sap.ui.getCore().byId("editquantity").setVisible(true).setValue("")
+                sap.ui.getCore().byId("id_Period").setVisible(false)
+                sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
+                sap.ui.getCore().byId("editDays").setVisible(true)
+            }
+             else {
                 sap.ui.getCore().byId("editquantity").setVisible(false)
                 sap.ui.getCore().byId("id_Period").setVisible(false)
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
@@ -1467,7 +1481,7 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     return;
                 }
-            } else if ((selectionmode === "QTY") && oCustomerData.AllMembers.length !== 0 && this.SelectedFacility.UnitPrice !== "0") {
+            } else if ((selectionmode === "QTY") && oCustomerData.AllMembers.length !== 0) {
                 if(
                 !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idUnitType"), "ID") ||
@@ -1604,7 +1618,10 @@ sap.ui.define([
 
                     // }
                     finalPrice = this.SelectedFacility.MinimumPrice
-                } else {
+                } else if(selectionmode==="QTY" && this.SelectedFacility.UnitPrice !== "0"){
+                     finalPrice = basePrice * iquantity;
+                }
+                else{
                     finalPrice = basePrice * iDays * iquantity;
 
                 }
@@ -3552,7 +3569,11 @@ sap.ui.define([
 
                                                 total = price * diffDays;
 
-                                            } else {
+                                            }
+                                            else if(oSelectedFacility.SelectionMode==="QTY" && oSelectedFacility.UnitPrice!=="0") {
+                                                total = price * Number(item.quantity || 1) ;
+
+                                            }else{
 
                                                 total = price * Number(item.quantity || 1) * diffDays;
                                             }
@@ -3752,10 +3773,15 @@ sap.ui.define([
 
                                                 total = price * diffDays;
 
-                                            } else {
+                                            }
+                                              else if(oSelectedFacility.SelectionMode==="QTY" && oSelectedFacility.UnitPrice!=="0") {
+                                                total = price * Number(item.quantity || 1) ;
+
+                                            }else{
 
                                                 total = price * Number(item.quantity || 1) * diffDays;
                                             }
+                                         
                                         }
                                     }
 
