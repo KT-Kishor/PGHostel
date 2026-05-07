@@ -35,6 +35,7 @@
         onAfterRendering: function () {
             this._attachDocumentInfoHover();
             this._attachFacilityDiscountInfoHover();
+            this._attachFacilitiesBreakdownHover();
             this._startAllCarouselsAutoSlide(3000);
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
         },
@@ -59,10 +60,10 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+            if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
@@ -1901,6 +1902,7 @@
 
             _rebuildSelectedFacilities: function () {
                 const oModel = this.getView().getModel("HostelModel");
+                const oFacilityModel = this.getView().getModel("FacilityModel");
                 const oUnits = this._getBookingUnits();
 
                 const aOccupants = this._getOccupantOptions ? this._getOccupantOptions() : [];
@@ -2070,6 +2072,12 @@
                         }.bind(this), 0).toFixed(2)
                     )
                 );
+
+                if (oFacilityModel) {
+                    oFacilityModel.refresh(true);
+                }
+
+                this._renderFacilityCards();
                 },
             // Calculate discounts for PERSON_QTY facilities with valid minimum offer
             // const aFacilityDiscounts = [];
@@ -4175,6 +4183,122 @@
                 }
             }.bind(this));
             this._getFacilityDiscountInfoPopover().data("hoverAfterOpenBound", true);
+        },
+
+        // Facilities breakdown popover methods
+        onFacilitiesBreakdownPress: function () {
+            const oPopover = this._getFacilitiesBreakdownPopover();
+
+            this._clearFacilitiesBreakdownPopoverClose();
+
+            if (oPopover.isOpen()) {
+                oPopover.close();
+                return;
+            }
+
+            this._openFacilitiesBreakdownPopover();
+        },
+
+        _getFacilitiesBreakdownPopover: function () {
+            if (!this._oFacilitiesBreakdownPopover) {
+                this._oFacilitiesBreakdownPopover = new ResponsivePopover({
+                    showHeader: false,
+                    placement: "Bottom",
+                    contentWidth: "28rem",
+                    content: [
+                        new sap.m.VBox({
+                            items: {
+                                path: 'HostelModel>/AllSelectedFacilities',
+                                template: new sap.m.VBox({
+                                    items: [
+                                        new Text({
+                                            text: {
+                                                parts: [
+                                                    { path: "HostelModel>FacilityName" },
+                                                    { path: "HostelModel>BreakdownText" },
+                                                    { path: "HostelModel>TotalAmount" },
+                                                    { path: "HostelModel>Currency" }
+                                                ],
+                                                formatter: function (sName, sBreakdown, fTotal, sCurrency) {
+                                                    var sResult = sName || "Facility";
+                                                    if (sBreakdown) {
+                                                        sResult += ": " + sBreakdown;
+                                                    }
+                                                    if (fTotal !== undefined && fTotal !== null) {
+                                                        sResult += " = " + fTotal + " " + (sCurrency || "");
+                                                    }
+                                                    return sResult;
+                                                }
+                                            },
+                                            wrapping: true
+                                        }).addStyleClass("sapUiTinyMarginBottom")
+                                    ]
+                                }),
+                                templateShareable: false
+                            }
+                        }).addStyleClass("sapUiSmallMargin")
+                    ]
+                });
+
+                this.getView().addDependent(this._oFacilitiesBreakdownPopover);
+            }
+
+            return this._oFacilitiesBreakdownPopover;
+        },
+
+        _openFacilitiesBreakdownPopover: function () {
+            var oIcon = this.byId("facilitiesBreakdownIcon") || this.byId("editFacilitiesBreakdownIcon");
+
+            this._clearFacilitiesBreakdownPopoverClose();
+
+            if (oIcon) {
+                this._getFacilitiesBreakdownPopover().openBy(oIcon);
+            }
+        },
+
+        _clearFacilitiesBreakdownPopoverClose: function () {
+            if (this._iFacilitiesBreakdownPopoverTimer) {
+                clearTimeout(this._iFacilitiesBreakdownPopoverTimer);
+                this._iFacilitiesBreakdownPopoverTimer = null;
+            }
+        },
+
+        _scheduleFacilitiesBreakdownPopoverClose: function () {
+            this._clearFacilitiesBreakdownPopoverClose();
+            this._iFacilitiesBreakdownPopoverTimer = setTimeout(function () {
+                if (this._oFacilitiesBreakdownPopover) {
+                    this._oFacilitiesBreakdownPopover.close();
+                }
+            }.bind(this), 180);
+        },
+
+        _attachFacilitiesBreakdownHover: function () {
+            var aIconIds = ["facilitiesBreakdownIcon", "editFacilitiesBreakdownIcon"];
+
+            aIconIds.forEach(function (sId) {
+                var oIcon = this.byId(sId);
+
+                if (oIcon && !oIcon.data("hoverBound")) {
+                    oIcon.data("hoverBound", true);
+                    oIcon.attachBrowserEvent("mouseenter", this._openFacilitiesBreakdownPopover.bind(this));
+                    oIcon.attachBrowserEvent("mouseleave", this._scheduleFacilitiesBreakdownPopoverClose.bind(this));
+                }
+            }.bind(this));
+
+            if (this._getFacilitiesBreakdownPopover().data("hoverAfterOpenBound")) {
+                return;
+            }
+
+            this._getFacilitiesBreakdownPopover().attachAfterOpen(function () {
+                var oPopover = this._getFacilitiesBreakdownPopover();
+
+                if (!oPopover.data("hoverBound")) {
+                    oPopover.data("hoverBound", true);
+                    oPopover.attachBrowserEvent("mouseenter", this._clearFacilitiesBreakdownPopoverClose.bind(this));
+                    oPopover.attachBrowserEvent("mouseleave", this._scheduleFacilitiesBreakdownPopoverClose.bind(this));
+                }
+            }.bind(this));
+            this._getFacilitiesBreakdownPopover().data("hoverAfterOpenBound", true);
         },
 
         _showDocumentUploadTypeError: function () {
