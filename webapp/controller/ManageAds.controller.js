@@ -504,10 +504,10 @@ sap.ui.define([
 
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function () {
-                        oDialog.close();
+                    press: () => {
+                         oDialog.close();
                     }
-                }),
+                }).addStyleClass("myUnifiedBtn"),
 
                 afterClose: function () {
                     oDialog.destroy();
