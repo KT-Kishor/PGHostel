@@ -42,6 +42,24 @@
         >
             <f:content>
                 <Label
+                    text="Name"
+                    required="true"
+                />
+                <ComboBox
+                    id="Membername"
+                    placeholder="Select Name"
+                    items="{CustomerData>/AllMembers}"
+                    value="{Bookingmodel>/MemberName}"
+                    change="MemberNameChange"
+                    width="100%"
+                    valueStateText="Please Select Name"
+                >
+                    <core:Item
+                        key="{CustomerData>MemberID}"
+                        text="{CustomerData>Name}"
+                    />
+                </ComboBox>
+                <Label
                     text="{i18n>iDProofType}"
                     required="true"
                 />

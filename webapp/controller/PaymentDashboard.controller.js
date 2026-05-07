@@ -598,7 +598,7 @@ sap.ui.define([
                     gstAmount: gst,
                     IncomeTax: this._convertToInr(item.IncomeTax, item),
                     totalAmountInINR: this._getInrValue(item),
-                    CustomerID: item.CustomerID,
+                    BookingID: item.BookingID,
                 });
 
 

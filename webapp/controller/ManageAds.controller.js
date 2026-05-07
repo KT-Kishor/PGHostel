@@ -4,14 +4,14 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast"
-], function (BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
+], function(BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageAds", {
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteManageAds").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
                 if (!LoginFUnction) return;
@@ -50,7 +50,7 @@ sap.ui.define([
             }
         },
 
-        _loadAds: async function () {
+        _loadAds: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 
             this.getBusyDialog()
@@ -65,7 +65,7 @@ sap.ui.define([
             }
         },
 
-        MA_AddnewAds: function () {
+        MA_AddnewAds: function() {
             const oView = this.getView();
 
             if (!this.ARD_Dialog) {
@@ -90,7 +90,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        MA_EditHostelFeature: function () {
+        MA_EditHostelFeature: function() {
             const oTable = this.byId("MA_id_ManageadsTable");
             const oSelected = oTable.getSelectedItems();
 
@@ -107,29 +107,46 @@ sap.ui.define([
             const oData = oSelected[0].getBindingContext("NewAdsModel").getObject();
 
             if (!this.ARD_Dialog) {
-                this.ARD_Dialog = sap.ui.xmlfragment(this.getView().getId(),
-                    "sap.ui.com.project1.fragment.ManageAds", this);
+                this.ARD_Dialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "sap.ui.com.project1.fragment.ManageAds",
+                    this
+                );
                 this.getView().addDependent(this.ARD_Dialog);
             }
 
-            // this.getView().getModel("NewAdsModel").setData(oData);
-            this.getView().getModel("EditAdsModel").setData({ ...oData });
+            // Set edit model
+            this.getView().getModel("EditAdsModel").setData({
+                ...oData
+            });
 
-            // Load image into upload model
+            // Load images into upload model
             this.getView().getModel("UploadModel").setData({
                 Photo1: oData.Photo1 || "",
                 Photo1Type: oData.Photo1Type || "",
                 Photo1Name: oData.Photo1Name || "",
+
                 Photo2: oData.Photo2 || "",
                 Photo2Type: oData.Photo2Type || "",
                 Photo2Name: oData.Photo2Name || ""
             });
 
-            // Add existing file to tokens
-            const aTokens = oData.Photo1Name ? [{
-                key: oData.Photo1Name,
-                text: oData.Photo1Name
-            }] : [];
+            // Add existing files to tokens
+            const aTokens = [];
+
+            if (oData.Photo1Name) {
+                aTokens.push({
+                    key: "Photo1",
+                    text: oData.Photo1Name
+                });
+            }
+
+            if (oData.Photo2Name) {
+                aTokens.push({
+                    key: "Photo2",
+                    text: oData.Photo2Name
+                });
+            }
 
             this.getView().getModel("tokenModel").setData({
                 tokens: aTokens
@@ -139,31 +156,26 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        MA_onCancelButtonPress: function () {
+        MA_onCancelButtonPress: function() {
             this.ARD_Dialog.close();
             this.byId("MA_id_Url").setValueState("None");
             this.byId("MA_id_ManageadsTable").removeSelections(true);
             this._resetAdsForm()
         },
 
-
-
-        onUrlChange: function (oEvent) {
+        onUrlChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-
-
-        MA_onsavebuttonpress: async function () {
-
+        MA_onsavebuttonpress: async function() {
             const oView = this.getView();
             const Payload = oView.getModel("EditAdsModel").getData();
             const oUpload = oView.getModel("UploadModel");
             const aPhotos = oUpload.getProperty("/Photos") || [];
 
-            // ✅ Validation
+            //  Validation
             var isMandatoryValid = utils._LCvalidateMandatoryField(
                 sap.ui.getCore().byId(oView.createId("MA_id_Url")), "ID"
             );
@@ -173,7 +185,6 @@ sap.ui.define([
                 return;
             }
 
-
             // Check existing images from DB
             const bHasExistingImage =
                 Payload.Photo1 || Payload.Photo2;
@@ -181,7 +192,7 @@ sap.ui.define([
             // Check new uploads
             const bHasNewImage = aPhotos.length > 0;
 
-            // 🚨 Final validation
+            // Final validation
             if (!bHasExistingImage && !bHasNewImage) {
                 MessageToast.show("Please upload at least 1 image.");
                 return;
@@ -190,8 +201,7 @@ sap.ui.define([
             this.getBusyDialog();
 
             try {
-
-                // ✅ Map array → backend fields
+                //  Map array → backend fields
                 const oPayload = {
                     URL: Payload.URL,
 
@@ -205,7 +215,7 @@ sap.ui.define([
                 };
 
                 if (Payload.ID) {
-                    // 🔵 UPDATE
+                    //  UPDATE
                     await this.ajaxUpdateWithJQuery("HM_Advertisement", {
                         data: {
                             ID: Payload.ID,
@@ -220,7 +230,7 @@ sap.ui.define([
                     this._resetAdsForm()
 
                 } else {
-                    // 🟢 CREATE
+                    //  CREATE
                     await this.ajaxCreateWithJQuery("HM_Advertisement", {
                         data: oPayload
                     });
@@ -239,8 +249,8 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-        _resetAdsForm: function () {
 
+        _resetAdsForm: function() {
             this.getView().getModel("EditAdsModel").setData({
                 ID: null,
                 URL: ""
@@ -255,93 +265,89 @@ sap.ui.define([
             });
         },
 
-       onFacilityFileChange: function (oEvent) {
-    let aFiles = oEvent.getParameter("files");
+        onFacilityFileChange: function(oEvent) {
+            let aFiles = oEvent.getParameter("files");
 
-    if (!aFiles) return;
+            if (!aFiles) return;
 
-    if (aFiles instanceof FileList) {
-        aFiles = Array.from(aFiles);
-    } else if (!Array.isArray(aFiles)) {
-        aFiles = [aFiles];
-    }
+            if (aFiles instanceof FileList) {
+                aFiles = Array.from(aFiles);
+            } else if (!Array.isArray(aFiles)) {
+                aFiles = [aFiles];
+            }
 
-    const oUploadModel = this.getView().getModel("UploadModel");
-    const oTokenModel = this.getView().getModel("tokenModel");
+            const oUploadModel = this.getView().getModel("UploadModel");
+            const oTokenModel = this.getView().getModel("tokenModel");
 
-    let aExistingPhotos = oUploadModel.getProperty("/Photos") || [];
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
+            let aExistingPhotos = oUploadModel.getProperty("/Photos") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-    // 🚫 GLOBAL LIMIT CHECK
-    if (aExistingPhotos.length + aFiles.length > 2) {
-        sap.m.MessageToast.show("You can upload maximum 2 photos only");
-        return;
-    }
+            //  GLOBAL LIMIT CHECK
+            if (aExistingPhotos.length + aFiles.length > 2) {
+                sap.m.MessageToast.show("You can upload maximum 2 photos only");
+                return;
+            }
 
-    aFiles.forEach((oFile) => {
+            aFiles.forEach((oFile) => {
 
-        // 🚫 Duplicate check
-        const bDuplicate = aExistingPhotos.some(photo => photo.name === oFile.name);
-        if (bDuplicate) {
-            sap.m.MessageToast.show("File already uploaded: " + oFile.name);
-            return;
-        }
+                //  Duplicate check
+                const bDuplicate = aExistingPhotos.some(photo => photo.name === oFile.name);
+                if (bDuplicate) {
+                    sap.m.MessageToast.show("File already uploaded: " + oFile.name);
+                    return;
+                }
 
-        const oReader = new FileReader();
+                const oReader = new FileReader();
 
-        oReader.onload = (e) => {
-            const base64 = e.target.result.split(",")[1];
+                oReader.onload = (e) => {
+                    const base64 = e.target.result.split(",")[1];
 
-            aExistingPhotos.push({
-                content: base64,
-                type: oFile.type,
-                name: oFile.name
+                    aExistingPhotos.push({
+                        content: base64,
+                        type: oFile.type,
+                        name: oFile.name
+                    });
+
+                    aTokens.push({
+                        key: oFile.name,
+                        text: oFile.name
+                    });
+
+                    oUploadModel.setProperty("/Photos", aExistingPhotos);
+                    oTokenModel.setProperty("/tokens", aTokens);
+                };
+
+                oReader.readAsDataURL(oFile);
+            });
+        },
+
+        onTokenDelete: function(oEvent) {
+            const aDeletedTokens = oEvent.getParameter("tokens"); //  correct
+
+            const oUploadModel = this.getView().getModel("UploadModel");
+            const oTokenModel = this.getView().getModel("tokenModel");
+
+            let aPhotos = oUploadModel.getProperty("/Photos") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+            // Loop through deleted tokens
+            aDeletedTokens.forEach((oToken) => {
+
+                const sKey = oToken.getKey();
+
+                //  Remove from photos
+                aPhotos = aPhotos.filter(photo => photo.name !== sKey);
+
+                //  Remove from tokens
+                aTokens = aTokens.filter(token => token.key !== sKey);
             });
 
-            aTokens.push({
-                key: oFile.name,
-                text: oFile.name
-            });
-
-            oUploadModel.setProperty("/Photos", aExistingPhotos);
+            //  Update models
+            oUploadModel.setProperty("/Photos", aPhotos);
             oTokenModel.setProperty("/tokens", aTokens);
-        };
+        },
 
-        oReader.readAsDataURL(oFile);
-    });
-},
-
-      onTokenDelete: function (oEvent) {
-
-    const aDeletedTokens = oEvent.getParameter("tokens"); // ✅ correct
-
-    const oUploadModel = this.getView().getModel("UploadModel");
-    const oTokenModel = this.getView().getModel("tokenModel");
-
-    let aPhotos = oUploadModel.getProperty("/Photos") || [];
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
-
-    // Loop through deleted tokens
-    aDeletedTokens.forEach((oToken) => {
-
-        const sKey = oToken.getKey();
-
-        //  Remove from photos
-        aPhotos = aPhotos.filter(photo => photo.name !== sKey);
-
-        //  Remove from tokens
-        aTokens = aTokens.filter(token => token.key !== sKey);
-    });
-
-    //  Update models
-    oUploadModel.setProperty("/Photos", aPhotos);
-    oTokenModel.setProperty("/tokens", aTokens);
-},
-
-
-
-        MA_DeleteHostelFeature: async function () {
-
+        MA_DeleteHostelFeature: async function() {
             var oTable = this.byId("MA_id_ManageadsTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -352,67 +358,67 @@ sap.ui.define([
 
             MessageBox.confirm(
                 "Are you sure you want to Delete the Selected data?", {
-                icon: MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                emphasizedAction: MessageBox.Action.NO,
-                styleClass: "myUnifiedBtn",
+                    icon: MessageBox.Icon.WARNING,
+                    title: "Confirm Deletion",
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
 
-                onClose: async (sAction) => {
+                    onClose: async (sAction) => {
 
-                    if (sAction !== MessageBox.Action.YES) {
-                        oTable.removeSelections(true);
-                        return;
-                    }
+                        if (sAction !== MessageBox.Action.YES) {
+                            oTable.removeSelections(true);
+                            return;
+                        }
 
-                    try {
-                        // ✅ OPEN properly
-                        this.getBusyDialog();
+                        try {
+                            //  OPEN properly
+                            this.getBusyDialog();
 
-                        const aDeletePromises = aSelectedItems.map(async (item) => {
-                            const oData = item.getBindingContext("NewAdsModel").getObject();
+                            const aDeletePromises = aSelectedItems.map(async (item) => {
+                                const oData = item.getBindingContext("NewAdsModel").getObject();
 
-                            await this.ajaxDeleteWithJQuery("HM_Advertisement", {
-                                filters: { ID: oData.ID }
+                                await this.ajaxDeleteWithJQuery("HM_Advertisement", {
+                                    filters: {
+                                        ID: oData.ID
+                                    }
+                                });
                             });
-                        });
 
-                        await Promise.all(aDeletePromises);
+                            await Promise.all(aDeletePromises);
 
-                        MessageToast.show(this.i18nModel.getText("adDeletedSuccessfully"));
+                            MessageToast.show(this.i18nModel.getText("adDeletedSuccessfully"));
 
-                        oTable.removeSelections(true);
+                            oTable.removeSelections(true);
 
-                        // ✅ Refresh table
-                        await this._loadAds();
+                            //  Refresh table
+                            await this._loadAds();
 
-                    } catch (err) {
-                        MessageToast.show(err.message || err.responseText);
-
-                    } finally {
-                        // ✅ ALWAYS CLOSE
-                        this.closeBusyDialog();
+                        } catch (err) {
+                            MessageToast.show(err.message || err.responseText);
+                        } finally {
+                            //  ALWAYS CLOSE
+                            this.closeBusyDialog();
+                        }
                     }
                 }
-            }
-            )
-                ;
+            );
         },
 
-        _resetFacilityValueStates: function () {
+        _resetFacilityValueStates: function() {
             ["MA_id_Url"].forEach(id => {
                 const oField = this.byId(id);
                 if (oField) oField.setValueState("None");
             });
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("NewAdsModel").setData({});
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
         },
 
@@ -420,10 +426,39 @@ sap.ui.define([
             var oContext = oEvent.getSource().getBindingContext("NewAdsModel");
             var oData = oContext.getObject();
 
-            if (!oData.Photo1 || !oData.Photo1.length) {
+            // Collect images
+            var aImages = [];
+
+            if (oData.Photo1) {
+                var sPhoto1 = oData.Photo1.replace(/\s/g, "");
+
+                if (!sPhoto1.startsWith("data:image")) {
+                    sPhoto1 = "data:image/jpeg;base64," + sPhoto1;
+                }
+
+                aImages.push({
+                    src: sPhoto1,
+                    name: oData.Photo1Name || "Photo 1"
+                });
+            }
+
+            if (oData.Photo2) {
+                var sPhoto2 = oData.Photo2.replace(/\s/g, "");
+
+                if (!sPhoto2.startsWith("data:image")) {
+                    sPhoto2 = "data:image/jpeg;base64," + sPhoto2;
+                }
+
+                aImages.push({
+                    src: sPhoto2,
+                    name: oData.Photo2Name || "Photo 2"
+                });
+            }
+
+            // No images
+            if (aImages.length === 0) {
                 sap.m.MessageBox.information(
-                    "No image is uploaded.",
-                    {
+                    "No image is uploaded.", {
                         title: "Information",
                         styleClass: "myUnifiedBtn"
                     }
@@ -431,39 +466,56 @@ sap.ui.define([
                 return;
             }
 
-            var sBase64 = oData.Photo1.replace(/\s/g, "");
-            if (sBase64 && !sBase64.startsWith("data:image")) {
-                sBase64 = "data:image/jpeg;base64," + sBase64;
-            }
-            var oImage = new sap.m.Image({
-                src: sBase64,
-                densityAware: false,
-                decorative: false,
+            // Create Carousel Pages
+            var aPages = aImages.map(function (oImg) {
+                return new sap.m.VBox({
+                    alignItems: "Center",
+                    justifyContent: "Center",
+                    width: "100%",
+                    height: "100%",
+                    items: [
+                        new sap.m.Image({
+                            src: oImg.src,
+                            densityAware: false,
+                            decorative: false,
+                            width: "100%",
+                            height: "100%"
+                        }).addStyleClass("carouselImage")
+                    ]
+                });
+            });
+
+            // Carousel
+            var oCarousel = new sap.m.Carousel({
+                pages: aPages,
                 width: "100%",
                 height: "100%",
-                style: "object-fit: cover; display:block; margin:0; padding:0;"
+                showPageIndicator: false
             });
+
+            // Dialog
             var oDialog = new sap.m.Dialog({
-                title: "Amenities",
-                contentWidth: "50%",
-                contentHeight: "60%",
+                title: "Advertisement Pictures",
+                contentWidth: "60%",
+                contentHeight: "70%",
                 horizontalScrolling: false,
                 verticalScrolling: false,
-                content: [oImage],
+                content: [oCarousel],
+
                 endButton: new sap.m.Button({
                     text: "Close",
-                    press: function () {
-                        oDialog.close();
+                    press: () => {
+                         oDialog.close();
                     }
-                }),
+                }).addStyleClass("myUnifiedBtn"),
+
                 afterClose: function () {
                     oDialog.destroy();
                 }
             });
+
             oDialog.addStyleClass("ImageDialogNoPadding");
             oDialog.open();
-        },
-
-
+        }
     });
 });

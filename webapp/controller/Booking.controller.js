@@ -22,6 +22,9 @@
             this._iFacilityPageSize = 3; // show 3 cards at once
             // Initialize primary member tracking for toast notifications
             this._sLastPrimaryMemberId = "SELF"; // Default to logged-in user
+            // Initialize member data loading flags
+            this._bMemberDataLoaded = false;
+            this._bMemberDataLoading = false;
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
                     this._resetBookingPageModels();
@@ -42,13 +45,24 @@
                 clearInterval(this._adCarouselInterval);
                 this._adCarouselInterval = null;
             }
+
+            // Clean up carousel event handlers
+            if (this._adCarouselPauseResumeHandlers) {
+                this._adCarouselPauseResumeHandlers.forEach(handler => {
+                    if (handler.element && handler.event && handler.fn) {
+                        handler.element.detachBrowserEvent(handler.event, handler.fn);
+                    }
+                });
+                this._adCarouselPauseResumeHandlers = null;
+            }
+
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             let oHostelModel = sap.ui.getCore().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
@@ -74,6 +88,50 @@
             this._recalculateSummary();
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
             oHostelModel.refresh(true);
+
+            // Start background loading of member data
+            this._loadMemberDataInBackground();
+        },
+
+        /**
+         * Load HM_MemberDocument data in background for F4 help
+         * This runs async without await so it doesn't block the UI
+         */
+        _loadMemberDataInBackground: function () {
+            // Prevent multiple simultaneous loads
+            if (this._bMemberDataLoading) {
+                return;
+            }
+
+            this._bMemberDataLoading = true;
+            this._bMemberDataLoaded = false;
+
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sUserID = oHostelModel.getProperty("/UserID") || "";
+
+            if (!sUserID) {
+                console.warn("Cannot load member data: UserID not available");
+                this._bMemberDataLoaded = true;
+                this._bMemberDataLoading = false;
+                return;
+            }
+
+            // Load member data in background
+            this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID })
+                .then(oResponse => {
+                    if (oResponse && oResponse.data) {
+                        const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [];
+                        oHostelModel.setProperty("/MemberList", aMemberList);
+                        console.log("✅ Member data loaded in background:", aMemberList.length, "members");
+                    }
+                    this._bMemberDataLoaded = true;
+                    this._bMemberDataLoading = false;
+                })
+                .catch(err => {
+                    console.error("❌ Failed to load member data in background:", err);
+                    this._bMemberDataLoaded = true; // Still set to true to avoid blocking users
+                    this._bMemberDataLoading = false;
+                });
         },
         _getBookingViewInitialData: function () {
             return {
@@ -311,13 +369,51 @@
                 return;
             }
 
-            // Clear any existing interval
+            // Clear any existing interval and event listeners
             if (this._adCarouselInterval) {
                 clearInterval(this._adCarouselInterval);
                 this._adCarouselInterval = null;
             }
 
-            // Start new interval
+            // Detach previous event listeners if they exist
+            if (this._adCarouselPauseResumeHandlers) {
+                this._adCarouselPauseResumeHandlers.forEach(handler => {
+                    if (handler.element && handler.event && handler.fn) {
+                        handler.element.detachBrowserEvent(handler.event, handler.fn);
+                    }
+                });
+            }
+
+            // Store event handlers for cleanup
+            this._adCarouselPauseResumeHandlers = [];
+
+            // Create pause/resume function
+            const PAUSE_AND_RESUME = () => {
+                if (this._adCarouselInterval) {
+                    clearInterval(this._adCarouselInterval);
+                    this._adCarouselInterval = null;
+                }
+
+                // Resume after 3 seconds of inactivity
+                setTimeout(() => {
+                    if (oCarousel && !oCarousel.bIsDestroyed && oCarousel.getPages().length > 1) {
+                        this._startAdvertisementCarouselAutoSlide();
+                    }
+                }, 3000);
+            };
+
+            // Attach events and store references
+            ['touchstart', 'mousedown'].forEach(event => {
+                const handler = PAUSE_AND_RESUME.bind(this);
+                oCarousel.attachBrowserEvent(event, handler);
+                this._adCarouselPauseResumeHandlers.push({
+                    element: oCarousel,
+                    event: event,
+                    fn: handler
+                });
+            });
+
+            // Start auto-scroll with setInterval (cleaner than original with proper cleanup)
             this._adCarouselInterval = setInterval(() => {
                 if (oCarousel && !oCarousel.bIsDestroyed) {
                     oCarousel.next();
@@ -326,23 +422,6 @@
                     this._adCarouselInterval = null;
                 }
             }, 3000);
-
-            // Pause on user interaction
-            const PAUSE_AND_RESUME = () => {
-                if (this._adCarouselInterval) {
-                    clearInterval(this._adCarouselInterval);
-                    this._adCarouselInterval = null;
-                }
-                // Resume after 3 seconds of inactivity
-                setTimeout(() => {
-                    if (oCarousel && !oCarousel.bIsDestroyed) {
-                        this._startAdvertisementCarouselAutoSlide();
-                    }
-                }, 3000);
-            };
-
-            oCarousel.attachBrowserEvent("touchstart", PAUSE_AND_RESUME);
-            oCarousel.attachBrowserEvent("mousedown", PAUSE_AND_RESUME);
         },
 
         onAdvertisementCarouselChange: function (oEvent) {
@@ -606,7 +685,16 @@
                 oBillingEndDate = oEndDate;
             }
 
-            return Math.max(Math.floor((oBillingEndDate - oStartDate) / 86400000), 0);
+            // Calculate base days
+            let iDays = Math.max(Math.floor((oBillingEndDate - oStartDate) / 86400000), 0);
+
+            // For monthly and yearly plans, add 1 day to compensate for the day subtracted in _updateAutoEndDate
+            // This ensures full month/year coverage (e.g., 365 days for a non-leap year, 366 for leap year)
+            if (sPlan === "Per Month" || sPlan === "Per Year") {
+                iDays += 1;
+            }
+
+            return iDays;
         },
 
         _buildFacilityPersonLines: function (oFacility) {
@@ -2665,13 +2753,49 @@
                 return;
             }
 
-            this._loadMasterMembersForDialog();
-            const oDialog = await this._getMemberSelectionDialog();
-            oDialog.open();
-            // ✅ Defer sync until after the dialog's table renders
-            setTimeout(function () {
-                this._syncMemberDialogSelections();
-            }.bind(this), 0);
+            // Check if member data is already loaded
+            if (this._bMemberDataLoaded === true) {
+            // Data is ready, proceed immediately
+                this._loadMasterMembersForDialog();
+                const oDialog = await this._getMemberSelectionDialog();
+                oDialog.open();
+                // ✅ Defer sync until after the dialog's table renders
+                setTimeout(function () {
+                    this._syncMemberDialogSelections();
+                }.bind(this), 0);
+            } else {
+                // Show busy indicator and wait for data to load
+                sap.ui.core.BusyIndicator.show(0);
+
+                // Set a timeout to hide busy indicator after maximum wait time (10 seconds)
+                const iMaxWaitTime = 10000; // 10 seconds
+                const iTimeoutId = setTimeout(() => {
+                    sap.ui.core.BusyIndicator.hide();
+                    sap.m.MessageToast.show("Member data loading is taking longer than expected. Please try again.");
+                }, iMaxWaitTime);
+
+                // Wait for data to be loaded
+                const waitForData = () => {
+                    if (this._bMemberDataLoaded === true) {
+                        clearTimeout(iTimeoutId);
+                        sap.ui.core.BusyIndicator.hide();
+                        // Data is now ready, proceed with opening dialog
+                        this._loadMasterMembersForDialog();
+                        this._getMemberSelectionDialog().then(oDialog => {
+                            oDialog.open();
+                            setTimeout(function () {
+                                this._syncMemberDialogSelections();
+                            }.bind(this), 0);
+                        });
+                    } else {
+                        // Check again after a short delay
+                        setTimeout(waitForData, 100);
+                    }
+                };
+
+                // Start waiting
+                waitForData();
+            }
         },
         MS_viewimage: function (oEvent) {
             const oPreviewContext = oEvent.getSource().getBindingContext("BookingView");
@@ -2683,23 +2807,17 @@
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
-                let last = b64;
-
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        if (
-                            last.startsWith("iVB") ||   // PNG
-                            last.startsWith("/9j") ||   // JPG
-                            last.startsWith("JVBER")   // PDF
-                        ) {
-                            return last;
-                        }
-                        last = atob(last);
-                    } catch (e) {
-                        break;
-                    }
+                // If already starts with known signatures, assume it's single-encoded
+                if (b64.startsWith("iVB") || b64.startsWith("/9j") || b64.startsWith("JVBER")) {
+                    return b64;
                 }
-                return last;
+                // Otherwise try decode once
+                try {
+                    return atob(b64);
+                } catch (e) {
+                    // If decode fails, return original (might be already decoded)
+                    return b64;
+                }
             }
 
             // ✅ Get clicked row data
@@ -3189,21 +3307,17 @@
                 }
 
                 let sDecoded = String(sValue).replace(/\s/g, "");
-                let sLast = sDecoded;
-
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        if (sLast.startsWith("iVB") || sLast.startsWith("/9j") || sLast.startsWith("JVBER")) {
-                            return sLast;
-                        }
-
-                        sLast = atob(sLast);
-                    } catch (e) {
-                        break;
-                    }
+                // If already starts with known signatures, assume it's single-encoded
+                if (sDecoded.startsWith("iVB") || sDecoded.startsWith("/9j") || sDecoded.startsWith("JVBER")) {
+                    return sDecoded;
                 }
-
-                return sLast;
+                // Otherwise try decode once
+                try {
+                    return atob(sDecoded);
+                } catch (e) {
+                    // If decode fails, return original (might be already decoded)
+                    return sDecoded;
+                }
             };
 
             const sBase64 = normalizeBase64(autoDecodeBase64(sRawBase64));
@@ -4461,16 +4575,11 @@
                 return sFallback;
             }
 
-            try {
-                if (!sBase64.startsWith("data:image")) {
-                    atob(sBase64.substring(0, 40));
-                    return "data:" + (oFacility.Photo1Type || "image/jpeg") + ";base64," + sBase64;
-                }
-
-                return sBase64;
-            } catch (oError) {
-                return sFallback;
+            if (!sBase64.startsWith("data:image")) {
+                return "data:" + (oFacility.Photo1Type || "image/jpeg") + ";base64," + sBase64;
             }
+
+            return sBase64;
         },
 
 

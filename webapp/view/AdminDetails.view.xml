@@ -782,6 +782,12 @@
                                     </Toolbar>
                                 </headerToolbar>
                                 <columns>
+                                  <Column demandPopin="true">
+                                        <Text
+                                            text="{i18n>membername}"
+                                            tooltip="{i18n>membername}"
+                                        />
+                                    </Column>
                                     <Column demandPopin="true">
                                         <Text
                                             text="{i18n>filename}"
@@ -807,6 +813,9 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
+                                            <Text
+                                                text="{CustomerData>MemberName}"
+                                            />
                                             <Link
                                                 text="{CustomerData>FileName}"
                                                 press="onFileNameLinkPress"

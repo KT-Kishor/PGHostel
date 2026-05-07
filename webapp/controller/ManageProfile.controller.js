@@ -42,8 +42,12 @@ sap.ui.define([
                 FileType: "",
                 FileContent: "",
                 Documents: [],
-                isEditMode: false
+                isEditMode: false,
+                BookingID : "",
+                CustomerName : ""
             }), "complaintTemp");
+
+            this.getView().setModel(new JSONModel({mode: "CREATE"}), "viewModel");
 
             // Router matched
             this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
@@ -650,6 +654,7 @@ sap.ui.define([
                 }
             });
         },
+
         onPressAddMember: function () {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -658,6 +663,7 @@ sap.ui.define([
             }
 
             this._mode = "CREATE";
+            this.getView().getModel("viewModel").setProperty("/mode", "CREATE");
 
             const oBookingView = this.getView().getModel("profileData"); // adjust if needed
             const sNewMemberID = this._generateMemberID(oBookingView);
@@ -675,7 +681,7 @@ sap.ui.define([
                 DocumentType: ""
             };
 
-            this.getView().setModel(new sap.ui.model.json.JSONModel(oNewMember), "Member");
+            this.getView().setModel(new JSONModel(oNewMember), "Member");
 
             //  Clear existing file data
             this._existingFileData = null;
@@ -692,6 +698,7 @@ sap.ui.define([
 
             this.UD_Dialog.open();
         },
+
         onEditMemberFromDialog: function (oEvent) {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -700,6 +707,7 @@ sap.ui.define([
             }
 
             this._mode = "UPDATE";
+            this.getView().getModel("viewModel").setProperty("/mode", "UPDATE");
 
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oData = oContext.getObject();
@@ -718,6 +726,11 @@ sap.ui.define([
                 UserID: oData.UserID || "",
                 Salutation: oData.Salutation 
             };
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(this._existingFileData),
+                "Member"
+            );
 
             sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "").setValueState("None");
             sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "").setValueState("None");
@@ -1882,8 +1895,6 @@ sap.ui.define([
             }
         },
 
-
-
         onPressRaiseComplaint: function () {
             this._openComplaintDialog(); // no data → create mode
         },
@@ -2046,6 +2057,8 @@ sap.ui.define([
                     FileName: "",
                     FileType: "",
                     FileContent: "",
+                    BookingID : "",
+                    CustomerName : "",
                     Documents: [],
                     isEditMode: false
                 });
@@ -2286,11 +2299,14 @@ sap.ui.define([
             const oRoomNo = this._getComplaintControl("idComplaintRoom");
             const oDescription = this._getComplaintControl("idComplaintDesc");
             const oBranchCombo = this._getComplaintControl("idBranchCombo");
-
+            const oBookingID = this._getComplaintControl("MP_id_AddBooking");
+            const oCustomerName = this._getComplaintControl("MP_id_AddCustComboBox");
 
 
             if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID") ||
                 !utils._LCstrictValidationComboBox(oRoomNo, "ID") ||
+                !utils._LCstrictValidationComboBox(oCustomerName, "ID") ||
+                !utils._LCstrictValidationComboBox(oBookingID, "ID") ||
                 !utils._LCvalidateMandatoryField(oComplaintType, "ID") ||
                 !utils._LCvalidateMandatoryField(oDescription, "ID")) {
                 MessageToast.show("Please fill all required fields.");
@@ -2316,7 +2332,9 @@ sap.ui.define([
                 BranchCode: sBranchCode,   // ← from ComboBox ONLY
                 FileName: oData.FileName || "",
                 FileType: oData.FileType || "",
-                File: oData.FileContent || ""
+                File: oData.FileContent || "",
+                BookingID : oData.BookingID,
+                CustomerName : oData.CustomerName
             };
 
 
@@ -2393,11 +2411,75 @@ sap.ui.define([
             this._openComplaintDialog(oComplaint);
         },
 
-        onComBranch: function (oEvent) {
+        onComBranch: async function (oEvent) {
             const oBranchCombo = oEvent.getSource();
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
             const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
-            this._setComplaintRoomComboData(sBranchCode, "");
+            this.BranchCode = sBranchCode; // Store globally if needed elsewhere
+            this._setComplaintRoomComboData(sBranchCode, ""); // Store globally if needed elsewhere
+            this.getView().setModel(new JSONModel([]), "customerbookingdata");  // Clear previous customer/booking data
+
+            if (sBranchCode) {
+                await this.onSearch();
+            }
+        },
+
+        onSearch: function () {
+            return new Promise((resolve, reject) => {
+                var filter = {
+                    BranchCode: this.BranchCode,
+                    UserID: this._oLoggedInUser.UserID,
+                    Status: "Assigned"
+                };
+
+                this.ajaxReadWithJQuery("HM_CustomerReadCall", filter).then((oData) => {
+                        var aData = Array.isArray(oData.commentData)  ? oData.commentData : [oData.commentData];
+                        this.getView().setModel(
+                            new sap.ui.model.json.JSONModel(aData),
+                            "customerbookingdata"
+                        );
+                        this.closeBusyDialog();
+                        resolve();
+                    }).catch((err) => {
+                        this.closeBusyDialog();
+                        MessageToast.show(err.responseText || "Failed to Load Customer Data.");
+                        reject(err);
+                    });
+            });
+        },
+
+        onChangeAddCustomer: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            const oCombo = oEvent.getSource();
+            const sCustomer = oCombo.getSelectedKey();
+
+            const aData = this.getView().getModel("customerbookingdata").getData() || [];
+            const oSelected = aData.find(item =>
+                item.CustomerName === sCustomer
+            );
+
+            if (oSelected) {
+                const oTempModel = this.getView().getModel("complaintTemp");
+                oTempModel.setProperty("/CustomerName", oSelected.CustomerName);
+                oTempModel.setProperty("/BookingID", oSelected.BookingID);
+            }
+        },
+
+        onChangeBookingID: function (oEvent) {
+        utils._LCstrictValidationComboBox(oEvent);
+
+            const oCombo = oEvent.getSource();
+            const sBookingID = oCombo.getSelectedKey();
+            const aData = this.getView().getModel("customerbookingdata").getData() || [];
+            const oSelected = aData.find(item =>
+                item.BookingID === sBookingID
+            );
+
+            if (oSelected) {
+                const oTempModel = this.getView().getModel("complaintTemp");
+                oTempModel.setProperty("/BookingID", oSelected.BookingID);
+                oTempModel.setProperty("/CustomerName", oSelected.CustomerName);
+            }
         },
 
         HF_viewimage: function (oEvent) {
