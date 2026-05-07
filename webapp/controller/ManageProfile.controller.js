@@ -45,6 +45,8 @@ sap.ui.define([
                 isEditMode: false
             }), "complaintTemp");
 
+            this.getView().setModel(new JSONModel({mode: "CREATE"}), "viewModel");
+
             // Router matched
             this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
         },
@@ -650,6 +652,7 @@ sap.ui.define([
                 }
             });
         },
+
         onPressAddMember: function () {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -658,6 +661,7 @@ sap.ui.define([
             }
 
             this._mode = "CREATE";
+            this.getView().getModel("viewModel").setProperty("/mode", "CREATE");
 
             const oBookingView = this.getView().getModel("profileData"); // adjust if needed
             const sNewMemberID = this._generateMemberID(oBookingView);
@@ -675,7 +679,7 @@ sap.ui.define([
                 DocumentType: ""
             };
 
-            this.getView().setModel(new sap.ui.model.json.JSONModel(oNewMember), "Member");
+            this.getView().setModel(new JSONModel(oNewMember), "Member");
 
             //  Clear existing file data
             this._existingFileData = null;
@@ -692,6 +696,7 @@ sap.ui.define([
 
             this.UD_Dialog.open();
         },
+
         onEditMemberFromDialog: function (oEvent) {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -700,6 +705,7 @@ sap.ui.define([
             }
 
             this._mode = "UPDATE";
+            this.getView().getModel("viewModel").setProperty("/mode", "UPDATE");
 
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oData = oContext.getObject();
@@ -718,6 +724,11 @@ sap.ui.define([
                 UserID: oData.UserID || "",
                 Salutation: oData.Salutation 
             };
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(this._existingFileData),
+                "Member"
+            );
 
             sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "").setValueState("None");
             sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "").setValueState("None");

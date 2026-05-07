@@ -42,7 +42,7 @@
                         hAlign="Left"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>CustomerID}" />
+                        <Text text="{i18n>bookingID}" />
                     </Column>
                     <Column
                         hAlign="End"
@@ -86,7 +86,7 @@
                     >
                         <cells>
                             <Text text="{dialogData>InvNo}" />
-                            <Text text="{dialogData>CustomerID}" />
+                            <Text text="{dialogData>BookingID}" />
                             <ObjectNumber
                                 number="{path: 'dialogData>SubTotalInGST', formatter: '.Formatter.fromatNumber'}"
                                 unit="INR"

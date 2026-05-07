@@ -7,17 +7,16 @@
 >
     <Dialog
         id="sds1"
-        title="{i18n>uploadDocuments}"
+        title="{= ${viewModel>/mode} === 'CREATE' ? 'Add Member' : 'Update Member' }"
         type="Standard"
         class="sapUiContentPadding"
     >
         <customHeader>
             <Bar class="barheader">
                 <contentLeft>
-                    <Title
-                        text="{i18n>uploadDocuments}"
-                        class="sapUiSmallMarginBegin"
-                    />
+                    <Title text="{= ${viewModel>/mode} === 'CREATE' ? 'Add Member' : 'Update Member' }"
+                    class="sapUiSmallMarginBegin"
+                />
                 </contentLeft>
             
             </Bar>
@@ -66,7 +65,7 @@
                             selectedKey="{Member>/Salutation}"
                             placeholder="Select salutation"
                             valueStateText="Please select salutation"
-                            change="onNewMemberSalutationChange"
+                            change="onNewMemberSalutationChange" editable="{= ${Member>/Relation} !== 'Self' }"
                         >
                             <core:Item
                                 key="Mr."
@@ -98,7 +97,7 @@
                             valueStateText="Please enter a valid full name"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
-                            maxLength="35"
+                            maxLength="35" editable="{= ${Member>/Relation} !== 'Self' }"
                         />
                     </VBox>
                 </HBox>
@@ -113,7 +112,7 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNewMemberDOBChange"
-                    valueStateText="Age must be between 0 and 100 years"
+                    valueStateText="Age must be between 0 and 100 years" editable="{= ${Member>/Relation} !== 'Self' }"
                 />
                 <Label
                     text="Gender"
@@ -124,7 +123,7 @@
                     selectedKey="{Member>/Gender}"
                     placeholder="Select gender"
                     valueStateText="Please select gender"
-                    change="onNewMemberGenderChange"
+                    change="onNewMemberGenderChange" editable="{= ${Member>/Relation} !== 'Self' }"
                 >
                     <core:Item
                         key="Male"
@@ -148,7 +147,7 @@
                     selectedKey="{Member>/Relation}"
                     placeholder="Select relationship"
                     valueStateText="Please select relationship"
-                    change="onNewMemberRelationChange"
+                    change="onNewMemberRelationChange" editable="{= ${Member>/Relation} !== 'Self' }"
                 >
                  
                     <core:Item

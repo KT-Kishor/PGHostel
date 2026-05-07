@@ -59,7 +59,7 @@
                         hAlign="Left"
                         minScreenWidth="Desktop"
                     >
-                        <Text text="{i18n>customerID}" />
+                        <Text text="{i18n>bookingID}" />
                     </Column>
                     <Column
                         demandPopin="true"
@@ -97,7 +97,7 @@
                                 text="{path: 'popoverData>InvoiceDate', formatter: '.Formatter.formatDate'}"
                             />
                             <Text text="{popoverData>CustomerName}" />
-                            <Text text="{popoverData>CustomerID}" />
+                            <Text text="{popoverData>BookingID}" />
                             <ObjectNumber
                                 number="{parts: [{ path: 'popoverData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="{popoverData>Currency}"

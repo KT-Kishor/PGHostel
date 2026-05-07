@@ -48,7 +48,7 @@
                         hAlign="Left"
                         minScreenWidth="Tablet"
                     >
-                        <Text text="{i18n>CustomerID}" />
+                        <Text text="{i18n>bookingID}" />
                     </Column>
                     <Column
                         demandPopin="true"
@@ -100,7 +100,7 @@
                             <Text
                                 text="{path: 'dialogData>InvoiceDate', formatter: '.Formatter.formatDate'}"
                             />
-                            <Text text="{dialogData>CustomerID}" />
+                            <Text text="{dialogData>BookingID}" />
                             <ObjectNumber
                                 number="{parts: [{ path: 'dialogData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="{dialogData>Currency}"
