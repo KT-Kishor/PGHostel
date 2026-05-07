@@ -2004,7 +2004,14 @@ sap.ui.define([
             
             // Restore original data from backup if it exists
             if (this._backupHostelModel) {
-                oHostelModel.setData(this._backupHostelModel);
+                // JSON.stringify converts Date objects to strings; restore TodayDate as a real Date
+                // BEFORE calling setData so that DatePicker's minDate binding never sees a string
+                var oBackupData = Object.assign({}, this._backupHostelModel);
+                var vTodayDate = oBackupData.TodayDate;
+                if (vTodayDate && !(vTodayDate instanceof Date)) {
+                    oBackupData.TodayDate = new Date(vTodayDate);
+                }
+                oHostelModel.setData(oBackupData);
             }
             if (this._backupBookingView) {
                 oBookingView.setData(Object.assign({}, this._backupBookingView));
