@@ -989,6 +989,7 @@ sap.ui.define([
             mOptions = mOptions || {};
             MessageBox.success(sMessage || "Booking updated successfully.", {
                 title: "Success",
+                styleClass: "myUnifiedBtn",
                 onClose: function () {
                     if (typeof mOptions.afterClose === "function") {
                         mOptions.afterClose();
@@ -1245,10 +1246,67 @@ sap.ui.define([
             return oBookingData;
         },
 
+        _validateBookingBeforeUpdate: function () {
+            var oModel = this.getView().getModel("HostelModel");
+            var oBookingView = this.getView().getModel("BookingView");
+            var sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
+            var bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
+            var bIsBusinessTravel = !!oModel.getProperty("/IsBusinessTravel");
+            var sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim();
+
+            var isMandatoryValid = (
+                !!sPropertyType &&
+                utils._LCstrictValidationComboBox(this.getView().byId("EditBookRoom_ID"), "ID") &&
+                utils._LCvalidateDate(this.getView().byId("EditBookStartdate_ID"), "ID") &&
+                utils._LCvalidateDate(this.getView().byId("EditBookEnddate_ID"), "ID")
+            );
+
+            if (!isMandatoryValid) {
+                MessageToast.show("Please fill mandatory booking details");
+                return false;
+            }
+
+            if ((oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
+                return !!oMember.Selected;
+            }).length < 1) {
+                MessageToast.show("Please select at least one member from the member list.");
+                return false;
+            }
+
+            if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
+                MessageToast.show("Please complete contact details before payment");
+                return false;
+            }
+
+            if (bSupportsCustomerGST && bIsBusinessTravel) {
+                var isGStvalidate = (
+                    utils._LCvalidateGstNumber(this.getView().byId("EditBookGst_ID"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("EditBookCompanyname_ID"), "ID") &&
+                    utils._LCvalidateMandatoryField(this.getView().byId("EditBookconpanyAddress_ID"), "ID")
+                );
+
+                if (!isGStvalidate) {
+                    MessageToast.show("Please fill business GST details");
+                    return false;
+                }
+
+                if (!this._isValidGSTINValue(sCustomerGSTIN)) {
+                    MessageToast.show("Please enter a valid GSTIN");
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
         onSubmitPress: async function () {
             if (this._isPaymentDialogSubmission(arguments[0]) &&
                 this.getView().getModel("HostelModel").getProperty("/IsEditMode")) {
                 return this._onPaymentSubmit();
+            }
+
+            if (!this._validateBookingBeforeUpdate()) {
+                return;
             }
 
             try {
