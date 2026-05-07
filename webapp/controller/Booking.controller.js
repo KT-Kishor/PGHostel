@@ -3250,6 +3250,12 @@
             oReader.readAsDataURL(oFile);
         },
 
+        onNewMemberFileSizeExceed: function (oEvent) {
+            const sFileName = oEvent.getParameter("fileName") || "File";
+            sap.m.MessageToast.show(sFileName + " exceeds the 2 MB size limit. Please choose a smaller file.");
+            oEvent.getSource().clear();
+        },
+
         onDeleteNewMemberDocument: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oFileUploader = this.byId("newMemberFileUploader");
