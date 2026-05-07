@@ -192,6 +192,7 @@
                         maximumFileSize="2"
                         sameFilenameAllowed="true"
                         change="onNewMemberDocumentChange"
+                        fileSizeExceed="onNewMemberFileSizeExceed"
                         buttonText="Upload"
                         fileType="pdf,jpg,jpeg,png,webp"
                         class="sapUiTinyMarginEnd myUnifiedBtn"
