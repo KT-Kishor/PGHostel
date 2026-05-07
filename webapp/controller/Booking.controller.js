@@ -5740,7 +5740,8 @@
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
-                    PaymentDetails: [this._getPaymentPayloadDetails()]
+                    // PaymentDetails: [this._getPaymentPayloadDetails()]
+                    PaymentDetails: (this.getView().getModel("PaymentModel").getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn" ? [] : [this._getPaymentPayloadDetails()]
                 }]
             };
         },
