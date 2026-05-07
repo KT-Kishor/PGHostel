@@ -61,10 +61,11 @@
                             columnsM="1"
                             class="responsiveForm"
                         >
-                            <Label text="Property Type" />
+<Label text="Property" />
+
                             <Input
                                 id="EditBookProperty_ID"
-                                value="{HostelModel>/PropertyType}"
+                                value="{= ${HostelModel>/Area} + (${HostelModel>/PropertyType} ? ' (' + ${HostelModel>/PropertyType} + ')' : '') }"
                                 editable="false"
                             />
                             <Label
