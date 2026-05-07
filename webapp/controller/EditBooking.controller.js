@@ -20,6 +20,9 @@ sap.ui.define([
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3;
             this._sLastPrimaryMemberId = "SELF";
+            // Initialize member data loading flags
+            this._bMemberDataLoaded = false;
+            this._bMemberDataLoading = false;
 
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
@@ -49,6 +52,7 @@ sap.ui.define([
             this._backupBookingView = null;
             this._backupFacilityModel = null;
             this._backupFacilitySelection = null;
+            this._backupAllFacilities = null;
             
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
@@ -78,71 +82,104 @@ sap.ui.define([
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
 
-                // 2. Fetch bed type + room data via BookingBedTypeRoomReadCall (same as _loadFilteredData in View_Rooms)
+                // 2. Parallel API calls for branch-related data, payments, and facilities
                 var oRoomData = {};
                 var oPricingData = {};
-                if (sBranchCode) {
-                    try {
-                        var oBedTypeResp = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
-                            BranchCode: sBranchCode
-                        });
-                        var aBedTypes = (oBedTypeResp && oBedTypeResp.data && oBedTypeResp.data.HM_BedType) || [];
-                        var aRooms = (oBedTypeResp && oBedTypeResp.data && oBedTypeResp.data.HM_Rooms) || [];
-
-                        // Find matching bed type by Name + ACType (like _loadFilteredData does)
-                        var sBedType = oBooking.BedType || "";
-                        var sBedName = sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
-                        var sACType = sBedType.indexOf("NON-AC") >= 0 ? "NON-AC" : "AC";
-                        oRoomData = aBedTypes.find(function (b) {
-                            return b.Name === sBedName && b.BranchCode === sBranchCode && b.ACType === sACType;
-                        }) || aBedTypes.find(function (b) {
-                            return b.BranchCode === sBranchCode;
-                        }) || {};
-
-                        // Find matching room for pricing (BedTypeName = "Name - ACType")
-                        var sBedTypeName = (oRoomData.Name || sBedName) + " - " + (oRoomData.ACType || sACType);
-                        oPricingData = aRooms.find(function (r) {
-                            return r.BranchCode === sBranchCode && r.BedTypeName && r.BedTypeName.trim().toLowerCase() === sBedTypeName.trim().toLowerCase();
-                        }) || aRooms.find(function (r) {
-                            return r.BranchCode === sBranchCode;
-                        }) || {};
-                    } catch (e) {
-                        // Bed type fetch failed — continue with booking data only
-                    }
-                }
-
-                // 3. Fetch branch data for GST, CheckIn/Out times (from getBranchHotelData)
                 var oBranchData = {};
-                if (sBranchCode) {
+                var aExistingPayments = [];
+                var oFacilitiesResponse = null;
+
+                try {
+                    // Create an array of promises for parallel execution
+                    var aPromises = [];
+
+                    // Add branch-related API calls only if branch code exists
+                    if (sBranchCode) {
+                        aPromises.push(
+                            this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", { BranchCode: sBranchCode })
+                                .then(function (oBedTypeResp) {
+                                    return { type: "bedType", data: oBedTypeResp };
+                                })
+                        );
+                        aPromises.push(
+                            this.ajaxReadWithJQuery("getBranchHotelData", { BranchCode: sBranchCode, BranchID: sBranchCode })
+                                .then(function (oBranchResp) {
+                                    return { type: "branch", data: oBranchResp };
+                                })
+                        );
+                        // Load facilities in parallel too
+                        aPromises.push(
+                            this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: sBranchCode })
+                                .then(function (oFacResp) {
+                                    return { type: "facilities", data: oFacResp };
+                                })
+                        );
+                    }
+
+                    // Payment call is independent and can run in parallel
+                    aPromises.push(
+                        this._readEditPaymentsByBookingId(sBookingID)
+                            .then(function (oPayments) {
+                                return { type: "payments", data: oPayments };
+                            })
+                    );
+
+                    // Execute all promises in parallel
+                    var aResults = await Promise.all(aPromises);
+
+                    // Process results
+                    aResults.forEach(function (oResult) {
+                        if (oResult.type === "bedType" && oResult.data) {
+                            var aBedTypes = (oResult.data.data && oResult.data.data.HM_BedType) || [];
+                            var aRooms = (oResult.data.data && oResult.data.data.HM_Rooms) || [];
+
+                            // Find matching bed type by Name + ACType
+                            var sBedType = oBooking.BedType || "";
+                            var sBedName = sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                            var sACType = sBedType.indexOf("NON-AC") >= 0 ? "NON-AC" : "AC";
+                            oRoomData = aBedTypes.find(function (b) {
+                                return b.Name === sBedName && b.BranchCode === sBranchCode && b.ACType === sACType;
+                            }) || aBedTypes.find(function (b) {
+                                return b.BranchCode === sBranchCode;
+                            }) || {};
+
+                            // Find matching room for pricing
+                            var sBedTypeName = (oRoomData.Name || sBedName) + " - " + (oRoomData.ACType || sACType);
+                            oPricingData = aRooms.find(function (r) {
+                                return r.BranchCode === sBranchCode && r.BedTypeName && r.BedTypeName.trim().toLowerCase() === sBedTypeName.trim().toLowerCase();
+                            }) || aRooms.find(function (r) {
+                                return r.BranchCode === sBranchCode;
+                            }) || {};
+                        } else if (oResult.type === "branch" && oResult.data) {
+                            var aBranches = (oResult.data.HM_Branch) || [];
+                            oBranchData = aBranches.find(function (b) {
+                                return b.BranchID === sBranchCode;
+                            }) || aBranches[0] || {};
+                        } else if (oResult.type === "payments") {
+                            aExistingPayments = oResult.data || [];
+                        } else if (oResult.type === "facilities" && oResult.data) {
+                            oFacilitiesResponse = oResult.data;
+                        }
+                    });
+
+                } catch (e) {
+                    // Any API failure — continue with booking data only
+                    console.warn("Parallel API calls failed:", e);
+                    // Fallback: try to get payments separately
                     try {
-                        var oBranchResp = await this.ajaxReadWithJQuery("getBranchHotelData", {
-                            BranchCode: sBranchCode,
-                            BranchID: sBranchCode
-                        });
-                        var aBranches = (oBranchResp && oBranchResp.HM_Branch) || [];
-                        oBranchData = aBranches.find(function (b) {
-                            return b.BranchID === sBranchCode;
-                        }) || aBranches[0] || {};
-                    } catch (e) {
-                        // Branch data fetch failed — continue
+                        aExistingPayments = await this._readEditPaymentsByBookingId(sBookingID);
+                    } catch (payErr) {
+                    // Ignore payment fetch error
                     }
                 }
 
-                // 3. Also fetch member documents (like onConfirmBooking does)
+                // 3. Also fetch member documents (like onConfirmBooking does) - non-blocking background load
                 var aMemberDocs = [];
-                try {
-                    var oLoginModel = sap.ui.getCore().getModel("LoginModel");
-                    var oUser = oLoginModel && oLoginModel.getData && oLoginModel.getData() || {};
-                    if (oUser.UserID) {
-                        var oMemberResp = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: oUser.UserID });
-                        aMemberDocs = Array.isArray(oMemberResp && oMemberResp.data) ? oMemberResp.data : [];
-                    }
-                } catch (e) {
-                    // Member fetch failed — continue
-                }
+                // Start background loading for member data (for F4 help)
+                // The actual member documents for edit data will be loaded asynchronously
+                // UserID will be set by _prefillLoggedInUser called later
 
                 var oEditData = this._normalizeBookingEditData(oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs);
-                var aExistingPayments = await this._readEditPaymentsByBookingId(sBookingID);
                 var fPaymentPaidAmount = this._getEditPaymentPaidAmount(aExistingPayments);
 
                 oHostelModel.setData(oEditData);
@@ -154,13 +191,27 @@ sap.ui.define([
 
                 this._initializeBookingData();
                 this._prefillLoggedInUser();
+                // Start background loading of member data for F4 help
+                this._loadMemberDataInBackground();
                 this._syncPropertyTypeState();
                 this._syncPlanState();
                 this._applySelectedPlanPrice();
 
-                await this._loadFacilities();
+                // Process facilities if we got them in parallel
+                if (oFacilitiesResponse) {
+                    this._aAllFacilities = oFacilitiesResponse.data || [];
+                    this._processFacilitiesForEdit();
+                } else {
+                // Fallback: load facilities separately
+                    await this._loadFacilities();
+                }
+
+                // Load advertisements in parallel with UI updates
+                this._loadAdvertisements().catch(function (e) {
+                    console.warn("Advertisement load failed:", e);
+                });
+
                 this._rebuildSelectedFacilities();
-                await this._loadAdvertisements();
 
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
@@ -174,10 +225,273 @@ sap.ui.define([
                 oBookingView.setProperty("/editModeEnabled", false); // Start in read-only mode
 
             } catch (oError) {
+                console.error("Edit booking load error:", oError);
                 MessageBox.error("Unable to load booking details for edit.");
             } finally {
                 this.closeBusyDialog();
             }
+        },
+
+        /**
+         * Override to merge member documents with existing API members in edit mode
+         */
+        _loadMemberDataInBackground: function () {
+            // Prevent multiple simultaneous loads
+            if (this._bMemberDataLoading) {
+                return;
+            }
+
+            this._bMemberDataLoading = true;
+            this._bMemberDataLoaded = false;
+
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sUserID = oHostelModel.getProperty("/UserID") || "";
+
+            if (!sUserID) {
+                console.warn("Cannot load member data: UserID not available");
+                this._bMemberDataLoaded = true;
+                this._bMemberDataLoading = false;
+                return;
+            }
+
+            // Load member data in background with a small delay to prioritize UI rendering
+            setTimeout(() => {
+                this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID })
+                    .then(oResponse => {
+                        if (oResponse && oResponse.data) {
+                            const aMemberDocs = Array.isArray(oResponse.data) ? oResponse.data : [];
+                            // Get existing MemberList from HostelModel (contains API members from HM_Customer)
+                            const aExistingMembers = oHostelModel.getProperty("/MemberList") || [];
+
+                            // Use lightweight merge for better performance
+                            const aUpdatedMembers = this._lightweightMergeMemberDocuments(aExistingMembers, aMemberDocs);
+                            oHostelModel.setProperty("/MemberList", aUpdatedMembers);
+                            console.log("✅ Member data loaded in background:", aMemberDocs.length, "documents");
+                        }
+                        this._bMemberDataLoaded = true;
+                        this._bMemberDataLoading = false;
+                    })
+                    .catch(err => {
+                        console.warn("Failed to load member data in background:", err);
+                        this._bMemberDataLoaded = true; // Still set to true to avoid blocking users
+                        this._bMemberDataLoading = false;
+                    });
+            }, 100); // Small delay to let UI render first
+        },
+
+        _lightweightMergeMemberDocuments: function (aApiMembers, aMemberDocs) {
+            if (!aMemberDocs.length) {
+                return aApiMembers;
+            }
+
+            // Create a map for faster lookups
+            const mMemberMap = {};
+            aApiMembers.forEach((oMember, iIndex) => {
+                const sKey = oMember.MemberID || `idx_${iIndex}`;
+                mMemberMap[sKey] = oMember;
+            });
+
+            aMemberDocs.forEach(oDocMember => {
+                const sKey = oDocMember.MemberID;
+                if (sKey && mMemberMap[sKey]) {
+                    // Quick merge of documents array
+                    if (Array.isArray(oDocMember.Documents) && oDocMember.Documents.length > 0) {
+                        mMemberMap[sKey].Documents = oDocMember.Documents;
+                    }
+                    // Copy only essential fields
+                    const oExisting = mMemberMap[sKey];
+                    if (!oExisting.DocumentType && oDocMember.DocumentType) oExisting.DocumentType = oDocMember.DocumentType;
+                    if (!oExisting.DocumentName && oDocMember.DocumentName) oExisting.DocumentName = oDocMember.DocumentName;
+                    if (!oExisting.FileName && oDocMember.FileName) oExisting.FileName = oDocMember.FileName;
+                } else if (sKey) {
+                    // New member - add to map
+                    mMemberMap[sKey] = oDocMember;
+                }
+            });
+
+            return Object.values(mMemberMap);
+        },
+
+        /**
+         * Merge member documents into existing member list
+         */
+        _mergeMemberDocuments: function (aApiMembers, aMemberDocs) {
+            if (!aMemberDocs.length) {
+                return aApiMembers;
+            }
+
+            // Create a copy of API members
+            const aMerged = JSON.parse(JSON.stringify(aApiMembers));
+
+            aMemberDocs.forEach(oDocMember => {
+                const oExisting = aMerged.find(am => am.MemberID === oDocMember.MemberID);
+                if (oExisting) {
+                    // Merge Documents array from HM_MemberDocument into the API member
+                    if (Array.isArray(oDocMember.Documents) && oDocMember.Documents.length > 0) {
+                        oExisting.Documents = oDocMember.Documents;
+                    }
+                    // Also copy top-level document fields if present on doc member but not on API member
+                    if (!oExisting.DocumentType && oDocMember.DocumentType) { oExisting.DocumentType = oDocMember.DocumentType; }
+                    if (!oExisting.DocumentName && oDocMember.DocumentName) { oExisting.DocumentName = oDocMember.DocumentName; }
+                    if (!oExisting.FileName && oDocMember.FileName) { oExisting.FileName = oDocMember.FileName; }
+                    if (!oExisting.File && oDocMember.File) { oExisting.File = oDocMember.File; }
+                    if (!oExisting.Document && oDocMember.Document) { oExisting.Document = oDocMember.Document; }
+                    if (!oExisting.FileType && oDocMember.FileType) { oExisting.FileType = oDocMember.FileType; }
+                    if (!oExisting.DocumentID && oDocMember.DocumentID) { oExisting.DocumentID = oDocMember.DocumentID; }
+                } else {
+                    // If no matching API member, add the document member as a new entry
+                    aMerged.push(oDocMember);
+                }
+            });
+
+            return aMerged;
+        },
+
+        /**
+         * Override to use PhotoUrl property for images instead of Base64 processing
+         */
+        _getFacilityImageSource: function (oFacility) {
+            // First check if PhotoUrl is provided (backend should send direct image URLs)
+            if (oFacility && oFacility.PhotoUrl) {
+                return oFacility.PhotoUrl;
+            }
+
+            // Fallback to parent implementation (which uses Base64)
+            return BookingController.prototype._getFacilityImageSource.call(this, oFacility);
+        },
+
+        /**
+         * Override to avoid Base64 decoding for document previews
+         * Use DocumentUrl if available, otherwise fallback to parent
+         */
+        _previewDocument: function (oDoc) {
+            // Check if document has a URL property (backend should provide direct URLs)
+            if (oDoc && (oDoc.DocumentUrl || oDoc.FileUrl || oDoc.Url)) {
+                const sUrl = oDoc.DocumentUrl || oDoc.FileUrl || oDoc.Url;
+                // Open URL in new tab or display in dialog
+                window.open(sUrl, '_blank');
+                return;
+            }
+
+            // Fallback to parent implementation (which uses Base64 decoding)
+            BookingController.prototype._previewDocument.call(this, oDoc);
+        },
+
+        _simplifyFacilityItemsForEdit: function (aRawFacilities, oBooking) {
+            // Lightweight facility processing - just extract essential info
+            if (!Array.isArray(aRawFacilities) || aRawFacilities.length === 0) {
+                return [];
+            }
+
+            var fnToNumber = function (vValue) {
+                var fValue = parseFloat(String(vValue === null || vValue === undefined ? "" : vValue).replace(/,/g, "").trim());
+                return isNaN(fValue) ? 0 : fValue;
+            };
+
+            var fnNormalizeKey = function (vValue) {
+                return String(vValue || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+            };
+
+            var fnGetFacilityKey = function (oItem) {
+                var sSelectionMode = String(oItem.SelectionMode || "").trim().toUpperCase() || "SINGLE";
+                var sFacilityName = fnNormalizeKey(oItem.FacilityName || oItem.Type || "");
+                var sChargeType = String(oItem.FacilityChargeType || "").trim().toUpperCase();
+                var sUnitText = fnNormalizeKey(oItem.UnitText || "");
+                return [
+                    sFacilityName,
+                    sSelectionMode,
+                    sSelectionMode === "PERSON_QTY" ? sChargeType : "",
+                    sUnitText
+                ].join("|");
+            };
+
+            var fnTrackPersonSelection = function (oAgg, oItem) {
+                var sSelectionMode = oAgg.SelectionMode;
+                var sMemberId = String(oItem.MemberID || "").trim();
+                var sMemberName = String(oItem.MemberName || oItem.Name || "").trim();
+                var sPersonKey = sMemberId || sMemberName;
+
+                if ((sSelectionMode === "PERSON" || sSelectionMode === "PERSON_QTY") && sPersonKey && oAgg.SelectedPersonIds.indexOf(sPersonKey) < 0) {
+                    oAgg.SelectedPersonIds.push(sPersonKey);
+                }
+
+                if (sSelectionMode !== "PERSON_QTY" || !sPersonKey) {
+                    return;
+                }
+
+                var iQty = Math.max(parseInt(oItem.Quantity, 10) || 0, 0);
+                var oExistingLine = oAgg.PersonQuantities.find(function (oLine) {
+                    return String(oLine.personId || "").trim() === sPersonKey;
+                });
+
+                if (!oExistingLine) {
+                    oExistingLine = {
+                        personId: sPersonKey,
+                        personName: sMemberName || sPersonKey,
+                        selected: iQty > 0,
+                        qty: 0
+                    };
+                    oAgg.PersonQuantities.push(oExistingLine);
+                }
+
+                oExistingLine.qty += iQty;
+                oExistingLine.selected = oExistingLine.selected || iQty > 0;
+
+                if (sMemberName) {
+                    oExistingLine.personName = sMemberName;
+                }
+            };
+
+            var mFacilityMap = {};
+
+            aRawFacilities.forEach(function (oItem) {
+                var sSelectionMode = String(oItem.SelectionMode || "").trim().toUpperCase() || "SINGLE";
+                var sFacilityId = fnGetFacilityKey(oItem);
+                var iRowQty = Math.max(parseInt(oItem.Quantity, 10) || 0, 0);
+
+                if (!mFacilityMap[sFacilityId]) {
+                    mFacilityMap[sFacilityId] = {
+                        FacilityID: oItem.FacilityID || oItem.ID || "",
+                        FacilityName: oItem.FacilityName || oItem.Type || "",
+                        Type: oItem.Type || "",
+                        SelectionMode: sSelectionMode,
+                        UnitText: oItem.UnitText || "Unit Price",
+                        Price: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
+                        SelectedPrice: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
+                        SelectedPriceType: oItem.UnitText || "Unit Price",
+                        UnitPrice: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
+                        BasicFacilityPrice: fnToNumber(oItem.BasicFacilityPrice),
+                        FacilityChargeType: oItem.FacilityChargeType || "",
+                        Quantity: sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY"
+                            ? iRowQty
+                            : Math.max(parseInt(oItem.Quantity, 10) || 1, 1),
+                        Currency: oItem.Currency || "",
+                        Image: oItem.Image || "",
+                        SavedTotalAmount: fnToNumber(oItem.FacilitiPrice || oItem.Price || oItem.TotalAmount || oItem.Amount),
+                        SavedQuantity: sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY"
+                            ? iRowQty
+                            : Math.max(parseInt(oItem.Quantity, 10) || 1, 1),
+                        RawFacilityItems: [Object.assign({}, oItem)],
+                        SelectedPersonIds: [],
+                        PersonQuantities: []
+                    };
+                } else {
+                    // Aggregate data
+                    var oAgg = mFacilityMap[sFacilityId];
+                    oAgg.RawFacilityItems.push(Object.assign({}, oItem));
+                    oAgg.SavedTotalAmount += fnToNumber(oItem.FacilitiPrice || oItem.Price || oItem.TotalAmount || oItem.Amount);
+                    if (sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY") {
+                        oAgg.Quantity += iRowQty;
+                        oAgg.SavedQuantity += iRowQty;
+                    }
+                }
+
+                fnTrackPersonSelection(mFacilityMap[sFacilityId], oItem);
+            });
+
+            return Object.keys(mFacilityMap).map(function (sKey) {
+                return mFacilityMap[sKey];
+            });
         },
 
         _normalizeBookingEditData: function (oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs) {
@@ -188,232 +502,9 @@ sap.ui.define([
             oPricingData = oPricingData || {};
             aMemberDocs = aMemberDocs || [];
 
-            // Parse FacilityItems — aggregate HM_Customer rows into the structure used by Booking.controller.
-            // HM_Customer can return one row per facility, per person, or per quantity. The edit page must
-            // normalize all supported selection modes before _loadFacilities merges with HM_Facilities:
-            // SINGLE, QTY, PERSON, PERSON_QTY.
-            var fnToNumber = function (vValue) {
-                var fValue = parseFloat(String(vValue === null || vValue === undefined ? "" : vValue).replace(/,/g, "").trim());
-                return isNaN(fValue) ? 0 : fValue;
-            };
-            var fnNormalizeFacilityKey = function (sValue) {
-                return String(sValue || "").trim().toLowerCase();
-            };
-            var fnNormalizeSelectionMode = function (sValue) {
-                var sMode = String(sValue || "").trim().toUpperCase();
-                return ["SINGLE", "QTY", "PERSON", "PERSON_QTY"].indexOf(sMode) >= 0 ? sMode : "SINGLE";
-            };
-            var fnGetPeriodMultiplierFromBooking = function (sUnitText) {
-                var sUnit = String(sUnitText || "").trim();
-                var oStartDate = oBooking.StartDate ? new Date(oBooking.StartDate) : null;
-                var oEndDate = oBooking.EndDate ? new Date(oBooking.EndDate) : null;
-
-                if (!oStartDate || !oEndDate || isNaN(oStartDate.getTime()) || isNaN(oEndDate.getTime()) || oEndDate <= oStartDate) {
-                    return 1;
-                }
-
-                if (sUnit === "Per Day") {
-                    return Math.max(Math.floor((oEndDate - oStartDate) / 86400000), 1);
-                }
-
-                if (sUnit === "Per Month") {
-                    var iMonths = (oEndDate.getFullYear() - oStartDate.getFullYear()) * 12 + (oEndDate.getMonth() - oStartDate.getMonth());
-                    if (oEndDate.getDate() >= oStartDate.getDate()) {
-                        iMonths += 1;
-                    }
-                    return Math.max(iMonths, 1);
-                }
-
-                if (sUnit === "Per Year") {
-                    var iYears = oEndDate.getFullYear() - oStartDate.getFullYear();
-                    if (oEndDate.getMonth() > oStartDate.getMonth() ||
-                        (oEndDate.getMonth() === oStartDate.getMonth() && oEndDate.getDate() >= oStartDate.getDate())) {
-                        iYears += 1;
-                    }
-                    return Math.max(iYears, 1);
-                }
-
-                return 1;
-            };
-            var fnGetRowQuantity = function (oItem, sSelectionMode) {
-                var iQty = parseInt(oItem.Quantity || oItem.quantity, 10);
-                if (!isNaN(iQty) && iQty > 0) {
-                    return iQty;
-                }
-
-                if (sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY") {
-                    return 0;
-                }
-
-                return 1;
-            };
-            var fnDeriveUnitPrice = function (oItem, sSelectionMode, iQty) {
-                var sUnitText = oItem.UnitText || "Unit Price";
-                var fExplicitUnitPrice = fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount);
-                var fBasicPrice = fnToNumber(oItem.BasicFacilityPrice);
-                var fRowTotal = fnToNumber(oItem.FacilitiPrice || oItem.Price || oItem.TotalAmount || oItem.Amount);
-                var iSafeQty = Math.max(parseInt(iQty, 10) || 0, 0);
-                var iPeriodMultiplier = fnGetPeriodMultiplierFromBooking(sUnitText);
-
-                if (fExplicitUnitPrice > 0) {
-                    return fExplicitUnitPrice;
-                }
-                if (fBasicPrice > 0) {
-                    return fBasicPrice;
-                }
-                if ((sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY") && iSafeQty > 0 && fRowTotal > 0) {
-                    return Number((fRowTotal / iSafeQty).toFixed(2));
-                }
-                if ((sSelectionMode === "SINGLE" || sSelectionMode === "PERSON") && iPeriodMultiplier > 0 && fRowTotal > 0) {
-                    return Number((fRowTotal / iPeriodMultiplier).toFixed(2));
-                }
-
-                return fRowTotal;
-            };
-            var fnAddUnique = function (aTarget, sValue) {
-                sValue = String(sValue || "").trim();
-                if (sValue && aTarget.indexOf(sValue) < 0) {
-                    aTarget.push(sValue);
-                }
-            };
-            var fnAddPersonQuantity = function (aTarget, sPersonId, sPersonName, iQty) {
-                sPersonId = String(sPersonId || "").trim();
-                sPersonName = String(sPersonName || "").trim();
-                iQty = Math.max(parseInt(iQty, 10) || 0, 0);
-
-                if (!sPersonId && !sPersonName) {
-                    return;
-                }
-
-                var oExisting = aTarget.find(function (oLine) {
-                    return String(oLine.personId || "").trim() === sPersonId && String(oLine.personName || "").trim() === sPersonName;
-                });
-
-                if (oExisting) {
-                    oExisting.qty = Math.max(parseInt(oExisting.qty, 10) || 0, 0) + iQty;
-                    if (!oExisting.personName && sPersonName) {
-                        oExisting.personName = sPersonName;
-                    }
-                    return;
-                }
-
-                aTarget.push({
-                    personId: sPersonId,
-                    personName: sPersonName,
-                    qty: iQty
-                });
-            };
-
+            // Simplified facility processing - defer complex processing until needed
             var aRawFacilities = oCustomer.FacilityItems || [];
-            var oFacilityMap = {};
-            aRawFacilities.forEach(function (oItem) {
-                var sKey = fnNormalizeFacilityKey(
-                    oItem.FacilityID ||
-                    oItem.ID ||
-                    [
-                        oItem.FacilityName || oItem.Type || "",
-                        oItem.SelectionMode || "",
-                        oItem.FacilityChargeType || "",
-                        oItem.UnitText || ""
-                    ].join("|")
-                );
-                if (!sKey) { return; }
-
-                var sSelectionMode = fnNormalizeSelectionMode(oItem.SelectionMode);
-                var sUnitText = oItem.UnitText || "Unit Price";
-                var iQty = fnGetRowQuantity(oItem, sSelectionMode);
-                var iEffectiveQty = iQty || ((sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY") ? 0 : 1);
-                var fUnitPrice = fnDeriveUnitPrice(oItem, sSelectionMode, iEffectiveQty);
-                var fRowTotal = fnToNumber(oItem.FacilitiPrice || oItem.Price || oItem.TotalAmount || oItem.Amount);
-                var sMemberID = String(oItem.MemberID || "").trim();
-                var sMemberName = String(oItem.MemberName || oItem.PersonName || "").trim();
-
-                if (!oFacilityMap[sKey]) {
-                    oFacilityMap[sKey] = {
-                        FacilityID: oItem.FacilityID || oItem.ID || "",
-                        FacilityName: oItem.FacilityName || oItem.Type || "",
-                        Type: oItem.Type || "",
-                        SelectionMode: sSelectionMode,
-                        UnitText: sUnitText,
-                        Price: fUnitPrice,
-                        SelectedPrice: fUnitPrice,
-                        SelectedPriceType: sUnitText,
-                        UnitPrice: fUnitPrice,
-                        BasicFacilityPrice: fnToNumber(oItem.BasicFacilityPrice),
-                        FacilityChargeType: oItem.FacilityChargeType || "",
-                        Quantity: sSelectionMode === "QTY" ? 0 : 1,
-                        Currency: oItem.Currency || "",
-                        Image: oItem.Image || "",
-                        SavedTotalAmount: 0,
-                        SavedQuantity: 0,
-                        RawFacilityItems: [],
-                        SelectedPersonIds: [],
-                        PersonQuantities: []
-                    };
-                }
-
-                var oAgg = oFacilityMap[sKey];
-                oAgg.RawFacilityItems.push(Object.assign({}, oItem));
-                oAgg.SelectionMode = oAgg.SelectionMode || sSelectionMode;
-                oAgg.UnitText = oAgg.UnitText || sUnitText;
-                oAgg.SelectedPriceType = oAgg.SelectedPriceType || sUnitText;
-                oAgg.Currency = oAgg.Currency || oItem.Currency || "";
-                oAgg.FacilityChargeType = oAgg.FacilityChargeType || oItem.FacilityChargeType || "";
-                oAgg.SavedTotalAmount = Number((fnToNumber(oAgg.SavedTotalAmount) + fRowTotal).toFixed(2));
-
-                if (fUnitPrice > 0) {
-                    oAgg.Price = fUnitPrice;
-                    oAgg.SelectedPrice = fUnitPrice;
-                    oAgg.UnitPrice = fUnitPrice;
-                }
-
-                if (sSelectionMode === "QTY") {
-                    oAgg.Quantity = Math.max(parseInt(oAgg.Quantity, 10) || 0, 0) + Math.max(iEffectiveQty, 0);
-                    oAgg.SavedQuantity = Math.max(parseInt(oAgg.SavedQuantity, 10) || 0, 0) + Math.max(iEffectiveQty, 0);
-                } else if (sSelectionMode === "PERSON_QTY") {
-                    oAgg.SavedQuantity = Math.max(parseInt(oAgg.SavedQuantity, 10) || 0, 0) + Math.max(iEffectiveQty, 0);
-                    if (sMemberID || sMemberName) {
-                        fnAddUnique(oAgg.SelectedPersonIds, sMemberID);
-                        fnAddPersonQuantity(oAgg.PersonQuantities, sMemberID, sMemberName, iEffectiveQty);
-                    }
-                } else if (sSelectionMode === "PERSON") {
-                    if (sMemberID) {
-                        fnAddUnique(oAgg.SelectedPersonIds, sMemberID);
-                    }
-                    if (sMemberID || sMemberName) {
-                        fnAddPersonQuantity(oAgg.PersonQuantities, sMemberID, sMemberName, 1);
-                    }
-                    oAgg.Quantity = 1;
-                } else {
-                    oAgg.Quantity = 1;
-                }
-
-                if (typeof oItem.SelectedPersonIds === "string") {
-                    try {
-                        var aParsedSelectedIds = JSON.parse(oItem.SelectedPersonIds);
-                        if (Array.isArray(aParsedSelectedIds)) {
-                            aParsedSelectedIds.forEach(function (sId) {
-                                fnAddUnique(oAgg.SelectedPersonIds, sId);
-                            });
-                        }
-                    } catch (e) { /* ignore */ }
-                }
-                if (typeof oItem.PersonQuantities === "string") {
-                    try {
-                        var aParsedPersonQty = JSON.parse(oItem.PersonQuantities);
-                        if (Array.isArray(aParsedPersonQty)) {
-                            aParsedPersonQty.forEach(function (oLine) {
-                                fnAddUnique(oAgg.SelectedPersonIds, oLine.personId);
-                                fnAddPersonQuantity(oAgg.PersonQuantities, oLine.personId, oLine.personName, oLine.qty);
-                            });
-                        }
-                    } catch (e) { /* ignore */ }
-                }
-            });
-
-            var aParsedFacilities = Object.keys(oFacilityMap).map(function (sKey) {
-                return oFacilityMap[sKey];
-            });
+            var aParsedFacilities = this._simplifyFacilityItemsForEdit(aRawFacilities, oBooking);
 
             // Determine ExtraBed from room data or from selected facilities
             var iExtraBed = oRoomData.ExtraBed || oBooking.ExtraBed || 0;
@@ -425,14 +516,30 @@ sap.ui.define([
                 });
             }
 
-            // Calculate duration in months from start / end dates
+            // Derive duration in the same unit used by the selected plan.
+            // The shared booking flow interprets SelectedMonths as:
+            // - month count for "Per Month"
+            // - year count for "Per Year"
+            // If we always store raw month difference here, yearly edit bookings
+            // get expanded again by the parent logic (for example 12 -> 12 years).
             var iSelectedMonths = 1;
             var oStart = oBooking.StartDate ? new Date(oBooking.StartDate) : null;
             var oEnd = oBooking.EndDate ? new Date(oBooking.EndDate) : null;
+            var sSelectedPriceType = oBooking.PaymentType || "";
             if (oStart && oEnd && !isNaN(oStart.getTime()) && !isNaN(oEnd.getTime())) {
                 var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
-                if (oEnd.getDate() >= oStart.getDate()) { iMonths += 1; }
-                iSelectedMonths = Math.max(iMonths, 1);
+
+                if (oEnd.getDate() >= oStart.getDate()) {
+                    iMonths += 1;
+                }
+
+                if (sSelectedPriceType === "Per Year") {
+                    iSelectedMonths = Math.max(Math.round(iMonths / 12), 1);
+                } else if (sSelectedPriceType === "Per Month") {
+                    iSelectedMonths = Math.max(iMonths, 1);
+                } else {
+                    iSelectedMonths = 1;
+                }
             }
 
             // Build NoOfPersonsList from capacity (like onConfirmBooking does)
@@ -470,7 +577,6 @@ sap.ui.define([
             var aMemberList = aApiMembers;
 
             // Determine FinalPrice based on selected plan (like onConfirmBooking sets SelectedPriceValue)
-            var sSelectedPriceType = oBooking.PaymentType || "";
             var fFinalPrice = 0;
             if (sSelectedPriceType === "Per Day") {
                 fFinalPrice = oPricingData.Price || oBooking.Price || oBooking.RoomPrice || 0;
@@ -875,6 +981,7 @@ sap.ui.define([
             this._backupBookingView = null;
             this._backupFacilityModel = null;
             this._backupFacilitySelection = null;
+            this._backupAllFacilities = null;
             this._aDeletedFacilityIds = null;
         },
 
@@ -901,16 +1008,37 @@ sap.ui.define([
                 return null;
             }
 
-            return this.byId(sFieldId) ||
+            // Try direct ID lookups first (fastest)
+            var oControl = this.byId(sFieldId) ||
                 sap.ui.getCore().byId(this._oPaymentDialog.getId() + "--" + sFieldId) ||
-                sap.ui.getCore().byId(sFieldId) ||
-                (this._oPaymentDialog.findAggregatedObjects && this._oPaymentDialog.findAggregatedObjects(true, function (oControl) {
+                sap.ui.getCore().byId(sFieldId);
+
+            if (oControl) {
+                return oControl;
+            }
+
+            // Try Fragment.byId for fragment controls
+            if (sap.ui.core.Fragment) {
+                oControl = sap.ui.core.Fragment.byId(this._oPaymentDialog.getId(), sFieldId);
+                if (oControl) {
+                    return oControl;
+                }
+            }
+
+            // Last resort: findAggregatedObjects (slow)
+            if (this._oPaymentDialog.findAggregatedObjects) {
+                var aMatches = this._oPaymentDialog.findAggregatedObjects(true, function (oControl) {
                     return oControl && oControl.getId && (
                         oControl.getId() === sFieldId ||
                         oControl.getId().slice(-("--" + sFieldId).length) === "--" + sFieldId
                     );
-                })[0]) ||
-                null;
+                });
+                if (aMatches && aMatches.length > 0) {
+                    return aMatches[0];
+                }
+            }
+
+            return null;
         },
 
         _getEditDifferencePaymentType: function () {
@@ -1700,11 +1828,106 @@ sap.ui.define([
             }).join("\n");
         },
 
+        _processFacilitiesForEdit: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var iExtraBed = this._toNumber(oHostelModel.getProperty("/ExtraBed"));
+            var aSelectedFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
+            var aFacilities = this._aAllFacilities || [];
+
+            // Filter and process facilities
+            var aProcessedFacilities = aFacilities
+                .filter(function (oFacility) {
+                    if ((oFacility.Type || "").toLowerCase().trim() === "extra bed") {
+                        return iExtraBed > 0;
+                    }
+                    return true;
+                })
+                .map(function (oFacility) {
+                    var oSelectedFacility = this._findSelectedFacilityForEdit(oFacility, aSelectedFacilities);
+                    var sSelectionMode = oSelectedFacility.SelectionMode || oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+                    var bIsSelected = !!(oSelectedFacility.FacilityName || oSelectedFacility.FacilityID || oSelectedFacility.ID);
+                    var bIsPersonQty = sSelectionMode === "PERSON_QTY";
+                    var bIsPerson = sSelectionMode === "PERSON";
+                    var iMinimumQty = bIsPersonQty
+                        ? (parseInt(oFacility.MinimumQty, 10) || 0)
+                        : 0;
+                    var fMinimumPrice = bIsPersonQty
+                        ? (parseFloat(oFacility.MinimumPrice) || 0)
+                        : 0;
+                    var sApiFacilityChargeType = bIsPersonQty
+                        ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
+                        : "";
+                    var sSavedFacilityChargeType = bIsPersonQty
+                        ? this._normalizeFacilityChargeType(oSelectedFacility.FacilityChargeType || sApiFacilityChargeType)
+                        : "";
+                    var aPersonQuantities = bIsPersonQty
+                        ? this._buildEditFacilityPersonQuantities(oSelectedFacility)
+                        : (Array.isArray(oSelectedFacility.PersonQuantities)
+                            ? oSelectedFacility.PersonQuantities.map(function (oLine) {
+                                var oOccupant = this._resolveEditFacilityOccupant(oLine.personId, oLine.personName);
+                                return {
+                                    personId: oOccupant ? oOccupant.id : oLine.personId,
+                                    personName: oOccupant ? oOccupant.name : oLine.personName,
+                                    qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
+                                };
+                            }.bind(this))
+                            : []);
+                    var aSelectedPersonIds = (bIsPersonQty || bIsPerson)
+                        ? this._buildEditFacilitySelectedPersonIds(oSelectedFacility, aPersonQuantities)
+                        : (Array.isArray(oSelectedFacility.SelectedPersonIds) ? oSelectedFacility.SelectedPersonIds.slice() : []);
+                    var fSelectedPrice = bIsPersonQty
+                        ? fMinimumPrice
+                        : this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
+                    var sSelectedPriceType = bIsPersonQty
+                        ? "Package Price"
+                        : (oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price");
+
+                    return {
+                        FacilityID: oSelectedFacility.FacilityID || oFacility.ID,
+                        CatalogFacilityID: oFacility.ID,
+                        FacilityName: oFacility.FacilityName || oFacility.Type,
+                        Type: oFacility.Type,
+                        SelectionMode: sSelectionMode,
+                        BranchCode: oFacility.BranchCode,
+                        Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
+                        Image: this._getFacilityImageSource(oFacility),
+                        UnitPrice: this._toNumber(oSelectedFacility.UnitPrice || oSelectedFacility.Price || oFacility.UnitPrice),
+                        PricePerHour: this._toNumber(oFacility.PerHourPrice),
+                        PricePerDay: this._toNumber(oFacility.PerDayPrice),
+                        PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
+                        PricePerYear: this._toNumber(oFacility.PerYearPrice),
+                        Selected: bIsSelected,
+                        SelectedPrice: fSelectedPrice,
+                        SelectedPriceType: sSelectedPriceType,
+                        UnitText: sSelectedPriceType,
+                        ApiFacilityChargeType: sApiFacilityChargeType,
+                        FacilityChargeType: sSavedFacilityChargeType,
+                        Quantity: Math.max(parseInt(oSelectedFacility.Quantity, 10) || parseInt(oSelectedFacility.SavedQuantity, 10) || 1, 1),
+                        SelectedPersonIds: aSelectedPersonIds,
+                        PersonQuantities: aPersonQuantities,
+                        RawFacilityItems: Array.isArray(oSelectedFacility.RawFacilityItems)
+                            ? oSelectedFacility.RawFacilityItems.map(function (oItem) {
+                                return Object.assign({}, oItem);
+                            })
+                            : [],
+                        SavedTotalAmount: this._toNumber(oSelectedFacility.SavedTotalAmount),
+                        SavedQuantity: Math.max(parseInt(oSelectedFacility.SavedQuantity, 10) || 0, 0),
+                        SelectionModeLabel: this._getFacilitySelectionModeLabel(sSelectionMode),
+                        MinimumQty: iMinimumQty,
+                        MinimumPrice: fMinimumPrice,
+                        PackageQty: iMinimumQty,
+                        PackagePrice: fMinimumPrice
+                    };
+                }.bind(this));
+
+            this._aAllFacilities = aProcessedFacilities;
+            this._syncSelectedFacilityPersonsWithOccupants();
+            this._applyEditFacilityPriceFilter();
+        },
+
         _loadFacilities: async function () {
             var oHostelModel = this.getView().getModel("HostelModel");
             var sBranchCode = oHostelModel.getProperty("/BranchCode");
-            var iExtraBed = this._toNumber(oHostelModel.getProperty("/ExtraBed"));
-            var aSelectedFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
 
             this._aAllFacilities = [];
 
@@ -1717,95 +1940,10 @@ sap.ui.define([
             try {
                 var oResponse = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: sBranchCode });
                 var aFacilities = oResponse && oResponse.data || [];
-
-                this._aAllFacilities = aFacilities
-                    .filter(function (oFacility) {
-                        if ((oFacility.Type || "").toLowerCase().trim() === "extra bed") {
-                            return iExtraBed > 0;
-                        }
-                        return true;
-                    })
-                    .map(function (oFacility) {
-                        var oSelectedFacility = this._findSelectedFacilityForEdit(oFacility, aSelectedFacilities);
-                        var sSelectionMode = oSelectedFacility.SelectionMode || oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
-                        var bIsSelected = !!(oSelectedFacility.FacilityName || oSelectedFacility.FacilityID || oSelectedFacility.ID);
-                        var bIsPersonQty = sSelectionMode === "PERSON_QTY";
-                        var bIsPerson = sSelectionMode === "PERSON";
-                        var iMinimumQty = bIsPersonQty
-                            ? (parseInt(oFacility.MinimumQty, 10) || 0)
-                            : 0;
-                        var fMinimumPrice = bIsPersonQty
-                            ? (parseFloat(oFacility.MinimumPrice) || 0)
-                            : 0;
-                        var sApiFacilityChargeType = bIsPersonQty
-                            ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
-                            : "";
-                        var sSavedFacilityChargeType = bIsPersonQty
-                            ? this._normalizeFacilityChargeType(oSelectedFacility.FacilityChargeType || sApiFacilityChargeType)
-                            : "";
-                        var aPersonQuantities = bIsPersonQty
-                            ? this._buildEditFacilityPersonQuantities(oSelectedFacility)
-                            : (Array.isArray(oSelectedFacility.PersonQuantities)
-                                ? oSelectedFacility.PersonQuantities.map(function (oLine) {
-                                    var oOccupant = this._resolveEditFacilityOccupant(oLine.personId, oLine.personName);
-                                    return {
-                                        personId: oOccupant ? oOccupant.id : oLine.personId,
-                                        personName: oOccupant ? oOccupant.name : oLine.personName,
-                                        qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
-                                    };
-                                }.bind(this))
-                                : []);
-                        var aSelectedPersonIds = (bIsPersonQty || bIsPerson)
-                            ? this._buildEditFacilitySelectedPersonIds(oSelectedFacility, aPersonQuantities)
-                            : (Array.isArray(oSelectedFacility.SelectedPersonIds) ? oSelectedFacility.SelectedPersonIds.slice() : []);
-                        var fSelectedPrice = bIsPersonQty
-                            ? fMinimumPrice
-                            : this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
-                        var sSelectedPriceType = bIsPersonQty
-                            ? "Package Price"
-                            : (oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price");
-
-                        return {
-                            FacilityID: oSelectedFacility.FacilityID || oFacility.ID,
-                            CatalogFacilityID: oFacility.ID,
-                            FacilityName: oFacility.FacilityName || oFacility.Type,
-                            Type: oFacility.Type,
-                            SelectionMode: sSelectionMode,
-                            BranchCode: oFacility.BranchCode,
-                            Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
-                            Image: this._getFacilityImageSource(oFacility),
-                            UnitPrice: this._toNumber(oSelectedFacility.UnitPrice || oSelectedFacility.Price || oFacility.UnitPrice),
-                            PricePerHour: this._toNumber(oFacility.PerHourPrice),
-                            PricePerDay: this._toNumber(oFacility.PerDayPrice),
-                            PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
-                            PricePerYear: this._toNumber(oFacility.PerYearPrice),
-                            Selected: bIsSelected,
-                            SelectedPrice: fSelectedPrice,
-                            SelectedPriceType: sSelectedPriceType,
-                            UnitText: sSelectedPriceType,
-                            ApiFacilityChargeType: sApiFacilityChargeType,
-                            FacilityChargeType: sSavedFacilityChargeType,
-                            Quantity: Math.max(parseInt(oSelectedFacility.Quantity, 10) || parseInt(oSelectedFacility.SavedQuantity, 10) || 1, 1),
-                            SelectedPersonIds: aSelectedPersonIds,
-                            PersonQuantities: aPersonQuantities,
-                            RawFacilityItems: Array.isArray(oSelectedFacility.RawFacilityItems)
-                                ? oSelectedFacility.RawFacilityItems.map(function (oItem) {
-                                    return Object.assign({}, oItem);
-                                })
-                                : [],
-                            SavedTotalAmount: this._toNumber(oSelectedFacility.SavedTotalAmount),
-                            SavedQuantity: Math.max(parseInt(oSelectedFacility.SavedQuantity, 10) || 0, 0),
-                            SelectionModeLabel: this._getFacilitySelectionModeLabel(sSelectionMode),
-                            MinimumQty: iMinimumQty,
-                            MinimumPrice: fMinimumPrice,
-                            PackageQty: iMinimumQty,
-                            PackagePrice: fMinimumPrice
-                        };
-                    }.bind(this));
-
-                this._syncSelectedFacilityPersonsWithOccupants();
-                this._applyEditFacilityPriceFilter();
+                this._aAllFacilities = aFacilities;
+                this._processFacilitiesForEdit();
             } catch (oError) {
+                console.warn("Failed to load facilities:", oError);
                 this.getView().getModel("FacilityModel").setProperty("/Facilities", []);
                 this._renderFacilityCards();
             }
@@ -1838,11 +1976,21 @@ sap.ui.define([
             var oFacilityModel = this.getView().getModel("FacilityModel");
             var oFacilitySelection = this.getView().getModel("FacilitySelection");
             
-            // Create deep backup copies of model data before enabling edit mode
-            this._backupHostelModel = JSON.parse(JSON.stringify(oHostelModel.getData()));
-            this._backupBookingView = JSON.parse(JSON.stringify(oBookingView.getData()));
-            this._backupFacilityModel = JSON.parse(JSON.stringify(oFacilityModel.getData()));
-            this._backupFacilitySelection = JSON.parse(JSON.stringify(oFacilitySelection.getData()));
+            // Create optimized backups - shallow copy for simple models, deep copy only for complex ones
+            var oHostelData = oHostelModel.getData();
+            var oBookingViewData = oBookingView.getData();
+            var oFacilityModelData = oFacilityModel.getData();
+            var oFacilitySelectionData = oFacilitySelection.getData();
+
+            // HostelModel has nested structures, need deep copy
+            this._backupHostelModel = JSON.parse(JSON.stringify(oHostelData));
+            // BookingView is relatively flat, shallow copy is sufficient
+            this._backupBookingView = Object.assign({}, oBookingViewData);
+            // Facility models contain nested arrays/objects, need deep copy for proper restoration
+            this._backupFacilityModel = JSON.parse(JSON.stringify(oFacilityModelData));
+            this._backupFacilitySelection = JSON.parse(JSON.stringify(oFacilitySelectionData));
+            // Backup _aAllFacilities array which contains selection state
+            this._backupAllFacilities = JSON.parse(JSON.stringify(this._aAllFacilities || []));
             
             oBookingView.setProperty("/editModeEnabled", true);
         },
@@ -1859,7 +2007,7 @@ sap.ui.define([
                 oHostelModel.setData(this._backupHostelModel);
             }
             if (this._backupBookingView) {
-                oBookingView.setData(this._backupBookingView);
+                oBookingView.setData(Object.assign({}, this._backupBookingView));
             }
             if (this._backupFacilityModel) {
                 oFacilityModel.setData(this._backupFacilityModel);
@@ -1867,6 +2015,14 @@ sap.ui.define([
             if (this._backupFacilitySelection) {
                 oFacilitySelection.setData(this._backupFacilitySelection);
             }
+            // Restore _aAllFacilities array which contains selection state
+            if (this._backupAllFacilities) {
+                this._aAllFacilities = JSON.parse(JSON.stringify(this._backupAllFacilities));
+            }
+
+            // Apply facility price filter to ensure facility model is properly synced with _aAllFacilities
+            // This updates the FacilityModel's /Facilities array with correct Selected state and prices
+            this._applyEditFacilityPriceFilter();
             
             // Reset facility carousel to first page
             this._iFacilityStartIndex = 0;
