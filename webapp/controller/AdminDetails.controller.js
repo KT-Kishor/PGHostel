@@ -975,7 +975,7 @@ sap.ui.define([
 
             if (oSelectedFacility.SelectionMode === "PERSON_QTY") {
                 aAllowedRateTypes = ["Unit Price"];
-                sap.ui.getCore().byId("idUnitType").setVisible(false)
+                sap.ui.getCore().byId("idUnitType").setVisible(false).setSelectedKey("")
                 sap.ui.getCore().byId("editquantity").setEditable(false)
 
 
@@ -983,14 +983,14 @@ sap.ui.define([
                 this.UnitTextChange()
             } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !=="0") {
                 aAllowedRateTypes = ["Unit Price"];
-                sap.ui.getCore().byId("idUnitType").setVisible(true)
+                sap.ui.getCore().byId("idUnitType").setVisible(true).setSelectedKey("")
                 sap.ui.getCore().byId("editquantity").setEditable(true)
                 sap.ui.getCore().byId("id_Period").setVisible(false)
 
                 // this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
                 // this.UnitTextChange()
             }else if(oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice ==="0"){
-                sap.ui.getCore().byId("idUnitType").setVisible(true)
+                sap.ui.getCore().byId("idUnitType").setVisible(true).setSelectedKey("")
                 sap.ui.getCore().byId("editquantity").setEditable(true)
                 sap.ui.getCore().byId("id_Period").setVisible(false)
             }
