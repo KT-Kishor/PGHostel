@@ -910,13 +910,13 @@ sap.ui.define([
 
             return aRows.map(function (oRow) {
                 var iRawIndex = this._findMatchingEditFacilityRawItemIndex(aRawItems, oRow, aUsedIndexes);
-                var sFacilityId = sFallbackFacilityId;
+                var sFacilityId = "";
                 var sMemberId = String(oRow.MemberID || "").trim();
                 var sMemberName = String(oRow.MemberName || "").trim();
 
                 if (iRawIndex >= 0) {
                     aUsedIndexes.push(iRawIndex);
-                    sFacilityId = String(aRawItems[iRawIndex].FacilityID || aRawItems[iRawIndex].ID || sFallbackFacilityId || "").trim();
+                    sFacilityId = String(aRawItems[iRawIndex].FacilityID || aRawItems[iRawIndex].ID || "").trim();
                     sMemberId = sMemberId || String(aRawItems[iRawIndex].MemberID || "").trim();
                     sMemberName = sMemberName || String(aRawItems[iRawIndex].MemberName || aRawItems[iRawIndex].PersonName || "").trim();
                 }
