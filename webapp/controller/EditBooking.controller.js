@@ -2104,6 +2104,12 @@ sap.ui.define([
             oBookingView.setProperty("/editModeEnabled", false);
         },
 
+        // Override to always fully clear coupon state (including typed value)
+        // Parent uses _resetCouponState(true) for facility changes which keeps the coupon input value
+        _resetCouponState: function (bKeepTypedValue) {
+            BookingController.prototype._resetCouponState.call(this, false);
+        },
+
         // Override to clear coupon field when room plan changes
         onRoomPlanChange: function (oEvent) {
             BookingController.prototype.onRoomPlanChange.call(this, oEvent);
