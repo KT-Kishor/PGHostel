@@ -1994,20 +1994,41 @@ sap.ui.define([
 
                 // Load customer booking data
                 if (this.BranchCode) {
-                    this.onSearch().then(() => {
 
-                        // Restore selected values after search
-                        oTempModel.setProperty(
-                            "/CustomerName",
-                            oComplaintData.CustomerName || ""
-                        );
+                this.onSearch().then(() => {
 
-                        oTempModel.setProperty(
-                            "/BookingID",
-                            oComplaintData.BookingID || ""
-                        );
-                    });
-                }
+                    const sCustomerName =
+                        (oComplaintData.CustomerName || "").trim();
+
+                    const sBookingID =
+                        (oComplaintData.BookingID || "").trim();
+
+                    // Update model
+                    oTempModel.setProperty("/CustomerName", sCustomerName);
+                    oTempModel.setProperty("/BookingID", sBookingID);
+
+                    sap.ui.getCore().applyChanges();
+
+                    // Get controls
+                    const oCustomerCombo =
+                        this._getComplaintControl("MP_id_AddCustComboBox");
+
+                    const oBookingCombo =
+                        this._getComplaintControl("MP_id_AddBooking");
+
+                    // Force selected keys
+                    if (oCustomerCombo) {
+                        oCustomerCombo.setSelectedKey(sCustomerName);
+                        oCustomerCombo.setValue(sCustomerName);
+                    }
+
+                    if (oBookingCombo) {
+                        oBookingCombo.setSelectedKey(sBookingID);
+                        oBookingCombo.setValue(sBookingID);
+                    }
+
+                });
+            }
 
             } else {
 
@@ -2167,7 +2188,10 @@ sap.ui.define([
                 this._getComplaintControl("idBranchCombo"),      // ← Added
                 this._getComplaintControl("idComplaintType"),
                 this._getComplaintControl("idComplaintRoom"),
-                this._getComplaintControl("idComplaintDesc")
+                this._getComplaintControl("idComplaintDesc"),
+                this._getComplaintControl("MP_id_AddCustComboBox"),
+                this._getComplaintControl("MP_id_AddBooking")
+
             ];
 
             aControls.forEach(function (oControl) {
@@ -2505,24 +2529,57 @@ sap.ui.define([
         },
 
         onSearch: function () {
+
             return new Promise((resolve, reject) => {
-                var filter = {
+
+                this.getBusyDialog()
+
+                const filter = {
                     BranchCode: this.BranchCode,
                     UserID: this._oLoggedInUser.UserID,
                     Status: "Assigned"
                 };
 
-                this.ajaxReadWithJQuery("HM_CustomerReadCall", filter).then((oData) => {
-                        var aData = Array.isArray(oData.commentData)  ? oData.commentData : [oData.commentData];
+                this.ajaxReadWithJQuery("HM_CustomerReadCall", filter)
+
+                    .then((oData) => {
+
+                        let aData = [];
+
+                        if (Array.isArray(oData.commentData)) {
+                            aData = oData.commentData;
+                        } else if (oData.commentData) {
+                            aData = [oData.commentData];
+                        }
+
+                        // Clean values
+                        aData = aData.map(item => ({
+                            ...item,
+                            CustomerName:
+                                (item.CustomerName || "").trim(),
+
+                            BookingID:
+                                (item.BookingID || "").trim()
+                        }));
+
                         this.getView().setModel(
                             new sap.ui.model.json.JSONModel(aData),
                             "customerbookingdata"
                         );
-                        this.closeBusyDialog();
-                        resolve();
-                    }).catch((err) => {
-                        this.closeBusyDialog();
-                        MessageToast.show(err.responseText || "Failed to Load Customer Data.");
+
+                        sap.ui.getCore().applyChanges();
+
+                        resolve(aData);
+                        this.closeBusyDialog()
+                    })
+
+                    .catch((err) => {
+
+                        MessageToast.show(
+                            err.responseText ||
+                            "Failed to Load Customer Data."
+                        );
+                        this.closeBusyDialog()
                         reject(err);
                     });
             });
