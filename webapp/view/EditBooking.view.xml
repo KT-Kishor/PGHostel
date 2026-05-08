@@ -10,8 +10,6 @@
 >
     <Page
         showHeader="true"
-        showNavButton="true"
-        navButtonPress="onNavBack"
         enableScrolling="true"
         class="BookBGBlur"
     >

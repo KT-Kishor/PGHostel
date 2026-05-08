@@ -618,6 +618,19 @@
     }"
         >
             <columns>
+            <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>bookingID}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>customerName}" />
+                </Column>
+
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
@@ -668,34 +681,18 @@
             <items>
                 <ColumnListItem type="Inactive">
                     <cells>
+                      <Text text="{profileData>BookingID}" />
+                        <Text text="{profileData>CustomerName}" />
                         <Text text="{profileData>ComplaintType}" />
                         <Text text="{profileData>BranchName}" />
                         <Text text="{profileData>RoomNo}" />
-                        <ExpandableText
-                            text="{profileData>ComplaintDescription}"
-                            maxCharacters="20"
-                        />
-                        <Text
-                            text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"
-                        />
-                        <Text
-                            text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${
-                                path: 'profileData>ExpectedResolvedDate',
-                                formatter: '.Formatter.formatDate'
-                            }}"
-                        />
+                        <ExpandableText text="{profileData>ComplaintDescription}" maxCharacters="20"/>
+                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
+                        <Text text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${path: 'profileData>ExpectedResolvedDate', 
+                        formatter: '.Formatter.formatDate'}}"/>
                         <Text text="{profileData>AssignedTo}" />
-
-                        <Button
-                            icon="sap-icon://edit"
-                            type="Transparent"
-                            press="onPressComplaintRow"
-                            tooltip="Edit Complaint"
-                            visible="{
-        path: 'profileData>ComplaintStatus',
-        formatter: '.Formatter.canEditComplaint'
-    }"
-                        />
+                        <Button icon="sap-icon://edit" type="Transparent" press="onPressComplaintRow"
+                        tooltip="Edit Complaint"  visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"/>
                     </cells>
                 </ColumnListItem>
             </items>
