@@ -74,7 +74,7 @@
                     liveChange="onchangesRaisedby"
                     valueStateText="{i18n>enteryourname}"
 					value="{SupportModel>/RaisedBy}"
-					placeholder="Enter name"/>
+					placeholder="Enter name" maxLength="50"/>
 
 				<!-- Email -->
 				<Label text="{i18n>contactemail}" required="true"/>

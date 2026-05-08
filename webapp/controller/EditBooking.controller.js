@@ -910,13 +910,13 @@ sap.ui.define([
 
             return aRows.map(function (oRow) {
                 var iRawIndex = this._findMatchingEditFacilityRawItemIndex(aRawItems, oRow, aUsedIndexes);
-                var sFacilityId = sFallbackFacilityId;
+                var sFacilityId = "";
                 var sMemberId = String(oRow.MemberID || "").trim();
                 var sMemberName = String(oRow.MemberName || "").trim();
 
                 if (iRawIndex >= 0) {
                     aUsedIndexes.push(iRawIndex);
-                    sFacilityId = String(aRawItems[iRawIndex].FacilityID || aRawItems[iRawIndex].ID || sFallbackFacilityId || "").trim();
+                    sFacilityId = String(aRawItems[iRawIndex].FacilityID || aRawItems[iRawIndex].ID || "").trim();
                     sMemberId = sMemberId || String(aRawItems[iRawIndex].MemberID || "").trim();
                     sMemberName = sMemberName || String(aRawItems[iRawIndex].MemberName || aRawItems[iRawIndex].PersonName || "").trim();
                 }
@@ -2046,8 +2046,8 @@ sap.ui.define([
 
             // HostelModel has nested structures, need deep copy
             this._backupHostelModel = JSON.parse(JSON.stringify(oHostelData));
-            // BookingView is relatively flat, shallow copy is sufficient
-            this._backupBookingView = Object.assign({}, oBookingViewData);
+            // BookingView contains nested FamilyMembers array, need deep copy for proper restoration
+            this._backupBookingView = JSON.parse(JSON.stringify(oBookingViewData));
             // Facility models contain nested arrays/objects, need deep copy for proper restoration
             this._backupFacilityModel = JSON.parse(JSON.stringify(oFacilityModelData));
             this._backupFacilitySelection = JSON.parse(JSON.stringify(oFacilitySelectionData));
@@ -2059,6 +2059,28 @@ sap.ui.define([
 
         // Cancel edit mode and revert to read-only
         onCancelEditPress: function () {
+
+            MessageBox.confirm(
+                "Are you sure you want to cancel? All unsaved changes will be lost.",
+                {
+                    title: "Confirm Cancel",
+
+                    styleClass: "myUnifiedBtn",
+
+                    onClose: function (sAction) {
+
+                        if (sAction !== MessageBox.Action.OK) {
+                            return;
+                        }
+
+                        this._performCancelEdit();
+
+                    }.bind(this)
+                }
+            );
+        },
+
+        _performCancelEdit: function () {
             var oBookingView = this.getView().getModel("BookingView");
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
@@ -2102,6 +2124,19 @@ sap.ui.define([
             
             // Ensure edit mode is disabled
             oBookingView.setProperty("/editModeEnabled", false);
+        },
+
+        // Override to always fully clear coupon state (including typed value)
+        // Parent uses _resetCouponState(true) for facility changes which keeps the coupon input value
+        _resetCouponState: function (bKeepTypedValue) {
+            BookingController.prototype._resetCouponState.call(this, false);
+        },
+
+        // Override to clear coupon field when room plan changes
+        onRoomPlanChange: function (oEvent) {
+            BookingController.prototype.onRoomPlanChange.call(this, oEvent);
+            this._resetCouponState(false);
+            this._recalculateSummary();
         },
 
         // Override facility card press to check edit mode

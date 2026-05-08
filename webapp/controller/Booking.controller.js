@@ -3069,6 +3069,7 @@
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
             this._rebuildSelectedFacilities();
+            this._resetCouponState(false);
             this._recalculateSummary();
             this.onCloseMemberSelectionDialog();
         },
@@ -4895,6 +4896,7 @@
                 this._updateSelectedPersonsFromFamily();
                 this._syncSelectedFacilityPersonsWithOccupants();
                 this._rebuildSelectedFacilities();
+                this._resetCouponState(false);
                 this._recalculateSummary();
                 MessageToast.show("Row deleted.");
             }
