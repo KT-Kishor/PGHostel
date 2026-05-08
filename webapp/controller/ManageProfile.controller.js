@@ -2032,9 +2032,7 @@ sap.ui.define([
                     FileType: "",
                     FileContent: "",
                     Documents: [],
-                    isEditMode: false,
-                    BookingID : "",
-                    CustomerName : ""
+                    isEditMode: false
                 });
 
                 // Auto load room + customer data if branch already selected
