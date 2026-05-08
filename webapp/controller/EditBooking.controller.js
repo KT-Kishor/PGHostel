@@ -2104,6 +2104,13 @@ sap.ui.define([
             oBookingView.setProperty("/editModeEnabled", false);
         },
 
+        // Override to clear coupon field when room plan changes
+        onRoomPlanChange: function (oEvent) {
+            BookingController.prototype.onRoomPlanChange.call(this, oEvent);
+            this._resetCouponState(false);
+            this._recalculateSummary();
+        },
+
         // Override facility card press to check edit mode
         onFacilityCardPress: function (oFacility, oCard, oEvent) {
             var oBookingView = this.getView().getModel("BookingView");
