@@ -2885,7 +2885,7 @@
                             press: function () {
                                 this._oPreviewDialog.close();
                             }.bind(this)
-                        }),
+                        }).addStyleClass("myUnifiedBtn"),
 
                         afterClose: function () {
                             this._oPreviewDialog.destroy();
@@ -2925,7 +2925,7 @@
                                 }
                                 this._oPreviewDialog.close();
                             }
-                        }),
+                        }).addStyleClass("myUnifiedBtn"),
 
                         afterClose: function () {
                             this._oPreviewDialog.destroy();
@@ -3400,7 +3400,7 @@
                         press: function () {
                             oDialog.close();
                         }
-                    }),
+                    }).addStyleClass("myUnifiedBtn"),
                     afterClose: function () {
                         oDialog.destroy();
                     }
@@ -3475,7 +3475,7 @@
                         press: function () {
                             oPdfDialog.close();
                         }
-                    }),
+                    }).addStyleClass("myUnifiedBtn"),
                     afterClose: function () {
                         if (this._customerPreviewUrl) {
                             URL.revokeObjectURL(this._customerPreviewUrl);
@@ -5740,7 +5740,8 @@
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
-                    PaymentDetails: [this._getPaymentPayloadDetails()]
+                    // PaymentDetails: [this._getPaymentPayloadDetails()]
+                    PaymentDetails: (this.getView().getModel("PaymentModel").getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn" ? [] : [this._getPaymentPayloadDetails()]
                 }]
             };
         },

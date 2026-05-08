@@ -1316,6 +1316,8 @@ sap.ui.define([
                     const oBranch = aBranchMaster.find(b => b.BranchID === sBranchCode);
 
                     return {
+                        BookingID : complain.BookingID || "",
+                        CustomerName : complain.CustomerName || "",
                         ComplaintID: complain.ComplaintID || complain.ComplainID || complain.ID || "",
                         ComplaintType: complain.ComplaintType || "",
                         Description: complain.Description || "",
@@ -1571,6 +1573,8 @@ sap.ui.define([
                     aFilters = [
                         new sap.ui.model.Filter({
                             filters: [
+                                new sap.ui.model.Filter("CustomerName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("BookingID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("ComplaintID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("ComplaintType", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("BranchName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
@@ -1916,26 +1920,34 @@ sap.ui.define([
                 let fileSize = 0;
 
                 if (rawFile) {
-                    // Handle Buffer-like object: { type: "Buffer", data: [...] }
-                    if (typeof rawFile === "object" && rawFile.data && Array.isArray(rawFile.data)) {
+                    // Handle Buffer-like object
+                    if (
+                        typeof rawFile === "object" &&
+                        rawFile.data &&
+                        Array.isArray(rawFile.data)
+                    ) {
                         rawFile = rawFile.data;
                     }
 
                     if (Array.isArray(rawFile)) {
+
                         // Convert byte array to base64
                         const byteArray = new Uint8Array(rawFile);
-                        fileSize = byteArray.length; // exact size in bytes
+                        fileSize = byteArray.length;
 
-                        // Build binary string
                         let binary = "";
+
                         for (let i = 0; i < byteArray.length; i++) {
                             binary += String.fromCharCode(byteArray[i]);
                         }
+
                         base64File = btoa(binary);
+
                     } else if (typeof rawFile === "string" && rawFile) {
-                        // Already a base64 string (from new upload)
+
+                        // Already base64
                         base64File = rawFile;
-                        fileSize = Math.ceil(rawFile.length * 0.75); // approximate
+                        fileSize = Math.ceil(rawFile.length * 0.75);
                     }
                 }
 
@@ -1943,36 +1955,70 @@ sap.ui.define([
                 const sExistingFileType = oComplaintData.FileType || "";
 
                 const aDocuments = sExistingFileName
-                    ? [
-                        {
-                            FileName: sExistingFileName,
-                            DocumentType: sExistingFileType,
-                            FileType: sExistingFileType,
-                            File: base64File,      // proper base64 for preview
-                            Base64: base64File,
-                            size: fileSize,
-                            // DocType: "Attachment"
-                        }
-                    ]
+                    ? [{
+                        FileName: sExistingFileName,
+                        DocumentType: sExistingFileType,
+                        FileType: sExistingFileType,
+                        File: base64File,
+                        Base64: base64File,
+                        size: fileSize,
+                        // DocType: "Attachment"
+                    }]
                     : [];
 
+                // Set edit data
                 oTempModel.setData({
-                    ComplaintID: oComplaintData.ComplaintID,
-                    ComplaintType: oComplaintData.ComplaintType,
+                    ComplaintID: oComplaintData.ComplaintID || "",
+                    ComplaintType: oComplaintData.ComplaintType || "",
                     RoomNo: oComplaintData.RoomNo || "",
                     RoomCombo: [],
                     Description: oComplaintData.Description || oComplaintData.ComplaintDescription || "",
                     BranchCode: oComplaintData.BranchCode?.trim() || "",
+                    CustomerName: oComplaintData.CustomerName || "",
+                    BookingID: oComplaintData.BookingID || "",
                     FileName: sExistingFileName,
                     FileType: sExistingFileType,
-                    FileContent: base64File, // store for saving
+                    FileContent: base64File,
                     Documents: aDocuments,
                     isEditMode: true
                 });
+
+                // Store selected branch globally
+                this.BranchCode = oComplaintData.BranchCode?.trim() || "";
+
+                // Load room combo
+                this._setComplaintRoomComboData(
+                    oTempModel.getProperty("/BranchCode"),
+                    oTempModel.getProperty("/RoomNo")
+                );
+
+                // Load customer booking data
+                if (this.BranchCode) {
+                    this.onSearch().then(() => {
+
+                        // Restore selected values after search
+                        oTempModel.setProperty(
+                            "/CustomerName",
+                            oComplaintData.CustomerName || ""
+                        );
+
+                        oTempModel.setProperty(
+                            "/BookingID",
+                            oComplaintData.BookingID || ""
+                        );
+                    });
+                }
+
             } else {
+
                 const aBranches = oProfileModel.getProperty("/BranchCombo") || [];
-                const sDefaultBranchCode = aBranches.length === 1 ? aBranches[0].BranchCode : "";
-                // New complaint: reset model
+
+                const sDefaultBranchCode =
+                    aBranches.length === 1
+                        ? aBranches[0].BranchCode
+                        : "";
+
+                // Reset for new complaint
                 oTempModel.setData({
                     ComplaintID: "",
                     ComplaintType: "",
@@ -1980,44 +2026,78 @@ sap.ui.define([
                     RoomCombo: [],
                     Description: "",
                     BranchCode: sDefaultBranchCode,
+                    CustomerName: "",
+                    BookingID: "",
                     FileName: "",
                     FileType: "",
                     FileContent: "",
                     Documents: [],
                     isEditMode: false
                 });
-            }
-            this._setComplaintRoomComboData(
-                oTempModel.getProperty("/BranchCode"),
-                oTempModel.getProperty("/RoomNo")
-            );
 
-            const sDialogTitle = oComplaintData ? "Edit Complaint" : "Raise New Complaint";
+                // Auto load room + customer data if branch already selected
+                if (sDefaultBranchCode) {
+
+                    this.BranchCode = sDefaultBranchCode;
+
+                    // Load room combo
+                    this._setComplaintRoomComboData(
+                        sDefaultBranchCode,
+                        ""
+                    );
+
+                    // Auto search customer booking data
+                    this.onSearch();
+
+                } else {
+
+                    this._setComplaintRoomComboData("", "");
+                }
+            }
+
+            const sDialogTitle = oComplaintData
+                ? "Edit Complaint"
+                : "Raise New Complaint";
 
             const fnUpdateUI = () => {
-                const aBranches = oProfileModel.getProperty("/BranchCombo") || [];
-                const oBranchCombo = this._getComplaintControl("idBranchCombo");
+
+                const aBranches =
+                    oProfileModel.getProperty("/BranchCombo") || [];
+
+                const oBranchCombo =
+                    this._getComplaintControl("idBranchCombo");
+
                 if (oBranchCombo) {
                     oBranchCombo.setEditable(aBranches.length !== 1);
                 }
 
-                const aRooms = oTempModel.getProperty("/RoomCombo") || [];
-                const oRoomCombo = this._getComplaintControl("idComplaintRoom");
+                const aRooms =
+                    oTempModel.getProperty("/RoomCombo") || [];
+
+                const oRoomCombo =
+                    this._getComplaintControl("idComplaintRoom");
+
                 if (oRoomCombo) {
                     oRoomCombo.setEditable(aRooms.length !== 1);
                 }
             };
 
-            // Open dialog (your existing logic)
+            // Open dialog
             if (!this._oComplaintDialog) {
+
                 Fragment.load({
                     name: "sap.ui.com.project1.fragment.Complaint",
                     controller: this
                 }).then(function (oDialog) {
+
                     this._oComplaintDialog = oDialog;
+
                     oView.addDependent(oDialog);
+
                     this._oComplaintDialog.setTitle(sDialogTitle);
+
                     oDialog.open();
+
                     this._resetComplaintValidationStates();
                     fnUpdateUI();
                 }.bind(this));
