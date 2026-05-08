@@ -567,7 +567,7 @@ sap.ui.define([
                             var oBody = {
                                 data: Payload,
                                 filters: {
-                                    CustomerID: data.CustomerID
+                                    BookingID: data.BookingID
                                 }
                             };
 

@@ -4124,7 +4124,6 @@ sap.ui.define([
                         if (oData.AllSelectedFacilities?.length > 0) {
                             oData.AllSelectedFacilities.forEach(fac => {
                                 facilityData.push({
-                                    PaymentID: "",
                                     FacilityName: fac.FacilityName,
                                     FacilitiPrice: fac.Price,
                                     StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
