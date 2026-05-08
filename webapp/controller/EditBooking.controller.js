@@ -2059,6 +2059,28 @@ sap.ui.define([
 
         // Cancel edit mode and revert to read-only
         onCancelEditPress: function () {
+
+            MessageBox.confirm(
+                "Are you sure you want to cancel? All unsaved changes will be lost.",
+                {
+                    title: "Confirm Cancel",
+
+                    styleClass: "myUnifiedBtn",
+
+                    onClose: function (sAction) {
+
+                        if (sAction !== MessageBox.Action.OK) {
+                            return;
+                        }
+
+                        this._performCancelEdit();
+
+                    }.bind(this)
+                }
+            );
+        },
+
+        _performCancelEdit: function () {
             var oBookingView = this.getView().getModel("BookingView");
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
