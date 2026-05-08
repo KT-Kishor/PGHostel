@@ -2046,8 +2046,8 @@ sap.ui.define([
 
             // HostelModel has nested structures, need deep copy
             this._backupHostelModel = JSON.parse(JSON.stringify(oHostelData));
-            // BookingView is relatively flat, shallow copy is sufficient
-            this._backupBookingView = Object.assign({}, oBookingViewData);
+            // BookingView contains nested FamilyMembers array, need deep copy for proper restoration
+            this._backupBookingView = JSON.parse(JSON.stringify(oBookingViewData));
             // Facility models contain nested arrays/objects, need deep copy for proper restoration
             this._backupFacilityModel = JSON.parse(JSON.stringify(oFacilityModelData));
             this._backupFacilitySelection = JSON.parse(JSON.stringify(oFacilitySelectionData));
