@@ -17,6 +17,7 @@ sap.ui.define([
                 // maxDate: maxDate,
                 focusedDate: new Date(2000, 0, 1),
                 minDate: new Date(1950, 0, 1),
+                maxdate : new Date()
             });
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteManageStaff").attachMatched(this._onRouteMatched, this);

@@ -420,13 +420,21 @@
                                 visible="{VisibleModel>/visible}"
                             >
                                 <core:Item
-                                    key="Mr."
-                                    text="Mr."
-                                />
-                                <core:Item
-                                    key="Mrs."
-                                    text="Mrs."
-                                />
+                                key="Mr."
+                                text="Mr."
+                            />
+                            <core:Item
+                                key="Ms."
+                                text="Ms."
+                            />
+                            <core:Item
+                                key="Mrs."
+                                text="Mrs."
+                            />
+                            <core:Item
+                                key="Dr."
+                                text="Dr."
+                            />
                                 <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"

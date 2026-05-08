@@ -28,7 +28,6 @@
                 filterChange="IA_.onFilterChange"
                 afterVariantLoad="IA_.onAfterVariantLoad"
                 showFilterConfiguration="false"
-                filterContainerWidth="auto"
                 class="filterBarTheme"
             >
 				<fb:filterGroupItems>

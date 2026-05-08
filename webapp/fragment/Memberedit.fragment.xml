@@ -113,6 +113,9 @@
                     valueFormat="dd/MM/yyyy"
                     change="onNewMemberDOBChange"
                     valueStateText="Age must be between 0 and 100 years" editable="{= ${Member>/Relation} !== 'Self' }"
+                     initialFocusedDateValue="{controller>/focusedDate}"
+                     minDate="{controller>/minDate}"
+                    maxDate="{controller>/maxdate}"
                 />
                 <Label
                     text="Gender"
@@ -219,7 +222,7 @@
                 <u:FileUploader
                     id="MM_id_FileUploader"
                     fileType="jpg,jpeg,png,PDF"
-                    sameFilenameAllowed="false"
+                    sameFilenameAllowed="true"
                     change="onFacilityFileChange"
                     visible="{VisibleModel>/visible}"
                     class="myUnifiedBtn"

@@ -92,6 +92,7 @@
                     change="onChangeDOB"
                     initialFocusedDateValue="{controller>/focusedDate}"
                     minDate="{controller>/minDate}"
+                    maxDate="{controller>/maxdate}"
                 />
 				<Label
                     text="{i18n>MVgender}"
