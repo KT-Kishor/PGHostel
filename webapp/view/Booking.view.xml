@@ -443,7 +443,7 @@
                     </layoutData>
                     <!-- Advertisement Carousel Section -->
                     <Title
-                        text="Developed by"
+                        text="Advertisement"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
