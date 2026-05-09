@@ -871,8 +871,18 @@
         </l:Grid>
 
         <footer>
-            <Toolbar>
-                <ToolbarSpacer />
+          	<Bar>
+            <contentLeft>
+             <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
+             <Link
+                text="{i18n>devlopby}"
+                href="https://kalpavrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+            
+            </contentLeft>
+				<contentRight>
                 <!-- Edit booking button - only visible when status is New and not in edit mode -->
                 <Button
                     text="Edit Booking"
@@ -895,7 +905,8 @@
                     press="onSubmitPress"
                     enabled="{BookingView>/editModeEnabled}"
                 />
-            </Toolbar>
+                  </contentRight>
+			</Bar>
         </footer>
     </Page>
 </mvc:View>
