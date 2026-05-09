@@ -2631,7 +2631,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   padding: 4px 8px;
   border-radius: 6px 6px 6px 6px !important;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal !important;
   overflow: hidden;
   text-overflow: ellipsis;
 }
