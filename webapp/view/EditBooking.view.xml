@@ -66,6 +66,17 @@
                                 value="{= ${HostelModel>/Area} + (${HostelModel>/PropertyType} ? ' (' + ${HostelModel>/PropertyType} + ')' : '') }"
                                 editable="false"
                             />
+
+<Label text="Bed Type" />
+
+                            <Input
+                                id="EditBookBedType_ID"
+                                value="{= ${HostelModel>/BedType} + (${HostelModel>/ACType} ? ' (' + ${HostelModel>/ACType} + ')' : '') }"
+                                editable="false"
+                            />
+
+
+                            
                             <Label
                                 text="Room Plan"
                                 required="true"
@@ -90,12 +101,16 @@
                                 value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
                                 editable="false"
                             />
-
-                            <Label text="No. of Persons" />
+                       <Label text="No. of Persons" />
+<Input
+    value="{= (${HostelModel>/PropertyType} === 'Hostel' || ${HostelModel>/PropertyType} === 'PG') ? 1 : ${HostelModel>/Capacity} }"
+    editable="false"
+/>
+                            <!-- <Label text="No. of Persons" />
                             <Input
                                 value="{HostelModel>/SelectedPerson}"
                                 editable="false"
-                            />
+                            /> -->
 
                             <Label
                                 text="Duration"
