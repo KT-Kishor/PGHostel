@@ -217,6 +217,7 @@ sap.ui.define([
 
                 this._rebuildSelectedFacilities();
 
+                await this._hydrateAppliedCouponData();
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
                 oHostelModel.refresh(true);
@@ -656,6 +657,7 @@ sap.ui.define([
                 AppliedDiscount: oBooking.Discount || 0,
                 AppliedCouponCode: oBooking.CouponCode || "",
                 CouponCode: oBooking.CouponCode || "",
+                AppliedCouponData: null,
 
                 // Members & Facilities
                 MemberList: aMemberList,
@@ -2126,17 +2128,38 @@ sap.ui.define([
             oBookingView.setProperty("/editModeEnabled", false);
         },
 
-        // Override to always fully clear coupon state (including typed value)
-        // Parent uses _resetCouponState(true) for facility changes which keeps the coupon input value
-        _resetCouponState: function (bKeepTypedValue) {
-            BookingController.prototype._resetCouponState.call(this, false);
+        _hydrateAppliedCouponData: async function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sCouponCode = String(oHostelModel.getProperty("/AppliedCouponCode") || "").trim();
+            var sBranchCode = String(oHostelModel.getProperty("/BranchCode") || "").trim();
+
+            if (!sCouponCode) {
+                oHostelModel.setProperty("/AppliedCouponData", null);
+                return null;
+            }
+
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+                    CouponCode: sCouponCode,
+                    Status: "Active"
+                });
+                var aCoupons = oResponse && oResponse.data || [];
+                var oMatchedCoupon = aCoupons.find(function (oCoupon) {
+                    var sCouponBranchCode = String(oCoupon.BranchCode || "").trim();
+                    return String(oCoupon.CouponCode || "").toUpperCase() === sCouponCode.toUpperCase()
+                        && (!sCouponBranchCode || sCouponBranchCode === sBranchCode);
+                }) || null;
+
+                oHostelModel.setProperty("/AppliedCouponData", oMatchedCoupon);
+                return oMatchedCoupon;
+            } catch (oError) {
+                oHostelModel.setProperty("/AppliedCouponData", null);
+                return null;
+            }
         },
 
-        // Override to clear coupon field when room plan changes
-        onRoomPlanChange: function (oEvent) {
-            BookingController.prototype.onRoomPlanChange.call(this, oEvent);
-            this._resetCouponState(false);
-            this._recalculateSummary();
+        _resetCouponState: function (bKeepTypedValue) {
+            BookingController.prototype._resetCouponState.call(this, bKeepTypedValue);
         },
 
         // Override facility card press to check edit mode

@@ -82,14 +82,15 @@
                     content="{path: 'VisibilityModel>/ACRooms'}"
                 >
 					<VBox class="bedCard">
-						<Carousel
-                            height="300px"
-                            width="100%"
-                            loop="true"
-                            showPageIndicator="false"
-                            backgroundDesign="Transparent"
-                            pages="{path: 'VisibilityModel>Images', templateShareable: false}"
-                        >
+				<Carousel
+    height="300px"
+    width="100%"
+    loop="true"
+    showPageIndicator="false"
+    backgroundDesign="Transparent"
+    class="roomCardCarousel"
+    pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+>
 							<pages>
 								<VBox class="imageWrapper">
 									<HBox class="areaTagBox">
@@ -194,14 +195,16 @@
                     content="{path: 'VisibilityModel>/NonACRooms'}"
                 >
 					<VBox class="bedCard">
-						<Carousel
-                            height="300px"
-                            width="100%"
-                            loop="true"
-                            showPageIndicator="false"
-                            backgroundDesign="Transparent"
-                            pages="{path: 'VisibilityModel>Images', templateShareable: false}"
-                        >
+                    <Carousel
+                        height="300px"
+                        width="100%"
+                        loop="true"
+                        showPageIndicator="false"
+                        backgroundDesign="Transparent"
+                        class="roomCardCarousel"
+                        pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+                        
+                    >
 							<pages>
 								<VBox class="imageWrapper">
 									<HBox class="areaTagBox">

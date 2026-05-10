@@ -1821,10 +1821,9 @@
             this._setFacilitySelectionSummary(oFacility);
 
             this.getView().getModel("FacilityModel").refresh(true);
-            this._resetCouponState(true);
             this._renderFacilityCards();
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
 
             oDialog.close();
         },
@@ -1852,10 +1851,9 @@
             this._setFacilitySelectionSummary(oFacility);
 
             this.getView().getModel("FacilityModel").refresh(true);
-            this._resetCouponState(true);
             this._renderFacilityCards();
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
         },
 
 
@@ -1875,10 +1873,9 @@
             oFacility.SelectionSummary = "";
 
             this.getView().getModel("FacilityModel").refresh(true);
-            this._resetCouponState(true);
             this._renderFacilityCards();
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
             oDialog.close();
         },
 
@@ -3069,8 +3066,7 @@
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
             this._rebuildSelectedFacilities();
-            this._resetCouponState(false);
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
             this.onCloseMemberSelectionDialog();
         },
 
@@ -4536,6 +4532,7 @@
             oModel.setProperty("/CouponCode", oData.CouponCode || "");
             oModel.setProperty("/AppliedDiscount", this._toNumber(oData.AppliedDiscount));
             oModel.setProperty("/AppliedCouponCode", oData.AppliedCouponCode || "");
+            oModel.setProperty("/AppliedCouponData", oData.AppliedCouponData || null);
             oModel.setProperty("/GSTType", oData.GSTType || "");
             oModel.setProperty("/GSTValue", this._toNumber(oData.GSTValue));
             oModel.setProperty("/PropertyGSTIN", oData.PropertyGSTIN || oData.GSTIN || "");
@@ -4766,23 +4763,29 @@
             oModel.setProperty("/EndDate", "");
             oModel.setProperty("/TotalDays", 0);
             this._clearSelectedFacilities();
-            this._resetCouponState(true);
             this._applySelectedPlanPrice();
             this._syncPlanState();
             this._applyFacilityPriceFilter();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: true });
         },
 
         onDurationChange: function (oEvent) {
             const oModel = this.getView().getModel("HostelModel");
             oModel.setProperty("/SelectedMonths", oEvent.getSource().getSelectedKey() || "1");
-            this._resetCouponState(false);
             this._updateAutoEndDate();
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: true });
+        },
+
+        _isLiveDateInputEvent: function (oEvent) {
+            return !!(oEvent && typeof oEvent.getId === "function" && oEvent.getId() === "liveChange");
         },
 
         onStartDateChange: function (oEvent) {
+            if (this._isLiveDateInputEvent(oEvent)) {
+                return;
+            }
+
             utils._LCvalidateDate(oEvent);
             const oModel = this.getView().getModel("HostelModel");
             const sStartDate = oModel.getProperty("/StartDate");
@@ -4796,9 +4799,8 @@
                 MessageToast.show("Start date cannot be before today");
                 oModel.setProperty("/StartDate", "");
                 oModel.setProperty("/EndDate", "");
-                this._resetCouponState(false);
                 this._rebuildSelectedFacilities();
-                this._recalculateSummary();
+                this._refreshCouponAndSummary({ checkDateWindow: true });
                 return;
             }
 
@@ -4806,12 +4808,15 @@
                 this._updateAutoEndDate();
             }
 
-            this._resetCouponState(false);
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: true });
         },
 
         onEndDateChange: function (oEvent) {
+            if (this._isLiveDateInputEvent(oEvent)) {
+                return;
+            }
+
             utils._LCvalidateDate(oEvent)
             const oModel = this.getView().getModel("HostelModel");
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
@@ -4821,15 +4826,13 @@
                 MessageToast.show("End date must be after start date");
                 oModel.setProperty("/EndDate", "");
                 oModel.setProperty("/TotalDays", 0);
-                this._resetCouponState(false);
                 this._rebuildSelectedFacilities();
-                this._recalculateSummary();
+                this._refreshCouponAndSummary({ checkDateWindow: true });
                 return;
             }
 
-            this._resetCouponState(false);
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: true });
         },
 
         _updateAutoEndDate: function () {
@@ -4862,10 +4865,9 @@
         onPropertyTypeChange: function (oEvent) {
 
             this.getView().getModel("HostelModel").setProperty("/PropertyType", oEvent.getSource().getSelectedKey());
-            this._resetCouponState(false);
             this._syncPropertyTypeState();
             this._rebuildSelectedFacilities();
-            this._recalculateSummary();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
         },
         // onPropertyChange: function (oEvent) {
         //     utils._LCstrictValidationComboBox(oEvent)
@@ -4896,8 +4898,7 @@
                 this._updateSelectedPersonsFromFamily();
                 this._syncSelectedFacilityPersonsWithOccupants();
                 this._rebuildSelectedFacilities();
-                this._resetCouponState(false);
-                this._recalculateSummary();
+                this._refreshCouponAndSummary({ checkDateWindow: false });
                 MessageToast.show("Row deleted.");
             }
         },
@@ -4985,6 +4986,12 @@
                     return;
                 }
 
+                var aCouponBookingDateReasons = this._getCouponBookingDateReasons(oMatchedCoupon);
+                if (aCouponBookingDateReasons.length > 0) {
+                    MessageToast.show("This coupon is not valid for the booking date.");
+                    return;
+                }
+
                 if (String(oMatchedCoupon.DiscountType || "").toLowerCase() === "percentage") {
                     fDiscountAmount = fCouponBaseAmount * (Number(oMatchedCoupon.DiscountValue || 0) / 100);
                     if (Number(oMatchedCoupon.UptoValue || 0) > 0 && fDiscountAmount > Number(oMatchedCoupon.UptoValue || 0)) {
@@ -4998,6 +5005,7 @@
 
                 oModel.setProperty("/AppliedDiscount", Number(fDiscountAmount.toFixed(2)));
                 oModel.setProperty("/AppliedCouponCode", sEnteredCode);
+                oModel.setProperty("/AppliedCouponData", oMatchedCoupon);
                 this._recalculateSummary();
 
                 // Show success message with coupon description if available
@@ -5028,6 +5036,121 @@
             }
             oModel.setProperty("/AppliedDiscount", 0);
             oModel.setProperty("/AppliedCouponCode", "");
+            oModel.setProperty("/AppliedCouponData", null);
+        },
+
+        _refreshCouponAndSummary: function (mOptions) {
+            this._recalculateSummary();
+            if (!this._isCouponValidationReady()) {
+                return;
+            }
+
+            if (this._validateCouponAfterChange(mOptions)) {
+                this._recalculateSummary();
+            }
+        },
+
+        _isCouponValidationReady: function () {
+            var oModel = this.getView().getModel("HostelModel");
+            var sPlan = String(oModel.getProperty("/SelectedPriceType") || "").trim();
+            var oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
+            var oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
+
+            if (sPlan === "Per Day") {
+                return !!(oStartDate && oEndDate && oEndDate > oStartDate);
+            }
+
+            if (sPlan === "Per Month" || sPlan === "Per Year") {
+                return !!(oStartDate && oEndDate);
+            }
+
+            return true;
+        },
+
+        _showCouponInvalidMessage: function (sMessage) {
+            MessageBox.show(sMessage, {
+                icon: MessageBox.Icon.WARNING,
+                title: "Coupon Removed",
+                actions: [MessageBox.Action.OK],
+                emphasizedAction: MessageBox.Action.OK
+            });
+
+            setTimeout(function () {
+                var aOpenDialogs = sap.m.InstanceManager.getOpenDialogs();
+                var oDialog = aOpenDialogs[aOpenDialogs.length - 1];
+
+                if (oDialog && typeof oDialog.getButtons === "function") {
+                    (oDialog.getButtons() || []).forEach(function (oButton) {
+                        oButton.addStyleClass("myUnifiedBtn");
+                    });
+                }
+            }, 0);
+        },
+
+        _getCouponBookingDateReasons: function (oCouponData) {
+            var oModel = this.getView().getModel("HostelModel");
+            var sBookingDate = this._formatDateToISO(oModel.getProperty("/BookingDate"));
+            var sCouponStartDate = this._formatDateToISO(oCouponData && oCouponData.StartDate);
+            var sCouponEndDate = this._formatDateToISO(oCouponData && oCouponData.EndDate);
+            var aReasons = [];
+
+            if (sBookingDate && sCouponStartDate && sBookingDate < sCouponStartDate) {
+                aReasons.push("booking date is before coupon validity start date");
+            }
+
+            if (sBookingDate && sCouponEndDate && sBookingDate > sCouponEndDate) {
+                aReasons.push("booking date is after coupon validity end date");
+            }
+
+            return aReasons;
+        },
+
+        _getCouponInvalidReasons: function (oCouponData) {
+            var fCouponBaseAmount = this._getCouponBaseAmount();
+            var aReasons = [];
+
+            if (fCouponBaseAmount < Number(oCouponData.MinOrderValue || 0)) {
+                aReasons.push("minimum order value is not met");
+            }
+
+            aReasons = aReasons.concat(this._getCouponBookingDateReasons(oCouponData));
+
+            return aReasons;
+        },
+
+        _validateCouponAfterChange: function (mOptions) {
+            var oModel = this.getView().getModel("HostelModel");
+            var sAppliedCode = oModel.getProperty("/AppliedCouponCode");
+            var oCouponData = oModel.getProperty("/AppliedCouponData");
+            var fExistingDiscount = this._toNumber(oModel.getProperty("/AppliedDiscount"));
+
+            if (!sAppliedCode || !oCouponData) {
+                return false;
+            }
+
+            var fCouponBaseAmount = this._getCouponBaseAmount();
+            var aReasons = this._getCouponInvalidReasons(oCouponData);
+
+            if (aReasons.length > 0) {
+                var sMessage = "The applied coupon is no longer valid: " + aReasons.join(" and ") + ". The coupon has been removed.";
+                this._showCouponInvalidMessage(sMessage);
+                this._resetCouponState(false);
+                return true;
+            } else {
+                var fDiscountAmount = 0;
+                if (String(oCouponData.DiscountType || "").toLowerCase() === "percentage") {
+                    fDiscountAmount = fCouponBaseAmount * (Number(oCouponData.DiscountValue || 0) / 100);
+                    if (Number(oCouponData.UptoValue || 0) > 0 && fDiscountAmount > Number(oCouponData.UptoValue || 0)) {
+                        fDiscountAmount = Number(oCouponData.UptoValue || 0);
+                    }
+                } else {
+                    fDiscountAmount = Number(oCouponData.DiscountValue || 0);
+                }
+                fDiscountAmount = Math.min(fDiscountAmount, fCouponBaseAmount);
+                fDiscountAmount = Number(fDiscountAmount.toFixed(2));
+                oModel.setProperty("/AppliedDiscount", fDiscountAmount);
+                return fExistingDiscount !== fDiscountAmount;
+            }
         },
 
 

@@ -667,20 +667,27 @@ sap.ui.define([
         },
 
         onPressAddMember: function () {
+
             if (!this.UD_Dialog) {
                 var oView = this.getView();
-                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Memberedit", this);
+                this.UD_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.Memberedit",
+                    this
+                );
                 oView.addDependent(this.UD_Dialog);
             }
 
             this._mode = "CREATE";
-            this.getView().getModel("viewModel").setProperty("/mode", "CREATE");
 
-            const oBookingView = this.getView().getModel("profileData"); // adjust if needed
-            const sNewMemberID = this._generateMemberID(oBookingView);
-            const sUserID = this.getView().getModel("profileData").getData().UserID 
+            this.getView().getModel("viewModel")
+                .setProperty("/mode", "CREATE");
 
-            //  Empty model for new member
+            const sUserID = this.getView()
+                .getModel("profileData")
+                .getData().UserID;
+
+            const sNewMemberID = this._generateMemberID();
+
             const oNewMember = {
                 MemberID: sNewMemberID,
                 UserID: sUserID,
@@ -689,15 +696,21 @@ sap.ui.define([
                 Relation: "",
                 Gender: "",
                 DateOfBirth: "",
-                DocumentType: ""
+                DocumentType: "",
+                DocumentName: "",
+                Document: "",
+                File: "",
+                FileType: "",
+                DocumentFile: null
             };
 
-            this.getView().setModel(new JSONModel(oNewMember), "Member");
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(oNewMember),
+                "Member"
+            );
 
-            //  Clear existing file data
             this._existingFileData = null;
             this._selectedFile = null;
-
             //  Reset UI fields
             sap.ui.getCore().byId("idSelect").setSelectedKey("").setValueState("None");
             sap.ui.getCore().byId("MM_id_MemberName").setValue("").setValueState("None");
@@ -711,35 +724,67 @@ sap.ui.define([
         },
 
         onEditMemberFromDialog: function (oEvent) {
+
             if (!this.UD_Dialog) {
                 var oView = this.getView();
-                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Memberedit", this);
+
+                this.UD_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.Memberedit",
+                    this
+                );
+
                 oView.addDependent(this.UD_Dialog);
             }
 
             this._mode = "UPDATE";
-            this.getView().getModel("viewModel").setProperty("/mode", "UPDATE");
 
-            var oContext = oEvent.getSource().getBindingContext("profileData");
+            this.getView().getModel("viewModel")
+                .setProperty("/mode", "UPDATE");
+
+            var oContext = oEvent.getSource()
+                .getBindingContext("profileData");
+
             var oData = oContext.getObject();
 
-            //  store existing file data
             this._existingFileData = {
                 FileName: oData.FileName,
                 FileType: oData.FileType,
                 File: oData.Attachment, // already base64
-                DocumentID: oData.DocumentID,
-                DocumentType: oData.DocumentType || "",
                 DateOfBirth: oData.DateOfBirth || "",
                 Gender: oData.Gender || "",
                 Relation: oData.Relation || "",
                 MemberID: oData.MemberID || "",
                 UserID: oData.UserID || "",
-                Salutation: oData.Salutation 
+                Salutation: oData.Salutation,
+                DocumentID: oData.DocumentID || "",
+                MemberID: oData.MemberID || "",
+                UserID: oData.UserID || "",
+                FileName: oData.FileName || "",
+                FileType: oData.FileType || "",
+                File: oData.Attachment || "",
+                DocumentType: oData.DocumentType || ""
+            };
+
+            const oMemberData = {
+                MemberID: oData.MemberID || "",
+                UserID: oData.UserID || "",
+                Salutation: oData.Salutation || "",
+                Name: oData.Name || "",
+                Relation: oData.Relation || "",
+                Gender: oData.Gender || "",
+                DateOfBirth: oData.DateOfBirth
+                    ? oData.DateOfBirth.split("-").reverse().join("/")
+                    : "",
+                DocumentType: oData.DocumentType || "",
+                DocumentName: oData.FileName || "",
+                Document: oData.Attachment || "",
+                File: oData.Attachment || "",
+                FileType: oData.FileType || "",
+                DocumentFile: null
             };
 
             this.getView().setModel(
-                new sap.ui.model.json.JSONModel(this._existingFileData),
+                new sap.ui.model.json.JSONModel(oMemberData),
                 "Member"
             );
 
@@ -757,140 +802,453 @@ sap.ui.define([
 
         onCloseDialog: function () {
             this.UD_Dialog.close();
-
         },
+
+        onNewMemberDocumentTypeChange: function (oEvent) {
+
+            const oComboBox = oEvent.getSource();
+            const sValue = String(oComboBox.getValue() || "").trim();
+
+            if (!sValue) {
+                oComboBox.setSelectedKey("");
+                oComboBox.setValue("");
+                oComboBox.setValueState("None");
+                return true;
+            }
+
+            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+        },
+
         onFacilityFileChange: function (oEvent) {
-            var aFiles = oEvent.getParameter("files");
 
-            if (!aFiles || aFiles.length === 0) return;
+            const oFileUploader = oEvent.getSource();
+            const oModel = this.getView().getModel("Member");
 
-            //  store selected file globally (or in model)
-            this._selectedFile = aFiles[0];
+            const oFile = oEvent.getParameter("files") &&
+                oEvent.getParameter("files")[0];
+
+            if (!oFile) {
+                return;
+            }
+
+            const iMaxSize = 2 * 1024 * 1024;
+
+            const sDocType = oModel.getProperty("/DocumentType");
+
+            if (!sDocType) {
+                sap.m.MessageToast.show(
+                    "Please select document type first"
+                );
+
+                oFileUploader.clear();
+                return;
+            }
+
+            if (oFile.size > iMaxSize) {
+
+                sap.m.MessageToast.show(
+                    oFile.name + " exceeds the 2 MB size limit."
+                );
+
+                oFileUploader.clear();
+                return;
+            }
+
+            const sFileName = oFile.name || "";
+
+            const sExt = sFileName.includes(".")
+                ? sFileName.split(".").pop().toLowerCase()
+                : "";
+
+            const bAllowedExt = [
+                "jpg",
+                "jpeg",
+                "png",
+                "webp",
+                "pdf"
+            ].includes(sExt);
+
+            if (!bAllowedExt) {
+
+                sap.m.MessageToast.show(
+                    "Only PDF, JPG, JPEG, PNG, WEBP allowed"
+                );
+
+                oFileUploader.clear();
+                return;
+            }
+
+            this._selectedFile = oFile;
+
+            const oReader = new FileReader();
+
+            oReader.onload = function (oLoadEvent) {
+
+                const sBase64 = String(
+                    oLoadEvent.target.result || ""
+                ).split(",")[1] || "";
+
+                let sNewName = sDocType
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, "_");
+
+                sNewName += "." + sExt;
+
+                oModel.setProperty("/DocumentName", sNewName);
+                oModel.setProperty("/DocumentFile", oFile);
+                oModel.setProperty("/Document", sBase64);
+                oModel.setProperty("/File", sBase64);
+                oModel.setProperty("/FileType", oFile.type || "");
+
+                oModel.refresh(true);
+            };
+
+            oReader.readAsDataURL(oFile);
         },
-        savepress: function () {
-            var oView = sap.ui.getCore()
-            var DocumentType = sap.ui.getCore().byId("idDocumentType").getSelectedKey();
-            var oMember = this.getView().getModel("Member").getData(); // adjust index if needed
 
+        onMemberFileSizeExceed: function (oEvent) {
 
-            if (
-                utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"), "ID") &&
-                utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
-                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"), "ID") &&
-                (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"),
-                 "ID")) &&
-                utils._LCstrictValidationComboBox(oView.byId("idDocumentType"), "ID")) {
+            const sFileName = oEvent.getParameter("fileName") || "File";
 
+            sap.m.MessageToast.show(
+                sFileName + " exceeds the 2 MB size limit."
+            );
 
-                if (!DocumentType) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
+            oEvent.getSource().clear();
+        },
+
+        onPreviewMemberDocument: function () {
+
+            const oDoc = this.getView()
+                .getModel("Member")
+                .getData();
+
+            this._previewDocument(oDoc);
+        },
+
+        _previewDocument: function (oDoc) {
+            const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
+
+            if (!sRawSource) {
+                MessageToast.show("No document to preview.");
+                return;
+            }
+
+            const aDataUrlParts = /^data:([^;]+);base64,(.+)$/i.exec(sRawSource);
+            const sRawBase64 = aDataUrlParts ? aDataUrlParts[2] : sRawSource;
+            const normalizeBase64 = function (sValue) {
+                let sNormalized = String(sValue || "").replace(/\s/g, "").replace(/-/g, "+").replace(/_/g, "/");
+                const iRemainder = sNormalized.length % 4;
+
+                if (iRemainder) {
+                    sNormalized += "=".repeat(4 - iRemainder);
+                }
+
+                return sNormalized;
+            };
+
+            const autoDecodeBase64 = function (sValue) {
+                if (!sValue) {
+                    return "";
+                }
+
+                let sDecoded = String(sValue).replace(/\s/g, "");
+                // If already starts with known signatures, assume it's single-encoded
+                if (sDecoded.startsWith("iVB") || sDecoded.startsWith("/9j") || sDecoded.startsWith("JVBER")) {
+                    return sDecoded;
+                }
+                // Otherwise try decode once
+                try {
+                    return atob(sDecoded);
+                } catch (e) {
+                    // If decode fails, return original (might be already decoded)
+                    return sDecoded;
+                }
+            };
+
+            const sBase64 = normalizeBase64(autoDecodeBase64(sRawBase64));
+            let sMimeType = String(oDoc.FileType || oDoc.MimeType || "").toLowerCase().trim();
+
+            if (!sMimeType && aDataUrlParts) {
+                sMimeType = String(aDataUrlParts[1] || "").toLowerCase();
+            }
+
+            if (sMimeType === "pdf" || sMimeType === ".pdf") {
+                sMimeType = "application/pdf";
+            } else if (sMimeType === "jpg" || sMimeType === "jpeg" || sMimeType === ".jpg" || sMimeType === ".jpeg") {
+                sMimeType = "image/jpeg";
+            } else if (sMimeType === "png" || sMimeType === ".png") {
+                sMimeType = "image/png";
+            } else if (sMimeType === "webp" || sMimeType === ".webp") {
+                sMimeType = "image/webp";
+            }
+
+            if (!sMimeType) {
+                if (sBase64.startsWith("iVB")) {
+                    sMimeType = "image/png";
+                } else if (sBase64.startsWith("/9j")) {
+                    sMimeType = "image/jpeg";
+                } else if (sBase64.startsWith("UklGR")) {
+                    sMimeType = "image/webp";
+                } else if (sBase64.startsWith("JVBER")) {
+                    sMimeType = "application/pdf";
+                }
+            }
+            //     fileType: oDoc?.FileType || oDoc?.MimeType || "",
+            //     detectedMimeType: sMimeType,
+            //     rawSourcePrefix: sRawSource.slice(0, 120),
+            //     rawSourceLength: sRawSource.length,
+            //     hasDataUrlPrefix: !!aDataUrlParts,
+            //     normalizedBase64Prefix: sBase64.slice(0, 120),
+            //     normalizedBase64Length: sBase64.length
+            // });
+
+            if (sMimeType.indexOf("image/") === 0) {
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                const oImage = new sap.m.Image({
+                    densityAware: false,
+                    width: "100%",
+                    height: "100%"
+                });
+
+                const oDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    contentWidth: "50%",
+                    contentHeight: "60%",
+                    draggable: true,
+                    resizable: true,
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "Center",
+                        alignItems: "Center",
+                        items: [oImage]
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oDialog.close();
+                        }
+                    }).addStyleClass("myUnifiedBtn"),
+                    afterClose: function () {
+                        oDialog.destroy();
+                    }
+                });
+
+                this.getView().addDependent(oDialog);
+                oImage.setSrc(sImageSrc);
+                oDialog.open();
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                let sByteChars = "";
+
+                try {
+                    sByteChars = atob(sBase64);
+                } catch (oError) {
+                    console.error("[Booking] PDF preview decode failed", {
+                        error: oError?.message || oError,
+                        fileName: oDoc?.FileName || oDoc?.DocumentName || "",
+                        fileType: oDoc?.FileType || oDoc?.MimeType || "",
+                        rawSourcePrefix: sRawSource.slice(0, 200),
+                        rawSourceLength: sRawSource.length,
+                        normalizedBase64Prefix: sBase64.slice(0, 200),
+                        normalizedBase64Length: sBase64.length
+                    });
+                    MessageToast.show("PDF content is not valid base64. Check console.");
                     return;
                 }
 
-                const MAX_SIZE = 2 * 1024 * 1024;
+                const aByteArrays = [];
 
-                //  Case 1: New file selected
-                if (this._selectedFile) {
-                    var file = this._selectedFile;
+                for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
+                    const sSlice = sByteChars.slice(iOffset, iOffset + 512);
+                    const aByteNumbers = new Array(sSlice.length);
 
-                    if (file.size > MAX_SIZE) {
-                        sap.m.MessageToast.show("File " + file.name + " exceeds 2 MB limit.");
-                        return;
+                    for (let i = 0; i < sSlice.length; i++) {
+                        aByteNumbers[i] = sSlice.charCodeAt(i);
                     }
 
-                    var reader = new FileReader();
-
-                    reader.onload = (e) => {
-                        var sBase64 = e.target.result.split(",")[1];
-
-                        //  Safe Date Conversion
-                        var dob = oMember.DateOfBirth
-                            ? oMember.DateOfBirth.split('/').reverse().join('-')
-                            : "";
-
-                        const isCreate = this._mode === "CREATE";
-
-                        var oPayload = {
-                            Members: [
-                                {
-                                    MemberID: isCreate ? oMember.MemberID : this._existingFileData.MemberID,
-                                    Salutation: oMember.Salutation,
-                                    Name: oMember.Name,
-                                    Relation: oMember.Relation,
-                                    Gender: oMember.Gender,
-                                    UserID: isCreate ? oMember.UserID : this._existingFileData.UserID,
-                                    DateOfBirth: dob,
-                                    Documents: [
-                                        {
-                                            DocumentID: isCreate ? "" : this._existingFileData.DocumentID,
-                                            MemberID: isCreate ? oMember.MemberID : this._existingFileData.MemberID,
-                                            UserID: isCreate ? oMember.UserID : this._existingFileData.UserID,
-                                            DocumentType: DocumentType,
-                                            FileName: file.name,
-                                            FileType: file.type,
-                                            File: sBase64
-                                        }
-                                    ]
-                                }
-                            ]
-                        };
-
-                        //  Call inside onload (VERY IMPORTANT)
-                        this._uploadDocument(oPayload);
-                    };
-
-                    //  Trigger file read
-                    reader.readAsDataURL(file);
+                    aByteArrays.push(new Uint8Array(aByteNumbers));
                 }
 
-                //  Case 2: No new file → use existing file
-                else if (this._existingFileData) {
+                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
 
-
-                    const isCreate = this._mode === "CREATE";
-
-                    if (isCreate) {
-                        sap.m.MessageToast.show("Please upload a file");
-                        return;
-                    }
-
-                    var oPayload = {
-                        Members: [
-                            {
-                                MemberID: this._existingFileData.MemberID,
-                                Salutation: oMember.Salutation,
-                                Name: oMember.Name,
-                                Relation: oMember.Relation,
-                                Gender: oMember.Gender,
-                                DateOfBirth: oMember.DateOfBirth.split('/').reverse().join('-'),
-                                UserID: this._existingFileData.UserID,
-                                Documents: [
-                                    {
-                                        DocumentID: this._existingFileData.DocumentID,
-                                        MemberID: this._existingFileData.MemberID,
-                                        UserID: this._existingFileData.UserID,
-                                        DocumentType: DocumentType,
-                                        FileName: this._existingFileData.FileName,
-                                        FileType: this._existingFileData.FileType,
-                                        File: this._existingFileData.File
-                                    }
-                                ]
-                            }
-                        ]
-                    };
-
-                    this._uploadDocument(oPayload);
+                if (this._customerPreviewUrl) {
+                    URL.revokeObjectURL(this._customerPreviewUrl);
                 }
 
-                else {
-                    sap.m.MessageToast.show("Please select a file");
+                this._customerPreviewUrl = URL.createObjectURL(oBlob);
+
+                const oPdfDialog = new sap.m.Dialog({
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    stretch: true,
+                    draggable: true,
+                    resizable: true,
+                    contentWidth: "60%",
+                    contentHeight: "60%",
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    contentPadding: "0rem",
+                    content: [new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+                            <div style="width:100%;height:100%;overflow:hidden;">
+                                <iframe src="${this._customerPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+                            </div>
+                        `
+                    })],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: function () {
+                            oPdfDialog.close();
+                        }
+                    }).addStyleClass("myUnifiedBtn"),
+                    afterClose: function () {
+                        if (this._customerPreviewUrl) {
+                            URL.revokeObjectURL(this._customerPreviewUrl);
+                            this._customerPreviewUrl = null;
+                        }
+
+                        oPdfDialog.destroy();
+                    }.bind(this)
+                });
+
+                this.getView().addDependent(oPdfDialog);
+                oPdfDialog.open();
+                return;
+            }
+
+            MessageToast.show("Unsupported document format.");
+        },
+
+        onDeleteMemberDocument: function () {
+
+            const oModel = this.getView().getModel("Member");
+
+            oModel.setProperty("/DocumentName", "");
+            oModel.setProperty("/DocumentFile", null);
+            oModel.setProperty("/Document", "");
+            oModel.setProperty("/File", "");
+            oModel.setProperty("/FileType", "");
+            oModel.setProperty("/DocumentType", "");
+
+            oModel.refresh(true);
+
+            const oFileUploader = sap.ui.getCore()
+                .byId("MM_id_FileUploader");
+
+            if (oFileUploader) {
+                oFileUploader.clear();
+            }
+
+            this._selectedFile = null;
+        },
+
+        savepress: function () {
+
+            var oView = sap.ui.getCore();
+
+            var oMember = this.getView()
+                .getModel("Member")
+                .getData();
+
+            if (
+                utils._LCstrictValidationComboBox(
+                    oView.byId("idSelect"),
+                    "ID"
+                ) &&
+                utils._LCvalidateMandatoryField(
+                    oView.byId("MM_id_MemberName"),
+                    "ID"
+                ) &&
+                utils._LCvalidateDate(
+                    oView.byId("MemberDOB"),
+                    "ID"
+                ) &&
+                utils._LCstrictValidationComboBox(
+                    oView.byId("MemberGenderCombo"),
+                    "ID"
+                ) &&
+                (
+                    oMember.Relation === "Self" ||
+                    utils._LCstrictValidationComboBox(
+                        oView.byId("MemberRelationCombo"),
+                        "ID"
+                    )
+                ) &&
+                utils._LCstrictValidationComboBox(
+                    oView.byId("idDocumentType"),
+                    "ID"
+                )
+            ) {
+
+                if (!oMember.DocumentType) {
+                    sap.m.MessageToast.show(
+                        "Please select document type"
+                    );
+                    return;
                 }
+
+                if (
+                    this._mode === "CREATE" &&
+                    !oMember.Document
+                ) {
+                    sap.m.MessageToast.show(
+                        "Please upload a document"
+                    );
+                    return;
+                }
+
+                const oPayload = {
+                    Members: [{
+                        MemberID: oMember.MemberID,
+                        Salutation: oMember.Salutation,
+                        Name: oMember.Name,
+                        Relation: oMember.Relation,
+                        Gender: oMember.Gender,
+                        UserID: oMember.UserID,
+                        DateOfBirth: oMember.DateOfBirth
+                            ? oMember.DateOfBirth
+                                .split("/")
+                                .reverse()
+                                .join("-")
+                            : "",
+                        Documents: [{
+                            DocumentID:
+                                this._mode === "UPDATE"
+                                    ? this._existingFileData.DocumentID
+                                    : "",
+
+                            MemberID: oMember.MemberID,
+
+                            UserID: oMember.UserID,
+
+                            DocumentType: oMember.DocumentType,
+
+                            FileName: oMember.DocumentName,
+
+                            FileType: oMember.FileType,
+
+                            File: oMember.File
+                        }]
+                    }]
+                };
+
+                this._uploadDocument(oPayload);
+
             } else {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
 
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("fillMandatoryFields")
+                );
             }
         },
+
         _uploadDocument: function (oDoc) {
             this.getBusyDialog();
 
