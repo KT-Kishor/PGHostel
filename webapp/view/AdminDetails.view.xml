@@ -418,6 +418,7 @@
                             <Select
                                 selectedKey="{Bookingmodel>/Salutation}"
                                 visible="{VisibleModel>/visible}"
+                                change="onAdminChangeSalutation"
                             >
                                 <core:Item
                                 key="Mr."

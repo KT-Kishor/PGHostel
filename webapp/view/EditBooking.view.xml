@@ -66,6 +66,17 @@
                                 value="{= ${HostelModel>/Area} + (${HostelModel>/PropertyType} ? ' (' + ${HostelModel>/PropertyType} + ')' : '') }"
                                 editable="false"
                             />
+
+<Label text="Bed Type" />
+
+                            <Input
+                                id="EditBookBedType_ID"
+                                value="{= ${HostelModel>/BedType} + (${HostelModel>/ACType} ? ' (' + ${HostelModel>/ACType} + ')' : '') }"
+                                editable="false"
+                            />
+
+
+                            
                             <Label
                                 text="Room Plan"
                                 required="true"
@@ -90,12 +101,16 @@
                                 value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
                                 editable="false"
                             />
-
-                            <Label text="No. of Persons" />
+                       <Label text="No. of Persons" />
+<Input
+    value="{= (${HostelModel>/PropertyType} === 'Hostel' || ${HostelModel>/PropertyType} === 'PG') ? 1 : ${HostelModel>/Capacity} }"
+    editable="false"
+/>
+                            <!-- <Label text="No. of Persons" />
                             <Input
                                 value="{HostelModel>/SelectedPerson}"
                                 editable="false"
-                            />
+                            /> -->
 
                             <Label
                                 text="Duration"
@@ -340,7 +355,7 @@
                     </layoutData>
                     <!-- Advertisement Carousel Section -->
                     <Title
-                        text="Developed by"
+                        text="Advertisement"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
@@ -871,8 +886,18 @@
         </l:Grid>
 
         <footer>
-            <Toolbar>
-                <ToolbarSpacer />
+          	<Bar>
+            <contentLeft>
+             <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
+             <Link
+                text="{i18n>devlopby}"
+                href="https://kalpavrikshatechnologies.com/"
+                target="_blank"
+                class="customLinkWhiteBg"
+            />
+            
+            </contentLeft>
+				<contentRight>
                 <!-- Edit booking button - only visible when status is New and not in edit mode -->
                 <Button
                     text="Edit Booking"
@@ -895,7 +920,8 @@
                     press="onSubmitPress"
                     enabled="{BookingView>/editModeEnabled}"
                 />
-            </Toolbar>
+                  </contentRight>
+			</Bar>
         </footer>
     </Page>
 </mvc:View>

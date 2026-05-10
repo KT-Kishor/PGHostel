@@ -317,9 +317,22 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
                 oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
+                this._restartRoomCardCarouselsAutoSlide();
             } catch (err) {
                 console.log(err);
                 oVisibilityModel.setProperty("/isDataLoaded", false);
+            }
+        },
+        onExit: function () {
+            this._stopRoomCardCarouselsAutoSlide();
+
+            if (this._roomCardCarouselStartTimeout) {
+                clearTimeout(this._roomCardCarouselStartTimeout);
+                this._roomCardCarouselStartTimeout = null;
+            }
+
+            if (BaseController.prototype.onExit) {
+                BaseController.prototype.onExit.apply(this, arguments);
             }
         },
         viewDetails: function (oEvent) {
@@ -443,41 +456,45 @@ sap.ui.define([
 
             const oFrag = this._oRoomDetailFragment;
 
-            // Reset price tile classes
-            oFrag.findAggregatedObjects(true, obj => obj.hasStyleClass && obj.hasStyleClass("priceItem"))
-                .forEach(item => {
-                    item.removeStyleClass("selectedTile");
-                    item.addStyleClass("defaultTile");
-                });
+            // Stop carousel first
+            this._stopRoomImageCarousel();
 
-            // Clear carousel pages instead of destroying them - use Fragment.byId for O(1) lookup
-            const oCarousel = sap.ui.core.Fragment.byId("roomDetailsFrag", "roomImageCarousel");
-            if (oCarousel) oCarousel.destroyPages();
+            if (this._carouselResumeTimeout) {
+                clearTimeout(this._carouselResumeTimeout);
+                this._carouselResumeTimeout = null;
+            }
 
-            // Refresh integration card instead of destroying it - need to know card ID
-            // Fallback to findAggregatedObjects for integration card since we don't know its ID
-            const oCard = oFrag.findAggregatedObjects(true, obj => obj.isA && obj.isA("sap.ui.integration.widgets.Card"))[0];
+            oFrag.findAggregatedObjects(true, obj =>
+                obj.hasStyleClass && obj.hasStyleClass("priceItem")
+            ).forEach(item => {
+                item.removeStyleClass("selectedTile");
+                item.addStyleClass("defaultTile");
+            });
+
+            const oCarousel = sap.ui.core.Fragment.byId(
+                "roomDetailsFrag",
+                "roomImageCarousel"
+            );
+
+            if (oCarousel) {
+                oCarousel.destroyPages();
+            }
+
+            const oCard = oFrag.findAggregatedObjects(
+                true,
+                obj => obj.isA && obj.isA("sap.ui.integration.widgets.Card")
+            )[0];
+
             if (oCard && oCard.refresh) {
                 oCard.refresh();
             }
 
-            // Clear model data instead of destroying models
             ["HostelModel", "FacilityModel"].forEach(name => {
                 const m = oFrag.getModel(name);
                 if (m) m.setData({});
             });
 
-            // Close the fragment but keep it in memory for reuse
             oFrag.close();
-
-            // Clear any carousel interval
-            if (this._carouselInterval) {
-                clearInterval(this._carouselInterval);
-                this._carouselInterval = null;
-            }
-
-            // NOTE: Fragment is NOT destroyed, NOT removed as dependent, and NOT set to null
-            // This allows it to be reused instantly next time viewDetails is called
         },
         onSelectPricePlan: function (oEvent) {
             const oTile = oEvent.getSource();
@@ -2136,22 +2153,97 @@ sap.ui.define([
             } else {
                 oTile.removeStyleClass("occupied");
             }
-        },
-        _bindCarousel: function () {
-            // Use Fragment.byId for O(1) lookup instead of O(n) findAggregatedObjects
-            const oCarousel = sap.ui.core.Fragment.byId("roomDetailsFrag", "roomImageCarousel");
-
-            if (!oCarousel) {
-                // Fallback to findAggregatedObjects for backward compatibility
-                const fallbackCarousel = this._oRoomDetailFragment
-                    .findAggregatedObjects(true,
-                        obj => obj.isA && obj.isA("sap.m.Carousel")
-                    )[0];
-                if (!fallbackCarousel) return;
-                return; // Use the fallback - but we should have found it via Fragment.byId
+        }, 
+        _startRoomCardCarouselsAutoSlide: function (iDelay = 3000) {
+            if (!this._roomCardCarouselTimers) {
+                this._roomCardCarouselTimers = new Map();
             }
 
-            // ---------- bind carousel images ----------
+            const aCarousels = this.getView().findAggregatedObjects(true, function (oControl) {
+                return oControl.isA &&
+                    oControl.isA("sap.m.Carousel") &&
+                    oControl.hasStyleClass &&
+                    oControl.hasStyleClass("roomCardCarousel");
+            });
+
+            aCarousels.forEach(function (oCarousel) {
+                if (!oCarousel || oCarousel.bIsDestroyed) return;
+
+                const aPages = oCarousel.getPages();
+                if (!aPages || aPages.length <= 1) return;
+
+                const sCarouselId = oCarousel.getId();
+
+                // Do not create duplicate timers
+                if (this._roomCardCarouselTimers.has(sCarouselId)) return;
+
+                const iTimer = setInterval(function () {
+                    if (!oCarousel || oCarousel.bIsDestroyed) {
+                        clearInterval(iTimer);
+                        this._roomCardCarouselTimers.delete(sCarouselId);
+                        return;
+                    }
+
+                    const aCurrentPages = oCarousel.getPages();
+                    if (!aCurrentPages || aCurrentPages.length <= 1) return;
+
+                    if (typeof oCarousel.next === "function") {
+                        oCarousel.next();
+                        return;
+                    }
+
+                    // Fallback if next() is not available
+                    const sActivePageId = oCarousel.getActivePage();
+                    const iCurrentIndex = aCurrentPages.findIndex(function (oPage) {
+                        return oPage.getId() === sActivePageId || oPage === sActivePageId;
+                    });
+
+                    const iNextIndex =
+                        iCurrentIndex >= 0
+                            ? (iCurrentIndex + 1) % aCurrentPages.length
+                            : 0;
+
+                    oCarousel.setActivePage(aCurrentPages[iNextIndex]);
+                }.bind(this), iDelay);
+
+                this._roomCardCarouselTimers.set(sCarouselId, iTimer);
+            }.bind(this));
+        },
+
+        _stopRoomCardCarouselsAutoSlide: function () {
+            if (!this._roomCardCarouselTimers) return;
+
+            this._roomCardCarouselTimers.forEach(function (iTimer) {
+                clearInterval(iTimer);
+            });
+
+            this._roomCardCarouselTimers.clear();
+        },
+
+        _restartRoomCardCarouselsAutoSlide: function () {
+            this._stopRoomCardCarouselsAutoSlide();
+
+            if (this._roomCardCarouselStartTimeout) {
+                clearTimeout(this._roomCardCarouselStartTimeout);
+            }
+
+            this._roomCardCarouselStartTimeout = setTimeout(function () {
+                requestAnimationFrame(function () {
+                    this._startRoomCardCarouselsAutoSlide(3000);
+                }.bind(this));
+            }.bind(this), 300);
+        },
+        _bindCarousel: function () {
+            const oCarousel = sap.ui.core.Fragment.byId(
+                "roomDetailsFrag",
+                "roomImageCarousel"
+            );
+
+            if (!oCarousel) return;
+
+            // Stop old timer before rebinding
+            this._stopRoomImageCarousel();
+
             oCarousel.unbindAggregation("pages");
 
             oCarousel.bindAggregation("pages", {
@@ -2165,41 +2257,76 @@ sap.ui.define([
                 })
             });
 
-            // ---------- AUTO SCROLL ----------
-            // Use native SAP UI5 Carousel auto-play properties instead of manual setInterval
-            const imgs =
+            const aImgs =
                 this._oRoomDetailFragment
                     ?.getModel("HostelModel")
                     ?.getProperty("/ImageList") || [];
 
-            if (imgs.length > 1) {
-                // Set native auto-play properties
-                oCarousel.setAutoPlay(true);
-                oCarousel.setAutoPlayDelay(3000);
+            if (aImgs.length <= 1) return; // nothing to rotate
 
-                // Pause on user interaction using native event handling
-                const PAUSE_FOR_10_SECONDS = () => {
-                    oCarousel.setAutoPlay(false);
+            // Wait until binding/rendering settles
+            setTimeout(() => {
+                this._startRoomImageCarousel(oCarousel, 3000);
+            }, 0);
 
-                    // Resume after 10 seconds
+            // Attach interaction pause only once
+            if (!oCarousel._roomCarouselPauseAttached) {
+                const fnPause = () => {
+                    this._stopRoomImageCarousel();
+
                     if (this._carouselResumeTimeout) {
                         clearTimeout(this._carouselResumeTimeout);
                     }
 
                     this._carouselResumeTimeout = setTimeout(() => {
-                        if (oCarousel && !oCarousel.bIsDestroyed && imgs.length > 1) {
-                            oCarousel.setAutoPlay(true);
-                        }
+                        this._startRoomImageCarousel(oCarousel, 3000);
                     }, 10000);
                 };
 
-                // Attach events for user interaction
-                oCarousel.attachBrowserEvent("touchstart", PAUSE_FOR_10_SECONDS);
-                oCarousel.attachBrowserEvent("mousedown", PAUSE_FOR_10_SECONDS);
-                oCarousel.attachBrowserEvent("click", PAUSE_FOR_10_SECONDS);
-            }
+                oCarousel.attachBrowserEvent("touchstart", fnPause);
+                oCarousel.attachBrowserEvent("mousedown", fnPause);
 
-            // Clear any existing interval (for backward compatibility)
+                oCarousel._roomCarouselPauseAttached = true;
+            }
+        },
+
+        _startRoomImageCarousel: function (oCarousel, iDelay = 3000) {
+            if (!oCarousel || oCarousel.bIsDestroyed) return;
+
+            this._stopRoomImageCarousel();
+
+            this._carouselInterval = setInterval(() => {
+                if (!oCarousel || oCarousel.bIsDestroyed) {
+                    this._stopRoomImageCarousel();
+                    return;
+                }
+
+                const aPages = oCarousel.getPages();
+
+                if (!aPages || aPages.length <= 1) return;
+
+                // Prefer native next() if available
+                if (typeof oCarousel.next === "function") {
+                    oCarousel.next();
+                    return;
+                }
+
+                // Fallback: manually set next active page
+                const sActivePageId = oCarousel.getActivePage();
+                const iCurrentIndex = aPages.findIndex(page =>
+                    page.getId() === sActivePageId || page === sActivePageId
+                );
+
+                const iNextIndex =
+                    iCurrentIndex >= 0
+                        ? (iCurrentIndex + 1) % aPages.length
+                        : 0;
+
+                oCarousel.setActivePage(aPages[iNextIndex]);
+            }, iDelay);
+        },
+
+        _stopRoomImageCarousel: function () {
             if (this._carouselInterval) {
                 clearInterval(this._carouselInterval);
                 this._carouselInterval = null;

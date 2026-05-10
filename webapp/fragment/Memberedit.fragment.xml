@@ -5,11 +5,15 @@
     xmlns:core="sap.ui.core"
     xmlns:u="sap.ui.unified"
 >
-    <Dialog
-        id="sds1"
-        title="{= ${viewModel>/mode} === 'CREATE' ? 'Add Member' : 'Update Member' }"
-        type="Standard"
-        class="sapUiContentPadding"
+     <Dialog
+        id="sds12"
+        class="newMemberDialog"
+        contentWidth="32rem"
+        stretch="{= ${device>/system/phone} }"
+        draggable="true"
+        resizable="false"
+        showHeader="true"
+        horizontalScrolling="false"
     >
         <customHeader>
             <Bar class="barheader">
@@ -187,47 +191,96 @@
                     />
                 </ComboBox>
                 <Label
-                    text="{i18n>iDProofType}"
-                    required="true"
-                />
-                <ComboBox
-                    id="idDocumentType"
-                    placeholder="{i18n>selectIDProof}"
-                    value="{Member>/DocumentType}"
-                    visible="{VisibleModel>/visible}"
-                    valueStateText="{i18n>selectIDProof}"
-                    change="onNewMemberRelationChange"
-                >
-                    <core:ListItem
-                        key="Aadhar Card"
-                        text="Aadhar Card"
-                    />
-                    <core:ListItem
-                        key="Pan Card"
-                        text="Pan Card"
-                    />
-                    <core:ListItem
-                        key="Driving License"
-                        text="Driving License"
-                    />
-                    <core:ListItem
-                        key="Passport"
-                        text="Passport"
-                    />
-                </ComboBox>
-                <Label
-                    text="{i18n>uploadDocument}"
-                    required="true"
-                />
-                <u:FileUploader
-                    id="MM_id_FileUploader"
-                    fileType="jpg,jpeg,png,PDF"
-                    sameFilenameAllowed="true"
-                    change="onFacilityFileChange"
-                    visible="{VisibleModel>/visible}"
-                    class="myUnifiedBtn"
-                    width="100%"
-                />
+    text="{i18n>uploadDocument}"
+    required="true"
+/>
+
+<HBox
+    width="100%"
+    fitContainer="true"
+    wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+    alignItems="Center"
+>
+    <!-- Document Type -->
+    <ComboBox
+        id="idDocumentType"
+        selectedKey="{Member>/DocumentType}"
+        placeholder="{i18n>selectIDProof}"
+        valueStateText="{i18n>selectIDProof}"
+        selectionChange="onNewMemberDocumentTypeChange"
+        change="onNewMemberDocumentTypeChange"
+        width="{= ${device>/system/phone} ? '100%' : '12rem'}"
+        class="sapUiTinyMarginEnd"
+        visible="{VisibleModel>/visible}"
+    >
+        <core:Item
+            key="Aadhar Card"
+            text="Aadhar Card"
+        />
+        <core:Item
+            key="Pan Card"
+            text="Pan Card"
+        />
+        <core:Item
+            key="Driving License"
+            text="Driving License"
+        />
+        <core:Item
+            key="Passport"
+            text="Passport"
+        />
+    </ComboBox>
+
+    <!-- Upload Button -->
+    <u:FileUploader
+        id="MM_id_FileUploader"
+        width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+        visible="{= !${Member>/DocumentName} }"
+        buttonOnly="true"
+        maximumFileSize="2"
+        sameFilenameAllowed="true"
+        change="onFacilityFileChange"
+        fileSizeExceed="onMemberFileSizeExceed"
+        buttonText="Upload"
+        fileType="pdf,jpg,jpeg,png,webp"
+        class="sapUiTinyMarginEnd myUnifiedBtn"
+    />
+
+    <!-- Info Icon -->
+    <core:Icon
+        id="memberDocumentInfoIcon"
+        src="sap-icon://hint"
+        size="1rem"
+        color="#0064d1"
+        hoverColor="DarkBlue"
+        press="onMemberDocumentInfoPress"
+        tooltip="Upload info"
+        visible="{= !${Member>/DocumentName} }"
+        class="sapUiSmallMarginBegin"
+    />
+
+    <!-- Preview + Remove -->
+    <HBox
+        visible="{= !!${Member>/DocumentName} }"
+        alignItems="Center"
+        wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+    >
+        <Link
+            text="{Member>/DocumentName}"
+            tooltip="{Member>/DocumentName}"
+            press="onPreviewMemberDocument"
+            width="10rem"
+            class="automatedEllipsis documentLink"
+        />
+
+        <Button
+            text="Remove"
+            icon="sap-icon://delete"
+            press="onDeleteMemberDocument"
+            class="myUnifiedBtn"
+        />
+    </HBox>
+</HBox>
             </f:content>
         </f:SimpleForm>
         <beginButton>

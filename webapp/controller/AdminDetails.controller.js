@@ -10,6 +10,8 @@ sap.ui.define([
 
 ], function (BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast, FilterOperator, Filter) {
     "use strict";
+     const $C = (id) => this.getView().byId(id);
+
     return BaseController.extend("sap.ui.com.project1.controller.AdminDetails", {
         Formatter: Formatter,
         onInit: function () {
@@ -869,6 +871,7 @@ sap.ui.define([
         },
 
         onAddFacilityDetails: function () {
+            // this.edit=true
             var data = this.getView().getModel("Bookingmodel").getData()
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
@@ -952,7 +955,7 @@ sap.ui.define([
 
             // 5. Get booking unitText
             var oBookingModel = this.getView().getModel("edit");
-            var sUnitText = oBookingModel.getProperty("/UnitText");// assuming the field is unitText
+            var sUnitText = oBookingModel.getProperty("/UnitText") || this.byId("idPaymentMethod1").getSelectedKey();// assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
             if (OrginalRentPrice === "0.00") {
@@ -1653,6 +1656,7 @@ sap.ui.define([
             if (!oCustomerData.AllSelectedFacilities) {
                 oCustomerData.AllSelectedFacilities = [];
             }
+            
 
             const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
                 item.FacilityName === oPayload.FacilityName &&
@@ -1689,6 +1693,28 @@ sap.ui.define([
                 }
             }
 
+            // if(!oPayload.MemberName && this.edit===true){
+            //    const newStart = this._parseDate(oPayload.StartDate);
+            //     const newEnd = this._parseDate(oPayload.EndDate);
+
+            //     const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+                  
+
+            //         const oldStart = this._parseDate(item.StartDate);
+            //         const oldEnd = this._parseDate(item.EndDate);
+
+            //         // ✅ Block ONLY if dates overlap
+            //         const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
+
+            //         return isOverlap;
+            //     });
+
+            //     if (oDuplicatedates) {
+            //         sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+            //         return;
+            //     }
+            // }
             // UPDATE existing OR ADD new
             if (this._editIndex !== undefined) {
                 oCustomerData.AllSelectedFacilities[this._editIndex] =
@@ -1833,6 +1859,12 @@ sap.ui.define([
             model.setProperty("/MobileNo", data.MobileNo);
             model.setProperty("/Salutation", data.Salutation);
             model.setProperty("/Address", data.Address);
+
+            if(model.getProperty("/Salutation")==="Dr."){
+                this.getView().byId("Ad_id_gender").setEnabled(true);
+            }else{
+                this.getView().byId("Ad_id_gender").setEnabled(false);
+            }
 
             if (data.PaymentType === "Per Month") {
                 model.setProperty("/UnitText", "monthly");
@@ -2287,6 +2319,7 @@ sap.ui.define([
         },
 
         onEditFacilityDetails: function () {
+            // this.edit=false
             var data = this.getView().getModel("Bookingmodel").getData()
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
@@ -2422,15 +2455,21 @@ sap.ui.define([
 
             // 6. Define allowed rate types based on booking unitText
             var aAllowedRateTypes = [];
-            if (oSelectedFacility.SelectionMode === "PERSON_QTY" || oSelectedFacility.SelectionMode === "QTY") {
+          
+            if (sUnitText === "Per Month" || sUnitText === "monthly") {
+                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+            } else if (sUnitText === "Per Day" || sUnitText === "daily") {
+                aAllowedRateTypes = ["Per Day", "Per Hour"];
+            } else if (sUnitText === "Per Hour") {
+                aAllowedRateTypes = ["Per Hour"];
+            } else {
+                aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
+            }
+              if (oSelectedFacility.SelectionMode === "PERSON_QTY") {
                 aAllowedRateTypes = ["Unit Price"];
 
-            }
-            if (sUnitText === "Per Month" || sUnitText === "monthly" || sUnitText === "Per Day" || sUnitText === "daily" || sUnitText === "Per Hour" || sUnitText === "hourly"
-               || sUnitText === "Per Year" || sUnitText === "yearly"
-            ) {
-              
-                aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
+            }else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !=="0"){
+                aAllowedRateTypes = ["Unit Price"];
             }
 
             var _aOriginalRateTypes = [
@@ -3034,7 +3073,9 @@ sap.ui.define([
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
         },
-        onSTDChange: function () {
+        onSTDChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+
             const oSTD = this.byId("CC_id_STDCode");
             const oMobile = this.byId("CD_ID_idPhone");
 
@@ -3047,37 +3088,61 @@ sap.ui.define([
             } else {
                 oMobile.setMaxLength(18);
             }
+
+        },
+         onAdminChangeSalutation: function (oEvent) {
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
+            const oGender = this.getView().byId("Ad_id_gender");
+            // 🔥 Clear salutation error immediately
+            oSalutation.setValueState("None");
+            if (!oGender) return;
+            // Reset gender first
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+            // Auto-map gender
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            }
+            // Dr. → manual gender selection
+
+            // ✅ Strict validation (CONTROL, not event)
+            utils._LCstrictValidationSelect(oSalutation);
         },
 
-        // CC_onChangeState: function (oEvent) {
-        //     utils._LCvalidateMandatoryField(oEvent);
-        //     const oView = this.getView();
-        //     const oModel = oView.getModel("Bookingmodel");
-        //     const oItem = oEvent.getSource().getSelectedItem();
-        //     const oCityCB = oView.byId("CC_id_City");
-        //     const oCountryCB = oView.byId("CC_id_Country");
+        CC_onChangeState: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+            const oView = this.getView();
+            const oModel = oView.getModel("Bookingmodel");
+            const oItem = oEvent.getSource().getSelectedItem();
+            const oCityCB = oView.byId("CC_id_City");
+            const oCountryCB = oView.byId("CC_id_Country");
 
-        //     // Reset
-        //     oModel.setProperty("/City", "");
-        //     oCityCB.setSelectedKey("");
-        //     oCityCB.setValue("");
-        //     oCityCB.getBinding("items")?.filter([]);
+            // Reset
+            oModel.setProperty("/City", "");
+            oCityCB.setSelectedKey("");
+            oCityCB.setValue("");
+            oCityCB.getBinding("items")?.filter([]);
 
-        //     if (!oItem) {
-        //         oModel.setProperty("/State", "");
-        //         return;
-        //     }
+            if (!oItem) {
+                oModel.setProperty("/State", "");
+                return;
+            }
 
-        //     const sStateName = oItem.getKey();
-        //     const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
-        //     oModel.setProperty("/State", sStateName);
+            const sStateName = oItem.getKey();
+            const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+            oModel.setProperty("/State", sStateName);
 
-        //     // Apply city filter
-        //     oCityCB.getBinding("items")?.filter([
-        //         new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
-        //         new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
-        //     ]);
-        // },
+            // Apply city filter
+            oCityCB.getBinding("items")?.filter([
+                new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
+                new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
+            ]);
+        },
 
         onChange: function (oEvent) {
             const oInput = oEvent.getSource();
@@ -3103,7 +3168,8 @@ sap.ui.define([
 
             // Validate length
             if (std === "+91" && mobileValue.length === requiredLength) {
-                oMobile.setValueState("None");       // valid
+                oMobile.setValueState("None");   
+                oMobile.setMaxLength(10);    // valid
             } else {
                 oMobile.setValueState("Error");      // invalid
             }
@@ -3923,7 +3989,7 @@ sap.ui.define([
                 "State": Bookingdata.State,
                 "City": Bookingdata.City,
                 "STDCode": Bookingdata.STDCode,
-                "Salutation": CustomerData.Salutation || "Mr.",
+                "Salutation": Bookingdata.Salutation || "Mr.",
                 "PermanentAddress": Bookingdata.Address,
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
@@ -4185,6 +4251,7 @@ sap.ui.define([
             var aFiles = oEvent.getParameter("files");  // selected files
             var oCustomerModel = this.getView().getModel("CustomerData");
             var DocumentType = this.getView().getModel("Bookingmodel").getData().DocumentType;
+            var ProofType = sap.ui.getCore().byId("idProofType").getSelectedKey();
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
             var MemberID = sap.ui.getCore().byId("Membername").getSelectedKey();
             var MemberName = sap.ui.getCore().byId("Membername").getSelectedItem()?.getText();
@@ -4203,7 +4270,7 @@ sap.ui.define([
                 }
             })
 
-            if (!DocumentType) {
+            if (!ProofType) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 oFileUploader.clear();
                 return;
@@ -6005,20 +6072,20 @@ sap.ui.define([
             }
         },
 
-        onSTDChange: function () {
-            const oSTD = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpSTD");
-            const oMobile = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPhone");
-            const std = oSTD.getValue();
+        // onSTDChange: function () {
+        //     const oSTD = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpSTD");
+        //     const std =this.getView().getModel("Bookingmodel").getProperty("/STDCode");
+        //     const oMobile = this.getView().byId("CD_ID_idPhone");
 
-            oMobile.setValue("");
+        //     oMobile.setValue("");
 
-            // Dynamic maxLength
-            if (std === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
-        },
+        //     // Dynamic maxLength
+        //     if (std === "+91") {
+        //         oMobile.setMaxLength(10);
+        //     } else {
+        //         oMobile.setMaxLength(18);
+        //     }
+        // },
 
         onAddressChange: function () {
             utils._LCvalidateAddress(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpAddress"));
