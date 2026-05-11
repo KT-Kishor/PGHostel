@@ -271,7 +271,6 @@ sap.ui.define([
                             // Use lightweight merge for better performance
                             const aUpdatedMembers = this._lightweightMergeMemberDocuments(aExistingMembers, aMemberDocs);
                             oHostelModel.setProperty("/MemberList", aUpdatedMembers);
-                            console.log("✅ Member data loaded in background:", aMemberDocs.length, "documents");
                         }
                         this._bMemberDataLoaded = true;
                         this._bMemberDataLoading = false;

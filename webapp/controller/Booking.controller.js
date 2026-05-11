@@ -122,8 +122,7 @@
                 .then(oResponse => {
                     if (oResponse && oResponse.data) {
                         const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [];
-                        oHostelModel.setProperty("/MemberList", aMemberList);
-                        console.log("✅ Member data loaded in background:", aMemberList.length, "members");
+                        oHostelModel.setProperty("/MemberList", aMemberList)
                     }
                     this._bMemberDataLoaded = true;
                     this._bMemberDataLoading = false;
