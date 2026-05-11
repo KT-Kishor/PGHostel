@@ -684,6 +684,23 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox>
+											<!-- Coupon Discount -->
+											<m:HBox
+                                                    justifyContent="SpaceBetween"
+                                                    visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
+                                                >
+												<m:Label
+                                                        text="{= 'Discount'
+                                                            + (${SelectedCustomerModel>/CouponCode} ? ' (' + ${SelectedCustomerModel>/CouponCode} + ')' : '')
+                                                            + ' :' }"
+                                                        class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                    />
+												<m:Text
+                                                        class="amountText"
+                                                        text="{path:'SelectedCustomerModel>/CouponDiscountValue', formatter: '.Formatter.fromatNumber'}"
+                                                        textAlign="End"
+                                                    />
+											</m:HBox>
 											<!-- CGST -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
@@ -728,23 +745,6 @@
                                                     text="{path: 'FilteredSOWModel>/gstAmount', formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Coupon Discount -->
-											<m:HBox
-                                                    justifyContent="SpaceBetween"
-                                                    visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
-                                                >
-												<m:Label
-                                                        text="{= 'Discount'
-                                                            + (${SelectedCustomerModel>/CouponCode} ? ' (' + ${SelectedCustomerModel>/CouponCode} + ')' : '')
-                                                            + ' :' }"
-                                                        class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                    />
-												<m:Text
-                                                        class="amountText"
-                                                        text="{path:'SelectedCustomerModel>/CouponDiscountValue', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="End"
-                                                    />
 											</m:HBox>
 											<!-- Round of -->
 											<m:HBox
