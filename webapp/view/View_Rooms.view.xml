@@ -4,22 +4,136 @@
 	xmlns:c="sap.ui.core"
 	xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core"
-    displayBlock="true"
-    height="100%"
-    busyIndicatorDelay="0"
-	xmlns:fb="sap.ui.comp.filterbar">
+	xmlns:uxap="sap.uxap"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:fb="sap.ui.comp.filterbar"
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0">
 	<Page
-        showHeader="true"
-        enableScrolling="true"
-        class="RoomsPage"
-    >
+		showHeader="true"
+		enableScrolling="true"
+		class="RoomsPage">
 		<headerContent>
 			<core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
-                type="XML"
-            />
+				fragmentName="sap.ui.com.project1.fragment.BookingHeader"
+				type="XML" />
 		</headerContent>
 		<content>
+         <FlexBox
+            direction="Row"
+            justifyContent="Center"
+            alignItems="Center"
+            class="sapUiMediumMargin profileFlex"
+        >
+            <VBox class="avatarContainer sapUiSmallMarginEnd">
+                <Avatar
+                    src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
+                    initials="{profileData>/initials}"
+                    displayShape="Square"
+                    displaySize="XL"
+                    class="customLargeAvatar "
+                />
+                
+            </VBox>
+
+            <!-- Profile Forms -->
+            <VBox>
+                <!-- DISPLAY MODE -->
+                <f:SimpleForm
+                    layout="ColumnLayout"
+                    columnsM="2"
+                    columnsL="2"
+                    class="sapUiTinyMarginTop RoomSimpleform"
+                   
+                >
+                    <f:content>
+                        <Label text="{i18n>Name}"  />
+                        <Text
+                            text="{BranchModel>/Name} ({BranchModel>/PropertyType})"
+                        />
+                        <!-- <Label text="{i18n>Property Type}"  />
+                        <Text
+                            text="{BranchModel>/PropertyType}"
+                        /> -->
+                        
+                        <Label text="{i18n>email}"   />
+                        <Text text="{BranchModel>/EmailID}" />
+
+                        <Label text="{i18n>MSmobileNo}"   />
+                        <Text text="{BranchModel>/STD} {BranchModel>/Contact}" />
+                        <Label
+                                    text="GSTIN"
+                                   visible="{= !!${BranchModel>/GSTIN} }"
+                                />
+                                <Text text="{BranchModel>/GSTIN}" visible="{= !!${BranchModel>/GSTIN} }" />
+
+
+                        <Label text="{i18n>address}"   />
+                        <Text
+                            text="{BranchModel>/Address}"
+                            wrapping="true"
+                        />
+                        <Label
+                                    text="Location"
+                                   
+                                />
+                                <Link
+                                    text="View on Map"
+                                    href="{BranchModel>/GeoLocation}"
+                                    target="_blank"
+                                />
+                    </f:content>
+                </f:SimpleForm>
+
+             
+            </VBox>
+        </FlexBox>
+<!-- <uxap:ObjectPageLayout
+    id="VR_id_ObjectPageLayout"
+    useIconTabBar="false"
+    
+> -->
+    <!-- <uxap:headerTitle>
+        <uxap:ObjectPageDynamicHeaderTitle>
+            <uxap:expandedHeading>
+                <HBox alignItems="Center">
+                   
+                      <Avatar id="MG_id_AvatarLarge"
+                        displaySize="L"
+                        displayShape= "Circle"
+                       src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
+                        class="sapUiSmallMarginEnd"
+                    />
+                    <VBox>
+                        <Title
+                            text="{BranchModel>/Name}"
+                            wrapping="true"
+                        />
+                        <Text
+                            text="{BranchModel>/PropertyType}"
+                            wrapping="true"
+                            
+                        />
+                         <Text
+                            text="{BranchModel>/EmailID}"
+                            wrapping="true"
+                            
+                        />
+                        <Text
+                            text="{BranchModel>/STD} {BranchModel>/Contact}"
+                            wrapping="true"
+                           
+                        />
+                    </VBox>
+                </HBox>
+            </uxap:expandedHeading>
+           
+        </uxap:ObjectPageDynamicHeaderTitle>
+    </uxap:headerTitle> -->
+   
+<!-- </uxap:ObjectPageLayout> -->
+
 			<!-- <fb:FilterBar
                 id="PO_id_FilterbarEmployee"
                 persistencyKey="myPersKey"
@@ -52,246 +166,174 @@
                                 displayFormat="dd/MM/yyyy"
                             /></fb:control></fb:FilterGroupItem></fb:filterGroupItems></fb:FilterBar> -->
 			<VBox
-                height="600px"
-                justifyContent="Center"
-                alignItems="Center"
-                visible="{VisibilityModel>/ShowGlobalNoData}"
-            >
+				height="600px"
+				justifyContent="Center"
+				alignItems="Center"
+				visible="{VisibilityModel>/ShowGlobalNoData}">
 				<Text
-                    text="{i18n>noRoomsFound}"
-                    class="cssNoDataMessage"
-                />
+					text="{i18n>noRoomsFound}"
+					class="cssNoDataMessage" />
 				<Text
-                    text="{i18n>pleaseselectanotherCity}"
-                    class="cssNoDataSubMessage"
-                />
+					text="{i18n>pleaseselectanotherCity}"
+					class="cssNoDataSubMessage" />
 			</VBox>
 			<Title
-                text="AC Rooms"
-                level="H2"
-                class="roomHeaderTitle sapUiMediumMarginBeginEnd"
-                visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}"
-            />
+				text="AC Rooms"
+				level="H2"
+				class="roomHeaderTitle sapUiMediumMarginBeginEnd"
+				visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}" />
 			<VBox class="sapUiTinyMarginTop">
 				<l:Grid
-                    id="idBedTypeFlex2"
-                    defaultSpan="XL3 L4 M6 S12"
-                    containerQuery="true"
-                    hSpacing="2"
-                    vSpacing="2"
-                    content="{path: 'VisibilityModel>/ACRooms'}"
-                >
+					id="idBedTypeFlex2"
+					defaultSpan="XL3 L4 M6 S12"
+					containerQuery="true"
+					hSpacing="2"
+					vSpacing="2"
+					content="{path: 'VisibilityModel>/ACRooms'}">
 					<VBox class="bedCard">
-				<Carousel
-    height="300px"
-    width="100%"
-    loop="true"
-    showPageIndicator="false"
-    backgroundDesign="Transparent"
-    class="roomCardCarousel"
-    pages="{path: 'VisibilityModel>Images', templateShareable: false}"
->
+						<Carousel
+							height="300px"
+							width="100%"
+							loop="true"
+							showPageIndicator="false"
+							backgroundDesign="Transparent"
+							class="roomCardCarousel"
+							pages="{path: 'VisibilityModel>Images', templateShareable: false}">
 							<pages>
 								<VBox class="imageWrapper">
 									<HBox class="areaTagBox">
 										<core:Icon
-                                            src="sap-icon://building"
-                                            size="0.9rem"
-                                            color="black"
-                                            class="sapUiTinyMarginEnd"
-                                        />
+											src="sap-icon://building"
+											size="0.9rem"
+											color="black"
+											class="sapUiTinyMarginEnd" />
 										<Text text="{VisibilityModel>Area}" />
 									</HBox>
 									<Image
-                                        src="{VisibilityModel>src}"
-                                        width="100%"
-                                        height="300px"
-                                        class="bedCardImage"
-                                        decorative="false"
-                                    />
-									<!-- <CustomListItem
-                                        type="Active"
-                                        press=".onRatingPress"
-                                        visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
-                                        tooltip="Tap to See Reviews"
-                                    ><HBox
-                                            class="ratingOverlay"
-                                            alignItems="Center"
-                                        ><RatingIndicator
-                                                value="{VisibilityModel>AverageRating}"
-                                                maxValue="5"
-                                                enabled="false"
-                                                iconSize="0.8rem"
-                                            /><Text
-                                                text="({VisibilityModel>TotalFeedbacks})"
-                                                class="ratingCountText"
-                                            /></HBox></CustomListItem> -->
+										src="{VisibilityModel>src}"
+										width="100%"
+										height="300px"
+										class="bedCardImage"
+										decorative="false" />
 								</VBox>
 							</pages>
 						</Carousel>
 						<VBox class="bedCardContent">
 							<Text
-                                text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
-                                class="bedCardTitle"
-                            />
+								text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+								class="bedCardTitle" />
 							<Text
-                                text="{VisibilityModel>Description}"
-                                class="bedCardDesc"
-                                maxLines="4"
-                                wrapping="true"
-                            />
+								text="{VisibilityModel>Description}"
+								class="bedCardDesc"
+								maxLines="4"
+								wrapping="true" />
 							<Text
-                                text="{
-                                    parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-                                    formatter: '.Formatter.formatStartingPrice'
-                                }"
-                                class="bedCardPrice"
-                            />
+								text="{
+									parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+									formatter: '.Formatter.formatStartingPrice'
+								}"
+								class="bedCardPrice" />
 							<HBox
-                                justifyContent="Center"
-                                alignItems="Center"
-                                class="sapUiTinyMarginTop"
-                            >
+								justifyContent="Center"
+								alignItems="Center"
+								class="sapUiTinyMarginTop">
 								<Link
-                                        text="Book Room"
-                                        press="onViewDetailsPress"
-                                        class="pillActionBtn pillLeft"
-                                    />
+									text="Book Room"
+									press="onViewDetailsPress"
+									class="pillActionBtn pillLeft" />
 								<Link
-                                        text="Enquiry"
-                                        press="onEnquiryPress"
-                                        class="pillActionBtn pillRight"
-                                    />
+									text="Enquiry"
+									press="onEnquiryPress"
+									class="pillActionBtn pillRight" />
 							</HBox>
 						</VBox>
 					</VBox>
 				</l:Grid>
 				<VBox
-                    alignItems="Center"
-                    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-                    visible="{VisibilityModel>/ShowViewMore}"
-                >
-					<!-- <Link
-                        id="idViewMoreBusy2"
-                        text="{i18n>viewmorerooms}"
-                        press="onViewMoreRooms"
-                        class="btnViewDetails"
-                    /> -->
-					<VBox height="2rem" /></VBox>
+					alignItems="Center"
+					class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+					visible="{VisibilityModel>/ShowViewMore}">
+					<VBox height="2rem" />
+				</VBox>
 			</VBox>
 			<Title
-                text="Non-AC Rooms"
-                level="H2"
-                class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
-                visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}"
-            />
+				text="Non-AC Rooms"
+				level="H2"
+				class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
+				visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}" />
 			<VBox class="sapUiTinyMarginTop">
 				<l:Grid
-                    id="idBedTypeFlex1"
-                    defaultSpan="XL3 L4 M6 S12"
-                    containerQuery="true"
-                    hSpacing="2"
-                    vSpacing="2"
-                    content="{path: 'VisibilityModel>/NonACRooms'}"
-                >
+					id="idBedTypeFlex1"
+					defaultSpan="XL3 L4 M6 S12"
+					containerQuery="true"
+					hSpacing="2"
+					vSpacing="2"
+					content="{path: 'VisibilityModel>/NonACRooms'}">
 					<VBox class="bedCard">
-                    <Carousel
-                        height="300px"
-                        width="100%"
-                        loop="true"
-                        showPageIndicator="false"
-                        backgroundDesign="Transparent"
-                        class="roomCardCarousel"
-                        pages="{path: 'VisibilityModel>Images', templateShareable: false}"
-                        
-                    >
+						<Carousel
+							height="300px"
+							width="100%"
+							loop="true"
+							showPageIndicator="false"
+							backgroundDesign="Transparent"
+							class="roomCardCarousel"
+							pages="{path: 'VisibilityModel>Images', templateShareable: false}">
 							<pages>
 								<VBox class="imageWrapper">
 									<HBox class="areaTagBox">
 										<core:Icon
-                                            src="sap-icon://building"
-                                            size="0.9rem"
-                                            color="black"
-                                            class="sapUiTinyMarginEnd"
-                                        />
+											src="sap-icon://building"
+											size="0.9rem"
+											color="black"
+											class="sapUiTinyMarginEnd" />
 										<Text text="{VisibilityModel>Area}" />
 									</HBox>
 									<Image
-                                        src="{VisibilityModel>src}"
-                                        width="100%"
-                                        height="300px"
-                                        class="bedCardImage"
-                                        decorative="false"
-                                    />
-									<!-- <CustomListItem
-                                        type="Active"
-                                        press=".onRatingPress"
-                                        visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }"
-                                        tooltip="Tap to See Reviews"
-                                    ><HBox
-                                            class="ratingOverlay"
-                                            alignItems="Center"
-                                        ><RatingIndicator
-                                                value="{VisibilityModel>AverageRating}"
-                                                maxValue="5"
-                                                enabled="false"
-                                                iconSize="0.8rem"
-                                            /><Text
-                                                text="({VisibilityModel>TotalFeedbacks})"
-                                                class="ratingCountText"
-                                            /></HBox></CustomListItem> -->
+										src="{VisibilityModel>src}"
+										width="100%"
+										height="300px"
+										class="bedCardImage"
+										decorative="false" />
 								</VBox>
 							</pages>
 						</Carousel>
 						<VBox class="bedCardContent">
 							<Text
-                                text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
-                                class="bedCardTitle"
-                            />
+								text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+								class="bedCardTitle" />
 							<Text
-                                text="{VisibilityModel>Description}"
-                                class="bedCardDesc"
-                                maxLines="4"
-                                wrapping="true"
-                            />
+								text="{VisibilityModel>Description}"
+								class="bedCardDesc"
+								maxLines="4"
+								wrapping="true" />
 							<Text
-                                text="{
-                                    parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-                                    formatter: '.Formatter.formatStartingPrice'
-                                }"
-                                class="bedCardPrice"
-                            />
+								text="{
+									parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+									formatter: '.Formatter.formatStartingPrice'
+								}"
+								class="bedCardPrice" />
 							<HBox
-                                justifyContent="Center"
-                                alignItems="Center"
-                                class="sapUiTinyMarginTop"
-                            >
+								justifyContent="Center"
+								alignItems="Center"
+								class="sapUiTinyMarginTop">
 								<Link
-                                        text="Book Room"
-                                        press="onViewDetailsPress"
-                                        class="pillActionBtn pillLeft"
-                                    />
+									text="Book Room"
+									press="onViewDetailsPress"
+									class="pillActionBtn pillLeft" />
 								<Link
-                                        text="Enquiry"
-                                        press="onEnquiryPress"
-                                        class="pillActionBtn pillRight"
-                                    />
+									text="Enquiry"
+									press="onEnquiryPress"
+									class="pillActionBtn pillRight" />
 							</HBox>
 						</VBox>
 					</VBox>
 				</l:Grid>
 				<VBox
-                    alignItems="Center"
-                    class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-                    visible="{VisibilityModel>/ShowViewMore}"
-                >
-					<!-- <Link
-                        id="idViewMoreBusy1"
-                        text="{i18n>viewmorerooms}"
-                        press="onViewMoreRooms"
-                        class="btnViewDetails"
-                    /> -->
-					<VBox height="2rem" /></VBox>
+					alignItems="Center"
+					class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+					visible="{VisibilityModel>/ShowViewMore}">
+					<VBox height="2rem" />
+				</VBox>
 			</VBox>
 		</content>
 	</Page>
