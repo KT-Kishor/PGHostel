@@ -271,7 +271,6 @@ sap.ui.define([
                             // Use lightweight merge for better performance
                             const aUpdatedMembers = this._lightweightMergeMemberDocuments(aExistingMembers, aMemberDocs);
                             oHostelModel.setProperty("/MemberList", aUpdatedMembers);
-                            console.log("✅ Member data loaded in background:", aMemberDocs.length, "documents");
                         }
                         this._bMemberDataLoaded = true;
                         this._bMemberDataLoading = false;
@@ -2162,13 +2161,18 @@ sap.ui.define([
             BookingController.prototype._resetCouponState.call(this, bKeepTypedValue);
         },
 
-        // Override facility card press to check edit mode
+        // Override facility card press - allow popover to open in read-only mode too
         onFacilityCardPress: function (oFacility, oCard, oEvent) {
             var oBookingView = this.getView().getModel("BookingView");
-            if (!oBookingView.getProperty("/editModeEnabled")) {
-                return; // Do nothing if not in edit mode
+            var oSelectionModel = this.getView().getModel("FacilitySelection");
+            var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") : false;
+
+            // Store edit mode state in selection model so popover controls can be disabled
+            if (oSelectionModel) {
+                oSelectionModel.setProperty("/editModeEnabled", bEditModeEnabled);
             }
-            // Call parent method
+
+            // Always call parent method to open the popover
             sap.ui.com.project1.controller.Booking.prototype.onFacilityCardPress.call(this, oFacility, oCard, oEvent);
         },
 
@@ -2185,7 +2189,8 @@ sap.ui.define([
 
         _getDefaultFacilitySelectionData: function () {
             return {
-                selectedFacilities: []
+                selectedFacilities: [],
+                editModeEnabled: false
             };
         },
 
