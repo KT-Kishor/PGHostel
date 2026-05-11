@@ -978,13 +978,17 @@
                     />
 					<!-- Generate PDF -->
 					<m:MenuButton
-                        visible="{= ${visiablityPlay>/merge}
+                        visible="{= 
+                            ${visiablityPlay>/merge}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
                                 || ${LoginModel>/Role} === 'SuperAdmin'
                                 || ${LoginModel>/Role} === 'Branch Manager'
                                 || ${LoginModel>/Role} === 'Front Office Employee'
-                                || ${LoginModel>/Role} === 'Customer'
+                                || (
+                                    ${LoginModel>/Role} === 'Customer'
+                                    &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
+                                )
                             )
                         }"
                         text="{i18n>GeneratePDF}"
