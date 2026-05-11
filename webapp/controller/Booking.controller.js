@@ -1281,6 +1281,10 @@
             const fUnitPrice = fPrice;
             const sFacilityChargeType = this._getFacilityChargeType(oFacility);
 
+            // Check if in edit mode (from BookingView model in EditBooking, or default true in Booking)
+            var oBookingView = this.getView().getModel("BookingView");
+            var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") : true;
+
             oSelectionModel.setData({
                 title: oFacility.FacilityName,
                 DisplayPrice: this._formatFacilityPriceWithUnit(
@@ -1307,7 +1311,8 @@
                 minimumPrice: fMinimumPrice,
                 unitPrice: fUnitPrice,
                 packageQty: iMinimumQty,
-                packagePrice: fMinimumPrice
+                packagePrice: fMinimumPrice,
+                editModeEnabled: bEditModeEnabled
             });
             
 
@@ -1326,6 +1331,7 @@
 
             oFacilityPopover.data("facilityRef", oFacility);
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
+            this._oFacilityRemoveButton.setEnabled(bEditModeEnabled);
 
             if (oOpenBy && oFacilityPopover.openBy) {
                 oFacilityPopover.openBy(oOpenBy);
@@ -1488,7 +1494,8 @@
                                     new sap.m.StepInput({
                                         width: "7rem",
                                         min: 1,
-                                        value: "{FacilitySelection>/quantity}"
+                                        value: "{FacilitySelection>/quantity}",
+                                        enabled: "{FacilitySelection>/editModeEnabled}"
                                     }).addStyleClass("facilityQtyModeStepInput")
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
@@ -1534,7 +1541,8 @@
                                                             ],
                                                             formatter: this.formatFacilityPersonSelected.bind(this)
                                                         },
-                                                        select: this.onFacilityPersonSelect.bind(this)
+                                                        select: this.onFacilityPersonSelect.bind(this),
+                                                        enabled: "{FacilitySelection>/editModeEnabled}"
                                                     }),
                                                     new sap.m.Text({
                                                         text: "{FacilitySelection>name}"
@@ -1620,7 +1628,8 @@
                                                 cells: [
                                                     new sap.m.CheckBox({
                                                         selected: "{FacilitySelection>selected}",
-                                                        select: this.onFacilityPersonSelect.bind(this)
+                                                        select: this.onFacilityPersonSelect.bind(this),
+                                                        enabled: "{FacilitySelection>/editModeEnabled}"
                                                     }),
 
                                                     new sap.m.Text({
@@ -1677,6 +1686,7 @@
                             text: "Remove",
                             type: "Transparent",
                             visible: false,
+                            enabled: "{FacilitySelection>/editModeEnabled}",
                             press: this.onFacilityDialogRemove.bind(this)
                         }).addStyleClass("myUnifiedBtn"),
                         new sap.m.ToolbarSpacer(),
@@ -1689,6 +1699,7 @@
                         new sap.m.Button({
                             text: "Confirm",
                             type: "Emphasized",
+                            enabled: "{FacilitySelection>/editModeEnabled}",
                             press: this.onFacilityDialogConfirm.bind(this)
                         }).addStyleClass("myUnifiedBtn")
                     ]
