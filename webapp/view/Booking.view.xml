@@ -91,7 +91,7 @@
                                 items="{HostelModel>/AvailablePaymentMethods}"
                                 selectionChange="onRoomPlanChange"
                                 change="onRoomplane"
-                                valueStateText="Select Room plane"
+                                valueStateText="Select Room plan"
                             >
                                 <core:Item
                                     key="{HostelModel>key}"
