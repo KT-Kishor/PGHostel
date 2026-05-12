@@ -1543,8 +1543,13 @@ sap.ui.define([
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
 
+            // When Booking History tab selected, fetch fresh booking data
+            if (sKey === "Booking History") {
+                await this._loadBookings();
+            }
+
             // When Payment tab selected, fetch invoices and bind to Payments
-            if (sKey === "Payment") {
+            else if (sKey === "Payment") {
                 try {
                     this.getBusyDialog();
                     const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
@@ -1654,6 +1659,66 @@ sap.ui.define([
                 this.closeBusyDialog()
             }
         },
+        _loadBookings: async function () {
+            const oModel = this.getView().getModel("profileData");
+            const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+
+            if (!sUserID) {
+                MessageToast.show("UserID not found.");
+                return;
+            }
+
+            try {
+                this.getBusyDialog();
+                const filter = { UserID: sUserID };
+                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
+                const aBookings = response?.BookingData || [];
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const aBookingData = aBookings.map(booking => {
+                    const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
+                    const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
+                    if (startDate) startDate.setHours(0, 0, 0, 0);
+                    if (endDate) endDate.setHours(0, 0, 0, 0);
+
+                    let bookingGroup = "Others";
+                    if (booking.Status === "Cancelled") {
+                        bookingGroup = "Cancelled";
+                    } else if (booking.Status === "Completed") {
+                        bookingGroup = "Completed";
+                    } else if (booking.Status === "New" || booking.Status === "Assigned") {
+                        if (startDate && endDate && startDate <= today && endDate >= today) {
+                            bookingGroup = "Ongoing";
+                        } else if (startDate && startDate > today) {
+                            bookingGroup = "Upcoming";
+                        }
+                    }
+
+                    return {
+                        bookingGroup: bookingGroup,
+                        BookingID: booking.BookingID || "",
+                        customerName: booking.CustomerName || "",
+                        BookingDate: booking.BookingDate || "",
+                        room: booking.RoomName || booking.RoomNumber || "",
+                        amount: booking.TotalAmount || booking.GrandTotal || booking.Amount || 0,
+                        currency: booking.Currency || "INR",
+                        status: booking.Status || booking.BookingStatus || "",
+                        StartDate: booking.StartDate,
+                        EndDate: booking.EndDate
+                    };
+                });
+
+                oModel.setProperty("/bookings", aBookingData);
+                this._updateRowCount();
+            } catch (err) {
+                MessageToast.show(err.message || "Error loading bookings");
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
         _loadComplaints: async function (bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
