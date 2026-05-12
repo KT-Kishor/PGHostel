@@ -191,30 +191,91 @@ sap.ui.define([
             })
         },
 
-        _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                RD_id_CustomerName1: new Set(),
-                RD_id_CompanyName1: new Set(),
+      _populateUniqueFilterValues: function (data) {
 
-            };
+    let oView = this.getView();
 
-            data.forEach(item => {
-                uniqueValues.RD_id_CustomerName1.add(item.RoomNo);
-                uniqueValues.RD_id_CompanyName1.add(item.BedTypeName);
+    // ===== Room No Unique =====
+    let oRoomCombo = oView.byId("RD_id_CustomerName1");
+    oRoomCombo.destroyItems();
+
+    let uniqueRooms = new Set();
+
+    data.forEach(item => {
+        if (item.RoomNo) {
+            uniqueRooms.add(item.RoomNo);
+        }
+    });
+
+    Array.from(uniqueRooms)
+        .sort()
+        .forEach(room => {
+            oRoomCombo.addItem(
+                new sap.ui.core.Item({
+                    key: room,
+                    text: room
+                })
+            );
+        });
+
+    // ===== Bed Type Unique =====
+    let oBedTypeCombo = oView.byId("RD_id_CompanyName1");
+    oBedTypeCombo.destroyItems();
+
+    let uniqueBedTypes = new Set();
+
+    data.forEach(item => {
+        if (item.BedTypeName) {
+            uniqueBedTypes.add(item.BedTypeName);
+        }
+    });
+
+    Array.from(uniqueBedTypes)
+        .sort()
+        .forEach(type => {
+            oBedTypeCombo.addItem(
+                new sap.ui.core.Item({
+                    key: type,
+                    text: type
+                })
+            );
+        });
+
+    // ===== Branch Unique =====
+    let oBranchCombo = oView.byId("PO_id_RBranch");
+    oBranchCombo.destroyItems();
+
+    let uniqueBranches = new Map();
+
+    data.forEach(item => {
+
+        if (item.BranchCode && !uniqueBranches.has(item.BranchCode)) {
+
+            uniqueBranches.set(item.BranchCode, {
+                BranchCode: item.BranchCode,
+                BranchName: item.BranchName,
+                City: item.City
             });
 
-            let oView = this.getView();
-            ["RD_id_CustomerName1", "RD_id_CompanyName1"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                oComboBox.destroyItems();
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    }));
-                });
-            });
-        },
+        }
+
+    });
+
+    Array.from(uniqueBranches.values())
+        .sort((a, b) => a.BranchCode.localeCompare(b.BranchCode))
+        .forEach(item => {
+
+            oBranchCombo.addItem(
+                new sap.ui.core.ListItem({
+                    key: item.BranchCode,
+                    text: item.BranchCode + " - " + item.BranchName,
+                    additionalText: item.City
+                })
+            );
+
+        });
+
+},
 
         HM_AddRoom: function (oEvent) {
             var oView = this.getView();
@@ -842,6 +903,8 @@ sap.ui.define([
 
             var sRoomNo = oView.byId("RD_id_CustomerName1").getSelectedKey() || oView.byId("RD_id_CustomerName1").getValue();
             var sbedtype = oView.byId("RD_id_CompanyName1").getSelectedKey() || oView.byId("RD_id_CompanyName1").getValue();
+            var sBranchCode = oView.byId("PO_id_RBranch").getSelectedKey() || oView.byId("PO_id_RBranch").getValue();
+
 
             let aBranchCodes = [];
 
@@ -870,6 +933,9 @@ sap.ui.define([
             if (sbedtype) {
                 filters.BedTypeName = sbedtype
             }
+             if (sBranchCode) {
+                filters.BranchCode = sBranchCode.split('-')[0];
+            }
 
             this.getBusyDialog()
             this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
@@ -883,7 +949,8 @@ sap.ui.define([
                     const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
-                        BranchName: branch ? branch.Name : bed.BranchCode // fallback
+                        BranchName: branch ? branch.Name : bed.BranchCode ,// fallback
+                        City: branch ? branch.City : "",
                     };
                 });
 
@@ -929,6 +996,7 @@ sap.ui.define([
         RD_onPressClear: function () {
             this.getView().byId("RD_id_CustomerName1").setSelectedKey("")
             this.getView().byId("RD_id_CompanyName1").setSelectedKey("")
+                this.getView().byId("PO_id_RBranch").setSelectedKey("")
         },
 
         onRoomNoInputLiveChange: function (oEvent) {

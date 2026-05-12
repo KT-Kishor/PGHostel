@@ -84,8 +84,8 @@ sap.ui.define([
             var sUserID = oView.byId("MV_id_UserID").getSelectedKey() ||
                 oView.byId("MV_id_UserID").getValue();
 
-            var sUserName = oView.byId("MV_id_UserName").getSelectedKey() ||
-                oView.byId("MV_id_UserName").getValue();
+            var sCity = oView.byId("MV_id_City").getSelectedKey() ||
+                oView.byId("MV_id_City").getValue();
 
             var sStatus = oView.byId("MV_id_Status").getSelectedKey() ||
                 oView.byId("MV_id_Status").getValue();
@@ -98,9 +98,9 @@ sap.ui.define([
             if (sUserID) {
                 filters.UserID = sUserID;
             }
-            // Apply UserName filter
-            if (sUserName) {
-                filters.UserName = sUserName;
+            // Apply City filter
+            if (sCity) {
+                filters.City = sCity;
             }
             // Apply Status Filter
             if (sStatus) {
@@ -157,19 +157,20 @@ sap.ui.define([
 
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
-                MV_id_UserID: new Set(),
-                MV_id_UserName: new Set(),
-                MV_id_Status: new Set()
+             
+                MV_id_Status: new Set(),
+                MV_id_City: new Set()
+
             };
 
             data.forEach(item => {
-                if (item.UserID) uniqueValues.MV_id_UserID.add(item.UserID);
-                if (item.UserName) uniqueValues.MV_id_UserName.add(item.UserName);
+           
                 if (item.Status) uniqueValues.MV_id_Status.add(item.Status);
+                if (item.City) uniqueValues.MV_id_City.add(item.City);
             });
             let oView = this.getView();
 
-            ["MV_id_UserID", "MV_id_UserName", "MV_id_Status"].forEach(field => {
+            ["MV_id_Status", "MV_id_City"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
                 oComboBox.destroyItems();
@@ -185,8 +186,9 @@ sap.ui.define([
 
         FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");
-            this.getView().byId("MV_id_UserName").setSelectedKey("")
+            // this.getView().byId("MV_id_UserName").setSelectedKey("")
             this.getView().byId("MV_id_Status").setSelectedKey("")
+            this.getView().byId("MV_id_City").setSelectedKey("")
         },
 
         onNavBack: function () {

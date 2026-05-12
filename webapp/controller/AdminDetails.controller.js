@@ -1659,7 +1659,7 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     // ✅ Block ONLY if dates overlap
-                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityChargeType === "DAILY";
+                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityChargeType === "DAILY" && item.FacilityName === oPayload.FacilityName;
 
                     return isOverlap;
                 });
