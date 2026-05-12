@@ -522,6 +522,7 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
+                                     submit="onApplyCoupon"
                             >
                                 <layoutData>
                                     <FlexItemData

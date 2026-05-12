@@ -411,6 +411,7 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
+                                submit="onApplyCoupon"
                                 enabled="{BookingView>/editModeEnabled}"
                             >
                                 <layoutData>

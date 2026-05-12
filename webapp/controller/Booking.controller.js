@@ -4963,7 +4963,7 @@
                 const aCoupons = oResponse?.data || [];
 
                 oMatchedCoupon = aCoupons.find(function (oCoupon) {
-                    return String(oCoupon.CouponCode || "").toUpperCase() === sEnteredCode.toUpperCase();
+                    return String(oCoupon.CouponCode || "").trim() === sEnteredCode;
                 });
 
                 if (!oMatchedCoupon) {
@@ -5002,7 +5002,7 @@
                     return;
                 }
 
-                if (String(oMatchedCoupon.DiscountType || "").toLowerCase() === "percentage") {
+                if (String(oMatchedCoupon.DiscountType || "").trim() === "percentage") {
                     fDiscountAmount = fCouponBaseAmount * (Number(oMatchedCoupon.DiscountValue || 0) / 100);
                     if (Number(oMatchedCoupon.UptoValue || 0) > 0 && fDiscountAmount > Number(oMatchedCoupon.UptoValue || 0)) {
                         fDiscountAmount = Number(oMatchedCoupon.UptoValue || 0);
@@ -5018,11 +5018,9 @@
                 oModel.setProperty("/AppliedCouponData", oMatchedCoupon);
                 this._recalculateSummary();
 
-                // Show success message with coupon description if available
                 let sMessage = "Coupon applied successfully";
                 if (oMatchedCoupon.Description) {
-                    sMessage;
-                    // += ": " + oMatchedCoupon.Description;
+                    // sMessage += ": " + oMatchedCoupon.Description;
                 }
                 MessageToast.show(sMessage);
             } catch (oError) {
