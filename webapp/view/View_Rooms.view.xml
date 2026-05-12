@@ -28,7 +28,7 @@
     class="branchFlex"
 >
     <!-- Avatar column -->
-    <VBox class="branchContainer panelbracket">
+    <VBox class="branchContainer sapUiSmallMarginBegin">
         <Avatar
             src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
             initials="{profileData>/initials}"
