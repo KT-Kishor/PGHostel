@@ -688,12 +688,6 @@
             // Calculate base days
             let iDays = Math.max(Math.floor((oBillingEndDate - oStartDate) / 86400000), 0);
 
-            // For monthly and yearly plans, add 1 day to compensate for the day subtracted in _updateAutoEndDate
-            // This ensures full month/year coverage (e.g., 365 days for a non-leap year, 366 for leap year)
-            if (sPlan === "Per Month" || sPlan === "Per Year") {
-                iDays += 1;
-            }
-
             return iDays;
         },
 
