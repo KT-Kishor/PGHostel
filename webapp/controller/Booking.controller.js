@@ -3100,7 +3100,7 @@
             if (oDatePicker) {
                 const now = new Date();
                 const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
-                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+                const focusDate = new Date(2000, 0, 1);
 
                 oDatePicker.setMaxDate(now);
                 oDatePicker.setMinDate(minDate);
@@ -3137,7 +3137,7 @@
             if (oDatePicker) {
                 const now = new Date();
                 const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
-                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+                const focusDate = new Date(2000, 0, 1);
 
                 oDatePicker.setMaxDate(now);
                 oDatePicker.setMinDate(minDate);

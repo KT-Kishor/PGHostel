@@ -71,7 +71,8 @@
 
 
 
-<Label text="Bed Type" />
+<Label text="Room Type" />
+
 
                             <Input
                                 id="BookBedType_ID"

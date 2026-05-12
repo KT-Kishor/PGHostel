@@ -67,7 +67,8 @@
                                 editable="false"
                             />
 
-<Label text="Bed Type" />
+<Label text="Room Type" />
+
 
                             <Input
                                 id="EditBookBedType_ID"

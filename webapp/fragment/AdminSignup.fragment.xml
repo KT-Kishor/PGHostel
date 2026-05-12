@@ -100,7 +100,7 @@
                 </HBox>
 
                 <Label
-                    text="{i18n>MVDDOB}"
+                    text="{i18n>asMVDDOB}"
                     required="true"
                 />
                 <!-- <DatePicker
