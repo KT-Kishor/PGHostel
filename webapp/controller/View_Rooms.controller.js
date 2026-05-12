@@ -19,10 +19,10 @@ sap.ui.define([
 
         },
         _onRouteMatched: async function (oEvent) {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
             // Clear the HostelModel when returning to this view
@@ -54,6 +54,9 @@ sap.ui.define([
             //        this._oBookingDateDialog.open();
 
             this.sPath = oEvent.getParameter("arguments").sPath;
+
+            // Fetch branch data for the specific BranchID
+            await this._loadBranchData();
 
             await this._loadFilteredData()
             const oView = this.getView();
@@ -140,6 +143,27 @@ sap.ui.define([
         onDatePickerChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
 
+        },
+
+        _loadBranchData: async function () {
+            const oView = this.getView();
+            const sBranchID = this.sPath;
+
+            try {
+                // Fetch branch data filtered by BranchID from HM_Branch backend endpoint
+                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {
+                    BranchID: sBranchID
+                });
+
+                // Set the filtered branch data to BranchModel
+                const aBranchData = oResponse?.data || [];
+                const oBranchModel = new JSONModel(aBranchData[0] || {});
+                oView.setModel(oBranchModel, "BranchModel");
+            } catch (error) {
+                console.error("Error loading branch data:", error);
+                // Set empty model on error
+                oView.setModel(new JSONModel({}), "BranchModel");
+            }
         },
 
         _loadFilteredData: async function () {

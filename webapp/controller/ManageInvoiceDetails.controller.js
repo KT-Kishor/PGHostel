@@ -345,7 +345,7 @@ sap.ui.define([
                                 "ManageCustomerModel"
                             );
 
-                            resolve(); // ✅ VERY IMPORTANT
+                            resolve(); 
                         }).catch((err) => {
                             MessageToast.show(err.responseText || "Failed to Load Customer Data.");
                             this.closeBusyDialog()
@@ -357,14 +357,14 @@ sap.ui.define([
                 if (this.sourceView === "Customerinvoice") {
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
                 } else if (this.sourceView === "AdminPage") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin",{
-                        sPath:"ManageInvoice"
+                    this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                        sPath: "ManageInvoice"
                     });
                 } else if (this.sourceView === "PaymentDashboard") {
                     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
                 } else {
-                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
-                        sPath:"ManageInvoicedetails"
+                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                        sPath: "ManageInvoicedetails"
                     });
                 }
             },
@@ -377,7 +377,7 @@ sap.ui.define([
                 try {
                     utils._LCvalidateMandatoryField(oEvent);
 
-                    this.SelectKey =  oEvent.getSource().getSelectedItem().getAdditionalText()
+                    this.SelectKey = oEvent.getSource().getSelectedItem().getAdditionalText()
                     const allData = this.getView().getModel("ManageCustomerModel").getData();
 
                     // Filter selected customer record
@@ -541,8 +541,8 @@ sap.ui.define([
                             item.StartDate,
                             item.EndDate,
                             item.TotalHour,
-                            item.SelectionMode,   
-                            item.Quantity       
+                            item.SelectionMode,
+                            item.Quantity
                         );
 
                         let particulars = "";
@@ -641,9 +641,7 @@ sap.ui.define([
                 // -------------------------
                 if (unit === "per day") {
                     baseDuration = diffDays + (diffDays === 1 ? " Day" : " Days");
-                }
-
-                else if (unit === "per month") {
+                } else if (unit === "per month") {
 
                     let months =
                         (end.getFullYear() - start.getFullYear()) * 12 +
@@ -654,9 +652,7 @@ sap.ui.define([
                     }
 
                     baseDuration = months + (months === 1 ? " Month" : " Months");
-                }
-
-                else if (unit === "per year") {
+                } else if (unit === "per year") {
 
                     if (diffDays < 364) {
                         baseDuration = diffDays + " Days";
@@ -664,21 +660,15 @@ sap.ui.define([
                         const years = Math.round(diffDays / 365);
                         baseDuration = years + (years === 1 ? " Year" : " Years");
                     }
-                }
-
-                else if (unit === "per hour") {
+                } else if (unit === "per hour") {
 
                     const hoursPerDay = Number(totalHour) || 1;
                     const totalHours = hoursPerDay * diffDays;
 
                     baseDuration = totalHours + (totalHours === 1 ? " Hour" : " Hours");
-                }
-
-                else if (unit === "unit price" || unit === "package price") {
+                } else if (unit === "unit price" || unit === "package price") {
                     baseDuration = "";
-                }
-
-                else if (unit === "fix") {
+                } else if (unit === "fix") {
                     return "-";
                 }
 
@@ -735,10 +725,7 @@ sap.ui.define([
                     return sUnit;
                 }
 
-                // -------------------------
                 // SELECTION MODE HANDLING
-                // -------------------------
-
                 if (mode === "QTY") {
 
                     if (unit === "unit price" || unit === "package price") {
@@ -945,41 +932,53 @@ sap.ui.define([
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled = !!taxType && taxRate > 0 && currency === "INR";
+                const isGSTEnabled = !!taxType &&
+                    taxRate > 0 &&
+                    currency === "INR";
+
                 this.visiablityPlay.setProperty("/GST", isGSTEnabled);
 
                 // ---------------- ITEM CALCULATION ----------------
                 aItems.forEach((item) => {
+
+                    // Original amount
                     const baseAmount = parseFloat(item.Total) || 0;
 
                     // ---------- DISCOUNT ----------
                     let discountAmount = 0;
+
                     if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
                         discountAmount = baseAmount * (parseFloat(item.Discount) / 100);
                     } else {
                         discountAmount = parseFloat(item.Discount) || 0;
                     }
 
+                    // Validation
                     if (discountAmount > baseAmount) {
                         discountAmount = 0;
-                        item.Discount = "0.00";
-                    } else {
-                        item.Discount = discountAmount.toFixed(2);
                     }
 
+                    // Final amount after item discount
                     const finalAmount = baseAmount - discountAmount;
+
+                    // Store values
+                    item.DiscountAmount = discountAmount.toFixed(2);
+                    item.FinalAmount = finalAmount.toFixed(2);
                     item.Total = finalAmount.toFixed(2);
 
-                    // ---------- GST LOGIC (FIXED) ----------
-                    // Force NO only if GST globally disabled
+                    // ---------- GST LOGIC ----------
                     if (!isGSTEnabled) {
                         item.GSTCalculation = "NO";
                     }
 
-                    const isGSTApplicable = isGSTEnabled && item.GSTCalculation === "YES";
+                    const isGSTApplicable =
+                        isGSTEnabled &&
+                        item.GSTCalculation === "YES";
 
-                    item.SAC = isGSTApplicable ? "996322" : "-";
+                    item.SAC =
+                        isGSTApplicable ? "996322" : "-";
 
+                    // GST applicable subtotal
                     if (isGSTApplicable) {
                         totalWithGST += finalAmount;
                     } else {
@@ -988,29 +987,49 @@ sap.ui.define([
                 });
 
                 // ---------------- SUBTOTALS ----------------
+                const subTotal = totalWithGST + totalWithoutGST;
+
                 oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
                 oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
+                oCustomerModel.setProperty("/SubTotal", subTotal.toFixed(2));
 
                 // ---------------- COUPON ----------------
                 let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
+
                 oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
+
+                // ---------------- DISCOUNTED TOTAL ----------------
+                let discountedTotal =
+                    subTotal - couponDiscount;
+
+                if (discountedTotal < 0) {
+                    discountedTotal = 0;
+                }
+
+                oCustomerModel.setProperty("/DiscountedTotal", discountedTotal.toFixed(2));
 
                 // ---------------- GST CALCULATION ----------------
                 let gstAmount = 0;
-                let finalAmount = totalWithGST + totalWithoutGST;
+                let finalAmount = discountedTotal;
 
                 if (isGSTEnabled) {
-                    if (taxType === "CGST/SGST") {
-                        gstAmount = (totalWithGST * taxRate) / 100;
-                        finalAmount += gstAmount * 2;
+                    // GST should apply after coupon discount
+                    const taxableAmount = discountedTotal;
 
-                        oCustomerModel.setProperty("/CGST", gstAmount.toFixed(2));
-                        oCustomerModel.setProperty("/SGST", gstAmount.toFixed(2));
+                    if (taxType === "CGST/SGST") {
+                        gstAmount = (taxableAmount * taxRate) / 100;
+
+                        const cgst = gstAmount;
+                        const sgst = gstAmount;
+
+                        finalAmount += cgst + sgst;
+
+                        oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
+                        oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
                         oCustomerModel.setProperty("/IGST", "0.00");
                     } else if (taxType === "IGST") {
-                        gstAmount = (totalWithGST * taxRate) / 100;
+                      gstAmount = (taxableAmount * taxRate) / 100;
                         finalAmount += gstAmount;
-
                         oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/CGST", "0.00");
                         oCustomerModel.setProperty("/SGST", "0.00");
@@ -1021,17 +1040,13 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
-                // ---------------- APPLY COUPON ----------------
-                finalAmount -= couponDiscount;
-                if (finalAmount < 0) finalAmount = 0;
-
                 // ---------------- ROUND OFF ----------------
                 const roundedAmount = Math.round(finalAmount);
-                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
 
+                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
                 oSOWModel.setProperty("/RoundOf", roundOffDiff);
-                oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
+                oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
                 // ---------------- PAYMENT ----------------
@@ -1383,8 +1398,8 @@ sap.ui.define([
                                 class: "myUnifiedBtn",
                                 press: function() {
                                     oDialog.close();
-                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
-                                        sPath:"TilePage"
+                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                                        sPath: "TilePage"
                                     });
                                 }
                             }),
@@ -1395,8 +1410,8 @@ sap.ui.define([
                                 press: async () => {
                                     oDialog.close();
                                     await that.CID_onPressGeneratePdf();
-                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice",{
-                                        sPath:"ManageInvoicedetails"
+                                    that.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                                        sPath: "ManageInvoicedetails"
                                     });
                                 }
                             }),
@@ -1657,7 +1672,7 @@ sap.ui.define([
 
                 var fFinalDue;
                 if (fTotalAmount > fAllReceivedAmount) {
-                    fFinalDue = fCalculatedDue; 
+                    fFinalDue = fCalculatedDue;
                 } else {
                     fFinalDue = (fBackendDueAmount !== null) ? fBackendDueAmount : fCalculatedDue;
                 }
@@ -2457,6 +2472,13 @@ sap.ui.define([
                         ]);
                     }
 
+                    if (parseFloat(oModel.CouponDiscount) > 0) {
+                        summaryBody.push([
+                            `Discount (${oModel.CouponCode}) :`,
+                            "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                        ]);
+                    }
+
                     if (data.Currency !== "USD" && oModel.Type) {
                         const percentageText = oModel.Value && oModel.Value !== "0" ? `(${oModel.Value}%)` : "";
 
@@ -2472,13 +2494,6 @@ sap.ui.define([
                         if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue) {
                             summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
-                    }
-
-                    if (parseFloat(oModel.CouponDiscount) > 0) {
-                        summaryBody.push([
-                            `Discount (${oModel.CouponCode}) :`,
-                            "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
-                        ]);
                     }
 
                     // if (parseFloat(oModel.RefundAmount) > 0) {
@@ -2764,21 +2779,29 @@ sap.ui.define([
                     // ================= ROOM TOTAL (FOR COUPON) =================
                     let roomTotal = 0;
 
+                    // ================= SUBTOTAL =================
+                    let subTotal = 0;
+
                     aInvoiceItems.forEach(item => {
                         const amount = parseFloat(item.Total) || 0;
 
+                        subTotal += amount;
+
                         // Identify Room items
-                        const isRoomItem = item.Particulars &&
-                            item.Particulars.toLowerCase().includes("room rent");
+                        const isRoomItem =
+                            item.Particulars &&
+                            item.Particulars.toLowerCase().includes("room");
 
                         if (isRoomItem) {
                             roomTotal += amount;
                         }
 
                         const isGSTApplicable =
-                            isGSTEnabled && item.GSTCalculation === "YES";
+                            isGSTEnabled &&
+                            item.GSTCalculation === "YES";
 
-                        item.SAC = isGSTApplicable ? "996322" : "-";
+                        item.SAC =
+                            isGSTApplicable ? "996322" : "-";
 
                         if (isGSTApplicable) {
                             totalWithGST += amount;
@@ -2787,50 +2810,63 @@ sap.ui.define([
                         }
                     });
 
-                    // ================= GST CALCULATION =================
-                    let cgst = 0,
-                        sgst = 0,
-                        igst = 0;
-                    let gstAmount = 0;
-                    let finalAmount = totalWithGST + totalWithoutGST;
+                    // ================= COUPON =================
+                    let couponDiscount =
+                        parseFloat(oCustomerModel.CouponDiscount) || 0;
 
-                    if (isGSTEnabled) {
-                        if (taxType === "CGST/SGST") {
-                            gstAmount = (totalWithGST * taxRate) / 100;
-                            cgst = gstAmount;
-                            sgst = gstAmount;
-                            finalAmount += gstAmount * 2;
-                        } else if (taxType === "IGST") {
-                            gstAmount = (totalWithGST * taxRate) / 100;
-                            igst = gstAmount;
-                            finalAmount += gstAmount;
-                        }
-                    }
-
-                    // ================= COUPON AFTER GST (ROOM ONLY) =================
-                    let couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
-
-                    // Coupon cannot exceed Room Total
+                    // Coupon cannot exceed room total
                     if (couponDiscount > roomTotal) {
                         couponDiscount = roomTotal;
                     }
 
-                    finalAmount -= couponDiscount;
+                    // ================= DISCOUNTED TOTAL =================
+                    let discountedTotal =
+                        subTotal - couponDiscount;
 
-                    if (finalAmount < 0) {
-                        finalAmount = 0;
+                    if (discountedTotal < 0) {
+                        discountedTotal = 0;
+                    }
+
+                    // ================= GST CALCULATION =================
+                    let cgst = 0;
+                    let sgst = 0;
+                    let igst = 0;
+                    let gstAmount = 0;
+
+                    // GST should calculate AFTER discount
+                    let finalAmount = discountedTotal;
+
+                    if (isGSTEnabled) {
+                        // Proportional taxable amount after discount
+                        let taxableAmount = discountedTotal;
+
+                        if (taxType === "CGST/SGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            cgst = gstAmount;
+                            sgst = gstAmount;
+                            finalAmount += cgst + sgst;
+                        } else if (taxType === "IGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            igst = gstAmount;
+                            finalAmount += igst;
+                        }
                     }
 
                     // ================= ROUND OFF =================
                     const roundedAmount = Math.round(finalAmount);
 
+                    const roundOff = (roundedAmount - finalAmount).toFixed(2);
+
                     // ================= ASSIGN VALUES FOR PDF =================
+                    oCustomerModel.SubTotal = subTotal.toFixed(2);
                     oCustomerModel.SubTotalInGST = totalWithGST.toFixed(2);
                     oCustomerModel.SubTotalNotGST = totalWithoutGST.toFixed(2);
+                    oCustomerModel.DiscountedTotal = discountedTotal.toFixed(2);
                     oCustomerModel.CGST = cgst.toFixed(2);
                     oCustomerModel.SGST = sgst.toFixed(2);
                     oCustomerModel.IGST = igst.toFixed(2);
                     oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
+                    oCustomerModel.RoundOff = roundOff;
                     oCustomerModel.TotalAmount = roundedAmount.toFixed(2);
 
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
@@ -2996,17 +3032,17 @@ sap.ui.define([
                     if (totalWithGST > 0)
                         summary.push(["Sub-Total (Taxable) :", Formatter.fromatNumber(totalWithGST)]);
 
-                    const pct = taxRate ? `(${taxRate}%)` : "";
-
-                    if (cgst > 0) summary.push([`CGST ${pct} :`, Formatter.fromatNumber(cgst)]);
-                    if (sgst > 0) summary.push([`SGST ${pct} :`, Formatter.fromatNumber(sgst)]);
-                    if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
-
                     if (couponDiscount > 0)
                         summary.push([
                             `Discount (${oCustomerModel.CouponCode}) :`,
                             "- " + Formatter.fromatNumber(couponDiscount)
                         ]);
+
+                    const pct = taxRate ? `(${taxRate}%)` : "";
+
+                    if (cgst > 0) summary.push([`CGST ${pct} :`, Formatter.fromatNumber(cgst)]);
+                    if (sgst > 0) summary.push([`SGST ${pct} :`, Formatter.fromatNumber(sgst)]);
+                    if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
 
                     const totalRowIndex = summary.length;
                     summary.push(["Total :", Formatter.fromatNumber(roundedAmount)]);
@@ -3319,6 +3355,13 @@ sap.ui.define([
                             summaryBody.push([`Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
                         }
 
+                        if (parseFloat(oModel.CouponDiscount) > 0) {
+                            summaryBody.push([
+                                `Discount (${oModel.CouponCode}) :`,
+                                "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                            ]);
+                        }
+
                         // IGST
                         if (oModel.Type === "IGST" && igst > 0) {
                             summaryBody.push([`IGST (${oModel.Value}%) :`, Formatter.fromatNumber(igst)]);
@@ -3332,13 +3375,6 @@ sap.ui.define([
                             if (sgst > 0) {
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
-                        }
-
-                        if (parseFloat(oModel.CouponDiscount) > 0) {
-                            summaryBody.push([
-                                `Discount (${oModel.CouponCode}) :`,
-                                "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
-                            ]);
                         }
 
                         // Total
@@ -3712,8 +3748,8 @@ sap.ui.define([
 
                 const finalItems = [
                     ...nonFacilityItems,
-                    ...existingFacilities, 
-                    ...newFacilityItems 
+                    ...existingFacilities,
+                    ...newFacilityItems
                 ];
 
                 finalItems.forEach((item, index) => {
@@ -3728,7 +3764,7 @@ sap.ui.define([
                 return new Date(`${year}-${month}-${day}`);
             },
 
-            _calculateFacilityTotal: function (item, cycleStart, cycleEnd, invoiceIndex = 0) {
+            _calculateFacilityTotal: function(item, cycleStart, cycleEnd, invoiceIndex = 0) {
 
                 let sDate = new Date(item.StartDate);
                 let eDate = new Date(item.EndDate);
@@ -3764,9 +3800,7 @@ sap.ui.define([
                     if (chargeType === "DAILY") {
                         const totalUnits = qty * useddaysforday;
                         facilityAmount = this._truncate2(totalUnits * unitPrice);
-                    }
-
-                    else if (chargeType === "ONCE_PER_BOOKING") {
+                    } else if (chargeType === "ONCE_PER_BOOKING") {
                         if (invoiceIndex > 0) return 0;
 
                         const totalUnits = qty;
@@ -3786,19 +3820,13 @@ sap.ui.define([
                 // ================= UNIT LOGIC =================
                 if (unit === "per day") {
                     facilityAmount = this._truncate2(multiplier * unitPrice * useddaysforday);
-                }
-
-                else if (unit === "per hour") {
+                } else if (unit === "per hour") {
                     facilityAmount = this._truncate2(multiplier * unitPrice * totalHour * useddaysforday);
-                }
-
-                else if (unit === "per month") {
+                } else if (unit === "per month") {
 
                     const usedMonths = this._calculateMonths(effectiveStart, effectiveEnd);
                     facilityAmount = this._truncate2(multiplier * unitPrice * usedMonths);
-                }
-
-                else if (unit === "per year") {
+                } else if (unit === "per year") {
 
                     const totalMonths = this._calculateMonths(sDate, eDate);
                     const years = Math.ceil(totalMonths / 12) || 1;
@@ -3817,15 +3845,15 @@ sap.ui.define([
                 return facilityAmount;
             },
 
-            _calculateDays: function (start, end) {
+            _calculateDays: function(start, end) {
                 return Math.floor((end - start) / 86400000) + 1;
             },
 
-            _calculateDaysForDay: function (start, end) {
+            _calculateDaysForDay: function(start, end) {
                 return Math.floor((end - start) / 86400000);
             },
 
-            _calculateMonths: function (start, end) {
+            _calculateMonths: function(start, end) {
                 let months =
                     (end.getFullYear() - start.getFullYear()) * 12 +
                     (end.getMonth() - start.getMonth());
@@ -3835,11 +3863,11 @@ sap.ui.define([
                 return months;
             },
 
-            _round2: function (value) {
+            _round2: function(value) {
                 return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
             },
 
-            _truncate2: function (value) {
+            _truncate2: function(value) {
                 return Math.floor(Number(value) * 100) / 100;
             },
         });

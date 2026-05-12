@@ -2628,7 +2628,6 @@ if (aData.length === 0) {
 
             var oBranchData = oCtx.getObject();
 
-
             this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
                 sPath: oBranchData.BranchID
             });
