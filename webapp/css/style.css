@@ -5614,3 +5614,106 @@ html, body {
 .facilityPersonQtyTable .sapMListTblHeaderCell {
     vertical-align: middle;
 }
+.RoomSimpleform{
+  background: #00b3c2 !important;
+}
+.branchFlex {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+/* Desktop only */
+.branchFormBox {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    /* margin-right: 0.25rem !important; */
+}
+
+.branchSimpleForm {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 1rem 2rem;
+    background: #fff;
+    border-radius: 0.75rem;
+}
+
+.branchSimpleForm .sapUiFormTitle {
+    display: none;
+    height: 0;
+}
+
+.branchSimpleForm .sapUiFormResGridCont > div {
+    margin-bottom: 0.4rem;
+}
+
+.branchSimpleForm .sapUiFormResGridCont > div:last-child {
+    margin-bottom: 0;
+}
+
+.branchSimpleForm .sapMLabel {
+    margin-right: 4.25rem !important;
+    white-space: nowrap;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+}
+
+.branchSimpleForm .branchValue {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+}
+
+.branchContainer {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Tablet + mobile */
+@media (max-width: 900px) {
+    .branchFlex {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 1rem;
+        margin: 0 !important;
+        width: 100%;
+    }
+
+    .branchFormBox {
+        width: 100%;
+        margin-right: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .branchSimpleForm {
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+
+    .branchContainer {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 600px) {
+    .branchFlex {
+        padding: 0.75rem;
+    }
+
+    .branchSimpleForm {
+        padding: 0.875rem;
+    }
+}

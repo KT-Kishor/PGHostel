@@ -493,30 +493,7 @@ sap.ui.define([
                 var BedType = oCustomer.Bookings?.[0]?.BedType
                 var PaymentType = oCustomer.Bookings?.[0]?.PaymentType
 
-                //  var Country=this.getView().getModel("sBRModel").getData().find((item)=>{
-                //      return item.BranchCode===sBranchCode
-                //  })
-
-                //   var oModel = new sap.ui.model.json.JSONModel(Country);
-
-                //     this.getView().setModel(oModel, "Country");
-
-                // await this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
-                //     var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-
-                //     var aFilteredRooms = aRooms.filter(function (room) {
-                //         return room.BranchCode === sBranchCode;
-                //     });
-
-
-                //     // set only filtered data to the model
-                //     var model = new sap.ui.model.json.JSONModel(aFilteredRooms);
-                //     this.getView().setModel(model, "Availablebeds");
-
-                //     var RoomBedprice = aFilteredRooms.filter(function (item) {
-                //         return item.BedTypeName === BedType
-                //     });
-                // })
+           
                 var aAllRooms = this.getView().getModel("Availablebeds").getData();
 
                 // Filter by BranchCode
@@ -782,7 +759,7 @@ sap.ui.define([
             this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
 
             let DiscountAmount = Discount || 0;
-            const SubTotal = FacilityPrice + roomRentPrice;
+            const SubTotal = FacilityPrice + roomRentPrice - DiscountAmount;
 
             let SGST = 0;
             let CGST = 0;
@@ -790,12 +767,12 @@ sap.ui.define([
             let grandTotal = 0;
             if (oCustomer.Bookings?.[0]?.GSTType === "IGST") {
                 IGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
-                grandTotal = SubTotal + IGST - DiscountAmount;
+                grandTotal = SubTotal + IGST ;
 
             } else {
                 SGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
                 CGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
-                grandTotal = SubTotal + SGST + CGST - DiscountAmount;
+                grandTotal = SubTotal + SGST + CGST ;
 
             }
             this.grandTotal = grandTotal;
@@ -1736,16 +1713,16 @@ sap.ui.define([
 
 
             oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
-            oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
+            oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0)) - Number(oCustomerData.Discount);
 
             if (oCustomerData.GSTType === "IGST") {
                 oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST ;
 
             } else {
                 oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
                 oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
 
             }
 
@@ -2000,7 +1977,7 @@ sap.ui.define([
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))
 
-                var SubTotal = SubTotal
+                var SubTotal = SubTotal - Number(CustData.Discount)
                 var CGST = SubTotal * CustData.GSTValue / 100
                 let TotalAmount;
 
@@ -2043,8 +2020,8 @@ sap.ui.define([
 
                 }
 
-                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount );
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
 
@@ -2064,7 +2041,7 @@ sap.ui.define([
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
 
-                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
+                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) - Number(CustData.Discount)
 
                 var CGST = SubTotal * CustData.GSTValue / 100
                 let TotalAmount;
@@ -2087,8 +2064,8 @@ sap.ui.define([
 
                 }
 
-                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount);
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
 
@@ -2106,7 +2083,7 @@ sap.ui.define([
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
 
-                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")))
+                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) - Number(CustData.Discount)
 
                 var CGST = SubTotal * CustData.GSTValue / 100
                 let TotalAmount;
@@ -2129,8 +2106,8 @@ sap.ui.define([
 
                 }
 
-                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount);
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
             }
@@ -2233,7 +2210,7 @@ sap.ui.define([
 
             // oCustomerData.setProperty("/SubTotal", SubTotal);
             // oCustomerData.setProperty("/Discount", CustData.Discount)
-            var SubTotal = (fPrice + fFacilityPrice)
+            var SubTotal = (fPrice + fFacilityPrice) - Number(CustData.Discount)
             var CGST = SubTotal * CustData.GSTValue / 100
 
             let TotalAmount;
@@ -2278,8 +2255,8 @@ sap.ui.define([
 
             }
 
-            oCustomerData.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-            oCustomerData.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+            oCustomerData.setProperty("/GrandTotal", TotalAmount );
+            oCustomerData.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
             oCustomerData.setProperty("/Duration", iCount)
@@ -2638,14 +2615,14 @@ sap.ui.define([
             // }
             // oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
 
-            oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0));
+            oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0)) - Number(oCustomerData.Discount);
             if (oCustomerData.GSTType === "IGST") {
                 oCustomerData.IGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST - Number(oCustomerData.Discount);
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.IGST ;
             } else {
                 oCustomerData.SGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
                 oCustomerData.CGST = oCustomerData.SubTotal * oCustomerData.GSTValue / 100;
-                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST - Number(oCustomerData.Discount);
+                oCustomerData.GrandTotal = oCustomerData.SubTotal + oCustomerData.SGST + oCustomerData.CGST;
             }
             oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid
 
@@ -2747,7 +2724,7 @@ sap.ui.define([
                 // oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
-                var SubTotal = fPrice + fFacilityPrice
+                var SubTotal = fPrice + fFacilityPrice  - Number(CustData.Discount)
                 var CGST = SubTotal * CustData.GSTValue / 100
 
                 let TotalAmount;
@@ -2790,8 +2767,8 @@ sap.ui.define([
                     oCustomerModel.setProperty("/CGST", CGST)
 
                 }
-                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount);
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
@@ -2933,7 +2910,7 @@ sap.ui.define([
                 // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 // oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
 
-                var SubTotal = fOriginalRentPrice + fFacilityPrice
+                var SubTotal = fOriginalRentPrice + fFacilityPrice - Number(CustData.Discount)
                 var CGST = SubTotal * CustData.GSTValue / 100
 
                 let TotalAmount;
@@ -2979,8 +2956,8 @@ sap.ui.define([
                     oCustomerModel.setProperty("/CGST", CGST)
 
                 }
-                oCustomerModel.setProperty("/GrandTotal", TotalAmount - Number(CustData.Discount));
-                oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount) - CustData.PaymentPaid);
+                oCustomerModel.setProperty("/GrandTotal", TotalAmount);
+                oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
@@ -3151,6 +3128,8 @@ sap.ui.define([
         },
 
         onmobileChange: function (oEvent) {
+            utils.onNumber(oEvent);
+
             const oSTD = this.byId("CC_id_STDCode");
             const oMobile = this.byId("CD_ID_idPhone");
 
@@ -4748,19 +4727,19 @@ sap.ui.define([
             var subtotal = 0;
 
             if (edit.UnitText === "Per Month") {
-                var subtotal = edit.Price * (edit.TotalUnits || 1) * Number(edit.quantity)
+                var subtotal =Number(edit.quantity) ? edit.Price * (edit.TotalUnits || 1) * Number(edit.quantity) : edit.Price * (edit.TotalUnits || 1)
 
             } else if (edit.UnitText === "Per Year") {
-                var subtotal = edit.Price * (edit.TotalUnits || 1) * Number(edit.quantity)
+                var subtotal =Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) * Number(edit.quantity) :  Number(edit.Price) * (edit.TotalUnits || 1)
             } else if (edit.UnitText === "Per Day") {
-                var subtotal = edit.Price * (edit.TotalDays || 1) * Number(edit.quantity)
+                var subtotal =Number(edit.quantity) ? Number(edit.Price) * (edit.TotalDays || 1) * Number(edit.quantity) : Number(edit.Price) * (edit.TotalDays || 1)
             } else if (edit.UnitText === "Per Hour") {
-                var subtotal = edit.Price * edit.TotalHour * edit.TotalDays * Number(edit.quantity)
+                var subtotal =Number(edit.quantity) ?  Number(edit.Price) * Number(edit.TotalHour) * Number(edit.TotalDays) * Number(edit.quantity) : Number(edit.Price) * Number(edit.TotalHour) * Number(edit.TotalDays)
             } else if (edit.UnitText === "Unit Price") {
                 if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                    var subtotal = edit.Price * (edit.TotalDays || 1);
+                    var subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalDays || 1) * Number(edit.quantity) : Number(edit.Price) * (edit.TotalDays || 1) ;
                 } else {
-                    var subtotal = edit.Price;
+                    var subtotal = Number(edit.Price);
                 }
             }
 
