@@ -19,10 +19,10 @@ sap.ui.define([
 
         },
         _onRouteMatched: async function (oEvent) {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
             // Clear the HostelModel when returning to this view
