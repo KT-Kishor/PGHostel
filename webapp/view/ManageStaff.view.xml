@@ -35,22 +35,22 @@
 							<ComboBox
                                 id="MS_id_UserID"
                                 items="{mainModel>/}"
-                                showClearIcon="true">
-								<core:Item key="{mainModel>UserID}" text="{mainModel>UserID}"/>
+                                showClearIcon="true" showSecondaryValues="true" filterSecondaryValues="true">
+								<core:ListItem key="{mainModel>UserID}" text="{mainModel>UserID}" additionalText="{mainModel>UserName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem
-                        name="UserName"
-                        label="{i18n>MVusername}"
+                        name="City"
+                        label="{i18n>city}"
                         groupName="Group"
                         visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
-                                id="MS_id_UserName"
+                                id="MS_id_City"
                                 items="{mainModel>/}"
                                 showClearIcon="true">
-								<core:Item key="{mainModel>UserName}" text="{mainModel>UserName}"/>
+								<core:Item key="{mainModel>City}" text="{mainModel>City}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -78,12 +78,9 @@
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="{i18n>MVUserID}" tooltip="{i18n>MVUserID}"/>
-					</Column>
-					<Column demandPopin="true">
 						<Text text="{i18n>MVstaffName}" tooltip="{i18n>MVstaffName}"/>
 					</Column>
-					<Column demandPopin="true">
+					<Column demandPopin="true" width="15%">
 						<Text text="{i18n>emailId}" tooltip="{i18n>emailId}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
@@ -96,31 +93,29 @@
 						<Text text="{i18n>MSmobileNo}" tooltip="{i18n>MSmobileNo}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>MVDcountry}" tooltip="{i18n>MVDcountry}"/>
-					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>MVDstate}" tooltip="{i18n>MVDstate}"/>
-					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>city}" tooltip="{i18n>city}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>address}" tooltip="{i18n>address}"/>
+					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
+						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
 					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{mainModel>UserID}" />
-							<Text text="{mainModel>Salutation} {mainModel>UserName}"/>
-							<ExpandableText text="{mainModel>EmailID}" maxCharacters="25"/>
-							<Text text="{mainModel>BranchCode}" />
+							<Text text="{mainModel>Salutation} {mainModel>UserName} ({mainModel>UserID})"/>
+							<Text text="{mainModel>EmailID}"/>
+							<Text text="{
+									parts: [
+										{ path: 'mainModel>BranchCode' },
+										{ path: 'BranchModel>/' }
+									],
+									formatter: '.Formatter.formatBranchNames'
+								}"
+							/>
 							<Text text="{mainModel>Gender}" />
 							<Text text="{mainModel>STDCode} {mainModel>MobileNo}"/>
-							<Text text="{mainModel>Country}" />
-							<Text text="{mainModel>State}" />
 							<Text text="{mainModel>City}" />
-							<ExpandableText text="{mainModel>Address}" maxCharacters="20"/>
+							<Text text="{mainModel>Address}"  wrapping="true"/>
 						</cells>
 					</ColumnListItem>
 				</items>

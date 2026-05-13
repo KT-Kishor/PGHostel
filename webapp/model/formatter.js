@@ -558,6 +558,21 @@ formatAgeFromDOBOrAge: function (sDateValue) {
     }
 },
 
+formatBranchNames: function (sBranchCodes, aBranches) {
+            if (!sBranchCodes || !aBranches || !Array.isArray(aBranches)) {
+                return "";
+            }
+
+            const aCodes = sBranchCodes.split(",").map(code => code.trim());
+
+            const aNames = aCodes.map(code => {
+                const oBranch = aBranches.find(branch => branch.BranchID === code);
+                return oBranch ? oBranch.Name : code;
+            });
+
+            return aNames.join(", ");
+        }
+
         
     }
 });

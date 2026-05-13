@@ -5,11 +5,11 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../model/formatter",
     "sap/ui/export/Spreadsheet",
-], function (BaseController, utils, MessageBox, MessageToast, Formatter, Spreadsheet) {
+], function(BaseController, utils, MessageBox, MessageToast, Formatter, Spreadsheet) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageStaff", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -17,13 +17,13 @@ sap.ui.define([
                 // maxDate: maxDate,
                 focusedDate: new Date(2000, 0, 1),
                 minDate: new Date(1950, 0, 1),
-                maxdate : new Date()
+                maxdate: new Date()
             });
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteManageStaff").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageStaff");
                 if (!LoginFUnction) return;
@@ -41,7 +41,7 @@ sap.ui.define([
             }
         },
 
-        _initEmptyMDModel: function () {
+        _initEmptyMDModel: function() {
             const emptyData = {
                 Salutation: "",
                 UserName: "",
@@ -63,7 +63,7 @@ sap.ui.define([
             this.getView().setModel(oModel, "MDmodel");
         },
 
-        _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             let aBranchCodes = [];
@@ -99,7 +99,7 @@ sap.ui.define([
             }
         },
 
-        HM_AddHostelFeature: function () {
+        HM_AddHostelFeature: function() {
             const oView = this.getView();
             if (!this.ARD_Dialog) {
                 this.ARD_Dialog = sap.ui.xmlfragment(
@@ -116,7 +116,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HM_EditHostelFeature: function () {
+        HM_EditHostelFeature: function() {
             const oTable = this.byId("MS_id_ManageStaff");
             const oSelected = oTable.getSelectedItem();
 
@@ -170,7 +170,7 @@ sap.ui.define([
         //     });
         // },
 
-        _resetValueStates: function () {
+        _resetValueStates: function() {
             const ids = [
                 "MS_id_signUpSalutation",
                 "MS_id_signUpName",
@@ -201,7 +201,7 @@ sap.ui.define([
             // if (confirmPwd) confirmPwd.setValueState("None");
         },
 
-        FD_onCancelButtonPress: function () {
+        FD_onCancelButtonPress: function() {
             this._initEmptyMDModel();
             // this._clearManualFields();
             this._resetValueStates();
@@ -209,7 +209,7 @@ sap.ui.define([
             if (this.ARD_Dialog) this.ARD_Dialog.close();
         },
 
-        onSignUp: async function () {
+        onSignUp: async function() {
             const C = this.byId.bind(this);
             const oModel = this.getView().getModel("MDmodel");
             const data = oModel.getData();
@@ -223,10 +223,10 @@ sap.ui.define([
                 utils._LCvalidateEmail(C("MS_id_signUpEmail"), "ID") &&
                 utils._LCstrictValidationMultiComboBox(C("MS_id_Branchcode"), "ID") &&
                 utils._LCvalidateMandatoryField(C("MS_id_Role"), "ID") &&
-                utils._LCvalidateMandatoryField(C("MS_id_signUpCountry"), "ID") &&
-                utils._LCvalidateMandatoryField(C("MS_id_signUpState"), "ID") &&
-                utils._LCvalidateMandatoryField(C("MS_id_signUpCity"), "ID") &&
-                utils._LCvalidateMandatoryField(C("MS_id_signUpSTD"), "ID") &&
+                utils._LCstrictValidationComboBox(C("MS_id_signUpCountry"), "ID") &&
+                utils._LCstrictValidationComboBox(C("MS_id_signUpState"), "ID") &&
+                utils._LCstrictValidationComboBox(C("MS_id_signUpCity"), "ID") &&
+                utils._LCstrictValidationComboBox(C("MS_id_signUpSTD"), "ID") &&
                 utils._LCvalidateISDmobile(C("MS_id_signUpPhone"), std) &&
                 utils._LCvalidateAddress(C("MS_id_signUpAddress"))
                 // utils._LCvalidatePassword(C("MS_id_signUpPassword"),
@@ -276,6 +276,8 @@ sap.ui.define([
                 Type: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID
             };
 
+            delete payload.BranchName;
+
             const isUpdate = !!data.UserID;
 
             this.getBusyDialog()
@@ -309,7 +311,7 @@ sap.ui.define([
             }
         },
 
-        Onsearch: function (flag) {
+        Onsearch: function(flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
@@ -318,8 +320,8 @@ sap.ui.define([
             var sUserID = oView.byId("MS_id_UserID").getSelectedKey() ||
                 oView.byId("MS_id_UserID").getValue();
 
-            var sUserName = oView.byId("MS_id_UserName").getSelectedKey() ||
-                oView.byId("MS_id_UserName").getValue();
+            var sCity = oView.byId("MS_id_City").getSelectedKey() ||
+                oView.byId("MS_id_City").getValue();
 
             // Branch Codes (from login)
             let aBranchCodes = [];
@@ -353,8 +355,8 @@ sap.ui.define([
             }
 
             // Apply UserName filter
-            if (sUserName) {
-                filters.UserName = sUserName;
+            if (sCity) {
+                filters.City = sCity;
             }
 
             this.getBusyDialog()
@@ -367,7 +369,7 @@ sap.ui.define([
 
                 let finalData = response;
                 if (oExistingModel.Role === "SuperAdmin") {
-                    finalData = finalData.filter(item => 
+                    finalData = finalData.filter(item =>
                         item.Role !== "Customer" && item.Role !== "SuperAdmin"
                     );
                 }
@@ -384,35 +386,58 @@ sap.ui.define([
             });
         },
 
-        _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                MS_id_UserID: new Set(),
-                MS_id_UserName: new Set()
-            };
-
-            data.forEach(item => {
-                if (item.UserID) uniqueValues.MS_id_UserID.add(item.UserID);
-                if (item.UserName) uniqueValues.MS_id_UserName.add(item.UserName);
-            });
-
+        _populateUniqueFilterValues: function(data) {
             let oView = this.getView();
 
-            ["MS_id_UserID", "MS_id_UserName"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                if (!oComboBox) return;
+            // ===== UserID Combo =====
+            let oUserCombo = oView.byId("MS_id_UserID");
 
-                oComboBox.destroyItems();
+            if (oUserCombo) {
+                oUserCombo.destroyItems();
 
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    }));
+                // Remove duplicate UserIDs
+                let uniqueUsers = {};
+                data.forEach(item => {
+                    if (item.UserID && !uniqueUsers[item.UserID]) {
+                        uniqueUsers[item.UserID] = item;
+                    }
                 });
-            });
+
+                Object.values(uniqueUsers)
+                    .sort((a, b) => a.UserID.localeCompare(b.UserID))
+                    .forEach(item => {
+                        oUserCombo.addItem(new sap.ui.core.ListItem({
+                            key: item.UserID,
+                            text: item.UserID,
+                            additionalText: item.UserName
+                        }));
+                    });
+            }
+
+            // ===== City Combo =====
+            let oCityCombo = oView.byId("MS_id_City");
+
+            if (oCityCombo) {
+                oCityCombo.destroyItems();
+
+                let uniqueCities = [...new Set(
+                    data
+                    .map(item => item.City)
+                    .filter(Boolean)
+                )];
+
+                uniqueCities
+                    .sort()
+                    .forEach(city => {
+                        oCityCombo.addItem(new sap.ui.core.Item({
+                            key: city,
+                            text: city
+                        }));
+                    });
+            }
         },
 
-        HM_DeleteHostelFeature: async function () {
+        HM_DeleteHostelFeature: async function() {
             var oTable = this.byId("MS_id_ManageStaff");
             var oSelectedItem = oTable.getSelectedItem();
 
@@ -427,64 +452,64 @@ sap.ui.define([
 
             MessageBox.confirm(
                 `Are you sure you want to delete the Staff record: ${sName}?`, {
-                icon: MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                emphasizedAction: MessageBox.Action.NO,
-                styleClass: "myUnifiedBtn",
-                onClose: async function (sAction) {
-                    if (sAction === MessageBox.Action.YES) {
-                        try {
-                            that.getBusyDialog()
+                    icon: MessageBox.Icon.WARNING,
+                    title: "Confirm Deletion",
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
+                    onClose: async function(sAction) {
+                        if (sAction === MessageBox.Action.YES) {
+                            try {
+                                that.getBusyDialog()
 
-                            await that.ajaxDeleteWithJQuery("HM_Login", {
-                                filters: {
-                                    UserID: oData.UserID
-                                }
-                            });
-                            await that.Onsearch("true"); // refresh table
-                        } catch (err) {
-                            sap.m.MessageToast.show(err.message || err.responseText);
-                        } finally {
-                            that.closeBusyDialog()
-                            MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
+                                await that.ajaxDeleteWithJQuery("HM_Login", {
+                                    filters: {
+                                        UserID: oData.UserID
+                                    }
+                                });
+                                await that.Onsearch("true"); // refresh table
+                            } catch (err) {
+                                sap.m.MessageToast.show(err.message || err.responseText);
+                            } finally {
+                                that.closeBusyDialog()
+                                MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
+                                oTable.removeSelections(true);
+                            }
+                        } else {
                             oTable.removeSelections(true);
                         }
-                    } else {
-                        oTable.removeSelections(true);
                     }
                 }
-            }
             );
         },
 
-        FC_onPressClear: function () {
+        FC_onPressClear: function() {
             this.getView().byId("MS_id_UserID").setSelectedKey("");
-            this.getView().byId("MS_id_UserName").setSelectedKey("")
+            this.getView().byId("MS_id_City").setSelectedKey("")
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
         },
 
-        onbranchChange: function (oEvent) {
+        onbranchChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationMultiComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onRoleChange: function (oEvent) {
+        onRoleChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onChangeSalutation: function (oEvent) {
+        onChangeSalutation: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
 
@@ -515,27 +540,30 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        _LCvalidateName: function (oEvent) {
+        _LCvalidateName: function(oEvent) {
             utils._LCvalidateName(oEvent);
         },
 
-        onChangeDOB: function (oEvent) {
+        onChangeDOB: function(oEvent) {
             utils._LCvalidateDate(oEvent);
         },
 
-        onChangeGender: function (oEvent) {
+        onChangeGender: function(oEvent) {
             utils._LCstrictValidationSelect(oEvent.getSource());
         },
 
-        onEmailliveChange: function (oEvent) {
+        onEmailliveChange: function(oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
-        onChangeCountry: function (oEvent) {
+        onChangeCountry: function(oEvent) {
             const oCountry = oEvent.getSource();
-            oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
-            utils._LCvalidateMandatoryField(oEvent);
+            oCountry.setValue(
+                oCountry.getValue().replace(/[^a-zA-Z\s]/g, "")
+            );
+
+            utils._LCstrictValidationComboBox(oEvent);
 
             const oModel = this.getView().getModel("MDmodel");
 
@@ -543,46 +571,73 @@ sap.ui.define([
             const oCity = this.byId("MS_id_signUpCity");
             const oSTD = this.byId("MS_id_signUpSTD");
 
-            // Model reset
-            ["State", "City", "Mobileno", "STDCode"].forEach(p =>
-                oModel.setProperty("/" + p, "")
-            );
+            // Reset model properties
+            ["State", "City", "MobileNo", "STDCode"].forEach(sProp => {
+                oModel.setProperty("/" + sProp, "");
+            });
 
-            // UI reset
-            oState.setValue("").setSelectedKey("");
-            oCity.setValue("").setSelectedKey("");
+            // Reset UI fields
+            oState.setValue("");
+            oState.setSelectedKey("");
+
+            oCity.setValue("");
+            oCity.setSelectedKey("");
+
             oSTD.setValue("");
 
-            // Block all child lists until prerequisites
+            // Block state list until valid country selected
             oState.getBinding("items")?.filter([
-                new sap.ui.model.Filter("stateName", "EQ", "__NONE__")
+                new sap.ui.model.Filter(
+                    "stateName",
+                    sap.ui.model.FilterOperator.EQ,
+                    "__NONE__"
+                )
             ]);
+
+            // Block city list until valid state selected
             oCity.getBinding("items")?.filter([
-                new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+                new sap.ui.model.Filter(
+                    "cityName",
+                    sap.ui.model.FilterOperator.EQ,
+                    "__NONE__"
+                )
             ]);
 
             const oItem = oCountry.getSelectedItem();
-            if (!oItem) return;
+
+            if (!oItem) {
+                return;
+            }
 
             const sCountry = oItem.getText();
             const sCountryCode = oItem.getAdditionalText()?.trim();
 
             oModel.setProperty("/Country", sCountry);
 
-            // STD handling
-            const countries = this.getOwnerComponent()
+            // Load STD code
+            const aCountries = this.getOwnerComponent()
                 .getModel("CountryModel")
                 .getData();
 
-            const data = countries.find(c => c.countryName === sCountry);
-            if (data?.stdCode) {
-                oModel.setProperty("/STDCode", data.stdCode);
-                oSTD.setValue(data.stdCode);
-                this.onSTDChange();
+            const oCountryData = aCountries.find(
+                c => c.countryName === sCountry
+            );
+
+            if (oCountryData?.stdCode) {
+
+                oModel.setProperty("/STDCode", oCountryData.stdCode);
+
+                oSTD.setValue(oCountryData.stdCode);
+
+                // Trigger STD logic safely
+                this.onSTDChange({
+                    getSource: () => oSTD
+                });
             }
 
-            //  RELEASE states only after country valid
+            // Release state dropdown only after valid country
             if (sCountryCode) {
+
                 oState.getBinding("items")?.filter([
                     new sap.ui.model.Filter(
                         "countryCode",
@@ -593,14 +648,64 @@ sap.ui.define([
             }
         },
 
-        onChangeState: function (oEvent) {
+        onSTDChange: function(oEvent) {
+
+            const oSTD = this.byId("MS_id_signUpSTD");
+            const oMobile = this.byId("MS_id_signUpPhone");
+
+            const sSTD = oSTD.getValue();
+
+            // Clear mobile number
+            oMobile.setValue("");
+
+            // Reset validations
+            oMobile.setValueState(sap.ui.core.ValueState.None);
+            oSTD.setValueState(sap.ui.core.ValueState.None);
+
+            oMobile.setValueStateText("");
+
+            // Dynamic mobile length
+            if (sSTD === "+91") {
+                oMobile.setMaxLength(10);
+            } else {
+                oMobile.setMaxLength(18);
+            }
+
+            // Validation only if event exists
+            if (oEvent) {
+                utils._LCstrictValidationComboBox(oEvent);
+            }
+        },
+
+        onPhoneLiveChange: function(oEvent) {
+
+            const oInput = oEvent.getSource();
+            let sValue = oInput.getValue();
+
+            const oSTD = this.byId("MS_id_signUpSTD");
+            const sSTD = oSTD.getSelectedKey();
+
+            // Allow only numbers
+            sValue = sValue.replace(/\D/g, "");
+
+            // Dynamic length restriction
+            if (sSTD === "+91") {
+                sValue = sValue.substring(0, 10);
+            } else {
+                sValue = sValue.substring(0, 18);
+            }
+
+            oInput.setValue(sValue);
+        },
+
+        onChangeState: function(oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
 
             // sanitize free typing
             oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
-            utils._LCvalidateMandatoryField(oEvent);
+            utils._LCstrictValidationComboBox(oEvent);
 
             // ALWAYS WRITE TO MODEL
             const sStateText =
@@ -632,7 +737,7 @@ sap.ui.define([
             ]);
         },
 
-        onChangeCity: function (oEvent) {
+        onChangeCity: function(oEvent) {
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("MDmodel");
 
@@ -659,37 +764,14 @@ sap.ui.define([
                 return;
             }
 
-            utils._LCvalidateMandatoryField(oEvent);
+            utils._LCstrictValidationComboBox(oEvent);
 
             // ALWAYS WRITE TO MODEL
             const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/City", sCityText);
         },
 
-        onSTDChange: function () {
-            const oSTD = this.byId("MS_id_signUpSTD");
-            const oMobile = this.byId("MS_id_signUpPhone");
-            const std = oSTD.getValue();
-
-            // Clear mobile number
-            oMobile.setValue("");
-
-            // Reset value state
-            oMobile.setValueState(sap.ui.core.ValueState.None);
-            oSTD.setValueState(sap.ui.core.ValueState.None);
-
-            
-            oMobile.setValueStateText("");
-
-            // Dynamic maxLength based on STD
-            if (std === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
-        },
-
-        onMobileLivechnage: function (oEvent) {
+        onMobileLivechnage: function(oEvent) {
             const oInput = oEvent.getSource();
 
             // Digits only
@@ -726,11 +808,11 @@ sap.ui.define([
             }
         },
 
-        onAddressChange: function () {
+        onAddressChange: function() {
             utils._LCvalidateAddress(this.byId("MS_id_signUpAddress"));
         },
 
-        SM_onChnageSetAndConfirm: function (oEvent) {
+        SM_onChnageSetAndConfirm: function(oEvent) {
             const oInput = oEvent.getSource();
             const sId = oInput.getId();
             let oStrengthText = null;
@@ -744,7 +826,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
 
-        FSM_onConfirm: function (oEvent) {
+        FSM_onConfirm: function(oEvent) {
             const oInput = oEvent?.getSource();
             if (!oInput) return false;
 
@@ -770,14 +852,14 @@ sap.ui.define([
             return true; //  EXPLICIT PASS
         },
 
-        SM_onTogglePasswordVisibility: function (oEvent) {
+        SM_onTogglePasswordVisibility: function(oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
 
-        SM_onGeneratePassword: function () {
+        SM_onGeneratePassword: function() {
             var oPwdInput = this.byId("MS_id_signUpPassword");
             var oStrength = this.byId("MS_id_passwordStrengthText"); // signup label
 
@@ -791,7 +873,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
 
-        MS_onDownload: function () {
+        MS_onDownload: function() {
             const oModel = this.byId("MS_id_ManageStaff").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
@@ -826,9 +908,8 @@ sap.ui.define([
             });
         },
 
-        createTableSheet: function () {
-            return [
-                {
+        createTableSheet: function() {
+            return [{
                     label: "Role",
                     property: "Role",
                     type: "string"
