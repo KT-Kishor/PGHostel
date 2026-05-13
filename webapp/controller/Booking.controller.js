@@ -19,12 +19,19 @@
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
-            this._iFacilityPageSize = 3; // show 3 cards at once
+            this._iFacilityPageSize = 3; // fallback; recalculated dynamically
+            this._iFacilityCardWidth = 250; // base card width (px)
+            this._iFacilityCardGap = 16;   // gap between cards (px) – matches CSS gap: 1rem
             // Initialize primary member tracking for toast notifications
             this._sLastPrimaryMemberId = "SELF"; // Default to logged-in user
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+
+            // Resize observer to recalculate visible card count
+            this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
+            sap.ui.core.ResizeHandler.register(this.getView(), this._fnFacilityResizeHandler);
+
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
                     this._resetBookingPageModels();
@@ -41,6 +48,10 @@
         },
 
         onExit: function () {
+            if (this._fnFacilityResizeHandler) {
+                sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
+                this._fnFacilityResizeHandler = null;
+            }
             this._clearAllCarouselTimers();
             if (this._adCarouselInterval) {
                 clearInterval(this._adCarouselInterval);
@@ -4380,6 +4391,58 @@
             oReader.readAsDataURL(oFile);
         },
 
+        _getVisibleCardCount: function () {
+            const oViewport = this.byId("facilityViewport");
+            if (!oViewport || !oViewport.getDomRef()) {
+                return sap.ui.Device.system.phone ? 1 : 3;
+            }
+
+            const iContainerWidth = oViewport.getDomRef().clientWidth;
+            if (!iContainerWidth || iContainerWidth <= 0) {
+                return sap.ui.Device.system.phone ? 1 : 3;
+            }
+
+            // On phone, always show 1 card
+            if (sap.ui.Device.system.phone) {
+                return 1;
+            }
+
+            const iCardWidth = this._iFacilityCardWidth || 250;
+            const iGap = this._iFacilityCardGap || 16;
+
+            // How many cards fit: floor((availableWidth + gap) / (cardWidth + gap))
+            const iFit = Math.floor((iContainerWidth + iGap) / (iCardWidth + iGap));
+            return Math.max(1, iFit);
+        },
+
+        _updateFacilityNavButtons: function (aFacilities) {
+            const oPrevBtn = this.byId("facilityPrevBtn");
+            const oNextBtn = this.byId("facilityNextBtn");
+            const iStart = this._iFacilityStartIndex || 0;
+            const iPageSize = this._iFacilityPageSize || 1;
+
+            if (oPrevBtn) {
+                oPrevBtn.setVisible(iStart > 0);
+            }
+            if (oNextBtn) {
+                oNextBtn.setVisible(iStart + iPageSize < aFacilities.length);
+            }
+        },
+
+        _onFacilityCarouselResize: function () {
+            if (!this.getView() || !this.getView().getDomRef()) {
+                return;
+            }
+            var iNewPageSize = this._getVisibleCardCount();
+            if (iNewPageSize !== this._iFacilityPageSize) {
+                this._iFacilityPageSize = iNewPageSize;
+                var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+                var iMaxStart = Math.max(aFacilities.length - iNewPageSize, 0);
+                this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
+                this._renderFacilityCards();
+            }
+        },
+
         _renderFacilityCards: function () {
             const oContainer = this.byId("facilityCardsContainer");
             const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
@@ -4390,29 +4453,34 @@
 
             oContainer.removeAllItems();
 
-
             if (!aFacilities.length) {
                 oContainer.addItem(new sap.m.Text({
                     text: "No facilities available for the selected room plan."
                 }).addStyleClass("sapUiSmallMarginTop"));
+                this._updateFacilityNavButtons(aFacilities);
                 return;
             }
 
-            const iStart = this._iFacilityStartIndex || 0;
-            const bPhone = sap.ui.Device.system.phone;
-            const iPageSize = bPhone ? 1 : 3;
-            this._iFacilityPageSize = iPageSize;
-            const aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
+            // Calculate visible card count dynamically from available viewport width
+            this._iFacilityPageSize = this._getVisibleCardCount();
+            var iPageSize = this._iFacilityPageSize;
+            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
 
-            const oRow = new sap.m.HBox({
+            var iStart = this._iFacilityStartIndex;
+            var aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
+            this._updateFacilityNavButtons(aFacilities);
+
+            var oRow = new sap.m.HBox({
                 width: "100%",
                 justifyContent: "Center",
                 alignItems: "Start",
                 wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
             }).addStyleClass("sapUiSmallMarginTop facilityCardsRow");
 
+            var that = this;
             aVisibleFacilities.forEach(function (oFacility) {
-                const oCard = new sap.m.VBox({
+                var oCard = new sap.m.VBox({
                     width: sap.ui.Device.system.phone ? "100%" : "250px",
                     alignItems: "Stretch",
                     justifyContent: "Start",
@@ -4717,16 +4785,18 @@
 
 
         onFacilityNext: function () {
-            const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
-            const iPageSize = this._iFacilityPageSize || 3;
-            const iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+            var iPageSize = this._getVisibleCardCount();
+            this._iFacilityPageSize = iPageSize;
+            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
 
             this._iFacilityStartIndex = Math.min((this._iFacilityStartIndex || 0) + iPageSize, iMaxStart);
             this._renderFacilityCards();
         },
 
         onFacilityPrev: function () {
-            const iPageSize = this._iFacilityPageSize || 3;
+            var iPageSize = this._getVisibleCardCount();
+            this._iFacilityPageSize = iPageSize;
             this._iFacilityStartIndex = Math.max((this._iFacilityStartIndex || 0) - iPageSize, 0);
             this._renderFacilityCards();
         },

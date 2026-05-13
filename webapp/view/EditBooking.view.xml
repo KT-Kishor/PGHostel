@@ -318,13 +318,14 @@
                                 class="facilitiesNavContainer facilityCarouselShell"
                             >
                                 <Button
+                                    id="facilityPrevBtn"
                                     icon="sap-icon://slim-arrow-left"
                                     press="onFacilityPrev"
                                     class="facilityNavBtn sapUiTinyMarginEnd myUnifiedBtn"
                                 />
 
                                 <HBox
-                                    id="EditfacilityViewport"
+                                    id="facilityViewport"
                                     width="100%"
                                     renderType="Bare"
                                     class="facilityViewport"
@@ -337,6 +338,7 @@
                                 </HBox>
 
                                 <Button
+                                    id="facilityNextBtn"
                                     icon="sap-icon://slim-arrow-right"
                                     press="onFacilityNext"
                                     class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"

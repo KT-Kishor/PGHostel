@@ -18,11 +18,17 @@ sap.ui.define([
                 .attachMatched(this._onEditRouteMatched, this);
 
             this._iFacilityStartIndex = 0;
-            this._iFacilityPageSize = 3;
+            this._iFacilityPageSize = 3; // fallback; recalculated dynamically
+            this._iFacilityCardWidth = 250;
+            this._iFacilityCardGap = 16;
             this._sLastPrimaryMemberId = "SELF";
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+
+            // Resize observer to recalculate visible card count
+            this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
+            sap.ui.core.ResizeHandler.register(this.getView(), this._fnFacilityResizeHandler);
 
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
@@ -32,10 +38,10 @@ sap.ui.define([
         },
 
         _onEditRouteMatched: async function (oEvent) {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
             var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";

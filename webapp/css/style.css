@@ -5194,12 +5194,16 @@ html, body {
 .facilityCarouselShell {
   gap: 1rem;
   position: relative;
+  display: flex !important;
+  align-items: center;
 }
 
 .facilityViewport {
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 24rem;
   padding: 0.25rem 0;
-  overflow: hidden !important;
+  white-space: normal;
 }
 
 .facilityCardsRow {
@@ -5207,6 +5211,7 @@ html, body {
   width: 100%;
   padding: 0 0.25rem;
   box-sizing: border-box;
+  justify-content: center !important;
 }
 
 .facilityServiceCard,

@@ -63,7 +63,7 @@
                             id="adminSalutation"
                             selectedKey="{AdminSignupModel>/Salutation}"
                             change="onAdminChangeSalutation"
-                            placeholder="Mr. / Ms. / Dr."
+                            placeholder="Mr."
                             valueStateText="{i18n>MVDsalutation}"
                         >
                             <core:ListItem
