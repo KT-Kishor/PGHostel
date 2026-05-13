@@ -3088,7 +3088,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   vertical-align: middle;
 }
 
-.Homepage {
+/* .Homepage {
   background-image: url("../image/BedHostel.png");
   background-size: cover;
   background-position: center;
@@ -3097,6 +3097,28 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   overflow: hidden;
   margin-bottom: 2rem !important;
   height: calc(100% - 1rem) !important;
+} */
+ .Homepage {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.6rem;
+    margin-bottom: 2rem !important;
+    height: calc(100% - 1rem) !important;
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* transition: opacity 2.5s ease-in-out; */
+    transition: opacity 1.8s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+.fadeOut {
+    opacity: 0;
+}
+
+.fadeIn {
+    opacity: 1;
 }
 
 .exploreBtn {

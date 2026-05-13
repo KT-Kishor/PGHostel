@@ -16,6 +16,8 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function(oEvent) {
+            var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+            if (!LoginFUnction) return;
                 this.getBusyDialog()
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
@@ -353,22 +355,71 @@ sap.ui.define([
                 });
             },
 
-            onNavBack: function() {
+           onNavBack: function () {
+
+    var oViewModel = this.getView().getModel("visiablityPlay");
+    var bIsEditMode = oViewModel && oViewModel.getProperty("/editable");
+
+    // Ask confirmation only in edit mode
+    if (bIsEditMode) {
+
+        this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+
+            function () {
+
+                oViewModel.setProperty("/Edit", false);
+
                 if (this.sourceView === "Customerinvoice") {
+
                     this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
                 } else if (this.sourceView === "AdminPage") {
+
                     this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
                         sPath: "ManageInvoice"
                     });
+
                 } else if (this.sourceView === "PaymentDashboard") {
+
                     this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
                 } else {
+
                     this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
                         sPath: "ManageInvoicedetails"
                     });
                 }
-            },
 
+            }.bind(this)
+        );
+
+    } else {
+
+        // Direct navigation when not in edit mode
+        if (this.sourceView === "Customerinvoice") {
+
+            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+        } else if (this.sourceView === "AdminPage") {
+
+            this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                sPath: "ManageInvoice"
+            });
+
+        } else if (this.sourceView === "PaymentDashboard") {
+
+            this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+        } else {
+
+            this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                sPath: "ManageInvoicedetails"
+            });
+        }
+    }
+},
             onHome: function() {
                 this.CommonLogoutFunction();
             },

@@ -37,7 +37,7 @@ sap.ui.define([
 
             this.getView().setModel(oDateModel, "controller");
         },
-
+      
         _getBrowserLocation: function () {
             if (!navigator.geolocation) return MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
 
@@ -260,6 +260,47 @@ sap.ui.define([
 // }
          
         },
+          onAfterRendering: function () {
+
+    var oHome = this.byId("idHome");
+
+    var aImages = [
+        sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
+        sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
+        sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
+        sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
+        sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
+    ];
+
+    var iIndex = 0;
+
+    // Initial Image
+    oHome.$().css("background-image", "url('" + aImages[0] + "')");
+
+    this._imageInterval = setInterval(function () {
+
+        // Fade Out
+        oHome.$().addClass("fadeOut");
+
+        setTimeout(function () {
+
+            iIndex = (iIndex + 1) % aImages.length;
+
+            oHome.$().css(
+                "background-image",
+                "url('" + aImages[iIndex] + "')"
+            );
+
+            // Fade In
+            oHome.$()
+                .removeClass("fadeOut")
+                .addClass("fadeIn");
+
+        }, 1000);
+
+    }, 5000);
+},
+
 
         _reopenRoomDetailAfterLogin: function () {
 
@@ -1021,7 +1062,9 @@ sap.ui.define([
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
-                  
+                   if (this._imageInterval) {
+        clearInterval(this._imageInterval);
+                                            }
                
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
@@ -1081,6 +1124,7 @@ if (aData.length === 0) {
             }
 
             if (sKey === "idHome") {
+                this.onAfterRendering()
                 this._exploreBtnAnimationTimeout = setTimeout(() => {
                     this._animateExploreButton();
                     this._exploreBtnAnimationTimeout = null;
@@ -5192,6 +5236,13 @@ if (aAttachments.length + oFiles.length > 3) {
         },
         onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
-        }
+        },
+        onExit: function () {
+
+    if (this._imageInterval) {
+        clearInterval(this._imageInterval);
+    }
+
+}
     });
 });

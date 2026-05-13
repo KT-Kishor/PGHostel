@@ -19,6 +19,10 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+             if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             this.call = false
             this._fromRoute = oEvent.getParameter("arguments").from;
             this._ViewDatePickersReadOnly(["Ad_id_editStartDate", "editEndDate", "AD_id_Date"], this.getView());
@@ -318,29 +322,105 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-            if (this._fromRoute === "Dashboard") {
-                this.getOwnerComponent().getRouter().navTo("RouteDashboard");
-            } else {
 
-                const oLoginModel = this.getView().getModel("LoginModel");
-                const sRole = oLoginModel?.getProperty("/Role") || "";
-                const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
-                if (sRole === "Customer") {
-                    this._sLoggedUserID = sEmpID;
-                    const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                    oUIModel.setProperty("/isLoggedIn", true);
-                    this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-                } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
-                        sPath: "DetailsPage"
-                    });
+    var oViewModel = this.getView().getModel("VisibleModel");
+    var bIsEditMode = oViewModel && oViewModel.getProperty("/visible");
+
+    // Ask confirmation only in edit mode
+    if (bIsEditMode) {
+
+        this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+
+            function () {
+
+                oViewModel.setProperty("/Edit", false);
+                this.getView().getModel("VisibleModel").setProperty("/visible", true);
+
+                if (this._fromRoute === "Dashboard") {
+                    this.getOwnerComponent().getRouter().navTo("RouteDashboard");
                 } else {
-                    this.getOwnerComponent().getRouter().navTo("RouteHostel");
+
+                    const oLoginModel = this.getView().getModel("LoginModel");
+                    const sRole = oLoginModel?.getProperty("/Role") || "";
+                    const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+
+                    if (sRole === "Customer") {
+
+                        this._sLoggedUserID = sEmpID;
+
+                        const oUIModel = this.getOwnerComponent().getModel("UIModel");
+                        oUIModel.setProperty("/isLoggedIn", true);
+
+                        this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                    } else if (
+                        sRole === "Admin" ||
+                        sRole === "Branch Manager" ||
+                        sRole === "Front Office Employee" ||
+                        sRole === "SuperAdmin"
+                    ) {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                            sPath: "DetailsPage"
+                        });
+
+                    } else {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                    }
+
+                    this.getView().getModel("CustomerData").setData({});
                 }
 
-                this.getView().getModel("CustomerData").setData({});
+            }.bind(this)
+        );
+
+    } else {
+
+        // Direct navigation when not in edit mode
+        if (this._fromRoute === "Dashboard") {
+
+            this.getOwnerComponent().getRouter().navTo("RouteDashboard");
+
+        } else {
+
+            const oLoginModel = this.getView().getModel("LoginModel");
+            const sRole = oLoginModel?.getProperty("/Role") || "";
+            const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
+
+            if (sRole === "Customer") {
+
+                this._sLoggedUserID = sEmpID;
+
+                const oUIModel = this.getOwnerComponent().getModel("UIModel");
+                oUIModel.setProperty("/isLoggedIn", true);
+
+                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+            } else if (
+                sRole === "Admin" ||
+                sRole === "Branch Manager" ||
+                sRole === "Front Office Employee" ||
+                sRole === "SuperAdmin"
+            ) {
+
+                this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                    sPath: "DetailsPage"
+                });
+
+            } else {
+
+                this.getOwnerComponent().getRouter().navTo("RouteHostel");
             }
-        },
+
+            this.getView().getModel("CustomerData").setData({});
+        }
+
+        this.getView().getModel("VisibleModel").setProperty("/visible", true);
+    }
+},
 
         onHome: function () {
             const oUser = this._oLoggedInUser;

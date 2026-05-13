@@ -19,6 +19,8 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             try {
+                var LoginFUnction = await this.commonLoginFunction("ManageFacility");
+                if (!LoginFUnction) return;
                 this.getBusyDialog();
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -260,18 +262,37 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-            // var flag = this.getView().getModel("VisibleModel").getProperty("/visible");
-            // if (flag === true) {
-            //     sap.m.MessageBox.show("Please Submit before navigating back?", {
-            //         icon: sap.m.MessageBox.Icon.WARNING,
-            //         styleClass: "myUnifiedBtn",
-            //         title: "Warning"
-            //     });
-            // } else {
-                this.getOwnerComponent().getRouter().navTo("RouteDamage",{
-                      sPath:"DamageDetails"
+             var oViewModel = this.getView().getModel("VisibleModel");
+
+    // Check edit mode
+    var bIsEditMode = oViewModel.getProperty("/visible");
+
+    if (bIsEditMode) {
+
+        // Ask confirmation only in edit mode
+        this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+
+            function () {
+
+                // Reset edit mode
+                oViewModel.setProperty("/Edit", false);
+                oViewModel.setProperty("/save", false);
+
+                // Navigate back
+                this.getRouter().navTo("RouteDamage", {
+                    sPath: "DamageDetails"
                 });
-            // }
+            }.bind(this)
+        );
+    }else {
+        // Direct navigation when not editing
+        this.getRouter().navTo("RouteDamage", {
+             sPath:"DamageDetails"
+        });
+    }
+              
         },
 
         onHome: function () {
