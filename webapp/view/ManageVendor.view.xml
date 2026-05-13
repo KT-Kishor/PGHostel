@@ -45,33 +45,10 @@
                                 showSecondaryValues="true"
 								filterSecondaryValues="true"
                             >
-                                <core:ListItem
-                                    key="{mainModel>UserID}"
-                                    text="{mainModel>UserName}"
-                                    additionalText="{mainModel>UserID}"
-                                />
+                               <core:ListItem key="{mainModel>UserID}" text="{mainModel>UserID}" additionalText="{mainModel>UserName}"/>
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
-                    <!-- <fb:FilterGroupItem
-                        name="UserName"
-                        label="{i18n>MVusername}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="MV_id_UserName"
-                                items="{mainModel>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{mainModel>UserName}"
-                                    text="{mainModel>UserName}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem> -->
                     <fb:FilterGroupItem
                         name="Status"
                         label="{i18n>status}"
@@ -99,7 +76,7 @@
                     >
                         <fb:control>
                             <ComboBox
-                                id="MV_id_City"
+                                id="MD_id_City"
                                 items="{mainModel>/}"
                                 showClearIcon="true"
                             >
