@@ -571,7 +571,85 @@ formatBranchNames: function (sBranchCodes, aBranches) {
             });
 
             return aNames.join(", ");
-        }
+        },
+
+         formatSelectionMode: function (sValue) {
+
+            if (!sValue) {
+                return "";
+            }
+
+            var aModes = sValue
+                .split(",")
+                .filter(Boolean);
+
+            var oMap = {
+                "SINGLE": "Per Room",
+                "QTY": "Per Quantity",
+                "PERSON": "Per Person",
+                "PERSON_QTY": "Per Package"
+            };
+
+            return aModes.map(function (sMode) {
+                return oMap[sMode] || sMode;
+            }).join(", ");
+
+        },
+     formatFacilityDetails: function (
+    iQty,
+    sPrice,
+    sCurrency,
+    sChargeType
+) {
+
+    var aText = [];
+
+    // Quantity
+    if (iQty && iQty !== 0) {
+        aText.push("Minimum quantity " + iQty);
+    }
+
+    // Price
+    if (sPrice && parseFloat(sPrice) !== 0) {
+
+        var sFormattedPrice =
+            parseFloat(sPrice).toFixed(2);
+
+        aText.push(
+            "with a price of " +
+            sFormattedPrice +
+            " " +
+            (sCurrency || "")
+        );
+    }
+
+    // Charge Type Mapping
+    var oChargeTypeMap = {
+        "SINGLE": "Per Room",
+        "QTY": "Per Quantity",
+        "PERSON": "Per Person",
+        "PERSON_QTY": "Per Package",
+        "ONCE_PER_BOOKING": "Once Per Booking"
+    };
+
+    // Billing Frequency
+    if (sChargeType) {
+
+        var sDisplayChargeType =
+            oChargeTypeMap[sChargeType] || sChargeType;
+
+        aText.push("charged " + sDisplayChargeType);
+    }
+
+    // If no values available
+    if (aText.length === 0) {
+        return "-";
+    }
+
+    return aText.join(" ");
+
+},
+
 
         
     }
