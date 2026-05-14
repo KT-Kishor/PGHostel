@@ -620,34 +620,62 @@
                                         </cells>
                                     </ColumnListItem>
 
+                                    <!-- Per-facility-item breakdown -->
                                     <ColumnListItem
                                         vAlign="Middle"
-                                        visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
+                                        visible="{= ${HostelModel>/AllSelectedFacilities}.length > 0}"
                                     >
                                         <cells>
-                                            <HBox
-                                                alignItems="Center"
-                                                wrap="NoWrap"
-                                            >
-                                                <Title
-                                                    text="Facilities"
-                                                    level='H6'
-                                                />
-                                                <core:Icon
-                                                    id="editFacilitiesBreakdownIcon"
-                                                    src="sap-icon://hint"
-                                                    size="1rem"
-                                                    color="#1a5f6b"
-                                                    hoverColor="DarkBlue"
-                                                    press="onFacilitiesBreakdownPress"
-                                                    tooltip="View facilities breakdown"
-                                                    class="sapUiTinyMarginBegin"
-                                                />
-                                            </HBox>
-                                            <HBox
+                                            <VBox class="sapUiTinyMarginTop sapUiTinyMarginBottom">
+                                                <HBox alignItems="Center" wrap="NoWrap">
+                                                    <Title text="Facilities" level="H6" />
+                                                    <core:Icon
+                                                        id="editFacilitiesBreakdownIcon"
+                                                        src="sap-icon://hint"
+                                                        size="1rem"
+                                                        color="#1a5f6b"
+                                                        hoverColor="DarkBlue"
+                                                        press="onFacilitiesBreakdownPress"
+                                                        tooltip="View facilities breakdown"
+                                                        class="sapUiTinyMarginBegin"
+                                                    />
+                                                </HBox>
+                                                <VBox
+                                                    items="{HostelModel>/AllSelectedFacilities}"
+                                                    class="sapUiTinyMarginTop"
+                                                >
+                                                    <VBox class="sapUiTinyMarginBottom">
+                                                        <layoutData>
+                                                            <FlexItemData growFactor="1" shrinkFactor="0" />
+                                                        </layoutData>
+                                                        <HBox alignItems="Start" wrap="NoWrap">
+                                                            <Text
+                                                                text="{HostelModel>FacilityName}"
+                                                                class="sapUiTinyMarginEnd"
+                                                            />
+                                                            <Text
+                                                                text="{= '(' + ${HostelModel>UnitText} + (${HostelModel>Quantity} > 1 ? ', Qty: ' + ${HostelModel>Quantity} : '') + ')' }"
+                                                                class="sapThemeMediumText"
+                                                            />
+                                                        </HBox>
+                                                        <Text
+                                                            text="{= 'Price: ' + (${HostelModel>Price} || 0) + ' ' + (${HostelModel>Currency} || 'INR') + ' / ' + ${HostelModel>UnitText}}"
+                                                            visible="{= ${HostelModel>Price} > 0}"
+                                                            class="sapThemeTinyText sapThemeMediumText"
+                                                        />
+                                                        <Text
+                                                            text="{= ${HostelModel>BreakdownText} ? ${HostelModel>BreakdownText} : '' }"
+                                                            visible="{= !!${HostelModel>BreakdownText} }"
+                                                            class="sapThemeTinyText"
+                                                        />
+                                                    </VBox>
+                                                </VBox>
+                                            </VBox>
+
+                                            <VBox
+                                                alignItems="End"
                                                 justifyContent="End"
-                                                alignItems="Center"
-                                                renderType="Bare"
+                                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                                             >
                                                 <Text
                                                     text="{path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.fromatNumber'}"
@@ -657,7 +685,7 @@
                                                     text="{HostelModel>/Currency}"
                                                     class="sapUiStrongText"
                                                 />
-                                            </HBox>
+                                            </VBox>
                                         </cells>
                                     </ColumnListItem>
 

@@ -1290,7 +1290,7 @@
             var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") : true;
 
             oSelectionModel.setData({
-                title: oFacility.FacilityName,
+                title: oFacility.DisplayFacilityName || oFacility.FacilityName,
                 DisplayPrice: this._formatFacilityPriceWithUnit(
                     fPrice,
                     oFacility.Currency || "INR",
@@ -2041,7 +2041,9 @@
 
                         return {
                             FacilityID: oFacility.FacilityID,
+                            CatalogFacilityID: oFacility.CatalogFacilityID || oFacility.ID,
                             FacilityName: oFacility.FacilityName,
+                            DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                             Currency: sCurrency,
                             SelectionMode: sSelectionMode,
                             Price: fPrice,
@@ -2068,7 +2070,12 @@
                                 )
                                 : this._formatFacilityPriceWithUnit(fPrice, sCurrency, sPriceType),
                             TotalAmount: Number(fTotal.toFixed(2)),
-                            BreakdownText: sBreakdown
+                            BreakdownText: sBreakdown,
+                            RawFacilityItems: Array.isArray(oFacility.RawFacilityItems)
+                                ? oFacility.RawFacilityItems.map(function (oItem) {
+                                    return Object.assign({}, oItem);
+                                })
+                                : []
                         };
                     }.bind(this));
                 oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
@@ -4507,7 +4514,7 @@
                                     justifyContent: "End",
                                     items: [
                                         new sap.m.Text({
-                                            text: oFacility.FacilityName,
+                                            text: oFacility.DisplayFacilityName || oFacility.FacilityName,
                                             textAlign: "Center",
                                             wrapping: true
                                         }).addStyleClass("facilityOverlayText facilityCardTitle")
