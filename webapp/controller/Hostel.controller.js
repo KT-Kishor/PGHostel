@@ -258,9 +258,9 @@ sap.ui.define([
 //         this._reopenRoomDetailAfterLogin();
 //     }, 300);
 // }
-         
+         this.onAfterAnimate()
         },
-          onAfterRendering: function () {
+          onAfterAnimate: function () {
 
     var oHome = this.byId("idHome");
 
@@ -1122,9 +1122,14 @@ if (aData.length === 0) {
                 oFooterModel.setProperty("/showGlobalFooter", true);
                 oFooterModel.setProperty("/showRoomsFooter", false);
             }
+            if(sKey === "idContact"){
+                if (this._imageInterval) {
+        clearInterval(this._imageInterval);
+            }
+        }
 
             if (sKey === "idHome") {
-                this.onAfterRendering()
+                this.onAfterAnimate()
                 this._exploreBtnAnimationTimeout = setTimeout(() => {
                     this._animateExploreButton();
                     this._exploreBtnAnimationTimeout = null;
@@ -3742,7 +3747,7 @@ if (aData.length === 0) {
                     const expiryTs = vm.getProperty("/otpExpiryTs");
                     if (!expiryTs || Date.now() > expiryTs) return this._onOtpExpired();
 
-                    // 4️⃣ Backend verification
+                    // 4 Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
                     if (!isValid) return MessageToast.show(this.i18nModel.getText("incorrectOTP"));
 
@@ -3780,6 +3785,7 @@ if (aData.length === 0) {
                 }
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
+                
                 // if (!user?.UserID) {
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
@@ -3802,6 +3808,7 @@ if (aData.length === 0) {
                 oLoginModel.setProperty("/City", user.City || "");
                 oLoginModel.setProperty("/Address", user.Address || "");
                 oLoginModel.setProperty("/DateofBirth", this.Formatter.DateFormat(user.DateOfBirth) || "");
+                
 
                 // Role Based Access
                 if (user.Role === "Customer") {
@@ -3821,6 +3828,8 @@ if (aData.length === 0) {
                     this._oSignDialog.close(),this._oSignDialog.destroy();
         this._oSignDialog = null;
                 }
+                if (this._imageInterval) {
+        clearInterval(this._imageInterval)}
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
