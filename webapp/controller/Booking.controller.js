@@ -5073,7 +5073,7 @@
                     return;
                 }
 
-                if (String(oMatchedCoupon.DiscountType || "").trim() === "percentage") {
+                if (String(oMatchedCoupon.DiscountType || "").trim().toLowerCase() === "percentage") {
                     fDiscountAmount = fCouponBaseAmount * (Number(oMatchedCoupon.DiscountValue || 0) / 100);
                     if (Number(oMatchedCoupon.UptoValue || 0) > 0 && fDiscountAmount > Number(oMatchedCoupon.UptoValue || 0)) {
                         fDiscountAmount = Number(oMatchedCoupon.UptoValue || 0);

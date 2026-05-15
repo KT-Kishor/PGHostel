@@ -536,10 +536,9 @@ sap.ui.define([
          * 2026-05-13 to 2026-05-17 = 4 days (exclusive end).
          */
         _getDayCount: function (oStartDate, oEndDate) {
-            if (!oStartDate || !oEndDate) { return 0; }
-            var oStart = oStartDate instanceof Date ? oStartDate : new Date(oStartDate);
-            var oEnd = oEndDate instanceof Date ? oEndDate : new Date(oEndDate);
-            if (isNaN(oStart.getTime()) || isNaN(oEnd.getTime()) || oEnd <= oStart) { return 0; }
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
             return Math.max(Math.floor((oEnd.getTime() - oStart.getTime()) / 86400000), 0);
         },
 
@@ -547,10 +546,9 @@ sap.ui.define([
          * Count months spanned between two dates (inclusive partial month = 1).
          */
         _getMonthCount: function (oStartDate, oEndDate) {
-            if (!oStartDate || !oEndDate) { return 0; }
-            var oStart = oStartDate instanceof Date ? oStartDate : new Date(oStartDate);
-            var oEnd = oEndDate instanceof Date ? oEndDate : new Date(oEndDate);
-            if (isNaN(oStart.getTime()) || isNaN(oEnd.getTime()) || oEnd <= oStart) { return 0; }
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
             var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
             if (oEnd.getDate() >= oStart.getDate()) { iMonths += 1; }
             return Math.max(iMonths, 0);
@@ -560,10 +558,9 @@ sap.ui.define([
          * Count years spanned between two dates (inclusive partial year = 1).
          */
         _getYearCount: function (oStartDate, oEndDate) {
-            if (!oStartDate || !oEndDate) { return 0; }
-            var oStart = oStartDate instanceof Date ? oStartDate : new Date(oStartDate);
-            var oEnd = oEndDate instanceof Date ? oEndDate : new Date(oEndDate);
-            if (isNaN(oStart.getTime()) || isNaN(oEnd.getTime()) || oEnd <= oStart) { return 0; }
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
             var iYears = oEnd.getFullYear() - oStart.getFullYear();
             var iStartMonth = oStart.getMonth();
             var iEndMonth = oEnd.getMonth();
@@ -596,12 +593,10 @@ sap.ui.define([
                 }
             }
             // Try full date objects
-            if (oStartDate && oEndDate) {
-                var oStart = oStartDate instanceof Date ? oStartDate : new Date(oStartDate);
-                var oEnd = oEndDate instanceof Date ? oEndDate : new Date(oEndDate);
-                if (!isNaN(oStart.getTime()) && !isNaN(oEnd.getTime()) && oEnd > oStart) {
-                    return Math.max((oEnd.getTime() - oStart.getTime()) / 3600000, 0);
-                }
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (oStart && oEnd && oEnd > oStart) {
+                return Math.max((oEnd.getTime() - oStart.getTime()) / 3600000, 0);
             }
             return 0;
         },
@@ -631,8 +626,8 @@ sap.ui.define([
             var iQuantity = this._getQuantityFactor(oFacilityItem.Quantity);
             var sChargeType = String(oFacilityItem.FacilityChargeType || "").trim().toUpperCase();
 
-            var oStartDate = oFacilityItem.StartDate ? new Date(oFacilityItem.StartDate) : null;
-            var oEndDate = oFacilityItem.EndDate ? new Date(oFacilityItem.EndDate) : null;
+            var oStartDate = this._parseDate(oFacilityItem.StartDate);
+            var oEndDate = this._parseDate(oFacilityItem.EndDate);
             var iDayCount = this._getDayCount(oStartDate, oEndDate);
             var iMonthCount = this._getMonthCount(oStartDate, oEndDate);
             var iYearCount = this._getYearCount(oStartDate, oEndDate);
@@ -671,6 +666,43 @@ sap.ui.define([
 
             // Default: treat as Unit Price
             return Number((fBasicPrice * iQuantity).toFixed(2));
+        },
+
+        /**
+         * Build a period-based breakdown text for facility display.
+         * Matches Booking controller format: "Qty (3) x 7 Per Day" or "7 Per Day" (SINGLE).
+         * @param {Object} oCalcItem - Calc item with StartDate, EndDate, UnitText, etc.
+         * @param {number} iQty - Quantity (1 for SINGLE, actual qty for QTY)
+         * @returns {string} Breakdown text string
+         */
+        _buildFacilityPeriodBreakdown: function (oCalcItem, iQty) {
+            var sPriceType = oCalcItem.UnitText || "Unit Price";
+            var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            var oCalcStart = this._parseDate(oCalcItem.StartDate);
+            var oCalcEnd = this._parseDate(oCalcItem.EndDate);
+            var sPeriodPart = "";
+
+            if (sUnitKey === "PERDAY") {
+                sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " Per Day";
+            } else if (sUnitKey === "PERMONTH") {
+                sPeriodPart = Math.max(this._getMonthCount(oCalcStart, oCalcEnd), 1) + " Per Month";
+            } else if (sUnitKey === "PERYEAR") {
+                sPeriodPart = Math.max(this._getYearCount(oCalcStart, oCalcEnd), 1) + " Per Year";
+            } else if (sUnitKey === "PERHOUR") {
+                var iDays = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1);
+                var iHours = Math.max(this._getHourCount(oCalcItem.StartDate, oCalcItem.EndDate, oCalcItem.StartTime, oCalcItem.EndTime, oCalcItem.TotalHour), 1);
+                sPeriodPart = iDays + " day(s) x " + iHours + " hr(s)";
+            } else if (sUnitKey === "PACKAGEPRICE" || sUnitKey === "PACKAGE") {
+                var sChargeType = String(oCalcItem.FacilityChargeType || "").toUpperCase();
+                if (sChargeType === "DAILY") {
+                    sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " day(s)";
+                }
+            }
+
+            if (iQty === 1) {
+                return sPeriodPart || "Qty (1)";
+            }
+            return "Qty (" + iQty + ")" + (sPeriodPart ? " x " + sPeriodPart : "");
         },
 
         /**
@@ -756,11 +788,9 @@ sap.ui.define([
                     var fPersonTotal = this._calculateFacilityTotal(oPersonCalcItem);
                     fTotal += fPersonTotal;
 
-                    var oStartDate = oPersonCalcItem.StartDate ? new Date(oPersonCalcItem.StartDate) : null;
-                    var oEndDate = oPersonCalcItem.EndDate ? new Date(oPersonCalcItem.EndDate) : null;
-                    var iDayCount = this._getDayCount(oStartDate, oEndDate);
-                    var iMonthCount = this._getMonthCount(oStartDate, oEndDate);
-                    var iYearCount = this._getYearCount(oStartDate, oEndDate);
+                    var iDayCount = this._getDayCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
+                    var iMonthCount = this._getMonthCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
+                    var iYearCount = this._getYearCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
                     var iHourCount = this._getHourCount(
                         oPersonCalcItem.StartDate, oPersonCalcItem.EndDate,
                         oPersonCalcItem.StartTime, oPersonCalcItem.EndTime,
@@ -824,17 +854,17 @@ sap.ui.define([
                         return false;
                     }.bind(this));
 
-                    var oStartDate, oEndDate;
+                    var sPersonStart, sPersonEnd;
                     if (aPersonItems.length > 0) {
                         var oPersonRaw = aPersonItems[0];
-                        oStartDate = oPersonRaw.StartDate ? new Date(oPersonRaw.StartDate) : null;
-                        oEndDate = oPersonRaw.EndDate ? new Date(oPersonRaw.EndDate) : null;
+                        sPersonStart = oPersonRaw.StartDate || null;
+                        sPersonEnd = oPersonRaw.EndDate || null;
                     } else {
-                        oStartDate = oFacility.StartDate ? new Date(oFacility.StartDate) : null;
-                        oEndDate = oFacility.EndDate ? new Date(oFacility.EndDate) : null;
+                        sPersonStart = oFacility.StartDate || null;
+                        sPersonEnd = oFacility.EndDate || null;
                     }
 
-                    var iDayCount = this._getDayCount(oStartDate, oEndDate);
+                    var iDayCount = this._getDayCount(sPersonStart, sPersonEnd);
                     var fPersonTotal;
 
                     if (sFacilityChargeType === "DAILY") {
@@ -896,10 +926,10 @@ sap.ui.define([
             // If we always store raw month difference here, yearly edit bookings
             // get expanded again by the parent logic (for example 12 -> 12 years).
             var iSelectedMonths = 1;
-            var oStart = oBooking.StartDate ? new Date(oBooking.StartDate) : null;
-            var oEnd = oBooking.EndDate ? new Date(oBooking.EndDate) : null;
+            var oStart = this._parseDate(oBooking.StartDate);
+            var oEnd = this._parseDate(oBooking.EndDate);
             var sSelectedPriceType = oBooking.PaymentType || "";
-            if (oStart && oEnd && !isNaN(oStart.getTime()) && !isNaN(oEnd.getTime())) {
+            if (oStart && oEnd) {
                 var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
 
                 if (oEnd.getDate() >= oStart.getDate()) {
@@ -2289,17 +2319,21 @@ sap.ui.define([
                         FacilityChargeType: sFacilityChargeType
                     };
 
+                    // Booking dates as fallback when facility dates are null
+                    var oBookingStart = oModel.getProperty("/StartDate");
+                    var oBookingEnd = oModel.getProperty("/EndDate");
+
                     // Try to get dates from the first RawFacilityItem
                     if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
                         var oFirstRaw = oFacility.RawFacilityItems[0];
-                        oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || null;
-                        oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || null;
+                        oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || oBookingStart || null;
+                        oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || oBookingEnd || null;
                         oCalcItem.StartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
                         oCalcItem.EndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
                         oCalcItem.TotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
                     } else {
-                        oCalcItem.StartDate = oFacility.StartDate || null;
-                        oCalcItem.EndDate = oFacility.EndDate || null;
+                        oCalcItem.StartDate = oFacility.StartDate || oBookingStart || null;
+                        oCalcItem.EndDate = oFacility.EndDate || oBookingEnd || null;
                         oCalcItem.StartTime = oFacility.StartTime || null;
                         oCalcItem.EndTime = oFacility.EndTime || null;
                         oCalcItem.TotalHour = oFacility.TotalHour || null;
@@ -2307,7 +2341,7 @@ sap.ui.define([
 
                     if (sSelectionMode === "SINGLE") {
                         fTotal = this._calculateFacilityTotal(oCalcItem);
-                        sBreakdown = "Qty (1)";
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, 1);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
                             roomCount: 1
@@ -2315,7 +2349,7 @@ sap.ui.define([
                     } else if (sSelectionMode === "QTY") {
                         fTotal = this._calculateFacilityTotal(oCalcItem);
                         var iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
-                        sBreakdown = "Qty (" + iQty + ")";
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, iQty);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
                             quantity: iQty
@@ -2381,7 +2415,7 @@ sap.ui.define([
                         });
                     } else {
                         fTotal = this._calculateFacilityTotal(oCalcItem);
-                        sBreakdown = "x 1";
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, 1);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: "SINGLE",
                             roomCount: 1
@@ -2464,15 +2498,16 @@ sap.ui.define([
 
             var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+            var oHostelModel = this.getView().getModel("HostelModel");
 
-            // Build calc item with facility-specific dates from _processFacilitiesForEdit
+            // Build calc item with facility-specific dates, falling back to booking dates
             var oCalcItem = {
                 BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
                 UnitText: sPriceType,
                 Quantity: oFacility.Quantity || 1,
                 FacilityChargeType: this._getFacilityChargeType(oFacility),
-                StartDate: oFacility.StartDate || null,
-                EndDate: oFacility.EndDate || null,
+                StartDate: oFacility.StartDate || (oHostelModel ? oHostelModel.getProperty("/StartDate") : null) || null,
+                EndDate: oFacility.EndDate || (oHostelModel ? oHostelModel.getProperty("/EndDate") : null) || null,
                 StartTime: oFacility.StartTime || null,
                 EndTime: oFacility.EndTime || null,
                 TotalHour: oFacility.TotalHour || null
@@ -2655,11 +2690,9 @@ sap.ui.define([
             var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
             var iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
-            var oStartDate = sFacilityStart ? new Date(sFacilityStart) : null;
-            var oEndDate = sFacilityEnd ? new Date(sFacilityEnd) : null;
-            var iDayCount = this._getDayCount(oStartDate, oEndDate);
-            var iMonthCount = this._getMonthCount(oStartDate, oEndDate);
-            var iYearCount = this._getYearCount(oStartDate, oEndDate);
+            var iDayCount = this._getDayCount(sFacilityStart, sFacilityEnd);
+            var iMonthCount = this._getMonthCount(sFacilityStart, sFacilityEnd);
+            var iYearCount = this._getYearCount(sFacilityStart, sFacilityEnd);
 
             var sBreakdown = "";
             if (sPriceType === "Per Day") {
@@ -2684,6 +2717,21 @@ sap.ui.define([
             sBreakdown += " = ₹" + fTotal.toFixed(2);
 
             return sBreakdown;
+        },
+
+        /**
+         * Override _getFacilityCardDetailText to hide the detail text when
+         * the summary breakdown is showing a calculation (dates differ or
+         * time components exist). This prevents "double breakdown" on the
+         * facility card — only the calculation breakdown should appear.
+         */
+        _getFacilityCardDetailText: function (oFacility) {
+            // If the summary text has a calculation breakdown, hide the detail text
+            if (this._getFacilityCardSummaryText(oFacility)) {
+                return "";
+            }
+            // Otherwise, fall back to parent behavior
+            return BookingController.prototype._getFacilityCardDetailText.call(this, oFacility);
         },
 
         formatSelectedFacilitiesBreakdown: function (aFacilities) {
@@ -3236,11 +3284,9 @@ sap.ui.define([
             var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
             var iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
-            var oStartDate = oFacility.StartDate ? new Date(oFacility.StartDate) : null;
-            var oEndDate = oFacility.EndDate ? new Date(oFacility.EndDate) : null;
-            var iDayCount = this._getDayCount(oStartDate, oEndDate);
-            var iMonthCount = this._getMonthCount(oStartDate, oEndDate);
-            var iYearCount = this._getYearCount(oStartDate, oEndDate);
+            var iDayCount = this._getDayCount(oFacility.StartDate, oFacility.EndDate);
+            var iMonthCount = this._getMonthCount(oFacility.StartDate, oFacility.EndDate);
+            var iYearCount = this._getYearCount(oFacility.StartDate, oFacility.EndDate);
 
             var sBreakdown = "";
             if (sPriceType === "Per Day") {
