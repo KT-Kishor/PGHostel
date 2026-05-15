@@ -4249,7 +4249,9 @@
                                                     if (sBreakdown) {
                                                         sResult += ": " + sBreakdown;
                                                     }
-                                                    if (fTotal !== undefined && fTotal !== null) {
+                                                    // Only append total for SINGLE/QTY modes (breakdown has no =).
+                                                    // PERSON/PERSON_QTY modes already have per-person subtotals.
+                                                    if (fTotal !== undefined && fTotal !== null && (sBreakdown || "").indexOf("=") === -1) {
                                                         sResult += " = " + fTotal + " " + (sCurrency || "");
                                                     }
                                                     return sResult;

@@ -5744,3 +5744,81 @@ html, body {
         padding: 0.875rem;
     }
 }
+
+/* ── Calculation Breakdown (Facility Popover) ── */
+
+.calcBreakdownSection {
+    width: 100% !important;
+    padding: 0 0.25rem !important;
+}
+
+.calcSectionHeader {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #556b82 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 0.35rem 0.25rem 0.2rem 0.25rem !important;
+}
+
+.calcItemList.sapMList {
+    background: transparent !important;
+    border: none !important;
+}
+
+.calcItemList .sapMListUl {
+    background: transparent !important;
+}
+
+.calcItemList .sapMLIB {
+    background: transparent !important;
+    border-bottom: 1px solid #e0e3e6 !important;
+    border-top: none !important;
+}
+
+.calcItemList .sapMLIB:last-child {
+    border-bottom: none !important;
+}
+
+.calcListItem {
+    padding: 0.12rem 0.25rem !important;
+}
+
+.calcListItem > .sapMLIBContent {
+    padding: 0 !important;
+}
+
+.calcPersonName {
+    font-size: 0.98rem !important;
+    font-weight: 700 !important;
+    color: #151a22 !important;
+    line-height: 1.4 !important;
+    word-wrap: break-word !important;
+    flex-shrink: 0 !important;
+}
+
+.calcDateIcon {
+    color: #151a22 !important;
+    flex-shrink: 0 !important;
+    margin: 0 0.15rem 0 0.35rem !important;
+}
+
+.calcDateRange {
+    font-size: 0.85rem !important;
+    color: #151a22 !important;
+    line-height: 1.4 !important;
+}
+
+.calcMath {
+    font-size: 0.85rem !important;
+    color: #151a22 !important;
+    line-height: 1.3 !important;
+}
+
+.calcSubtotal {
+    font-size: 0.98rem !important;
+    font-weight: 700 !important;
+    color: #0b7e8d !important;
+    white-space: nowrap !important;
+    padding-left: 0.75rem !important;
+}
