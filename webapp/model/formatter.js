@@ -163,6 +163,8 @@ sap.ui.define([
             switch (sStatus) {
                 case "New":
                     return "Indication05";
+                case "Confirmed":
+                    return "Success";
                 case "Renew":
                     return "Indication03";
                 case "Active":

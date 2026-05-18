@@ -295,7 +295,7 @@ sap.ui.define([
                 return "Completed";
             }
 
-            if (booking.Status === "New" || booking.Status === "Assigned") {
+            if (booking.Status === "New" || booking.Status === "Assigned" || booking.Status === "Confirmed") {
                 if (startDate && endDate && startDate <= today && endDate >= today) {
                     return "Ongoing";
                 }
@@ -303,6 +303,10 @@ sap.ui.define([
                 if (startDate && startDate > today) {
                     return "Upcoming";
                 }
+            }
+
+            if (booking.Status === "Rejected") {
+                return "Rejected";
             }
 
             return "Others";

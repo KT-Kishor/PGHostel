@@ -237,14 +237,16 @@ sap.ui.define([
                 // Check if status is "New" and update BookingView model accordingly
                 var oBookingView = this.getView().getModel("BookingView");
                 var bIsStatusNew = sStatus === "New";
+                var bIsStatusConfirmed = sStatus === "Confirmed";
+                var bIsEditableStatus = bIsStatusNew || bIsStatusConfirmed;
                 var bIsAdminUpdatedYes = sAdminUpdated === "YES";
                 oBookingView.setProperty("/isStatusNew", bIsStatusNew);
                 oBookingView.setProperty("/isAdminUpdatedYes", bIsAdminUpdatedYes);
-                oBookingView.setProperty("/showEditButton", bIsStatusNew && !bIsAdminUpdatedYes);
+                oBookingView.setProperty("/showEditButton", bIsEditableStatus && !bIsAdminUpdatedYes);
                 oBookingView.setProperty("/editModeEnabled", false); // Start in read-only mode
 
                 // Show message when admin has updated the booking
-                if (bIsStatusNew && bIsAdminUpdatedYes) {
+                if (bIsEditableStatus && bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
                         "This booking has been updated as per your request. To make any further changes, please contact us. Thank you for your cooperation!\n\nRegards,\n" + sBranchName,

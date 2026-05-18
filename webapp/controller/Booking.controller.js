@@ -6208,13 +6208,15 @@
                 };
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
-                let sMessage = "Booking created successfully.";
+                // let sMessage = "Booking created successfully.";
+                let sMessage = "Thank you! Your booking request has been received.\n\n" +
+                    "We are checking room availability, and the confirmation status will be emailed to you shortly";
 
                 oHostelModel.setProperty("/BookingPayload", oPayload);
 
                 if (aBookingDetails.length) {
-                    sMessage = "Booking created successfully.\n\n" + aBookingDetails.map(function (oItem) {
-                        return "Booking ID: " + oItem.BookingID;
+                    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
+                        return "Booking Reference No: " + oItem.BookingID;
                     }).join("\n");
                 }
 
@@ -6223,8 +6225,9 @@
                 }
 
                 MessageBox.success(sMessage, {
-                    title: "Success",
+                    title: "Booking Request Received",
                     styleClass: "myUnifiedBtn",
+                    contentWidth: "500px",
                     onClose: function () {
                         const sUserID = oHostelModel.getProperty("/UserID");
 
