@@ -443,7 +443,7 @@ sap.ui.define([
             oStartDate.setHours(0, 0, 0, 0);
             oToday.setHours(0, 0, 0, 0);
 
-            if (oStartDate.getTime() !== oToday.getTime() && this.data.Status !== "Assigned") {
+            if (oStartDate.getTime() !== oToday.getTime() && this.data.Status !== "Confirmed") {
                 sap.m.MessageToast.show("Room can be assigned only on start date");
                 return;
             }
@@ -532,6 +532,111 @@ sap.ui.define([
 
             this.HM_Dialog.open();
         },
+      HM_ConfirmRoom: function (oEvent) {
+            var table = this.byId("idPOTable");
+            var selected = table.getSelectedItem();
+
+                var Model = selected.getBindingContext("HostelModel");
+            var ID = Model.getObject();
+
+            
+            if (ID.Status !== "New") {
+                sap.m.MessageToast.show("Only new bookings can be confirmed.");
+                return;
+            }
+
+    var Payload = {
+        Status: "Confirmed"
+    };
+
+    var oBody = {
+        data: Payload,
+        filters: {
+            BookingID: ID.BookingID
+        }
+    };
+
+    var that = this;
+
+    sap.m.MessageBox.confirm(
+        "Are you sure you want to confirm this room booking?",
+        {
+            actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+            emphasizedAction: sap.m.MessageBox.Action.YES,
+
+            onClose: async function (oAction) {
+                if (oAction === sap.m.MessageBox.Action.YES) {
+                    that.getBusyDialog();
+                    await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
+                    that.Cust_read();
+                }
+            }
+        }
+    );
+},
+HM_RejectRoom: function (oEvent) {
+     var table = this.byId("idPOTable");
+            var selected = table.getSelectedItem();
+
+                var Model = selected.getBindingContext("HostelModel");
+          this.ID = Model.getObject();
+
+            if (this.ID.Status !== "New") {
+                sap.m.MessageToast.show("Only New bookings can be rejected.");
+                return;
+            }
+          if (!this.RB_Dialog) {
+                this.RB_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.RejectDesc",
+                    this
+                );
+                this.getView().addDependent(this.RB_Dialog);
+            }
+            sap.ui.getCore().byId("idRejectReason").setValue("").setValueState("None");
+                        this.RB_Dialog.open();
+
+},
+onRejectReasonChange: function (oEvent) {
+   utils._LCvalidateMandatoryField(oEvent);
+       
+},
+onRejectSave:async function(){
+
+     var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
+             if (
+                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idRejectReason"), "ID")
+                ) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText(
+                            "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                        )
+                    );
+                    return;
+                }
+     
+       var Payload = {
+        Status: "Rejected",
+        RejectDesc: rejectReason
+    };
+
+    var oBody = {
+        data: Payload,
+        filters: {
+            BookingID: this.ID.BookingID
+        }
+    };
+        this.getBusyDialog();
+     await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
+        this.Cust_read();
+        this.RB_Dialog.close();
+
+this.byId("idPOTable").removeSelections()
+},
+onRejectCancel:function(){
+    this.RB_Dialog.close();
+this.byId("idPOTable").removeSelections()
+
+},
         HM_UnassignRoom: function () {
             var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();

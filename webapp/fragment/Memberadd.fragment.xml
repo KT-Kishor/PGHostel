@@ -1,0 +1,281 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:unified="sap.ui.unified"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:c="sap.ui.core"
+    xmlns:u="sap.ui.unified">
+    <Dialog
+        id="abnewMemberDialog"
+        class="newMemberDialog"
+        contentWidth="32rem"
+        stretch="{= ${device>/system/phone} }"
+        draggable="true"
+        resizable="false"
+        showHeader="true"
+        horizontalScrolling="false">
+         <customHeader>
+            <Bar class="barheader">
+                <contentLeft>
+                    <Title text="{= ${viewModel>/mode} === 'CREATE' ? 'Add Member' : 'Update Member' }"
+                    class="sapUiSmallMarginBegin"
+                />
+                </contentLeft>
+            </Bar>
+        </customHeader>
+        <content>
+            <f:SimpleForm
+                editable="true"
+                layout="ResponsiveGridLayout"
+                width="100%"
+                columnsXL="2"
+                columnsL="2"
+                columnsM="1"
+                class="sapUiTinyMargin">
+                <!-- Salutation + Name -->
+                <HBox width="100%">
+                    <VBox width="35%">
+                        <Label
+                            text="Salutation"
+                            required="true"
+                        />
+                         <ComboBox
+                            id="AD_idSelect"
+                            selectedKey="{BookingView>/NewMemberDraft/Salutation}"
+                            placeholder="Select salutation"
+                            valueStateText="Please select salutation"
+                            change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                        >
+                            <core:Item
+                                key="Mr."
+                                text="Mr."
+                            />
+                            <core:Item
+                                key="Ms."
+                                text="Ms."
+                            />
+                            <core:Item
+                                key="Mrs."
+                                text="Mrs."
+                            />
+                            <core:Item
+                                key="Dr."
+                                text="Dr."
+                            />
+                          
+                        </ComboBox>
+                    </VBox>
+                    <VBox
+                        width="65%"
+                        class="sapUiTinyMarginBegin"
+                    >
+                        <Label
+                            text="Full Name"
+                            required="true"
+                        />
+                        <Input
+                            id="AD_id_MemberName"
+                            value="{BookingView>/NewMemberDraft/Name}"
+                            placeholder="Enter full name"
+                            valueStateText="Please enter a valid full name"
+                            liveChange="onNewMemberNameChange"
+                            change="onNewMemberNameChange"
+                            maxLength="35" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                        />
+                    </VBox>
+                </HBox>
+                <!-- DOB -->
+                <Label
+                    text="Date of Birth"
+                    required="true"
+                />
+                <DatePicker
+                    id="AD_id_MemberDOB"
+                     value="{BookingView>/NewMemberDraft/DateOfBirth}"
+                    placeholder="DD/MM/YYYY"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="dd/MM/yyyy"
+                    change="onNewMemberDOBChange"
+                    valueStateText="Age must be between 0 and 100 years" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                     initialFocusedDateValue="{controller>/focusedDate}"
+                     minDate="{controller>/minDate}"
+                    maxDate="{controller>/maxdate}"
+                />
+
+                <!-- Gender -->
+                <Label
+                    text="Gender"
+                    required="true"
+                />
+                 <ComboBox
+                    id="AD_id_MemberGenderCombo"
+                    selectedKey="{BookingView>/NewMemberDraft/Gender}"
+                    placeholder="Select gender"
+                    valueStateText="Please select gender"
+                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                >
+                    <core:Item
+                        key="Male"
+                        text="Male"
+                    />
+                    <core:Item
+                        key="Female"
+                        text="Female"
+                    />
+                    <core:Item
+                        key="Other"
+                        text="Other"
+                    />
+                </ComboBox>
+                
+                <!-- Relationship -->
+                <Label
+                    text="Relationship"
+                    required="true"
+                />
+                  <ComboBox
+                    id="AD_id_MemberRelationCombo"
+                    selectedKey="{BookingView>/NewMemberDraft/Relation}"
+                    placeholder="Select relationship"
+                    valueStateText="Please select relationship"
+                    change="onNewMemberRelationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                >
+                    <core:Item
+                        key="Spouse"
+                        text="Spouse"
+                    />
+                    <core:Item
+                        key="Child"
+                        text="Child"
+                    />
+                    <core:Item
+                        key="Father"
+                        text="Father"
+                    />
+                    <core:Item
+                        key="Mother"
+                        text="Mother"
+                    />
+                     <core:Item
+                        key="Friend"
+                        text="Friend"
+                    />
+                    <core:Item
+                        key="Brother"
+                        text="Brother"
+                    />
+                    <core:Item
+                        key="Sister"
+                        text="Sister"
+                    />
+                       <core:Item
+                        key="Other"
+                        text="Other"
+                    />
+                </ComboBox>
+
+                <Label
+                    text="{i18n>uploadDocument}"
+                    required="true"
+                />
+                
+                <HBox
+                    width="100%"
+                    alignItems="Center"
+                >
+
+                <!-- Document Type -->
+                    <ComboBox
+                        id="AD_id_DocumentType"
+                        selectedKey="{BookingView>/NewMemberDraft/Documents/0/DocumentType}"
+                        placeholder="{i18n>selectIDProof}"
+                        valueStateText="{i18n>selectIDProof}"
+                        selectionChange="onNewMemberDocumentTypeChange"
+                        change="onNewMemberDocumentTypeChange"
+                        width="{= ${device>/system/phone} ? '100%' : '12rem'}"
+                        class="sapUiTinyMarginEnd"
+                    >
+                        <core:Item
+                            key="Aadhar Card"
+                            text="Aadhar Card"
+                        />
+                        <core:Item
+                            key="Pan Card"
+                            text="Pan Card"
+                        />
+                        <core:Item
+                            key="Driving License"
+                            text="Driving License"
+                        />
+                        <core:Item
+                            key="Passport"
+                            text="Passport"
+                        />
+                    </ComboBox>
+
+                   <!-- Upload Button -->
+                <unified:FileUploader
+                    id="AD_id_FileUploader"
+                    width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+                    visible="{= !${BookingView>/NewMemberDraft/Documents/0/FileName} }"
+                    buttonOnly="true"
+                    maximumFileSize="2"
+                    sameFilenameAllowed="true"
+                    change="onFileUpload"
+                    fileSizeExceed="onMemberFileSizeExceed"
+                    buttonText="Upload"
+                    fileType="pdf,jpg,jpeg,png,webp"
+                    class="sapUiTinyMarginEnd myUnifiedBtn"
+                />
+
+                <!-- Info Icon -->
+                <core:Icon
+                    id="AD_id_memberDocumentInfoIcon"
+                    size="1rem"
+                    color="#0064d1"
+                    press="onMemberDocumentInfoPress"
+                    tooltip="Upload info"
+                    visible="{= !!${BookingView>/NewMemberDraft/Documents/0/FileName} }"
+                    class="sapUiSmallMarginBegin"
+                />
+
+                <!-- Preview + Remove -->
+                <HBox
+                    visible="{= !!${BookingView>/NewMemberDraft/Documents/0/FileName} }"
+                    alignItems="Center"
+                    wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                >
+
+                    <Link
+                        text="{BookingView>/NewMemberDraft/Documents/0/FileName}"
+                        tooltip="{BookingView>/NewMemberDraft/Documents/0/FileName}"
+                        press="MS_viewimage"
+                        width="10rem"
+                        class="automatedEllipsis documentLink"
+                    />
+
+                    <Button
+                        text="Remove"
+                        icon="sap-icon://delete"
+                        press="onRemoveButtonPress"
+                        class="myUnifiedBtn"
+                    />
+
+                </HBox>
+                </HBox>
+            </f:SimpleForm>
+        </content>
+        <beginButton>
+            <Button
+                text="Save"
+                press="onSaveNewMember"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCloseNewMemberDialog"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

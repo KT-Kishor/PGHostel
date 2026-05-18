@@ -1,0 +1,99 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="abmemberSelectDialog"
+        class="memberSelectDialog"
+        contentWidth="64rem"
+        contentHeight="32rem"
+        stretchOnPhone="true"
+        draggable="true"
+        resizable="true"
+    >
+        <customHeader>
+            <OverflowToolbar>
+                <Title text="Select Members" />
+                <ToolbarSpacer />
+                <Button
+                    text="Add New Member"
+                    icon="sap-icon://add"
+                    press="onAddNewMemberFromDialog"
+                    class="myUnifiedBtn"
+                />
+            </OverflowToolbar>
+        </customHeader>
+
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <SearchField
+                    width="100%"
+                    placeholder="Search by name / relationship / document"
+                    liveChange="onMemberSearch"
+                    search="onMemberSearch"
+                    class="sapUiTinyMarginBottom"
+                />
+
+                <Table
+                    id="abmemberSelectTable"
+                    mode="MultiSelect"
+                    items="{BookingView>/Members}"
+                    noDataText="No saved members available"
+                    growing="true"
+                    growingScrollToLoad="true"
+                    updateFinished="onMemberDialogTableUpdateFinished"
+                    selectionChange="onMemberSelectionChange"
+                >
+                    <columns>
+                        <Column><Text text="Full Name" /></Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Age" /></Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Relationship" /></Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
+                        <Column width="5rem"><Text text="" /></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}" />
+                                <Text text="{path: 'BookingView>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
+                                <Text text="{BookingView>Gender}" />
+                                <Text text="{BookingView>Relation}" />
+                                <Text text="{BookingView>Documents/0/DocumentType}" />
+                                <!-- <Text text="{BookingView>DocumentName}" /> -->
+                                <Link
+                                text="{BookingView>Documents/0/FileName}"
+                                press="MS_viewimage"
+                                class="documentLink"
+                            />
+                                <Button
+                                    icon="sap-icon://edit"
+                                    type="Transparent"
+                                    tooltip="Edit member"
+                                    press="onEditMemberFromDialog"
+                                    class="myUnifiedBtn"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                text="Add Selected"
+                press="onConfirmMemberSelection"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCloseMemberSelectionDialog"
+                class="myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

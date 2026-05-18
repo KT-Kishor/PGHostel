@@ -439,7 +439,7 @@
                                 <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"
-                                        cellsLarge="2"
+                                        cellsLarge="1.8"
                                     />
                                 </layoutData>
                             </Select>
@@ -450,7 +450,7 @@
                                 id="AD_id_CustomerName"
                                 valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
-                                width="50%"
+                                width="40%"
                                  placeholder="Enter full name"
                             />
 
@@ -788,6 +788,7 @@
                                             class="myUnifiedBtn"
                                             visible="{VisibleModel>/visible}"
                                         />
+                                        
                                     </Toolbar>
                                 </headerToolbar>
                                 <columns>

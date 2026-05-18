@@ -152,6 +152,18 @@
 					<OverflowToolbar>
 						<Title text="{i18n>bookingList} ({HostelModel>/count})" />
 						<ToolbarSpacer />
+                        <Button
+                            text="Confirm"
+                            tooltip="Confirm"
+                            press="HM_ConfirmRoom"
+                            class="myUnifiedBtn"
+                        />
+                          <Button
+                            text="Reject"
+                            tooltip="Reject"
+                            press="HM_RejectRoom"
+                            class="myUnifiedBtn"
+                        />
 						<Button
                             text="{i18n>assignRoom}"
                             tooltip="{i18n>assignRoom}"

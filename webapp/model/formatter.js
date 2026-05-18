@@ -237,6 +237,8 @@ sap.ui.define([
                     return "Success"
                       case "Partially Recovered":
                     return "Indication06"
+                       case "Confirmed":
+                    return "Success"
                 default:
                     return "Indication01";
 
