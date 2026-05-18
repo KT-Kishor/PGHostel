@@ -16,7 +16,7 @@
 
     return BaseController.extend("sap.ui.com.project1.controller.Booking", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function () {   
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // fallback; recalculated dynamically
@@ -4401,18 +4401,20 @@
         },
 
         _getVisibleCardCount: function () {
+            const bIsMobile = sap.ui.Device.support.touch && window.innerWidth <= 1024;
+
             const oViewport = this.byId("facilityViewport");
             if (!oViewport || !oViewport.getDomRef()) {
-                return sap.ui.Device.system.phone ? 1 : 3;
+                return bIsMobile ? 1 : 3;
             }
 
             const iContainerWidth = oViewport.getDomRef().clientWidth;
             if (!iContainerWidth || iContainerWidth <= 0) {
-                return sap.ui.Device.system.phone ? 1 : 3;
+                return bIsMobile ? 1 : 3;
             }
 
-            // On phone, always show 1 card
-            if (sap.ui.Device.system.phone) {
+            // On mobile, always show 1 card
+            if (bIsMobile) {
                 return 1;
             }
 
@@ -4568,6 +4570,107 @@
             }.bind(this));
 
             oContainer.addItem(oRow);
+            this._attachFacilitySwipeHandlers();
+            this._renderFacilityDots();
+        },
+
+
+        _attachFacilitySwipeHandlers: function () {
+            // Use touch-support + width instead of system.phone so it works
+            // with Chrome DevTools device emulation as well as real devices.
+            if (!sap.ui.Device.support.touch || window.innerWidth > 1024) {
+                return;
+            }
+
+            var oViewport = this.byId("facilityViewport");
+            if (!oViewport) {
+                return;
+            }
+
+            // attachBrowserEvent is managed by UI5 and automatically
+            // re-attaches when the underlying DOM is recreated.
+            // Guard on the control instance so we never double-attach.
+            if (this._oFacilityViewportControl === oViewport) {
+                return;
+            }
+            this._oFacilityViewportControl = oViewport;
+
+            var iStartX = 0, iStartY = 0;
+            var that = this;
+
+            oViewport.attachBrowserEvent("touchstart", function (e) {
+                if (e.touches && e.touches.length) {
+                    iStartX = e.touches[0].clientX;
+                    iStartY = e.touches[0].clientY;
+                } else if (e.targetTouches && e.targetTouches.length) {
+                    iStartX = e.targetTouches[0].clientX;
+                    iStartY = e.targetTouches[0].clientY;
+                }
+            });
+
+            oViewport.attachBrowserEvent("touchend", function (e) {
+                var iEndX, iEndY;
+                if (e.changedTouches && e.changedTouches.length) {
+                    iEndX = e.changedTouches[0].clientX;
+                    iEndY = e.changedTouches[0].clientY;
+                } else {
+                    return;
+                }
+                var iDiffX = iStartX - iEndX;
+                var iDiffY = iStartY - iEndY;
+
+                if (Math.abs(iDiffX) > Math.abs(iDiffY) && Math.abs(iDiffX) > 50) {
+                    if (iDiffX > 0) {
+                        that.onFacilityNext();
+                    } else {
+                        that.onFacilityPrev();
+                    }
+                }
+            });
+        },
+
+
+        _renderFacilityDots: function () {
+            if (!sap.ui.Device.support.touch || window.innerWidth > 1024) {
+                return;
+            }
+            var oDotsContainer = this.byId("facilityDotsContainer");
+            if (!oDotsContainer) return;
+            oDotsContainer.destroyItems();
+            oDotsContainer.setVisible(false);
+
+            var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+            var iTotal = aFacilities.length;
+            if (iTotal <= 1) return;
+
+            var iPageSize = this._iFacilityPageSize || this._getVisibleCardCount();
+            var iCurrent = this._iFacilityStartIndex || 0;
+
+            // Calculate active dot index (page-based)
+            var iActivePage = Math.floor(iCurrent / iPageSize);
+            var iTotalPages = Math.ceil(iTotal / iPageSize);
+
+            oDotsContainer.setVisible(true);
+            for (var i = 0; i < iTotalPages; i++) {
+                var oDot = new sap.m.HBox({
+                    width: "10px",
+                    height: "10px"
+                }).addStyleClass("facilityDot");
+                if (i === iActivePage) {
+                    oDot.addStyleClass("facilityDotActive");
+                }
+                oDotsContainer.addItem(oDot);
+            }
+
+            // Show/hide the swipe-hint animation on the right edge based on page
+            var oViewport = this.byId("facilityViewport");
+            if (oViewport) {
+                if (iActivePage >= iTotalPages - 1) {
+                    oViewport.addStyleClass("facilityNoSwipeHint");
+                } else {
+                    oViewport.removeStyleClass("facilityNoSwipeHint");
+                }
+            }
         },
 
 

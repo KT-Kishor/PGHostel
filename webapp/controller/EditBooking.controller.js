@@ -68,6 +68,7 @@ sap.ui.define([
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
             oBookingViewData.editModeEnabled = false; // Start in read-only mode
             oBookingViewData.isStatusNew = false; // Will be set after loading
+            oBookingViewData.isAdminUpdatedYes = false; // Will be set after loading
             oBookingViewData.showEditButton = false; // Will be set after loading
             
             this.getView().setModel(oHostelModel, "HostelModel");
@@ -91,6 +92,7 @@ sap.ui.define([
                 var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
+                var sAdminUpdated = oBooking.AdminUpdated || "";
 
                 // 2. Parallel API calls for branch-related data, payments, and facilities
                 var oRoomData = {};
@@ -223,7 +225,11 @@ sap.ui.define([
 
                 this._rebuildSelectedFacilities();
 
-                await this._hydrateAppliedCouponData();
+                // Load coupon data in background - will recalculate summary when ready
+                this._hydrateAppliedCouponData().then((function () {
+                    this._recalculateSummary();
+                }).bind(this));
+
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
                 oHostelModel.refresh(true);
@@ -231,9 +237,25 @@ sap.ui.define([
                 // Check if status is "New" and update BookingView model accordingly
                 var oBookingView = this.getView().getModel("BookingView");
                 var bIsStatusNew = sStatus === "New";
+                var bIsAdminUpdatedYes = sAdminUpdated === "YES";
                 oBookingView.setProperty("/isStatusNew", bIsStatusNew);
-                oBookingView.setProperty("/showEditButton", bIsStatusNew);
+                oBookingView.setProperty("/isAdminUpdatedYes", bIsAdminUpdatedYes);
+                oBookingView.setProperty("/showEditButton", bIsStatusNew && !bIsAdminUpdatedYes);
                 oBookingView.setProperty("/editModeEnabled", false); // Start in read-only mode
+
+                // Show message when admin has updated the booking
+                if (bIsStatusNew && bIsAdminUpdatedYes) {
+                    var sBranchName = oHostelModel.getProperty("/Area") || "";
+                    MessageBox.warning(
+                        "This booking has been updated as per your request. To make any further changes, please contact us. Thank you for your cooperation!\n\nRegards,\n" + sBranchName,
+                        {
+                            title: "Booking Status Updated",
+                            styleClass: "myUnifiedBtn",
+                            contentWidth: "500px",
+                            actions: [MessageBox.Action.OK]
+                        }
+                    );
+                }
 
             } catch (oError) {
                 console.error("Edit booking load error:", oError);
@@ -2502,7 +2524,6 @@ sap.ui.define([
             if (!oFacility || !oFacility.Selected) {
                 return 0;
             }
-
             var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
             var oHostelModel = this.getView().getModel("HostelModel");
@@ -2806,6 +2827,7 @@ sap.ui.define([
                 endDateEditable: true,
                 editModeEnabled: false,
                 isStatusNew: false,
+                isAdminUpdatedYes: false,
                 showEditButton: false,
                 DurationOptions: [
                     { key: "1", text: "1 Month" },
@@ -2967,6 +2989,58 @@ sap.ui.define([
         },
 
         /**
+         * Show calculation breakdown only for condition 2:
+         * dates differ from the booking, or explicit StartTime/EndTime values exist.
+         * TotalHour alone should not trigger the breakdown.
+         */
+        _shouldShowFacilityCalcBreakdown: function (oFacility) {
+            if (!oFacility || !oFacility.Selected) {
+                return false;
+            }
+
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sBookingStart = oHostelModel ? oHostelModel.getProperty("/StartDate") : "";
+            var sBookingEnd = oHostelModel ? oHostelModel.getProperty("/EndDate") : "";
+
+            var fnNormalizeDate = function (vDate) {
+                var oParsedDate = this._parseDate(vDate);
+                if (!oParsedDate || isNaN(oParsedDate.getTime())) {
+                    return "";
+                }
+
+                return [
+                    oParsedDate.getFullYear(),
+                    String(oParsedDate.getMonth() + 1).padStart(2, "0"),
+                    String(oParsedDate.getDate()).padStart(2, "0")
+                ].join("-");
+            }.bind(this);
+
+            var fnHasExplicitTimeValues = function (oItem) {
+                var sStartTime = String(oItem.StartTime || "").trim();
+                var sEndTime = String(oItem.EndTime || "").trim();
+
+                if (sStartTime || sEndTime) {
+                    return true;
+                }
+                return false;
+            };
+
+            var sNormalizedBookingStart = fnNormalizeDate(sBookingStart);
+            var sNormalizedBookingEnd = fnNormalizeDate(sBookingEnd);
+            var aItems = Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
+                ? oFacility.RawFacilityItems
+                : [oFacility];
+
+            return aItems.some(function (oItem) {
+                var sFacilityStart = fnNormalizeDate(oItem.StartDate || oFacility.StartDate);
+                var sFacilityEnd = fnNormalizeDate(oItem.EndDate || oFacility.EndDate);
+                var bDatesDiffer = sFacilityStart !== sNormalizedBookingStart || sFacilityEnd !== sNormalizedBookingEnd;
+
+                return bDatesDiffer || fnHasExplicitTimeValues(oItem);
+            });
+        },
+
+        /**
          * Build a structured calculation breakdown for a facility item
          * shown in the popover dialog as a compact invoice-style list.
          * Returns { hasBreakdown: Boolean, items: Array, grandTotal: String, currency: String }
@@ -2975,6 +3049,10 @@ sap.ui.define([
         _buildFacilityCalcBreakdown: function (oFacility) {
             if (!oFacility || !oFacility.Selected) {
                 return { hasBreakdown: false, items: [], grandTotal: "₹0.00", currency: "INR" };
+            }
+
+            if (!this._shouldShowFacilityCalcBreakdown(oFacility)) {
+                return { hasBreakdown: false, items: [], grandTotal: "0.00", currency: oFacility.Currency || "INR" };
             }
 
             var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -3254,3 +3332,6 @@ sap.ui.define([
         }
     });
 });
+
+
+

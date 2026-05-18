@@ -453,6 +453,15 @@
                                     class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"
                                 />
                             </HBox>
+<!-- Dot indicators for mobile swipe navigation -->
+<HBox
+    id="facilityDotsContainer"
+    justifyContent="Center"
+    alignItems="Center"
+    class="facilityDotsRow sapUiTinyMarginTop"
+    visible="false"
+/>
+
                         </VBox>
                     </Panel>
                 </VBox>
