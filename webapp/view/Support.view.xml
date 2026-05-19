@@ -65,7 +65,6 @@
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
                 items="{path: 'SupportModel>/',sorter: {path: 'Status', group: true}}" >
 				<headerToolbar>
 					<OverflowToolbar>
