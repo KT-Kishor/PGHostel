@@ -1903,7 +1903,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 var customerHasThisBed = oCustomer.some(function (cust) {
                     return cust.BookingID === data.BookingID &&
                         cust.BedType === bed.BedTypeName &&
-                        (cust.Status === "Assigned" || cust.Status === "New");
+                        (cust.Status === "Assigned" || cust.Status === "New" || cust.Status === "Confirmed");
                 });
 
                 if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
@@ -3511,6 +3511,35 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
             });
         },
+        onMemberSearch: function (oEvent) {
+    var sQuery = oEvent.getParameter("newValue") || 
+                 oEvent.getParameter("query") || "";
+
+    var oTable = this.byId("abmemberSelectTable");
+    var oBinding = oTable.getBinding("items");
+
+    if (!oBinding) {
+        return;
+    }
+
+    var aFilters = [];
+
+    if (sQuery && sQuery.trim() !== "") {
+        aFilters.push(
+            new sap.ui.model.Filter({
+                filters: [
+                    new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Relation", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Documents/0/FileName", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Documents/0/DocumentType", sap.ui.model.FilterOperator.Contains, sQuery)
+                ],
+                and: false
+            })
+        );
+    }
+
+    oBinding.filter(aFilters);
+},
 
         onSaveBooking:function(){
 const oModel = this.getView().getModel("CustomerData");
@@ -3527,9 +3556,12 @@ const toDelete = [];
 const toKeep = [];
 
 facilityItems.forEach(f => {
-    if (!validMemberIds.has(f.MemberID)) {
+
+    if (!validMemberIds.has(f.MemberID) && f.MemberID !=="") {
         toDelete.push(f);
-    } else {
+    } else if(!f.MemberID) {
+        toKeep.push(f);
+    }else{
         toKeep.push(f);
     }
 });
@@ -3542,7 +3574,7 @@ if (toDelete.length === 0) {
 
 // confirmation
 sap.m.MessageBox.confirm(
-    "Some facilities are invalid and will be deleted. Do you want to continue?",
+    "Some facilities are assigned to different members and will be removed. Do you want to continue?",
     {
         actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
         emphasizedAction: sap.m.MessageBox.Action.YES,
@@ -3556,12 +3588,15 @@ sap.m.MessageBox.confirm(
             oModel.setProperty("/AllSelectedFacilities", toKeep);
 
             // 2. delete backend records sequentially or parallel
+            
             const deletePromises = toDelete.map(f => {
+                if(f.FacilityID) {
                 return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
                     filters: {
                         FacilityID: f.FacilityID
                     }
                 });
+            }
             });
 
             await Promise.all(deletePromises);
@@ -8080,7 +8115,7 @@ setTimeout(function () {
 
             oBinding.filter(aFilters);
         },
-        onConfirmMemberSelection: function () {
+    onConfirmMemberSelection: function () {
 
     var oView = this.getView();
     var oTable = sap.ui.getCore().byId("abmemberSelectTable");
@@ -8095,6 +8130,24 @@ setTimeout(function () {
     var oCustomerModel = this.getView().getModel("BookingView");
     var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
+    // validate filename before pushing
+    for (let oItem of aSelectedItems) {
+
+        var oContext = oItem.getBindingContext("BookingView");
+        var oData = oContext.getObject();
+
+        var aMemberDocs = oData.Documents || [];
+
+
+            if (aMemberDocs.length === 0) {
+                sap.m.MessageBox.error(
+                    "Document is missing for member: " + (oData.Name || "")
+                );
+                return;
+            }
+    }
+
+    // push documents
     aSelectedItems.forEach(function (oItem) {
 
         var oContext = oItem.getBindingContext("BookingView");
@@ -8111,30 +8164,30 @@ setTimeout(function () {
                 MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
                 FileName: doc.FileName,
                 FileType: doc.FileType,
-                File: doc.File // base64 if already stored
+                File: doc.File
             });
 
         });
     });
 
     this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
-var oModel = this.getView().getModel("CustomerData");
-var oData = oModel.getData();
 
-var aDocs = oData.Documents || [];
+    var oModel = this.getView().getModel("CustomerData");
+    var oData = oModel.getData();
 
-// keep only valid docs (have both fields)
-var allMembers = aDocs
-    .filter(doc => doc.MemberID && doc.MemberName)
-    .map(doc => ({
-        MemberID: doc.MemberID,
-        Name: doc.MemberName
-    }));
+    var aDocs = oData.Documents || [];
 
-// update model
-oModel.setProperty("/AllMembers", allMembers);
+    // keep only valid docs
+    var allMembers = aDocs
+        .filter(doc => doc.MemberID && doc.MemberName)
+        .map(doc => ({
+            MemberID: doc.MemberID,
+            Name: doc.MemberName
+        }));
 
-            this.UD_Dialog.close();
+    oModel.setProperty("/AllMembers", allMembers);
+
+    this.UD_Dialog.close();
 
     sap.m.MessageToast.show("Selected member documents added successfully");
 }

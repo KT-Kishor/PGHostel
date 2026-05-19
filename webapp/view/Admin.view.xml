@@ -142,7 +142,6 @@
                 width="auto"
                 busyIndicatorDelay="0"
                 updateFinished="onTableUpdateFinished"
-                class="sapUiResponsiveMargin"
                 items="{path: 'HostelModel>/',  sorter: [{
                     path: 'BranchName', group: true },
 					    { path: 'BookingDate', descending: true },

@@ -4433,10 +4433,22 @@
             const iPageSize = this._iFacilityPageSize || 1;
 
             if (oPrevBtn) {
-                oPrevBtn.setVisible(iStart > 0);
+                if (iStart > 0) {
+                    oPrevBtn.setVisible(true);
+                    oPrevBtn.removeStyleClass("facilityNavBtnHidden");
+                } else {
+                    oPrevBtn.setVisible(true);
+                    oPrevBtn.addStyleClass("facilityNavBtnHidden");
+                }
             }
             if (oNextBtn) {
-                oNextBtn.setVisible(iStart + iPageSize < aFacilities.length);
+                if (iStart + iPageSize < aFacilities.length) {
+                    oNextBtn.setVisible(true);
+                    oNextBtn.removeStyleClass("facilityNavBtnHidden");
+                } else {
+                    oNextBtn.setVisible(true);
+                    oNextBtn.addStyleClass("facilityNavBtnHidden");
+                }
             }
         },
 

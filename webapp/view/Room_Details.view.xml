@@ -89,7 +89,6 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                class="sapUiResponsiveMargin"
                 items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true}}">
 				<headerToolbar>
 					<OverflowToolbar>

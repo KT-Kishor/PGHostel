@@ -38,10 +38,10 @@ sap.ui.define([
         },
 
         _onEditRouteMatched: async function (oEvent) {
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+            if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
             var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";
@@ -741,6 +741,11 @@ sap.ui.define([
             var aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             var aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
 
+            // Booking-level dates from HostelModel — always up-to-date when duration changes
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var oBookingStart = oHostelModel.getProperty("/StartDate");
+            var oBookingEnd = oHostelModel.getProperty("/EndDate");
+
             var fnGetPersonName = function (sPersonId) {
                 var oFound = (aOccupants || []).find(function (oPerson) {
                     return oPerson.id === sPersonId;
@@ -794,16 +799,18 @@ sap.ui.define([
                         FacilityChargeType: oFacility.FacilityChargeType || ""
                     };
 
+                    // Use booking-level dates for duration calculation (updated when duration changes),
+                    // but keep time fields from raw items (not duration-dependent)
                     if (aPersonItems.length > 0) {
                         var oPersonRaw = aPersonItems[0];
-                        oPersonCalcItem.StartDate = oPersonRaw.StartDate || oFacility.StartDate || null;
-                        oPersonCalcItem.EndDate = oPersonRaw.EndDate || oFacility.EndDate || null;
+                        oPersonCalcItem.StartDate = oBookingStart || oPersonRaw.StartDate || oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oBookingEnd || oPersonRaw.EndDate || oFacility.EndDate || null;
                         oPersonCalcItem.StartTime = oPersonRaw.StartTime || oFacility.StartTime || null;
                         oPersonCalcItem.EndTime = oPersonRaw.EndTime || oFacility.EndTime || null;
                         oPersonCalcItem.TotalHour = oPersonRaw.TotalHour || oFacility.TotalHour || null;
                     } else {
-                        oPersonCalcItem.StartDate = oFacility.StartDate || null;
-                        oPersonCalcItem.EndDate = oFacility.EndDate || null;
+                        oPersonCalcItem.StartDate = oBookingStart || oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oBookingEnd || oFacility.EndDate || null;
                         oPersonCalcItem.StartTime = oFacility.StartTime || null;
                         oPersonCalcItem.EndTime = oFacility.EndTime || null;
                         oPersonCalcItem.TotalHour = oFacility.TotalHour || null;
@@ -883,22 +890,15 @@ sap.ui.define([
                         return false;
                     }.bind(this));
 
-                    var sPersonStart, sPersonEnd;
-                    if (aPersonItems.length > 0) {
-                        var oPersonRaw = aPersonItems[0];
-                        sPersonStart = oPersonRaw.StartDate || null;
-                        sPersonEnd = oPersonRaw.EndDate || null;
-                    } else {
-                        sPersonStart = oFacility.StartDate || null;
-                        sPersonEnd = oFacility.EndDate || null;
-                    }
-
-                    var iDayCount = this._getDayCount(sPersonStart, sPersonEnd);
+                    // Use booking-level chargeable day count (updated when duration changes)
+                    // instead of stale raw item dates
+                    var iChargeableDayCount = this._getFacilityChargeableDayCount();
+                    var iDayCount = Math.max(iChargeableDayCount, 1);
                     var fPersonTotal;
 
                     if (sFacilityChargeType === "DAILY") {
-                        // DAILY: BasicFacilityPrice already includes QTY, so only multiply by days
-                        fPersonTotal = fPackagePrice * Math.max(iDayCount, 1);
+                        // DAILY: package price × chargeable days (from booking duration)
+                        fPersonTotal = fPackagePrice * iDayCount;
                     } else if (sFacilityChargeType === "ONCE_PER_BOOKING") {
                         // ONCE_PER_BOOKING: BasicFacilityPrice already includes QTY, flat total
                         fPersonTotal = fPackagePrice;
@@ -914,8 +914,8 @@ sap.ui.define([
                         packagePrice: fPackagePrice,
                         quantity: iQty,
                         chargeType: sFacilityChargeType,
-                        startDate: sPersonStart,
-                        endDate: sPersonEnd,
+                        startDate: oBookingStart,
+                        endDate: oBookingEnd,
                         dayCount: iDayCount,
                         personTotal: fPersonTotal
                     });
@@ -2354,17 +2354,18 @@ sap.ui.define([
                     var oBookingStart = oModel.getProperty("/StartDate");
                     var oBookingEnd = oModel.getProperty("/EndDate");
 
-                    // Try to get dates from the first RawFacilityItem
+                    // Use booking-level dates for duration calculation (updated when duration changes),
+                    // keep time fields from raw items (not duration-dependent)
                     if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
                         var oFirstRaw = oFacility.RawFacilityItems[0];
-                        oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || oBookingStart || null;
-                        oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || oBookingEnd || null;
+                        oCalcItem.StartDate = oBookingStart || oFirstRaw.StartDate || oFacility.StartDate || null;
+                        oCalcItem.EndDate = oBookingEnd || oFirstRaw.EndDate || oFacility.EndDate || null;
                         oCalcItem.StartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
                         oCalcItem.EndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
                         oCalcItem.TotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
                     } else {
-                        oCalcItem.StartDate = oFacility.StartDate || oBookingStart || null;
-                        oCalcItem.EndDate = oFacility.EndDate || oBookingEnd || null;
+                        oCalcItem.StartDate = oBookingStart || oFacility.StartDate || null;
+                        oCalcItem.EndDate = oBookingEnd || oFacility.EndDate || null;
                         oCalcItem.StartTime = oFacility.StartTime || null;
                         oCalcItem.EndTime = oFacility.EndTime || null;
                         oCalcItem.TotalHour = oFacility.TotalHour || null;
@@ -2530,18 +2531,32 @@ sap.ui.define([
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
             var oHostelModel = this.getView().getModel("HostelModel");
 
-            // Build calc item with facility-specific dates, falling back to booking dates
+            // Use booking-level dates first (updated when duration changes),
+            // keep time fields from raw items (not duration-dependent)
+            var oBookingStart = oHostelModel ? oHostelModel.getProperty("/StartDate") : null;
+            var oBookingEnd = oHostelModel ? oHostelModel.getProperty("/EndDate") : null;
+
             var oCalcItem = {
                 BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
                 UnitText: sPriceType,
                 Quantity: oFacility.Quantity || 1,
-                FacilityChargeType: this._getFacilityChargeType(oFacility),
-                StartDate: oFacility.StartDate || (oHostelModel ? oHostelModel.getProperty("/StartDate") : null) || null,
-                EndDate: oFacility.EndDate || (oHostelModel ? oHostelModel.getProperty("/EndDate") : null) || null,
-                StartTime: oFacility.StartTime || null,
-                EndTime: oFacility.EndTime || null,
-                TotalHour: oFacility.TotalHour || null
+                FacilityChargeType: this._getFacilityChargeType(oFacility)
             };
+
+            if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
+                var oFirstRaw = oFacility.RawFacilityItems[0];
+                oCalcItem.StartDate = oBookingStart || oFirstRaw.StartDate || oFacility.StartDate || null;
+                oCalcItem.EndDate = oBookingEnd || oFirstRaw.EndDate || oFacility.EndDate || null;
+                oCalcItem.StartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
+                oCalcItem.EndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
+                oCalcItem.TotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
+            } else {
+                oCalcItem.StartDate = oBookingStart || oFacility.StartDate || null;
+                oCalcItem.EndDate = oBookingEnd || oFacility.EndDate || null;
+                oCalcItem.StartTime = oFacility.StartTime || null;
+                oCalcItem.EndTime = oFacility.EndTime || null;
+                oCalcItem.TotalHour = oFacility.TotalHour || null;
+            }
 
             var fBaseTotal = this._calculateFacilityTotal(oCalcItem);
             var iPersonCount = Array.isArray(oFacility.SelectedPersonIds)
@@ -3068,14 +3083,16 @@ sap.ui.define([
             var sFacStart, sFacEnd, sFacStartTime, sFacEndTime, sFacTotalHour;
             if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
                 var oFirstRaw = oFacility.RawFacilityItems[0];
-                sFacStart = oFirstRaw.StartDate || oFacility.StartDate || sBookingStart || null;
-                sFacEnd = oFirstRaw.EndDate || oFacility.EndDate || sBookingEnd || null;
+                // Use booking-level dates first (updated when duration changes),
+                // keep time fields from raw items (not duration-dependent)
+                sFacStart = sBookingStart || oFirstRaw.StartDate || oFacility.StartDate || null;
+                sFacEnd = sBookingEnd || oFirstRaw.EndDate || oFacility.EndDate || null;
                 sFacStartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
                 sFacEndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
                 sFacTotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
             } else {
-                sFacStart = oFacility.StartDate || sBookingStart || null;
-                sFacEnd = oFacility.EndDate || sBookingEnd || null;
+                sFacStart = sBookingStart || oFacility.StartDate || null;
+                sFacEnd = sBookingEnd || oFacility.EndDate || null;
                 sFacStartTime = oFacility.StartTime || null;
                 sFacEndTime = oFacility.EndTime || null;
                 sFacTotalHour = oFacility.TotalHour || null;
@@ -3334,6 +3351,7 @@ sap.ui.define([
         }
     });
 });
+
 
 
 
