@@ -76,10 +76,11 @@
                             />
                         </items>
                     </ComboBox>
-                    <Label
-                        required="true"
-                        text="{i18n>CDDiscountValue}"
-                    />
+                   <Label
+    id="lblDiscountValue"
+    required="true"
+    text="{CouponView>/DiscountValueLabel}"
+/>
                     <Input
                         id="inDiscountValue"
                         value="{CouponView>/CurrentCoupon/DiscountValue}"

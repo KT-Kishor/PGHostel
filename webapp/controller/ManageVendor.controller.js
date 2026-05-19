@@ -84,8 +84,8 @@ sap.ui.define([
             var sUserID = oView.byId("MV_id_UserID").getSelectedKey() ||
                 oView.byId("MV_id_UserID").getValue();
 
-            var sUserName = oView.byId("MV_id_UserName").getSelectedKey() ||
-                oView.byId("MV_id_UserName").getValue();
+            var sCity = oView.byId("MD_id_City").getSelectedKey() ||
+                oView.byId("MD_id_City").getValue();
 
             var sStatus = oView.byId("MV_id_Status").getSelectedKey() ||
                 oView.byId("MV_id_Status").getValue();
@@ -98,9 +98,9 @@ sap.ui.define([
             if (sUserID) {
                 filters.UserID = sUserID;
             }
-            // Apply UserName filter
-            if (sUserName) {
-                filters.UserName = sUserName;
+            // Apply City filter
+            if (sCity) {
+                filters.City = sCity;
             }
             // Apply Status Filter
             if (sStatus) {
@@ -131,7 +131,7 @@ sap.ui.define([
                     this._applyStatusGrouping();
                 }.bind(this));
                 this.getView().setModel(model, "mainModel");
-                this._populateUniqueFilterValues(finalData);
+                this._populateUniqueFilterValues(this._originalStaffData);
             }).catch((err) => {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -155,38 +155,84 @@ sap.ui.define([
             oBinding.sort(oSorter);
         },
 
-        _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                MV_id_UserID: new Set(),
-                MV_id_UserName: new Set(),
-                MV_id_Status: new Set()
-            };
-
-            data.forEach(item => {
-                if (item.UserID) uniqueValues.MV_id_UserID.add(item.UserID);
-                if (item.UserName) uniqueValues.MV_id_UserName.add(item.UserName);
-                if (item.Status) uniqueValues.MV_id_Status.add(item.Status);
-            });
+        _populateUniqueFilterValues: function(data) {
             let oView = this.getView();
 
-            ["MV_id_UserID", "MV_id_UserName", "MV_id_Status"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                if (!oComboBox) return;
-                oComboBox.destroyItems();
+            // ===== UserID Combo =====
+            let oUserCombo = oView.byId("MV_id_UserID");
 
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    }));
+            if (oUserCombo) {
+                oUserCombo.destroyItems();
+
+                // Remove duplicate UserIDs
+                let uniqueUsers = {};
+                data.forEach(item => {
+                    if (item.UserID && !uniqueUsers[item.UserID]) {
+                        uniqueUsers[item.UserID] = item;
+                    }
                 });
-            });
+
+                Object.values(uniqueUsers)
+                    .sort((a, b) => a.UserID.localeCompare(b.UserID))
+                    .forEach(item => {
+                        oUserCombo.addItem(new sap.ui.core.ListItem({
+                            key: item.UserID,
+                            text: item.UserID,
+                            additionalText: item.UserName
+                        }));
+                    });
+            }
+
+            // ===== City Combo =====
+            let oCityCombo = oView.byId("MD_id_City");
+
+            if (oCityCombo) {
+                oCityCombo.destroyItems();
+
+                let uniqueCities = [...new Set(
+                    data
+                    .map(item => item.City)
+                    .filter(Boolean)
+                )];
+
+                uniqueCities
+                    .sort()
+                    .forEach(city => {
+                        oCityCombo.addItem(new sap.ui.core.Item({
+                            key: city,
+                            text: city
+                        }));
+                    });
+            }
+
+            // ===== Status Combo =====
+            let oStatusCombo = oView.byId("MV_id_Status");
+
+            if (oStatusCombo) {
+                oStatusCombo.destroyItems();
+
+                let uniqueCities = [...new Set(
+                    data
+                    .map(item => item.Status)
+                    .filter(Boolean)
+                )];
+
+                uniqueCities
+                    .sort()
+                    .forEach(Status => {
+                        oStatusCombo.addItem(new sap.ui.core.Item({
+                            key: Status,
+                            text: Status
+                        }));
+                    });
+            }
         },
 
         FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");
-            this.getView().byId("MV_id_UserName").setSelectedKey("")
+            // this.getView().byId("MV_id_UserName").setSelectedKey("")
             this.getView().byId("MV_id_Status").setSelectedKey("")
+            this.getView().byId("MD_id_City").setSelectedKey("")
         },
 
         onNavBack: function () {

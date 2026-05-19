@@ -75,6 +75,29 @@
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
+
+                      <fb:FilterGroupItem
+                        name="Branch"
+                        label="{i18n>branch}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="PO_id_Branch"
+                                 items="{BedDetails>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                               
+                                  <core:ListItem
+                        key="{BedDetails>BranchID}"
+                        text="{BedDetails>BranchID} - {BedDetails>BranchName}"
+                        additionalText="{BedDetails>City}"
+                    />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
             <Table

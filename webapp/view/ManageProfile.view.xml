@@ -373,8 +373,7 @@
                 justifyContent="Start"
                 class="customActionBox"
             >
-
-            <Button
+                <Button
                     text="Add Members"
                     press="onPressAddMember"
                     class="myUnifiedBtn sapUiSmallMarginEnd"
@@ -406,12 +405,12 @@
             busyIndicatorDelay="0"
             noDataText="No booking history found"
             items="{
-                    path: 'profileData>/bookings',
-                    sorter: [
-                        { path: 'bookingGroup', descending: false, group: true },
-                        { path: 'BookingDate', descending: true }
-                    ]
-                }"
+                path: 'profileData>/bookings',
+                sorter: [
+                    { path: 'bookingGroup', descending: false, group: true },
+                    { path: 'BookingDateSort', descending: true }
+                ]
+            }"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
         >
@@ -480,8 +479,7 @@
         >
             <columns>
                 <Column demandPopin="true">
-<Text text="{i18n>fullname}" />
-
+                    <Text text="{i18n>fullname}" />
                 </Column>
                 <Column demandPopin="true">
                     <Text text="{i18n>age}" />
@@ -495,18 +493,19 @@
                 >
                     <Text text="{i18n>document}" />
                 </Column>
-                    <Column
+                <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
-                >
-                </Column>
+                />
                 <!-- <Column demandPopin="true" minScreenWidth="Desktop"><Text text="{i18n>status}"/></Column> -->
             </columns>
 
             <items>
                 <ColumnListItem press="">
                     <cells>
-                        <Text text="{= ${profileData>Salutation} + ' ' + ${profileData>Name}}" />
+                        <Text
+                            text="{= ${profileData>Salutation} + ' ' + ${profileData>Name}}"
+                        />
                         <Text
                             text="{path: 'profileData>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
                         />
@@ -516,13 +515,13 @@
                             text="{i18n>view}"
                             press="HF_viewimage"
                         />
-                            <Button
-        icon="sap-icon://edit"
-        type="Transparent"
-        tooltip="Upload Document"
-        press="onEditMemberFromDialog"
-        class="myUnifiedBtn"
-    />
+                        <Button
+                            icon="sap-icon://edit"
+                            type="Transparent"
+                            tooltip="Upload Document"
+                            press="onEditMemberFromDialog"
+                            class="myUnifiedBtn"
+                        />
                         <!--  <ObjectStatus
                             text="{profileData>status}"
                             state="{ path:'profileData>status',
@@ -618,7 +617,7 @@
     }"
         >
             <columns>
-            <Column
+                <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
@@ -681,18 +680,30 @@
             <items>
                 <ColumnListItem type="Inactive">
                     <cells>
-                      <Text text="{profileData>BookingID}" />
+                        <Text text="{profileData>BookingID}" />
                         <Text text="{profileData>CustomerName}" />
                         <Text text="{profileData>ComplaintType}" />
                         <Text text="{profileData>BranchName}" />
                         <Text text="{profileData>RoomNo}" />
-                        <ExpandableText text="{profileData>ComplaintDescription}" maxCharacters="20"/>
-                        <Text text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"/>
-                        <Text text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${path: 'profileData>ExpectedResolvedDate', 
-                        formatter: '.Formatter.formatDate'}}"/>
+                        <ExpandableText
+                            text="{profileData>ComplaintDescription}"
+                            maxCharacters="20"
+                        />
+                        <Text
+                            text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"
+                        />
+                        <Text
+                            text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${path: 'profileData>ExpectedResolvedDate', 
+                        formatter: '.Formatter.formatDate'}}"
+                        />
                         <Text text="{profileData>AssignedTo}" />
-                        <Button icon="sap-icon://edit" type="Transparent" press="onPressComplaintRow"
-                        tooltip="Edit Complaint"  visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"/>
+                        <Button
+                            icon="sap-icon://edit"
+                            type="Transparent"
+                            press="onPressComplaintRow"
+                            tooltip="Edit Complaint"
+                            visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>

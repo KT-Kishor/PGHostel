@@ -222,10 +222,41 @@ sap.ui.define([
         },
 
         BI_onButtonPress: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageVendor",{
-                sPath:"Vendordetails"
-            });
+            // var oRouter = this.getOwnerComponent().getRouter();
+            // oRouter.navTo("RouteManageVendor",{
+            //     sPath:"Vendordetails"
+            // });
+             var oViewModel = this.getView().getModel("editable");
+
+    // Check edit mode
+    var bIsEditMode = oViewModel.getProperty("/Edit");
+
+    if (bIsEditMode) {
+
+        // Ask confirmation only in edit mode
+        this.showConfirmationDialog(
+            this.i18nModel.getText("ConfirmActionTitle"),
+            this.i18nModel.getText("backConfirmation"),
+
+            function () {
+
+                // Reset edit mode
+                oViewModel.setProperty("/Edit", false);
+                oViewModel.setProperty("/save", false);
+
+                // Navigate back
+                this.getRouter().navTo("RouteManageVendor", {
+                   sPath:"Vendordetails"
+                });
+
+            }.bind(this)
+        );
+    }else {
+        // Direct navigation when not editing
+        this.getRouter().navTo("RouteManageVendor", {
+            sPath:"Vendordetails"
+        });
+    }
         },
 
         onEditOrSavePress: async function () {

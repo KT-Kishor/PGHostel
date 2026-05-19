@@ -17,12 +17,18 @@ sap.ui.define([
                 .getRoute("RouteEditBooking")
                 .attachMatched(this._onEditRouteMatched, this);
 
-            this._iFacilityStartIndex = 0;
-            this._iFacilityPageSize = 3;
+            this._iFacilityStartIndex = 0;  
+            this._iFacilityPageSize = 3; // fallback; recalculated dynamically
+            this._iFacilityCardWidth = 250;
+            this._iFacilityCardGap = 16;
             this._sLastPrimaryMemberId = "SELF";
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+
+            // Resize observer to recalculate visible card count
+            this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
+            sap.ui.core.ResizeHandler.register(this.getView(), this._fnFacilityResizeHandler);
 
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
@@ -32,10 +38,10 @@ sap.ui.define([
         },
 
         _onEditRouteMatched: async function (oEvent) {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
             var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";
@@ -62,6 +68,7 @@ sap.ui.define([
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
             oBookingViewData.editModeEnabled = false; // Start in read-only mode
             oBookingViewData.isStatusNew = false; // Will be set after loading
+            oBookingViewData.isAdminUpdatedYes = false; // Will be set after loading
             oBookingViewData.showEditButton = false; // Will be set after loading
             
             this.getView().setModel(oHostelModel, "HostelModel");
@@ -85,6 +92,7 @@ sap.ui.define([
                 var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
+                var sAdminUpdated = oBooking.AdminUpdated || "";
 
                 // 2. Parallel API calls for branch-related data, payments, and facilities
                 var oRoomData = {};
@@ -217,7 +225,11 @@ sap.ui.define([
 
                 this._rebuildSelectedFacilities();
 
-                await this._hydrateAppliedCouponData();
+                // Load coupon data in background - will recalculate summary when ready
+                this._hydrateAppliedCouponData().then((function () {
+                    this._recalculateSummary();
+                }).bind(this));
+
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
                 oHostelModel.refresh(true);
@@ -225,9 +237,27 @@ sap.ui.define([
                 // Check if status is "New" and update BookingView model accordingly
                 var oBookingView = this.getView().getModel("BookingView");
                 var bIsStatusNew = sStatus === "New";
+                var bIsStatusConfirmed = sStatus === "Confirmed";
+                var bIsEditableStatus = bIsStatusNew || bIsStatusConfirmed;
+                var bIsAdminUpdatedYes = sAdminUpdated === "YES";
                 oBookingView.setProperty("/isStatusNew", bIsStatusNew);
-                oBookingView.setProperty("/showEditButton", bIsStatusNew);
+                oBookingView.setProperty("/isAdminUpdatedYes", bIsAdminUpdatedYes);
+                oBookingView.setProperty("/showEditButton", bIsEditableStatus && !bIsAdminUpdatedYes);
                 oBookingView.setProperty("/editModeEnabled", false); // Start in read-only mode
+
+                // Show message when admin has updated the booking
+                if (bIsEditableStatus && bIsAdminUpdatedYes) {
+                    var sBranchName = oHostelModel.getProperty("/Area") || "";
+                    MessageBox.warning(
+                        "This booking has been updated as per your request. To make any further changes, please contact us. Thank you for your cooperation!\n\nRegards,\n" + sBranchName,
+                        {
+                            title: "Booking Status Updated",
+                            styleClass: "myUnifiedBtn",
+                            contentWidth: "500px",
+                            actions: [MessageBox.Action.OK]
+                        }
+                    );
+                }
 
             } catch (oError) {
                 console.error("Edit booking load error:", oError);
@@ -397,16 +427,28 @@ sap.ui.define([
             };
 
             var fnGetFacilityKey = function (oItem) {
+                // Always include UnitText in the key to prevent merging items with
+                // different pricing units (Per Day vs Per Month) into a single entry.
+                var sUnitText = fnNormalizeKey(oItem.UnitText || "Unit Price");
                 var sSelectionMode = String(oItem.SelectionMode || "").trim().toUpperCase() || "SINGLE";
+
+                // For PERSON and PERSON_QTY modes, each person gets their own FacilityID,
+                // so we must NOT use FacilityID as the key — otherwise two people with the
+                // same facility would create two separate cards instead of one card with a
+                // person table. Group by name+mode+unitText so all person items aggregate.
+                if (sSelectionMode === "PERSON" || sSelectionMode === "PERSON_QTY") {
+                    var sFacilityName = fnNormalizeKey(oItem.FacilityName || oItem.Type || "");
+                    return sFacilityName + "|" + sSelectionMode + "|" + sUnitText;
+                }
+
+                // For SINGLE/QTY modes, use FacilityID|UnitText to separate different
+                // UnitText variants while keeping same-variant items together.
+                var sFacilityID = String(oItem.FacilityID || oItem.ID || "").trim();
+                if (sFacilityID) {
+                    return sFacilityID + "|" + sUnitText;
+                }
                 var sFacilityName = fnNormalizeKey(oItem.FacilityName || oItem.Type || "");
-                var sChargeType = String(oItem.FacilityChargeType || "").trim().toUpperCase();
-                var sUnitText = fnNormalizeKey(oItem.UnitText || "");
-                return [
-                    sFacilityName,
-                    sSelectionMode,
-                    sSelectionMode === "PERSON_QTY" ? sChargeType : "",
-                    sUnitText
-                ].join("|");
+                return sFacilityName + "|" + sSelectionMode + "|" + sUnitText;
             };
 
             var fnTrackPersonSelection = function (oAgg, oItem) {
@@ -475,6 +517,12 @@ sap.ui.define([
                         SavedQuantity: sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY"
                             ? iRowQty
                             : Math.max(parseInt(oItem.Quantity, 10) || 1, 1),
+                        // Per-item date/time for facility-specific pricing calculations
+                        StartDate: oItem.StartDate || null,
+                        EndDate: oItem.EndDate || null,
+                        StartTime: oItem.StartTime || null,
+                        EndTime: oItem.EndTime || null,
+                        TotalHour: oItem.TotalHour || null,
                         RawFacilityItems: [Object.assign({}, oItem)],
                         SelectedPersonIds: [],
                         PersonQuantities: []
@@ -496,6 +544,388 @@ sap.ui.define([
             return Object.keys(mFacilityMap).map(function (sKey) {
                 return mFacilityMap[sKey];
             });
+        },
+
+        /**
+         * Convert a value to a number safely. Falls back to 0 for invalid inputs.
+         * Mirrors the parent _toNumber but is self-contained for the edit flow.
+         */
+        _toNumber: function (vValue) {
+            var fValue = parseFloat(String(vValue === undefined || vValue === null ? "" : vValue).replace(/,/g, "").trim());
+            return isNaN(fValue) ? 0 : fValue;
+        },
+
+        /**
+         * Count exclusive days between two dates.
+         * 2026-05-13 to 2026-05-17 = 4 days (exclusive end).
+         */
+        _getDayCount: function (oStartDate, oEndDate) {
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
+            return Math.max(Math.floor((oEnd.getTime() - oStart.getTime()) / 86400000), 0);
+        },
+
+        /**
+         * Count months spanned between two dates (inclusive partial month = 1).
+         */
+        _getMonthCount: function (oStartDate, oEndDate) {
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
+            var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
+            if (oEnd.getDate() >= oStart.getDate()) { iMonths += 1; }
+            return Math.max(iMonths, 0);
+        },
+
+        /**
+         * Count years spanned between two dates (inclusive partial year = 1).
+         */
+        _getYearCount: function (oStartDate, oEndDate) {
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
+            var iYears = oEnd.getFullYear() - oStart.getFullYear();
+            var iStartMonth = oStart.getMonth();
+            var iEndMonth = oEnd.getMonth();
+            if (iEndMonth > iStartMonth || (iEndMonth === iStartMonth && oEnd.getDate() >= oStart.getDate())) {
+                iYears += 1;
+            }
+            return Math.max(iYears, 0);
+        },
+
+        /**
+         * Count hours between two times (HH:MM format) or two full Date objects.
+         * Falls back to TotalHour if present.
+         */
+        _getHourCount: function (oStartDate, oEndDate, sStartTime, sEndTime, fTotalHour) {
+            // If TotalHour is explicitly provided, use it
+            if (fTotalHour !== undefined && fTotalHour !== null && parseFloat(fTotalHour) > 0) {
+                return parseFloat(fTotalHour);
+            }
+            // Try time strings
+            if (sStartTime && sEndTime) {
+                var fnParseTime = function (sTime) {
+                    var aParts = String(sTime).trim().split(":");
+                    return parseInt(aParts[0], 10) * 60 + parseInt(aParts[1] || "0", 10);
+                };
+                var iStartMins = fnParseTime(sStartTime);
+                var iEndMins = fnParseTime(sEndTime);
+                if (!isNaN(iStartMins) && !isNaN(iEndMins)) {
+                    var iDiffMins = iEndMins > iStartMins ? iEndMins - iStartMins : (24 * 60 - iStartMins + iEndMins);
+                    return Math.max(iDiffMins / 60, 0);
+                }
+            }
+            // Try full date objects
+            var oStart = this._parseDate(oStartDate);
+            var oEnd = this._parseDate(oEndDate);
+            if (oStart && oEnd && oEnd > oStart) {
+                return Math.max((oEnd.getTime() - oStart.getTime()) / 3600000, 0);
+            }
+            return 0;
+        },
+
+        /**
+         * Compute a quantity factor from Quantity field.
+         * Returns Quantity as a number, defaulting to 1.
+         */
+        _getQuantityFactor: function (iQuantity) {
+            var iQty = parseInt(iQuantity, 10);
+            return isNaN(iQty) || iQty <= 0 ? 1 : iQty;
+        },
+
+        /**
+         * Calculate facility total based on UnitText pricing rules:
+         *   Unit Price   → BasicFacilityPrice × Quantity
+         *   Package Price → ONCE_PER_BOOKING: BasicFacilityPrice × Quantity
+         *                   Daily: BasicFacilityPrice × Quantity × DayCount
+         *   Per Day      → BasicFacilityPrice × DayCount × Quantity
+         *   Per Hour     → BasicFacilityPrice × HourCount × Quantity
+         *   Per Month    → BasicFacilityPrice × MonthCount × Quantity
+         *   Per Year     → BasicFacilityPrice × YearCount × Quantity
+         */
+        _calculateFacilityTotal: function (oFacilityItem) {
+            var fBasicPrice = this._toNumber(oFacilityItem.BasicFacilityPrice);
+            var sUnitText = String(oFacilityItem.UnitText || "Unit Price").trim();
+            var iQuantity = this._getQuantityFactor(oFacilityItem.Quantity);
+            var sChargeType = String(oFacilityItem.FacilityChargeType || "").trim().toUpperCase();
+
+            var oStartDate = this._parseDate(oFacilityItem.StartDate);
+            var oEndDate = this._parseDate(oFacilityItem.EndDate);
+            var iDayCount = this._getDayCount(oStartDate, oEndDate);
+            var iMonthCount = this._getMonthCount(oStartDate, oEndDate);
+            var iYearCount = this._getYearCount(oStartDate, oEndDate);
+            var iHourCount = this._getHourCount(oFacilityItem.StartDate, oFacilityItem.EndDate, oFacilityItem.StartTime, oFacilityItem.EndTime, oFacilityItem.TotalHour);
+
+            var sUnitKey = sUnitText.toUpperCase();
+
+            if (sUnitKey === "UNIT PRICE" || sUnitKey === "UNIT") {
+                return Number((fBasicPrice * iQuantity).toFixed(2));
+            }
+
+            if (sUnitKey === "PACKAGE PRICE" || sUnitKey === "PACKAGE") {
+                if (sChargeType === "DAILY") {
+                    return Number((fBasicPrice * iQuantity * Math.max(iDayCount, 1)).toFixed(2));
+                }
+                return Number((fBasicPrice * iQuantity).toFixed(2));
+            }
+
+            if (sUnitKey === "PER DAY" || sUnitKey === "PERDAY") {
+                return Number((fBasicPrice * Math.max(iDayCount, 1) * iQuantity).toFixed(2));
+            }
+
+            if (sUnitKey === "PER HOUR" || sUnitKey === "PERHOUR") {
+                // Per Hour pricing: BasicFacilityPrice × DayCount × HourCount × Quantity
+                // Hourly rates apply each day over the booking duration
+                return Number((fBasicPrice * Math.max(iDayCount, 1) * Math.max(iHourCount, 1) * iQuantity).toFixed(2));
+            }
+
+            if (sUnitKey === "PER MONTH" || sUnitKey === "PERMONTH") {
+                return Number((fBasicPrice * Math.max(iMonthCount, 1) * iQuantity).toFixed(2));
+            }
+
+            if (sUnitKey === "PER YEAR" || sUnitKey === "PERYEAR") {
+                return Number((fBasicPrice * Math.max(iYearCount, 1) * iQuantity).toFixed(2));
+            }
+
+            // Default: treat as Unit Price
+            return Number((fBasicPrice * iQuantity).toFixed(2));
+        },
+
+        /**
+         * Build a period-based breakdown text for facility display.
+         * Matches Booking controller format: "Qty (3) x 7 Per Day" or "7 Per Day" (SINGLE).
+         * @param {Object} oCalcItem - Calc item with StartDate, EndDate, UnitText, etc.
+         * @param {number} iQty - Quantity (1 for SINGLE, actual qty for QTY)
+         * @returns {string} Breakdown text string
+         */
+        _buildFacilityPeriodBreakdown: function (oCalcItem, iQty) {
+            var sPriceType = oCalcItem.UnitText || "Unit Price";
+            var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            var oCalcStart = this._parseDate(oCalcItem.StartDate);
+            var oCalcEnd = this._parseDate(oCalcItem.EndDate);
+            var sPeriodPart = "";
+
+            if (sUnitKey === "PERDAY") {
+                sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " Per Day";
+            } else if (sUnitKey === "PERMONTH") {
+                sPeriodPart = Math.max(this._getMonthCount(oCalcStart, oCalcEnd), 1) + " Per Month";
+            } else if (sUnitKey === "PERYEAR") {
+                sPeriodPart = Math.max(this._getYearCount(oCalcStart, oCalcEnd), 1) + " Per Year";
+            } else if (sUnitKey === "PERHOUR") {
+                var iDays = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1);
+                var iHours = Math.max(this._getHourCount(oCalcItem.StartDate, oCalcItem.EndDate, oCalcItem.StartTime, oCalcItem.EndTime, oCalcItem.TotalHour), 1);
+                sPeriodPart = iDays + " day(s) x " + iHours + " hr(s)";
+            } else if (sUnitKey === "PACKAGEPRICE" || sUnitKey === "PACKAGE") {
+                var sChargeType = String(oCalcItem.FacilityChargeType || "").toUpperCase();
+                if (sChargeType === "DAILY") {
+                    sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " day(s)";
+                }
+            }
+
+            if (iQty === 1) {
+                return sPeriodPart || "Qty (1)";
+            }
+            return "Qty (" + iQty + ")" + (sPeriodPart ? " x " + sPeriodPart : "");
+        },
+
+        /**
+         * Calculate per-person totals for PERSON and PERSON_QTY modes.
+         * Each person's RawFacilityItem contains their own StartDate/EndDate,
+         * so we compute each person's total individually and sum them.
+         * Returns { total: Number, personBreakdown: Array }.
+         */
+        _calculatePerPersonTotal: function (oFacility, aOccupants) {
+            var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            var aRawItems = Array.isArray(oFacility.RawFacilityItems) ? oFacility.RawFacilityItems : [];
+            var aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
+            var aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
+
+            var fnGetPersonName = function (sPersonId) {
+                var oFound = (aOccupants || []).find(function (oPerson) {
+                    return oPerson.id === sPersonId;
+                });
+                return oFound ? oFound.name : sPersonId;
+            };
+
+            var fTotal = 0;
+            var aPersonBreakdown = [];
+
+            if (sSelectionMode === "PERSON") {
+                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+                var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+
+                aSelectedPersonIds.forEach(function (sPersonId) {
+                    var sPersonName = fnGetPersonName(sPersonId);
+                    // Find the occupant for this personId to get aliases for matching
+                    var oOccupant = (aOccupants || []).find(function (oPerson) {
+                        return oPerson.id === sPersonId;
+                    });
+                    // Find raw items for this person using alias-based matching
+                    var aPersonItems = aRawItems.filter(function (oItem) {
+                        var sItemMemberId = String(oItem.MemberID || "").trim();
+                        var sItemMemberName = String(oItem.MemberName || oItem.Name || "").trim();
+                        // Direct match first
+                        if (sItemMemberId === sPersonId || sItemMemberName === sPersonId) {
+                            return true;
+                        }
+                        // Alias-based match using occupant resolution
+                        if (oOccupant && oOccupant.aliases) {
+                            return oOccupant.aliases.some(function (sAlias) {
+                                var sNormAlias = this._normalizeEditPersonKey(sAlias);
+                                var sNormMemberName = this._normalizeEditPersonKey(sItemMemberName);
+                                var sNormMemberId = this._normalizeEditPersonKey(sItemMemberId);
+                                return sNormAlias && (
+                                    sNormAlias === sNormMemberId ||
+                                    sNormAlias === sNormMemberName ||
+                                    sNormAlias.indexOf(sNormMemberName) >= 0 ||
+                                    sNormMemberName.indexOf(sNormAlias) >= 0
+                                );
+                            }.bind(this));
+                        }
+                        return false;
+                    }.bind(this));
+
+                    // Build calc item with this person's specific dates
+                    var oPersonCalcItem = {
+                        BasicFacilityPrice: fPrice,
+                        UnitText: sPriceType,
+                        Quantity: 1,
+                        FacilityChargeType: oFacility.FacilityChargeType || ""
+                    };
+
+                    if (aPersonItems.length > 0) {
+                        var oPersonRaw = aPersonItems[0];
+                        oPersonCalcItem.StartDate = oPersonRaw.StartDate || oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oPersonRaw.EndDate || oFacility.EndDate || null;
+                        oPersonCalcItem.StartTime = oPersonRaw.StartTime || oFacility.StartTime || null;
+                        oPersonCalcItem.EndTime = oPersonRaw.EndTime || oFacility.EndTime || null;
+                        oPersonCalcItem.TotalHour = oPersonRaw.TotalHour || oFacility.TotalHour || null;
+                    } else {
+                        oPersonCalcItem.StartDate = oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oFacility.EndDate || null;
+                        oPersonCalcItem.StartTime = oFacility.StartTime || null;
+                        oPersonCalcItem.EndTime = oFacility.EndTime || null;
+                        oPersonCalcItem.TotalHour = oFacility.TotalHour || null;
+                    }
+
+                    var fPersonTotal = this._calculateFacilityTotal(oPersonCalcItem);
+                    fTotal += fPersonTotal;
+
+                    var iDayCount = this._getDayCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
+                    var iMonthCount = this._getMonthCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
+                    var iYearCount = this._getYearCount(oPersonCalcItem.StartDate, oPersonCalcItem.EndDate);
+                    var iHourCount = this._getHourCount(
+                        oPersonCalcItem.StartDate, oPersonCalcItem.EndDate,
+                        oPersonCalcItem.StartTime, oPersonCalcItem.EndTime,
+                        oPersonCalcItem.TotalHour
+                    );
+
+                    aPersonBreakdown.push({
+                        personId: sPersonId,
+                        personName: sPersonName,
+                        price: fPrice,
+                        priceType: sPriceType,
+                        startDate: oPersonCalcItem.StartDate,
+                        endDate: oPersonCalcItem.EndDate,
+                        startTime: oPersonCalcItem.StartTime,
+                        endTime: oPersonCalcItem.EndTime,
+                        totalHour: oPersonCalcItem.TotalHour,
+                        dayCount: iDayCount,
+                        monthCount: iMonthCount,
+                        yearCount: iYearCount,
+                        hourCount: iHourCount,
+                        personTotal: fPersonTotal
+                    });
+                }.bind(this));
+
+            } else if (sSelectionMode === "PERSON_QTY") {
+                var fPackagePrice = this._toNumber(
+                    oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice
+                );
+                var sFacilityChargeType = this._getFacilityChargeType(oFacility);
+
+                var aValidLines = aPersonQuantities.filter(function (oLine) {
+                    return (parseInt(oLine.qty, 10) || 0) > 0;
+                });
+
+                aValidLines.forEach(function (oLine) {
+                    var sPersonId = oLine.personId;
+                    var sPersonName = oLine.personName || fnGetPersonName(sPersonId);
+                    var iQty = Math.max(parseInt(oLine.qty, 10) || 0, 1);
+
+                    // Find the occupant for this personId to get aliases for matching
+                    var oOccupant = (aOccupants || []).find(function (oPerson) {
+                        return oPerson.id === sPersonId;
+                    });
+                    // Find raw items for this person using alias-based matching
+                    var aPersonItems = aRawItems.filter(function (oItem) {
+                        var sItemMemberId = String(oItem.MemberID || "").trim();
+                        var sItemMemberName = String(oItem.MemberName || oItem.Name || "").trim();
+                        // Direct match first
+                        if (sItemMemberId === sPersonId || sItemMemberName === sPersonId) {
+                            return true;
+                        }
+                        // Alias-based match using occupant resolution
+                        if (oOccupant && oOccupant.aliases) {
+                            return oOccupant.aliases.some(function (sAlias) {
+                                var sNormAlias = this._normalizeEditPersonKey(sAlias);
+                                var sNormMemberName = this._normalizeEditPersonKey(sItemMemberName);
+                                var sNormMemberId = this._normalizeEditPersonKey(sItemMemberId);
+                                return sNormAlias && (
+                                    sNormAlias === sNormMemberId ||
+                                    sNormAlias === sNormMemberName ||
+                                    sNormAlias.indexOf(sNormMemberName) >= 0 ||
+                                    sNormMemberName.indexOf(sNormAlias) >= 0
+                                );
+                            }.bind(this));
+                        }
+                        return false;
+                    }.bind(this));
+
+                    var sPersonStart, sPersonEnd;
+                    if (aPersonItems.length > 0) {
+                        var oPersonRaw = aPersonItems[0];
+                        sPersonStart = oPersonRaw.StartDate || null;
+                        sPersonEnd = oPersonRaw.EndDate || null;
+                    } else {
+                        sPersonStart = oFacility.StartDate || null;
+                        sPersonEnd = oFacility.EndDate || null;
+                    }
+
+                    var iDayCount = this._getDayCount(sPersonStart, sPersonEnd);
+                    var fPersonTotal;
+
+                    if (sFacilityChargeType === "DAILY") {
+                        // DAILY: BasicFacilityPrice already includes QTY, so only multiply by days
+                        fPersonTotal = fPackagePrice * Math.max(iDayCount, 1);
+                    } else if (sFacilityChargeType === "ONCE_PER_BOOKING") {
+                        // ONCE_PER_BOOKING: BasicFacilityPrice already includes QTY, flat total
+                        fPersonTotal = fPackagePrice;
+                    } else {
+                        fPersonTotal = fPackagePrice * iQty;
+                    }
+
+                    fTotal += fPersonTotal;
+
+                    aPersonBreakdown.push({
+                        personId: sPersonId,
+                        personName: sPersonName,
+                        packagePrice: fPackagePrice,
+                        quantity: iQty,
+                        chargeType: sFacilityChargeType,
+                        startDate: sPersonStart,
+                        endDate: sPersonEnd,
+                        dayCount: iDayCount,
+                        personTotal: fPersonTotal
+                    });
+                }.bind(this));
+            }
+
+            return {
+                total: Number(fTotal.toFixed(2)),
+                personBreakdown: aPersonBreakdown
+            };
         },
 
         _normalizeBookingEditData: function (oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs) {
@@ -527,10 +957,10 @@ sap.ui.define([
             // If we always store raw month difference here, yearly edit bookings
             // get expanded again by the parent logic (for example 12 -> 12 years).
             var iSelectedMonths = 1;
-            var oStart = oBooking.StartDate ? new Date(oBooking.StartDate) : null;
-            var oEnd = oBooking.EndDate ? new Date(oBooking.EndDate) : null;
+            var oStart = this._parseDate(oBooking.StartDate);
+            var oEnd = this._parseDate(oBooking.EndDate);
             var sSelectedPriceType = oBooking.PaymentType || "";
-            if (oStart && oEnd && !isNaN(oStart.getTime()) && !isNaN(oEnd.getTime())) {
+            if (oStart && oEnd) {
                 var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
 
                 if (oEnd.getDate() >= oStart.getDate()) {
@@ -1875,13 +2305,299 @@ sap.ui.define([
             this._rebuildSelectedFacilities();
         },
 
+        /**
+         * Override _rebuildSelectedFacilities to use facility-item-specific dates
+         * instead of the booking-wide date range. This ensures each facility item's
+         * total is calculated using its own StartDate/EndDate.
+         */
+        _rebuildSelectedFacilities: function () {
+            var oModel = this.getView().getModel("HostelModel");
+            var oFacilityModel = this.getView().getModel("FacilityModel");
+            var that = this;
+
+            var aOccupants = this._getEditFacilityOccupants
+                ? this._getEditFacilityOccupants()
+                : (this._getOccupantOptions ? this._getOccupantOptions() : []);
+
+            var fnGetPersonName = function (sPersonId) {
+                var oFound = aOccupants.find(function (oPerson) {
+                    return oPerson.id === sPersonId;
+                });
+                return oFound ? oFound.name : sPersonId;
+            };
+
+            var aSelectedFacilities = (this._aAllFacilities || [])
+                .filter(function (oFacility) {
+                    return !!oFacility.Selected;
+                })
+                .map(function (oFacility) {
+                    var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+                    var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+                    var sCurrency = oFacility.Currency || "INR";
+                    var sFacilityChargeType = this._getFacilityChargeType(oFacility);
+                    var aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
+                    var aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
+
+                    var fTotal = 0;
+                    var sBreakdown = "";
+                    var sAllocationDetails = "";
+
+                    // Build a facility-like object with per-item dates for _calculateFacilityTotal
+                    var oCalcItem = {
+                        BasicFacilityPrice: oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice || 0,
+                        UnitText: sPriceType,
+                        Quantity: oFacility.Quantity || 1,
+                        FacilityChargeType: sFacilityChargeType
+                    };
+
+                    // Booking dates as fallback when facility dates are null
+                    var oBookingStart = oModel.getProperty("/StartDate");
+                    var oBookingEnd = oModel.getProperty("/EndDate");
+
+                    // Try to get dates from the first RawFacilityItem
+                    if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
+                        var oFirstRaw = oFacility.RawFacilityItems[0];
+                        oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || oBookingStart || null;
+                        oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || oBookingEnd || null;
+                        oCalcItem.StartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
+                        oCalcItem.EndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
+                        oCalcItem.TotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
+                    } else {
+                        oCalcItem.StartDate = oFacility.StartDate || oBookingStart || null;
+                        oCalcItem.EndDate = oFacility.EndDate || oBookingEnd || null;
+                        oCalcItem.StartTime = oFacility.StartTime || null;
+                        oCalcItem.EndTime = oFacility.EndTime || null;
+                        oCalcItem.TotalHour = oFacility.TotalHour || null;
+                    }
+
+                    if (sSelectionMode === "SINGLE") {
+                        fTotal = this._calculateFacilityTotal(oCalcItem);
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, 1);
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            roomCount: 1
+                        });
+                    } else if (sSelectionMode === "QTY") {
+                        fTotal = this._calculateFacilityTotal(oCalcItem);
+                        var iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, iQty);
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            quantity: iQty
+                        });
+                    } else if (sSelectionMode === "PERSON") {
+                        // Per-person calculation: each person has their own date range
+                        var oPerPersonResult = this._calculatePerPersonTotal(oFacility, aOccupants);
+                        fTotal = oPerPersonResult.total;
+                        // Build breakdown showing each person's individual calculation
+                        var aPersonLines = oPerPersonResult.personBreakdown.map(function (oPerson) {
+                            var sUnitLabel = "";
+                            var sUnitKey = (oPerson.priceType || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            if (sUnitKey === "PERDAY") { sUnitLabel = oPerson.dayCount + " day(s)"; }
+                            else if (sUnitKey === "PERMONTH") { sUnitLabel = oPerson.monthCount + " month(s)"; }
+                            else if (sUnitKey === "PERYEAR") { sUnitLabel = oPerson.yearCount + " year(s)"; }
+                            else if (sUnitKey === "PERHOUR") { sUnitLabel = oPerson.dayCount + " day(s) × " + oPerson.hourCount + " hr(s)"; }
+                            else { sUnitLabel = "flat"; }
+                            return oPerson.personName + " (" + sUnitLabel + " × ₹" + oPerson.price.toFixed(2) + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                        });
+                        sBreakdown = aPersonLines.join(", ");
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            selectedPersons: oPerPersonResult.personBreakdown.map(function (oPerson) {
+                                return {
+                                    personId: oPerson.personId,
+                                    personName: oPerson.personName,
+                                    dayCount: oPerson.dayCount,
+                                    monthCount: oPerson.monthCount,
+                                    yearCount: oPerson.yearCount,
+                                    hourCount: oPerson.hourCount,
+                                    personTotal: oPerson.personTotal
+                                };
+                            })
+                        });
+                    } else if (sSelectionMode === "PERSON_QTY") {
+                        // Per-person calculation: each person has their own date range
+                        var oPerPersonResult = this._calculatePerPersonTotal(oFacility, aOccupants);
+                        fTotal = oPerPersonResult.total;
+                        // Build breakdown showing each person's individual calculation
+                        var aPersonLines = oPerPersonResult.personBreakdown.map(function (oPerson) {
+                            if (oPerson.chargeType === "DAILY") {
+                                return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " day(s) = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                            }
+                            if (oPerson.chargeType === "ONCE_PER_BOOKING") {
+                                return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                            }
+                            return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                        });
+                        sBreakdown = aPersonLines.join(", ");
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            facilityChargeType: sFacilityChargeType,
+                            selectedPersons: oPerPersonResult.personBreakdown.map(function (oPerson) {
+                                return {
+                                    personId: oPerson.personId,
+                                    personName: oPerson.personName,
+                                    quantity: oPerson.quantity,
+                                    chargeType: oPerson.chargeType,
+                                    dayCount: oPerson.dayCount,
+                                    personTotal: oPerson.personTotal
+                                };
+                            })
+                        });
+                    } else {
+                        fTotal = this._calculateFacilityTotal(oCalcItem);
+                        sBreakdown = this._buildFacilityPeriodBreakdown(oCalcItem, 1);
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: "SINGLE",
+                            roomCount: 1
+                        });
+                    }
+
+                    return {
+                        FacilityID: oFacility.FacilityID,
+                        CatalogFacilityID: oFacility.CatalogFacilityID,
+                        FacilityName: oFacility.FacilityName,
+                        DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
+                        Currency: sCurrency,
+                        SelectionMode: sSelectionMode,
+                        Price: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                        UnitText: sPriceType,
+                        FacilityChargeType: sFacilityChargeType,
+                        Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
+                        SelectedPersonIds: aSelectedPersonIds.slice(),
+                        PersonQuantities: aPersonQuantities.map(function (oLine) {
+                            return {
+                                personId: oLine.personId,
+                                personName: oLine.personName || fnGetPersonName(oLine.personId),
+                                qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
+                            };
+                        }),
+                        MinimumQty: parseInt(oFacility.MinimumQty, 10) || 0,
+                        MinimumPrice: parseFloat(oFacility.MinimumPrice) || 0,
+                        AllocationDetails: sAllocationDetails,
+                        RateText: sSelectionMode === "PERSON_QTY"
+                            ? this._formatFacilityPriceWithUnit(
+                                this._toNumber(oFacility.MinimumPrice),
+                                sCurrency,
+                                "Package Price"
+                            )
+                            : this._formatFacilityPriceWithUnit(
+                                this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                                sCurrency,
+                                sPriceType
+                            ),
+                        TotalAmount: Number(fTotal.toFixed(2)),
+                        BreakdownText: sBreakdown,
+                        RawFacilityItems: Array.isArray(oFacility.RawFacilityItems)
+                            ? oFacility.RawFacilityItems.map(function (oItem) {
+                                return Object.assign({}, oItem);
+                            })
+                            : []
+                    };
+                }.bind(this));
+
+            oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
+            oModel.setProperty("/FacilityDiscounts", []);
+            oModel.setProperty("/TotalFacilityDiscount", 0);
+            oModel.setProperty("/HasFacilityOfferDiscount", false);
+            oModel.setProperty("/HasValidFacilityOffer", false);
+            oModel.setProperty(
+                "/TotalFacilityPrice",
+                Number(
+                    aSelectedFacilities.reduce(function (sum, oItem) {
+                        return sum + (this._toNumber(oItem.TotalAmount));
+                    }.bind(this), 0).toFixed(2)
+                )
+            );
+
+            if (oFacilityModel) {
+                oFacilityModel.refresh(true);
+            }
+
+            this._renderFacilityCards();
+        },
+
+        /**
+         * Override _getFacilityCardTotalAmount to use facility-specific dates
+         * instead of booking-wide dates. Mimics EditBookingDetails' price × days
+         * pattern while respecting UnitText pricing rules via _calculateFacilityTotal.
+         */
+        _getFacilityCardTotalAmount: function (oFacility) {
+            if (!oFacility || !oFacility.Selected) {
+                return 0;
+            }
+            var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+            var oHostelModel = this.getView().getModel("HostelModel");
+
+            // Build calc item with facility-specific dates, falling back to booking dates
+            var oCalcItem = {
+                BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                UnitText: sPriceType,
+                Quantity: oFacility.Quantity || 1,
+                FacilityChargeType: this._getFacilityChargeType(oFacility),
+                StartDate: oFacility.StartDate || (oHostelModel ? oHostelModel.getProperty("/StartDate") : null) || null,
+                EndDate: oFacility.EndDate || (oHostelModel ? oHostelModel.getProperty("/EndDate") : null) || null,
+                StartTime: oFacility.StartTime || null,
+                EndTime: oFacility.EndTime || null,
+                TotalHour: oFacility.TotalHour || null
+            };
+
+            var fBaseTotal = this._calculateFacilityTotal(oCalcItem);
+            var iPersonCount = Array.isArray(oFacility.SelectedPersonIds)
+                ? oFacility.SelectedPersonIds.length
+                : 0;
+
+            if (sSelectionMode === "PERSON") {
+                var aOccupants = this._getEditFacilityOccupants
+                    ? this._getEditFacilityOccupants()
+                    : (this._getOccupantOptions ? this._getOccupantOptions() : []);
+                return this._calculatePerPersonTotal(oFacility, aOccupants).total;
+            }
+
+            if (sSelectionMode === "PERSON_QTY") {
+                var aOccupants = this._getEditFacilityOccupants
+                    ? this._getEditFacilityOccupants()
+                    : (this._getOccupantOptions ? this._getOccupantOptions() : []);
+                return this._calculatePerPersonTotal(oFacility, aOccupants).total;
+            }
+
+            // SINGLE and QTY — _calculateFacilityTotal handles Quantity and UnitText rules
+            return fBaseTotal;
+        },
+
+        /**
+         * Override _getFacilityCardSummaryText to show calculation breakdown
+         * on the facility card when facility dates differ from booking dates.
+         */
+        _getFacilityCardSummaryText: function (oFacility) {
+            // Never show calculation breakdown on the facility card.
+            // Breakdown details are shown only in the popover dialog.
+            return "";
+        },
+
+        /**
+         * Override _getFacilityCardDetailText to hide the detail text when
+         * the summary breakdown is showing a calculation (dates differ or
+         * time components exist). This prevents "double breakdown" on the
+         * facility card — only the calculation breakdown should appear.
+         */
+        _getFacilityCardDetailText: function (oFacility) {
+            // If the summary text has a calculation breakdown, hide the detail text
+            if (this._getFacilityCardSummaryText(oFacility)) {
+                return "";
+            }
+            // Otherwise, fall back to parent behavior
+            return BookingController.prototype._getFacilityCardDetailText.call(this, oFacility);
+        },
+
         formatSelectedFacilitiesBreakdown: function (aFacilities) {
             if (!Array.isArray(aFacilities) || aFacilities.length === 0) {
                 return "";
             }
 
             return aFacilities.map(function (oFacility) {
-                var sName = oFacility.FacilityName || "Facility";
+                var sName = oFacility.DisplayFacilityName || oFacility.FacilityName || "Facility";
                 var sBreakdown = oFacility.BreakdownText || "";
                 var sTotal = oFacility.TotalAmount !== undefined && oFacility.TotalAmount !== null
                     ? " = " + oFacility.TotalAmount + " " + (oFacility.Currency || "")
@@ -1891,13 +2607,153 @@ sap.ui.define([
             }).join("\n");
         },
 
+        /**
+         * Find ALL matching selected facilities for a catalog facility.
+         * Returns an array of matches (unlike _findSelectedFacilityForEdit which returns only one).
+         * This is needed to handle facilities with multiple UnitText variants
+         * (e.g., "Extra Pillow" with both "Per Day" and "Per Month" pricing).
+         */
+        _findAllSelectedFacilitiesForEdit: function (oFacility, aSelectedFacilities) {
+            aSelectedFacilities = Array.isArray(aSelectedFacilities) ? aSelectedFacilities : [];
+
+            var sFacilityId = String(oFacility.ID || oFacility.FacilityID || "").trim();
+            var sFacilityNameKey = this._normalizeEditFacilityKey(oFacility.FacilityName || oFacility.Type || "");
+            var aMatches = [];
+
+            // Try matching by catalog FacilityID first
+            if (sFacilityId) {
+                aSelectedFacilities.forEach(function (oSelected) {
+                    var sSelectedCatalogId = String(oSelected.CatalogFacilityID || "").trim();
+                    var sSelectedFacilityId = String(oSelected.FacilityID || oSelected.ID || "").trim();
+                    if (sSelectedCatalogId === sFacilityId || sSelectedFacilityId === sFacilityId) {
+                        if (aMatches.indexOf(oSelected) < 0) {
+                            aMatches.push(oSelected);
+                        }
+                    }
+                });
+            }
+
+            // Fall back to name matching if no ID matches found
+            if (aMatches.length === 0 && sFacilityNameKey) {
+                aSelectedFacilities.forEach(function (oSelected) {
+                    var sSelectedNameKey = this._normalizeEditFacilityKey(oSelected.FacilityName || oSelected.Type || "");
+                    if (sSelectedNameKey && (
+                        sSelectedNameKey === sFacilityNameKey ||
+                        sSelectedNameKey.indexOf(sFacilityNameKey) >= 0 ||
+                        sFacilityNameKey.indexOf(sSelectedNameKey) >= 0
+                    )) {
+                        if (aMatches.indexOf(oSelected) < 0) {
+                            aMatches.push(oSelected);
+                        }
+                    }
+                }.bind(this));
+            }
+
+            return aMatches;
+        },
+
+        /**
+         * Build a single processed facility entry from a catalog facility and a selected facility match.
+         * Extracted from _processFacilitiesForEdit to support 1:N mapping for UnitText variants.
+         */
+        _buildProcessedFacilityEntry: function (oFacility, oSelectedFacility, bIsSelected, bShowUnitTextSuffix) {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sSelectionMode = oSelectedFacility.SelectionMode || oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            var bIsPersonQty = sSelectionMode === "PERSON_QTY";
+            var bIsPerson = sSelectionMode === "PERSON";
+            var iMinimumQty = bIsPersonQty
+                ? (parseInt(oFacility.MinimumQty, 10) || 0)
+                : 0;
+            var fMinimumPrice = bIsPersonQty
+                ? (parseFloat(oFacility.MinimumPrice) || 0)
+                : 0;
+            var sApiFacilityChargeType = bIsPersonQty
+                ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
+                : "";
+            var sSavedFacilityChargeType = bIsPersonQty
+                ? this._normalizeFacilityChargeType(oSelectedFacility.FacilityChargeType || sApiFacilityChargeType)
+                : "";
+            var aPersonQuantities = bIsPersonQty
+                ? this._buildEditFacilityPersonQuantities(oSelectedFacility)
+                : (Array.isArray(oSelectedFacility.PersonQuantities)
+                    ? oSelectedFacility.PersonQuantities.map(function (oLine) {
+                        var oOccupant = this._resolveEditFacilityOccupant(oLine.personId, oLine.personName);
+                        return {
+                            personId: oOccupant ? oOccupant.id : oLine.personId,
+                            personName: oOccupant ? oOccupant.name : oLine.personName,
+                            qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
+                        };
+                    }.bind(this))
+                    : []);
+            var aSelectedPersonIds = (bIsPersonQty || bIsPerson)
+                ? this._buildEditFacilitySelectedPersonIds(oSelectedFacility, aPersonQuantities)
+                : (Array.isArray(oSelectedFacility.SelectedPersonIds) ? oSelectedFacility.SelectedPersonIds.slice() : []);
+            var fSelectedPrice = bIsPersonQty
+                ? fMinimumPrice
+                : this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
+            var sSelectedPriceType = bIsPersonQty
+                ? "Package Price"
+                : (oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price");
+
+            // Build DisplayFacilityName: append UnitText suffix when multiple variants exist
+            var sBaseName = oFacility.FacilityName || oFacility.Type || "";
+            var sDisplayFacilityName = sBaseName;
+            if (bShowUnitTextSuffix && sSelectedPriceType) {
+                sDisplayFacilityName = sBaseName + " (" + sSelectedPriceType + ")";
+            }
+
+            return {
+                FacilityID: oSelectedFacility.FacilityID || oFacility.ID,
+                CatalogFacilityID: oFacility.ID,
+                FacilityName: sBaseName,
+                DisplayFacilityName: sDisplayFacilityName,
+                Type: oFacility.Type,
+                SelectionMode: sSelectionMode,
+                BranchCode: oFacility.BranchCode,
+                Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
+                Image: this._getFacilityImageSource(oFacility),
+                UnitPrice: this._toNumber(oSelectedFacility.UnitPrice || oSelectedFacility.Price || oFacility.UnitPrice),
+                PricePerHour: this._toNumber(oFacility.PerHourPrice),
+                PricePerDay: this._toNumber(oFacility.PerDayPrice),
+                PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
+                PricePerYear: this._toNumber(oFacility.PerYearPrice),
+                Selected: bIsSelected,
+                SelectedPrice: fSelectedPrice,
+                SelectedPriceType: sSelectedPriceType,
+                UnitText: sSelectedPriceType,
+                ApiFacilityChargeType: sApiFacilityChargeType,
+                FacilityChargeType: sSavedFacilityChargeType,
+                Quantity: Math.max(parseInt(oSelectedFacility.Quantity, 10) || parseInt(oSelectedFacility.SavedQuantity, 10) || 1, 1),
+                SelectedPersonIds: aSelectedPersonIds,
+                PersonQuantities: aPersonQuantities,
+                RawFacilityItems: Array.isArray(oSelectedFacility.RawFacilityItems)
+                    ? oSelectedFacility.RawFacilityItems.map(function (oItem) {
+                        return Object.assign({}, oItem);
+                    })
+                    : [],
+                SavedTotalAmount: this._toNumber(oSelectedFacility.SavedTotalAmount),
+                SavedQuantity: Math.max(parseInt(oSelectedFacility.SavedQuantity, 10) || 0, 0),
+                SelectionModeLabel: this._getFacilitySelectionModeLabel(sSelectionMode),
+                MinimumQty: iMinimumQty,
+                MinimumPrice: fMinimumPrice,
+                PackageQty: iMinimumQty,
+                PackagePrice: fMinimumPrice,
+                StartDate: oSelectedFacility.StartDate || null,
+                EndDate: oSelectedFacility.EndDate || null,
+                StartTime: oSelectedFacility.StartTime || null,
+                EndTime: oSelectedFacility.EndTime || null,
+                TotalHour: oSelectedFacility.TotalHour || null
+            };
+        },
+
         _processFacilitiesForEdit: function () {
             var oHostelModel = this.getView().getModel("HostelModel");
             var iExtraBed = this._toNumber(oHostelModel.getProperty("/ExtraBed"));
             var aSelectedFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
             var aFacilities = this._aAllFacilities || [];
 
-            // Filter and process facilities
+            // Filter and process facilities — use reduce to allow 1:N mapping
+            // when a catalog facility has multiple UnitText variants in the booking
             var aProcessedFacilities = aFacilities
                 .filter(function (oFacility) {
                     if ((oFacility.Type || "").toLowerCase().trim() === "extra bed") {
@@ -1905,83 +2761,35 @@ sap.ui.define([
                     }
                     return true;
                 })
-                .map(function (oFacility) {
-                    var oSelectedFacility = this._findSelectedFacilityForEdit(oFacility, aSelectedFacilities);
-                    var sSelectionMode = oSelectedFacility.SelectionMode || oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
-                    var bIsSelected = !!(oSelectedFacility.FacilityName || oSelectedFacility.FacilityID || oSelectedFacility.ID);
-                    var bIsPersonQty = sSelectionMode === "PERSON_QTY";
-                    var bIsPerson = sSelectionMode === "PERSON";
-                    var iMinimumQty = bIsPersonQty
-                        ? (parseInt(oFacility.MinimumQty, 10) || 0)
-                        : 0;
-                    var fMinimumPrice = bIsPersonQty
-                        ? (parseFloat(oFacility.MinimumPrice) || 0)
-                        : 0;
-                    var sApiFacilityChargeType = bIsPersonQty
-                        ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
-                        : "";
-                    var sSavedFacilityChargeType = bIsPersonQty
-                        ? this._normalizeFacilityChargeType(oSelectedFacility.FacilityChargeType || sApiFacilityChargeType)
-                        : "";
-                    var aPersonQuantities = bIsPersonQty
-                        ? this._buildEditFacilityPersonQuantities(oSelectedFacility)
-                        : (Array.isArray(oSelectedFacility.PersonQuantities)
-                            ? oSelectedFacility.PersonQuantities.map(function (oLine) {
-                                var oOccupant = this._resolveEditFacilityOccupant(oLine.personId, oLine.personName);
-                                return {
-                                    personId: oOccupant ? oOccupant.id : oLine.personId,
-                                    personName: oOccupant ? oOccupant.name : oLine.personName,
-                                    qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
-                                };
-                            }.bind(this))
-                            : []);
-                    var aSelectedPersonIds = (bIsPersonQty || bIsPerson)
-                        ? this._buildEditFacilitySelectedPersonIds(oSelectedFacility, aPersonQuantities)
-                        : (Array.isArray(oSelectedFacility.SelectedPersonIds) ? oSelectedFacility.SelectedPersonIds.slice() : []);
-                    var fSelectedPrice = bIsPersonQty
-                        ? fMinimumPrice
-                        : this._deriveEditFacilitySelectedPrice(oSelectedFacility, oFacility, sSelectionMode);
-                    var sSelectedPriceType = bIsPersonQty
-                        ? "Package Price"
-                        : (oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "Unit Price");
+                .reduce(function (aResult, oFacility) {
+                    // Find ALL matching selected facilities for this catalog facility
+                    var aMatches = this._findAllSelectedFacilitiesForEdit(oFacility, aSelectedFacilities);
 
-                    return {
-                        FacilityID: oSelectedFacility.FacilityID || oFacility.ID,
-                        CatalogFacilityID: oFacility.ID,
-                        FacilityName: oFacility.FacilityName || oFacility.Type,
-                        Type: oFacility.Type,
-                        SelectionMode: sSelectionMode,
-                        BranchCode: oFacility.BranchCode,
-                        Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
-                        Image: this._getFacilityImageSource(oFacility),
-                        UnitPrice: this._toNumber(oSelectedFacility.UnitPrice || oSelectedFacility.Price || oFacility.UnitPrice),
-                        PricePerHour: this._toNumber(oFacility.PerHourPrice),
-                        PricePerDay: this._toNumber(oFacility.PerDayPrice),
-                        PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
-                        PricePerYear: this._toNumber(oFacility.PerYearPrice),
-                        Selected: bIsSelected,
-                        SelectedPrice: fSelectedPrice,
-                        SelectedPriceType: sSelectedPriceType,
-                        UnitText: sSelectedPriceType,
-                        ApiFacilityChargeType: sApiFacilityChargeType,
-                        FacilityChargeType: sSavedFacilityChargeType,
-                        Quantity: Math.max(parseInt(oSelectedFacility.Quantity, 10) || parseInt(oSelectedFacility.SavedQuantity, 10) || 1, 1),
-                        SelectedPersonIds: aSelectedPersonIds,
-                        PersonQuantities: aPersonQuantities,
-                        RawFacilityItems: Array.isArray(oSelectedFacility.RawFacilityItems)
-                            ? oSelectedFacility.RawFacilityItems.map(function (oItem) {
-                                return Object.assign({}, oItem);
-                            })
-                            : [],
-                        SavedTotalAmount: this._toNumber(oSelectedFacility.SavedTotalAmount),
-                        SavedQuantity: Math.max(parseInt(oSelectedFacility.SavedQuantity, 10) || 0, 0),
-                        SelectionModeLabel: this._getFacilitySelectionModeLabel(sSelectionMode),
-                        MinimumQty: iMinimumQty,
-                        MinimumPrice: fMinimumPrice,
-                        PackageQty: iMinimumQty,
-                        PackagePrice: fMinimumPrice
-                    };
-                }.bind(this));
+                    if (aMatches.length === 0) {
+                        // No selected facilities — create one unselected card
+                        aResult.push(this._buildProcessedFacilityEntry(oFacility, {}, false, false));
+                        return aResult;
+                    }
+
+                    // Determine if UnitTexts differ among the matches
+                    var aUniqueUnitTexts = [];
+                    aMatches.forEach(function (oMatch) {
+                        var sKey = String(oMatch.UnitText || oMatch.SelectedPriceType || "Unit Price").trim().toUpperCase();
+                        // Normalize for comparison
+                        sKey = sKey.replace(/[^A-Z0-9]/g, "");
+                        if (aUniqueUnitTexts.indexOf(sKey) < 0) {
+                            aUniqueUnitTexts.push(sKey);
+                        }
+                    });
+                    var bShowSuffix = aUniqueUnitTexts.length > 1;
+
+                    // Create one processed entry per matching selected facility
+                    aMatches.forEach(function (oSelectedFacility) {
+                        aResult.push(this._buildProcessedFacilityEntry(oFacility, oSelectedFacility, true, bShowSuffix));
+                    }.bind(this));
+
+                    return aResult;
+                }.bind(this), []);
 
             this._aAllFacilities = aProcessedFacilities;
             this._syncSelectedFacilityPersonsWithOccupants();
@@ -2021,6 +2829,7 @@ sap.ui.define([
                 endDateEditable: true,
                 editModeEnabled: false,
                 isStatusNew: false,
+                isAdminUpdatedYes: false,
                 showEditButton: false,
                 DurationOptions: [
                     { key: "1", text: "1 Month" },
@@ -2172,8 +2981,321 @@ sap.ui.define([
                 oSelectionModel.setProperty("/editModeEnabled", bEditModeEnabled);
             }
 
-            // Always call parent method to open the popover
+            // Always call parent method to open the popover (which calls _openFacilitySelectionDialog -> setData() replacing ALL model data)
             sap.ui.com.project1.controller.Booking.prototype.onFacilityCardPress.call(this, oFacility, oCard, oEvent);
+
+            // Set facilityBreakdown AFTER parent setData() so it isnt wiped out
+            if (oSelectionModel) {
+                oSelectionModel.setProperty("/facilityBreakdown", this._buildFacilityCalcBreakdown(oFacility));
+            }
+        },
+
+        /**
+         * Show calculation breakdown only for condition 2:
+         * dates differ from the booking, or explicit StartTime/EndTime values exist.
+         * TotalHour alone should not trigger the breakdown.
+         */
+        _shouldShowFacilityCalcBreakdown: function (oFacility) {
+            if (!oFacility || !oFacility.Selected) {
+                return false;
+            }
+
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sBookingStart = oHostelModel ? oHostelModel.getProperty("/StartDate") : "";
+            var sBookingEnd = oHostelModel ? oHostelModel.getProperty("/EndDate") : "";
+
+            var fnNormalizeDate = function (vDate) {
+                var oParsedDate = this._parseDate(vDate);
+                if (!oParsedDate || isNaN(oParsedDate.getTime())) {
+                    return "";
+                }
+
+                return [
+                    oParsedDate.getFullYear(),
+                    String(oParsedDate.getMonth() + 1).padStart(2, "0"),
+                    String(oParsedDate.getDate()).padStart(2, "0")
+                ].join("-");
+            }.bind(this);
+
+            var fnHasExplicitTimeValues = function (oItem) {
+                var sStartTime = String(oItem.StartTime || "").trim();
+                var sEndTime = String(oItem.EndTime || "").trim();
+
+                if (sStartTime || sEndTime) {
+                    return true;
+                }
+                return false;
+            };
+
+            var sNormalizedBookingStart = fnNormalizeDate(sBookingStart);
+            var sNormalizedBookingEnd = fnNormalizeDate(sBookingEnd);
+            var aItems = Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
+                ? oFacility.RawFacilityItems
+                : [oFacility];
+
+            return aItems.some(function (oItem) {
+                var sFacilityStart = fnNormalizeDate(oItem.StartDate || oFacility.StartDate);
+                var sFacilityEnd = fnNormalizeDate(oItem.EndDate || oFacility.EndDate);
+                var bDatesDiffer = sFacilityStart !== sNormalizedBookingStart || sFacilityEnd !== sNormalizedBookingEnd;
+
+                return bDatesDiffer || fnHasExplicitTimeValues(oItem);
+            });
+        },
+
+        /**
+         * Build a structured calculation breakdown for a facility item
+         * shown in the popover dialog as a compact invoice-style list.
+         * Returns { hasBreakdown: Boolean, items: Array, grandTotal: String, currency: String }
+         * Each item: { personName, tag, dateRange, math, subtotal }
+         */
+        _buildFacilityCalcBreakdown: function (oFacility) {
+            if (!oFacility || !oFacility.Selected) {
+                return { hasBreakdown: false, items: [], grandTotal: "₹0.00", currency: "INR" };
+            }
+
+            if (!this._shouldShowFacilityCalcBreakdown(oFacility)) {
+                return { hasBreakdown: false, items: [], grandTotal: "0.00", currency: oFacility.Currency || "INR" };
+            }
+
+            var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sBookingStart = oHostelModel ? oHostelModel.getProperty("/StartDate") : "";
+            var sBookingEnd = oHostelModel ? oHostelModel.getProperty("/EndDate") : "";
+            var sCurrency = oFacility.Currency || (oHostelModel ? oHostelModel.getProperty("/Currency") : "INR") || "INR";
+            var sFacilityTag = oFacility.DisplayFacilityName || oFacility.FacilityName || oFacility.Type || "";
+
+            // Resolve facility-specific dates (from RawFacilityItems or facility itself, fallback to booking)
+            var sFacStart, sFacEnd, sFacStartTime, sFacEndTime, sFacTotalHour;
+            if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
+                var oFirstRaw = oFacility.RawFacilityItems[0];
+                sFacStart = oFirstRaw.StartDate || oFacility.StartDate || sBookingStart || null;
+                sFacEnd = oFirstRaw.EndDate || oFacility.EndDate || sBookingEnd || null;
+                sFacStartTime = oFirstRaw.StartTime || oFacility.StartTime || null;
+                sFacEndTime = oFirstRaw.EndTime || oFacility.EndTime || null;
+                sFacTotalHour = oFirstRaw.TotalHour || oFacility.TotalHour || null;
+            } else {
+                sFacStart = oFacility.StartDate || sBookingStart || null;
+                sFacEnd = oFacility.EndDate || sBookingEnd || null;
+                sFacStartTime = oFacility.StartTime || null;
+                sFacEndTime = oFacility.EndTime || null;
+                sFacTotalHour = oFacility.TotalHour || null;
+            }
+
+            // Format date for compact display (DD/MM)
+            var fnFormatDateShort = function (s) {
+                if (!s) { return ""; }
+                var d = new Date(s);
+                if (!isNaN(d.getTime())) {
+                    var dd = String(d.getDate()).padStart(2, "0");
+                    var mm = String(d.getMonth() + 1).padStart(2, "0");
+                    return dd + "/" + mm;
+                }
+                return String(s).replace(/T.*$/, "").trim();
+            };
+
+            var sDateRange = "";
+            if (sFacStart && sFacEnd) {
+                sDateRange = fnFormatDateShort(sFacStart) + " To " + fnFormatDateShort(sFacEnd);
+            } else if (sFacStart) {
+                sDateRange = fnFormatDateShort(sFacStart);
+            } else if (sFacEnd) {
+                sDateRange = fnFormatDateShort(sFacEnd);
+            }
+
+            var aItems = [];
+            var fGrandTotal = 0;
+
+            // ── PERSON / PERSON_QTY modes ──
+            if (sSelectionMode === "PERSON" || sSelectionMode === "PERSON_QTY") {
+                fGrandTotal = this._getFacilityCardTotalAmount(oFacility);
+                var aOccupants = this._getEditFacilityOccupants
+                    ? this._getEditFacilityOccupants()
+                    : (this._getOccupantOptions ? this._getOccupantOptions() : []);
+                var oPerPersonResult = this._calculatePerPersonTotal(oFacility, aOccupants);
+
+                if (oPerPersonResult.personBreakdown.length > 0) {
+                    oPerPersonResult.personBreakdown.forEach(function (oPerson) {
+                        var sPersonDateRange = "";
+                        if (oPerson.startDate && oPerson.endDate) {
+                            sPersonDateRange = fnFormatDateShort(oPerson.startDate) + " To " + fnFormatDateShort(oPerson.endDate);
+                        } else if (oPerson.startDate) {
+                            sPersonDateRange = fnFormatDateShort(oPerson.startDate);
+                        } else if (oPerson.endDate) {
+                            sPersonDateRange = fnFormatDateShort(oPerson.endDate);
+                        }
+
+                        var sMath = "";
+                        if (sSelectionMode === "PERSON") {
+                            var sUnitLabel = "";
+                            var sUnitKey = (oPerson.priceType || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            if (sUnitKey === "PERDAY") { sUnitLabel = Math.max(oPerson.dayCount, 1) + "Day(s)"; }
+                            else if (sUnitKey === "PERMONTH") { sUnitLabel = Math.max(oPerson.monthCount, 1) + "Mos"; }
+                            else if (sUnitKey === "PERYEAR") { sUnitLabel = Math.max(oPerson.yearCount, 1) + "Yrs"; }
+                            else if (sUnitKey === "PERHOUR") { sUnitLabel = Math.max(oPerson.dayCount, 1) + "Day(s) × " + Math.max(oPerson.hourCount, 1) + "Hr(s)"; }
+                            else { sUnitLabel = "× 1"; }
+                            sMath = "₹" + oPerson.price.toFixed(2) + " × " + sUnitLabel;
+                        } else {
+                            // PERSON_QTY
+                            if (oPerson.chargeType === "DAILY") {
+                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " Days";
+                            } else if (oPerson.chargeType === "ONCE_PER_BOOKING") {
+                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × 1";
+                            } else {
+                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity;
+                            }
+                        }
+
+                        aItems.push({
+                            personName: oPerson.personName,
+                            tag: "",
+                            dateRange: sPersonDateRange || sDateRange,
+                            math: sMath,
+                            subtotal: "₹" + oPerson.personTotal.toFixed(2)
+                        });
+                    }.bind(this));
+                }
+            } else {
+                // ── SINGLE / QTY modes ──
+                fGrandTotal = this._getFacilityCardTotalAmount(oFacility);
+                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+                var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+                var iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+                var iDayCount = this._getDayCount(sFacStart, sFacEnd);
+                var iMonthCount = this._getMonthCount(sFacStart, sFacEnd);
+                var iYearCount = this._getYearCount(sFacStart, sFacEnd);
+                var iHourCount = this._getHourCount(sFacStart, sFacEnd, sFacStartTime, sFacEndTime, sFacTotalHour);
+
+                var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                var sMath = "";
+
+                if (sUnitKey === "PERHOUR") {
+                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + "Day(s) × " + Math.max(iHourCount, 1) + "Hr(s)";
+                } else if (sUnitKey === "PERDAY") {
+                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + " Days";
+                } else if (sUnitKey === "PERMONTH") {
+                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iMonthCount, 1) + " Mos";
+                } else if (sUnitKey === "PERYEAR") {
+                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iYearCount, 1) + " Yrs";
+                } else if (sUnitKey === "UNITPRICE" || sUnitKey === "UNIT") {
+                    sMath = "₹" + fPrice.toFixed(2);
+                } else if (sUnitKey === "PACKAGEPRICE" || sUnitKey === "PACKAGE") {
+                    var sChargeType = String(oFacility.FacilityChargeType || "").toUpperCase();
+                    if (sChargeType === "DAILY") {
+                        sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + " Days";
+                    } else {
+                        sMath = "₹" + fPrice.toFixed(2) + " (once)";
+                    }
+                } else {
+                    sMath = "₹" + fPrice.toFixed(2);
+                }
+
+                if (iQuantity > 1) {
+                    sMath += " × " + iQuantity + " Qty";
+                }
+
+                // For SINGLE/QTY, use facility name as the personName and tag
+                var sDisplayName = sFacilityTag || "Facility";
+                aItems.push({
+                    personName: sDisplayName,
+                    tag: sSelectionMode === "QTY" ? "×" + iQuantity : "",
+                    dateRange: sDateRange,
+                    math: sMath,
+                    subtotal: "₹" + fGrandTotal.toFixed(2)
+                });
+            }
+
+            return {
+                hasBreakdown: aItems.length > 0,
+                items: aItems,
+                grandTotal: "₹" + fGrandTotal.toFixed(2),
+                currency: sCurrency
+            };
+        },
+
+        /**
+         * Override _getFacilitySelectionDialog to inject a compact invoice-style
+         * calculation breakdown list into the popover content, visible only when
+         * facility dates differ from booking dates or time components exist.
+         */
+        _getFacilitySelectionDialog: function () {
+            var oDialog = sap.ui.com.project1.controller.Booking.prototype._getFacilitySelectionDialog.call(this);
+
+            // Inject the breakdown section only once
+            if (!this._bFacilityBreakdownInjected && oDialog) {
+                var aContent = oDialog.getContent();
+                if (aContent && aContent.length > 0) {
+                    var oVBox = aContent[0];
+                    if (oVBox && oVBox.addItem) {
+                        // Thin separator
+                        oVBox.addItem(
+                            new sap.m.ToolbarSpacer({ height: "0.25rem" })
+                        );
+                        // Compact invoice-style calculation breakdown
+                        oVBox.addItem(
+                            new sap.m.VBox({
+                                visible: "{= !!${FacilitySelection>/facilityBreakdown/hasBreakdown} }",
+                                items: [
+                                    // Section header
+                                    new sap.m.Text({
+                                        text: "Calculation"
+                                    }).addStyleClass("calcSectionHeader"),
+                                    // Person/item rows
+                                    new sap.m.List({
+                                        showNoData: false,
+                                        showSeparators: "Inner",
+                                        items: {
+                                            path: "FacilitySelection>/facilityBreakdown/items",
+                                            template: new sap.m.CustomListItem({
+                                                content: [
+                                                    new sap.m.VBox({
+                                                        width: "100%",
+                                                        items: [
+                                                            // Line 1: Name (wraps) + sap-icon://date-time + "From date" (continuous inline)
+                                                            new sap.m.HBox({
+                                                                alignItems: "Center",
+                                                                items: [
+                                                                    new sap.m.Text({
+                                                                        text: "{FacilitySelection>personName}",
+                                                                        wrapping: true
+                                                                    }).addStyleClass("calcPersonName"),
+                                                                    new sap.ui.core.Icon({
+                                                                        src: "sap-icon://date-time",
+                                                                        size: "0.875rem"
+                                                                    }).addStyleClass("calcDateIcon"),
+                                                                    new sap.m.Text({
+                                                                        text: "{= 'From ' + ${FacilitySelection>dateRange} }"
+                                                                    }).addStyleClass("calcDateRange")
+                                                                ]
+                                                            }),
+                                                            // Line 2: math (left, near-black) + subtotal (right, teal)
+                                                            new sap.m.HBox({
+                                                                width: "100%",
+                                                                justifyContent: "SpaceBetween",
+                                                                alignItems: "Center",
+                                                                items: [
+                                                                    new sap.m.Text({
+                                                                        text: "{FacilitySelection>math}"
+                                                                    }).addStyleClass("calcMath"),
+                                                                    new sap.m.Text({
+                                                                        text: "{FacilitySelection>subtotal}"
+                                                                    }).addStyleClass("calcSubtotal")
+                                                                ]
+                                                            })
+                                                        ]
+                                                    })
+                                                ]
+                                            }).addStyleClass("calcListItem")
+                                        }
+                                    }).addStyleClass("calcItemList")
+                                ]
+                            }).addStyleClass("calcBreakdownSection")
+                        );
+                    }
+                }
+                this._bFacilityBreakdownInjected = true;
+            }
+
+            return oDialog;
         },
 
         // Override the nav back to always go to ManageProfile
@@ -2212,3 +3334,6 @@ sap.ui.define([
         }
     });
 });
+
+
+

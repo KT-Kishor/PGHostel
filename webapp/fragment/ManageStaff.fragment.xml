@@ -2,14 +2,12 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:f="sap.ui.layout.form"
-	xmlns:l="sap.ui.layout"
->
+	xmlns:l="sap.ui.layout">
 	<Dialog
         id="MS_id_authDialog"
         draggable="true"
         resizable="true"
-        class="authDialog"
-    >
+        class="authDialog">
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
@@ -18,10 +16,9 @@
 			</Bar>
 		</customHeader>
 		<content>
-        
 			<f:SimpleForm
-              id="MS_id_signUpForm"
-    editable="true"
+            id="MS_id_signUpForm"
+            editable="true"
             layout="ColumnLayout"
             labelSpanXL="3"
             labelSpanL="3"
@@ -39,46 +36,36 @@
             >
 				<Label text=""/>
 				<!-- Empty label to align properly -->
-<Label text=""/>
-
-<!-- Salutation -->
-
-
-	<Label text="{i18n>fullname}" required="true"/>
-
-<ComboBox
-    id="MS_id_signUpSalutation"
-    selectedKey="{MDmodel>/Salutation}"
-    change="onChangeSalutation"
-    placeholder="{i18n>mr}"
-    valueStateText="{i18n>MVDsalutation}">
-    
-    <layoutData>
-        <l:GridData span="XL3 L3 M3 S12"/>
-    </layoutData>
-
-    <core:ListItem key="Mr." text="Mr."/>
-    <core:ListItem key="Ms." text="Ms."/>
-    <core:ListItem key="Mrs." text="Mrs."/>
-    <core:ListItem key="Dr." text="Dr."/>
-    <core:ListItem key="Other." text="Other."/>
-</ComboBox>
-
-<Input
-    id="MS_id_signUpName"
-    value="{MDmodel>/UserName}"
-    placeholder="{i18n>enterFullName}"
-    required="true"
-    liveChange="_LCvalidateName"
-    valueStateText="{i18n>MSenterValidName}"
-    maxLength="50">
-    
-    <layoutData>
-        <l:GridData span="XL9 L9 M9 S12"/>
-    </layoutData>
-
-</Input>
-                
+				<Label text=""/>
+				<!-- Salutation -->
+				<Label text="{i18n>fullname}" required="true"/>
+				<ComboBox
+                id="MS_id_signUpSalutation"
+                selectedKey="{MDmodel>/Salutation}"
+                change="onChangeSalutation"
+                placeholder="{i18n>mr}"
+                valueStateText="{i18n>MVDsalutation}">
+					<layoutData>
+						<l:GridData span="XL3 L3 M3 S12"/>
+					</layoutData>
+					<core:ListItem key="Mr." text="Mr."/>
+					<core:ListItem key="Ms." text="Ms."/>
+					<core:ListItem key="Mrs." text="Mrs."/>
+					<core:ListItem key="Dr." text="Dr."/>
+					<core:ListItem key="Other." text="Other."/>
+				</ComboBox>
+				<Input
+                id="MS_id_signUpName"
+                value="{MDmodel>/UserName}"
+                placeholder="{i18n>enterFullName}"
+                required="true"
+                liveChange="_LCvalidateName"
+                valueStateText="{i18n>MSenterValidName}"
+                maxLength="50">
+					<layoutData>
+						<l:GridData span="XL9 L9 M9 S12"/>
+					</layoutData>
+				</Input>
 				<Label
                     text="{i18n>MVDDOB}"
                     required="true"
@@ -124,7 +111,6 @@
 				<Label
                     text="{i18n>emailId}"
                     required="true"
-                    class="sapUiTinyMarginTop"
                 />
 				<Input
                     id="MS_id_signUpEmail"
@@ -232,38 +218,39 @@
                     />
 				</ComboBox>
 				<Label text="" />
-		<Label text="{i18n>MSmobileNo}" required="true"/>
-
-<!-- STD (small) -->
-<ComboBox
-    id="MS_id_signUpSTD"
-    placeholder="ISD"
-    selectedKey="{MDmodel>/STDCode}"
-    width="100%"
-    class="smallSTD">
-    
-    <layoutData>
-        <l:GridData span="XL2 L2 M3 S12"/>
-    </layoutData>
-
-    <core:ListItem
-        key="{CountryModel>stdCode}"
-        text="{CountryModel>stdCode}" />
-</ComboBox>
-
-<!-- Mobile (big) -->
-<Input
-    id="MS_id_signUpPhone"
-    type="Tel"
-    value="{MDmodel>/MobileNo}"
-    placeholder="Enter mobile number"
-    width="100%">
-    
-    <layoutData>
-        <l:GridData span="XL10 L10 M9 S12"/>
-    </layoutData>
-
-</Input>
+				<Label text="{i18n>MSmobileNo}" required="true"/>
+				<!-- STD (small) -->
+				<ComboBox
+                id="MS_id_signUpSTD"
+                placeholder="ISD"
+                selectedKey="{MDmodel>/STDCode}"
+                width="100%"
+                class="smallSTD"
+                showSecondaryValues="true" 
+                items="{path:'CountryModel>/', length:1000}" 
+                filterSecondaryValues="true" change="onSTDChange"
+                valueStateText="{i18n>selectISDCode}">
+					<layoutData>
+						<l:GridData span="XL2 L2 M3 S12"/>
+					</layoutData>
+					<core:ListItem 
+                    key="{CountryModel>stdCode}" 
+                    text="{CountryModel>stdCode}" 
+                    additionalText="{CountryModel>code}" 
+                    />
+				</ComboBox>
+				<!-- Mobile (big) -->
+				<Input
+                id="MS_id_signUpPhone"
+                type="Tel"
+                value="{MDmodel>/MobileNo}"
+                placeholder="Enter mobile number"
+                liveChange="onPhoneLiveChange"
+                width="100%">
+					<layoutData>
+						<l:GridData span="XL10 L10 M9 S12"/>
+					</layoutData>
+				</Input>
 				<Label
                     text="{i18n>address}"
                     required="true"
@@ -276,9 +263,7 @@
                     liveChange="onAddressChange"
                     placeholder="{i18n>placeHolderAddress}"
                 />
-			
 			</f:SimpleForm>
-            
 		</content>
 		<footer>
 			<Toolbar>

@@ -16,15 +16,22 @@
 
     return BaseController.extend("sap.ui.com.project1.controller.Booking", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function () {   
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
-            this._iFacilityPageSize = 3; // show 3 cards at once
+            this._iFacilityPageSize = 3; // fallback; recalculated dynamically
+            this._iFacilityCardWidth = 250; // base card width (px)
+            this._iFacilityCardGap = 16;   // gap between cards (px) – matches CSS gap: 1rem
             // Initialize primary member tracking for toast notifications
             this._sLastPrimaryMemberId = "SELF"; // Default to logged-in user
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+
+            // Resize observer to recalculate visible card count
+            this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
+            sap.ui.core.ResizeHandler.register(this.getView(), this._fnFacilityResizeHandler);
+
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
                     this._resetBookingPageModels();
@@ -41,6 +48,10 @@
         },
 
         onExit: function () {
+            if (this._fnFacilityResizeHandler) {
+                sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
+                this._fnFacilityResizeHandler = null;
+            }
             this._clearAllCarouselTimers();
             if (this._adCarouselInterval) {
                 clearInterval(this._adCarouselInterval);
@@ -688,12 +699,6 @@
             // Calculate base days
             let iDays = Math.max(Math.floor((oBillingEndDate - oStartDate) / 86400000), 0);
 
-            // For monthly and yearly plans, add 1 day to compensate for the day subtracted in _updateAutoEndDate
-            // This ensures full month/year coverage (e.g., 365 days for a non-leap year, 366 for leap year)
-            if (sPlan === "Per Month" || sPlan === "Per Year") {
-                iDays += 1;
-            }
-
             return iDays;
         },
 
@@ -1285,7 +1290,7 @@
             var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") : true;
 
             oSelectionModel.setData({
-                title: oFacility.FacilityName,
+                title: oFacility.DisplayFacilityName || oFacility.FacilityName,
                 DisplayPrice: this._formatFacilityPriceWithUnit(
                     fPrice,
                     oFacility.Currency || "INR",
@@ -2036,7 +2041,9 @@
 
                         return {
                             FacilityID: oFacility.FacilityID,
+                            CatalogFacilityID: oFacility.CatalogFacilityID || oFacility.ID,
                             FacilityName: oFacility.FacilityName,
+                            DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                             Currency: sCurrency,
                             SelectionMode: sSelectionMode,
                             Price: fPrice,
@@ -2063,7 +2070,12 @@
                                 )
                                 : this._formatFacilityPriceWithUnit(fPrice, sCurrency, sPriceType),
                             TotalAmount: Number(fTotal.toFixed(2)),
-                            BreakdownText: sBreakdown
+                            BreakdownText: sBreakdown,
+                            RawFacilityItems: Array.isArray(oFacility.RawFacilityItems)
+                                ? oFacility.RawFacilityItems.map(function (oItem) {
+                                    return Object.assign({}, oItem);
+                                })
+                                : []
                         };
                     }.bind(this));
                 oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
@@ -3100,7 +3112,7 @@
             if (oDatePicker) {
                 const now = new Date();
                 const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
-                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+                const focusDate = new Date(2000, 0, 1);
 
                 oDatePicker.setMaxDate(now);
                 oDatePicker.setMinDate(minDate);
@@ -3137,7 +3149,7 @@
             if (oDatePicker) {
                 const now = new Date();
                 const minDate = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
-                const focusDate = new Date(now.getFullYear() - 10, now.getMonth(), now.getDate());
+                const focusDate = new Date(2000, 0, 1);
 
                 oDatePicker.setMaxDate(now);
                 oDatePicker.setMinDate(minDate);
@@ -4237,7 +4249,9 @@
                                                     if (sBreakdown) {
                                                         sResult += ": " + sBreakdown;
                                                     }
-                                                    if (fTotal !== undefined && fTotal !== null) {
+                                                    // Only append total for SINGLE/QTY modes (breakdown has no =).
+                                                    // PERSON/PERSON_QTY modes already have per-person subtotals.
+                                                    if (fTotal !== undefined && fTotal !== null && (sBreakdown || "").indexOf("=") === -1) {
                                                         sResult += " = " + fTotal + " " + (sCurrency || "");
                                                     }
                                                     return sResult;
@@ -4386,6 +4400,60 @@
             oReader.readAsDataURL(oFile);
         },
 
+        _getVisibleCardCount: function () {
+            const bIsMobile = sap.ui.Device.support.touch && window.innerWidth <= 1024;
+
+            const oViewport = this.byId("facilityViewport");
+            if (!oViewport || !oViewport.getDomRef()) {
+                return bIsMobile ? 1 : 3;
+            }
+
+            const iContainerWidth = oViewport.getDomRef().clientWidth;
+            if (!iContainerWidth || iContainerWidth <= 0) {
+                return bIsMobile ? 1 : 3;
+            }
+
+            // On mobile, always show 1 card
+            if (bIsMobile) {
+                return 1;
+            }
+
+            const iCardWidth = this._iFacilityCardWidth || 250;
+            const iGap = this._iFacilityCardGap || 16;
+
+            // How many cards fit: floor((availableWidth + gap) / (cardWidth + gap))
+            const iFit = Math.floor((iContainerWidth + iGap) / (iCardWidth + iGap));
+            return Math.max(1, iFit);
+        },
+
+        _updateFacilityNavButtons: function (aFacilities) {
+            const oPrevBtn = this.byId("facilityPrevBtn");
+            const oNextBtn = this.byId("facilityNextBtn");
+            const iStart = this._iFacilityStartIndex || 0;
+            const iPageSize = this._iFacilityPageSize || 1;
+
+            if (oPrevBtn) {
+                oPrevBtn.setVisible(iStart > 0);
+            }
+            if (oNextBtn) {
+                oNextBtn.setVisible(iStart + iPageSize < aFacilities.length);
+            }
+        },
+
+        _onFacilityCarouselResize: function () {
+            if (!this.getView() || !this.getView().getDomRef()) {
+                return;
+            }
+            var iNewPageSize = this._getVisibleCardCount();
+            if (iNewPageSize !== this._iFacilityPageSize) {
+                this._iFacilityPageSize = iNewPageSize;
+                var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+                var iMaxStart = Math.max(aFacilities.length - iNewPageSize, 0);
+                this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
+                this._renderFacilityCards();
+            }
+        },
+
         _renderFacilityCards: function () {
             const oContainer = this.byId("facilityCardsContainer");
             const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
@@ -4396,29 +4464,34 @@
 
             oContainer.removeAllItems();
 
-
             if (!aFacilities.length) {
                 oContainer.addItem(new sap.m.Text({
                     text: "No facilities available for the selected room plan."
                 }).addStyleClass("sapUiSmallMarginTop"));
+                this._updateFacilityNavButtons(aFacilities);
                 return;
             }
 
-            const iStart = this._iFacilityStartIndex || 0;
-            const bPhone = sap.ui.Device.system.phone;
-            const iPageSize = bPhone ? 1 : 3;
-            this._iFacilityPageSize = iPageSize;
-            const aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
+            // Calculate visible card count dynamically from available viewport width
+            this._iFacilityPageSize = this._getVisibleCardCount();
+            var iPageSize = this._iFacilityPageSize;
+            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
 
-            const oRow = new sap.m.HBox({
+            var iStart = this._iFacilityStartIndex;
+            var aVisibleFacilities = aFacilities.slice(iStart, iStart + iPageSize);
+            this._updateFacilityNavButtons(aFacilities);
+
+            var oRow = new sap.m.HBox({
                 width: "100%",
                 justifyContent: "Center",
                 alignItems: "Start",
                 wrap: sap.ui.Device.system.phone ? "Wrap" : "NoWrap"
             }).addStyleClass("sapUiSmallMarginTop facilityCardsRow");
 
+            var that = this;
             aVisibleFacilities.forEach(function (oFacility) {
-                const oCard = new sap.m.VBox({
+                var oCard = new sap.m.VBox({
                     width: sap.ui.Device.system.phone ? "100%" : "250px",
                     alignItems: "Stretch",
                     justifyContent: "Start",
@@ -4445,7 +4518,7 @@
                                     justifyContent: "End",
                                     items: [
                                         new sap.m.Text({
-                                            text: oFacility.FacilityName,
+                                            text: oFacility.DisplayFacilityName || oFacility.FacilityName,
                                             textAlign: "Center",
                                             wrapping: true
                                         }).addStyleClass("facilityOverlayText facilityCardTitle")
@@ -4497,6 +4570,107 @@
             }.bind(this));
 
             oContainer.addItem(oRow);
+            this._attachFacilitySwipeHandlers();
+            this._renderFacilityDots();
+        },
+
+
+        _attachFacilitySwipeHandlers: function () {
+            // Use touch-support + width instead of system.phone so it works
+            // with Chrome DevTools device emulation as well as real devices.
+            if (!sap.ui.Device.support.touch || window.innerWidth > 1024) {
+                return;
+            }
+
+            var oViewport = this.byId("facilityViewport");
+            if (!oViewport) {
+                return;
+            }
+
+            // attachBrowserEvent is managed by UI5 and automatically
+            // re-attaches when the underlying DOM is recreated.
+            // Guard on the control instance so we never double-attach.
+            if (this._oFacilityViewportControl === oViewport) {
+                return;
+            }
+            this._oFacilityViewportControl = oViewport;
+
+            var iStartX = 0, iStartY = 0;
+            var that = this;
+
+            oViewport.attachBrowserEvent("touchstart", function (e) {
+                if (e.touches && e.touches.length) {
+                    iStartX = e.touches[0].clientX;
+                    iStartY = e.touches[0].clientY;
+                } else if (e.targetTouches && e.targetTouches.length) {
+                    iStartX = e.targetTouches[0].clientX;
+                    iStartY = e.targetTouches[0].clientY;
+                }
+            });
+
+            oViewport.attachBrowserEvent("touchend", function (e) {
+                var iEndX, iEndY;
+                if (e.changedTouches && e.changedTouches.length) {
+                    iEndX = e.changedTouches[0].clientX;
+                    iEndY = e.changedTouches[0].clientY;
+                } else {
+                    return;
+                }
+                var iDiffX = iStartX - iEndX;
+                var iDiffY = iStartY - iEndY;
+
+                if (Math.abs(iDiffX) > Math.abs(iDiffY) && Math.abs(iDiffX) > 50) {
+                    if (iDiffX > 0) {
+                        that.onFacilityNext();
+                    } else {
+                        that.onFacilityPrev();
+                    }
+                }
+            });
+        },
+
+
+        _renderFacilityDots: function () {
+            if (!sap.ui.Device.support.touch || window.innerWidth > 1024) {
+                return;
+            }
+            var oDotsContainer = this.byId("facilityDotsContainer");
+            if (!oDotsContainer) return;
+            oDotsContainer.destroyItems();
+            oDotsContainer.setVisible(false);
+
+            var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+            var iTotal = aFacilities.length;
+            if (iTotal <= 1) return;
+
+            var iPageSize = this._iFacilityPageSize || this._getVisibleCardCount();
+            var iCurrent = this._iFacilityStartIndex || 0;
+
+            // Calculate active dot index (page-based)
+            var iActivePage = Math.floor(iCurrent / iPageSize);
+            var iTotalPages = Math.ceil(iTotal / iPageSize);
+
+            oDotsContainer.setVisible(true);
+            for (var i = 0; i < iTotalPages; i++) {
+                var oDot = new sap.m.HBox({
+                    width: "10px",
+                    height: "10px"
+                }).addStyleClass("facilityDot");
+                if (i === iActivePage) {
+                    oDot.addStyleClass("facilityDotActive");
+                }
+                oDotsContainer.addItem(oDot);
+            }
+
+            // Show/hide the swipe-hint animation on the right edge based on page
+            var oViewport = this.byId("facilityViewport");
+            if (oViewport) {
+                if (iActivePage >= iTotalPages - 1) {
+                    oViewport.addStyleClass("facilityNoSwipeHint");
+                } else {
+                    oViewport.removeStyleClass("facilityNoSwipeHint");
+                }
+            }
         },
 
 
@@ -4723,16 +4897,18 @@
 
 
         onFacilityNext: function () {
-            const aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
-            const iPageSize = this._iFacilityPageSize || 3;
-            const iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+            var iPageSize = this._getVisibleCardCount();
+            this._iFacilityPageSize = iPageSize;
+            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
 
             this._iFacilityStartIndex = Math.min((this._iFacilityStartIndex || 0) + iPageSize, iMaxStart);
             this._renderFacilityCards();
         },
 
         onFacilityPrev: function () {
-            const iPageSize = this._iFacilityPageSize || 3;
+            var iPageSize = this._getVisibleCardCount();
+            this._iFacilityPageSize = iPageSize;
             this._iFacilityStartIndex = Math.max((this._iFacilityStartIndex || 0) - iPageSize, 0);
             this._renderFacilityCards();
         },
@@ -5002,7 +5178,7 @@
                     return;
                 }
 
-                if (String(oMatchedCoupon.DiscountType || "").trim() === "percentage") {
+                if (String(oMatchedCoupon.DiscountType || "").trim().toLowerCase() === "percentage") {
                     fDiscountAmount = fCouponBaseAmount * (Number(oMatchedCoupon.DiscountValue || 0) / 100);
                     if (Number(oMatchedCoupon.UptoValue || 0) > 0 && fDiscountAmount > Number(oMatchedCoupon.UptoValue || 0)) {
                         fDiscountAmount = Number(oMatchedCoupon.UptoValue || 0);
@@ -6032,13 +6208,15 @@
                 };
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
-                let sMessage = "Booking created successfully.";
+                // let sMessage = "Booking created successfully.";
+                let sMessage = "Thank you! Your booking request has been received.\n\n" +
+                    "We are checking room availability, and the confirmation status will be emailed to you shortly";
 
                 oHostelModel.setProperty("/BookingPayload", oPayload);
 
                 if (aBookingDetails.length) {
-                    sMessage = "Booking created successfully.\n\n" + aBookingDetails.map(function (oItem) {
-                        return "Booking ID: " + oItem.BookingID;
+                    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
+                        return "Booking Reference No: " + oItem.BookingID;
                     }).join("\n");
                 }
 
@@ -6047,8 +6225,9 @@
                 }
 
                 MessageBox.success(sMessage, {
-                    title: "Success",
+                    title: "Booking Request Received",
                     styleClass: "myUnifiedBtn",
+                    contentWidth: "500px",
                     onClose: function () {
                         const sUserID = oHostelModel.getProperty("/UserID");
 
