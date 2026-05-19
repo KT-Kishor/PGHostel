@@ -430,7 +430,9 @@ sap.ui.define([
 
             if (
                 this.data.Status === "Cancelled" ||
-                this.data.Status === "Completed"
+                this.data.Status === "Completed" ||
+                this.data.Status === "Rejected" ||
+                this.data.Status === "New"
             ) {
                 sap.m.MessageToast.show(this.i18nModel.getText("thisCustomercantbeAssign"));
                 return;
@@ -536,6 +538,11 @@ sap.ui.define([
             var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();
 
+              if (!selected) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoConfirmRoom"));
+                return;
+            }
+
                 var Model = selected.getBindingContext("HostelModel");
             var ID = Model.getObject();
 
@@ -569,6 +576,9 @@ sap.ui.define([
                     that.getBusyDialog();
                     await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
                     that.Cust_read();
+                    that.byId("idPOTable").removeSelections()
+                }else{
+                    that.byId("idPOTable").removeSelections()
                 }
             }
         }
@@ -577,6 +587,10 @@ sap.ui.define([
 HM_RejectRoom: function (oEvent) {
      var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();
+              if (!selected) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoRejectRoom"));
+                return;
+            }
 
                 var Model = selected.getBindingContext("HostelModel");
           this.ID = Model.getObject();

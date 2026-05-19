@@ -767,7 +767,6 @@
                                 width="100%"
                                 class="sapUiSmallMarginTop"
                                 items="{path: 'CustomerData>/Documents'}"
-                                mode="{= ${VisibleModel>/visible} === true ? 'Delete' : 'None' }"
                                 delete="onDocumentDelete"
                                 busyIndicatorDelay="0"
                                 inset="false"
@@ -1362,7 +1361,7 @@
                                 tooltip="GST Setup"
                                 press="onGSTBooking"
                                 visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
-                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"
+                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
                             <Button
@@ -1376,7 +1375,7 @@
                                      &amp;&amp; ${CustomerData>/Status} !== 'Completed'
                                      &amp;&amp;
                                     (
-                                        ${CustomerData>/Status} === 'New' ||
+                                        (${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Confirmed') ||
                                         (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin')
                                     )
                                     &amp;&amp; !${VisibleModel>/visible}
@@ -1388,7 +1387,7 @@
                                 tooltip="{i18n>cancelBooking}"
                                 text="{i18n>cancelBooking}"
                                 press="onPressCancelBooking"
-                                visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
+                                visible="{= (${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Confirmed') &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
                                 class="sapUiSmallMarginBegin myUnifiedBtn"
                             />
 

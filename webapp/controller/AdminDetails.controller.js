@@ -3527,9 +3527,10 @@ const toDelete = [];
 const toKeep = [];
 
 facilityItems.forEach(f => {
-    if (!validMemberIds.has(f.MemberID)) {
+
+    if (!validMemberIds.has(f.MemberID) && f.MemberID !=="") {
         toDelete.push(f);
-    } else {
+    } else if(!f.MemberID) {
         toKeep.push(f);
     }
 });
@@ -8080,7 +8081,7 @@ setTimeout(function () {
 
             oBinding.filter(aFilters);
         },
-        onConfirmMemberSelection: function () {
+    onConfirmMemberSelection: function () {
 
     var oView = this.getView();
     var oTable = sap.ui.getCore().byId("abmemberSelectTable");
@@ -8095,6 +8096,24 @@ setTimeout(function () {
     var oCustomerModel = this.getView().getModel("BookingView");
     var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
+    // validate filename before pushing
+    for (let oItem of aSelectedItems) {
+
+        var oContext = oItem.getBindingContext("BookingView");
+        var oData = oContext.getObject();
+
+        var aMemberDocs = oData.Documents || [];
+
+
+            if (aMemberDocs.length === 0) {
+                sap.m.MessageBox.error(
+                    "Document is missing for member: " + (oData.Name || "")
+                );
+                return;
+            }
+    }
+
+    // push documents
     aSelectedItems.forEach(function (oItem) {
 
         var oContext = oItem.getBindingContext("BookingView");
@@ -8111,30 +8130,30 @@ setTimeout(function () {
                 MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
                 FileName: doc.FileName,
                 FileType: doc.FileType,
-                File: doc.File // base64 if already stored
+                File: doc.File
             });
 
         });
     });
 
     this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
-var oModel = this.getView().getModel("CustomerData");
-var oData = oModel.getData();
 
-var aDocs = oData.Documents || [];
+    var oModel = this.getView().getModel("CustomerData");
+    var oData = oModel.getData();
 
-// keep only valid docs (have both fields)
-var allMembers = aDocs
-    .filter(doc => doc.MemberID && doc.MemberName)
-    .map(doc => ({
-        MemberID: doc.MemberID,
-        Name: doc.MemberName
-    }));
+    var aDocs = oData.Documents || [];
 
-// update model
-oModel.setProperty("/AllMembers", allMembers);
+    // keep only valid docs
+    var allMembers = aDocs
+        .filter(doc => doc.MemberID && doc.MemberName)
+        .map(doc => ({
+            MemberID: doc.MemberID,
+            Name: doc.MemberName
+        }));
 
-            this.UD_Dialog.close();
+    oModel.setProperty("/AllMembers", allMembers);
+
+    this.UD_Dialog.close();
 
     sap.m.MessageToast.show("Selected member documents added successfully");
 }
