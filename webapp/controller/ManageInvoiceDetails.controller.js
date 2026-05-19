@@ -16,6 +16,8 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function(oEvent) {
+                var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+                if (!LoginFUnction) return;
                 this.getBusyDialog()
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
@@ -345,7 +347,7 @@ sap.ui.define([
                                 "ManageCustomerModel"
                             );
 
-                            resolve(); 
+                            resolve();
                         }).catch((err) => {
                             MessageToast.show(err.responseText || "Failed to Load Customer Data.");
                             this.closeBusyDialog()
@@ -354,21 +356,70 @@ sap.ui.define([
             },
 
             onNavBack: function() {
-                if (this.sourceView === "Customerinvoice") {
-                    this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-                } else if (this.sourceView === "AdminPage") {
-                    this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
-                        sPath: "ManageInvoice"
-                    });
-                } else if (this.sourceView === "PaymentDashboard") {
-                    this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+                var oViewModel = this.getView().getModel("visiablityPlay");
+                var bIsEditMode = oViewModel && oViewModel.getProperty("/editable");
+
+                // Ask confirmation only in edit mode
+                if (bIsEditMode) {
+
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("ConfirmActionTitle"),
+                        this.i18nModel.getText("backConfirmation"),
+
+                        function() {
+
+                            oViewModel.setProperty("/Edit", false);
+
+                            if (this.sourceView === "Customerinvoice") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                            } else if (this.sourceView === "AdminPage") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                                    sPath: "ManageInvoice"
+                                });
+
+                            } else if (this.sourceView === "PaymentDashboard") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+                            } else {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                                    sPath: "ManageInvoicedetails"
+                                });
+                            }
+
+                        }.bind(this)
+                    );
+
                 } else {
-                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
-                        sPath: "ManageInvoicedetails"
-                    });
+
+                    // Direct navigation when not in edit mode
+                    if (this.sourceView === "Customerinvoice") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                    } else if (this.sourceView === "AdminPage") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                            sPath: "ManageInvoice"
+                        });
+
+                    } else if (this.sourceView === "PaymentDashboard") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+                    } else {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                            sPath: "ManageInvoicedetails"
+                        });
+                    }
                 }
             },
-
             onHome: function() {
                 this.CommonLogoutFunction();
             },
@@ -395,7 +446,7 @@ sap.ui.define([
 
                     // Reset booking combo
                     this.byId("CID_id_AddBooking").setSelectedKey("");
-                    
+
                     // Reset selected key properly
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", "");
 
@@ -568,7 +619,7 @@ sap.ui.define([
                             GSTCalculation: "YES",
                             Discount: "0.00",
                             GrossPrice: item.BasicFacilityPrice,
-                            Total: parseFloat(item.FacilitiPrice),
+                            Total: parseFloat(item.FacilityPrice),
                             StartDate: this.Formatter.DateFormat(item.StartDate),
                             EndDate: this.Formatter.DateFormat(item.EndDate),
                             Currency: item.Currency,
@@ -623,9 +674,9 @@ sap.ui.define([
                 const mode = selectionMode?.toUpperCase();
                 const unit = sUnit?.toLowerCase();
 
-                // -------------------------
+                // ---------
                 // VALIDATE DATES
-                // -------------------------
+                // ---------
                 if (!sStartDate || !sEndDate) return "";
 
                 const start = new Date(sStartDate);
@@ -636,9 +687,9 @@ sap.ui.define([
 
                 let baseDuration = "";
 
-                // -------------------------
+                // ---------
                 // BASE DURATION CALCULATION
-                // -------------------------
+                // ---------
                 if (unit === "per day") {
                     baseDuration = diffDays + (diffDays === 1 ? " Day" : " Days");
                 } else if (unit === "per month") {
@@ -927,7 +978,7 @@ sap.ui.define([
                 let totalWithGST = 0;
                 let totalWithoutGST = 0;
 
-                // ---------------- GST MASTER CHECK ----------------
+                //  GST MASTER CHECK 
                 const taxType = oCustomerModel.getProperty("/Type");
                 const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
                 const currency = oSOWModel.getProperty("/Currency");
@@ -938,7 +989,7 @@ sap.ui.define([
 
                 this.visiablityPlay.setProperty("/GST", isGSTEnabled);
 
-                // ---------------- ITEM CALCULATION ----------------
+                //  ITEM CALCULATION 
                 aItems.forEach((item) => {
 
                     // Original amount
@@ -986,19 +1037,19 @@ sap.ui.define([
                     }
                 });
 
-                // ---------------- SUBTOTALS ----------------
+                //  SUBTOTALS 
                 const subTotal = totalWithGST + totalWithoutGST;
 
                 oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
                 oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
                 oCustomerModel.setProperty("/SubTotal", subTotal.toFixed(2));
 
-                // ---------------- COUPON ----------------
+                //  COUPON 
                 let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
 
                 oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
 
-                // ---------------- DISCOUNTED TOTAL ----------------
+                //  DISCOUNTED TOTAL 
                 let discountedTotal =
                     subTotal - couponDiscount;
 
@@ -1008,7 +1059,7 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/DiscountedTotal", discountedTotal.toFixed(2));
 
-                // ---------------- GST CALCULATION ----------------
+                //  GST CALCULATION 
                 let gstAmount = 0;
                 let finalAmount = discountedTotal;
 
@@ -1028,7 +1079,7 @@ sap.ui.define([
                         oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
                         oCustomerModel.setProperty("/IGST", "0.00");
                     } else if (taxType === "IGST") {
-                      gstAmount = (taxableAmount * taxRate) / 100;
+                        gstAmount = (taxableAmount * taxRate) / 100;
                         finalAmount += gstAmount;
                         oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/CGST", "0.00");
@@ -1040,7 +1091,7 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
-                // ---------------- ROUND OFF ----------------
+                //  ROUND OFF 
                 const roundedAmount = Math.round(finalAmount);
 
                 const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
@@ -1049,7 +1100,7 @@ sap.ui.define([
                 oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
                 oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
 
-                // ---------------- PAYMENT ----------------
+                //  PAYMENT 
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
                 const oInvoicePaymentModel = oView.getModel("InvoicePayment");
@@ -2746,16 +2797,16 @@ sap.ui.define([
                         return;
                     }
 
-                    // ================= SELECTED ITEMS =================
+                    //  SELECTED ITEMS 
                     const aInvoiceItems = aSelectedItems.map(oItem =>
                         oItem.getBindingContext("ManageInvoiceItemModel").getObject()
                     );
 
-                    // ================= MODELS =================
+                    //  MODELS 
                     const oCustomerModel = oView.getModel("SelectedCustomerModel").getData();
                     const oSOWModel = oView.getModel("FilteredSOWModel").getData();
 
-                    // ================= GST MASTER CHECK (SAME AS UI) =================
+                    //  GST MASTER CHECK (SAME AS UI) 
                     const gstin = oCustomerModel.GST;
                     const taxType = oCustomerModel.Type;
                     const taxRate = parseFloat(oCustomerModel.Value) || 0;
@@ -2765,21 +2816,21 @@ sap.ui.define([
                         taxRate > 0 &&
                         currency === "INR";
 
-                    // ================= COMPANY DETAILS =================
+                    //  COMPANY DETAILS 
                     const filter = {
                         BranchID: [oCustomerModel.BranchCode]
                     };
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
 
-                    // ================= RECALCULATE TOTALS (SELECTED ONLY) =================
+                    //  RECALCULATE TOTALS (SELECTED ONLY) 
                     let totalWithGST = 0;
                     let totalWithoutGST = 0;
 
-                    // ================= ROOM TOTAL (FOR COUPON) =================
+                    //  ROOM TOTAL (FOR COUPON) 
                     let roomTotal = 0;
 
-                    // ================= SUBTOTAL =================
+                    //  SUBTOTAL 
                     let subTotal = 0;
 
                     aInvoiceItems.forEach(item => {
@@ -2810,7 +2861,7 @@ sap.ui.define([
                         }
                     });
 
-                    // ================= COUPON =================
+                    //  COUPON 
                     let couponDiscount =
                         parseFloat(oCustomerModel.CouponDiscount) || 0;
 
@@ -2819,7 +2870,7 @@ sap.ui.define([
                         couponDiscount = roomTotal;
                     }
 
-                    // ================= DISCOUNTED TOTAL =================
+                    //  DISCOUNTED TOTAL 
                     let discountedTotal =
                         subTotal - couponDiscount;
 
@@ -2827,7 +2878,7 @@ sap.ui.define([
                         discountedTotal = 0;
                     }
 
-                    // ================= GST CALCULATION =================
+                    //  GST CALCULATION 
                     let cgst = 0;
                     let sgst = 0;
                     let igst = 0;
@@ -2852,12 +2903,12 @@ sap.ui.define([
                         }
                     }
 
-                    // ================= ROUND OFF =================
+                    //  ROUND OFF 
                     const roundedAmount = Math.round(finalAmount);
 
                     const roundOff = (roundedAmount - finalAmount).toFixed(2);
 
-                    // ================= ASSIGN VALUES FOR PDF =================
+                    //  ASSIGN VALUES FOR PDF 
                     oCustomerModel.SubTotal = subTotal.toFixed(2);
                     oCustomerModel.SubTotalInGST = totalWithGST.toFixed(2);
                     oCustomerModel.SubTotalNotGST = totalWithoutGST.toFixed(2);
@@ -2872,7 +2923,7 @@ sap.ui.define([
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
                     const showSAC = isGSTEnabled;
 
-                    // ================= PDF INIT =================
+                    //  PDF INIT 
                     const doc = new jsPDF("p", "mm", "a4");
                     const pageWidth = doc.internal.pageSize.getWidth();
                     const pageHeight = doc.internal.pageSize.getHeight();
@@ -2880,7 +2931,7 @@ sap.ui.define([
                     const usableWidth = pageWidth - margin * 2;
                     let currentY = 25;
 
-                    // ================= HEADER =================
+                    //  HEADER 
                     doc.setFont("times", "bold").setFontSize(14);
                     doc.text(oCustomerModel.Status === "Payment Received" ? "TAX INVOICE" : "DRAFT INVOICE",
                         pageWidth - 18,
@@ -2893,7 +2944,7 @@ sap.ui.define([
                         doc.addImage("data:image/png;base64," + companyImage, "PNG", margin, 15, 40, 40);
                     }
 
-                    // ================= INVOICE DETAILS =================
+                    //  INVOICE DETAILS 
                     currentY = 40;
                     doc.setFontSize(11).setFont("times", "bold");
 
@@ -2909,7 +2960,7 @@ sap.ui.define([
                         currentY += 6;
                     });
 
-                    // ================= CUSTOMER DETAILS =================
+                    //  CUSTOMER DETAILS 
                     currentY += 10;
                     doc.text("To,", margin, currentY);
                     doc.setFont("times", "normal");
@@ -2938,7 +2989,7 @@ sap.ui.define([
 
                     currentY += 5;
 
-                    // ================= ITEMS TABLE =================
+                    //  ITEMS TABLE 
                     const head = showSAC ? [
                         ['Sl.No', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross', 'Unit', 'Total']
                     ] : [
@@ -3023,7 +3074,7 @@ sap.ui.define([
 
                     currentY = doc.lastAutoTable.finalY + 6;
 
-                    // ================= SUMMARY =================
+                    //  SUMMARY 
                     const summary = [];
 
                     if (totalWithoutGST > 0)
@@ -3085,7 +3136,7 @@ sap.ui.define([
                         }
                     });
 
-                    // ================= AMOUNT IN WORDS =================
+                    //  AMOUNT IN WORDS 
                     currentY = doc.lastAutoTable.finalY + 8;
                     doc.setFont("times", "bold");
                     doc.text("Amount in Words :", margin, currentY);
@@ -3097,7 +3148,7 @@ sap.ui.define([
                     doc.setFont("times", "bold");
                     doc.text("Thank you for staying with us.", margin, currentY + 5);
 
-                    // ================= FOOTER =================
+                    //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
                     for (let i = 1; i <= totalPages; i++) {
                         doc.setPage(i);
@@ -3121,7 +3172,7 @@ sap.ui.define([
                     } = window.jspdf;
                     const oView = this.getView();
 
-                    // ================= FETCH OVERALL INVOICE DATA =================
+                    //  FETCH OVERALL INVOICE DATA 
                     const filterData = oView.getModel("SelectedCustomerModel").getData();
 
                     const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
@@ -3134,19 +3185,19 @@ sap.ui.define([
                         return;
                     }
 
-                    // ================= COMPANY DETAILS =================
+                    //  COMPANY DETAILS 
                     const companyRes = await this.ajaxReadWithJQuery("HM_Branch", {
                         BranchID: [invoices[0].BranchCode]
                     });
                     const company = companyRes.data[0];
                     const companyImage = company.Photo1;
 
-                    // ================= PAYMENT HISTORY (COMMON) =================
+                    //  PAYMENT HISTORY (COMMON) 
                     const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
                         BookingID: [filterData.BookingID]
                     });
 
-                    // ================= PDF INIT =================
+                    //  PDF INIT 
                     const doc = new jsPDF({
                         orientation: "portrait",
                         unit: "mm",
@@ -3158,7 +3209,7 @@ sap.ui.define([
                     const pageHeight = doc.internal.pageSize.getHeight();
                     const usableWidth = pageWidth - 2 * margin;
 
-                    // ================= LOOP EACH INVOICE =================
+                    //  LOOP EACH INVOICE 
                     for (let invIndex = 0; invIndex < invoices.length; invIndex++) {
 
                         const oModel = invoices[invIndex];
@@ -3170,7 +3221,7 @@ sap.ui.define([
 
                         let currentY = 0;
 
-                        // ================= HEADER =================
+                        //  HEADER 
                         let headerMargin = 25.4;
                         doc.setFontSize(14).setFont("times", "bold");
                         doc.text(
@@ -3186,7 +3237,7 @@ sap.ui.define([
                             doc.addImage(imgData, "PNG", margin, 15, 40, 40);
                         }
 
-                        // ================= INVOICE DETAILS =================
+                        //  INVOICE DETAILS 
                         const detailsStartY = 35;
                         const rowHeight = 6.5;
                         const columnWidths = [30, 30];
@@ -3215,7 +3266,7 @@ sap.ui.define([
                             currentY += rowHeight;
                         });
 
-                        // ================= CUSTOMER DETAILS =================
+                        //  CUSTOMER DETAILS 
                         currentY += 15;
                         doc.setFont("times", "bold").setFontSize(11);
                         doc.text("To,", margin, currentY);
@@ -3251,7 +3302,7 @@ sap.ui.define([
 
                         currentY += 5;
 
-                        // ================= ITEM TABLE =================
+                        //  ITEM TABLE 
                         const showSAC = !!oModel.GST;
 
                         const body = oCompanyItemModel.map((item, index) => {
@@ -3339,7 +3390,7 @@ sap.ui.define([
 
                         currentY = doc.lastAutoTable.finalY + 5;
 
-                        // ================= SUMMARY =================
+                        //  SUMMARY 
                         const summaryBody = [];
                         const subTotalGST = parseFloat(oModel.SubTotalInGST || 0);
                         const subTotalNoGST = parseFloat(oModel.SubTotalNotGST || 0);
@@ -3424,7 +3475,7 @@ sap.ui.define([
 
                         currentY = doc.lastAutoTable.finalY + 10;
 
-                        // ================= AMOUNT IN WORDS =================
+                        //  AMOUNT IN WORDS 
                         const totalInWords = await this.convertNumberToWords(oModel.TotalAmount, oModel.Currency);
                         doc.setFont("times", "bold");
                         doc.text("Amount in Words :", margin, currentY);
@@ -3434,7 +3485,7 @@ sap.ui.define([
                         doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY);
                     }
 
-                    // ================= Transaction History (ONCE) =================
+                    //  Transaction History (ONCE) 
                     if (paymentRes?.commentData?.length) {
                         doc.addPage();
                         doc.setFont("times", "bold").setFontSize(11);
@@ -3486,7 +3537,7 @@ sap.ui.define([
                         });
                     }
 
-                    // ================= FOOTER =================
+                    //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
                     for (let i = 1; i <= totalPages; i++) {
                         doc.setPage(i);
@@ -3715,7 +3766,7 @@ sap.ui.define([
 
                     if (isAlreadyExists) return;
 
-                    // ================= ADD NEW =================
+                    //  ADD NEW 
                     newFacilityItems.push({
                         ItemID: null,
                         InvNo: nonFacilityItems[0]?.InvNo,
@@ -3765,110 +3816,375 @@ sap.ui.define([
             },
 
             _calculateFacilityTotal: function(item, cycleStart, cycleEnd, invoiceIndex = 0) {
-
-                let sDate = new Date(item.StartDate);
-                let eDate = new Date(item.EndDate);
+                const sDate = new Date(item.StartDate);
+                const eDate = new Date(item.EndDate);
 
                 sDate.setHours(0, 0, 0, 0);
                 eDate.setHours(0, 0, 0, 0);
 
-                // Overlap check
+                //  OVERLAP 
                 const overlaps = !(eDate < cycleStart || sDate > cycleEnd);
-                if (!overlaps) return 0;
+                if (!overlaps) {
+                    return 0;
+                }
 
                 const effectiveStart = sDate > cycleStart ? sDate : cycleStart;
                 const effectiveEnd = eDate < cycleEnd ? eDate : cycleEnd;
 
                 const usedDays = this._calculateDays(effectiveStart, effectiveEnd);
                 const useddaysforday = this._calculateDaysForDay(effectiveStart, effectiveEnd);
+                const totalusedDays = this._calculateDaysForDay(sDate, eDate);
 
                 const unit = item.UnitText?.toLowerCase();
                 const selectionMode = item.SelectionMode?.toUpperCase();
                 const chargeType = item.FacilityChargeType?.toUpperCase();
+                const bookingUnit = item.PaymentType?.toLowerCase();
 
                 const qty = Number(item.Quantity) || 1;
-                const unitPrice = Number(item.BasicFacilityPrice) || 0;
+                const unitPrice = Number(item.UnitPrice) || 0;
+                const price = Number(item.BasicFacilityPrice) || unitPrice;
+                const totalprice = Number(item.FacilitiPrice) || price;
                 const totalHour = Number(item.TotalHour) || 1;
-                const totalprice = Number(item.FacilitiPrice) || unitPrice;
 
-                let multiplier = 1;
                 let facilityAmount = 0;
 
-                // ================= PERSON_QTY =================
+                // PERSON_QTY
                 if (selectionMode === "PERSON_QTY") {
-
                     if (chargeType === "DAILY") {
-                        const totalUnits = qty * useddaysforday;
-                        facilityAmount = this._truncate2(totalUnits * unitPrice);
-                    } else if (chargeType === "ONCE_PER_BOOKING") {
-                        if (invoiceIndex > 0) return 0;
 
-                        const totalUnits = qty;
-                        facilityAmount = this._truncate2(totalUnits * unitPrice);
+                        // PER DAY
+                        if (bookingUnit === "per day") {
+                            facilityAmount = this._truncate2(price * useddaysforday);
+                            item.CalculatedUnits = qty;
+                        }
+
+                        // PER MONTH
+                        else if (bookingUnit === "per month") {
+                            facilityAmount = this._truncate2(price * useddaysforday);
+                            item.CalculatedUnits = qty;
+                        }
+
+                        // PER YEAR
+                        else if (bookingUnit === "per year") {
+                            const years = Math.ceil(this._calculateTotalMonths(sDate, eDate) / 12) || 1;
+                            const yearlyPrice = totalprice / years;
+                            const overlapDays = this._calculateYearDays(effectiveStart, effectiveEnd);
+
+                            if (overlapDays >= 364) {
+                                facilityAmount = this._round2(yearlyPrice);
+                            } else {
+                                const dailyRate = yearlyPrice / 365;
+                                facilityAmount = this._round2(dailyRate * overlapDays);
+                            }
+
+                            item.CalculatedUnits = qty;
+                        }
+
+                        item.StartDate = this._formatDateLocal(effectiveStart);
+                        item.EndDate = this._formatDateLocal(effectiveEnd);
                     }
+
+                    //  ONCE PER BOOKING 
+                    else if (chargeType === "ONCE_PER_BOOKING") {
+
+                        if (invoiceIndex > 0) {
+                            return 0;
+                        }
+
+                        facilityAmount = this._truncate2(price);
+                        item.CalculatedUnits = qty;
+                        item.StartDate = this._formatDateLocal(sDate);
+                        item.EndDate = this._formatDateLocal(eDate);
+                    }
+
+                    item.UsedDays = usedDays;
+                    item.FacilityPrice = facilityAmount;
+                    return facilityAmount;
+                }
+
+
+                // QTY
+                if (selectionMode === "QTY") {
+
+                    // ONLY FIRST INVOICE
+                    if (invoiceIndex > 0) {
+                        return 0;
+                    }
+
+                    // UNIT PRICE
+                    if (unit === "unit price") {
+                        facilityAmount = this._truncate2(qty * price);
+                    }
+
+                    // PER DAY
+                    else if (unit === "per day") {
+                        facilityAmount = this._truncate2(qty * price * totalusedDays);
+                    }
+
+                    // PER HOUR
+                    else if (unit === "per hour") {
+                        facilityAmount = this._truncate2(qty * price * totalHour * totalusedDays);
+                    }
+
+                    // PER MONTH
+                    else if (unit === "per month") {
+
+                        const usedMonths = this._calculateTotalMonths(sDate, eDate);
+                        facilityAmount = this._truncate2(qty * price * usedMonths);
+                    }
+
+                    // PER YEAR
+                    else if (unit === "per year") {
+                        const years = Math.ceil(this._calculateTotalMonths(sDate, eDate) / 12) || 1;
+
+                        const yearlyPrice = totalprice / years;
+
+                        const overlapDays = this._calculateYearDays(effectiveStart, effectiveEnd);
+
+                        if (overlapDays >= 364) {
+
+                            facilityAmount = this._round2(qty * yearlyPrice);
+                        } else {
+
+                            const dailyRate = yearlyPrice / 365;
+                            facilityAmount = this._round2(
+                                qty * dailyRate * overlapDays
+                            );
+                        }
+                    }
+
+                    item.StartDate = this._formatDateLocal(sDate);
+                    item.EndDate = this._formatDateLocal(eDate);
+                    item.UsedDays = usedDays;
+                    item.FacilityPrice = facilityAmount;
+                    item.CalculatedQty = qty;
 
                     return facilityAmount;
                 }
 
-                // ================= MULTIPLIER =================
-                if (selectionMode === "QTY" || selectionMode === "PERSON") {
-                    multiplier = qty;
-                } else if (selectionMode === "SINGLE") {
-                    multiplier = 1;
-                }
 
-                // ================= UNIT LOGIC =================
-                if (unit === "per day") {
-                    facilityAmount = this._truncate2(multiplier * unitPrice * useddaysforday);
-                } else if (unit === "per hour") {
-                    facilityAmount = this._truncate2(multiplier * unitPrice * totalHour * useddaysforday);
-                } else if (unit === "per month") {
+                // SINGLE / PERSON
+                if (selectionMode === "SINGLE" || selectionMode === "PERSON") {
 
-                    const usedMonths = this._calculateMonths(effectiveStart, effectiveEnd);
-                    facilityAmount = this._truncate2(multiplier * unitPrice * usedMonths);
-                } else if (unit === "per year") {
-
-                    const totalMonths = this._calculateMonths(sDate, eDate);
-                    const years = Math.ceil(totalMonths / 12) || 1;
-
-                    const yearlyPrice = totalprice / years;
-                    const overlapDays = usedDays;
-
-                    if (overlapDays >= 364) {
-                        facilityAmount = this._round2(multiplier * yearlyPrice);
-                    } else {
-                        const dailyRate = yearlyPrice / 365;
-                        facilityAmount = this._round2(multiplier * dailyRate * overlapDays);
+                    // PER DAY
+                    if (unit === "per day") {
+                        facilityAmount = this._truncate2(
+                            price * useddaysforday
+                        );
                     }
+
+                    // PER HOUR
+                    else if (unit === "per hour") {
+
+                        facilityAmount = this._truncate2(
+                            price * totalHour * useddaysforday
+                        );
+                    }
+
+                    // PER MONTH
+                    else if (unit === "per month") {
+
+                        const usedMonths = this._calculateTotalMonths(
+                            effectiveStart,
+                            effectiveEnd
+                        );
+
+                        facilityAmount = this._truncate2(
+                            price * usedMonths
+                        );
+                    }
+
+                    // PER YEAR
+                    else if (unit === "per year") {
+
+                        const years = Math.ceil(
+                            this._calculateTotalMonths(sDate, eDate) / 12
+                        ) || 1;
+
+                        const yearlyPrice = totalprice / years;
+
+                        const overlapDays = this._calculateYearDays(
+                            effectiveStart,
+                            effectiveEnd
+                        );
+
+                        if (overlapDays >= 364) {
+
+                            facilityAmount = this._round2(
+                                yearlyPrice
+                            );
+
+                        } else {
+
+                            const dailyRate = yearlyPrice / 365;
+
+                            facilityAmount = this._round2(
+                                dailyRate * overlapDays
+                            );
+                        }
+                    }
+
+                    item.StartDate = this._formatDateLocal(effectiveStart);
+                    item.EndDate = this._formatDateLocal(effectiveEnd);
+                    item.UsedDays = usedDays;
+                    item.FacilityPrice = facilityAmount;
+
+                    return facilityAmount;
                 }
 
-                return facilityAmount;
+                return 0;
             },
 
-            _calculateDays: function(start, end) {
-                return Math.floor((end - start) / 86400000) + 1;
+
+            // MONTHLY CYCLE
+            _getMonthlyCycle: function(baseDate, index) {
+
+                const cycleStart = new Date(baseDate);
+
+                cycleStart.setMonth(
+                    cycleStart.getMonth() + index
+                );
+
+                const cycleEnd = new Date(cycleStart);
+
+                cycleEnd.setMonth(
+                    cycleEnd.getMonth() + 1
+                );
+
+                cycleEnd.setDate(
+                    cycleEnd.getDate() - 1
+                );
+
+                cycleStart.setHours(0, 0, 0, 0);
+                cycleEnd.setHours(0, 0, 0, 0);
+
+                return {
+                    cycleStart,
+                    cycleEnd
+                };
             },
 
-            _calculateDaysForDay: function(start, end) {
-                return Math.floor((end - start) / 86400000);
+
+            // YEARLY CYCLE
+
+            _getYearlyCycle: function(baseDate, index) {
+
+                const cycleStart = new Date(baseDate);
+
+                cycleStart.setFullYear(
+                    cycleStart.getFullYear() + index
+                );
+
+                const cycleEnd = new Date(cycleStart);
+
+                cycleEnd.setFullYear(
+                    cycleEnd.getFullYear() + 1
+                );
+
+                cycleEnd.setDate(
+                    cycleEnd.getDate() - 1
+                );
+
+                cycleStart.setHours(0, 0, 0, 0);
+                cycleEnd.setHours(0, 0, 0, 0);
+
+                return {
+                    cycleStart,
+                    cycleEnd
+                };
             },
 
-            _calculateMonths: function(start, end) {
+
+            // TOTAL MONTHS
+
+            _calculateTotalMonths: function(startDate, endDate) {
+
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
                 let months =
                     (end.getFullYear() - start.getFullYear()) * 12 +
                     (end.getMonth() - start.getMonth());
 
-                if (end.getDate() >= start.getDate()) months += 1;
+                if (months === 0) {
+                    return 1;
+                }
+
+                if (end.getDate() >= start.getDate()) {
+                    months += 1;
+                }
 
                 return months;
             },
 
-            _round2: function(value) {
-                return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+            // DAYS
+
+            _calculateDays: function(start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                ) + 1;
             },
 
+
+            // DAYS FOR DAY
+
+            _calculateDaysForDay: function(start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                );
+            },
+
+
+            // YEAR DAYS
+
+            _calculateYearDays: function(start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                ) + 1;
+            },
+
+
+            // ROUND 2
+
+            _round2: function(value) {
+
+                return Math.round(
+                    (Number(value) + Number.EPSILON) * 100
+                ) / 100;
+            },
+
+
+            // TRUNCATE 2
+
             _truncate2: function(value) {
-                return Math.floor(Number(value) * 100) / 100;
+
+                return Math.floor(
+                    (Number(value) + Number.EPSILON) * 100
+                ) / 100;
+            },
+
+
+            // FORMAT DATE
+
+            _formatDateLocal: function(date) {
+
+                const d = new Date(date);
+
+                const y = d.getFullYear();
+
+                const m = String(
+                    d.getMonth() + 1
+                ).padStart(2, "0");
+
+                const day = String(
+                    d.getDate()
+                ).padStart(2, "0");
+
+                return `${y}-${m}-${day}`;
             },
         });
     });

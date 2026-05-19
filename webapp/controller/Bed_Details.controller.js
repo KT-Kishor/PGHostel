@@ -455,6 +455,8 @@ sap.ui.define([
                 oView.byId("PO_id_CustomerName").getValue();
             var sCustomerID = oView.byId("PO_id_CompanyName").getSelectedKey() ||
                 oView.byId("PO_id_CompanyName").getValue();
+                  var sBranch = oView.byId("PO_id_Branch").getSelectedKey() ||
+                oView.byId("PO_id_Branch").getValue();
 
             let aBranchCodes = [];
 
@@ -479,6 +481,7 @@ sap.ui.define([
 
             if (sCustomerName) filters.Name = sCustomerName;
             if (sCustomerID) filters.ACType = sCustomerID;
+            if (sBranch) filters.BranchCode = sBranch.split('-')[0];
 
             this.getBusyDialog()
 
@@ -494,7 +497,9 @@ sap.ui.define([
                         const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                         return {
                             ...bed,
-                            BranchName: branch ? branch.Name : bed.BranchID
+                            BranchName: branch ? branch.Name : bed.BranchID,
+                            BranchID: branch ? branch.BranchID : bed.BranchID,
+                            City: branch ? branch.City : "",
                         };
                     });
 
@@ -534,28 +539,68 @@ sap.ui.define([
                 });
         },
 
-        _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                PO_id_CustomerName: new Set(),
+      _populateUniqueFilterValues: function (data) {
 
-            };
+    let oView = this.getView();
 
-            data.forEach(item => {
-                uniqueValues.PO_id_CustomerName.add(item.Name);
+    // ===== Customer Unique =====
+    let oCustomerCombo = oView.byId("PO_id_CustomerName");
+    oCustomerCombo.destroyItems();
+
+    let uniqueCustomers = new Set();
+
+    data.forEach(item => {
+        if (item.Name) {
+            uniqueCustomers.add(item.Name);
+        }
+    });
+
+    Array.from(uniqueCustomers)
+        .sort()
+        .forEach(name => {
+            oCustomerCombo.addItem(
+                new sap.ui.core.Item({
+                    key: name,
+                    text: name
+                })
+            );
+        });
+
+    // ===== Branch Unique =====
+    let oBranchCombo = oView.byId("PO_id_Branch");
+    oBranchCombo.destroyItems();
+
+    let uniqueBranches = new Map();
+
+    data.forEach(item => {
+
+        if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
+
+            uniqueBranches.set(item.BranchID, {
+                BranchID: item.BranchID,
+                BranchName: item.BranchName,
+                City: item.City
             });
 
-            let oView = this.getView();
-            ["PO_id_CustomerName"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                oComboBox.destroyItems();
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
-                    }));
-                });
-            });
-        },
+        }
+
+    });
+
+    Array.from(uniqueBranches.values())
+        .sort((a, b) => a.BranchID.localeCompare(b.BranchID))
+        .forEach(item => {
+
+            oBranchCombo.addItem(
+                new sap.ui.core.ListItem({
+                    key: item.BranchID,
+                    text: item.BranchID + " - " + item.BranchName,
+                    additionalText: item.City
+                })
+            );
+
+        });
+
+},
 
         HM_onSearch: function () {
             var oView = this.getView();
@@ -585,6 +630,8 @@ sap.ui.define([
         PO_onPressClear: function () {
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
+            this.getView().byId("PO_id_Branch").setSelectedKey("")
+
         },
 
         onbranchChange: function (oEvent) {

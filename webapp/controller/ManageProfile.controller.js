@@ -114,62 +114,63 @@ sap.ui.define([
                 const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                const aBookingData = aBookings.map(booking => {
-                    const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-                    if (oStart) {
-                        oStart.setHours(0, 0, 0, 0);
-                    }
+                // const aBookingData = aBookings.map(booking => {
+                //     const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
+                //     if (oStart) {
+                //         oStart.setHours(0, 0, 0, 0);
+                //     }
 
-                    const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
-                    const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
-                    if (startDate) startDate.setHours(0, 0, 0, 0);
-                    if (endDate) endDate.setHours(0, 0, 0, 0);
+                //     const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
+                //     const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
+                //     if (startDate) startDate.setHours(0, 0, 0, 0);
+                //     if (endDate) endDate.setHours(0, 0, 0, 0);
 
-                    let bookingGroup = "Others";
-                    if (booking.Status === "Cancelled") {
-                        bookingGroup = "Cancelled";
-                    } else if (booking.Status === "Completed") {
-                        bookingGroup = "Completed";
-                    } else if (booking.Status === "New" || booking.Status === "Assigned") {
-                        // Ongoing = Today is between StartDate & EndDate
-                        if (startDate && endDate && startDate <= today && endDate >= today) {
-                            bookingGroup = "Ongoing";
-                            // Upcoming = Future StartDate
-                        } else if (startDate && startDate > today) {
-                            bookingGroup = "Upcoming";
-                        }
-                    }
-                    let GSTValue = 0;
-                    if (booking.GSTType === "IGST") {
-                        GSTValue = Number(booking.GSTValue) / 100 || 0;
-                    } else {
-                        GSTValue = (Number(booking.GSTValue) + Number(booking.GSTValue)) / 100 || 0;
-                    }
+                //     let bookingGroup = "Others";
+                //     if (booking.Status === "Cancelled") {
+                //         bookingGroup = "Cancelled";
+                //     } else if (booking.Status === "Completed") {
+                //         bookingGroup = "Completed";
+                //     } else if (booking.Status === "New" || booking.Status === "Assigned") {
+                //         // Ongoing = Today is between StartDate & EndDate
+                //         if (startDate && endDate && startDate <= today && endDate >= today) {
+                //             bookingGroup = "Ongoing";
+                //             // Upcoming = Future StartDate
+                //         } else if (startDate && startDate > today) {
+                //             bookingGroup = "Upcoming";
+                //         }
+                //     }
+                //     let GSTValue = 0;
+                //     if (booking.GSTType === "IGST") {
+                //         GSTValue = Number(booking.GSTValue) / 100 || 0;
+                //     } else {
+                //         GSTValue = (Number(booking.GSTValue) + Number(booking.GSTValue)) / 100 || 0;
+                //     }
 
-                    return {
-                        bookingGroup: bookingGroup,
-                        customerName: booking.Salutation + " " + booking.CustomerName,
-                        room: booking.BedType || "",
-                        Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
-                        EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
-                        BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                        // amount: (
-                        //     (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
-                        //     ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
-                        // ).toString() || "",
-                        amount: (
-                            ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) - Number(booking.Discount || 0)) * (1 + GSTValue)
-                        ).toString() || "",
+                //     return {
+                //         bookingGroup: bookingGroup,
+                //         customerName: booking.Salutation + " " + booking.CustomerName,
+                //         room: booking.BedType || "",
+                //         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
+                //         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
+                //         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
+                //         // amount: (
+                //         //     (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
+                //         //     ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
+                //         // ).toString() || "",
+                //         amount: (
+                //             ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) - Number(booking.Discount || 0)) * (1 + GSTValue)
+                //         ).toString() || "",
 
-                        status: booking.Status,
-                        currency: booking.Currency,
-                        BookingID: booking.BookingID?.toString() || "",
-                        MemberID: booking.MemberID || "",
-                        CustomerName: booking.CustomerName || "",
-                    }
+                //         status: booking.Status,
+                //         currency: booking.Currency,
+                //         BookingID: booking.BookingID?.toString() || "",
+                //         MemberID: booking.MemberID || "",
+                //         CustomerName: booking.CustomerName || "",
+                //     }
 
-                });
+                // });
 
+                const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
@@ -238,6 +239,143 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        _formatDisplayDate: function (sDate) {
+            if (!sDate) {
+                return "";
+            }
+
+            const oDate = new Date(sDate);
+
+            if (isNaN(oDate.getTime())) {
+                return "";
+            }
+
+            return oDate.toLocaleDateString("en-GB");
+        },
+
+        _getBookingGroup: function (booking) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
+            const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
+
+            if (startDate) {
+                startDate.setHours(0, 0, 0, 0);
+            }
+
+            if (endDate) {
+                endDate.setHours(0, 0, 0, 0);
+            }
+
+            if (booking.Status === "Cancelled") {
+                return "Cancelled";
+            }
+
+            if (booking.Status === "Completed") {
+                return "Completed";
+            }
+
+            if (booking.Status === "New" || booking.Status === "Assigned" || booking.Status === "Confirmed") {
+                if (startDate && endDate && startDate <= today && endDate >= today) {
+                    return "Ongoing";
+                }
+
+                if (startDate && startDate > today) {
+                    return "Upcoming";
+                }
+            }
+
+            if (booking.Status === "Rejected") {
+                return "Rejected";
+            }
+
+            return "Others";
+        },
+
+        _calculateBookingAmount: function (booking) {
+            let GSTValue = 0;
+
+            if (booking.GSTType === "IGST") {
+                GSTValue = Number(booking.GSTValue || 0) / 100;
+            } else {
+                GSTValue = (Number(booking.GSTValue || 0) + Number(booking.GSTValue || 0)) / 100;
+            }
+
+            const roomPrice = Number(booking.TotalRoomprice || 0);
+            const facilityPrice = Number(booking.FacilityPrice || 0);
+            const discount = Number(booking.Discount || 0);
+
+            const amount = ((roomPrice + facilityPrice) - discount) * (1 + GSTValue);
+
+            return amount.toString();
+        },
+
+        _normalizeBookingData: function (booking) {
+            const sCustomerName = [
+                booking.Salutation || "",
+                booking.CustomerName || ""
+            ].join(" ").trim();
+
+            return {
+                bookingGroup: this._getBookingGroup(booking),
+
+                customerName: sCustomerName,
+                BookingID: booking.BookingID?.toString() || "",
+                MemberID: booking.MemberID || "",
+                CustomerName: booking.CustomerName || "",
+
+                BookingDate: this._formatDisplayDate(booking.BookingDate),
+                BookingDateSort: booking.BookingDate ? new Date(booking.BookingDate).getTime() : 0,
+
+                Startdate: this._formatDisplayDate(booking.StartDate),
+                StartDate: booking.StartDate || "",
+                EndDate: this._formatDisplayDate(booking.EndDate),
+
+                room: booking.BedType || booking.RoomName || booking.RoomNumber || booking.RoomNo || "",
+
+                amount: this._calculateBookingAmount(booking),
+                currency: booking.Currency || "INR",
+                status: booking.Status || booking.BookingStatus || ""
+            };
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         _applyCountryStateCityFilters: function () {
 
@@ -1543,8 +1681,13 @@ sap.ui.define([
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
 
+            // When Booking History tab selected, fetch fresh booking data
+            if (sKey === "Booking History") {
+                await this._loadBookings();
+            }
+
             // When Payment tab selected, fetch invoices and bind to Payments
-            if (sKey === "Payment") {
+            else if (sKey === "Payment") {
                 try {
                     this.getBusyDialog();
                     const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
@@ -1654,6 +1797,67 @@ sap.ui.define([
                 this.closeBusyDialog()
             }
         },
+        _loadBookings: async function () {
+            const oModel = this.getView().getModel("profileData");
+            const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
+
+            if (!sUserID) {
+                MessageToast.show("UserID not found.");
+                return;
+            }
+
+            try {
+                this.getBusyDialog();
+                const filter = { UserID: sUserID };
+                const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
+                const aBookings = response?.BookingData || [];
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // const aBookingData = aBookings.map(booking => {
+                //     const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
+                //     const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
+                //     if (startDate) startDate.setHours(0, 0, 0, 0);
+                //     if (endDate) endDate.setHours(0, 0, 0, 0);
+
+                //     let bookingGroup = "Others";
+                //     if (booking.Status === "Cancelled") {
+                //         bookingGroup = "Cancelled";
+                //     } else if (booking.Status === "Completed") {
+                //         bookingGroup = "Completed";
+                //     } else if (booking.Status === "New" || booking.Status === "Assigned") {
+                //         if (startDate && endDate && startDate <= today && endDate >= today) {
+                //             bookingGroup = "Ongoing";
+                //         } else if (startDate && startDate > today) {
+                //             bookingGroup = "Upcoming";
+                //         }
+                //     }
+
+                //     return {
+                //         bookingGroup: bookingGroup,
+                //         BookingID: booking.BookingID || "",
+                //         customerName: booking.CustomerName || "",
+                //         BookingDate: booking.BookingDate || "",
+                //         room: booking.RoomName || booking.RoomNumber || "",
+                //         amount: booking.TotalAmount || booking.GrandTotal || booking.Amount || 0,
+                //         currency: booking.Currency || "INR",
+                //         status: booking.Status || booking.BookingStatus || "",
+                //         StartDate: booking.StartDate,
+                //         EndDate: booking.EndDate
+                //     };
+                // });
+
+                const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
+                oModel.setProperty("/bookings", aBookingData);
+                this._updateRowCount();
+            } catch (err) {
+                MessageToast.show(err.message || "Error loading bookings");
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
         _loadComplaints: async function (bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";

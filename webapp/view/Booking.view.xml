@@ -71,7 +71,8 @@
 
 
 
-<Label text="Bed Type" />
+<Label text="Room Type" />
+
 
                             <Input
                                 id="BookBedType_ID"
@@ -426,6 +427,7 @@
                                 class="facilitiesNavContainer facilityCarouselShell"
                             >
                                 <Button
+                                    id="facilityPrevBtn"
                                     icon="sap-icon://slim-arrow-left"
                                     press="onFacilityPrev"
                                     class="facilityNavBtn sapUiTinyMarginEnd myUnifiedBtn"
@@ -445,11 +447,21 @@
                                 </HBox>
 
                                 <Button
+                                    id="facilityNextBtn"
                                     icon="sap-icon://slim-arrow-right"
                                     press="onFacilityNext"
                                     class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"
                                 />
                             </HBox>
+<!-- Dot indicators for mobile swipe navigation -->
+<HBox
+    id="facilityDotsContainer"
+    justifyContent="Center"
+    alignItems="Center"
+    class="facilityDotsRow sapUiTinyMarginTop"
+    visible="false"
+/>
+
                         </VBox>
                     </Panel>
                 </VBox>

@@ -298,74 +298,132 @@ sap.ui.define([
             });
         },
 
-        Onsearch: function (flag) {
-            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-            const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
+ Onsearch: function (flag) {
 
-            var oView = this.getView();
-            var oTable = oView.byId("HF_HostelFeatureTable");
-            var oBinding = oTable.getBinding("items");
+    const oExistingModel = this.getOwnerComponent()
+        .getModel("LoginModel")
+        .getData();
 
-            var sFacilityName = oView.byId("HF_id_FacilityName").getSelectedKey() ||
-                oView.byId("HF_id_FacilityName").getValue();
+    const omainModel = this.getOwnerComponent()
+        .getModel("mainModel")
+        ?.getData() || [];
 
-            let aBranchCodes = [];
+    var oView = this.getView();
 
-            if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
-            } else if (oExistingModel.BranchCode) {
-                aBranchCodes = oExistingModel.BranchCode.split(",").map(code => code.trim());
-            }
+    var oTable = oView.byId("HF_HostelFeatureTable");
 
-            let filters = {};
+    var oBinding = oTable.getBinding("items");
 
-            if (oExistingModel.Role === "Admin") {
-                filters = { BranchCode: aBranchCodes };
-                filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin") {
-                filters.BranchCode = "";
-            } else {
-                filters.BranchCode = oExistingModel.BranchCode;
-            }
+    // Facility Name
+    var sFacilityName = oView.byId("HF_id_FacilityName")
+        .getSelectedKey() ||
+        oView.byId("HF_id_FacilityName").getValue();
 
-            if (sFacilityName) filters.FacilityName = sFacilityName;
-            this.getBusyDialog()
-            return this.ajaxReadWithJQuery("HM_HostelFeatures", filters).then((oData) => {
-                let response = Array.isArray(oData.data) ? oData.data : [oData.data];
+    // Branch Code
+    var sBranchCode = oView.byId("HF_id_BranchCode")
+        .getSelectedKey() ||
+        oView.byId("HF_id_BranchCode").getValue();
 
-                const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+    let aBranchCodes = [];
 
-                // Map BranchCode to BranchName directly in response
-                response = response.map(bed => {
-                    const branch = branchData.find(br => br.BranchID === bed.BranchCode);
-                    return {
-                        ...bed,
-                        BranchName: branch ? branch.Name : bed.BranchID
-                    };
-                });
+    if (Array.isArray(omainModel) && omainModel.length) {
 
-                if (!this._originalBedData || flag === "true") {
-                    this._originalBedData = response;
-                }
+        aBranchCodes = omainModel
+            .map(item => item.BranchID)
+            .flat()
+            .filter(Boolean)
+            .join(",");
 
-                if (Object.keys(filters).length === 0) {
-                    const model = new sap.ui.model.json.JSONModel(this._originalBedData);
-                    this.getView().setModel(model, "HostelFeatures");
-                    this._populateUniqueFilterValues(this._originalBedData);
-                    return;
-                }
+    } else if (oExistingModel.BranchCode) {
 
-                const filteredData = response;
-                const model = new sap.ui.model.json.JSONModel(filteredData);
-                this.getView().setModel(model, "HostelFeatures");
-                this._populateUniqueFilterValues(this._originalBedData);
-            }).catch((err) => {
-                this.closeBusyDialog()
-                sap.m.MessageToast.show(err.message || err.responseText);
-            }).finally(() => {
-                this.closeBusyDialog()
-            });
-        },
+        aBranchCodes = oExistingModel.BranchCode
+            .split(",")
+            .map(code => code.trim());
+    }
+
+    let filters = {};
+
+    // Role Based Filter
+    if (oExistingModel.Role === "Admin") {
+
+        filters = {
+            BranchCode: aBranchCodes
+        };
+
+        filters.Role = "Admin";
+
+    } else if (oExistingModel.Role === "SuperAdmin") {
+
+        filters.BranchCode = "";
+
+    } else {
+
+        filters.BranchCode = oExistingModel.BranchCode;
+    }
+
+    // Facility Filter
+    if (sFacilityName) {
+        filters.FacilityName = sFacilityName;
+    }
+
+    // Branch Filter from FilterBar
+    if (sBranchCode) {
+        filters.BranchCode = sBranchCode;
+    }
+
+    this.getBusyDialog();
+
+    return this.ajaxReadWithJQuery(
+        "HM_HostelFeatures",
+        filters
+    ).then((oData) => {
+
+        let response = Array.isArray(oData.data)
+            ? oData.data
+            : [oData.data];
+
+        const branchData = this.getView()
+            .getModel("BranchModel")
+            ?.getData() || [];
+
+        response = response.map(bed => {
+
+            const branch = branchData.find(
+                br => br.BranchID === bed.BranchCode
+            );
+
+            return {
+                ...bed,
+                BranchName: branch
+                    ? branch.Name
+                    : bed.BranchCode
+            };
+
+        });
+
+        if (!this._originalBedData || flag === "true") {
+            this._originalBedData = response;
+        }
+
+        const model = new sap.ui.model.json.JSONModel(response);
+
+        this.getView().setModel(model, "HostelFeatures");
+
+        this._populateUniqueFilterValues(this._originalBedData);
+
+    }).catch((err) => {
+
+        sap.m.MessageToast.show(
+            err.message || err.responseText
+        );
+
+    }).finally(() => {
+
+        this.closeBusyDialog();
+
+    });
+
+},
 
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
@@ -456,6 +514,7 @@ sap.ui.define([
 
         FC_onPressClear: function () {
             this.getView().byId("HF_id_FacilityName").setSelectedKey("")
+            this.getView().byId("HF_id_BranchCode").setSelectedKey("")
         },
 
         onNavBack: function () {

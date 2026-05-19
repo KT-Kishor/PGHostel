@@ -67,7 +67,8 @@
                                 editable="false"
                             />
 
-<Label text="Bed Type" />
+<Label text="Room Type" />
+
 
                             <Input
                                 id="EditBookBedType_ID"
@@ -317,13 +318,14 @@
                                 class="facilitiesNavContainer facilityCarouselShell"
                             >
                                 <Button
+                                    id="facilityPrevBtn"
                                     icon="sap-icon://slim-arrow-left"
                                     press="onFacilityPrev"
                                     class="facilityNavBtn sapUiTinyMarginEnd myUnifiedBtn"
                                 />
 
                                 <HBox
-                                    id="EditfacilityViewport"
+                                    id="facilityViewport"
                                     width="100%"
                                     renderType="Bare"
                                     class="facilityViewport"
@@ -336,11 +338,21 @@
                                 </HBox>
 
                                 <Button
+                                    id="facilityNextBtn"
                                     icon="sap-icon://slim-arrow-right"
                                     press="onFacilityNext"
                                     class="facilityNavBtn sapUiTinyMarginBegin myUnifiedBtn"
                                 />
                             </HBox>
+<!-- Dot indicators for mobile swipe navigation -->
+<HBox
+    id="facilityDotsContainer"
+    justifyContent="Center"
+    alignItems="Center"
+    class="facilityDotsRow sapUiTinyMarginTop"
+    visible="false"
+/>
+
                         </VBox>
                     </Panel>
                 </VBox>
@@ -617,34 +629,32 @@
                                         </cells>
                                     </ColumnListItem>
 
+                                    <!-- Per-facility-item breakdown -->
                                     <ColumnListItem
                                         vAlign="Middle"
-                                        visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
+                                        visible="{= ${HostelModel>/AllSelectedFacilities}.length > 0}"
                                     >
                                         <cells>
+                                            <VBox class="sapUiTinyMarginTop sapUiTinyMarginBottom">
+                                                <HBox alignItems="Center" wrap="NoWrap">
+                                                    <Title text="Facilities" level="H6" />
+                                                    <core:Icon
+                                                        id="editFacilitiesBreakdownIcon"
+                                                        src="sap-icon://hint"
+                                                        size="1rem"
+                                                        color="#1a5f6b"
+                                                        hoverColor="DarkBlue"
+                                                        press="onFacilitiesBreakdownPress"
+                                                        tooltip="View facilities breakdown"
+                                                        class="sapUiTinyMarginBegin"
+                                                    />
+                                                </HBox>
+                                            </VBox>
+
                                             <HBox
-                                                alignItems="Center"
-                                                wrap="NoWrap"
-                                            >
-                                                <Title
-                                                    text="Facilities"
-                                                    level='H6'
-                                                />
-                                                <core:Icon
-                                                    id="editFacilitiesBreakdownIcon"
-                                                    src="sap-icon://hint"
-                                                    size="1rem"
-                                                    color="#1a5f6b"
-                                                    hoverColor="DarkBlue"
-                                                    press="onFacilitiesBreakdownPress"
-                                                    tooltip="View facilities breakdown"
-                                                    class="sapUiTinyMarginBegin"
-                                                />
-                                            </HBox>
-                                            <HBox
-                                                justifyContent="End"
-                                                alignItems="Center"
                                                 renderType="Bare"
+                                                justifyContent="End"
+                                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                                             >
                                                 <Text
                                                     text="{path: 'HostelModel>/TotalFacilityPrice', formatter: '.Formatter.fromatNumber'}"

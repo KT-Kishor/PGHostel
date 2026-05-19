@@ -53,6 +53,29 @@
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        name="BranchCode"
+                        label="{i18n>MSbranchCode}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="HF_id_BranchCode"
+                                items="{BranchModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                                <core:ListItem
+                                    key="{BranchModel>BranchID}"
+                                    text="{BranchModel>BranchID} - {BranchModel>Name}"
+                                    additionalText="{BranchModel>City}"
+                                />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
             </fb:FilterBar>
             <Table
                 id="HF_HostelFeatureTable"

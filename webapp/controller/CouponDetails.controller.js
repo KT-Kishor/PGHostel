@@ -21,7 +21,8 @@ sap.ui.define([
             // View model for dialog state
             var oViewModel = new JSONModel({
                 DialogMode: "Add",        // "Add" or "Edit"
-                CurrentCoupon: {}         // bound to dialog
+                CurrentCoupon: {} 
+                        // bound to dialog
             });
             this.getView().setModel(oViewModel, "CouponView");
             if (!this.getView().getModel("CouponModel")) {
@@ -31,7 +32,8 @@ sap.ui.define([
                 DialogMode: "Add",
                 CurrentCoupon: {},
                 isUptoEnabled: false,
-                isReq: false
+                isReq: false,
+                DiscountValueLabel:"Discount Value"
             }), "CouponView");
 
         },
@@ -947,27 +949,40 @@ this.closeBusyDialog()
 
 
         onChange_DiscountType: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent);
 
-            const oVM = this.getView().getModel("CouponView");
-            const sKey = oEvent.getSource().getSelectedKey();
-            const oDiscountInput = this.byId("inDiscountValue");
+    utils._LCstrictValidationComboBox(oEvent);
 
-            // Reset value + state when type changes
-            oDiscountInput.setValue("");
-            oDiscountInput.setValueState(sap.ui.core.ValueState.None);
+    const oVM = this.getView().getModel("CouponView");
+    const sKey = oEvent.getSource().getSelectedKey();
+    const oDiscountInput = this.byId("inDiscountValue");
 
-            if (sKey === "Percentage") {
-                oVM.setProperty("/isUptoEnabled", true);
-                oVM.setProperty("/isReq", true);
-                oDiscountInput.setMaxLength(5); // 99.99
-            } else {
-                oVM.setProperty("/isUptoEnabled", false);
-                oVM.setProperty("/isReq", false);
-                oVM.setProperty("/CurrentCoupon/UptoValue", "");
-                oDiscountInput.setMaxLength(10); // fixed amount
-            }
-        },
+    // Reset value + state
+    oDiscountInput.setValue("");
+    oDiscountInput.setValueState(sap.ui.core.ValueState.None);
+
+    if (sKey === "Percentage") {
+
+        oVM.setProperty("/isUptoEnabled", true);
+        oVM.setProperty("/isReq", true);
+
+        oDiscountInput.setMaxLength(5);
+
+        // Change Label
+        oVM.setProperty("/DiscountValueLabel", "Percentage");
+
+    } else {
+
+        oVM.setProperty("/isUptoEnabled", false);
+        oVM.setProperty("/isReq", false);
+
+        oVM.setProperty("/CurrentCoupon/UptoValue", "");
+
+        oDiscountInput.setMaxLength(10);
+
+        // Change Label
+        oVM.setProperty("/DiscountValueLabel", "Discount Value");
+    }
+},
         onLiveChange_DiscountValue: function (oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
