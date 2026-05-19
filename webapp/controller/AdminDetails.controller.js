@@ -3561,6 +3561,8 @@ facilityItems.forEach(f => {
         toDelete.push(f);
     } else if(!f.MemberID) {
         toKeep.push(f);
+    }else{
+        toKeep.push(f);
     }
 });
 
@@ -3572,7 +3574,7 @@ if (toDelete.length === 0) {
 
 // confirmation
 sap.m.MessageBox.confirm(
-    "Some facilities are invalid and will be deleted. Do you want to continue?",
+    "Some facilities are assigned to different members and will be removed. Do you want to continue?",
     {
         actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
         emphasizedAction: sap.m.MessageBox.Action.YES,
