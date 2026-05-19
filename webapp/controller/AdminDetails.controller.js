@@ -1903,7 +1903,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 var customerHasThisBed = oCustomer.some(function (cust) {
                     return cust.BookingID === data.BookingID &&
                         cust.BedType === bed.BedTypeName &&
-                        (cust.Status === "Assigned" || cust.Status === "New");
+                        (cust.Status === "Assigned" || cust.Status === "New" || cust.Status === "Confirmed");
                 });
 
                 if (assignedCount >= Number(bed.NoofPerson) && !customerHasThisBed) {
@@ -3511,6 +3511,35 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
             });
         },
+        onMemberSearch: function (oEvent) {
+    var sQuery = oEvent.getParameter("newValue") || 
+                 oEvent.getParameter("query") || "";
+
+    var oTable = this.byId("abmemberSelectTable");
+    var oBinding = oTable.getBinding("items");
+
+    if (!oBinding) {
+        return;
+    }
+
+    var aFilters = [];
+
+    if (sQuery && sQuery.trim() !== "") {
+        aFilters.push(
+            new sap.ui.model.Filter({
+                filters: [
+                    new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Relation", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Documents/0/FileName", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Documents/0/DocumentType", sap.ui.model.FilterOperator.Contains, sQuery)
+                ],
+                and: false
+            })
+        );
+    }
+
+    oBinding.filter(aFilters);
+},
 
         onSaveBooking:function(){
 const oModel = this.getView().getModel("CustomerData");
@@ -3557,12 +3586,15 @@ sap.m.MessageBox.confirm(
             oModel.setProperty("/AllSelectedFacilities", toKeep);
 
             // 2. delete backend records sequentially or parallel
+            
             const deletePromises = toDelete.map(f => {
+                if(f.FacilityID) {
                 return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
                     filters: {
                         FacilityID: f.FacilityID
                     }
                 });
+            }
             });
 
             await Promise.all(deletePromises);
