@@ -741,11 +741,6 @@ sap.ui.define([
             var aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             var aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
 
-            // Booking-level dates from HostelModel — always up-to-date when duration changes
-            var oHostelModel = this.getView().getModel("HostelModel");
-            var oBookingStart = oHostelModel.getProperty("/StartDate");
-            var oBookingEnd = oHostelModel.getProperty("/EndDate");
-
             var fnGetPersonName = function (sPersonId) {
                 var oFound = (aOccupants || []).find(function (oPerson) {
                     return oPerson.id === sPersonId;
@@ -799,18 +794,16 @@ sap.ui.define([
                         FacilityChargeType: oFacility.FacilityChargeType || ""
                     };
 
-                    // Use booking-level dates for duration calculation (updated when duration changes),
-                    // but keep time fields from raw items (not duration-dependent)
                     if (aPersonItems.length > 0) {
                         var oPersonRaw = aPersonItems[0];
-                        oPersonCalcItem.StartDate = oBookingStart || oPersonRaw.StartDate || oFacility.StartDate || null;
-                        oPersonCalcItem.EndDate = oBookingEnd || oPersonRaw.EndDate || oFacility.EndDate || null;
+                        oPersonCalcItem.StartDate = oPersonRaw.StartDate || oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oPersonRaw.EndDate || oFacility.EndDate || null;
                         oPersonCalcItem.StartTime = oPersonRaw.StartTime || oFacility.StartTime || null;
                         oPersonCalcItem.EndTime = oPersonRaw.EndTime || oFacility.EndTime || null;
                         oPersonCalcItem.TotalHour = oPersonRaw.TotalHour || oFacility.TotalHour || null;
                     } else {
-                        oPersonCalcItem.StartDate = oBookingStart || oFacility.StartDate || null;
-                        oPersonCalcItem.EndDate = oBookingEnd || oFacility.EndDate || null;
+                        oPersonCalcItem.StartDate = oFacility.StartDate || null;
+                        oPersonCalcItem.EndDate = oFacility.EndDate || null;
                         oPersonCalcItem.StartTime = oFacility.StartTime || null;
                         oPersonCalcItem.EndTime = oFacility.EndTime || null;
                         oPersonCalcItem.TotalHour = oFacility.TotalHour || null;
@@ -890,15 +883,22 @@ sap.ui.define([
                         return false;
                     }.bind(this));
 
-                    // Use booking-level chargeable day count (updated when duration changes)
-                    // instead of stale raw item dates
-                    var iChargeableDayCount = this._getFacilityChargeableDayCount();
-                    var iDayCount = Math.max(iChargeableDayCount, 1);
+                    var sPersonStart, sPersonEnd;
+                    if (aPersonItems.length > 0) {
+                        var oPersonRaw = aPersonItems[0];
+                        sPersonStart = oPersonRaw.StartDate || null;
+                        sPersonEnd = oPersonRaw.EndDate || null;
+                    } else {
+                        sPersonStart = oFacility.StartDate || null;
+                        sPersonEnd = oFacility.EndDate || null;
+                    }
+
+                    var iDayCount = this._getDayCount(sPersonStart, sPersonEnd);
                     var fPersonTotal;
 
                     if (sFacilityChargeType === "DAILY") {
-                        // DAILY: package price × chargeable days (from booking duration)
-                        fPersonTotal = fPackagePrice * iDayCount;
+                        // DAILY: BasicFacilityPrice already includes QTY, so only multiply by days
+                        fPersonTotal = fPackagePrice * Math.max(iDayCount, 1);
                     } else if (sFacilityChargeType === "ONCE_PER_BOOKING") {
                         // ONCE_PER_BOOKING: BasicFacilityPrice already includes QTY, flat total
                         fPersonTotal = fPackagePrice;
@@ -914,8 +914,8 @@ sap.ui.define([
                         packagePrice: fPackagePrice,
                         quantity: iQty,
                         chargeType: sFacilityChargeType,
-                        startDate: oBookingStart,
-                        endDate: oBookingEnd,
+                        startDate: sPersonStart,
+                        endDate: sPersonEnd,
                         dayCount: iDayCount,
                         personTotal: fPersonTotal
                     });
