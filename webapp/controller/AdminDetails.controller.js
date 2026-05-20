@@ -3608,10 +3608,135 @@ sap.m.MessageBox.confirm(
     }
 );
         },
+        HM_ConfirmRoom: async function (oEvent) {
+        var ID= this.getView().getModel("CustomerData").getData()
 
-        
-        
+         
+   this.getBusyDialog();
+   const pdfBase64 = await this.onGeneratePDF();
+   this.closeBusyDialog();
+    var Payload = {
+        Status: "Confirmed",
+        CustomerName: ID.CustomerName,
+        BookingID: ID.BookingID,
+        CustomerEmail: ID.CustomerEmail || "",
+        BedType: ID.BedType || "",
+        BookingDate: ID.BookingDate,
+        StartDate: ID.StartDate,
+        EndDate: ID.EndDate,
+        MemberID: ID.MemberID || "",
+        Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
+        RentPrice: ID.RentPrice || 0,
+        pdfAttachment: {
+                        fileName: "BookingVoucher.pdf",
+                        mimeType: "application/pdf",
+                        content: pdfBase64
+                    }
+    };
 
+    var oBody = {
+        data: Payload,
+        filters: {
+            BookingID: ID.BookingID
+        }
+    };
+
+    var that = this;
+
+    sap.m.MessageBox.confirm(
+        "Are you sure you want to confirm this room booking?",
+        {
+            actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+            emphasizedAction: sap.m.MessageBox.Action.YES,
+
+            onClose: async function (oAction) {
+                if (oAction === sap.m.MessageBox.Action.YES) {
+                    that.getBusyDialog();
+                    await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
+                    that.AD_onSearch();
+                }
+            }
+        }
+    );
+},
+          
+HM_RejectRoom: function (oEvent) {
+    this.ID = this.getView().getModel("CustomerData").getData()
+
+          
+          if (!this.RB_Dialog) {
+                this.RB_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.RejectDesc",
+                    this
+                );
+                this.getView().addDependent(this.RB_Dialog);
+            }
+            sap.ui.getCore().byId("idRejectReason").setValue("").setValueState("None");
+                        this.RB_Dialog.open();
+
+},
+onRejectSave: async function () {
+
+    var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
+
+    if (
+        !utils._LCvalidateMandatoryField(
+            sap.ui.getCore().byId("idRejectReason"),
+            "ID"
+        )
+    ) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText(
+                "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+            )
+        );
+        return;
+    }
+
+ 
+    var ID =  this.ID;
+
+    var Payload = {
+         Status: "Rejected",
+        RejectDesc: rejectReason,
+
+        // Email Required Data
+        CustomerName: ID.CustomerName,
+        BookingID: ID.BookingID,
+        CustomerEmail: ID.CustomerEmail || "",
+        BedType: ID.BedType || "",
+        BookingDate: ID.BookingDate,
+        StartDate: ID.StartDate,
+        EndDate: ID.EndDate,
+        MemberID: ID.MemberID || "",
+        Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
+        RentPrice: ID.RentPrice || 0
+    };
+
+    var oBody = {
+        data: Payload,
+        filters: {
+            BookingID: this.ID.BookingID
+        }
+    };
+
+    this.getBusyDialog();
+
+    await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
+
+    this.AD_onSearch();
+
+    this.RB_Dialog.close();
+
+},
+
+onRejectCancel:function(){
+    this.RB_Dialog.close();
+},
+onRejectReasonChange: function (oEvent) {
+   utils._LCvalidateMandatoryField(oEvent);
+       
+},
         onSaveBooking1: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
@@ -7077,7 +7202,8 @@ var memberIds = CustomerData.Documents
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
 
-            doc.save("StayVriksha_Booking.pdf");
+        //    (IMPORTANT CHANGE)
+            return doc.output("datauristring").split(",")[1];
         },
         onAddNewMemberFromDialog: function () {
             this._mode = "CREATE";
