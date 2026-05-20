@@ -7737,7 +7737,7 @@ var memberIds = CustomerData.AllMembers
 
         MS_viewimage: function () {
 
-            const oDraft = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
+            const oDraft = this.getView().getModel("BookingView").getData().Members[0]
 
             const oDocument = oDraft?.Documents?.[0];
 
