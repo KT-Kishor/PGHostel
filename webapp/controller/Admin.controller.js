@@ -534,123 +534,6 @@ sap.ui.define([
 
             this.HM_Dialog.open();
         },
-      HM_ConfirmRoom: function (oEvent) {
-            var table = this.byId("idPOTable");
-            var selected = table.getSelectedItem();
-
-              if (!selected) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoConfirmRoom"));
-                return;
-            }
-
-                var Model = selected.getBindingContext("HostelModel");
-            var ID = Model.getObject();
-
-            
-            if (ID.Status !== "New") {
-                sap.m.MessageToast.show("Only new bookings can be confirmed.");
-                return;
-            }
-
-    var Payload = {
-        Status: "Confirmed"
-    };
-
-    var oBody = {
-        data: Payload,
-        filters: {
-            BookingID: ID.BookingID
-        }
-    };
-
-    var that = this;
-
-    sap.m.MessageBox.confirm(
-        "Are you sure you want to confirm this room booking?",
-        {
-            actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-            emphasizedAction: sap.m.MessageBox.Action.YES,
-
-            onClose: async function (oAction) {
-                if (oAction === sap.m.MessageBox.Action.YES) {
-                    that.getBusyDialog();
-                    await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
-                    that.Cust_read();
-                    that.byId("idPOTable").removeSelections()
-                }else{
-                    that.byId("idPOTable").removeSelections()
-                }
-            }
-        }
-    );
-},
-HM_RejectRoom: function (oEvent) {
-     var table = this.byId("idPOTable");
-            var selected = table.getSelectedItem();
-              if (!selected) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoRejectRoom"));
-                return;
-            }
-
-                var Model = selected.getBindingContext("HostelModel");
-          this.ID = Model.getObject();
-
-            if (this.ID.Status !== "New") {
-                sap.m.MessageToast.show("Only New bookings can be rejected.");
-                return;
-            }
-          if (!this.RB_Dialog) {
-                this.RB_Dialog = sap.ui.xmlfragment(
-                    "sap.ui.com.project1.fragment.RejectDesc",
-                    this
-                );
-                this.getView().addDependent(this.RB_Dialog);
-            }
-            sap.ui.getCore().byId("idRejectReason").setValue("").setValueState("None");
-                        this.RB_Dialog.open();
-
-},
-onRejectReasonChange: function (oEvent) {
-   utils._LCvalidateMandatoryField(oEvent);
-       
-},
-onRejectSave:async function(){
-
-     var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
-             if (
-                    !utils._LCvalidateMandatoryField(sap.ui.getCore().byId("idRejectReason"), "ID")
-                ) {
-                    sap.m.MessageToast.show(
-                        this.i18nModel.getText(
-                            "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
-                        )
-                    );
-                    return;
-                }
-     
-       var Payload = {
-        Status: "Rejected",
-        RejectDesc: rejectReason
-    };
-
-    var oBody = {
-        data: Payload,
-        filters: {
-            BookingID: this.ID.BookingID
-        }
-    };
-        this.getBusyDialog();
-     await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
-        this.Cust_read();
-        this.RB_Dialog.close();
-
-this.byId("idPOTable").removeSelections()
-},
-onRejectCancel:function(){
-    this.RB_Dialog.close();
-this.byId("idPOTable").removeSelections()
-
-},
         HM_UnassignRoom: function () {
             var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();
@@ -743,7 +626,7 @@ this.byId("idPOTable").removeSelections()
 
         //         // Perform AJAX call only after file is fully read
         //         $.ajax({
-        //             url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+        //             url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_BedType",
         //             method: "POST",
         //             contentType: "application/json",
         //             headers: {
@@ -807,7 +690,7 @@ this.byId("idPOTable").removeSelections()
 
             /* ================= VALIDATIONS ================= */
 
-            if (ID.Status === "New" && this.selectedIndex === 0) {
+            if (ID.Status === "Confirmed" && this.selectedIndex === 0) {
                 if (
                     !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
                     !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
@@ -823,7 +706,7 @@ this.byId("idPOTable").removeSelections()
                 }
             }
 
-            if ((ID.Status === "Assigned" || ID.Status === "New") && this.selectedIndex === 1) {
+            if ((ID.Status === "Assigned" || ID.Status === "Confirmed") && this.selectedIndex === 1) {
                 if (
                     !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
                 ) {
@@ -908,6 +791,7 @@ this.byId("idPOTable").removeSelections()
                 Payload = {
                     CustomerEmail: ID.CustomerEmail,
                     UserID:ID.UserID,
+                    MemberID:ID.MemberID,
                     CustomerName: ID.CustomerName,
                     DepositAmount: parseInt(DepositAmount),
                     DepositCurrency: "INR",
@@ -933,6 +817,7 @@ this.byId("idPOTable").removeSelections()
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
                     UserID:ID.UserID,
+                    MemberID:ID.MemberID,
                     Status: "Assigned"
                 };
 
@@ -1163,7 +1048,7 @@ this.byId("idPOTable").removeSelections()
             var sId = oData.ID;
 
             $.ajax({
-                url: "https://rest.kalpavrikshatechnologies.com/HM_Customer/" + sId,
+                url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_Customer/" + sId,
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(oData),

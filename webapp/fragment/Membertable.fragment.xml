@@ -30,7 +30,6 @@
                     width="100%"
                     placeholder="Search by name / relationship / document"
                     liveChange="onMemberSearch"
-                    search="onMemberSearch"
                     class="sapUiTinyMarginBottom"
                 />
 

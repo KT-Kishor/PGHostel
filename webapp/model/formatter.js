@@ -633,7 +633,7 @@ formatBranchNames: function (sBranchCodes, aBranches) {
         "QTY": "Per Quantity",
         "PERSON": "Per Person",
         "PERSON_QTY": "Per Package",
-        "ONCE_PER_BOOKING": "Once Per Booking"
+        "Entire_Booking": "Once Per Booking"
     };
 
     // Billing Frequency

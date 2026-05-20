@@ -95,10 +95,10 @@
                     maxLength="2"
                 />
 				<Label text="Billing Frequency" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY }" required="true"/>
-				<RadioButtonGroup id="id_PeriodSelect" columns="2" select=".onPeriodTypeSelect" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY'}" selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'ONCE_PER_BOOKING' ? 1 : -1) }">
+				<RadioButtonGroup id="id_PeriodSelect" columns="2" select=".onPeriodTypeSelect" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY'}" selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'Entire_Booking' ? 1 : -1) }">
 					<buttons >
 						<RadioButton text="Daily" />
-						<RadioButton text="ONCE_PER_BOOKING" />
+						<RadioButton text="Entire_Booking" />
 					</buttons>
 				</RadioButtonGroup>
 				<Label
