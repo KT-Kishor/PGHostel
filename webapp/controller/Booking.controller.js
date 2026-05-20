@@ -1337,6 +1337,11 @@
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
             this._oFacilityRemoveButton.setEnabled(bEditModeEnabled);
 
+            // Set initial focus on Confirm button instead of Cancel
+            if (this._oFacilityConfirmButton) {
+                oFacilityPopover.setInitialFocus(this._oFacilityConfirmButton);
+            }
+
             if (oOpenBy && oFacilityPopover.openBy) {
                 oFacilityPopover.openBy(oOpenBy);
                 return;
@@ -1700,7 +1705,7 @@
                                 oDialog.close();
                             }
                         }).addStyleClass("myUnifiedBtn"),
-                        new sap.m.Button({
+                        this._oFacilityConfirmButton = new sap.m.Button({
                             text: "Confirm",
                             type: "Emphasized",
                             enabled: "{FacilitySelection>/editModeEnabled}",
