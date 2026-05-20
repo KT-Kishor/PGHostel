@@ -710,7 +710,7 @@ sap.ui.define([
 
 
 
-                var sUrl = "https://rest.kalpavrikshatechnologies.com/HM_Rooms";
+                var sUrl = "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_Rooms";
                 var sMethod = "POST";
                 var oBody = {
                     data: Payload
@@ -851,7 +851,7 @@ sap.ui.define([
                                         .getObject();
 
                                     return $.ajax({
-                                        url: "https://rest.kalpavrikshatechnologies.com/HM_Rooms",
+                                        url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_Rooms",
                                         method: "DELETE",
                                         contentType: "application/json",
                                         data: JSON.stringify({

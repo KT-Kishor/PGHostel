@@ -222,7 +222,7 @@
                 primaryGuestName: "",
                 quantity: 1,
                 singlePersonQty: 0,
-                facilityChargeType: "ONCE_PER_BOOKING",
+                facilityChargeType: "Entire_Booking",
                 selectedPriceType: "",
                 personOptions: [],
                 selectedPersonIds: [],
@@ -1337,6 +1337,11 @@
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
             this._oFacilityRemoveButton.setEnabled(bEditModeEnabled);
 
+            // Set initial focus on Confirm button instead of Cancel
+            if (this._oFacilityConfirmButton) {
+                oFacilityPopover.setInitialFocus(this._oFacilityConfirmButton);
+            }
+
             if (oOpenBy && oFacilityPopover.openBy) {
                 oFacilityPopover.openBy(oOpenBy);
                 return;
@@ -1700,7 +1705,7 @@
                                 oDialog.close();
                             }
                         }).addStyleClass("myUnifiedBtn"),
-                        new sap.m.Button({
+                        this._oFacilityConfirmButton = new sap.m.Button({
                             text: "Confirm",
                             type: "Emphasized",
                             enabled: "{FacilitySelection>/editModeEnabled}",
@@ -1725,7 +1730,7 @@
                 return "DAILY";
             }
 
-            return "ONCE_PER_BOOKING";
+            return "Entire_Booking";
         },
 
         _getFacilityChargeType: function (oFacility) {
@@ -1757,7 +1762,7 @@
             const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
-            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "ONCE_PER_BOOKING";
+            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "Entire_Booking";
             const oDefaultOccupant = this._getDefaultOccupant();
 
             let aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
@@ -1882,7 +1887,7 @@
             oFacility.SelectedPrice = 0;
             oFacility.SelectedPriceType = "";
             oFacility.Quantity = 1;
-            oFacility.FacilityChargeType = "ONCE_PER_BOOKING";
+            oFacility.FacilityChargeType = "Entire_Booking";
             oFacility.SelectedPersonIds = [];
             oFacility.PersonQuantities = [];
             oFacility.SelectionSummary = "";
@@ -1900,7 +1905,7 @@
                 oFacility.SelectedPrice = 0;
                 oFacility.SelectedPriceType = "";
                 oFacility.Quantity = 1;
-                oFacility.FacilityChargeType = "ONCE_PER_BOOKING";
+                oFacility.FacilityChargeType = "Entire_Booking";
                 oFacility.SelectedPersonIds = [];
                 oFacility.PersonQuantities = [];
                 oFacility.SelectionSummary = "";

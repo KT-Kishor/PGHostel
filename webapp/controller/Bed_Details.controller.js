@@ -747,7 +747,7 @@ sap.ui.define([
                                         .getObject();
 
                                     return $.ajax({
-                                        url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+                                        url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_BedType",
                                         method: "DELETE",
                                         contentType: "application/json",
                                         data: JSON.stringify({

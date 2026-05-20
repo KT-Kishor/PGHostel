@@ -113,7 +113,7 @@
                   >
                                 <buttons>
                                     <RadioButton text="Daily" />
-                                    <RadioButton text="ONCE_PER_BOOKING" />
+                                    <RadioButton text="Entire_Booking" />
                                 </buttons>
                             </RadioButtonGroup> 
 
