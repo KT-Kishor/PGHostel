@@ -5415,6 +5415,10 @@ html, body {
   text-align: left !important;
 }
 
+.facilityNavBtnHidden {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
 .facilityNavBtn {
   min-width: 3rem !important;
   min-height: 3rem !important;

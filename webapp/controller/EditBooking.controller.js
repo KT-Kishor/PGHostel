@@ -38,10 +38,10 @@ sap.ui.define([
         },
 
         _onEditRouteMatched: async function (oEvent) {
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+            if (performance.navigation && performance.navigation.type === 1) {
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo("RouteHostel", {}, true);
+            }
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
             var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";
@@ -93,6 +93,10 @@ sap.ui.define([
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
                 var sAdminUpdated = oBooking.AdminUpdated || "";
+
+                // Store original booking dates for condition 1/2 facility determination
+                this._sOriginalBookingStartDate = oBooking.StartDate || "";
+                this._sOriginalBookingEndDate = oBooking.EndDate || "";
 
                 // 2. Parallel API calls for branch-related data, payments, and facilities
                 var oRoomData = {};
@@ -502,10 +506,9 @@ sap.ui.define([
                         Type: oItem.Type || "",
                         SelectionMode: sSelectionMode,
                         UnitText: oItem.UnitText || "Unit Price",
-                        Price: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
-                        SelectedPrice: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
+                        Price: fnToNumber(oItem.BasicFacilityPrice || oItem.PricePerUnit || oItem.UnitAmount),
+                        SelectedPrice: fnToNumber(oItem.BasicFacilityPrice || oItem.PricePerUnit || oItem.UnitAmount),
                         SelectedPriceType: oItem.UnitText || "Unit Price",
-                        UnitPrice: fnToNumber(oItem.UnitPrice || oItem.PricePerUnit || oItem.UnitAmount),
                         BasicFacilityPrice: fnToNumber(oItem.BasicFacilityPrice),
                         FacilityChargeType: oItem.FacilityChargeType || "",
                         Quantity: sSelectionMode === "QTY" || sSelectionMode === "PERSON_QTY"
@@ -553,6 +556,45 @@ sap.ui.define([
         _toNumber: function (vValue) {
             var fValue = parseFloat(String(vValue === undefined || vValue === null ? "" : vValue).replace(/,/g, "").trim());
             return isNaN(fValue) ? 0 : fValue;
+        },
+
+        /**
+         * Condition 1 check: facility dates match original booking dates and no time values.
+         * These facilities should use current booking dates so duration changes propagate.
+         * Condition 2: facility has admin-set dates/times different from booking — keeps its own.
+         */
+        _isBookingDateDependentFacility: function (oFacility) {
+            if (!oFacility) { return false; }
+
+            var fnNormDate = function (vDate) {
+                var oParsed = this._parseDate(vDate);
+                if (!oParsed || isNaN(oParsed.getTime())) { return ""; }
+                return oParsed.getFullYear() + "-" +
+                    String(oParsed.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(oParsed.getDate()).padStart(2, "0");
+            }.bind(this);
+
+            var sOrigStart = fnNormDate(this._sOriginalBookingStartDate);
+            var sOrigEnd = fnNormDate(this._sOriginalBookingEndDate);
+
+            if (!sOrigStart || !sOrigEnd) { return true; }
+
+            var aItems = Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
+                ? oFacility.RawFacilityItems
+                : [oFacility];
+
+            return aItems.every(function (oItem) {
+                var sFacStart = fnNormDate(oItem.StartDate || oFacility.StartDate);
+                var sFacEnd = fnNormDate(oItem.EndDate || oFacility.EndDate);
+                var sStartTime = String(oItem.StartTime || "").trim();
+                var sEndTime = String(oItem.EndTime || "").trim();
+
+                var bDatesMatch = (!sFacStart && !sFacEnd) ||
+                    (sFacStart === sOrigStart && sFacEnd === sOrigEnd);
+                var bNoTimeValues = !sStartTime && !sEndTime;
+
+                return bDatesMatch && bNoTimeValues;
+            }.bind(this));
         },
 
         /**
@@ -741,6 +783,12 @@ sap.ui.define([
             var aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             var aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
 
+            // Condition 1 check: use current booking dates when facility follows booking dates
+            var bUseBookingDates = this._isBookingDateDependentFacility(oFacility);
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sBookingStart = bUseBookingDates && oHostelModel ? oHostelModel.getProperty("/StartDate") : null;
+            var sBookingEnd = bUseBookingDates && oHostelModel ? oHostelModel.getProperty("/EndDate") : null;
+
             var fnGetPersonName = function (sPersonId) {
                 var oFound = (aOccupants || []).find(function (oPerson) {
                     return oPerson.id === sPersonId;
@@ -752,7 +800,7 @@ sap.ui.define([
             var aPersonBreakdown = [];
 
             if (sSelectionMode === "PERSON") {
-                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice);
                 var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
 
                 aSelectedPersonIds.forEach(function (sPersonId) {
@@ -794,7 +842,13 @@ sap.ui.define([
                         FacilityChargeType: oFacility.FacilityChargeType || ""
                     };
 
-                    if (aPersonItems.length > 0) {
+                    if (bUseBookingDates) {
+                        oPersonCalcItem.StartDate = sBookingStart;
+                        oPersonCalcItem.EndDate = sBookingEnd;
+                        oPersonCalcItem.StartTime = null;
+                        oPersonCalcItem.EndTime = null;
+                        oPersonCalcItem.TotalHour = (aPersonItems.length > 0 ? aPersonItems[0].TotalHour : null) || oFacility.TotalHour || null;
+                    } else if (aPersonItems.length > 0) {
                         var oPersonRaw = aPersonItems[0];
                         oPersonCalcItem.StartDate = oPersonRaw.StartDate || oFacility.StartDate || null;
                         oPersonCalcItem.EndDate = oPersonRaw.EndDate || oFacility.EndDate || null;
@@ -884,7 +938,10 @@ sap.ui.define([
                     }.bind(this));
 
                     var sPersonStart, sPersonEnd;
-                    if (aPersonItems.length > 0) {
+                    if (bUseBookingDates) {
+                        sPersonStart = sBookingStart;
+                        sPersonEnd = sBookingEnd;
+                    } else if (aPersonItems.length > 0) {
                         var oPersonRaw = aPersonItems[0];
                         sPersonStart = oPersonRaw.StartDate || null;
                         sPersonEnd = oPersonRaw.EndDate || null;
@@ -2201,7 +2258,7 @@ sap.ui.define([
                 );
             }
 
-            var fSelectedPrice = this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price || oSelectedFacility.UnitPrice || oSelectedFacility.BasicFacilityPrice);
+            var fSelectedPrice = this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price || oSelectedFacility.BasicFacilityPrice);
             var fSavedTotal = this._toNumber(oSelectedFacility.SavedTotalAmount);
             var iQuantity = Math.max(parseInt(oSelectedFacility.Quantity || oSelectedFacility.SavedQuantity, 10) || 0, 0);
             var iPersonQtyTotal = Array.isArray(oSelectedFacility.PersonQuantities)
@@ -2226,7 +2283,7 @@ sap.ui.define([
                 return Number((fSavedTotal / iPersonCount).toFixed(2));
             }
 
-            return this._toNumber(oFacility.UnitPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
+            return this._toNumber(oFacility.BasicFacilityPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
         },
 
         _applyEditFacilityPriceFilter: function () {
@@ -2251,7 +2308,7 @@ sap.ui.define([
                 oFacility.SelectionModeLabel = this._getFacilitySelectionModeLabel(oFacility.SelectionMode);
 
                 if (oFacility.Selected) {
-                    var fSavedPrice = this._toNumber(oFacility.SelectedPrice || oFacility.Price || oFacility.UnitPrice || oFacility.CurrentPrice);
+                    var fSavedPrice = this._toNumber(oFacility.SelectedPrice || oFacility.Price || oFacility.BasicFacilityPrice || oFacility.CurrentPrice);
                     var sSavedPriceType = oFacility.SelectedPriceType || oFacility.UnitText || (oMatchedOption && oMatchedOption.key) || "Unit Price";
 
                     if (oFacility.SelectionMode === "PERSON_QTY") {
@@ -2344,7 +2401,7 @@ sap.ui.define([
 
                     // Build a facility-like object with per-item dates for _calculateFacilityTotal
                     var oCalcItem = {
-                        BasicFacilityPrice: oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice || 0,
+                        BasicFacilityPrice: oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice || 0,
                         UnitText: sPriceType,
                         Quantity: oFacility.Quantity || 1,
                         FacilityChargeType: sFacilityChargeType
@@ -2353,9 +2410,19 @@ sap.ui.define([
                     // Booking dates as fallback when facility dates are null
                     var oBookingStart = oModel.getProperty("/StartDate");
                     var oBookingEnd = oModel.getProperty("/EndDate");
+                    var bUseBookingDates = this._isBookingDateDependentFacility(oFacility);
 
-                    // Try to get dates from the first RawFacilityItem
-                    if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
+                    if (bUseBookingDates) {
+                        // Condition 1: facility follows booking dates — duration changes propagate
+                        oCalcItem.StartDate = oBookingStart;
+                        oCalcItem.EndDate = oBookingEnd;
+                        oCalcItem.StartTime = null;
+                        oCalcItem.EndTime = null;
+                        oCalcItem.TotalHour = oFacility.TotalHour ||
+                            (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
+                                ? oFacility.RawFacilityItems[0].TotalHour : null) || null;
+                    } else if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
+                    // Condition 2: facility has admin-set dates/times — use them
                         var oFirstRaw = oFacility.RawFacilityItems[0];
                         oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || oBookingStart || null;
                         oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || oBookingEnd || null;
@@ -2460,7 +2527,7 @@ sap.ui.define([
                         DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                         Currency: sCurrency,
                         SelectionMode: sSelectionMode,
-                        Price: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                        Price: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
                         UnitText: sPriceType,
                         FacilityChargeType: sFacilityChargeType,
                         Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
@@ -2482,7 +2549,7 @@ sap.ui.define([
                                 "Package Price"
                             )
                             : this._formatFacilityPriceWithUnit(
-                                this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                                this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
                                 sCurrency,
                                 sPriceType
                             ),
@@ -2530,18 +2597,28 @@ sap.ui.define([
             var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
             var oHostelModel = this.getView().getModel("HostelModel");
 
-            // Build calc item with facility-specific dates, falling back to booking dates
+            // Build calc item with appropriate dates based on condition 1/2
+            var bUseBookingDates = this._isBookingDateDependentFacility(oFacility);
             var oCalcItem = {
-                BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice),
+                BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
                 UnitText: sPriceType,
                 Quantity: oFacility.Quantity || 1,
-                FacilityChargeType: this._getFacilityChargeType(oFacility),
-                StartDate: oFacility.StartDate || (oHostelModel ? oHostelModel.getProperty("/StartDate") : null) || null,
-                EndDate: oFacility.EndDate || (oHostelModel ? oHostelModel.getProperty("/EndDate") : null) || null,
-                StartTime: oFacility.StartTime || null,
-                EndTime: oFacility.EndTime || null,
-                TotalHour: oFacility.TotalHour || null
+                FacilityChargeType: this._getFacilityChargeType(oFacility)
             };
+
+            if (bUseBookingDates) {
+                oCalcItem.StartDate = oHostelModel ? oHostelModel.getProperty("/StartDate") : null;
+                oCalcItem.EndDate = oHostelModel ? oHostelModel.getProperty("/EndDate") : null;
+                oCalcItem.StartTime = null;
+                oCalcItem.EndTime = null;
+                oCalcItem.TotalHour = oFacility.TotalHour || null;
+            } else {
+                oCalcItem.StartDate = oFacility.StartDate || (oHostelModel ? oHostelModel.getProperty("/StartDate") : null) || null;
+                oCalcItem.EndDate = oFacility.EndDate || (oHostelModel ? oHostelModel.getProperty("/EndDate") : null) || null;
+                oCalcItem.StartTime = oFacility.StartTime || null;
+                oCalcItem.EndTime = oFacility.EndTime || null;
+                oCalcItem.TotalHour = oFacility.TotalHour || null;
+            }
 
             var fBaseTotal = this._calculateFacilityTotal(oCalcItem);
             var iPersonCount = Array.isArray(oFacility.SelectedPersonIds)
@@ -2712,7 +2789,7 @@ sap.ui.define([
                 BranchCode: oFacility.BranchCode,
                 Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
                 Image: this._getFacilityImageSource(oFacility),
-                UnitPrice: this._toNumber(oSelectedFacility.UnitPrice || oSelectedFacility.Price || oFacility.UnitPrice),
+                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice),
                 PricePerHour: this._toNumber(oFacility.PerHourPrice),
                 PricePerDay: this._toNumber(oFacility.PerDayPrice),
                 PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
@@ -2992,54 +3069,25 @@ sap.ui.define([
 
         /**
          * Show calculation breakdown only for condition 2:
-         * dates differ from the booking, or explicit StartTime/EndTime values exist.
-         * TotalHour alone should not trigger the breakdown.
+         * AdminUpdated = "YES" AND (dates differ from booking OR explicit StartTime/EndTime values).
          */
         _shouldShowFacilityCalcBreakdown: function (oFacility) {
             if (!oFacility || !oFacility.Selected) {
                 return false;
             }
 
-            var oHostelModel = this.getView().getModel("HostelModel");
-            var sBookingStart = oHostelModel ? oHostelModel.getProperty("/StartDate") : "";
-            var sBookingEnd = oHostelModel ? oHostelModel.getProperty("/EndDate") : "";
-
-            var fnNormalizeDate = function (vDate) {
-                var oParsedDate = this._parseDate(vDate);
-                if (!oParsedDate || isNaN(oParsedDate.getTime())) {
-                    return "";
-                }
-
-                return [
-                    oParsedDate.getFullYear(),
-                    String(oParsedDate.getMonth() + 1).padStart(2, "0"),
-                    String(oParsedDate.getDate()).padStart(2, "0")
-                ].join("-");
-            }.bind(this);
-
-            var fnHasExplicitTimeValues = function (oItem) {
-                var sStartTime = String(oItem.StartTime || "").trim();
-                var sEndTime = String(oItem.EndTime || "").trim();
-
-                if (sStartTime || sEndTime) {
-                    return true;
-                }
+            var oBookingView = this.getView().getModel("BookingView");
+            var bIsAdminUpdatedYes = oBookingView ? oBookingView.getProperty("/isAdminUpdatedYes") : false;
+            if (!bIsAdminUpdatedYes) {
                 return false;
-            };
+            }
 
-            var sNormalizedBookingStart = fnNormalizeDate(sBookingStart);
-            var sNormalizedBookingEnd = fnNormalizeDate(sBookingEnd);
-            var aItems = Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
-                ? oFacility.RawFacilityItems
-                : [oFacility];
+            // Condition 2 per-facility: dates differ or has explicit time values
+            if (this._isBookingDateDependentFacility(oFacility)) {
+                return false;
+            }
 
-            return aItems.some(function (oItem) {
-                var sFacilityStart = fnNormalizeDate(oItem.StartDate || oFacility.StartDate);
-                var sFacilityEnd = fnNormalizeDate(oItem.EndDate || oFacility.EndDate);
-                var bDatesDiffer = sFacilityStart !== sNormalizedBookingStart || sFacilityEnd !== sNormalizedBookingEnd;
-
-                return bDatesDiffer || fnHasExplicitTimeValues(oItem);
-            });
+            return true;
         },
 
         /**
@@ -3157,7 +3205,7 @@ sap.ui.define([
             } else {
                 // ── SINGLE / QTY modes ──
                 fGrandTotal = this._getFacilityCardTotalAmount(oFacility);
-                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice);
                 var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
                 var iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
                 var iDayCount = this._getDayCount(sFacStart, sFacEnd);
