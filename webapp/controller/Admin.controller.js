@@ -690,7 +690,7 @@ sap.ui.define([
 
             /* ================= VALIDATIONS ================= */
 
-            if (ID.Status === "New" && this.selectedIndex === 0) {
+            if (ID.Status === "Confirmed" && this.selectedIndex === 0) {
                 if (
                     !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
                     !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
@@ -706,7 +706,7 @@ sap.ui.define([
                 }
             }
 
-            if ((ID.Status === "Assigned" || ID.Status === "New") && this.selectedIndex === 1) {
+            if ((ID.Status === "Assigned" || ID.Status === "Confirmed") && this.selectedIndex === 1) {
                 if (
                     !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
                 ) {
@@ -791,6 +791,7 @@ sap.ui.define([
                 Payload = {
                     CustomerEmail: ID.CustomerEmail,
                     UserID:ID.UserID,
+                    MemberID:ID.MemberID,
                     CustomerName: ID.CustomerName,
                     DepositAmount: parseInt(DepositAmount),
                     DepositCurrency: "INR",
@@ -816,6 +817,7 @@ sap.ui.define([
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
                     UserID:ID.UserID,
+                    MemberID:ID.MemberID,
                     Status: "Assigned"
                 };
 

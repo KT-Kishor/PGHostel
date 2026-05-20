@@ -542,7 +542,7 @@ sap.ui.define([
 
                     Documents: oCustomer.Documents || []
                 };
-             const AllMembers = oCustomer.Members;
+                 const AllMembers = oCustomer.Members;
 
                 // 2. Map through documents to inject the Member Name
                 const Documents = (oCustomer.Documents || []).map(doc => {
@@ -3531,6 +3531,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 filters: [
                     new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sQuery),
                     new sap.ui.model.Filter("Relation", sap.ui.model.FilterOperator.Contains, sQuery),
+                    new sap.ui.model.Filter("Gender", sap.ui.model.FilterOperator.Contains, sQuery),
                     new sap.ui.model.Filter("Documents/0/FileName", sap.ui.model.FilterOperator.Contains, sQuery),
                     new sap.ui.model.Filter("Documents/0/DocumentType", sap.ui.model.FilterOperator.Contains, sQuery)
                 ],
@@ -3579,7 +3580,7 @@ sap.m.MessageBox.confirm(
     {
         actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
         emphasizedAction: sap.m.MessageBox.Action.YES,
-
+        styleClass: "myUnifiedBtn",
         onClose: async function (oAction) {
             if (oAction !== sap.m.MessageBox.Action.YES) {
                 return;
@@ -3649,7 +3650,7 @@ sap.m.MessageBox.confirm(
         {
             actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
             emphasizedAction: sap.m.MessageBox.Action.YES,
-
+            styleClass: "myUnifiedBtn",
             onClose: async function (oAction) {
                 if (oAction === sap.m.MessageBox.Action.YES) {
                     that.getBusyDialog();
