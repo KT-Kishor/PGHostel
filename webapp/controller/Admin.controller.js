@@ -626,7 +626,7 @@ sap.ui.define([
 
         //         // Perform AJAX call only after file is fully read
         //         $.ajax({
-        //             url: "https://rest.kalpavrikshatechnologies.com/HM_BedType",
+        //             url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_BedType",
         //             method: "POST",
         //             contentType: "application/json",
         //             headers: {
@@ -1048,7 +1048,7 @@ sap.ui.define([
             var sId = oData.ID;
 
             $.ajax({
-                url: "https://rest.kalpavrikshatechnologies.com/HM_Customer/" + sId,
+                url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/HM_Customer/" + sId,
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(oData),
