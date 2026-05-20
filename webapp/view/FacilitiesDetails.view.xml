@@ -152,10 +152,10 @@
                         columns="2" 
                         select=".onPeriodTypeSelect" 
                         visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
-                        selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'ONCE_PER_BOOKING' ? 1 : -1) }" editable="{editable>/Edit}">
+                        selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'Entire_Booking' ? 1 : -1) }" editable="{editable>/Edit}">
 											<m:buttons>
 												<m:RadioButton text="Daily" />
-												<m:RadioButton text="ONCE_PER_BOOKING" />
+												<m:RadioButton text="Entire_Booking" />
 											</m:buttons>
 										</m:RadioButtonGroup>
 										<m:Label

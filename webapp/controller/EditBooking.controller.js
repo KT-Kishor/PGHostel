@@ -679,7 +679,7 @@ sap.ui.define([
         /**
          * Calculate facility total based on UnitText pricing rules:
          *   Unit Price   → BasicFacilityPrice × Quantity
-         *   Package Price → ONCE_PER_BOOKING: BasicFacilityPrice × Quantity
+         *   Package Price → Entire_Booking: BasicFacilityPrice × Quantity
          *                   Daily: BasicFacilityPrice × Quantity × DayCount
          *   Per Day      → BasicFacilityPrice × DayCount × Quantity
          *   Per Hour     → BasicFacilityPrice × HourCount × Quantity
@@ -956,8 +956,8 @@ sap.ui.define([
                     if (sFacilityChargeType === "DAILY") {
                         // DAILY: BasicFacilityPrice already includes QTY, so only multiply by days
                         fPersonTotal = fPackagePrice * Math.max(iDayCount, 1);
-                    } else if (sFacilityChargeType === "ONCE_PER_BOOKING") {
-                        // ONCE_PER_BOOKING: BasicFacilityPrice already includes QTY, flat total
+                    } else if (sFacilityChargeType === "Entire_Booking") {
+                        // Entire_Booking: BasicFacilityPrice already includes QTY, flat total
                         fPersonTotal = fPackagePrice;
                     } else {
                         fPersonTotal = fPackagePrice * iQty;
@@ -2491,7 +2491,7 @@ sap.ui.define([
                             if (oPerson.chargeType === "DAILY") {
                                 return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " day(s) = ₹" + oPerson.personTotal.toFixed(2) + ")";
                             }
-                            if (oPerson.chargeType === "ONCE_PER_BOOKING") {
+                            if (oPerson.chargeType === "Entire_Booking") {
                                 return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
                             }
                             return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
@@ -3186,7 +3186,7 @@ sap.ui.define([
                             // PERSON_QTY
                             if (oPerson.chargeType === "DAILY") {
                                 sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " Days";
-                            } else if (oPerson.chargeType === "ONCE_PER_BOOKING") {
+                            } else if (oPerson.chargeType === "Entire_Booking") {
                                 sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × 1";
                             } else {
                                 sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity;

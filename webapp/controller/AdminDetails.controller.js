@@ -1707,7 +1707,7 @@ sap.ui.define([
 
             oPayload.TotalMonths = oPayload.TotalUnits || "1"
             oPayload.TotalYears = oPayload.TotalUnits || "1"
-            // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY" : ""
+            // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire_Booking" : "DAILY" : ""
             var memberName = sap.ui.getCore().byId("editMembername").getValue() || "";
 
 var matchedMember = oCustomerData.AllMembers.find(member =>
@@ -1722,7 +1722,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
             oPayload.SelectionMode = selectionmode
 
             if (oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "ONCE_PER_BOOKING" : "DAILY"
+                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire_Booking" : "DAILY"
             }
 
 
@@ -1739,7 +1739,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
             const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
                 item.FacilityName === oPayload.FacilityName &&
-                item.FacilityChargeType === "ONCE_PER_BOOKING" && item.MemberName === oPayload.MemberName
+                item.FacilityChargeType === "Entire_Booking" && item.MemberName === oPayload.MemberName
             );
 
             if (oDuplicate) {
@@ -2481,7 +2481,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
-            } else if (oSelectedData.FacilityChargeType === "ONCE_PER_BOOKING") {
+            } else if (oSelectedData.FacilityChargeType === "Entire_Booking") {
                 sap.ui.getCore().byId("editquantity").setVisible(true)
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(1)
@@ -3367,7 +3367,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                if (item.FacilityChargeType === "Entire_Booking") {
                                     firstMonthAmount = Number(item.TotalAmount);
 
                                 } else {
@@ -3937,7 +3937,7 @@ const documents = CustomerData.Documents || [];
 
                                     } else if (unit === "unit price" || unit === "package price") {
 
-                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                        if (item.FacilityChargeType === "Entire_Booking") {
 
                                             total = price;
 
@@ -4141,7 +4141,7 @@ const documents = CustomerData.Documents || [];
 
                                     } else if (unit === "unit price" || unit === "package price") {
 
-                                        if (item.FacilityChargeType === "ONCE_PER_BOOKING") {
+                                        if (item.FacilityChargeType === "Entire_Booking") {
 
                                             total = price;
 
