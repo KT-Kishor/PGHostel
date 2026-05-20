@@ -533,6 +533,7 @@ sap.ui.define([
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
                     GSTNumber: oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
+                    MemberID: oCustomer.Bookings?.[0]?.MemberID || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
 
@@ -3549,7 +3550,7 @@ const facilityItems = CustomerData.AllSelectedFacilities || [];
 const documents = CustomerData.Documents || [];
 
 // valid MemberIDs
-const validMemberIds = new Set(documents.map(d => d.MemberID));
+const validMemberIds = new Set(CustomerData.AllMembers.map(d => d.MemberID));
 
 // split invalid vs valid
 const toDelete = [];
@@ -3621,9 +3622,9 @@ sap.m.MessageBox.confirm(
         BookingID: ID.BookingID,
         CustomerEmail: ID.CustomerEmail || "",
         BedType: ID.BedType || "",
-        BookingDate: ID.BookingDate,
-        StartDate: ID.StartDate,
-        EndDate: ID.EndDate,
+        BookingDate: new Date(ID.BookingDate).toISOString().split('T')[0],
+        StartDate: ID.StartDate.split('/').reverse().join('-'),
+        EndDate: ID.EndDate.split('/').reverse().join('-'),
         MemberID: ID.MemberID || "",
         Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
         RentPrice: ID.RentPrice || 0,
@@ -4360,7 +4361,7 @@ const documents = CustomerData.Documents || [];
             };
 
 
-var memberIds = CustomerData.Documents
+var memberIds = CustomerData.AllMembers
     .map(doc => doc.MemberID)
     .join(",");
 
@@ -8111,43 +8112,58 @@ var memberIds = CustomerData.Documents
             );
         },
 
-        onUploadDocumentFile: async function () {
+      onUploadDocumentFile: async function () {
 
-            if (!this.UD_Dialog) {
-                var oView = this.getView();
-                this.UD_Dialog = sap.ui.xmlfragment(
-                    "sap.ui.com.project1.fragment.Membertable",
-                    this
-                );
-                oView.addDependent(this.UD_Dialog);
-            }
-               var sPropertyType=this.getView()
-                .getModel("CustomerData")
-                .getData().PropertyType
-              var oTable = sap.ui.getCore().byId("abmemberSelectTable");
+    if (!this.UD_Dialog) {
+        var oView = this.getView();
 
-               if (sPropertyType === "Hostel") {
+        this.UD_Dialog = sap.ui.xmlfragment(
+            "sap.ui.com.project1.fragment.Membertable",
+            this
+        );
 
+        oView.addDependent(this.UD_Dialog);
+    }
+
+    var sPropertyType = this.getView()
+        .getModel("CustomerData")
+        .getData().PropertyType;
+
+    var oTable = sap.ui.getCore().byId("abmemberSelectTable");
+
+    if (sPropertyType === "Hostel") {
         oTable.setMode("SingleSelectLeft");
         oTable.removeSelections(true);
-
     } else {
-
         oTable.setMode("MultiSelect");
     }
-            var userID = this.getView()
-                .getModel("CustomerData")
-                .getData().UserID;
 
-            const filter = {
-                UserID: userID
-            };
+    var oCustomerData = this.getView()
+        .getModel("CustomerData")
+        .getData();
 
-            this.getBusyDialog()
-  var Doc = this.getView().getModel("CustomerData").getData().Documents;
+    var userID = oCustomerData.UserID;
 
-await this.ajaxReadWithJQuery("HM_Member", filter)
-    .then((item) => {
+    // Existing selected MemberIDs
+    var aSelectedMemberIds = [];
+
+    if (oCustomerData.MemberID) {
+        aSelectedMemberIds = oCustomerData.MemberID
+            .split(",")
+            .map(function (id) {
+                return id.trim();
+            });
+    }
+
+    const filter = {
+        UserID: userID
+    };
+
+    this.getBusyDialog();
+
+    try {
+
+        var item = await this.ajaxReadWithJQuery("HM_Member", filter);
 
         var aMember = Array.isArray(item.data)
             ? item.data
@@ -8159,33 +8175,31 @@ await this.ajaxReadWithJQuery("HM_Member", filter)
 
         this.getView().setModel(oMemberModel, "BookingView");
 
-        // Get table
-  
-setTimeout(function () {
+        // Wait for table binding
+        setTimeout(function () {
 
-    var aSelectedMemberIds = Doc.map(function (oDoc) {
-        return oDoc.MemberID;
-    });
+            oTable.getItems().forEach(function (oItem) {
 
-    oTable.getItems().forEach(function (oItem) {
+                var oData = oItem
+                    .getBindingContext("BookingView")
+                    .getObject();
 
-        var oData = oItem
-            .getBindingContext("BookingView")
-            .getObject();
+                if (aSelectedMemberIds.includes(oData.MemberID)) {
+                    oTable.setSelectedItem(oItem, true);
+                }
 
-        if (aSelectedMemberIds.includes(oData.MemberID)) {
-            oTable.setSelectedItem(oItem, true);
-        }
+            });
 
-    });
+        }, 300);
 
-}, 300);
+        this.UD_Dialog.open();
 
-    });
-            this.closeBusyDialog()
+    } catch (e) {
+        sap.m.MessageBox.error("Failed to load members");
+    }
 
-            this.UD_Dialog.open();
-        },
+    this.closeBusyDialog();
+},
         onMemberSelectionChange: function (oEvent) {
 
     var oTable = oEvent.getSource();
