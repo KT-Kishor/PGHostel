@@ -261,71 +261,67 @@ sap.ui.define([
 
          this.onAfterAnimate()
         },
- onAfterAnimate: function () {
-
+onAfterAnimate: function () {
     var oHome = this.byId("idHome");
     var oComponent = this.getOwnerComponent();
 
     oHome.setBusy(true);
 
-    // wait until all images loaded
     var oInterval = setInterval(function () {
-
         if (oComponent._imagesLoaded) {
-
             clearInterval(oInterval);
 
             var aImages = oComponent._aPreloadedImages;
             var iIndex = 0;
 
-            // first image
+            // Apply base styling and CSS transition for background-image
             oHome.$().css({
                 "background-image": "url('" + aImages[0] + "')",
                 "background-size": "cover",
                 "background-position": "center",
                 "background-repeat": "no-repeat",
-                "opacity": "1"
+                "transition": "background-image 0.8s ease-in-out" // Handles the smooth fade
             });
 
-            // small render delay
             setTimeout(function () {
-
                 oHome.setBusy(false);
-
             }, 300);
 
-            // slider
-            this._imageInterval = setInterval(function () {
+            // Clear any existing interval to prevent memory leaks
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+            }
 
-                oHome.$().fadeOut(400, function () {
+            // Slider
+         this._imageInterval = setInterval(function () {
 
-                    iIndex = (iIndex + 1) % aImages.length;
+    iIndex = (iIndex + 1) % aImages.length;
 
-                    oHome.$().css(
-                        "background-image",
-                        "url('" + aImages[iIndex] + "')"
-                    );
+    var sNextImage = "url('" + aImages[iIndex] + "')";
 
-                    oHome.$().fadeIn(400);
+    // Preload image before applying
+    var img = new Image();
+    img.src = aImages[iIndex];
 
-                });
+    img.onload = function () {
 
-            }, 6000);
+        var $home = oHome.$();
+
+        // Force smooth repaint trick
+
+        // Apply new background
+        $home.css({
+            "background-image": sNextImage,
+            "background-size": "cover",
+            "background-position": "center",
+            "background-repeat": "no-repeat"
+        });
+
+    };
+
+}.bind(this), 6000);
         }   
     }.bind(this), 50);
-},
-
-
-        _reopenRoomDetailAfterLogin: function () {
-
-    if (!this._oRoomDetailFragment) {
-        this._oRoomDetailFragment = sap.ui.xmlfragment(
-            "sap.ui.com.project1.fragment.SignInSignup",
-            this
-        );
-        this.getView().addDependent(this._oRoomDetailFragment);
-    }
-    this._oRoomDetailFragment.open();
 },
 
         _clearOtpValidityTimer: function () {
