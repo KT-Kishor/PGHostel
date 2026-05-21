@@ -222,7 +222,7 @@
                 primaryGuestName: "",
                 quantity: 1,
                 singlePersonQty: 0,
-                facilityChargeType: "Entire_Booking",
+                facilityChargeType: "Entire Booking",
                 selectedPriceType: "",
                 personOptions: [],
                 selectedPersonIds: [],
@@ -1730,7 +1730,7 @@
                 return "DAILY";
             }
 
-            return "Entire_Booking";
+            return "Entire Booking";
         },
 
         _getFacilityChargeType: function (oFacility) {
@@ -1762,7 +1762,7 @@
             const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
-            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "Entire_Booking";
+            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "Entire Booking";
             const oDefaultOccupant = this._getDefaultOccupant();
 
             let aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
@@ -1887,7 +1887,7 @@
             oFacility.SelectedPrice = 0;
             oFacility.SelectedPriceType = "";
             oFacility.Quantity = 1;
-            oFacility.FacilityChargeType = "Entire_Booking";
+            oFacility.FacilityChargeType = "Entire Booking";
             oFacility.SelectedPersonIds = [];
             oFacility.PersonQuantities = [];
             oFacility.SelectionSummary = "";
@@ -1905,7 +1905,7 @@
                 oFacility.SelectedPrice = 0;
                 oFacility.SelectedPriceType = "";
                 oFacility.Quantity = 1;
-                oFacility.FacilityChargeType = "Entire_Booking";
+                oFacility.FacilityChargeType = "Entire Booking";
                 oFacility.SelectedPersonIds = [];
                 oFacility.PersonQuantities = [];
                 oFacility.SelectionSummary = "";
@@ -6066,6 +6066,7 @@
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
+                    Deposit:oHostelModel.getProperty("/Deposit") || 0,
                     // PaymentDetails: [this._getPaymentPayloadDetails()]
                     PaymentDetails: (this.getView().getModel("PaymentModel").getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn" ? [] : [this._getPaymentPayloadDetails()]
                 }]
@@ -6215,6 +6216,7 @@
                 const oMainData = oPayloadData.data[0];
 
                 const pdfBase64 = await this.onGeneratePDF(oMainData);
+                delete oPayloadData.data[0].Deposit;
                 const oPayload = {
                     data: oPayloadData.data,
                     pdfAttachment: {
@@ -6506,8 +6508,8 @@
             const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(booking.Discount) || 0;
-            const deposit = parseFloat(booking.Deposit) || 0;
-            const grandTotal = oHostelModel.GrandTotal;
+            const deposit = parseFloat(data.Deposit) || 0;
+            let grandTotal = oHostelModel.GrandTotal;
 
             // Payment Summary Card
             const summaryHeight = 90;
@@ -6563,7 +6565,7 @@
             }
 
             addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-            addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
+            // addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
 
             // Add separator line
             summaryY += 2;

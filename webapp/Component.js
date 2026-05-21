@@ -25,6 +25,39 @@ sap.ui.define([
                 // call the base component's init function
                 UIComponent.prototype.init.apply(this, arguments);
 
+                 var aImages = [
+                sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
+                sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
+                sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
+                sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
+                sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
+            ];
+
+            this._aPreloadedImages = [];
+            this._imagesLoaded = false;
+
+            var iLoaded = 0;
+
+            aImages.forEach(function (sSrc) {
+
+                var oImg = new Image();
+
+                oImg.onload = function () {
+
+                    iLoaded++;
+
+                    if (iLoaded === aImages.length) {
+                        this._imagesLoaded = true;
+                    }
+
+                }.bind(this);
+
+                oImg.src = sSrc;
+
+                this._aPreloadedImages.push(sSrc);
+
+            }.bind(this));
+
                 // enable routing
                 this.getRouter().initialize();
 

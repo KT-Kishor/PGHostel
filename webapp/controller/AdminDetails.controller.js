@@ -1707,7 +1707,7 @@ sap.ui.define([
 
             oPayload.TotalMonths = oPayload.TotalUnits || "1"
             oPayload.TotalYears = oPayload.TotalUnits || "1"
-            // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire_Booking" : "DAILY" : ""
+            // oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period") ? sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY" : ""
             var memberName = sap.ui.getCore().byId("editMembername").getValue() || "";
 
 var matchedMember = oCustomerData.AllMembers.find(member =>
@@ -1722,7 +1722,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
             oPayload.SelectionMode = selectionmode
 
             if (oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire_Booking" : "DAILY"
+                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
             }
 
 
@@ -1739,7 +1739,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
             const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
                 item.FacilityName === oPayload.FacilityName &&
-                item.FacilityChargeType === "Entire_Booking" && item.MemberName === oPayload.MemberName
+                item.FacilityChargeType === "Entire Booking" && item.MemberName === oPayload.MemberName
             );
 
             if (oDuplicate) {
@@ -2481,7 +2481,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
-            } else if (oSelectedData.FacilityChargeType === "Entire_Booking") {
+            } else if (oSelectedData.FacilityChargeType === "Entire Booking") {
                 sap.ui.getCore().byId("editquantity").setVisible(true)
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(1)
@@ -3367,7 +3367,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                                 firstMonthAmount = Number(item.Price) * overlapDays;
                             } else if (item.UnitText === "Unit Price") {
 
-                                if (item.FacilityChargeType === "Entire_Booking") {
+                                if (item.FacilityChargeType === "Entire Booking") {
                                     firstMonthAmount = Number(item.TotalAmount);
 
                                 } else {
@@ -3937,7 +3937,7 @@ const documents = CustomerData.Documents || [];
 
                                     } else if (unit === "unit price" || unit === "package price") {
 
-                                        if (item.FacilityChargeType === "Entire_Booking") {
+                                        if (item.FacilityChargeType === "Entire Booking") {
 
                                             total = price;
 
@@ -4141,7 +4141,7 @@ const documents = CustomerData.Documents || [];
 
                                     } else if (unit === "unit price" || unit === "package price") {
 
-                                        if (item.FacilityChargeType === "Entire_Booking") {
+                                        if (item.FacilityChargeType === "Entire Booking") {
 
                                             total = price;
 
@@ -7058,7 +7058,7 @@ var memberIds = CustomerData.AllMembers
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(data.Discount) || 0;
             const deposit = parseFloat(data.Deposit) || 0;
-            const grandTotal = subTotal - discount + deposit;
+            let grandTotal = subTotal - discount;
 
             // Payment Summary Card
             const summaryHeight = 90;
@@ -7106,15 +7106,17 @@ var memberIds = CustomerData.AllMembers
                 const sgst = parseFloat(data.SGST) || 0;
                 addLine(`CGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
                 addLine(`SGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
+                grandTotal += cgst + sgst; 
             }
 
             if (data.GSTType === "IGST") {
                 const igst = parseFloat(data.CGST) || 0;
                 addLine(`IGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+                grandTotal += igst; 
             }
 
             addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-            addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
+            // addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
 
             // Add separator line
             summaryY += 2;

@@ -4793,6 +4793,7 @@ width: 44px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: 30px;
 }
 
 .BranchCard .sapMCrsl,

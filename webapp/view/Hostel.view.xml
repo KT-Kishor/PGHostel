@@ -165,36 +165,8 @@
                                             >
                                                 <VBox width="100%">
                                                     <!-- <HBox justifyContent="End"><Button text="Filter" icon="sap-icon://map" press="onpressFilter" width="200px" class="sapUiTinyMargin"/></HBox> -->
-                                                    <VBox
-                                                        height="350px"
-                                                        class="sapUiContentPadding HostelRooms sapUiTinyMargin"
-                                                    >
-                                                        <l:Grid
-                                                            defaultSpan="XL12 L12 M12 S12"
-                                                            width="100%"
-                                                            class="position-welcome"
-                                                        >
-                                                            <VBox
-                                                                class=" sapUiLargeMarginTop heroTextBox"
-                                                            >
-                                                                <Text
-                                                                    class="custom-welcome sapUiTinyMarginTopBottom"
-                                                                    text="{i18n>bookYourRoom} "
-                                                                />
-                                                                <!-- <Text class="custom-welcome  sapUiTinyMarginTopBottom " text="{i18n>companynameKT}" /> -->
-                                                                <Text
-                                                                    text="{i18n>yourNewHomeAwayFromHome}"
-                                                                    class="custom-tagline s apUiTinyMarginTop "
-                                                                />
-                                                            </VBox>
-                                                            <HBox
-                                                                width="100%"
-                                                                justifyContent="End"
-                                                                alignItems="Center"
-                                                            />
-                                                        </l:Grid>
-                                                    </VBox>
-
+                                                   
+    
                                                     <fb:FilterBar
                                                         id="filterbar"
                                                         persistencyKey="myPersKey"
@@ -288,7 +260,7 @@
 
                                                     <VBox
                                                         height="100%"
-                                                        justifyContent="Start"
+                                                        justifyContent="Center"
                                                     >
                                                         <l:Grid
                                                             id="idBedTypeFlex"

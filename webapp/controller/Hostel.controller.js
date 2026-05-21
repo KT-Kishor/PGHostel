@@ -258,47 +258,61 @@ sap.ui.define([
 //         this._reopenRoomDetailAfterLogin();
 //     }, 300);
 // }
+
          this.onAfterAnimate()
         },
-          onAfterAnimate: function () {
+ onAfterAnimate: function () {
 
     var oHome = this.byId("idHome");
+    var oComponent = this.getOwnerComponent();
 
-    var aImages = [
-        sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
-    ];
+    oHome.setBusy(true);
 
-    var iIndex = 0;
+    // wait until all images loaded
+    var oInterval = setInterval(function () {
 
-    // Initial Image
-    oHome.$().css("background-image", "url('" + aImages[0] + "')");
+        if (oComponent._imagesLoaded) {
 
-    this._imageInterval = setInterval(function () {
+            clearInterval(oInterval);
 
-        // Fade Out
-        oHome.$().addClass("fadeOut");
+            var aImages = oComponent._aPreloadedImages;
+            var iIndex = 0;
 
-        setTimeout(function () {
+            // first image
+            oHome.$().css({
+                "background-image": "url('" + aImages[0] + "')",
+                "background-size": "cover",
+                "background-position": "center",
+                "background-repeat": "no-repeat",
+                "opacity": "1"
+            });
 
-            iIndex = (iIndex + 1) % aImages.length;
+            // small render delay
+            setTimeout(function () {
 
-            oHome.$().css(
-                "background-image",
-                "url('" + aImages[iIndex] + "')"
-            );
+                oHome.setBusy(false);
 
-            // Fade In
-            oHome.$()
-                .removeClass("fadeOut")
-                .addClass("fadeIn");
+            }, 300);
 
-        }, 1000);
+            // slider
+            this._imageInterval = setInterval(function () {
 
-    }, 5000);
+                oHome.$().fadeOut(400, function () {
+
+                    iIndex = (iIndex + 1) % aImages.length;
+
+                    oHome.$().css(
+                        "background-image",
+                        "url('" + aImages[iIndex] + "')"
+                    );
+
+                    oHome.$().fadeIn(400);
+
+                });
+
+            }, 6000);
+        }   
+    }.bind(this), 50);
 },
 
 
