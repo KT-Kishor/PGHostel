@@ -6218,6 +6218,8 @@
 
                 const pdfBase64 = await this.onGeneratePDF(oMainData);
                 delete oPayloadData.data[0].Deposit;
+                // Property name below
+                // oPayloadData.data[0].Area=oHostelModel.getData().Area 
                 const oPayload = {
                     data: oPayloadData.data,
                     pdfAttachment: {

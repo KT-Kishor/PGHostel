@@ -3724,6 +3724,7 @@ sap.m.MessageBox.confirm(
         MemberID: ID.MemberID || "",
         Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
         RentPrice: ID.GrandTotal || 0,
+        // PropertyName:ID.BranchName || "",
         pdfAttachment: {
                         fileName: "BookingVoucher.pdf",
                         mimeType: "application/pdf",

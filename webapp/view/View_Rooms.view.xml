@@ -20,7 +20,6 @@
 				type="XML" />
 		</headerContent>
 		<content>
-		        <VBox class="sapUiSmallMarginTop">
 			<uxap:ObjectPageLayout
 				id="VR_id_ObjectPageLayout"
 				useIconTabBar="false"
@@ -396,7 +395,6 @@
 					</uxap:ObjectPageSection>
 				</uxap:sections>
 			</uxap:ObjectPageLayout>
-			     </VBox>
 		</content>
 	</Page>
 </mvc:View>
