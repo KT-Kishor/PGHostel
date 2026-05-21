@@ -2796,13 +2796,13 @@
                     this._syncMemberDialogSelections();
                 }.bind(this), 0);
             } else {
-                // Show busy indicator and wait for data to load
-                sap.ui.core.BusyIndicator.show(0);
+                // Show busy dialog from BaseController and wait for data to load
+                this.getBusyDialog();
 
-                // Set a timeout to hide busy indicator after maximum wait time (10 seconds)
+                // Set a timeout to close busy dialog after maximum wait time (10 seconds)
                 const iMaxWaitTime = 10000; // 10 seconds
                 const iTimeoutId = setTimeout(() => {
-                    sap.ui.core.BusyIndicator.hide();
+                    this.closeBusyDialog();
                     sap.m.MessageToast.show("Member data loading is taking longer than expected. Please try again.");
                 }, iMaxWaitTime);
 
@@ -2810,7 +2810,7 @@
                 const waitForData = () => {
                     if (this._bMemberDataLoaded === true) {
                         clearTimeout(iTimeoutId);
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog();
                         // Data is now ready, proceed with opening dialog
                         this._loadMasterMembersForDialog();
                         this._getMemberSelectionDialog().then(oDialog => {
