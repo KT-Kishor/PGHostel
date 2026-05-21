@@ -46,7 +46,7 @@
 									src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
 									displaySize="L"
 									displayShape="Square"
-									class="vrSquareAvatarSmall sapUiTinyMarginEnd" />
+									class="vrSquareAvatarSmall sapUiTinyMarginEnd sapUiAvatarImageContain" />
 								<Title
 									text="{BranchModel>/Name}"
 									wrapping="true" />
@@ -72,7 +72,7 @@
             src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
             displaySize="XL"
             displayShape="Square"
-            class="vrSquareAvatarLarge sapUiMediumMarginEnd sapUiSmallMarginBottom"
+            class="vrSquareAvatarLarge sapUiMediumMarginEnd sapUiSmallMarginBottom sapUiAvatarImageContain"
         />
 
         <VBox

@@ -4232,7 +4232,8 @@
         _getFacilitiesBreakdownPopover: function () {
             if (!this._oFacilitiesBreakdownPopover) {
                 this._oFacilitiesBreakdownPopover = new ResponsivePopover({
-                    showHeader: false,
+                    showHeader: true,
+                    title: "Facilities Breakdown",
                     placement: "Bottom",
                     contentWidth: "28rem",
                     content: [

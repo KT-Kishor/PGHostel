@@ -6109,3 +6109,17 @@ html, body {
     background-attachment: fixed;
     min-height: 100%;
 }
+
+.sapUiAvatarImageContain .sapMAvatarImg,
+.sapUiAvatarImageContain span[style*="background-image"],
+.sapUiAvatarImageContain div[style*="background-image"],
+.sapUiAvatarImageContain .sapMAvatarContent {
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    object-fit: contain !important;
+}
+
+.sapUiAvatarImageContain.sapMAvatar {
+    background-color: transparent !important;
+}
