@@ -1772,28 +1772,115 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 }
             }
 
-            // if(!oPayload.MemberName && this.edit===true){
-            //    const newStart = this._parseDate(oPayload.StartDate);
-            //     const newEnd = this._parseDate(oPayload.EndDate);
+    //         if(!oPayload.MemberName && this.edit===true){
+    //            const newStart = this._parseDate(oPayload.StartDate);
+    //             const newEnd = this._parseDate(oPayload.EndDate);
 
-            //     const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+    //             const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
 
 
 
-            //         const oldStart = this._parseDate(item.StartDate);
-            //         const oldEnd = this._parseDate(item.EndDate);
+    //                 const oldStart = this._parseDate(item.StartDate);
+    //                 const oldEnd = this._parseDate(item.EndDate);
 
-            //         // ✅ Block ONLY if dates overlap
-            //         const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
+    //                 // ✅ Block ONLY if dates overlap
+    //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
 
-            //         return isOverlap;
-            //     });
+    //                 return isOverlap;
+    //             });
 
-            //     if (oDuplicatedates) {
-            //         sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-            //         return;
-            //     }
-            // }
+    //             if (oDuplicatedates) {
+    //                 sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+    //                 return;
+    //             }
+    //         }
+
+    //          if(!oPayload.MemberName && this.edit===false){
+    //            const newStart = this._parseDate(oPayload.StartDate);
+    // const newEnd = this._parseDate(oPayload.EndDate);
+
+    // const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+
+    //     // ✅ Skip same row while editing
+    //     if (this.edit === false && index === this._editIndex) {
+    //         return false;
+    //     }
+
+    //     const oldStart = this._parseDate(item.StartDate);
+    //     const oldEnd = this._parseDate(item.EndDate);
+
+    //     return (
+    //         newStart <= oldEnd &&
+    //         newEnd >= oldStart &&
+    //         item.FacilityName === oPayload.FacilityName
+    //     );
+    // });
+
+    // if (oDuplicatedates) {
+    //     sap.m.MessageToast.show(
+    //         this.i18nModel.getText("dateOverlapExists")
+    //     );
+    //     return;
+    // }
+    //         }
+
+    //          if(oPayload.MemberName && this.edit===true){
+    //          const newStart = this._parseDate(oPayload.StartDate);
+    //             const newEnd = this._parseDate(oPayload.EndDate);
+
+    //             const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+    //                 // ✅ Only check for SAME member
+    //                 if (item.MemberName !== oPayload.MemberName) {
+    //                     return false;
+    //                 }
+
+    //                 const oldStart = this._parseDate(item.StartDate);
+    //                 const oldEnd = this._parseDate(item.EndDate);
+
+    //                 // ✅ Block ONLY if dates overlap
+    //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+
+    //                 return isOverlap;
+    //             });
+
+    //             if (oDuplicatedates) {
+    //                 sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+    //                 return;
+    //             }
+    //         }
+    //           if (oPayload.MemberName && this.edit===false) {
+    //              const newStart = this._parseDate(oPayload.StartDate);
+    // const newEnd = this._parseDate(oPayload.EndDate);
+
+    // const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+
+    //       if (item.MemberName !== oPayload.MemberName) {
+    //                     return false;
+    //                 }
+
+    //     // ✅ Skip same row while editing
+    //     if (this.edit === false && index === this._editIndex) {
+    //         return false;
+    //     }
+
+    //     const oldStart = this._parseDate(item.StartDate);
+    //     const oldEnd = this._parseDate(item.EndDate);
+
+    //     return (
+    //         newStart <= oldEnd &&
+    //         newEnd >= oldStart &&
+    //         item.FacilityName === oPayload.FacilityName
+    //     );
+    // });
+
+    // if (oDuplicatedates) {
+    //     sap.m.MessageToast.show(
+    //         this.i18nModel.getText("dateOverlapExists")
+    //     );
+    //     return;
+    // }
+    //         }
             // UPDATE existing OR ADD new
             if (this._editIndex !== undefined) {
                 oCustomerData.AllSelectedFacilities[this._editIndex] =
@@ -2473,7 +2560,7 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
 
-
+              
             if (oSelectedData.FacilityChargeType === "DAILY") {
                 sap.ui.getCore().byId("editquantity").setVisible(true)
 
@@ -2501,6 +2588,14 @@ oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
+            }
+
+
+            if(oSelectedData.UnitText==="Per Month" || oSelectedData.UnitText==="Per Year"){
+                sap.ui.getCore().byId("editEndDate").setEditable(false)
+
+            }else{
+                sap.ui.getCore().byId("editEndDate").setEditable(true)
             }
 
             if (oSelectedData.MemberName !== "") {
@@ -3628,7 +3723,7 @@ sap.m.MessageBox.confirm(
         EndDate: ID.EndDate.split('/').reverse().join('-'),
         MemberID: ID.MemberID || "",
         Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
-        RentPrice: ID.RentPrice || 0,
+        RentPrice: ID.GrandTotal || 0,
         pdfAttachment: {
                         fileName: "BookingVoucher.pdf",
                         mimeType: "application/pdf",
@@ -7110,7 +7205,7 @@ var memberIds = CustomerData.AllMembers
             }
 
             if (data.GSTType === "IGST") {
-                const igst = parseFloat(data.CGST) || 0;
+                const igst = parseFloat(data.IGST) || 0;
                 addLine(`IGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
                 grandTotal += igst; 
             }

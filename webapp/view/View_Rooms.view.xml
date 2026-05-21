@@ -13,18 +13,20 @@
 	<Page
 		showHeader="true"
 		enableScrolling="true"
-		class="RoomsPage">
-		<headerContent>
+		class="RoomsPage roomsBgPage">
+		<headerContent >
 			<core:Fragment
 				fragmentName="sap.ui.com.project1.fragment.BookingHeader"
 				type="XML" />
 		</headerContent>
 		<content>
+		        <VBox class="sapUiSmallMarginTop">
 			<uxap:ObjectPageLayout
 				id="VR_id_ObjectPageLayout"
 				useIconTabBar="false"
 				showTitleInHeaderContent="true"
-				class="vrObjectPageLayout"
+				class="vrObjectPageLayout roomsBgLayout"
+				
 					>
 
 				<uxap:headerTitle>
@@ -174,7 +176,7 @@
 					<uxap:ObjectPageSection
 					visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }"				id="VR_id_ACSection"
 						title="AC Rooms"
-						titleUppercase="false">
+						titleUppercase="false" >
 						<uxap:subSections>
 							<uxap:ObjectPageSubSection
 								id="VR_id_ACSubSection"
@@ -191,7 +193,7 @@
 										<VBox class="sapUiTinyMarginTop">
 											<l:Grid
 												id="idBedTypeFlex2"
-												defaultSpan="XL3 L4 M6 S12"
+												defaultSpan="XL4 L4 M6 S12"
 												containerQuery="true"
 												hSpacing="2"
 												vSpacing="2"
@@ -394,6 +396,7 @@
 					</uxap:ObjectPageSection>
 				</uxap:sections>
 			</uxap:ObjectPageLayout>
+			     </VBox>
 		</content>
 	</Page>
 </mvc:View>

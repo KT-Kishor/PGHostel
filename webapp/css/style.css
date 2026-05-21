@@ -558,7 +558,7 @@
 }
 
 .bedCard {
-    width: auto;
+    width: 90%;
     height: auto;
     border-radius: 16px;
     padding: 6px;
@@ -5745,6 +5745,7 @@ html, body {
   border-radius: 12px !important ;
     border-left: 6px solid #00b7c7 !important;
 }
+
 .RoomsPage {
   position: relative;   /* important */
   background-image: url("../image/BedHostel.png");
@@ -6086,4 +6087,25 @@ html, body {
     .pricingDetailsTable .sapMText {
         font-size: 0.76rem !important;
     }
+}
+.roomsBgLayout,
+.roomsBgLayout .sapUxAPObjectPageWrapper,
+.roomsBgLayout .sapUxAPObjectPageContainer,
+.roomsBgLayout .sapUxAPObjectPageSectionContainer,
+.roomsBgLayout .sapUxAPBlockContainer,
+.roomsBgLayout .sapUxAPObjectPageSubSection,
+.roomsBgLayout .sapUxAPObjectPageSection,
+.roomsBgLayout .sapMPage,
+.roomsBgLayout .sapMPageBgStandard {
+    background: transparent !important;
+}
+
+/* Full page background image */
+.roomsBgLayout {
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100%;
 }

@@ -13,7 +13,7 @@
         class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >
-    <headerContent>
+        <headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.BookingHeader"
                 type="XML"
@@ -23,8 +23,8 @@
             <content>
                 <VBox class="sapUiSmallMargin">
                     <Title
-                     text="{= ${CustomerData>/PropertyType} + ' booking (' + ${CustomerData>/BranchName} + ')' }"
-                     class="boldBlackText sapUiSmallMarginBottom"
+                        text="{= ${CustomerData>/PropertyType} + ' booking (' + ${CustomerData>/BranchName} + ')' }"
+                        class="boldBlackText sapUiSmallMarginBottom"
                     />
                     <!-- Responsive Booking Status and Buttons -->
                     <!-- Left Side Info -->
@@ -68,29 +68,11 @@
                             </VBox>
                         </FlexBox>
                         <!-- RIGHT SIDE BUTTONS -->
-                        <!-- <FlexBox
-                            class="rightButtons"
-                            wrap="NoWrap"
-                            justifyContent="End"
-                            alignItems="End"
-                        >
+                        <!-- <FlexBox class="rightButtons" wrap="NoWrap" justifyContent="End" alignItems="End">
                         
-                            <Button
-                                text="Set GST"
-                                id="idGST"
-                                tooltip="GST Setup"
-                                press="onGSTBooking"
-                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
-                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
-                            <Button
-                                text="{i18n>MSedit}"
-                                id="idedit"
-                                tooltip="{i18n>MSedit}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                                press="onEditBooking"
-                                visible="{=
+                            <Button text="Set GST" id="idGST" tooltip="GST Setup" press="onGSTBooking" visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
+                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' }" class="sapUiSmallMarginBegin myUnifiedBtn" />
+                            <Button text="{i18n>MSedit}" id="idedit" tooltip="{i18n>MSedit}" class="sapUiSmallMarginBegin myUnifiedBtn" press="onEditBooking" visible="{=
                                     ${CustomerData>/Status} !== 'Cancelled'
                                      &amp;&amp; ${CustomerData>/Status} !== 'Completed'
                                      &amp;&amp;
@@ -99,46 +81,17 @@
                                         (${CustomerData>/Status} === 'Assigned' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin')
                                     )
                                     &amp;&amp; !${VisibleModel>/visible}
-                                }"
-                            />
+                                }" />
 
-                            <Button
-                                id="idcancel"
-                                tooltip="{i18n>cancelBooking}"
-                                text="{i18n>cancelBooking}"
-                                press="onPressCancelBooking"
-                                visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                            <Button id="idcancel" tooltip="{i18n>cancelBooking}" text="{i18n>cancelBooking}" press="onPressCancelBooking" visible="{= ${CustomerData>/Status} === 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }" class="sapUiSmallMarginBegin myUnifiedBtn" />
 
-                            <Button
-                                text="{i18n>checkOut}"
-                                id="idCheckout"
-                                tooltip="{i18n>checkOut}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                                press="onChekout"
-                                visible="{= ${CustomerData>/Status} === 'Assigned' 
+                            <Button text="{i18n>checkOut}" id="idCheckout" tooltip="{i18n>checkOut}" class="sapUiSmallMarginBegin myUnifiedBtn" press="onChekout" visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible}
-                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }"
-                            />
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }" />
 
-                            <Button
-                                text="Submit"
-                                id="idsave"
-                                tooltip="Submit"
-                                press="onSaveBooking"
-                                visible="{VisibleModel>/visible}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                            <Button text="Submit" id="idsave" tooltip="Submit" press="onSaveBooking" visible="{VisibleModel>/visible}" class="sapUiSmallMarginBegin myUnifiedBtn" />
 
-                            <Button
-                                id="idcancelbtn"
-                                text="{i18n>CancelButton}"
-                                tooltip="{i18n>CancelButton}"
-                                press="onCancelBooking"
-                                visible="{VisibleModel>/visible}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                            <Button id="idcancelbtn" text="{i18n>CancelButton}" tooltip="{i18n>CancelButton}" press="onCancelBooking" visible="{VisibleModel>/visible}" class="sapUiSmallMarginBegin myUnifiedBtn" />
                         </FlexBox> -->
                     </FlexBox>
                 </VBox>
@@ -421,21 +374,21 @@
                                 change="onAdminChangeSalutation"
                             >
                                 <core:Item
-                                key="Mr."
-                                text="Mr."
-                            />
-                            <core:Item
-                                key="Ms."
-                                text="Ms."
-                            />
-                            <core:Item
-                                key="Mrs."
-                                text="Mrs."
-                            />
-                            <core:Item
-                                key="Dr."
-                                text="Dr."
-                            />
+                                    key="Mr."
+                                    text="Mr."
+                                />
+                                <core:Item
+                                    key="Ms."
+                                    text="Ms."
+                                />
+                                <core:Item
+                                    key="Mrs."
+                                    text="Mrs."
+                                />
+                                <core:Item
+                                    key="Dr."
+                                    text="Dr."
+                                />
                                 <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"
@@ -451,7 +404,7 @@
                                 valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
                                 width="40%"
-                                 placeholder="Enter full name"
+                                placeholder="Enter full name"
                             />
 
                             <Label
@@ -652,7 +605,7 @@
                                 id="Ad_id_Address"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
-                                 placeholder="Enter address"
+                                placeholder="Enter address"
                             />
 
                             <Label
@@ -668,16 +621,9 @@
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MSmobileNo}"
                             />
-                            <!-- <Input
-                                id="CC_id_STDCode"
-                                value="{Bookingmodel>/STDCode}"
-                                visible="{VisibleModel>/visible}"
-                            >
+                            <!-- <Input id="CC_id_STDCode" value="{Bookingmodel>/STDCode}" visible="{VisibleModel>/visible}">
                                 <layoutData>
-                                    <f:ColumnElementData
-                                        cellsSmall="2"
-                                        cellsLarge="1"
-                                    />
+                                    <f:ColumnElementData cellsSmall="2" cellsLarge="1" />
                                 </layoutData>
                             </Input> -->
 
@@ -787,11 +733,10 @@
                                             class="myUnifiedBtn"
                                             visible="{VisibleModel>/visible}"
                                         />
-                                        
                                     </Toolbar>
                                 </headerToolbar>
                                 <columns>
-                                  <Column demandPopin="true">
+                                    <Column demandPopin="true">
                                         <Text
                                             text="{i18n>membername}"
                                             tooltip="{i18n>membername}"
@@ -928,7 +873,7 @@
                                     tooltip="Period"
                                 />
                             </Column>
-                               <Column
+                            <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
@@ -937,7 +882,7 @@
                                     tooltip="Coupon Code"
                                 />
                             </Column>
-                               <Column
+                            <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
@@ -959,7 +904,9 @@
                         <items>
                             <ColumnListItem>
                                 <cells>
-                                   <Text text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }" />
+                                    <Text
+                                        text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }"
+                                    />
                                     <Text
                                         text="{
                                                 parts: [
@@ -976,11 +923,9 @@
                                         text="{path:'CustomerData>EndDate'}"
                                     />
                                     <!-- <Text text="{CustomerData>UnitText}" /> -->
+                                    <Text text="{CustomerData>UnitText}" />
                                     <Text
-                                        text="{CustomerData>UnitText}"
-                                    />
-                  <Text
-  text="{= (${CustomerData>UnitText} === 'Per Month')
+                                        text="{= (${CustomerData>UnitText} === 'Per Month')
     ? Number(${CustomerData>TotalMonths}) + ' ' + 
       (Number(${CustomerData>TotalMonths}) === 1 ? 'Month' : 'Months') +
       (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
@@ -1002,14 +947,13 @@
 
     : Number(${CustomerData>quantity}) + ' Qty'
 }"
-/>
-
-
-
+                                    />
 
                                     <Text text="{CustomerData>CouponCode}" />
 
-                                    <Text text="{CustomerData>CouponDiscount}" />
+                                    <Text
+                                        text="{CustomerData>CouponDiscount}"
+                                    />
 
                                     <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
                                     <Text
@@ -1072,10 +1016,10 @@
                                 />
                             </HBox>
 
-                                <!-- Discount -->
-                              <HBox justifyContent="SpaceBetween">
+                            <!-- Discount -->
+                            <HBox justifyContent="SpaceBetween">
                                 <Label
-                                      text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+                                    text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
     ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
     : 'Discount:' }"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1092,13 +1036,13 @@
                                     textAlign="End"
                                 />
                             </HBox>
-                               <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
+                            <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
                             <HBox
                                 width="100%"
                                 justifyContent="End"
                                 alignItems="Center"
                                 class="sapUiSmallMarginBottom"
-                               visible="false"
+                                visible="false"
                             >
                                 <!-- Coupon Label -->
                                 <Label
@@ -1117,7 +1061,7 @@
                                     valueHelpIconSrc="sap-icon://decline"
                                     valueHelpRequest="oncancelCoupon"
                                     liveChange="onCouponLiveChange"
-                                />      
+                                />
                                 <!-- Apply Now Button -->
                                 <Button
                                     id="idApplyNowButton"
@@ -1128,42 +1072,25 @@
                                     visible="{= !${VisibleModel>/IsCouponApplied} }"
                                 />
                             </HBox>
-                            <!-- <HBox
-                                justifyContent="SpaceBetween"
-                                visible="{= ${CustomerData>/CouponCode} ? true : false }"
-                            >
-                                <Label
-                                    text="{i18n>couponCode}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            <!-- <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CouponCode} ? true : false }">
+                                <Label text="{i18n>couponCode}" class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel" />
+                                <Text class="amountText totalColumnBold1" text="{
                             parts: [{ path: 'CustomerData>/CouponCode' }]
-                        }"
-                                    textAlign="End"
-                                />
+                        }" textAlign="End" />
                             </HBox> -->
 
                             <!-- Discount -->
                             <!-- <HBox justifyContent="SpaceBetween">
-                                <Label
-                                      text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+                                <Label text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
     ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
-    : 'Discount:' }"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+    : 'Discount:' }" class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel" />
+                                <Text class="amountText totalColumnBold1" text="{
                             parts: [
                                 { path: 'CustomerData>/Discount' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
-                        }"
-                                    textAlign="End"
-                                />
+                        }" textAlign="End" />
                             </HBox> -->
                             <!-- Sub Total -->
                             <HBox justifyContent="SpaceBetween">
@@ -1184,9 +1111,12 @@
                                 />
                             </HBox>
                             <!-- CGST -->
-                            <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CGST} > 0 }">
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                visible="{= ${CustomerData>/CGST} > 0 }"
+                            >
                                 <Label
-                                   text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                                    text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text
@@ -1202,7 +1132,10 @@
                                 />
                             </HBox>
                             <!-- SGST -->
-                            <HBox justifyContent="SpaceBetween"  visible="{= ${CustomerData>/SGST} > 0 }">
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                visible="{= ${CustomerData>/SGST} > 0 }"
+                            >
                                 <Label
                                     text="{= 'SGST (' + ${CustomerData>/GSTValue} + '%):'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1220,7 +1153,10 @@
                                 />
                             </HBox>
                             <!-- IGST -->
-                               <HBox justifyContent="SpaceBetween"  visible="{= ${CustomerData>/IGST} > 0 }">
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                visible="{= ${CustomerData>/IGST} > 0 }"
+                            >
                                 <Label
                                     text="{= 'IGST (' + ${CustomerData>/GSTValue} + '%):'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1237,7 +1173,7 @@
                                     textAlign="End"
                                 />
                             </HBox>
-                       
+
                             <!-- Grand Total -->
                             <HBox justifyContent="SpaceBetween">
                                 <Label
@@ -1255,9 +1191,9 @@
                         }"
                                     textAlign="End"
                                 />
-                               <!-- Deposit -->
+                                <!-- Deposit -->
                             </HBox>
-                                <HBox justifyContent="SpaceBetween">
+                            <HBox justifyContent="SpaceBetween">
                                 <Label
                                     text="Security Deposit:"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1274,8 +1210,8 @@
                                     textAlign="End"
                                 />
                             </HBox>
-                                    <!-- Paid -->
-                              <HBox justifyContent="SpaceBetween">
+                            <!-- Paid -->
+                            <HBox justifyContent="SpaceBetween">
                                 <Label
                                     text="Paid Amount:"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1292,8 +1228,11 @@
                                     textAlign="End"
                                 />
                             </HBox>
-                                <!-- Refund -->
-                              <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }">
+                            <!-- Refund -->
+                            <HBox
+                                justifyContent="SpaceBetween"
+                                visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }"
+                            >
                                 <Label
                                     text="Refund credited:"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1310,8 +1249,8 @@
                                     textAlign="End"
                                 />
                             </HBox>
-                                    <!-- Due Amount -->
-                               <HBox justifyContent="SpaceBetween">
+                            <!-- Due Amount -->
+                            <HBox justifyContent="SpaceBetween">
                                 <Label
                                     text="{= ${CustomerData>/DueAmount} >= 0 ? 'Due Amount:' : 'Refund Amount:'}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
@@ -1335,118 +1274,117 @@
         </ScrollContainer>
         <!-- <footer>
         
-         <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
+         <core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML" />
         </footer> -->
 
         <footer>
-			<Bar>
-            <contentLeft>
-             <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
-             <Link
-                text="{i18n>devlopby}"
-                href="https://kalpavrikshatechnologies.com/"
-                target="_blank"
-                class="customLinkWhiteBg"
-            />
-            
-            </contentLeft>
-				<contentRight>
-<!-- Confirm -->
-                  <Button
-                            text="Approve Booking"
-                            tooltip="Approve Booking"
-                            press="HM_ConfirmRoom"
-                            class="myUnifiedBtn"
-                            visible="{= ${CustomerData>/Status} === 'New' }"
-                        />
+            <Bar>
+                <contentLeft>
+                    <Image
+                        src="../image/TransparentKTlogo.png"
+                        width="30px"
+                        height="30px"
+                    />
+                    <Link
+                        text="{i18n>devlopby}"
+                        href="https://kalpavrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </contentLeft>
+                <contentRight>
+                    <!-- Confirm -->
+                    <Button
+                        text="Approve Booking"
+                        tooltip="Approve Booking"
+                        press="HM_ConfirmRoom"
+                        class="myUnifiedBtn"
+                        visible="{= ${CustomerData>/Status} === 'New' }"
+                    />
 
-<!-- Reject -->
-                          <Button
-                            text="Reject Booking"
-                            tooltip="Reject Booking"
-                            press="HM_RejectRoom"
-                            class="myUnifiedBtn"
-                            visible="{= ${CustomerData>/Status} === 'New' }"
-
-                        />
+                    <!-- Reject -->
+                    <Button
+                        text="Reject Booking"
+                        tooltip="Reject Booking"
+                        press="HM_RejectRoom"
+                        class="myUnifiedBtn"
+                        visible="{= ${CustomerData>/Status} === 'New' }"
+                    />
                     <!-- Refund Amount -->
-                   <Button
-                                text="Set GST"
-                                id="idGST"
-                                tooltip="GST Setup"
-                                press="onGSTBooking"
-                                visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
+                    <Button
+                        text="Set GST"
+                        id="idGST"
+                        tooltip="GST Setup"
+                        press="onGSTBooking"
+                        visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
-                            <Button
-                                text="{i18n>MSedit}"
-                                id="idedit"
-                                tooltip="{i18n>MSedit}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                                press="onEditBooking"
-                                visible="{=
-                                    ${CustomerData>/Status} !== 'Cancelled'
-                                     &amp;&amp; ${CustomerData>/Status} !== 'Completed'
-                                     &amp;&amp;
-                                    (
-                                         ${CustomerData>/Status} === 'Confirmed' ||
-                                        (${CustomerData>/Status} === 'Assigned' &amp;&amp; ${CustomerData>/Status} !== 'New' &amp;&amp; (${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin')
-                                    )
-                                    &amp;&amp; !${VisibleModel>/visible}
-                                }"
-                            />
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                    />
+                    <Button
+                        text="{i18n>MSedit}"
+                        id="idedit"
+                        tooltip="{i18n>MSedit}"
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        press="onEditBooking"
+                        visible="{=
+                                 ${CustomerData>/Status} !== 'Cancelled'
+                                  &amp;&amp; ${CustomerData>/Status} !== 'Completed'
+                                  &amp;&amp; ${CustomerData>/Status} !== 'New'
+                                  &amp;&amp; (
+                                        ${CustomerData>/Status} === 'Confirmed'
+                                            || (
+                                           ${CustomerData>/Status} === 'Assigned'
+                                             &amp;&amp; (
+                                           ${LoginModel>/Role} === 'Admin'
+                                           || ${LoginModel>/Role} === 'SuperAdmin'
+                                              )
+                                            )
+                                               )
+                                       &amp;&amp; !${VisibleModel>/visible}
+                                                }"
+                    />
 
-                            <Button
-                                id="idcancel"
-                                tooltip="{i18n>cancelBooking}"
-                                text="{i18n>cancelBooking}"
-                                press="onPressCancelBooking"
-                                visible="{= ${CustomerData>/Status} === 'Confirmed' &amp;&amp; ${CustomerData>/Status} !== 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                    <Button
+                        id="idcancel"
+                        tooltip="{i18n>cancelBooking}"
+                        text="{i18n>cancelBooking}"
+                        press="onPressCancelBooking"
+                        visible="{= ${CustomerData>/Status} === 'Confirmed' &amp;&amp; ${CustomerData>/Status} !== 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                    />
 
-                            <Button
-                                text="{i18n>checkOut}"
-                                id="idCheckout"
-                                tooltip="{i18n>checkOut}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                                press="onChekout"
-                                visible="{= ${CustomerData>/Status} === 'Assigned' 
+                    <Button
+                        text="{i18n>checkOut}"
+                        id="idCheckout"
+                        tooltip="{i18n>checkOut}"
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        press="onChekout"
+                        visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible} &amp;&amp; ${CustomerData>/Status} !== 'New'
                                     &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }"
-                            />
+                    />
 
-                            <Button
-                                text="Submit"
-                                id="idsave"
-                                tooltip="Submit"
-                                press="onSaveBooking"
-                                visible="{VisibleModel>/visible}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                    <Button
+                        text="Submit"
+                        id="idsave"
+                        tooltip="Submit"
+                        press="onSaveBooking"
+                        visible="{VisibleModel>/visible}"
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                    />
 
-                            <Button
-                                id="idcancelbtn"
-                                text="{i18n>CancelButton}"
-                                tooltip="{i18n>CancelButton}"
-                                press="onCancelBooking"
-                                visible="{VisibleModel>/visible}"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                            />
+                    <Button
+                        id="idcancelbtn"
+                        text="{i18n>CancelButton}"
+                        tooltip="{i18n>CancelButton}"
+                        press="onCancelBooking"
+                        visible="{VisibleModel>/visible}"
+                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                    />
 
-                            <!-- <Button id="idgeneratePDFbtn"
-                                text="{i18n>GeneratePDF}"
-                                tooltip="{i18n>GeneratePDF}"
-                                press="onGeneratePDF"
-                                class="sapUiSmallMarginBegin myUnifiedBtn"
-                                visible="{= !${VisibleModel>/visible}}"
-                            /> -->
+                    <!-- <Button id="idgeneratePDFbtn" text="{i18n>GeneratePDF}" tooltip="{i18n>GeneratePDF}" press="onGeneratePDF" class="sapUiSmallMarginBegin myUnifiedBtn" visible="{= !${VisibleModel>/visible}}" /> -->
                 </contentRight>
-			</Bar>
-		</footer>
+            </Bar>
+        </footer>
     </Page>
 </mvc:View>
