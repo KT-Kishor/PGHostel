@@ -19,6 +19,7 @@ sap.ui.define([
 
         },
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog()
             if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
@@ -59,6 +60,7 @@ sap.ui.define([
             await this._loadBranchData();
 
             await this._loadFilteredData()
+            this.closeBusyDialog()
             const oView = this.getView();
             oView.setModel(new JSONModel({
                 isOtpSelected: false,
@@ -174,7 +176,7 @@ sap.ui.define([
 
             // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
-                this.getView().setBusy(true);
+                this.getBusyDialog();
                 oVisibilityModel.setProperty("/isDataLoaded", false);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
@@ -183,7 +185,7 @@ sap.ui.define([
                 });
                 await this.model(response)
                 oVisibilityModel.setProperty("/isDataLoaded", true);
-                this.getView().setBusy(false);
+                this.closeBusyDialog();
 
 
                 let matchedRooms = response.data.HM_BedType || [];
