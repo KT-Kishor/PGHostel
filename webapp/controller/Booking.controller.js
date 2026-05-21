@@ -2799,17 +2799,9 @@
                 // Show busy dialog from BaseController and wait for data to load
                 this.getBusyDialog();
 
-                // Set a timeout to close busy dialog after maximum wait time (10 seconds)
-                const iMaxWaitTime = 10000; // 10 seconds
-                const iTimeoutId = setTimeout(() => {
-                    this.closeBusyDialog();
-                    sap.m.MessageToast.show("Member data loading is taking longer than expected. Please try again.");
-                }, iMaxWaitTime);
-
-                // Wait for data to be loaded
+                // Wait for data to be loaded (polls indefinitely until _bMemberDataLoaded becomes true)
                 const waitForData = () => {
                     if (this._bMemberDataLoaded === true) {
-                        clearTimeout(iTimeoutId);
                         this.closeBusyDialog();
                         // Data is now ready, proceed with opening dialog
                         this._loadMasterMembersForDialog();
