@@ -3724,7 +3724,7 @@ sap.m.MessageBox.confirm(
         MemberID: ID.MemberID || "",
         Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
         RentPrice: ID.GrandTotal || 0,
-        // PropertyName:ID.BranchName || "",
+        PropertyName:ID.BranchName || "",
         pdfAttachment: {
                         fileName: "BookingVoucher.pdf",
                         mimeType: "application/pdf",
@@ -3776,7 +3776,7 @@ HM_RejectRoom: function (oEvent) {
 onRejectSave: async function () {
 
     var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
-
+    
     if (
         !utils._LCvalidateMandatoryField(
             sap.ui.getCore().byId("idRejectReason"),
@@ -3808,7 +3808,8 @@ onRejectSave: async function () {
         EndDate: ID.EndDate,
         MemberID: ID.MemberID || "",
         Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
-        RentPrice: ID.RentPrice || 0
+        RentPrice: ID.RentPrice || 0,
+        PropertyName : ID.BranchName
     };
 
     var oBody = {
