@@ -39,7 +39,7 @@ sap.ui.define([
         },
 
         onAfterRendering: function () {
-            this._attachInputFocusHandlers();
+            this._startAllCarouselsAutoSlide(3000);
         },
 
         _getBrowserLocation: function () {
@@ -373,60 +373,6 @@ onAfterAnimate: function () {
             }.bind(this), 6000); ////6000
         },
 
-        _isEditableInput: function (el) {
-            if (!el) return false;
-            var tagName = el.tagName && el.tagName.toLowerCase();
-            if (tagName === "input" || tagName === "textarea" || tagName === "select") {
-                if (el.readOnly || el.disabled || el.type === "hidden" || el.type === "submit" || el.type === "button" || el.type === "image") {
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        },
-
-        _attachInputFocusHandlers: function () {
-            var oView = this.getView();
-            if (!oView) return;
-            var oDomRef = oView.getDomRef();
-            if (!oDomRef) return;
-
-            this._fnHomeFocusIn = function (oEvent) {
-                if (this._isEditableInput(oEvent.target)) {
-                    this._stopHomeImageSlider();
-                }
-            }.bind(this);
-
-            this._fnHomeFocusOut = function (oEvent) {
-                clearTimeout(this._homeFocusOutTimer);
-                this._homeFocusOutTimer = setTimeout(function () {
-                    if (!this._isEditableInput(document.activeElement)) {
-                        this._startHomeImageSlider();
-                    }
-                }.bind(this), 150);
-            }.bind(this);
-
-            oDomRef.addEventListener("focusin", this._fnHomeFocusIn);
-            oDomRef.addEventListener("focusout", this._fnHomeFocusOut);
-        },
-
-        _detachInputFocusHandlers: function () {
-            var oView = this.getView();
-            if (!oView) return;
-            var oDomRef = oView.getDomRef();
-            if (oDomRef) {
-                if (this._fnHomeFocusIn) {
-                    oDomRef.removeEventListener("focusin", this._fnHomeFocusIn);
-                }
-                if (this._fnHomeFocusOut) {
-                    oDomRef.removeEventListener("focusout", this._fnHomeFocusOut);
-                }
-            }
-            clearTimeout(this._homeFocusOutTimer);
-            this._fnHomeFocusIn = null;
-            this._fnHomeFocusOut = null;
-            this._homeFocusOutTimer = null;
-        },
 
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -1268,7 +1214,6 @@ if (aData.length === 0) {
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
             this._stopHomeImageSlider();
-            this._detachInputFocusHandlers();
         },
 
         onpressFilter: function () {
@@ -1278,10 +1223,7 @@ if (aData.length === 0) {
                 this.ARD_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.Filter_Branch", this);
                 oView.addDependent(this.ARD_Dialog);
                 this.ARD_Dialog.attachAfterClose(function () {
-                    clearTimeout(this._homeFocusOutTimer);
-                    this._homeFocusOutTimer = setTimeout(function () {
-                        this._startHomeImageSlider();
-                    }.bind(this), 200);
+                    this._startHomeImageSlider();
                 }.bind(this));
             }
             this._stopHomeImageSlider();
@@ -1363,10 +1305,7 @@ if (aData.length === 0) {
         this._oSignDialog = null;    // 🔥 CRITICAL FIX
     }
           // Dialog was destroyed – afterClose won't fire, so resume slider directly
-          clearTimeout(this._homeFocusOutTimer);
-          this._homeFocusOutTimer = setTimeout(function () {
-              this._startHomeImageSlider();
-          }.bind(this), 200);
+          this._startHomeImageSlider();
 },
 
         onSwitchToSignIn: function () {
@@ -3229,10 +3168,7 @@ if (aData.length === 0) {
         },
 
         _resetAuthDialog: function () {
-            clearTimeout(this._homeFocusOutTimer);
-            this._homeFocusOutTimer = setTimeout(function () {
-                this._startHomeImageSlider();
-            }.bind(this), 200);
+            this._startHomeImageSlider();
 
             const oModel = this.getView().getModel("LoginMode");
 
@@ -3963,10 +3899,7 @@ if (aData.length === 0) {
         this._oSignDialog = null;
                 }
                 // Dialog was destroyed – afterClose won't fire, so resume slider directly
-                clearTimeout(this._homeFocusOutTimer);
-                this._homeFocusOutTimer = setTimeout(function () {
-                    this._startHomeImageSlider();
-                }.bind(this), 200);
+                this._startHomeImageSlider();
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
@@ -4273,10 +4206,7 @@ if (aData.length === 0) {
                 this._oAdminSignup.attachAfterClose(() => {
                     this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
-                    clearTimeout(this._homeFocusOutTimer);
-                    this._homeFocusOutTimer = setTimeout(function () {
-                        this._startHomeImageSlider();
-                    }.bind(this), 200);
+                    this._startHomeImageSlider();
                 });
             }
 
@@ -5137,12 +5067,8 @@ if (aData.length === 0) {
                     oDialog.open();
 
                     this._supportRequestDialog.attachAfterClose(() => {
-
-                    this.HF_onCancelButtonPress();
-                        clearTimeout(this._homeFocusOutTimer);
-                        this._homeFocusOutTimer = setTimeout(function () {
-                            this._startHomeImageSlider();
-                        }.bind(this), 200);
+                        this.HF_onCancelButtonPress();
+                        this._startHomeImageSlider();
                 });
 
                 }.bind(this));

@@ -7,8 +7,9 @@ sap.ui.define([
     "sap/ui/Device",
     "sap/ui/com/project1/model/models",
     "sap/ui/model/json/JSONModel",
+    "sap/m/Carousel",
 ],
-    function (UIComponent, Device, models, JSONModel) {
+    function (UIComponent, Device, models, JSONModel, Carousel) {
         "use strict";
 
         return UIComponent.extend("sap.ui.com.project1.Component", {
@@ -24,6 +25,54 @@ sap.ui.define([
             init: async function () {
                 // call the base component's init function
                 UIComponent.prototype.init.apply(this, arguments);
+
+
+                // --- Global virtual keyboard / carousel slide blocker ---
+                window.isVirtualKeyboardActive = false;
+
+                // Helper function to detect if an element accepts text input (triggers keyboard)
+                var fnIsInputField = function (el) {
+                    if (!el) { return false; }
+                    var sTagName = el.tagName;
+                    var sType = el.type ? el.type.toLowerCase() : "";
+
+                    // Core input tags
+                    if (sTagName === "INPUT" || sTagName === "TEXTAREA" || el.isContentEditable) {
+                        // Ignore buttons, checkboxes, radio buttons hidden types which do NOT open keyboard
+                        var aNonInputTypes = ["button", "checkbox", "radio", "submit", "image", "hidden", "file"];
+                        if (sTagName === "INPUT" && aNonInputTypes.includes(sType)) {
+                            return false;
+                        }
+                        return true;
+                    }
+                    return false;
+                };
+
+                window.addEventListener("focusin", function (e) {
+                    if (fnIsInputField(e.target)) {
+                        window.isVirtualKeyboardActive = true;
+                    }
+                });
+
+                window.addEventListener("focusout", function (e) {
+                    // Short timeout covers the transition when moving between fields inside forms
+                    setTimeout(function () {
+                        if (!fnIsInputField(document.activeElement)) {
+                            window.isVirtualKeyboardActive = false;
+                        }
+                    }, 300);
+                });
+
+                // Monkey-patch sap.m.Carousel.prototype.next to block auto-slide while keyboard is active
+                var _origCarouselNext = Carousel.prototype.next;
+                Carousel.prototype.next = function () {
+                    if (window.isVirtualKeyboardActive) {
+                        // Return the carousel instance to maintain method chaining without triggering rendering
+                        return this;
+                    }
+                    return _origCarouselNext.apply(this, arguments);
+                };
+                // --- End global override ---
 
                  var aImages = [
                 sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),

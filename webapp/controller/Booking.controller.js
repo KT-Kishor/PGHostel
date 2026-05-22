@@ -40,12 +40,11 @@
 
         },
         onAfterRendering: function () {
+            this._startAllCarouselsAutoSlide(3000);
             this._attachDocumentInfoHover();
             this._attachFacilityDiscountInfoHover();
             this._attachFacilitiesBreakdownHover();
-            this._startAllCarouselsAutoSlide(3000);
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
-            this._attachInputFocusHandlers();
         },
 
         onExit: function () {
@@ -53,7 +52,6 @@
                 sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
                 this._fnFacilityResizeHandler = null;
             }
-            this._clearAllCarouselTimers();
             if (this._adCarouselInterval) {
                 clearInterval(this._adCarouselInterval);
                 this._adCarouselInterval = null;
@@ -68,8 +66,6 @@
                 });
                 this._adCarouselPauseResumeHandlers = null;
             }
-
-            this._detachInputFocusHandlers();
 
             BaseController.prototype.onExit.call(this);
         },
@@ -444,112 +440,6 @@
             if (oAdvertisementModel) {
                 oAdvertisementModel.setProperty("/currentPage", iNewPage);
             }
-        },
-
-        /* ── Carousel pause / resume on input focus ── */
-
-        _isEditableInput: function (el) {
-            if (!el) return false;
-            var tagName = el.tagName && el.tagName.toLowerCase();
-            if (tagName === "input" || tagName === "textarea" || tagName === "select") {
-                if (el.readOnly || el.disabled || el.type === "hidden" || el.type === "submit" || el.type === "button" || el.type === "image") {
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        },
-
-        _stopCarouselAutoplay: function () {
-            var oView = this.getView();
-            if (!oView) return;
-
-            // Pause all native SAP UI5 Carousel auto-play
-            var aCarousels = oView.findAggregatedObjects(true, function (c) {
-                return c && c.isA && c.isA("sap.m.Carousel");
-            });
-            aCarousels.forEach(function (carousel) {
-                if (!carousel || carousel.bIsDestroyed) return;
-                if (typeof carousel.setAutoPlay === "function") {
-                    carousel.setAutoPlay(false);
-                }
-            });
-
-            // Pause advertisement carousel setInterval
-            if (this._adCarouselInterval) {
-                clearInterval(this._adCarouselInterval);
-                this._adCarouselInterval = null;
-            }
-        },
-
-        _startCarouselAutoplay: function () {
-            var oView = this.getView();
-            if (!oView) return;
-
-            // Resume all native SAP UI5 Carousel auto-play
-            var aCarousels = oView.findAggregatedObjects(true, function (c) {
-                return c && c.isA && c.isA("sap.m.Carousel");
-            });
-            aCarousels.forEach(function (carousel) {
-                if (!carousel || carousel.bIsDestroyed) return;
-                var pages = carousel.getPages();
-                if (!pages || pages.length <= 1) return;
-                if (typeof carousel.setAutoPlay === "function") {
-                    carousel.setAutoPlay(true);
-                }
-                if (typeof carousel.setAutoPlayDelay === "function") {
-                    carousel.setAutoPlayDelay(3000);
-                }
-            });
-
-            // Resume advertisement carousel setInterval
-            var oAdCarousel = this.byId("AdvertisementCarousel");
-            if (oAdCarousel && !oAdCarousel.bIsDestroyed && oAdCarousel.getPages().length > 1) {
-                this._startAdvertisementCarouselAutoSlide();
-            }
-        },
-
-        _attachInputFocusHandlers: function () {
-            var oView = this.getView();
-            if (!oView) return;
-            var oDomRef = oView.getDomRef();
-            if (!oDomRef) return;
-
-            this._fnCarouselFocusIn = function (oEvent) {
-                if (this._isEditableInput(oEvent.target)) {
-                    this._stopCarouselAutoplay();
-                }
-            }.bind(this);
-
-            this._fnCarouselFocusOut = function (oEvent) {
-                clearTimeout(this._carouselFocusOutTimer);
-                this._carouselFocusOutTimer = setTimeout(function () {
-                    if (!this._isEditableInput(document.activeElement)) {
-                        this._startCarouselAutoplay();
-                    }
-                }.bind(this), 150);
-            }.bind(this);
-
-            oDomRef.addEventListener("focusin", this._fnCarouselFocusIn);
-            oDomRef.addEventListener("focusout", this._fnCarouselFocusOut);
-        },
-
-        _detachInputFocusHandlers: function () {
-            var oView = this.getView();
-            if (!oView) return;
-            var oDomRef = oView.getDomRef();
-            if (oDomRef) {
-                if (this._fnCarouselFocusIn) {
-                    oDomRef.removeEventListener("focusin", this._fnCarouselFocusIn);
-                }
-                if (this._fnCarouselFocusOut) {
-                    oDomRef.removeEventListener("focusout", this._fnCarouselFocusOut);
-                }
-            }
-            clearTimeout(this._carouselFocusOutTimer);
-            this._fnCarouselFocusIn = null;
-            this._fnCarouselFocusOut = null;
-            this._carouselFocusOutTimer = null;
         },
 
         onAdvertisementImagePress: function (oEvent) {
@@ -3228,7 +3118,6 @@
             // Make date picker read-only
             this._ViewDatePickersReadOnly(["newMemberDOB"], this.getView());
 
-            this._stopCarouselAutoplay();
             oDialog.open();
             this._attachDocumentInfoHover();
         },
@@ -3266,7 +3155,6 @@
             // Make date picker read-only
             this._ViewDatePickersReadOnly(["newMemberDOB"], this.getView());
 
-            this._stopCarouselAutoplay();
             oDialog.open();
             this._attachDocumentInfoHover();
         },
@@ -3278,12 +3166,6 @@
 
         onNewMemberDialogAfterClose: function () {
             this._resetNewMemberDialogState();
-            // Resume carousel autoplay after dialog closes with a short delay
-            // so focusin can re-pause if focus lands on another editable input
-            clearTimeout(this._carouselFocusOutTimer);
-            this._carouselFocusOutTimer = setTimeout(function () {
-                this._startCarouselAutoplay();
-            }.bind(this), 200);
         },
 
         onNewMemberDialogEscape: function (oEvent) {
