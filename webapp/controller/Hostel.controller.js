@@ -323,7 +323,7 @@ onAfterAnimate: function () {
 
     };
 
-}.bind(this), 600); ////6000
+}.bind(this), 6000); ////6000
         }   
     }.bind(this), 50);
 },
@@ -370,7 +370,7 @@ onAfterAnimate: function () {
                         });
                     }
                 };
-            }.bind(this), 600); ////6000
+            }.bind(this), 6000); ////6000
         },
 
         _isEditableInput: function (el) {
