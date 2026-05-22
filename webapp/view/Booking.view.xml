@@ -311,7 +311,11 @@
                                         <Text text="Primary" />
                                     </Column>
 
-                                    <Column>
+                                    <Column
+                                        minScreenWidth="Tablet"
+                                        demandPopin="true"
+                                   >
+
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column

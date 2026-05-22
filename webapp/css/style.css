@@ -6139,3 +6139,46 @@ html, body {
 .facilityBreakdownBtn .sapMBtnContent {
   color: white !important;
 }
+
+/* Signup panel two-column FlexBox layout */
+.signUpColumns {
+  width: 100%;
+}
+
+.signUpLeftCol {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding-right: 0.75rem;
+}
+
+.signUpRightCol {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding-left: 0.75rem;
+}
+
+/* Reduce margins inside signup panel on mobile & tablets */
+@media only screen and (max-width: 1024px) {
+  .signUpPanelCompact .sapMPanelContent {
+    padding: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapUiFormResGridMainCont,
+  .signUpPanelCompact .sapUiFormResGridMainContInner {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapUiRespGrid {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapMPanelExpandableIcon {
+    margin: 0.5rem !important;
+  }
+
+  .signUpLeftCol,
+  .signUpRightCol {
+    flex: 1 1 100%;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}

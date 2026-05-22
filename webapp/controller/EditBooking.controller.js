@@ -253,7 +253,7 @@ sap.ui.define([
                 if (bIsEditableStatus && bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
-                        "This booking has been updated as per your request. To make any further changes, please contact us. Thank you for your cooperation!\n\nRegards,\n" + sBranchName,
+                        "This booking has been updated as per your request. To make any further changes, please contact " + sBranchName + ". \n\nThank you for your cooperation!\n" ,
                         {
                             title: "Booking Status Updated",
                             styleClass: "myUnifiedBtn",
