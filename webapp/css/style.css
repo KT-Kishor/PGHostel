@@ -5662,6 +5662,18 @@ html, body {
   color: white !important;
 }
 
+.mobileAutoHeightPopoverDialog {
+  width: min(95vw, 32rem) !important;
+  max-width: min(95vw, 32rem) !important;
+}
+
+.mobileAutoHeightPopoverDialog .sapMDialogSection,
+.mobileAutoHeightPopoverDialog .sapMDialogScrollCont,
+.mobileAutoHeightPopoverDialog .sapMDialogScroll {
+  height: auto !important;
+  max-height: 80vh !important;
+}
+
 .ComboBoxFileUploaderContainer{
     flex-wrap: wrap !important;
 }
@@ -6122,4 +6134,8 @@ html, body {
 
 .sapUiAvatarImageContain.sapMAvatar {
     background-color: transparent !important;
+}
+.facilityBreakdownBtn .sapMBtnIcon,
+.facilityBreakdownBtn .sapMBtnContent {
+  color: white !important;
 }

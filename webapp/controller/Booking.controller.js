@@ -1329,6 +1329,8 @@
             }
             if (sap.ui.Device.system.phone) {
                 sPopoverWidth = "95vw";
+                oFacilityPopover.setContentHeight(null);
+                this._applyMobilePopoverDialogBehavior(oFacilityPopover, "mobileAutoHeightPopoverDialog");
             }
             oFacilityPopover.setContentWidth(sPopoverWidth);
 
@@ -1380,11 +1382,12 @@
                 return this._oFacilityDialog;
             }
 
-            const oDialog = new sap.m.Popover({
+            const oDialog = new ResponsivePopover({
                 contentWidth: sap.ui.Device.system.phone ? "95vw" : "30rem",
                 placement: sap.ui.Device.system.phone ? sap.m.PlacementType.VerticalPreferredBottom : sap.m.PlacementType.Auto,
                 verticalScrolling: true,
                 horizontalScrolling: false,
+                showCloseButton: false,
                 customHeader: new sap.m.Bar({
                     contentMiddle: [
                         new sap.m.Title({
@@ -1530,8 +1533,11 @@
                                         width: sap.ui.Device.system.phone ? "95%" : "97%",
                                         columns: [
                                             new sap.m.Column({
-                                                width: sap.ui.Device.system.phone ? "2.7rem" : "3.2rem",
-                                                header: new sap.m.Text({ text: "Pick" }).addStyleClass("sapUiTinyMarginEnd"),
+                                                width: sap.ui.Device.system.phone ? "4rem" : "3.2rem",
+                                                header: new sap.m.Text({
+                                                    text: "Pick",
+                                                    wrapping: false
+                                                }).addStyleClass("sapUiTinyMarginEnd"),
                                             }),
                                             new sap.m.Column({
                                                 header: new sap.m.Text({ text: "Person" }).addStyleClass("sapUiTinyMarginEnd"),
@@ -1714,9 +1720,25 @@
                 })
             });
 
+            if (sap.ui.Device.system.phone && oDialog._oControl && oDialog._oControl.setStretch) {
+                this._applyMobilePopoverDialogBehavior(oDialog, "mobileAutoHeightPopoverDialog");
+            }
+
             this.getView().addDependent(oDialog);
             this._oFacilityDialog = oDialog;
             return this._oFacilityDialog;
+        },
+
+        _applyMobilePopoverDialogBehavior: function (oPopover, sStyleClass) {
+            if (!sap.ui.Device.system.phone || !oPopover || !oPopover._oControl || !oPopover._oControl.setStretch) {
+                return;
+            }
+
+            oPopover._oControl.setStretch(false);
+
+            if (sStyleClass) {
+                oPopover._oControl.addStyleClass(sStyleClass);
+            }
         },
 
         _supportsFacilityChargeType: function (sSelectionMode) {
@@ -4226,7 +4248,7 @@
                     showHeader: true,
                     title: "Facilities Breakdown",
                     placement: "Bottom",
-                    contentWidth: "28rem",
+                    contentWidth: sap.ui.Device.system.phone ? "95vw" : "28rem",
                     content: [
                         new sap.m.VBox({
                             items: {
@@ -4262,7 +4284,12 @@
                             }
                         }).addStyleClass("sapUiSmallMargin")
                     ]
-                });
+                }).addStyleClass("facilityBreakdownBtn");
+
+                if (sap.ui.Device.system.phone) {
+                    this._oFacilitiesBreakdownPopover.setContentHeight(null);
+                    this._applyMobilePopoverDialogBehavior(this._oFacilitiesBreakdownPopover, "mobileAutoHeightPopoverDialog");
+                }
 
                 this.getView().addDependent(this._oFacilitiesBreakdownPopover);
             }
