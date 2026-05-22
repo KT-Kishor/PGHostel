@@ -37,7 +37,11 @@ sap.ui.define([
 
             this.getView().setModel(oDateModel, "controller");
         },
-      
+
+        onAfterRendering: function () {
+            this._attachInputFocusHandlers();
+        },
+
         _getBrowserLocation: function () {
             if (!navigator.geolocation) return MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
 
@@ -272,7 +276,7 @@ onAfterAnimate: function () {
             clearInterval(oInterval);
 
             var aImages = oComponent._aPreloadedImages;
-            var iIndex = 0;
+            this._homeSliderIndex = 0;
 
             // Apply base styling and CSS transition for background-image
             oHome.$().css({
@@ -295,13 +299,13 @@ onAfterAnimate: function () {
             // Slider
          this._imageInterval = setInterval(function () {
 
-    iIndex = (iIndex + 1) % aImages.length;
+             this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
 
-    var sNextImage = "url('" + aImages[iIndex] + "')";
+             var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
 
     // Preload image before applying
     var img = new Image();
-    img.src = aImages[iIndex];
+             img.src = aImages[this._homeSliderIndex];
 
     img.onload = function () {
 
@@ -319,10 +323,110 @@ onAfterAnimate: function () {
 
     };
 
-}.bind(this), 6000);
+}.bind(this), 600); ////6000
         }   
     }.bind(this), 50);
 },
+
+        /* ── Home image slider pause / resume on input focus ── */
+
+        _stopHomeImageSlider: function () {
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+                this._imageInterval = null;
+            }
+        },
+
+        _startHomeImageSlider: function () {
+            var oTabHeader = this.byId("mainTabHeader");
+            if (oTabHeader && oTabHeader.getSelectedKey() !== "idHome") return;
+
+            var oHome = this.byId("idHome");
+            var oComponent = this.getOwnerComponent();
+            if (!oHome || !oComponent || !oComponent._imagesLoaded) return;
+
+            var aImages = oComponent._aPreloadedImages;
+            if (!aImages || aImages.length <= 1) return;
+
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+            }
+
+            this._homeSliderIndex = this._homeSliderIndex || 0;
+            this._imageInterval = setInterval(function () {
+                this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
+                var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
+
+                var img = new Image();
+                img.src = aImages[this._homeSliderIndex];
+                img.onload = function () {
+                    var $home = oHome.$();
+                    if ($home) {
+                        $home.css({
+                            "background-image": sNextImage,
+                            "background-size": "cover",
+                            "background-position": "center",
+                            "background-repeat": "no-repeat"
+                        });
+                    }
+                };
+            }.bind(this), 600); ////6000
+        },
+
+        _isEditableInput: function (el) {
+            if (!el) return false;
+            var tagName = el.tagName && el.tagName.toLowerCase();
+            if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+                if (el.readOnly || el.disabled || el.type === "hidden" || el.type === "submit" || el.type === "button" || el.type === "image") {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        },
+
+        _attachInputFocusHandlers: function () {
+            var oView = this.getView();
+            if (!oView) return;
+            var oDomRef = oView.getDomRef();
+            if (!oDomRef) return;
+
+            this._fnHomeFocusIn = function (oEvent) {
+                if (this._isEditableInput(oEvent.target)) {
+                    this._stopHomeImageSlider();
+                }
+            }.bind(this);
+
+            this._fnHomeFocusOut = function (oEvent) {
+                clearTimeout(this._homeFocusOutTimer);
+                this._homeFocusOutTimer = setTimeout(function () {
+                    if (!this._isEditableInput(document.activeElement)) {
+                        this._startHomeImageSlider();
+                    }
+                }.bind(this), 150);
+            }.bind(this);
+
+            oDomRef.addEventListener("focusin", this._fnHomeFocusIn);
+            oDomRef.addEventListener("focusout", this._fnHomeFocusOut);
+        },
+
+        _detachInputFocusHandlers: function () {
+            var oView = this.getView();
+            if (!oView) return;
+            var oDomRef = oView.getDomRef();
+            if (oDomRef) {
+                if (this._fnHomeFocusIn) {
+                    oDomRef.removeEventListener("focusin", this._fnHomeFocusIn);
+                }
+                if (this._fnHomeFocusOut) {
+                    oDomRef.removeEventListener("focusout", this._fnHomeFocusOut);
+                }
+            }
+            clearTimeout(this._homeFocusOutTimer);
+            this._fnHomeFocusIn = null;
+            this._fnHomeFocusOut = null;
+            this._homeFocusOutTimer = null;
+        },
 
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -1163,6 +1267,8 @@ if (aData.length === 0) {
             if (this._exploreBtnAnimationTimeout) {
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
+            this._stopHomeImageSlider();
+            this._detachInputFocusHandlers();
         },
 
         onpressFilter: function () {
@@ -1171,7 +1277,14 @@ if (aData.length === 0) {
 
                 this.ARD_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.Filter_Branch", this);
                 oView.addDependent(this.ARD_Dialog);
+                this.ARD_Dialog.attachAfterClose(function () {
+                    clearTimeout(this._homeFocusOutTimer);
+                    this._homeFocusOutTimer = setTimeout(function () {
+                        this._startHomeImageSlider();
+                    }.bind(this), 200);
+                }.bind(this));
             }
+            this._stopHomeImageSlider();
             this._clearFilterFields()
             var oBedTypeCombo = this.byId("id_Area");
             this.byId("id_Roomtype").setSelectedKey("");
@@ -1233,6 +1346,7 @@ if (aData.length === 0) {
 
             // Reset dialog title
             this.oViewModel.setProperty("/dialogTitle", "Sign In");
+            this._stopHomeImageSlider();
             this.getView().addStyleClass("blur-background");
             this._oSignDialog.open();
         },
@@ -1248,6 +1362,11 @@ if (aData.length === 0) {
 
         this._oSignDialog = null;    // 🔥 CRITICAL FIX
     }
+          // Dialog was destroyed – afterClose won't fire, so resume slider directly
+          clearTimeout(this._homeFocusOutTimer);
+          this._homeFocusOutTimer = setTimeout(function () {
+              this._startHomeImageSlider();
+          }.bind(this), 200);
 },
 
         onSwitchToSignIn: function () {
@@ -3110,6 +3229,11 @@ if (aData.length === 0) {
         },
 
         _resetAuthDialog: function () {
+            clearTimeout(this._homeFocusOutTimer);
+            this._homeFocusOutTimer = setTimeout(function () {
+                this._startHomeImageSlider();
+            }.bind(this), 200);
+
             const oModel = this.getView().getModel("LoginMode");
 
             // Reset LoginMode data (your existing block)
@@ -3838,8 +3962,11 @@ if (aData.length === 0) {
                     this._oSignDialog.close(),this._oSignDialog.destroy();
         this._oSignDialog = null;
                 }
-                if (this._imageInterval) {
-        clearInterval(this._imageInterval)}
+                // Dialog was destroyed – afterClose won't fire, so resume slider directly
+                clearTimeout(this._homeFocusOutTimer);
+                this._homeFocusOutTimer = setTimeout(function () {
+                    this._startHomeImageSlider();
+                }.bind(this), 200);
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
@@ -4146,6 +4273,10 @@ if (aData.length === 0) {
                 this._oAdminSignup.attachAfterClose(() => {
                     this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
+                    clearTimeout(this._homeFocusOutTimer);
+                    this._homeFocusOutTimer = setTimeout(function () {
+                        this._startHomeImageSlider();
+                    }.bind(this), 200);
                 });
             }
 
@@ -4157,6 +4288,7 @@ if (aData.length === 0) {
                 // oDate.setMinDate(new Date(2000, 0, 1));
             }
 
+            this._stopHomeImageSlider();
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
 
@@ -5001,16 +5133,22 @@ if (aData.length === 0) {
 
                     this._supportRequestDialog = oDialog;
                     this.getView().addDependent(oDialog);
+                    this._stopHomeImageSlider();
                     oDialog.open();
 
                     this._supportRequestDialog.attachAfterClose(() => {
-                 
+
                     this.HF_onCancelButtonPress();
+                        clearTimeout(this._homeFocusOutTimer);
+                        this._homeFocusOutTimer = setTimeout(function () {
+                            this._startHomeImageSlider();
+                        }.bind(this), 200);
                 });
 
                 }.bind(this));
 
             } else {
+                this._stopHomeImageSlider();
                 this._supportRequestDialog.open();
             }
 
@@ -5255,13 +5393,6 @@ if (aAttachments.length + oFiles.length > 3) {
         },
         onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
-        },
-        onExit: function () {
-
-    if (this._imageInterval) {
-        clearInterval(this._imageInterval);
-    }
-
-}
+        }
     });
 });
