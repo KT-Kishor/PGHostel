@@ -558,7 +558,7 @@
 }
 
 .bedCard {
-    width: 90%;
+    width: 95%;
     height: auto;
     border-radius: 16px;
     padding: 6px;
@@ -4670,7 +4670,7 @@ width: 44px !important;
     width: auto;
     height: auto;
     border-radius: 16px;
-    padding: 6px;
+    padding: 4px;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)), linear-gradient(180deg, #00c6d6 0%, #00b7c7 45%, #008b96 100%) !important;
     color: rgb(0, 0, 0) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);

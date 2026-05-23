@@ -132,7 +132,7 @@
                 </HBox>
             </HBox>
         </VBox>
-
+		   
         <VBox
             class="sapUiSmallMarginBottom"
             width="450px"
@@ -185,19 +185,19 @@
 								<uxap:blocks>
 									<VBox>
 										<!-- <Title
-											text="AC Rooms"
+				     						text="AC Rooms"
 											level="H2"
 											class="roomHeaderTitle sapUiMediumMarginBeginEnd"
 											visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}" /> -->
-										<VBox class="sapUiTinyMarginTop">
+										<VBox class="">
 											<l:Grid
-												id="idBedTypeFlex2"
-												defaultSpan="XL4 L4 M6 S12"
-												containerQuery="true"
-												hSpacing="2"
-												vSpacing="2"
+													id="idBedTypeFlex2"
+													defaultSpan="XL3 L3 M6 S12"
+													containerQuery="true"
+				           							hSpacing="0"
+													vSpacing="0"
 												content="{path: 'VisibilityModel>/ACRooms'}">
-												<VBox class="bedCard">
+												<VBox class="bedCard sapUiTinyMargin">
 													<Carousel
 														height="300px"
 														width="100%"
@@ -290,15 +290,15 @@
 											level="H2"
 											class="roomHeaderTitle sapUiMediumMarginBegin sapUiTinyMarginTop"
 											visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}" /> -->
-										<VBox class="sapUiTinyMarginTop">
+										<VBox class="">
 											<l:Grid
-												id="idBedTypeFlex1"
-												defaultSpan="XL3 L4 M6 S12"
-												containerQuery="true"
-												hSpacing="2"
-												vSpacing="2"
+													id="idBedTypeFlex1"
+													defaultSpan="XL3 L3 M6 S12"
+													containerQuery="true"
+													hSpacing="0"
+													vSpacing="0"
 												content="{path: 'VisibilityModel>/NonACRooms'}">
-												<VBox class="bedCard">
+												<VBox class="bedCard sapUiTinyMargin">
 													<Carousel
 														height="300px"
 														width="100%"
