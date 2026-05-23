@@ -342,8 +342,10 @@
                                         <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
                                             <Text text="Document" />
                                         </Column> -->
-                                    <Column width="6rem">
-                                        <Text text="Action" />
+                                    <Column width="6rem"     
+                                    minScreenWidth="Tablet"
+                                    demandPopin="true">
+                                       
                                     </Column>
                                 </columns>
 
