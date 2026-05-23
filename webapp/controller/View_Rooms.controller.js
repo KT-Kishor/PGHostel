@@ -19,6 +19,7 @@ sap.ui.define([
 
         },
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog()
             if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
@@ -59,6 +60,7 @@ sap.ui.define([
             await this._loadBranchData();
 
             await this._loadFilteredData()
+            this.closeBusyDialog()
             const oView = this.getView();
             oView.setModel(new JSONModel({
                 isOtpSelected: false,
@@ -174,7 +176,7 @@ sap.ui.define([
 
             // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
-                this.getView().setBusy(true);
+                this.getBusyDialog();
                 oVisibilityModel.setProperty("/isDataLoaded", false);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
@@ -183,7 +185,7 @@ sap.ui.define([
                 });
                 await this.model(response)
                 oVisibilityModel.setProperty("/isDataLoaded", true);
-                this.getView().setBusy(false);
+                this.closeBusyDialog();
 
 
                 let matchedRooms = response.data.HM_BedType || [];
@@ -1998,13 +2000,13 @@ sap.ui.define([
             // -------------------------
             if (!bLoggedIn) {
 
-    //             // STEP 1: Save current booking state
-    // const oLocalData = this.oHostelModel?.getData() || {};
+                //             // STEP 1: Save current booking state
+                // const oLocalData = this.oHostelModel?.getData() || {};
 
-    // sessionStorage.setItem("pendingBookingData", JSON.stringify(oLocalData));
+                // sessionStorage.setItem("pendingBookingData", JSON.stringify(oLocalData));
 
-    // // STEP 2: Set navigation intent flag
-    // sessionStorage.setItem("redirectAfterLogin", "bookingFlow");
+                // // STEP 2: Set navigation intent flag
+                // sessionStorage.setItem("redirectAfterLogin", "bookingFlow");
                 MessageBox.information(
                     "Please log in to continue booking.",
                     {
@@ -2013,10 +2015,10 @@ sap.ui.define([
                         actions: [MessageBox.Action.OK],
                         emphasizedAction: MessageBox.Action.OK,
                         onClose: function () {
-                              this.onpressLogin();
+                            this.onpressLogin();
                             // this.getOwnerComponent().getRouter().navTo("RouteHostel");
 
-                          
+
                         }.bind(this)
                     }
                 );
@@ -2115,6 +2117,17 @@ sap.ui.define([
                 return;
             }
 
+            // Apply busy dialog while routing to booking page
+            this.getBusyDialog();
+
+            // Close the busy dialog once the booking route finishes matching
+            const oBookingRoute = this.getOwnerComponent().getRouter().getRoute("RouteBooking");
+            const fnCloseBusy = function () {
+                this.closeBusyDialog();
+                oBookingRoute.detachMatched(fnCloseBusy, this);
+            };
+            oBookingRoute.attachMatched(fnCloseBusy, this);
+
             const aPersonsList = [];
             for (let i = 1; i <= iAvailableBeds; i++) {
                 aPersonsList.push({
@@ -2142,6 +2155,7 @@ sap.ui.define([
             const oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBooking");
         },
+
 
         onRoomDetailOpened: function () {
             // This is called from the fragment's afterOpen event

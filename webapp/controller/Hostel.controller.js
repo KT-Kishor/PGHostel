@@ -37,7 +37,11 @@ sap.ui.define([
 
             this.getView().setModel(oDateModel, "controller");
         },
-      
+
+        onAfterRendering: function () {
+            this._startAllCarouselsAutoSlide(3000);
+        },
+
         _getBrowserLocation: function () {
             if (!navigator.geolocation) return MessageToast.show(this.i18nModel.getText("geolocationnotsupported"));
 
@@ -258,61 +262,117 @@ sap.ui.define([
 //         this._reopenRoomDetailAfterLogin();
 //     }, 300);
 // }
+
          this.onAfterAnimate()
         },
-          onAfterAnimate: function () {
-
+onAfterAnimate: function () {
     var oHome = this.byId("idHome");
+    var oComponent = this.getOwnerComponent();
 
-    var aImages = [
-        sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
-        sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
-    ];
+    oHome.setBusy(true);
 
-    var iIndex = 0;
+    var oInterval = setInterval(function () {
+        if (oComponent._imagesLoaded) {
+            clearInterval(oInterval);
 
-    // Initial Image
-    oHome.$().css("background-image", "url('" + aImages[0] + "')");
+            var aImages = oComponent._aPreloadedImages;
+            this._homeSliderIndex = 0;
 
-    this._imageInterval = setInterval(function () {
+            // Apply base styling and CSS transition for background-image
+            oHome.$().css({
+                "background-image": "url('" + aImages[0] + "')",
+                "background-size": "cover",
+                "background-position": "center",
+                "background-repeat": "no-repeat",
+                "transition": "background-image 0.8s ease-in-out" // Handles the smooth fade
+            });
 
-        // Fade Out
-        oHome.$().addClass("fadeOut");
+            setTimeout(function () {
+                oHome.setBusy(false);
+            }, 300);
 
-        setTimeout(function () {
+            // Clear any existing interval to prevent memory leaks
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+            }
 
-            iIndex = (iIndex + 1) % aImages.length;
+            // Slider
+         this._imageInterval = setInterval(function () {
 
-            oHome.$().css(
-                "background-image",
-                "url('" + aImages[iIndex] + "')"
-            );
+             this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
 
-            // Fade In
-            oHome.$()
-                .removeClass("fadeOut")
-                .addClass("fadeIn");
+             var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
 
-        }, 1000);
+    // Preload image before applying
+    var img = new Image();
+             img.src = aImages[this._homeSliderIndex];
 
-    }, 5000);
+    img.onload = function () {
+
+        var $home = oHome.$();
+
+        // Force smooth repaint trick
+
+        // Apply new background
+        $home.css({
+            "background-image": sNextImage,
+            "background-size": "cover",
+            "background-position": "center",
+            "background-repeat": "no-repeat"
+        });
+
+    };
+
+}.bind(this), 6000); ////6000
+        }   
+    }.bind(this), 50);
 },
 
+        /* ── Home image slider pause / resume on input focus ── */
 
-        _reopenRoomDetailAfterLogin: function () {
+        _stopHomeImageSlider: function () {
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+                this._imageInterval = null;
+            }
+        },
 
-    if (!this._oRoomDetailFragment) {
-        this._oRoomDetailFragment = sap.ui.xmlfragment(
-            "sap.ui.com.project1.fragment.SignInSignup",
-            this
-        );
-        this.getView().addDependent(this._oRoomDetailFragment);
-    }
-    this._oRoomDetailFragment.open();
-},
+        _startHomeImageSlider: function () {
+            var oTabHeader = this.byId("mainTabHeader");
+            if (oTabHeader && oTabHeader.getSelectedKey() !== "idHome") return;
+
+            var oHome = this.byId("idHome");
+            var oComponent = this.getOwnerComponent();
+            if (!oHome || !oComponent || !oComponent._imagesLoaded) return;
+
+            var aImages = oComponent._aPreloadedImages;
+            if (!aImages || aImages.length <= 1) return;
+
+            if (this._imageInterval) {
+                clearInterval(this._imageInterval);
+            }
+
+            this._homeSliderIndex = this._homeSliderIndex || 0;
+            this._imageInterval = setInterval(function () {
+                this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
+                var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
+
+                var img = new Image();
+                img.src = aImages[this._homeSliderIndex];
+                img.onload = function () {
+                    var $home = oHome.$();
+                    if ($home) {
+                        $home.css({
+                            "background-image": sNextImage,
+                            "background-size": "cover",
+                            "background-position": "center",
+                            "background-repeat": "no-repeat"
+                        });
+                    }
+                };
+            }.bind(this), 6000); ////6000
+        },
+
 
         _clearOtpValidityTimer: function () {
             if (this._otpValidityInterval) {
@@ -1153,6 +1213,7 @@ if (aData.length === 0) {
             if (this._exploreBtnAnimationTimeout) {
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
+            this._stopHomeImageSlider();
         },
 
         onpressFilter: function () {
@@ -1161,7 +1222,11 @@ if (aData.length === 0) {
 
                 this.ARD_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.Filter_Branch", this);
                 oView.addDependent(this.ARD_Dialog);
+                this.ARD_Dialog.attachAfterClose(function () {
+                    this._startHomeImageSlider();
+                }.bind(this));
             }
+            this._stopHomeImageSlider();
             this._clearFilterFields()
             var oBedTypeCombo = this.byId("id_Area");
             this.byId("id_Roomtype").setSelectedKey("");
@@ -1223,6 +1288,7 @@ if (aData.length === 0) {
 
             // Reset dialog title
             this.oViewModel.setProperty("/dialogTitle", "Sign In");
+            this._stopHomeImageSlider();
             this.getView().addStyleClass("blur-background");
             this._oSignDialog.open();
         },
@@ -1238,6 +1304,8 @@ if (aData.length === 0) {
 
         this._oSignDialog = null;    // 🔥 CRITICAL FIX
     }
+          // Dialog was destroyed – afterClose won't fire, so resume slider directly
+          this._startHomeImageSlider();
 },
 
         onSwitchToSignIn: function () {
@@ -3100,6 +3168,8 @@ if (aData.length === 0) {
         },
 
         _resetAuthDialog: function () {
+            this._startHomeImageSlider();
+
             const oModel = this.getView().getModel("LoginMode");
 
             // Reset LoginMode data (your existing block)
@@ -3828,8 +3898,8 @@ if (aData.length === 0) {
                     this._oSignDialog.close(),this._oSignDialog.destroy();
         this._oSignDialog = null;
                 }
-                if (this._imageInterval) {
-        clearInterval(this._imageInterval)}
+                // Dialog was destroyed – afterClose won't fire, so resume slider directly
+                this._startHomeImageSlider();
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
@@ -4136,6 +4206,7 @@ if (aData.length === 0) {
                 this._oAdminSignup.attachAfterClose(() => {
                     this.getView().removeStyleClass("blur-background");
                     this._resetAdminSignupForm();
+                    this._startHomeImageSlider();
                 });
             }
 
@@ -4147,6 +4218,7 @@ if (aData.length === 0) {
                 // oDate.setMinDate(new Date(2000, 0, 1));
             }
 
+            this._stopHomeImageSlider();
             this.getView().addStyleClass("blur-background");
             this._oAdminSignup.open();
 
@@ -4991,16 +5063,18 @@ if (aData.length === 0) {
 
                     this._supportRequestDialog = oDialog;
                     this.getView().addDependent(oDialog);
+                    this._stopHomeImageSlider();
                     oDialog.open();
 
                     this._supportRequestDialog.attachAfterClose(() => {
-                 
-                    this.HF_onCancelButtonPress();
+                        this.HF_onCancelButtonPress();
+                        this._startHomeImageSlider();
                 });
 
                 }.bind(this));
 
             } else {
+                this._stopHomeImageSlider();
                 this._supportRequestDialog.open();
             }
 
@@ -5245,13 +5319,6 @@ if (aAttachments.length + oFiles.length > 3) {
         },
         onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
-        },
-        onExit: function () {
-
-    if (this._imageInterval) {
-        clearInterval(this._imageInterval);
-    }
-
-}
+        }
     });
 });

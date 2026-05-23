@@ -40,10 +40,10 @@
 
         },
         onAfterRendering: function () {
+            this._startAllCarouselsAutoSlide(3000);
             this._attachDocumentInfoHover();
             this._attachFacilityDiscountInfoHover();
             this._attachFacilitiesBreakdownHover();
-            this._startAllCarouselsAutoSlide(3000);
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
         },
 
@@ -52,7 +52,6 @@
                 sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
                 this._fnFacilityResizeHandler = null;
             }
-            this._clearAllCarouselTimers();
             if (this._adCarouselInterval) {
                 clearInterval(this._adCarouselInterval);
                 this._adCarouselInterval = null;
@@ -222,7 +221,7 @@
                 primaryGuestName: "",
                 quantity: 1,
                 singlePersonQty: 0,
-                facilityChargeType: "Entire_Booking",
+                facilityChargeType: "Entire Booking",
                 selectedPriceType: "",
                 personOptions: [],
                 selectedPersonIds: [],
@@ -1330,6 +1329,8 @@
             }
             if (sap.ui.Device.system.phone) {
                 sPopoverWidth = "95vw";
+                oFacilityPopover.setContentHeight(null);
+                this._applyMobilePopoverDialogBehavior(oFacilityPopover, "mobileAutoHeightPopoverDialog");
             }
             oFacilityPopover.setContentWidth(sPopoverWidth);
 
@@ -1381,11 +1382,12 @@
                 return this._oFacilityDialog;
             }
 
-            const oDialog = new sap.m.Popover({
+            const oDialog = new ResponsivePopover({
                 contentWidth: sap.ui.Device.system.phone ? "95vw" : "30rem",
                 placement: sap.ui.Device.system.phone ? sap.m.PlacementType.VerticalPreferredBottom : sap.m.PlacementType.Auto,
                 verticalScrolling: true,
                 horizontalScrolling: false,
+                showCloseButton: false,
                 customHeader: new sap.m.Bar({
                     contentMiddle: [
                         new sap.m.Title({
@@ -1531,8 +1533,11 @@
                                         width: sap.ui.Device.system.phone ? "95%" : "97%",
                                         columns: [
                                             new sap.m.Column({
-                                                width: sap.ui.Device.system.phone ? "2.7rem" : "3.2rem",
-                                                header: new sap.m.Text({ text: "Pick" }).addStyleClass("sapUiTinyMarginEnd"),
+                                                width: sap.ui.Device.system.phone ? "4rem" : "3.2rem",
+                                                header: new sap.m.Text({
+                                                    text: "Pick",
+                                                    wrapping: false
+                                                }).addStyleClass("sapUiTinyMarginEnd"),
                                             }),
                                             new sap.m.Column({
                                                 header: new sap.m.Text({ text: "Person" }).addStyleClass("sapUiTinyMarginEnd"),
@@ -1715,9 +1720,25 @@
                 })
             });
 
+            if (sap.ui.Device.system.phone && oDialog._oControl && oDialog._oControl.setStretch) {
+                this._applyMobilePopoverDialogBehavior(oDialog, "mobileAutoHeightPopoverDialog");
+            }
+
             this.getView().addDependent(oDialog);
             this._oFacilityDialog = oDialog;
             return this._oFacilityDialog;
+        },
+
+        _applyMobilePopoverDialogBehavior: function (oPopover, sStyleClass) {
+            if (!sap.ui.Device.system.phone || !oPopover || !oPopover._oControl || !oPopover._oControl.setStretch) {
+                return;
+            }
+
+            oPopover._oControl.setStretch(false);
+
+            if (sStyleClass) {
+                oPopover._oControl.addStyleClass(sStyleClass);
+            }
         },
 
         _supportsFacilityChargeType: function (sSelectionMode) {
@@ -1730,7 +1751,7 @@
                 return "DAILY";
             }
 
-            return "Entire_Booking";
+            return "Entire Booking";
         },
 
         _getFacilityChargeType: function (oFacility) {
@@ -1762,7 +1783,7 @@
             const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
-            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "Entire_Booking";
+            const sFacilityChargeType = oSelectionModel.getProperty("/facilityChargeType") || "Entire Booking";
             const oDefaultOccupant = this._getDefaultOccupant();
 
             let aSelectedPersonIds = oSelectionModel.getProperty("/selectedPersonIds") || [];
@@ -1887,7 +1908,7 @@
             oFacility.SelectedPrice = 0;
             oFacility.SelectedPriceType = "";
             oFacility.Quantity = 1;
-            oFacility.FacilityChargeType = "Entire_Booking";
+            oFacility.FacilityChargeType = "Entire Booking";
             oFacility.SelectedPersonIds = [];
             oFacility.PersonQuantities = [];
             oFacility.SelectionSummary = "";
@@ -1905,7 +1926,7 @@
                 oFacility.SelectedPrice = 0;
                 oFacility.SelectedPriceType = "";
                 oFacility.Quantity = 1;
-                oFacility.FacilityChargeType = "Entire_Booking";
+                oFacility.FacilityChargeType = "Entire Booking";
                 oFacility.SelectedPersonIds = [];
                 oFacility.PersonQuantities = [];
                 oFacility.SelectionSummary = "";
@@ -2796,21 +2817,13 @@
                     this._syncMemberDialogSelections();
                 }.bind(this), 0);
             } else {
-                // Show busy indicator and wait for data to load
-                sap.ui.core.BusyIndicator.show(0);
+                // Show busy dialog from BaseController and wait for data to load
+                this.getBusyDialog();
 
-                // Set a timeout to hide busy indicator after maximum wait time (10 seconds)
-                const iMaxWaitTime = 10000; // 10 seconds
-                const iTimeoutId = setTimeout(() => {
-                    sap.ui.core.BusyIndicator.hide();
-                    sap.m.MessageToast.show("Member data loading is taking longer than expected. Please try again.");
-                }, iMaxWaitTime);
-
-                // Wait for data to be loaded
+                // Wait for data to be loaded (polls indefinitely until _bMemberDataLoaded becomes true)
                 const waitForData = () => {
                     if (this._bMemberDataLoaded === true) {
-                        clearTimeout(iTimeoutId);
-                        sap.ui.core.BusyIndicator.hide();
+                        this.closeBusyDialog();
                         // Data is now ready, proceed with opening dialog
                         this._loadMasterMembersForDialog();
                         this._getMemberSelectionDialog().then(oDialog => {
@@ -4232,9 +4245,10 @@
         _getFacilitiesBreakdownPopover: function () {
             if (!this._oFacilitiesBreakdownPopover) {
                 this._oFacilitiesBreakdownPopover = new ResponsivePopover({
-                    showHeader: false,
+                    showHeader: true,
+                    title: "Facilities Breakdown",
                     placement: "Bottom",
-                    contentWidth: "28rem",
+                    contentWidth: sap.ui.Device.system.phone ? "95vw" : "28rem",
                     content: [
                         new sap.m.VBox({
                             items: {
@@ -4270,7 +4284,12 @@
                             }
                         }).addStyleClass("sapUiSmallMargin")
                     ]
-                });
+                }).addStyleClass("facilityBreakdownBtn");
+
+                if (sap.ui.Device.system.phone) {
+                    this._oFacilitiesBreakdownPopover.setContentHeight(null);
+                    this._applyMobilePopoverDialogBehavior(this._oFacilitiesBreakdownPopover, "mobileAutoHeightPopoverDialog");
+                }
 
                 this.getView().addDependent(this._oFacilitiesBreakdownPopover);
             }
@@ -6066,6 +6085,7 @@
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
+                    Deposit:oHostelModel.getProperty("/Deposit") || 0,
                     // PaymentDetails: [this._getPaymentPayloadDetails()]
                     PaymentDetails: (this.getView().getModel("PaymentModel").getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn" ? [] : [this._getPaymentPayloadDetails()]
                 }]
@@ -6215,6 +6235,9 @@
                 const oMainData = oPayloadData.data[0];
 
                 const pdfBase64 = await this.onGeneratePDF(oMainData);
+                delete oPayloadData.data[0].Deposit;
+                // Property name below
+                oPayloadData.data[0].Area=oHostelModel.getData().Area 
                 const oPayload = {
                     data: oPayloadData.data,
                     pdfAttachment: {
@@ -6506,8 +6529,8 @@
             const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(booking.Discount) || 0;
-            const deposit = parseFloat(booking.Deposit) || 0;
-            const grandTotal = oHostelModel.GrandTotal;
+            const deposit = parseFloat(data.Deposit) || 0;
+            let grandTotal = oHostelModel.GrandTotal;
 
             // Payment Summary Card
             const summaryHeight = 90;
@@ -6563,7 +6586,7 @@
             }
 
             addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-            addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
+            // addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
 
             // Add separator line
             summaryY += 2;

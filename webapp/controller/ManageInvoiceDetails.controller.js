@@ -3885,7 +3885,7 @@ sap.ui.define([
                     }
 
                     //  ONCE PER BOOKING 
-                    else if (chargeType === "Entire_Booking") {
+                    else if (chargeType === "Entire Booking") {
 
                         if (invoiceIndex > 0) {
                             return 0;

@@ -558,7 +558,7 @@
 }
 
 .bedCard {
-    width: auto;
+    width: 90%;
     height: auto;
     border-radius: 16px;
     padding: 6px;
@@ -3131,7 +3131,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     border-radius: 0.6rem;
     margin-bottom: 2rem !important;
     height: calc(100% - 1rem) !important;
-    background-image: url("../image/BedHostel.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -4793,6 +4792,7 @@ width: 44px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: 30px;
 }
 
 .BranchCard .sapMCrsl,
@@ -5662,6 +5662,18 @@ html, body {
   color: white !important;
 }
 
+.mobileAutoHeightPopoverDialog {
+  width: min(95vw, 32rem) !important;
+  max-width: min(95vw, 32rem) !important;
+}
+
+.mobileAutoHeightPopoverDialog .sapMDialogSection,
+.mobileAutoHeightPopoverDialog .sapMDialogScrollCont,
+.mobileAutoHeightPopoverDialog .sapMDialogScroll {
+  height: auto !important;
+  max-height: 80vh !important;
+}
+
 .ComboBoxFileUploaderContainer{
     flex-wrap: wrap !important;
 }
@@ -5745,6 +5757,7 @@ html, body {
   border-radius: 12px !important ;
     border-left: 6px solid #00b7c7 !important;
 }
+
 .RoomsPage {
   position: relative;   /* important */
   background-image: url("../image/BedHostel.png");
@@ -6086,4 +6099,86 @@ html, body {
     .pricingDetailsTable .sapMText {
         font-size: 0.76rem !important;
     }
+}
+.roomsBgLayout,
+.roomsBgLayout .sapUxAPObjectPageWrapper,
+.roomsBgLayout .sapUxAPObjectPageContainer,
+.roomsBgLayout .sapUxAPObjectPageSectionContainer,
+.roomsBgLayout .sapUxAPBlockContainer,
+.roomsBgLayout .sapUxAPObjectPageSubSection,
+.roomsBgLayout .sapUxAPObjectPageSection,
+.roomsBgLayout .sapMPage,
+.roomsBgLayout .sapMPageBgStandard {
+    background: transparent !important;
+}
+
+/* Full page background image */
+.roomsBgLayout {
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100%;
+}
+
+.sapUiAvatarImageContain .sapMAvatarImg,
+.sapUiAvatarImageContain span[style*="background-image"],
+.sapUiAvatarImageContain div[style*="background-image"],
+.sapUiAvatarImageContain .sapMAvatarContent {
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    object-fit: contain !important;
+}
+
+.sapUiAvatarImageContain.sapMAvatar {
+    background-color: transparent !important;
+}
+.facilityBreakdownBtn .sapMBtnIcon,
+.facilityBreakdownBtn .sapMBtnContent {
+  color: white !important;
+}
+
+/* Signup panel two-column FlexBox layout */
+.signUpColumns {
+  width: 100%;
+}
+
+.signUpLeftCol {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding-right: 0.75rem;
+}
+
+.signUpRightCol {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding-left: 0.75rem;
+}
+
+/* Reduce margins inside signup panel on mobile & tablets */
+@media only screen and (max-width: 1024px) {
+  .signUpPanelCompact .sapMPanelContent {
+    padding: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapUiFormResGridMainCont,
+  .signUpPanelCompact .sapUiFormResGridMainContInner {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapUiRespGrid {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .signUpPanelCompact .sapMPanelExpandableIcon {
+    margin: 0.5rem !important;
+  }
+
+  .signUpLeftCol,
+  .signUpRightCol {
+    flex: 1 1 100%;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
 }

@@ -113,7 +113,7 @@
                   >
                                 <buttons>
                                     <RadioButton text="Daily" />
-                                    <RadioButton text="Entire_Booking" />
+                                    <RadioButton text="Entire Booking" />
                                 </buttons>
                             </RadioButtonGroup> 
 

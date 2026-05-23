@@ -10,7 +10,7 @@
         draggable="true"
         resizable="true"
         class="authDialog"
-        contentWidth="{= ${LoginViewModel>/authFlow} === 'signup' ? '65rem' : '28rem' }"
+        contentWidth="{= ${LoginViewModel>/authFlow} === 'signup' ? '80rem' : '28rem' }"
         contentHeight="auto"
     >
         <!--stretch="{= ${device>/system/phone} }"-->
@@ -335,346 +335,387 @@
                     </HBox>
                 </f:SimpleForm>
             </Panel>
- <Panel
-    id="signUpPanel"
-    visible="{= ${LoginViewModel>/authFlow} === 'signup' }"
->
-    <content>
-
-                <f:SimpleForm
-                    id="signUpLeftForm"
-                editable="true"
-            layout="ResponsiveGridLayout"
-            labelSpanXL="4"
-            labelSpanL="4"
-            labelSpanM="4"
-            labelSpanS="12"
-            adjustLabelSpan="false"
-            emptySpanXL="0"
-            emptySpanL="0"
-            emptySpanM="0"
-            emptySpanS="0"
-            columnsXL="2"
-            columnsL="2"
-            columnsM="2"
-            singleContainerFullSize="false"
-                    class="sapUiNoContentPadding"
-                >
-                    <f:content>
-                        <core:Title text="Personal Details" />
-
-                        <Label
-                            text="{i18n>fullname}"
-                            required="true"
-                        />
-                        <HBox
-                            width="100%"
-                            justifyContent="Start"
-                            alignItems="Center"
+            <!-- SIGN UP PANEL -->
+            <Panel
+                id="signUpPanel"
+                class="signUpPanelCompact"
+                visible="{= ${LoginViewModel>/authFlow} === 'signup' }"
+            >
+                <FlexBox direction="Row" wrap="Wrap" alignItems="Start" class="signUpColumns">
+                    <!-- ===== LEFT COLUMN: Personal Details + Contact Details ===== -->
+                    <VBox class="signUpLeftCol">
+                        <f:SimpleForm
+                            id="signUpLeftForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="3"
+                            labelSpanL="3"
+                            labelSpanM="3"
+                            labelSpanS="12"
+                            adjustLabelSpan="false"
+                            emptySpanXL="0"
+                            emptySpanL="0"
+                            emptySpanM="0"
+                            emptySpanS="0"
+                            columnsXL="1"
+                            columnsL="1"
+                            columnsM="1"
+                            singleContainerFullSize="false"
                         >
-                            <VBox width="35%">
-                                <ComboBox
-                                    id="signUpSalutation"
-                                    selectedKey=""
-                                    change="onChangeSalutation"
-                                    placeholder="{i18n>mr}"
-                                    valueStateText="{i18n>MVDsalutation}"
-                                >
-                                    <core:ListItem
-                                        key="Mr."
-                                        text="Mr."
-                                    />
-                                    <core:ListItem
-                                        key="Ms."
-                                        text="Ms."
-                                    />
-                                    <core:ListItem
-                                        key="Mrs."
-                                        text="Mrs."
-                                    />
-                                    <core:ListItem
-                                        key="Dr."
-                                        text="Dr."
-                                    />
-                                </ComboBox>
-                            </VBox>
-                            <VBox
-                                width="65%"
-                                class="sapUiTinyMarginBegin"
-                            >
-                                <Input
-                                    id="signUpName"
-                                    value="{LoginMode>/fullname}"
-                                    placeholder="{i18n>enterFullName}"
+                            <f:content>
+                                <core:Title text="Personal Details" />
+
+                                <!-- Full Name -->
+                                <Label
+                                    text="{i18n>fullname}"
                                     required="true"
-                                    liveChange="_LCvalidateName"
-                                    valueStateText="{i18n>MSenterValidName}"
+                                />
+                                <HBox
+                                    width="100%"
+                                    justifyContent="Start"
+                                    alignItems="Center"
+                                >
+                                    <VBox width="35%">
+                                        <ComboBox
+                                            id="signUpSalutation"
+                                            selectedKey=""
+                                            change="onChangeSalutation"
+                                            placeholder="{i18n>mr}"
+                                            valueStateText="{i18n>MVDsalutation}"
+                                        >
+                                            <core:ListItem
+                                                key="Mr."
+                                                text="Mr."
+                                            />
+                                            <core:ListItem
+                                                key="Ms."
+                                                text="Ms."
+                                            />
+                                            <core:ListItem
+                                                key="Mrs."
+                                                text="Mrs."
+                                            />
+                                            <core:ListItem
+                                                key="Dr."
+                                                text="Dr."
+                                            />
+                                        </ComboBox>
+                                    </VBox>
+                                    <VBox
+                                        width="65%"
+                                        class="sapUiTinyMarginBegin"
+                                    >
+                                        <Input
+                                            id="signUpName"
+                                            value="{LoginMode>/fullname}"
+                                            placeholder="{i18n>enterFullName}"
+                                            required="true"
+                                            liveChange="_LCvalidateName"
+                                            valueStateText="{i18n>MSenterValidName}"
+                                            maxLength="50"
+                                        />
+                                    </VBox>
+                                </HBox>
+
+                                <!-- DOB -->
+                                <Label
+                                    text="{i18n>MVDDOB}"
+                                    required="true"
+                                />
+                                <DatePicker
+                                    id="signUpDOB"
+                                    value="{LoginMode>/DateOfBirth}"
+                                    displayFormat="dd/MM/yyyy"
+                                    valueFormat="yyyy-MM-dd"
+                                    change="onChangeDOB"
+                                    initialFocusedDateValue="{LoginMode>/minDate}"
+                                />
+
+                                <!-- Gender -->
+                                <Label
+                                    text="{i18n>MVgender}"
+                                    required="true"
+                                />
+                                <Select
+                                    id="signUpGender"
+                                    selectedKey=""
+                                    change="onChangeGender"
+                                >
+                                    <core:Item
+                                        key=""
+                                        text="Select Gender"
+                                    />
+                                    <core:Item
+                                        key="Male"
+                                        text="Male"
+                                    />
+                                    <core:Item
+                                        key="Female"
+                                        text="Female"
+                                    />
+                                    <core:Item
+                                        key="Other"
+                                        text="Other"
+                                    />
+                                </Select>
+<core:Title text="Contact Details" />
+
+
+
+                                <!-- Email -->
+                                <Label
+                                    text="{i18n>email}"
+                                    required="true"
+                                />
+                                <Input
+                                    id="signUpEmail"
+                                    value="{LoginMode>/Email}"
+                                    placeholder="{i18n>enterEmailId}"
+                                    type="Email"
+                                    required="true"
+                                    liveChange="onEmailliveChange"
+                                    valueStateText="{i18n>MSenterValidEmail}"
                                     maxLength="50"
                                 />
-                            </VBox>
-                        </HBox>
 
-                        <Label
-                            text="{i18n>MVDDOB}"
-                            required="true"
-                        />
-                        <DatePicker
-                            id="signUpDOB"
-                            value="{LoginMode>/DateOfBirth}"
-                            displayFormat="dd/MM/yyyy"
-                            valueFormat="yyyy-MM-dd"
-                            change="onChangeDOB"
-                            initialFocusedDateValue="{LoginMode>/minDate}"
-                        />
-
-                        <Label
-                            text="{i18n>MVgender}"
-                            required="true"
-                        />
-                        <Select
-                            id="signUpGender"
-                            selectedKey=""
-                            change="onChangeGender"
-                        >
-                            <core:Item
-                                key=""
-                                text="Select Gender"
-                            />
-                            <core:Item
-                                key="Male"
-                                text="Male"
-                            />
-                            <core:Item
-                                key="Female"
-                                text="Female"
-                            />
-                            <core:Item
-                                key="Other"
-                                text="Other"
-                            />
-                        </Select>
-                           <core:Title text=""  />
-
-                        <Label
-                            text="{i18n>MSmobileNo}"
-                            required="true"
-                        />
-                        <HBox
-                            width="100%"
-                            justifyContent="Start"
-                            alignItems="Center"
-                        >
-                            <VBox width="35%">
+                                <!-- Country -->
+                                <Label
+                                    text="{i18n>MVDcountry}"
+                                    required="true"
+                                />
                                 <ComboBox
-                                    change="onSTDChange"
-                                    id="signUpSTD"
-                                    value="{LoginMode>/STDCode}"
-                                    placeholder="+91"
-                                    valueStateText="{i18n>MSselectCode}"
-                                    showSecondaryValues="true"
+                                    id="signUpCountry"
+                                    value="{LoginMode>/Country}"
+                                    change="onChangeCountry"
+                                    selectionChange="onChangeCountry"
+                                    placeholder="{i18n>selectCountry}"
+                                    valueStateText="{i18n>MVDselectcountry}"
                                     items="{path:'CountryModel>/', length:1000}"
-                                    filterSecondaryValues="true"
+                                    showSecondaryValues="true"
                                 >
                                     <core:ListItem
-                                        key="{CountryModel>stdCode}"
-                                        text="{CountryModel>stdCode}"
+                                        key="{CountryModel>countryName}"
+                                        text="{CountryModel>countryName}"
                                         additionalText="{CountryModel>code}"
                                     />
                                 </ComboBox>
-                            </VBox>
-                            <VBox
-                                width="65%"
-                                class="sapUiTinyMarginBegin"
-                            >
-                                <Input
-                                    id="signUpPhone"
-                                    type="Tel"
-                                    value="{LoginMode>/Mobileno}"
-                                    placeholder="{i18n>enterMobileNumber}"
-                                    maxLength="18"
-                                    liveChange="onMobileLivechnage"
-                                    valueStateText="{i18n>MSmobileNoValueState}"
+
+                                <!-- State -->
+                                <Label
+                                    text="{i18n>MVDstate}"
+                                    required="true"
                                 />
-                            </VBox>
-                        </HBox>
+                                <ComboBox
+                                    id="signUpState"
+                                    value="{LoginMode>/State}"
+                                    change="onChangeState"
+                                    selectionChange="onChangeState"
+                                    placeholder="{i18n>selectState}"
+                                    valueStateText="{i18n>MSselectState}"
+                                    items="{path:'StateModel>/', length:1000}"
+                                    showSecondaryValues="true"
+                                >
+                                    <core:ListItem
+                                        key="{StateModel>stateName}"
+                                        text="{StateModel>stateName}"
+                                    />
+                                </ComboBox>
 
-                        <Label
-                            text="{i18n>address}"
-                            required="true"
-                        />
-                        <TextArea
-                            id="signUpAddress"
-                            rows="3"
-                            value="{LoginMode>/Address}"
-                            liveChange="onAddressChange"
-                            placeholder="{i18n>placeHolderAddress}"
-                            maxLength="120"
-                        />
+                                <!-- City -->
+                                <Label
+                                    text="{i18n>city}"
+                                    required="true"
+                                />
+                                <ComboBox
+                                    selectionChange="onCitySelect"
+                                    id="signUpCity"
+                                    value="{LoginMode>/City}"
+                                    change="onChangeCity"
+                                    placeholder="{i18n>cityValueText}"
+                                    valueStateText="{i18n>MSselectCity}"
+                                    items="{path:'CityModel>/', length:1000}"
+                                    showSecondaryValues="true"
+                                >
+                                    <core:ListItem
+                                        key="{CityModel>cityName}"
+                                        text="{CityModel>cityName}"
+                                        additionalText="{CityModel>branchCode}"
+                                    />
+                                </ComboBox>
+                            </f:content>
+                        </f:SimpleForm>
+                    </VBox>
 
-                     
-
-            
-                      <core:Title text="Contact Details" />
-
-                        <Label
-                            text="{i18n>email}"
-                            required="true"
-                        />
-                        <Input
-                            id="signUpEmail"
-                            value="{LoginMode>/Email}"
-                            placeholder="{i18n>enterEmailId}"
-                            type="Email"
-                            required="true"
-                            liveChange="onEmailliveChange"
-                            valueStateText="{i18n>MSenterValidEmail}"
-                            maxLength="50"
-                        />
-
-                        <Label
-                            text="{i18n>MVDcountry}"
-                            required="true"
-                        />
-                        <ComboBox
-                            id="signUpCountry"
-                            value="{LoginMode>/Country}"
-                            change="onChangeCountry"
-                            selectionChange="onChangeCountry"
-                            placeholder="{i18n>selectCountry}"
-                            valueStateText="{i18n>MVDselectcountry}"
-                            items="{path:'CountryModel>/', length:1000}"
-                            showSecondaryValues="true"
+                    <!-- ===== RIGHT COLUMN: Mobile No + Address + Create Password ===== -->
+                    <VBox class="signUpRightCol">
+                        <f:SimpleForm
+                            id="signUpRightForm"
+                            editable="true"
+                            layout="ResponsiveGridLayout"
+                            labelSpanXL="3"
+                            labelSpanL="3"
+                            labelSpanM="3"
+                            labelSpanS="12"
+                            adjustLabelSpan="false"
+                            emptySpanXL="0"
+                            emptySpanL="0"
+                            emptySpanM="0"
+                            emptySpanS="0"
+                            columnsXL="1"
+                            columnsL="1"
+                            columnsM="1"
+                            singleContainerFullSize="false"
                         >
-                            <core:ListItem
-                                key="{CountryModel>countryName}"
-                                text="{CountryModel>countryName}"
-                                additionalText="{CountryModel>code}"
-                            />
-                        </ComboBox>
+                            <f:content>
+                                <!-- Mobile No -->
+                                <Label
+                                    text="{i18n>MSmobileNo}"
+                                    required="true"
+                                />
+                                <HBox
+                                    width="100%"
+                                    justifyContent="Start"
+                                    alignItems="Center"
+                                >
+                                    <VBox width="35%">
+                                        <ComboBox
+                                            change="onSTDChange"
+                                            id="signUpSTD"
+                                            value="{LoginMode>/STDCode}"
+                                            placeholder="+91"
+                                            valueStateText="{i18n>MSselectCode}"
+                                            showSecondaryValues="true"
+                                            items="{path:'CountryModel>/', length:1000}"
+                                            filterSecondaryValues="true"
+                                        >
+                                            <core:ListItem
+                                                key="{CountryModel>stdCode}"
+                                                text="{CountryModel>stdCode}"
+                                                additionalText="{CountryModel>code}"
+                                            />
+                                        </ComboBox>
+                                    </VBox>
+                                    <VBox
+                                        width="65%"
+                                        class="sapUiTinyMarginBegin"
+                                    >
+                                        <Input
+                                            id="signUpPhone"
+                                            type="Tel"
+                                            value="{LoginMode>/Mobileno}"
+                                            placeholder="{i18n>enterMobileNumber}"
+                                            maxLength="18"
+                                            liveChange="onMobileLivechnage"
+                                            valueStateText="{i18n>MSmobileNoValueState}"
+                                        />
+                                    </VBox>
+                                </HBox>
 
-                        <Label
-                            text="{i18n>MVDstate}"
-                            required="true"
-                        />
-                        <ComboBox
-                            id="signUpState"
-                            value="{LoginMode>/State}"
-                            change="onChangeState"
-                            selectionChange="onChangeState"
-                            placeholder="{i18n>selectState}"
-                            valueStateText="{i18n>MSselectState}"
-                            items="{path:'StateModel>/', length:1000}"
-                            showSecondaryValues="true"
-                        >
-                            <core:ListItem
-                                key="{StateModel>stateName}"
-                                text="{StateModel>stateName}"
-                            />
-                        </ComboBox>
+                                <!-- Address -->
+                                <Label
+                                    text="{i18n>address}"
+                                    required="true"
+                                />
+                                <TextArea
+                                    id="signUpAddress"
+                                    rows="3"
+                                    value="{LoginMode>/Address}"
+                                    liveChange="onAddressChange"
+                                    placeholder="{i18n>placeHolderAddress}"
+                                    maxLength="120"
+                                />
 
-                        <Label
-                            text="{i18n>city}"
-                            required="true"
-                        />
-                        <ComboBox
-                            selectionChange="onCitySelect"
-                            id="signUpCity"
-                            value="{LoginMode>/City}"
-                            change="onChangeCity"
-                            placeholder="{i18n>cityValueText}"
-                            valueStateText="{i18n>MSselectCity}"
-                            items="{path:'CityModel>/', length:1000}"
-                            showSecondaryValues="true"
-                        >
-                            <core:ListItem
-                                key="{CityModel>cityName}"
-                                text="{CityModel>cityName}"
-                                additionalText="{CityModel>branchCode}"
-                            />
-                        </ComboBox>
 <core:Title text="Create Password" />
 
-                        <MessageStrip
-                            id="passwordHelpStrip"
-                            type="Information"
-                            showIcon="false"
-                            text="{i18n>msgStrip}"
-                            class="sapUiSmallMarginBottom"
-                        />
 
-                        <Label
-                            text="{i18n>MScreatePassword}"
-                            required="true"
-                        />
-                        <VBox width="100%">
-                            <Input
-                                showValueStateMessage="false"
-                                id="signUpPassword"
-                                width="100%"
-                                placeholder="{i18n>enterPassword}"
-                                value="{LoginMode>/password}"
-                                type="Password"
-                                liveChange="SM_onChnageSetAndConfirm"
-                                showValueHelp="true"
-                                valueHelpIconSrc="sap-icon://show"
-                                valueHelpRequest="SM_onTogglePasswordVisibility"
-                                maxLength="50"
-                            />
-                            <HBox
-                                width="100%"
-                                justifyContent="SpaceBetween"
-                                class=""
-                            >
-                                <Text
-                                    id="passwordStrengthText"
-                                    class="pwdMinFail"
-                                />
-                                <Button
-                                    text="{i18n>MSgeneratePassword}"
-                                    tooltip="{i18n>MSgeneratePassword}"
-                                    type="Transparent"
-                                    icon="sap-icon://refresh"
-                                    press="SM_onGeneratePassword"
-                                />
-                            </HBox>
-                        </VBox>
+<MessageStrip
+    id="passwordHelpStrip"
+    type="Information"
+    showIcon="false"
+    text="{i18n>msgStrip}"
+    class="sapUiSmallMarginBottom"
+/>
 
-                        <Label
-                            text="{i18n>MSconfirmPassword}"
-                            required="true"
-                        />
-                        <Input
-                            id="signUpConfirmPassword"
-                            placeholder="{i18n>MSenterConfirmPassword}"
-                            value="{LoginMode>/comfirmpass}"
-                            type="Password"
-                            change="FSM_onConfirm"
-                            liveChange="FSM_onConfirm"
-                            showValueHelp="true"
-                            valueStateText="{i18n>MSenterConfirmPassword}"
-                            valueHelpIconSrc="sap-icon://show"
-                            valueHelpRequest="SM_onTogglePasswordVisibility"
-                            maxLength="50"
-                            submit="onSignUp"
-                        />
-                    </f:content>
-                </f:SimpleForm>
-     
-        <!-- BUTTON AT BOTTOM -->
-        <HBox
-            justifyContent="End"
-            class="sapUiSmallMargin"
-        >
-            <Button
-                text="{i18n>MSsignUp}"
-                tooltip="{i18n>MSsignUp}"
-                class="myUnifiedBtn sapUiSmallMarginEnd"
-                width="120px"
-                press="onSignUp"
-            />
-        </HBox>
-    </content>
-</Panel>
+
+
+                                <!-- Create Password -->
+                                <Label
+                                    text="{i18n>MScreatePassword}"
+                                    required="true"
+                                />
+                                <VBox width="100%">
+                                    <Input
+                                        showValueStateMessage="false"
+                                        id="signUpPassword"
+                                        width="100%"
+                                        placeholder="{i18n>enterPassword}"
+                                        value="{LoginMode>/password}"
+                                        type="Password"
+                                        liveChange="SM_onChnageSetAndConfirm"
+                                        showValueHelp="true"
+                                        valueHelpIconSrc="sap-icon://show"
+                                        valueHelpRequest="SM_onTogglePasswordVisibility"
+                                        maxLength="50"
+                                    />
+                                    <HBox
+                                        width="100%"
+                                        justifyContent="SpaceBetween"
+                                        class=""
+                                    >
+                                        <Text
+                                            id="passwordStrengthText"
+                                            class="pwdMinFail"
+                                        />
+                                        <Button
+                                            text="{i18n>MSgeneratePassword}"
+                                            tooltip="{i18n>MSgeneratePassword}"
+                                            type="Transparent"
+                                            icon="sap-icon://refresh"
+                                            press="SM_onGeneratePassword"
+                                        />
+                                    </HBox>
+                                </VBox>
+
+                                <!-- Confirm Password -->
+                                <Label
+                                    text="{i18n>MSconfirmPassword}"
+                                    required="true"
+                                />
+                                <Input
+                                    id="signUpConfirmPassword"
+                                    placeholder="{i18n>MSenterConfirmPassword}"
+                                    value="{LoginMode>/comfirmpass}"
+                                    type="Password"
+                                    change="FSM_onConfirm"
+                                    liveChange="FSM_onConfirm"
+                                    showValueHelp="true"
+                                    valueStateText="{i18n>MSenterConfirmPassword}"
+                                    valueHelpIconSrc="sap-icon://show"
+                                    valueHelpRequest="SM_onTogglePasswordVisibility"
+                                    maxLength="50"
+                                    submit="onSignUp"
+                                />
+                            </f:content>
+                        </f:SimpleForm>
+                    </VBox>
+                </FlexBox>
+
+<!-- SIGN UP BUTTON -->
+<HBox
+    justifyContent="End"
+    class="sapUiSmallMargin"
+>
+    <Button
+        text="{i18n>MSsignUp}"
+        tooltip="{i18n>MSsignUp}"
+        class="myUnifiedBtn sapUiSmallMarginEnd"
+        width="120px"
+        press="onSignUp"
+    />
+</HBox>
+
+
+            </Panel>
 
         </VBox>
     </Dialog>

@@ -344,7 +344,7 @@ sap.ui.define([
                     if (oRadioGroup) {
                         oRadioGroup.setValueState("Error");
                     }
-                    MessageToast.show("Please select Daily or Entire_Booking facility Type.");
+                    MessageToast.show("Please select Daily or Entire Booking facility Type.");
                     return;
                 } else {
                     if (oRadioGroup) {
@@ -511,7 +511,7 @@ sap.ui.define([
         onPeriodTypeSelect: function(oEvent) {
             var selectedIndex = oEvent.getParameter("selectedIndex");
             var oFacilityModel = this.getView().getModel("FacilitiesModel");
-            var selectedSession = selectedIndex === 0 ? "Daily" : selectedIndex === 1 ? "Entire_Booking" : "";
+            var selectedSession = selectedIndex === 0 ? "Daily" : selectedIndex === 1 ? "Entire Booking" : "";
             oFacilityModel.setProperty("/FacilityChargeType", selectedSession); // Set selected session in model
             // Clear value state if a session is selected
             var oRadioGroup = this.getView().byId("id_PeriodSelect");
