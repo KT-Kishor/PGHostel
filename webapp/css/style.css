@@ -645,11 +645,16 @@
 }
 
 .vrHeaderLabel {
-    min-width: 9.5rem;
-    max-width: 9.5rem;
+    min-width: 6rem;
+    max-width: 6rem;
     color: #5e738d !important;
     font-weight: 700 !important;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    line-height: 1.4 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
 }
 
 .vrSnappedAvatar.sapMAvatar {
@@ -738,6 +743,21 @@
 .vrHeaderValueLink {
     overflow-wrap: anywhere;
     word-break: break-word;
+}
+
+.vrRatingStars.sapMRatingIndicator {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    vertical-align: middle;
+}
+
+.vrRatingRow {
+    align-items: center !important;
+}
+
+.vrRatingRow .vrHeaderLabel {
+    align-items: center !important;
+    padding-top: 0 !important;
 }
 
 .bedCardImage {
@@ -6378,19 +6398,24 @@ html, body {
   }
 
   .vrHeaderLabel {
-    min-width: 7.25rem;
-    max-width: 7.25rem;
+    min-width: 5rem;
+    max-width: 5rem;
     font-size: 0.8rem !important;
-    width: 7.25rem;
-    flex: 0 0 7.25rem;
+    width: 5rem;
+    flex: 0 0 5rem;
+    display: flex;
+    align-items: center;
+    line-height: 1.25rem !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
   }
 
   .vrHeaderValueLink,
   .vrHeaderValueText,
   .vrHeaderValueBox {
     flex: 1 1 0;
-    width: calc(100% - 7.75rem);
-    max-width: calc(100% - 7.75rem);
+    width: calc(100% - 5.5rem);
+    max-width: calc(100% - 5.5rem);
     min-width: 0;
   }
 
@@ -6426,6 +6451,18 @@ html, body {
 
   .vrRatingRow {
     margin-top: 0.35rem !important;
+    align-items: center !important;
+  }
+
+  .vrRatingRow .vrHeaderLabel {
+    align-items: center !important;
+    padding-top: 0 !important;
+  }
+
+  .vrRatingStars.sapMRatingIndicator {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    vertical-align: middle;
     margin-bottom: 0 !important;
   }
 
