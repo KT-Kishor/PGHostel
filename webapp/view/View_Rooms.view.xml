@@ -121,7 +121,7 @@
 					</HBox>
 					<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow vrRatingRow">
 						<Label text="User Rating:" design="Bold" class="vrHeaderLabel" />
-						<HBox alignItems="Center" class="vrHeaderValueBox">
+						<HBox id="VR_id_RatingClickable" alignItems="Center" class="vrHeaderValueBox vrRatingClickable">
 							<RatingIndicator
 								value="{= Number(${VisibilityModel>/AverageRating}) || 0 }"
 								maxValue="5"

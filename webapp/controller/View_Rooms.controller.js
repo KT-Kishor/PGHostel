@@ -16,7 +16,22 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteViewRooms").attachMatched(this._onRouteMatched, this);
+        },
 
+        onAfterRendering: function () {
+            var oRatingHBox = this.byId("VR_id_RatingClickable");
+            if (oRatingHBox && !this._ratingClickAttached) {
+                this._ratingClickAttached = true;
+                var oDomRef = oRatingHBox.getDomRef();
+                if (oDomRef) {
+                    var self = this;
+                    $(oDomRef).on("click", function (e) {
+                        if (!$(e.target).closest(".vrRatingCount").length) {
+                            self.onRatingPress();
+                        }
+                    });
+                }
+            }
         },
         _onRouteMatched: async function (oEvent) {
             this.getBusyDialog()
@@ -2586,6 +2601,22 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Error opening maps.");
             }
+        },
+
+        onRatingPress: function () {
+            var oBranchModel = this.getView().getModel("BranchModel");
+            var oBranchData = oBranchModel ? oBranchModel.getData() : {};
+            var oSelectedBedType = this.getOwnerComponent().getModel("SelectedBedType");
+            if (!oSelectedBedType) {
+                oSelectedBedType = new sap.ui.model.json.JSONModel({});
+                this.getOwnerComponent().setModel(oSelectedBedType, "SelectedBedType");
+            }
+            oSelectedBedType.setData({
+                BranchID: oBranchData.BranchID || oBranchData.BranchCode || "",
+                Name: oBranchData.Name || "",
+                BranchCode: oBranchData.BranchID || oBranchData.BranchCode || ""
+            });
+            this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
         },
 
         onNavBack: function () {

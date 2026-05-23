@@ -746,9 +746,13 @@
 }
 
 .vrRatingStars.sapMRatingIndicator {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
     vertical-align: middle;
+    height: auto !important;
+    pointer-events: none !important;
 }
 
 .vrRatingRow {
@@ -758,6 +762,32 @@
 .vrRatingRow .vrHeaderLabel {
     align-items: center !important;
     padding-top: 0 !important;
+}
+
+.vrRatingRow .vrHeaderValueBox {
+    align-items: center !important;
+    height: 100%;
+}
+
+.vrRatingClickable {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Transparent overlay to catch all clicks on the rating area */
+.vrRatingClickable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.vrRatingClickable:hover .vrRatingStars.sapMRatingIndicator .sapMRatingItem,
+.vrRatingClickable:hover .vrRatingCount {
+    opacity: 0.8;
 }
 
 .bedCardImage {
@@ -6464,6 +6494,10 @@ html, body {
     padding-top: 0 !important;
     vertical-align: middle;
     margin-bottom: 0 !important;
+    line-height: 1.25rem !important;
+    height: 1.25rem !important;
+    overflow: hidden;
+    pointer-events: none !important;
   }
 
   .vrSnappedAvatar.sapMAvatar {
