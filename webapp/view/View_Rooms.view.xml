@@ -41,6 +41,7 @@
 									src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
 									displaySize="L"
 									displayShape="Square"
+									visible="{= !!${BranchModel>/Photo1} }"
 									class="vrSquareAvatarSmall vrSnappedAvatar sapUiAvatarImageContain" />
 								<VBox class="vrSnappedTitleBlock sapUiSmallMarginBegin">
 									<Title
@@ -68,6 +69,7 @@
 						src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
 						displaySize="XL"
 						displayShape="Square"
+						visible="{= !!${BranchModel>/Photo1} }"
 						class="vrSquareAvatarLarge sapUiMediumMarginEnd sapUiAvatarImageContain vrHeaderAvatar" />
 
 					<VBox class="vrTitleBlock">
