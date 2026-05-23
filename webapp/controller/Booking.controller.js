@@ -4014,16 +4014,23 @@
         _getDocumentInfoPopover: function () {
             if (!this._oDocumentInfoPopover) {
                 this._oDocumentInfoPopover = new ResponsivePopover({
-                    showHeader: false,
+                    showHeader: true,
+                    showCloseButton: true,
+                    title: "Document Upload Info",
                     placement: "Bottom",
-                    contentWidth: "18rem",
+                    contentWidth: sap.ui.Device.system.phone ? "95vw" : "18rem",
                     content: [
                         new Text({
                             text: "Choose a document & upload clear image or PDF up to 2 MB",
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
-                });
+                }).addStyleClass("facilityBreakdownBtn");
+
+                if (sap.ui.Device.system.phone) {
+                    this._oDocumentInfoPopover.setContentHeight(null);
+                    this._applyMobilePopoverDialogBehavior(this._oDocumentInfoPopover, "mobileAutoHeightPopoverDialog");
+                }
 
                 this.getView().addDependent(this._oDocumentInfoPopover);
             }
