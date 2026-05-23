@@ -83,7 +83,7 @@
 
 				<VBox class="sapUiMediumMarginEnd sapUiSmallMarginBottom vrHeaderSection vrHeaderSectionPrimary">
 					<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow">
-						<Label text="Email Address:" design="Bold" class="vrHeaderLabel" />
+						<Label text="Email:" design="Bold" class="vrHeaderLabel" />
 						<Link
 							text="{BranchModel>/EmailID}"
 							href="{= 'mailto:' + ${BranchModel>/EmailID} }"
@@ -91,7 +91,7 @@
 							class="vrHeaderValueLink" />
 					</HBox>
 					<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow">
-						<Label text="Contact Number:" design="Bold" class="vrHeaderLabel" />
+						<Label text="Contact:" design="Bold" class="vrHeaderLabel" />
 						<Link
 							text="{BranchModel>/STD} {BranchModel>/Contact}"
 							href="{= 'tel:' + ${BranchModel>/Contact} }"
