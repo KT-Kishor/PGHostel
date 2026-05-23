@@ -2784,6 +2784,13 @@
                     controller: this
                 }).then(function (oDialog) {
                     this.getView().addDependent(oDialog);
+
+                    if (sap.ui.Device.system.phone) {
+                        oDialog.setStretch(false);
+                        oDialog.setContentHeight("auto");
+                        oDialog.addStyleClass("mobileAutoHeightPopoverDialog");
+                    }
+
                     return oDialog;
                 }.bind(this));
             }
