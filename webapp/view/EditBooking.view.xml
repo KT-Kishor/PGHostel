@@ -577,13 +577,13 @@
                                 class="pricingDetailsTable sapUiTinyMarginBottom"
                             >
                                 <columns>
-                                    <Column width="60%">
+                                    <Column width="55%">
                                         <header>
                                             <Text text="Item" />
                                         </header>
                                     </Column>
                                     <Column
-                                        width="40%"
+                                        width="45%"
                                         hAlign="End"
                                     >
                                         <header>
@@ -852,39 +852,39 @@
                                             </HBox>
                                         </cells>
                                     </ColumnListItem>
+                                    <ColumnListItem
+                                        vAlign="Middle" 
+                                        class="grandTotalBar grandTotalFinalRow"
+                                    >
+                                        <cells>
+                                            <Title
+                                                text="Grand Total"
+                                                level="H3"
+                                                titleStyle="H3"
+                                            />
+                                            <HBox
+                                                justifyContent="End"
+                                                alignItems="Center"
+                                                renderType="Bare"
+                                            >
+                                                <Title
+                                                    text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
+                                                    level="H3"
+                                                    titleStyle="H3"
+                                                    class="sapUiTinyMarginEnd"
+                                                    wrapping="true"
+                                                />
+                                                <Title
+                                                    text="{HostelModel>/Currency}"
+                                                    level="H3"
+                                                    titleStyle="H3"
+                                                    wrapping="true"
+                                                />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
                                 </items>
                             </Table>
-
-                            <HBox
-                                justifyContent="SpaceBetween"
-                                alignItems="Center"
-                                class="sapUiTinyMarginBottom grandTotalBar"
-                            >
-                                <Title
-                                    text="Grand Total"
-                                    level="H3"
-                                    titleStyle="H3"
-                                    class="sapUiSmallMarginBegin"
-                                />
-                                <HBox
-                                    justifyContent="End"
-                                    alignItems="Center"
-                                    renderType="Bare"
-                                >
-                                    <Title
-                                        text="{path: 'HostelModel>/GrandTotal', formatter: '.Formatter.fromatNumber'}"
-                                        level="H3"
-                                        titleStyle="H3"
-                                        class="sapUiTinyMarginEnd"
-                                    />
-                                    <Title
-                                        text="{HostelModel>/Currency}"
-                                        level="H3"
-                                        titleStyle="H3"
-                                        class="sapUiTinyMarginEnd"
-                                    />
-                                </HBox>
-                            </HBox>
 
                             <MessageStrip
                                 text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
