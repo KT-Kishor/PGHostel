@@ -540,7 +540,8 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
-                                     submit="onApplyCoupon"
+                                maxLength="15"
+                                submit="onApplyCoupon"
                             >
                                 <layoutData>
                                     <FlexItemData
@@ -893,6 +894,7 @@
                                             <Title
                                                 text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
                                                 level="H6"
+                                                wrapping="true"
                                             />
                                             <HBox
                                                 justifyContent="End"

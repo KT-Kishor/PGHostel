@@ -5194,37 +5194,44 @@
                 });
 
                 if (!oMatchedCoupon) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Invalid coupon code");
                     return;
                 }
 
                 if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon cannot be applied to this booking");
                     return;
                 }
 
                 if (String(oMatchedCoupon.BranchCode || "").trim() && String(oMatchedCoupon.BranchCode || "").trim() !== String(sBranchCode || "").trim()) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon is not valid for the selected branch.");
                     return;
                 }
 
                 if (this._isCouponExpired(oMatchedCoupon.EndDate)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Coupon is expired");
                     return;
                 }
 
                 if (this._isCouponNotStarted(oMatchedCoupon.StartDate)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Coupon is not active yet");
                     return;
                 }
 
                 if (fCouponBaseAmount < Number(oMatchedCoupon.MinOrderValue || 0)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Minimum order value is not met for this coupon.");
                     return;
                 }
 
                 var aCouponBookingDateReasons = this._getCouponBookingDateReasons(oMatchedCoupon);
                 if (aCouponBookingDateReasons.length > 0) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon is not valid for the booking date.");
                     return;
                 }

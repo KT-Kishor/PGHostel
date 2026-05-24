@@ -427,6 +427,7 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
+                                maxLength="15"
                                 submit="onApplyCoupon"
                                 enabled="{BookingView>/editModeEnabled}"
                             >
@@ -712,6 +713,7 @@
                                             <Title
                                                 text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
                                                 level="H6"
+                                                wrapping="true"
                                             />
                                             <HBox
                                                 justifyContent="End"
