@@ -6275,12 +6275,22 @@ html, body {
     padding: 0.5rem 0.5rem !important;
 }
 
+.pricingDetailsTable .sapMListTblHeaderCell {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 /* Tablet pricing table */
 @media (max-width: 900px) {
     .pricingDetailsTable .sapMListTblCell,
     .pricingDetailsTable .sapMListTblHeaderCell {
         padding: 0.4rem 0.4rem !important;
         font-size: 0.88rem !important;
+    }
+
+    .pricingDetailsTable .sapMListTblHeaderCell {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .pricingDetailsTable .sapMTitle {
@@ -6298,6 +6308,11 @@ html, body {
     .pricingDetailsTable .sapMListTblHeaderCell {
         padding: 0.35rem 0.3rem !important;
         font-size: 0.82rem !important;
+    }
+
+    .pricingDetailsTable .sapMListTblHeaderCell {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .pricingDetailsTable .sapMTitle {
