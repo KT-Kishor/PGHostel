@@ -80,13 +80,13 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>MVstaffName}" tooltip="{i18n>MVstaffName}"/>
 					</Column>
-					<Column demandPopin="true" width="15%">
+					<Column demandPopin="true" width="15%" minScreenWidth="Tablet">
 						<Text text="{i18n>emailId}" tooltip="{i18n>emailId}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>branchCode}" tooltip="{i18n>branchCode}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true">
 						<Text text="{i18n>MVgender}" tooltip="{i18n>MVgender}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
