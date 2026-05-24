@@ -1687,7 +1687,8 @@
                                                 return "Facility will be applied to " + (sPrimaryGuestName || "Primary Guest");
                                             }
                                         },
-                                        level: "H6"
+                                        level: "H6",
+                                        wrapping: true
                                     }).addStyleClass("sapUiTinyMarginEnd")
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd")

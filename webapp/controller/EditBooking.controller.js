@@ -38,10 +38,10 @@ sap.ui.define([
         },
 
         _onEditRouteMatched: async function (oEvent) {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
             var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";
