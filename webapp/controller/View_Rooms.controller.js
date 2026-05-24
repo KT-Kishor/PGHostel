@@ -268,8 +268,11 @@ sap.ui.define([
                     const sGSTIN = oBranchInfo?.GSTIN || "";
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
-                    const PropertyType = oBranchInfo?.PropertyType || "";
                     const LandMark = oBranchInfo?.LandMark || "";
+                    const PropertyType = oBranchInfo?.PropertyType || ""; 
+                    const PropertySTD = oBranchInfo.STD || "";
+                    const PropertyMobileNo = oBranchInfo.Contact || "";
+                    const PropertyEmail = oBranchInfo.EmailID || "";
 
 
                     const aImages = [];
@@ -332,7 +335,10 @@ sap.ui.define([
                         AvailableDate: Date,
                         ExtraBed: room.ExtraBed,
                         LandMark: LandMark, 
-                        PropertyType: PropertyType || room.PropertyType || ""
+                        PropertyType: PropertyType || room.PropertyType || "",
+                        PropertySTD: PropertySTD,
+                        PropertyMobileNo: PropertyMobileNo,
+                        PropertyEmail: PropertyEmail
                     };
                 });
 
@@ -411,7 +417,11 @@ sap.ui.define([
                     GeoLocation: oSelected.GeoLocation,
                     AvailableDate: oSelected.AvailableDate,
                     ExtraBed: oSelected.ExtraBed || 0,
-                    PropertyType: oSelected.PropertyType || ""
+                    PropertyType: oSelected.PropertyType || "",
+                    PropertySTD: oSelected.PropertySTD || "",
+                    PropertyMobileNo: oSelected.PropertyMobileNo || "",
+                    PropertyEmail: oSelected.PropertyEmail || ""
+                    
                 };
 
                 const oHostelModel = new JSONModel(oFullDetails);
@@ -2083,6 +2093,9 @@ sap.ui.define([
                 BedType: oData.BedType || "",
                 ACType: oData.ACType || "",
                 PropertyType: oData.PropertyType || "",
+                PropertySTD: oData.PropertySTD || "",
+                PropertyMobileNo: oData.PropertyMobileNo || "",
+                PropertyEmail: oData.PropertyEmail || "",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
                 Area: oData.Area || "",
