@@ -1687,7 +1687,8 @@
                                                 return "Facility will be applied to " + (sPrimaryGuestName || "Primary Guest");
                                             }
                                         },
-                                        level: "H6"
+                                        level: "H6",
+                                        wrapping: true
                                     }).addStyleClass("sapUiTinyMarginEnd")
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd")
@@ -2784,6 +2785,13 @@
                     controller: this
                 }).then(function (oDialog) {
                     this.getView().addDependent(oDialog);
+
+                    if (sap.ui.Device.system.phone) {
+                        oDialog.setStretch(false);
+                        oDialog.setContentHeight("auto");
+                        oDialog.addStyleClass("mobileAutoHeightPopoverDialog");
+                    }
+
                     return oDialog;
                 }.bind(this));
             }
@@ -4014,16 +4022,23 @@
         _getDocumentInfoPopover: function () {
             if (!this._oDocumentInfoPopover) {
                 this._oDocumentInfoPopover = new ResponsivePopover({
-                    showHeader: false,
+                    showHeader: true,
+                    showCloseButton: true,
+                    title: "Document Upload Info",
                     placement: "Bottom",
-                    contentWidth: "18rem",
+                    contentWidth: sap.ui.Device.system.phone ? "95vw" : "18rem",
                     content: [
                         new Text({
                             text: "Choose a document & upload clear image or PDF up to 2 MB",
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
-                });
+                }).addStyleClass("facilityBreakdownBtn");
+
+                if (sap.ui.Device.system.phone) {
+                    this._oDocumentInfoPopover.setContentHeight(null);
+                    this._applyMobilePopoverDialogBehavior(this._oDocumentInfoPopover, "mobileAutoHeightPopoverDialog");
+                }
 
                 this.getView().addDependent(this._oDocumentInfoPopover);
             }
@@ -5179,37 +5194,44 @@
                 });
 
                 if (!oMatchedCoupon) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Invalid coupon code");
                     return;
                 }
 
                 if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon cannot be applied to this booking");
                     return;
                 }
 
                 if (String(oMatchedCoupon.BranchCode || "").trim() && String(oMatchedCoupon.BranchCode || "").trim() !== String(sBranchCode || "").trim()) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon is not valid for the selected branch.");
                     return;
                 }
 
                 if (this._isCouponExpired(oMatchedCoupon.EndDate)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Coupon is expired");
                     return;
                 }
 
                 if (this._isCouponNotStarted(oMatchedCoupon.StartDate)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Coupon is not active yet");
                     return;
                 }
 
                 if (fCouponBaseAmount < Number(oMatchedCoupon.MinOrderValue || 0)) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("Minimum order value is not met for this coupon.");
                     return;
                 }
 
                 var aCouponBookingDateReasons = this._getCouponBookingDateReasons(oMatchedCoupon);
                 if (aCouponBookingDateReasons.length > 0) {
+                    oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon is not valid for the booking date.");
                     return;
                 }
@@ -6236,8 +6258,12 @@
 
                 const pdfBase64 = await this.onGeneratePDF(oMainData);
                 delete oPayloadData.data[0].Deposit;
-                // Property name below
-                oPayloadData.data[0].Area=oHostelModel.getData().Area 
+
+                const oHostelData = oHostelModel.getData();
+                oPayloadData.data[0].Area = oHostelData.Area || "";
+                oPayloadData.data[0].PropertySTD = oHostelData.PropertySTD || "";
+                oPayloadData.data[0].PropertyMobileNo = oHostelData.PropertyMobileNo || "";
+                oPayloadData.data[0].PropertyEmail = oHostelData.PropertyEmail || "";
                 const oPayload = {
                     data: oPayloadData.data,
                     pdfAttachment: {

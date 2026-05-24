@@ -4665,7 +4665,7 @@ if (aData.length === 0) {
                 // 🔑 ADDITION: preview URL for images ONLY
                 const previewUrl = URL.createObjectURL(file);
                 docs.push({
-                    FileName: file.name,
+                    FileName: selectedDocType,
                     DocumentType: file.type, // MIME
                     VdocType: selectedDocType, // Aadhaar / PAN etc
                     File: base64,

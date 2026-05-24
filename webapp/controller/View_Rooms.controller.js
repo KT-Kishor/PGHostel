@@ -16,14 +16,29 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteViewRooms").attachMatched(this._onRouteMatched, this);
+        },
 
+        onAfterRendering: function () {
+            var oRatingHBox = this.byId("VR_id_RatingClickable");
+            if (oRatingHBox && !this._ratingClickAttached) {
+                this._ratingClickAttached = true;
+                var oDomRef = oRatingHBox.getDomRef();
+                if (oDomRef) {
+                    var self = this;
+                    $(oDomRef).on("click", function (e) {
+                        if (!$(e.target).closest(".vrRatingCount").length) {
+                            self.onRatingPress();
+                        }
+                    });
+                }
+            }
         },
         _onRouteMatched: async function (oEvent) {
             this.getBusyDialog()
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
             // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
             // Clear the HostelModel when returning to this view
@@ -253,8 +268,11 @@ sap.ui.define([
                     const sGSTIN = oBranchInfo?.GSTIN || "";
                     const sCheckInTime = oBranchInfo?.CheckinTime || "";
                     const sCheckOutTime = oBranchInfo?.CheckoutTime || "";
-                    const PropertyType = oBranchInfo?.PropertyType || "";
                     const LandMark = oBranchInfo?.LandMark || "";
+                    const PropertyType = oBranchInfo?.PropertyType || ""; 
+                    const PropertySTD = oBranchInfo.STD || "";
+                    const PropertyMobileNo = oBranchInfo.Contact || "";
+                    const PropertyEmail = oBranchInfo.EmailID || "";
 
 
                     const aImages = [];
@@ -317,7 +335,10 @@ sap.ui.define([
                         AvailableDate: Date,
                         ExtraBed: room.ExtraBed,
                         LandMark: LandMark, 
-                        PropertyType: PropertyType || room.PropertyType || ""
+                        PropertyType: PropertyType || room.PropertyType || "",
+                        PropertySTD: PropertySTD,
+                        PropertyMobileNo: PropertyMobileNo,
+                        PropertyEmail: PropertyEmail
                     };
                 });
 
@@ -396,7 +417,11 @@ sap.ui.define([
                     GeoLocation: oSelected.GeoLocation,
                     AvailableDate: oSelected.AvailableDate,
                     ExtraBed: oSelected.ExtraBed || 0,
-                    PropertyType: oSelected.PropertyType || ""
+                    PropertyType: oSelected.PropertyType || "",
+                    PropertySTD: oSelected.PropertySTD || "",
+                    PropertyMobileNo: oSelected.PropertyMobileNo || "",
+                    PropertyEmail: oSelected.PropertyEmail || ""
+                    
                 };
 
                 const oHostelModel = new JSONModel(oFullDetails);
@@ -2068,6 +2093,9 @@ sap.ui.define([
                 BedType: oData.BedType || "",
                 ACType: oData.ACType || "",
                 PropertyType: oData.PropertyType || "",
+                PropertySTD: oData.PropertySTD || "",
+                PropertyMobileNo: oData.PropertyMobileNo || "",
+                PropertyEmail: oData.PropertyEmail || "",
                 Capacity: parseInt(oData.Capacity, 10) || 1,
                 Address: oData.Address || "",
                 Area: oData.Area || "",
@@ -2586,6 +2614,24 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show("Error opening maps.");
             }
+        },
+
+        onRatingPress: function () {
+            var oBranchModel = this.getView().getModel("BranchModel");
+            var oBranchData = oBranchModel ? oBranchModel.getData() : {};
+            var oSelectedBedType = this.getOwnerComponent().getModel("SelectedBedType");
+            if (!oSelectedBedType) {
+                oSelectedBedType = new sap.ui.model.json.JSONModel({});
+                this.getOwnerComponent().setModel(oSelectedBedType, "SelectedBedType");
+            }
+            oSelectedBedType.setData({
+                BranchID: oBranchData.BranchID || oBranchData.BranchCode || "",
+                Name: oBranchData.Name || "",
+                BranchCode: oBranchData.BranchID || oBranchData.BranchCode || "",
+                fromRoute: "RouteViewRooms",
+                fromRoutePath: this.sPath
+            });
+            this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
         },
 
         onNavBack: function () {

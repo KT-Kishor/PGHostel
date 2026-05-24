@@ -558,7 +558,7 @@
 }
 
 .bedCard {
-    width: 90%;
+    width: 95%;
     height: auto;
     border-radius: 16px;
     padding: 6px;
@@ -585,6 +585,201 @@
 .bedCard:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.vrHeaderRow {
+    width: 100%;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem 1.25rem;
+    align-items: flex-start !important;
+}
+
+.vrHeaderAvatar.sapMAvatar {
+    width: 8.75rem !important;
+    height: 8.75rem !important;
+    min-width: 8.75rem;
+    border-radius: 1.2rem !important;
+    background: linear-gradient(180deg, #d6f0ff 0%, #bfe7ff 100%) !important;
+    padding: 0.65rem !important;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.vrIdentityRow {
+    min-width: 31rem;
+    max-width: 32rem;
+    align-items: flex-start !important;
+}
+
+.vrTitleBlock {
+    min-width: 0;
+    max-width: 18rem;
+    flex: 1 1 auto;
+    padding-top: 1.55rem;
+}
+
+.vrHeaderTitle {
+    font-size: 1.8rem !important;
+    line-height: 1.12 !important;
+    font-weight: 800 !important;
+    color: #132235 !important;
+}
+
+.vrHeaderSubtitle {
+    font-size: 0.95rem !important;
+    color: #132235 !important;
+    font-weight: 500;
+}
+
+.vrHeaderSection {
+    min-width: 21rem;
+    max-width: 24rem;
+    padding-top: 0.85rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.vrHeaderFieldRow {
+    width: 100%;
+    min-width: 0;
+}
+
+.vrHeaderLabel {
+    min-width: 6rem;
+    max-width: 6rem;
+    color: #5e738d !important;
+    font-weight: 700 !important;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    line-height: 1.4 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.vrSnappedAvatar.sapMAvatar {
+    margin-right: 0 !important;
+}
+
+.vrSnappedHeader {
+    gap: 0.75rem;
+    align-items: center !important;
+}
+
+.vrSnappedTitleBlock {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0.15rem;
+}
+
+.vrSnappedHeader .sapMFlexItem:last-child {
+    min-width: 0;
+    margin-left: 0.15rem;
+}
+
+.sapUxAPObjectPageHeaderStickied .vrSnappedHeader,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedHeader {
+    align-items: center !important;
+}
+
+.sapUxAPObjectPageHeaderStickied .vrSnappedTitleBlock,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedTitleBlock,
+.sapUxAPObjectPageHeaderStickied .vrSnappedHeader .sapMFlexItem:last-child,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedHeader .sapMFlexItem:last-child {
+    margin-left: 0.6rem !important;
+}
+
+.sapUxAPObjectPageHeaderStickied .vrSnappedAvatar.sapMAvatar,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedAvatar.sapMAvatar {
+    margin-right: 0.2rem !important;
+}
+
+.vrSnappedTitle,
+.vrSnappedTitle.sapMTitle,
+.vrSnappedTitle .sapMTitleStyleAuto,
+.vrSnappedTitle bdi,
+.sapUxAPObjectPageHeaderStickied .vrSnappedTitle,
+.sapUxAPObjectPageHeaderStickied .vrSnappedTitle.sapMTitle,
+.sapUxAPObjectPageHeaderStickied .vrSnappedTitle .sapMTitleStyleAuto,
+.sapUxAPObjectPageHeaderStickied .vrSnappedTitle bdi,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle.sapMTitle,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle .sapMTitleStyleAuto,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle bdi {
+    font-size: 1.8rem !important;
+    line-height: 1.12 !important;
+    font-weight: 800 !important;
+    color: #132235 !important;
+    font-family: inherit !important;
+}
+
+.vrSnappedSubtitle,
+.vrSnappedSubtitle.sapMText,
+.vrSnappedSubtitle .sapMText,
+.vrSnappedSubtitle bdi,
+.sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle,
+.sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle.sapMText,
+.sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle .sapMText,
+.sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle bdi,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle.sapMText,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle .sapMText,
+.sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle bdi {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: #132235 !important;
+    font-family: inherit !important;
+}
+
+.vrHeaderValueLink,
+.vrHeaderValueText,
+.vrHeaderValueBox {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.vrHeaderValueLink {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.vrRatingStars.sapMRatingIndicator {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle;
+    height: auto !important;
+    pointer-events: none !important;
+}
+
+.vrRatingRow {
+    align-items: center !important;
+}
+
+.vrRatingRow .vrHeaderLabel {
+    align-items: center !important;
+    padding-top: 0 !important;
+}
+
+.vrRatingRow .vrHeaderValueBox {
+    align-items: center !important;
+}
+
+.vrRatingClickable {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    height: auto !important;
+    max-height: 1.4rem;
+    overflow: visible;
+}
+
+.vrRatingClickable:hover .vrRatingStars.sapMRatingIndicator .sapMRatingItem,
+.vrRatingClickable:hover .vrRatingCount {
+    opacity: 0.8;
 }
 
 .bedCardImage {
@@ -2804,6 +2999,19 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   color: #0b7e8d !important;
 }
 
+.grandTotalFinalRow .sapMTitle {
+  font-weight: bold !important;
+  font-size: clamp(0.85rem, 2vw, 1.6rem) !important;
+  line-height: 1.3 !important;
+  text-overflow: unset !important;
+  overflow: visible !important;
+}
+
+.grandTotalFinalRow .sapMListTblCell {
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
 /* Tablet grand total - slightly smaller */
 @media (max-width: 900px) {
   .grandTotalBar .sapMTitle.sapMTitleStyleH3,
@@ -4670,7 +4878,7 @@ width: 44px !important;
     width: auto;
     height: auto;
     border-radius: 16px;
-    padding: 6px;
+    padding: 4px;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)), linear-gradient(180deg, #00c6d6 0%, #00b7c7 45%, #008b96 100%) !important;
     color: rgb(0, 0, 0) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -6067,12 +6275,22 @@ html, body {
     padding: 0.5rem 0.5rem !important;
 }
 
+.pricingDetailsTable .sapMListTblHeaderCell {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 /* Tablet pricing table */
 @media (max-width: 900px) {
     .pricingDetailsTable .sapMListTblCell,
     .pricingDetailsTable .sapMListTblHeaderCell {
         padding: 0.4rem 0.4rem !important;
         font-size: 0.88rem !important;
+    }
+
+    .pricingDetailsTable .sapMListTblHeaderCell {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .pricingDetailsTable .sapMTitle {
@@ -6090,6 +6308,11 @@ html, body {
     .pricingDetailsTable .sapMListTblHeaderCell {
         padding: 0.35rem 0.3rem !important;
         font-size: 0.82rem !important;
+    }
+
+    .pricingDetailsTable .sapMListTblHeaderCell {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .pricingDetailsTable .sapMTitle {
@@ -6134,6 +6357,228 @@ html, body {
 
 .sapUiAvatarImageContain.sapMAvatar {
     background-color: transparent !important;
+}
+
+@media (max-width: 1100px) {
+  .vrHeaderRow {
+    gap: 1rem;
+    padding: 0.75rem 0.75rem 1rem;
+  }
+
+  .vrTitleBlock {
+    max-width: 15rem;
+    padding-top: 1.1rem;
+  }
+
+  .vrIdentityRow {
+    min-width: 26rem;
+    max-width: 100%;
+  }
+
+  .vrHeaderSection {
+    min-width: 18rem;
+    max-width: 100%;
+  }
+
+  .vrHeaderTitle {
+    font-size: 1.55rem !important;
+  }
+
+  .vrHeaderSubtitle {
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .vrHeaderRow {
+    gap: 0;
+    padding: 0.5rem 0.5rem 1rem;
+  }
+
+  .vrIdentityRow {
+    min-width: 100%;
+    max-width: 100%;
+    margin-right: 0 !important;
+  }
+
+  .vrHeaderAvatar.sapMAvatar {
+    width: 5.9rem !important;
+    height: 5.9rem !important;
+    min-width: 5.9rem;
+    border-radius: 1rem !important;
+    padding: 0.4rem !important;
+  }
+
+  .vrTitleBlock {
+    min-width: 0;
+    max-width: calc(100% - 6.8rem);
+    padding-top: 0.35rem;
+  }
+
+  .vrHeaderTitle {
+    font-size: 1.32rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .vrHeaderSubtitle {
+    font-size: 0.88rem !important;
+  }
+
+  .vrHeaderSection {
+    min-width: 100%;
+    max-width: 100%;
+    padding-top: 0;
+  }
+
+  .vrHeaderSectionPrimary.sapUiSmallMarginBottom,
+  .vrHeaderSectionPrimary {
+    order: 2;
+    margin-bottom: 0 !important;
+  }
+
+  .vrHeaderSectionSecondary.sapUiSmallMarginBottom,
+  .vrHeaderSectionSecondary {
+    order: 3;
+    margin-bottom: 0 !important;
+  }
+
+  .vrHeaderFieldRow {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start !important;
+    gap: 0;
+    margin-bottom: 0.5rem !important;
+    width: 100%;
+  }
+
+  .vrHeaderLabel {
+    min-width: 5rem;
+    max-width: 5rem;
+    font-size: 0.8rem !important;
+    width: 5rem;
+    flex: 0 0 5rem;
+    display: flex;
+    align-items: center;
+    line-height: 1.25rem !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .vrHeaderValueLink,
+  .vrHeaderValueText,
+  .vrHeaderValueBox {
+    flex: 1 1 0;
+    width: calc(100% - 5.5rem);
+    max-width: calc(100% - 5.5rem);
+    min-width: 0;
+  }
+
+  .vrHeaderSection .sapMLnk,
+  .vrHeaderSection .sapMText,
+  .vrHeaderValueLink.sapMLnk,
+  .vrHeaderValueText.sapMText,
+  .vrHeaderValueLink .sapMLnkText,
+  .vrHeaderValueText,
+  .vrHeaderValueLink {
+    width: 100%;
+    font-size: 0.8rem !important;
+    line-height: 1.25rem !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .vrHeaderValueBox {
+    flex-wrap: nowrap;
+    align-items: center !important;
+  }
+
+  .vrHeaderValueLink,
+  .vrHeaderValueText {
+    display: block !important;
+    max-width: 100% !important;
+  }
+
+  .vrRatingCount {
+    line-height: 1.25rem !important;
+  }
+
+  .vrRatingRow {
+    margin-top: 0 !important;
+    align-items: center !important;
+  }
+
+  .vrRatingRow .vrHeaderLabel {
+    align-items: center !important;
+    padding-top: 0 !important;
+  }
+
+  .vrRatingStars.sapMRatingIndicator {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    vertical-align: middle;
+    margin-bottom: 0 !important;
+    line-height: 1.25rem !important;
+    height: 1.25rem !important;
+    overflow: hidden;
+    pointer-events: none !important;
+  }
+
+  .vrSnappedAvatar.sapMAvatar {
+    margin-right: 0 !important;
+  }
+
+  .vrSnappedHeader {
+    gap: 0.6rem;
+  }
+
+  .vrSnappedTitle,
+  .vrSnappedTitle.sapMTitle,
+  .vrSnappedTitle .sapMTitleStyleAuto,
+  .vrSnappedTitle bdi,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedTitle,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedTitle.sapMTitle,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedTitle .sapMTitleStyleAuto,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedTitle bdi,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle.sapMTitle,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle .sapMTitleStyleAuto,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedTitle bdi {
+    font-size: 1.32rem !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+  }
+
+  .vrSnappedSubtitle,
+  .vrSnappedSubtitle.sapMText,
+  .vrSnappedSubtitle .sapMText,
+  .vrSnappedSubtitle bdi,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle.sapMText,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle .sapMText,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedSubtitle bdi,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle.sapMText,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle .sapMText,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedSubtitle bdi {
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+  }
+
+  .vrSnappedTitleBlock {
+    margin-left: 0.25rem;
+  }
+
+  .vrSnappedHeader .sapMFlexItem:last-child {
+    margin-left: 0.25rem;
+  }
+
+  .sapUxAPObjectPageHeaderStickied .vrSnappedTitleBlock,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedTitleBlock,
+  .sapUxAPObjectPageHeaderStickied .vrSnappedHeader .sapMFlexItem:last-child,
+  .sapUxAPObjectPageHeaderContentHidden .vrSnappedHeader .sapMFlexItem:last-child {
+    margin-left: 0.45rem !important;
+  }
 }
 .facilityBreakdownBtn .sapMBtnIcon,
 .facilityBreakdownBtn .sapMBtnContent {

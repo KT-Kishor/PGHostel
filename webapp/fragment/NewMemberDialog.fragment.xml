@@ -195,7 +195,7 @@
                         fileSizeExceed="onNewMemberFileSizeExceed"
                         buttonText="Upload"
                         fileType="pdf,jpg,jpeg,png,webp"
-                        class="sapUiTinyMarginEnd myUnifiedBtn"
+                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd myUnifiedBtn"
                     />
                     <core:Icon
                         id="newMemberDocumentInfoIcon"
