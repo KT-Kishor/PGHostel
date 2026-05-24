@@ -110,7 +110,7 @@
 				</VBox>
 
 				<VBox class="sapUiSmallMarginBottom vrHeaderSection vrHeaderSectionSecondary">
-					<HBox alignItems="Start" class="vrHeaderFieldRow">
+					<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow">
 						<Label text="Address:" design="Bold" class="vrHeaderLabel" />
 						<Link
 							text="{BranchModel>/Address}"

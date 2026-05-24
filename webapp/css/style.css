@@ -766,23 +766,15 @@
 
 .vrRatingRow .vrHeaderValueBox {
     align-items: center !important;
-    height: 100%;
 }
 
 .vrRatingClickable {
     cursor: pointer;
-    position: relative;
-}
-
-/* Transparent overlay to catch all clicks on the rating area */
-.vrRatingClickable::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    height: auto !important;
+    max-height: 1.4rem;
+    overflow: visible;
 }
 
 .vrRatingClickable:hover .vrRatingStars.sapMRatingIndicator .sapMRatingItem,
@@ -6371,7 +6363,7 @@ html, body {
 
 @media (max-width: 768px) {
   .vrHeaderRow {
-    gap: 0.75rem;
+    gap: 0;
     padding: 0.5rem 0.5rem 1rem;
   }
 
@@ -6410,20 +6402,24 @@ html, body {
     padding-top: 0;
   }
 
+  .vrHeaderSectionPrimary.sapUiSmallMarginBottom,
   .vrHeaderSectionPrimary {
     order: 2;
+    margin-bottom: 0 !important;
   }
 
-.vrHeaderSectionSecondary {
+  .vrHeaderSectionSecondary.sapUiSmallMarginBottom,
+  .vrHeaderSectionSecondary {
     order: 3;
-}
+    margin-bottom: 0 !important;
+  }
 
   .vrHeaderFieldRow {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: flex-start !important;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem !important;
+    gap: 0;
+    margin-bottom: 0.5rem !important;
     width: 100%;
   }
 
@@ -6480,7 +6476,7 @@ html, body {
   }
 
   .vrRatingRow {
-    margin-top: 0.35rem !important;
+    margin-top: 0 !important;
     align-items: center !important;
   }
 
