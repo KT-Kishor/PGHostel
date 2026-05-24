@@ -2627,7 +2627,9 @@ sap.ui.define([
             oSelectedBedType.setData({
                 BranchID: oBranchData.BranchID || oBranchData.BranchCode || "",
                 Name: oBranchData.Name || "",
-                BranchCode: oBranchData.BranchID || oBranchData.BranchCode || ""
+                BranchCode: oBranchData.BranchID || oBranchData.BranchCode || "",
+                fromRoute: "RouteViewRooms",
+                fromRoutePath: this.sPath
             });
             this.getOwnerComponent().getRouter().navTo("RouteCustomerReview");
         },

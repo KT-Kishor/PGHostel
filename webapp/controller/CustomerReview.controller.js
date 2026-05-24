@@ -117,13 +117,22 @@ sap.ui.define([
             const oBox = this.byId("CR_id_ReviewContainer");
             const oLoginModel = this.getView().getModel("LoginModel");
             const sRole = oLoginModel?.getProperty("/Role") || "";
-            if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
+            const oSelectedBedType = this.getOwnerComponent().getModel("SelectedBedType");
+            const oBedData = oSelectedBedType ? oSelectedBedType.getData() : {};
+            // If we navigated here from ViewRooms/{sPath}, return to that same page
+            if (oBedData.fromRoute === "RouteViewRooms" && oBedData.fromRoutePath) {
+                this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
+                    sPath: oBedData.fromRoutePath
+                });
+                oSelectedBedType.setData("");
+            } else if (sRole === "Admin" || sRole === "Branch Manager" || sRole === "Front Office Employee" || sRole === "SuperAdmin") {
                 this.getOwnerComponent().getRouter().navTo("TilePage");
+                oSelectedBedType.setData("");
             } else {
                 const sTabKey = "idRooms"
                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
                 sessionStorage.setItem("homePageReturnTab", sTabKey);
-                this.getOwnerComponent().getModel("SelectedBedType").setData("")
+                oSelectedBedType.setData("")
             }
             oBox.removeAllItems();
             this._aAllFeedbacks = [];
