@@ -4958,27 +4958,13 @@ sap.ui.define([
 
             sap.m.MessageToast.show("Preview not supported");
         },
-        onApplyCoupon: async function() {
+        onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
 
-            var sEnteredCode = Bookingmodel.CouponCode || this.getView().byId("couponInput").getValue();
-            const filter = {
-                CouponCode: sEnteredCode,
-                Status: "Active"
-            };
-            this.getBusyDialog()
-            await this.ajaxReadWithJQuery("HM_Coupon", filter).then((oData) => {
-                var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
-                var model = new sap.ui.model.json.JSONModel(aCoupon);
-                this.getView().setModel(model, "CouponModel")
+            var sEnteredCode = (Bookingmodel.CouponCode ||
+                this.getView().byId("couponInput").getValue() || "").trim();
 
-            });
-            this.closeBusyDialog()
-            var oCouponData = this.getView().getModel("CouponModel").getData();
-
-            // user entered code
-            this.Code = Bookingmodel.CouponCode; // user entered code
             if (!sEnteredCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
                 return;
@@ -4989,135 +4975,323 @@ sap.ui.define([
                 return;
             }
 
-            // 1. Check coupon exists
-            var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
-            if (!oCoupon) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
-                return;
-            }
-            if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
-                sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
-                return;
-            }
+            const filter = {
+                CouponCode: sEnteredCode,
+                Status: "Active"
+            };
 
-            if (Bookingmodel.StartDate.includes("/")) {
-                Bookingmodel.StartDate = Bookingmodel.StartDate.split("/").reverse().join("-");
-            } else if (Bookingmodel.EndDate.includes("/")) {
-                Bookingmodel.EndDate = Bookingmodel.EndDate.split("/").reverse().join("-");
-            }
-            // 2. Date validation
-            var custStart = new Date(Bookingmodel.StartDate);
-            var custEnd = new Date(Bookingmodel.EndDate);
-            var coupStart = new Date(oCoupon.StartDate);
-            var coupEnd = new Date(oCoupon.EndDate);
+            try {
 
-            if (custStart < coupStart || custStart > coupEnd) {
-                sap.m.MessageToast.show(this.i18nModel.getText("couponnotValidforSelectedDates"));
-                return; // Exit function immediately
-            }
-            if (!oCoupon.Status === "Active") {
-                sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
-                return;
-            }
+                this.getBusyDialog();
 
-            // 3. Percentage discount
+                let oData = await this.ajaxReadWithJQuery("HM_CouponBookingCount", filter);
 
-            var subtotal = oCustomerData.RentPrice + oCustomerData.TotalFacilityPrice
-            oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
-            if (oCoupon.MinOrderValue > subtotal) {
-                sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
-                return;
-            }
-            this.originalDis = oCustomerData.Discount
-            this.CouponDiscount = oCoupon.DiscountValue
+                var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-            var discountAmount = 0;
-            var newSubtotal = "";
+                var oCoupon = aCoupon.find(c =>
+                    String(c.CouponCode || "").trim() === sEnteredCode
+                );
 
-            // Check discount type
-            if (oCoupon.DiscountType === "Percentage") {
-                discountAmount = (subtotal * Number(oCoupon.DiscountValue || 0)) / 100;
-                if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
-                    discountAmount = Number(oCoupon.UptoValue);
+                // Coupon exists
+                if (!oCoupon) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+                    return;
                 }
+
+                // Status validation
+                if (String(oCoupon.Status || "").trim() !== "Active") {
+                    sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
+                    return;
+                }
+
+                // Usage count validation
+                if (Number(oCoupon.couponUsedCount || 0) >= Number(oCoupon.MaxUses || 0)) {
+                    sap.m.MessageToast.show("This coupon cannot be applied to this booking");
+                    return;
+                }
+
+                // Branch validation
+                if (
+                    String(oCoupon.BranchCode || "").trim() &&
+                    String(oCoupon.BranchCode || "").trim() !==
+                    String(oCustomerData.BranchCode || "").trim()
+                ) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText("thiscouponnotAvailableforthisBranch")
+                    );
+                    return;
+                }
+
+                // Expiry validation
+                if (this._isCouponExpired(oCoupon.EndDate)) {
+                    sap.m.MessageToast.show("Coupon is expired");
+                    return;
+                }
+
+                // Not started validation
+                if (this._isCouponNotStarted(oCoupon.StartDate)) {
+                    sap.m.MessageToast.show("Coupon is not active yet");
+                    return;
+                }
+
+                // Date format correction
+                if (Bookingmodel.StartDate.includes("/")) {
+                    Bookingmodel.StartDate =
+                        Bookingmodel.StartDate.split("/").reverse().join("-");
+                }
+
+                if (Bookingmodel.EndDate.includes("/")) {
+                    Bookingmodel.EndDate =
+                        Bookingmodel.EndDate.split("/").reverse().join("-");
+                }
+
+                // Booking date validation
+                var aCouponBookingDateReasons =
+                    this._getCouponBookingDateReasons(oCoupon);
+
+                if (aCouponBookingDateReasons.length > 0) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText("couponnotValidforSelectedDates")
+                    );
+                    return;
+                }
+
+                // Subtotal
+                var subtotal =
+                    Number(oCustomerData.RentPrice || 0) +
+                    Number(oCustomerData.TotalFacilityPrice || 0);
+
+                // Minimum order validation
+                if (subtotal < Number(oCoupon.MinOrderValue || 0)) {
+                    sap.m.MessageToast.show(
+                        "Coupon not Applicable for Below Minimum Value " +
+                        oCoupon.MinOrderValue
+                    );
+                    return;
+                }
+
+                this.originalDis = oCustomerData.Discount;
+                this.CouponDiscount = oCoupon.DiscountValue;
+
+                var discountAmount = 0;
+                var newSubtotal = 0;
+
+                // Discount calculation
+                if (
+                    String(oCoupon.DiscountType || "")
+                    .trim()
+                    .toLowerCase() === "percentage"
+                ) {
+
+                    discountAmount =
+                        subtotal * (Number(oCoupon.DiscountValue || 0) / 100);
+
+                    if (
+                        Number(oCoupon.UptoValue || 0) > 0 &&
+                        discountAmount > Number(oCoupon.UptoValue || 0)
+                    ) {
+                        discountAmount = Number(oCoupon.UptoValue || 0);
+                    }
+
+                } else {
+
+                    discountAmount = Number(oCoupon.DiscountValue || 0);
+                }
+
+                // Prevent excess discount
+                discountAmount = Math.min(discountAmount, subtotal);
+
                 newSubtotal = subtotal - discountAmount;
-            } else if (oCoupon.DiscountType === "Fixed Amount") {
-                discountAmount = Number(oCoupon.DiscountValue || 0);
-                newSubtotal = subtotal - discountAmount;
+
+                var cgst = newSubtotal * 0.09;
+                var sgst = newSubtotal * 0.09;
+                var grandTotal = newSubtotal + cgst + sgst;
+                var dueAmount = newSubtotal + cgst + sgst;
+
+                // Update Model
+                oCustomerData.Discount = discountAmount.toFixed(2);
+                oCustomerData.SubTotal = newSubtotal;
+                oCustomerData.CGST = cgst;
+                oCustomerData.SGST = sgst;
+                oCustomerData.GrandTotal = grandTotal;
+                oCustomerData.CouponCode = sEnteredCode;
+                oCustomerData.DueAmount = dueAmount;
+                
+
+                this.getView().getModel("CustomerData").refresh(true);
+
+                this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", true);
+
+                sap.m.MessageToast.show(this.i18nModel.getText("couponAppliedSuccessfully"));
+
+            } catch (oError) {
+                sap.m.MessageToast.show("Error applying coupon");
+            } finally {
+                this.closeBusyDialog();
             }
-            var cgst = newSubtotal * 0.09;
-            var sgst = newSubtotal * 0.09;
-            var grandTotal = newSubtotal + cgst + sgst;
-
-            // 5. Update Model
-            oCustomerData.Discount = discountAmount.toFixed(2);
-            oCustomerData.SubTotal = newSubtotal;
-            oCustomerData.CGST = cgst;
-            oCustomerData.SGST = sgst;
-            oCustomerData.GrandTotal = grandTotal;
-
-            this.getView().getModel("CustomerData").refresh(true);
-            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", true);
-
-            sap.m.MessageToast.show(this.i18nModel.getText("couponAppliedSuccessfully"));
         },
 
-        onEditCouponCodeLiveChange: async function() {
+        _isCouponExpired: function (sEndDate) {
+
+            if (!sEndDate) {
+                return false;
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const endDate = new Date(sEndDate);
+            endDate.setHours(0,0,0,0);
+
+            return endDate < today;
+        },
+
+        _isCouponNotStarted: function (sStartDate) {
+
+            if (!sStartDate) {
+                return false;
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const startDate = new Date(sStartDate);
+            startDate.setHours(0,0,0,0);
+
+            return startDate > today;
+        },
+
+        _getCouponBookingDateReasons: function (oCoupon) {
+
+            const Bookingmodel =
+                this.getView().getModel("Bookingmodel").getData();
+
+            let reasons = [];
+
+            if (!Bookingmodel.StartDate) {
+                return reasons;
+            }
+
+            let bookingStart = Bookingmodel.StartDate;
+
+            if (bookingStart.includes("/")) {
+                bookingStart =
+                    bookingStart.split("/")
+                    .reverse()
+                    .join("-");
+            }
+
+            const bookingDate = new Date(bookingStart);
+            const couponStart = new Date(oCoupon.StartDate);
+            const couponEnd = new Date(oCoupon.EndDate);
+
+            bookingDate.setHours(0,0,0,0);
+            couponStart.setHours(0,0,0,0);
+            couponEnd.setHours(0,0,0,0);
+
+            if (
+                bookingDate < couponStart ||
+                bookingDate > couponEnd
+            ) {
+                reasons.push("invalidDate");
+            }
+
+            return reasons;
+        },
+
+        onEditCouponCodeLiveChange: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var edit = this.getView().getModel("edit").getData();
 
+            var sEnteredCode =(edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode")?.getValue() || "").trim();
 
-
-
-            var sEnteredCode = edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode").getValue();
             if (!sEnteredCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
                 return;
             }
 
-            const filter = {
-                CouponCode: sEnteredCode,
-                Status: "Active"
-            };
-            this.getBusyDialog()
-            await this.ajaxReadWithJQuery("HM_CouponFacilityCount", filter).then((oData) => {
-                var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
-                var model = new sap.ui.model.json.JSONModel(aCoupon);
-                this.getView().setModel(model, "CouponModel")
+            try {
 
-            });
-            this.closeBusyDialog()
-            var oCouponData = this.getView().getModel("CouponModel").getData();
+                this.getBusyDialog();
 
+                const filter = {
+                    CouponCode: sEnteredCode,
+                    Status: "Active"
+                };
 
-            var oCoupon = oCouponData.find(c => c.CouponCode === sEnteredCode);
-            if (!oCoupon) {
-                sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
-                return;
-            }
-            var bCouponLimitReached = false;
+                const oData = await this.ajaxReadWithJQuery(
+                    "HM_CouponFacilityCount",
+                    filter
+                );
 
-            if (oCouponData) {
-                for (let i = 0; i < oCustomerData.AllSelectedFacilities.length; i++) {
-                    let item = oCustomerData.AllSelectedFacilities[i];
+                const oCouponData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
-                    if (item.CouponCode) {
+                let oCoupon = oCouponData.find(c =>
+                    String(c.CouponCode || "").trim() === sEnteredCode
+                );
 
-                        var oCoupon = oCouponData.find(c => c.CouponCode === item.CouponCode);
-                        if (!oCoupon) {
+                if (!oCoupon) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+                    return;
+                }
+
+                // Status validation
+                if (String(oCoupon.Status || "").trim() !== "Active") {
+                    sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
+                    return;
+                }
+
+                // Usage validation
+                if (
+                    Number(oCoupon.couponUsedCount || 0) >=
+                    Number(oCoupon.MaxUses || 0)
+                ) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText("couponUsageLimitReached")
+                    );
+                    return;
+                }
+
+                // Facility coupon count validation
+                let bCouponLimitReached = false;
+
+                if (oCouponData && oCustomerData.AllSelectedFacilities) {
+
+                    for (let i = 0;
+                        i < oCustomerData.AllSelectedFacilities.length;
+                        i++) {
+
+                        let item =
+                            oCustomerData.AllSelectedFacilities[i];
+
+                        if (!item.CouponCode) {
                             continue;
                         }
 
-                        // Count coupon usage in AllSelectedFacilities
-                        var iUsedCount = oCustomerData.AllSelectedFacilities.filter(f =>
-                            f.CouponCode === item.CouponCode
-                        ).length;
+                        let existingCoupon =
+                            oCouponData.find(c =>
+                                c.CouponCode === item.CouponCode
+                            );
 
-                        if (iUsedCount === Number(oCoupon.MaxUses)) {
+                        if (!existingCoupon) {
+                            continue;
+                        }
+
+                        let iUsedCount =
+                            oCustomerData.AllSelectedFacilities
+                            .filter(f =>
+                                f.CouponCode === item.CouponCode
+                            ).length;
+
+                        if (
+                            iUsedCount >=
+                            Number(existingCoupon.MaxUses || 0)
+                        ) {
+
                             sap.m.MessageToast.show(
                                 this.i18nModel.getText(
                                     "couponUsageLimitReached",
-                                    [oCoupon.MaxUses]
+                                    [existingCoupon.MaxUses]
                                 )
                             );
 
@@ -5126,127 +5300,203 @@ sap.ui.define([
                         }
                     }
                 }
-            }
 
-            if (bCouponLimitReached) {
-                return;
-            }
-            if (Number(oCoupon.MaxUses) === oCoupon.couponUsedCount) {
-                sap.m.MessageToast.show(this.i18nModel.getText("couponUsageLimitReached"));
-                return;
-            }
+                if (bCouponLimitReached) {
+                    return;
+                }
 
-            if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
-                sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
-                return;
-            }
+                // Branch validation
+                if (
+                    String(oCoupon.BranchCode || "").trim() !==
+                    String(oCustomerData.BranchCode || "").trim()
+                ) {
 
-            // if (oCoupon.BranchCode !== oCustomerData.BranchCode) {
-            //     sap.m.MessageToast.show(this.i18nModel.getText("thiscouponnotAvailableforthisBranch"));
-            //     return;
-            // }
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText(
+                            "thiscouponnotAvailableforthisBranch"
+                        )
+                    );
+                    return;
+                }
 
-            if (edit.StartDate.includes("/")) {
-                edit.StartDate = edit.StartDate.split("/").reverse().join("-");
-            } else if (edit.EndDate.includes("/")) {
-                edit.EndDate = edit.EndDate.split("/").reverse().join("-");
-            }
-            // 2. Date validation
-            var custStart = new Date(edit.StartDate);
-            var custEnd = new Date(edit.EndDate);
-            var coupStart = new Date(oCoupon.StartDate);
-            var coupEnd = new Date(oCoupon.EndDate);
+                // Expiry validation
+                if (this._isCouponExpired(oCoupon.EndDate)) {
+                    sap.m.MessageToast.show("Coupon is expired");
+                    return;
+                }
 
-            if (custStart < coupStart || custStart > coupEnd) {
-                sap.m.MessageToast.show(this.i18nModel.getText("couponnotValidforSelectedDates"));
-                return; // Exit function immediately
-            }
-            if (!oCoupon.Status === "Active") {
-                sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
-                return;
-            }
+                // Not started validation
+                if (this._isCouponNotStarted(oCoupon.StartDate)) {
+                    sap.m.MessageToast.show(
+                        "Coupon is not active yet"
+                    );
+                    return;
+                }
 
-            // 3. Percentage discount
+                // Safe date conversion
+                if (edit.StartDate?.includes("/")) {
+                    edit.StartDate = edit.StartDate.split("/").reverse().join("-");
+                }
 
-            var subtotal = 0;
+                if (edit.EndDate?.includes("/")) {
+                    edit.EndDate = edit.EndDate.split("/").reverse().join("-");
+                }
 
-            if (edit.UnitText === "Per Month") {
-                var subtotal = Number(edit.quantity) ? edit.Price * (edit.TotalUnits || 1) * Number(edit.quantity) : edit.Price * (edit.TotalUnits || 1)
+                let subtotal = 0;
 
-            } else if (edit.UnitText === "Per Year") {
-                var subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) * Number(edit.quantity) : Number(edit.Price) * (edit.TotalUnits || 1)
-            } else if (edit.UnitText === "Per Day") {
-                var subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalDays || 1) * Number(edit.quantity) : Number(edit.Price) * (edit.TotalDays || 1)
-            } else if (edit.UnitText === "Per Hour") {
-                var subtotal = Number(edit.quantity) ? Number(edit.Price) * Number(edit.TotalHour) * Number(edit.TotalDays) * Number(edit.quantity) : Number(edit.Price) * Number(edit.TotalHour) * Number(edit.TotalDays)
-            } else if (edit.UnitText === "Unit Price") {
-                if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 0) {
-                    var subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalDays || 1) * Number(edit.quantity) : Number(edit.Price) * (edit.TotalDays || 1);
+                if (edit.UnitText === "Per Month") {
+
+                    subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) * Number(edit.quantity)
+                     : Number(edit.Price) * (edit.TotalUnits || 1);
+
+                } else if (edit.UnitText === "Per Year") {
+
+                    subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) *
+                    Number(edit.quantity) : Number(edit.Price) * (edit.TotalUnits || 1);
+
+                } else if (edit.UnitText === "Per Day") {
+
+                    subtotal = Number(edit.quantity)
+                        ? Number(edit.Price) *
+                        (edit.TotalDays || 1) *
+                        Number(edit.quantity)
+                        : Number(edit.Price) *
+                        (edit.TotalDays || 1);
+
+                } else if (edit.UnitText === "Per Hour") {
+
+                    subtotal = Number(edit.quantity)
+                        ? Number(edit.Price) *
+                        Number(edit.TotalHour || 0) *
+                        Number(edit.TotalDays || 0) *
+                        Number(edit.quantity)
+                        : Number(edit.Price) *
+                        Number(edit.TotalHour || 0) *
+                        Number(edit.TotalDays || 0);
+
+                } else if (edit.UnitText === "Unit Price") {
+
+                    if (
+                        sap.ui.getCore()
+                            .byId("id_Period")
+                            ?.getSelectedIndex() === 0
+                    ) {
+
+                        subtotal = Number(edit.quantity)
+                            ? Number(edit.Price) *
+                            (edit.TotalDays || 1) *
+                            Number(edit.quantity)
+                            : Number(edit.Price) *
+                            (edit.TotalDays || 1);
+
+                    } else {
+
+                        subtotal = Number(edit.Price || 0);
+                    }
+                }
+
+                // Minimum value validation
+                if (
+                    subtotal <
+                    Number(oCoupon.MinOrderValue || 0)
+                ) {
+
+                    sap.m.MessageToast.show(
+                        "Coupon not Applicable for Below Minimum Value " +
+                        oCoupon.MinOrderValue
+                    );
+
+                    return;
+                }
+
+                let discountAmount = 0;
+
+                if (
+                    String(oCoupon.DiscountType || "")
+                    .trim()
+                    .toLowerCase() === "percentage"
+                ) {
+
+                    discountAmount =
+                        subtotal *
+                        (Number(oCoupon.DiscountValue || 0) / 100);
+
+                    if (
+                        Number(oCoupon.UptoValue || 0) > 0 &&
+                        discountAmount >
+                        Number(oCoupon.UptoValue || 0)
+                    ) {
+
+                        discountAmount =
+                            Number(oCoupon.UptoValue || 0);
+                    }
+
                 } else {
-                    var subtotal = Number(edit.Price);
+
+                    discountAmount =
+                        Number(oCoupon.DiscountValue || 0);
                 }
+
+                discountAmount =
+                    Math.min(discountAmount, subtotal);
+
+                this.getView()
+                    .getModel("edit")
+                    .setProperty(
+                        "/CouponDiscount",
+                        discountAmount.toFixed(2)
+                    );
+
+                this.getView()
+                    .getModel("edit")
+                    .setProperty(
+                        "/EndDate",
+                        edit.EndDate.split("-")
+                        .reverse()
+                        .join("/")
+                    );
+
+            } catch (oError) {
+
+                sap.m.MessageToast.show(
+                    "Error applying coupon"
+                );
+
+            } finally {
+
+                this.closeBusyDialog();
             }
-
-            oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
-            if (oCoupon.MinOrderValue > subtotal) {
-                sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
-                return;
-            }
-
-
-
-            var discountAmount = 0;
-            // Check discount type
-            if (oCoupon.DiscountType === "Percentage") {
-                discountAmount = (subtotal * Number(oCoupon.DiscountValue || 0)) / 100;
-                if (oCoupon.UptoValue > 0 && discountAmount > oCoupon.UptoValue) {
-                    discountAmount = Number(oCoupon.UptoValue);
-                }
-            } else if (oCoupon.DiscountType === "Fixed Amount") {
-                discountAmount = Number(oCoupon.DiscountValue || 0);
-            }
-
-            this.getView().getModel("edit").setProperty("/CouponDiscount", discountAmount.toFixed(2));
-            this.getView().getModel("edit").setProperty("/EndDate", edit.EndDate.split("-").reverse().join("/"));
-
-
         },
 
-
-        oncancelCoupon: function() {
+        oncancelCoupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
-            var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
-
-            // Reset coupon code and discount
             oCustomerData.CouponCode = "";
-            var originalRent = Number(oCustomerData.RentPrice || 0);
-            var FacilitiPrice = Number(oCustomerData.TotalFacilityPrice || 0);
 
-            var previousDiscount = Number(this.Discount || 0);
-            // Recalculate subtotal (original subtotal before coupon)
-            var subtotal = originalRent + FacilitiPrice - previousDiscount; // Assuming SubTotal originally was just RentPrice
+            let rent = Number(oCustomerData.RentPrice || 0);
+            let facility = Number(oCustomerData.TotalFacilityPrice || 0);
+            let subtotal = rent + facility;
+            let cgst = subtotal * 0.09;
+            let sgst = subtotal * 0.09;
+            let grandTotal = subtotal + cgst + sgst;
+            let dueAmount = subtotal + cgst + sgst;
+
+            // Completely remove coupon discount
+            oCustomerData.Discount = 0;
             oCustomerData.SubTotal = subtotal;
-
-            // Recalculate taxes
-            var cgst = subtotal * 0.09;
-            var sgst = subtotal * 0.09;
-            var grandTotal = subtotal + cgst + sgst;
-
-            // Update model values
-            this.originalDis = oCustomerData.Discount
-            oCustomerData.Discount = previousDiscount;
             oCustomerData.CGST = cgst;
             oCustomerData.SGST = sgst;
             oCustomerData.GrandTotal = grandTotal;
+            oCustomerData.DueAmount = dueAmount;
 
-            // Refresh model and reset coupon flag
             this.getView().getModel("CustomerData").refresh(true);
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
             this.getView().getModel("Bookingmodel").setProperty("/CouponCode", "");
-            var oInput = this.getView().byId("couponInput");
-            oInput.setValue("");
-            oInput.setShowValueHelp(false);
 
+            var oInput = this.getView().byId("couponInput");
+            if (oInput) {
+                oInput.setValue("");
+                oInput.setShowValueHelp(false);
+            }
         },
 
         onUploadDocumentFile: function() {
