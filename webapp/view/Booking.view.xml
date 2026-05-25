@@ -939,7 +939,7 @@
                                     </ColumnListItem>
 
 
-                                    <ColumnListItem
+                                    <!-- <ColumnListItem
                                         vAlign="Middle"
                                         visible="{= !!${HostelModel>/CustomerGSTIN} }"
                                     >
@@ -955,7 +955,7 @@
                                                 />
                                             </HBox>
                                         </cells>
-                                    </ColumnListItem>
+                                    </ColumnListItem> -->
 
                                     <ColumnListItem
                                         vAlign="Middle"
