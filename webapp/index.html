@@ -1,16 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Hostel Management</title>
+
+    <!-- Primary SEO -->
+    <title>Stay Vriksha | Hostels, PGs, Hotels & Rentals in India</title>
+    <meta name="title" content="Stay Vriksha | Hostels, PGs, Hotels & Rentals in India">
+    <meta name="description" content="Find hostels, PG accommodation, rented properties, service apartments, hotels, rooms for rent and co-living spaces across Kalaburagi, Karnataka and India.">
+    <meta name="keywords" content="Stay Vriksha, stayvriksha, hostel, hostels, PG, paying guest, rented properties, rental properties, service apartments, service appartments, hotel, hotels, rooms for rent, co-living, accommodation, stays, property management, Kalaburagi, Gulbarga, Karnataka, India">
+    <meta name="author" content="Stay Vriksha">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN-KA">
+    <meta name="geo.placename" content="Kalaburagi, Gulbarga, Karnataka, India">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://stayvriksha.in/">
+
+    <!-- Favicon / App Icon -->
+    <link rel="icon" type="image/png" href="./image/SVLogo.png">
+    <link rel="apple-touch-icon" href="./image/SVLogo.png">
+
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Stay Vriksha">
+    <meta property="og:url" content="https://stayvriksha.in/">
+    <meta property="og:title" content="Stay Vriksha | One Network. Endless Stays.">
+    <meta property="og:description" content="Stay Vriksha helps users find hostels, PG accommodation, rented properties, service apartments and hotels, while helping property owners manage bookings, tenants and operations.">
+    <meta property="og:image" content="https://stayvriksha.in/image/SVLogo.png">
+    <meta property="og:locale" content="en_IN">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Stay Vriksha | Hostels, PGs, Hotels & Rentals in India">
+    <meta name="twitter:description" content="Find hostels, PG accommodation, rented properties, service apartments, hotels, rooms for rent and co-living spaces across India.">
+    <meta name="twitter:image" content="https://stayvriksha.in/image/SVLogo.png">
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#2E7D32">
+
+    <!-- Structured Data: Organization + Website -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://stayvriksha.in/#organization",
+                "name": "Stay Vriksha",
+                "alternateName": "stayvriksha",
+                "url": "https://stayvriksha.in/",
+                "logo": "https://stayvriksha.in/image/SVLogo.png",
+                "slogan": "One Network. Endless Stays.",
+                "description": "Stay Vriksha helps users find hostels, PG accommodation, rented properties, service apartments and hotels, while also helping property owners manage bookings, tenants and operations.",
+                "areaServed": [
+                    "Kalaburagi",
+                    "Gulbarga",
+                    "Karnataka",
+                    "India"
+                ],
+                "knowsAbout": [
+                    "Hostels",
+                    "PG Accommodation",
+                    "Paying Guest Accommodation",
+                    "Rented Properties",
+                    "Service Apartments",
+                    "Hotels",
+                    "Rooms for Rent",
+                    "Co-living",
+                    "Property Management"
+                ]
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://stayvriksha.in/#website",
+                "name": "Stay Vriksha",
+                "alternateName": "stayvriksha",
+                "url": "https://stayvriksha.in/",
+                "publisher": {
+                    "@id": "https://stayvriksha.in/#organization"
+                },
+                "description": "Find hostels, PG accommodation, rented properties, service apartments, hotels, rooms for rent and co-living spaces across Kalaburagi, Karnataka and India."
+            }
+        ]
+    }
+    </script>
+
     <style>
         html, body, body > div, #container, #container-uiarea {
             height: 100%;
         }
+
+        body {
+            margin: 0;
+            font-family: "Poppins", Arial, sans-serif;
+        }
     </style>
+
+    <!-- External Libraries -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- SAPUI5 Bootstrap -->
      <script id="sap-ui-bootstrap" src="https://sapui5.hana.ondemand.com/1.136.1/resources/sap-ui-core.js"
     data-sap-ui-theme="sap_horizon" data-sap-ui-resourceroots='{
             "sap.ui.com.project1": "./"
@@ -18,17 +115,22 @@
     data-sap-ui-async="true" data-sap-ui-frameOptions="trusted"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 </head>
+
 <body class="sapUiBody sapUiSizeCompact" id="content">
+    <noscript>
+        <h1>Stay Vriksha</h1>
+        <p>
+            Welcome to Stay Vriksha. One Network. Endless Stays.
+            Find hostels, PG accommodation, rented properties, service apartments,
+            hotels, rooms for rent and co-living spaces across Kalaburagi,
+            Gulbarga, Karnataka and India.
+        </p>
+    </noscript>
+
     <div
         data-sap-ui-component
         data-name="sap.ui.com.project1"

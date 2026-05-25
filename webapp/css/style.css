@@ -5974,8 +5974,8 @@ html, body {
   background-repeat: no-repeat;
   border-radius: 0.6rem;
   overflow: hidden;
-  margin-bottom: 2rem !important;
-  height: calc(100% - 1rem) !important;
+  margin-bottom: 0 !important;
+  height: 100% !important;
 }
 
 /* Transparent overlay */

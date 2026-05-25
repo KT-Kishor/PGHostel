@@ -531,6 +531,9 @@ sap.ui.define([
                     GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
+                    PropertySTD : Branch.STD || "",
+                    PropertyMobileNo : Branch.Contact || "",
+                    PropertyEmail : Branch.EmailID || "",
                     GSTNumber: oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
                     MemberID: oCustomer.Bookings?.[0]?.MemberID || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
@@ -3725,6 +3728,10 @@ sap.ui.define([
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.GrandTotal || 0,
                 PropertyName: ID.BranchName || "",
+                PropertySTD : ID.PropertySTD || "",
+                PropertyMobileNo : ID.PropertyMobileNo || "",
+                PropertyEmail : ID.PropertyEmail || "",
+                PropertyType: ID.PropertyType,
                 pdfAttachment: {
                     fileName: "BookingVoucher.pdf",
                     mimeType: "application/pdf",
@@ -3808,7 +3815,11 @@ sap.ui.define([
                 MemberID: ID.MemberID || "",
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.RentPrice || 0,
-                PropertyName: ID.BranchName
+                PropertyName: ID.BranchName,
+                PropertySTD : ID.PropertySTD || "",
+                PropertyMobileNo : ID.PropertyMobileNo || "",
+                PropertyEmail : ID.PropertyEmail || "",
+                PropertyType: ID.PropertyType
             };
 
             var oBody = {
@@ -6946,15 +6957,11 @@ sap.ui.define([
         onGeneratePDF: async function() {
             const data = this.getView().getModel("CustomerData").getData();
 
-            let filter = {
-                BranchID: [data.BranchCode]
-            };
+            let filter = {BranchID: [data.BranchCode]};
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];
 
-            const {
-                jsPDF
-            } = window.jspdf;
+            const {jsPDF} = window.jspdf;
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
@@ -7037,48 +7044,315 @@ sap.ui.define([
             currentY += 55;
 
             // ========== GUEST & STAY DETAILS ==========
-            checkNewPage(50);
 
-            // Guest Details Box
-            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
-            doc.roundedRect(15, currentY, 88, 45, 4, 4, "FD");
+            checkNewPage(80);
 
-            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.rect(15, currentY, 5, 45, "F");
+            // Remove duplicate SELF from members
+            const members = (data.AllMembers || []).filter(member =>
+                member.Relation !== "SELF"
+            );
 
+
+            // ---------- GUEST DETAILS ----------
+
+            let guestBoxY = currentY;
+
+            // Guest Table Data
+            let guestBody = [
+                [
+                    "1",
+                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
+                    data.Gender || "-",
+                    `${data.STDCode || "+91"} ${data.MobileNo || "-"}`,
+                    Formatter.formatAgeFromDOBOrAge(
+                        this._parseDate(data.DateOfBirth)
+                    ) || "-",
+                    "SELF"
+                ]
+            ];
+
+            // Additional Members
+            members.forEach((member, index) => {
+                guestBody.push([
+                    (index + 2).toString(),
+                    `${member.Salutation || ""} ${member.Name || "-"}`,
+                    member.Gender || "-",
+                    "-",
+                    Formatter.formatAgeFromDOBOrAge(
+                        member.DateOfBirth
+                    ) || "-",
+                    member.Relation || "-"
+                ]);
+            });
+
+
+            // Background Box
+            doc.setFillColor(
+                LIGHT_GRAY[0],
+                LIGHT_GRAY[1],
+                LIGHT_GRAY[2]
+            );
+
+            doc.setDrawColor(
+                BORDER_LIGHT[0],
+                BORDER_LIGHT[1],
+                BORDER_LIGHT[2]
+            );
+
+            // temporary height
+            doc.roundedRect(
+                15,
+                guestBoxY,
+                180,
+                25,
+                4,
+                4,
+                "FD"
+            );
+
+
+            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("GUEST DETAILS", 24, currentY + 8);
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(60, 60, 60);
-            doc.text(`Name: ${data.Salutation || "Mr."} ${data.CustomerName || "Guest"}`, 24, currentY + 18);
-            doc.text(`Email: ${data.CustomerEmail || "guest@email.com"}`, 24, currentY + 26);
-            doc.text(`Contact: ${data.STDCode || "+91"} ${data.MobileNo || "XXXXXXXXXX"}`, 24, currentY + 34);
+            doc.setTextColor(
+                PRIMARY_COLOR[0],
+                PRIMARY_COLOR[1],
+                PRIMARY_COLOR[2]
+            );
 
-            // Stay Details Box
-            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-            doc.roundedRect(107, currentY, 88, 45, 4, 4, "FD");
+            doc.text("GUEST DETAILS", 24, guestBoxY + 10);
 
-            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.rect(107, currentY, 5, 45, "F");
 
+            // Guest Table
+            doc.autoTable({
+
+                startY: guestBoxY + 15,
+
+                margin: {
+                    left: 20,
+                    right: 15
+                },
+
+                head: [
+                    [
+                        "Sl.No",
+                        "Guest Name",
+                        "Gender",
+                        "Mobile",
+                        "DOB",
+                        "Relation"
+                    ]
+                ],
+
+                body: guestBody,
+
+                theme: "grid",
+
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                    cellPadding: 2,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1,
+                    valign: "middle"
+                },
+
+                headStyles: {
+                    fillColor: PRIMARY_COLOR,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    halign: "center",
+                    fontSize: 9
+                },
+
+                columnStyles: {
+                    0: {
+                        cellWidth: 15,
+                        halign: "center"
+                    },
+                    1: {
+                        cellWidth: 48
+                    },
+                    2: {
+                        cellWidth: 20,
+                        halign: "center"
+                    },
+                    3: {
+                        cellWidth: 32,
+                        halign: "center"
+                    },
+                    4: {
+                        cellWidth: 28,
+                        halign: "center"
+                    },
+                    5: {
+                        cellWidth: 28,
+                        halign: "center"
+                    }
+                }
+
+            });
+
+
+            // Calculate exact box height
+            let guestBoxHeight =
+                (doc.lastAutoTable.finalY - guestBoxY) + 12;
+
+
+            // Draw final border
+            doc.setDrawColor(
+                BORDER_LIGHT[0],
+                BORDER_LIGHT[1],
+                BORDER_LIGHT[2]
+            );
+
+            doc.roundedRect(
+                15,
+                guestBoxY,
+                180,
+                guestBoxHeight,
+                4,
+                4,
+                "S"
+            );
+
+            // Accent Bar — full height
+            doc.setFillColor(
+                ACCENT_COLOR[0],
+                ACCENT_COLOR[1],
+                ACCENT_COLOR[2]
+            );
+
+            doc.rect(
+                15,
+                guestBoxY,
+                5,
+                guestBoxHeight,
+                "F"
+            );
+
+
+            // Small clean spacing before Stay Details
+            currentY = guestBoxY + guestBoxHeight + 12;
+
+
+
+            // ---------- STAY DETAILS ----------
+            checkNewPage(60);
+
+            doc.setFillColor(
+                LIGHT_GRAY[0],
+                LIGHT_GRAY[1],
+                LIGHT_GRAY[2]
+            );
+
+            doc.setDrawColor(
+                BORDER_LIGHT[0],
+                BORDER_LIGHT[1],
+                BORDER_LIGHT[2]
+            );
+
+            doc.roundedRect(
+                15,
+                currentY,
+                180,
+                55,
+                4,
+                4,
+                "FD"
+            );
+
+
+            // Accent Bar
+            doc.setFillColor(
+                ACCENT_COLOR[0],
+                ACCENT_COLOR[1],
+                ACCENT_COLOR[2]
+            );
+
+            doc.rect(15, currentY, 5, 55,"F");
+
+            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("STAY DETAILS", 116, currentY + 8);
+
+            doc.setTextColor(
+                PRIMARY_COLOR[0],
+                PRIMARY_COLOR[1],
+                PRIMARY_COLOR[2]
+            );
+
+            doc.text(
+                "STAY DETAILS",
+                24,
+                currentY + 10
+            );
+
+
+            // LEFT SIDE
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(90, 90, 90);
+
+            doc.text("Check-in Date", 24, currentY + 22);
+            doc.text("Check-out Date", 24, currentY + 34);
+            doc.text("Duration", 24, currentY + 46);
 
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(60, 60, 60);
-            doc.text(`Check-in: ${data.StartDate || "DD/MM/YYYY"}`, 116, currentY + 18);
-            doc.text(`Check-out: ${data.EndDate || "DD/MM/YYYY"}`, 116, currentY + 26);
-            doc.text(`Room: ${data.BedType || "Standard"}`, 116, currentY + 34);
+            doc.setTextColor(50, 50, 50);
 
-            currentY += 55;
+            doc.text(
+                `${data.StartDate || "-"}`,
+                60,
+                currentY + 22
+            );
+
+            doc.text(
+                `${data.EndDate || "-"}`,
+                60,
+                currentY + 34
+            );
+
+            doc.text(
+                `${data.Duration || "0"} ${data.DurationUnit || ""}`,
+                60,
+                currentY + 46
+            );
+
+
+            // RIGHT SIDE
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(90, 90, 90);
+
+            doc.text("Room Type", 115, currentY + 22);
+            doc.text("No Of Guests", 115, currentY + 34);
+            doc.text("Booking Status", 115, currentY + 46);
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(50, 50, 50);
+
+            doc.text(
+                `${data.BedType || "-"}`,
+                150,
+                currentY + 22
+            );
+
+            doc.text(
+                `${data.NoOfPersons || "-"}`,
+                150,
+                currentY + 34
+            );
+
+            doc.text(
+                `${data.Status || "-"}`,
+                150,
+                currentY + 46
+            );
+
+
+            // Final position
+            currentY += 70;
 
             // ========== FACILITY DETAILS TABLE ==========
 
@@ -7366,6 +7640,7 @@ sap.ui.define([
             //    (IMPORTANT CHANGE)
             return doc.output("datauristring").split(",")[1];
         },
+
         onAddNewMemberFromDialog: function() {
             this._mode = "CREATE";
             this._sEditPath = null;
