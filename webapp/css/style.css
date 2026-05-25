@@ -3819,8 +3819,8 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 .sapMFlexBox.AddressInline {
   display: inline-flex !important;
   width: fit-content !important;
-  max-width: 90%;
-  min-width: 200px;
+  max-width: 100%;
+  min-width: 64%; 
 }
 
 .AddressTextLarge {
@@ -3847,7 +3847,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   background-color: transparent !important;
   text-decoration: underline !important;
 }
-
+/* Address desktop: keep original behavior */
+.AddressBox.AddressInline {
+  box-sizing: border-box;
+}
 .AddressBox {
   background: #fafafa;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -3855,7 +3858,29 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   padding: 0.75rem 1.25rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
+@media only screen and (max-width: 768px) {
+  .AddressBox.AddressInline {
+    width: calc(100% - 32px) !important;
+    min-width: calc(100% - 32px) !important;
+    max-width: calc(100% - 32px) !important;
 
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 8px !important;
+
+    box-sizing: border-box;
+  }
+
+  .AddressTextLarge {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+}
 .AddressTextLarge.sapMLnk {
     color: #008b96 !important;
     text-decoration: none;        
