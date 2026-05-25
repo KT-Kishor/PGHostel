@@ -5224,8 +5224,9 @@
                 }
 
                 if (fCouponBaseAmount < Number(oMatchedCoupon.MinOrderValue || 0)) {
+                    const fMinOrderValue = Number(oMatchedCoupon.MinOrderValue || 0);
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("Minimum order value is not met for this coupon.");
+                    MessageToast.show(`Minimum order value ${this.Formatter.fromatNumber(fMinOrderValue)} is required to apply this coupon.`);
                     return;
                 }
 
