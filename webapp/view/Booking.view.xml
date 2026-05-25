@@ -122,9 +122,10 @@
                                 text="Duration"
                                 visible="{BookingView>/showDurationSelector}"
                             />
-                            <Select
+                            <ComboBox
                                 id="BookDuration_ID"
                                 class="boldSelectItems"
+                                width="100%"
                                 selectedKey="{HostelModel>/SelectedMonths}"
                                 items="{BookingView>/DurationOptions}"
                                 visible="{BookingView>/showDurationSelector}"
@@ -135,7 +136,7 @@
                                     key="{BookingView>key}"
                                     text="{BookingView>text}"
                                 />
-                            </Select>
+                            </ComboBox>
 
                             <Label
                                 text="Start Date"
