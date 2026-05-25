@@ -306,22 +306,20 @@
                             >
                                 <columns>
                                     <Column
-                                        width="6rem"
+                                        
                                         visible="{BookingView>/showFamilySection}"
                                     >
                                         <Text text="Primary" />
                                     </Column>
 
                                     <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
+                                        width="3rem"
                                    >
 
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
+                                      
                                     >
                                         <Text text="Age" />
                                     </Column>
@@ -334,7 +332,7 @@
                                     <Column
                                         minScreenWidth="Tablet"
                                         demandPopin="true"
-                                    >
+                                      >
                                         <Text text="Relationship" />
                                     </Column>
                                     <!-- <Column minScreenWidth="Tablet" demandPopin="true">
@@ -343,9 +341,7 @@
                                         <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
                                             <Text text="Document" />
                                         </Column> -->
-                                    <Column width="6rem"     
-                                    minScreenWidth="Tablet"
-                                    demandPopin="true">
+                                    <Column >
                                        
                                     </Column>
                                 </columns>
