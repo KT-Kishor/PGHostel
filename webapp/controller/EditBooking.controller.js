@@ -1091,6 +1091,10 @@ sap.ui.define([
 
                 // Property details (from branch + room data, like onConfirmBooking)
                 PropertyType: oBranchData.PropertyType || oBooking.PropertyType || "",
+                PropertyName: oBranchData.Name || oBooking.PropertyName || "",
+                PropertySTD: oBranchData.STD || oBooking.PropertySTD || "",
+                PropertyMobileNo: oBranchData.Contact || oBooking.PropertyMobileNo || "",
+                PropertyEmail: oBranchData.EmailID || oBooking.PropertyEmail || "",
                 Address: oBranchData.Address || oBooking.Address || "",
                 Area: oBranchData.Name || "",
                 Description: oRoomData.Description || oBooking.Description || "",
@@ -1824,6 +1828,13 @@ sap.ui.define([
                 // Build the update payload
                 var oPayloadData = this._buildBookingCreatePayload();
                 oPayloadData.data[0].BookingID = sBookingID;
+
+                var oHostelData = oHostelModel.getData();
+                oPayloadData.data[0].Area = oHostelData.Area || "";
+                oPayloadData.data[0].PropertySTD = oHostelData.PropertySTD || "";
+                oPayloadData.data[0].PropertyMobileNo = oHostelData.PropertyMobileNo || "";
+                oPayloadData.data[0].PropertyEmail = oHostelData.PropertyEmail || "";
+
                 var aDeletedFacilityIds = this._getDeletedFacilityIdsForUpdate(
                     oCustomer.FacilityItems || [],
                     oPayloadData.data[0].FacilityItems || []

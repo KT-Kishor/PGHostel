@@ -4403,6 +4403,11 @@ sap.ui.define([
                 "STDCode": Bookingdata.STDCode,
                 "Salutation": Bookingdata.Salutation || "Mr.",
                 "PermanentAddress": Bookingdata.Address,
+                "Area": CustomerData.BranchName,
+                "PropertyType": CustomerData.PropertyType,
+                "PropertySTD": CustomerData.PropertySTD,
+                "PropertyMobileNo": CustomerData.PropertyMobileNo,
+                "PropertyEmail": CustomerData.PropertyEmail,
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
                     "RentPrice": CustomerData.GrandTotal,
