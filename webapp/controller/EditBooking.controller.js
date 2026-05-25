@@ -43,8 +43,9 @@ sap.ui.define([
             //     oRouter.navTo("RouteHostel", {}, true);
             // }
             var oArgs = oEvent.getParameter("arguments") || {};
-            var sBookingID = oArgs.BookingID ? decodeURIComponent(oArgs.BookingID) : "";
-            var sMemberID = oArgs.MemberID ? decodeURIComponent(oArgs.MemberID) : "";
+            var sBookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
+            var sMemberID = oArgs.MemberID ? atob(decodeURIComponent(oArgs.MemberID)) : "";
+
 
             if (!sBookingID) {
                 MessageBox.error("Booking ID is required for editing.");
