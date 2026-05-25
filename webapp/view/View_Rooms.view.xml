@@ -46,7 +46,7 @@
 										displayShape="Square"
 										visible="{= !!${BranchModel>/Photo1} }"
 										class="vrSquareAvatarSmall vrSnappedAvatar sapUiAvatarImageContain" />
-									<VBox class="vrSnappedTitleBlock sapUiSmallMarginBegin">
+									<VBox class="vrSnappedTitleBlock">
 										<Title
 											text="{BranchModel>/Name}"
 											wrapping="true"
