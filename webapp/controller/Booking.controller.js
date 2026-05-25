@@ -6327,16 +6327,20 @@
             }
         },
 
-        onGeneratePDF: async function (data) {
+        onGeneratePDF: async function(data) {
             const booking = data.Booking?.[0] || {};
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
-            let filter = { BranchID: [booking.BranchCode] };
+            let filter = {
+                BranchID: [booking.BranchCode]
+            };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0] || {};
 
-            const { jsPDF } = window.jspdf;
+            const {
+                jsPDF
+            } = window.jspdf;
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
@@ -6363,27 +6367,34 @@
 
             // ========== HEADER SECTION ==========
             doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.rect(0, 0, 210, 35, "F");
+            doc.rect(0, 0, 210, 32, "F"); // reduced header height
 
             doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.rect(0, 35, 210, 3, "F");
+            doc.rect(0, 32, 210, 2.5, "F");
 
+            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(24);
             doc.setTextColor(255, 255, 255);
-            doc.text("BOOKING VOUCHER", 20, 22);
+            doc.text("BOOKING VOUCHER", 20, 20);
 
+            // Compact Right Box
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(255, 255, 255);
-            doc.setLineWidth(0.2);
-            doc.roundedRect(140, 12, 55, 18, 3, 3, "FD");
 
-            doc.setFontSize(9);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            // doc.text(`Booking ID: ${booking.BookingID || "N/A"}`, 142, 19);
-            doc.text(`Booked On: ${Formatter.formatDate(booking.BookingDate) || "N/A"}`, 142, 24);
+            doc.roundedRect(145, 9, 45, 10, 3, 3, "FD");
 
-            currentY = 45;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            doc.setTextColor(...PRIMARY_COLOR);
+
+            doc.text(
+                `Booked On: ${data.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`,
+                148,
+                15
+            );
+
+            currentY = 40;
 
             // ================= PROPERTY =================
             checkNewPage(50);
@@ -6411,55 +6422,264 @@
 
             if (company.GeoLocation) {
                 doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.textWithLink("View Property on Map", 20, contactY + 10, { url: company.GeoLocation });
+                doc.textWithLink("View Property on Map", 20, contactY + 10, {
+                    url: company.GeoLocation
+                });
             }
 
             currentY += 55;
 
             // ================= GUEST & STAY =================
-            checkNewPage(50);
 
-            // Guest Details Box
-            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
-            doc.roundedRect(15, currentY, 88, 45, 4, 4, "FD");
+            checkNewPage(100);
 
-            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.rect(15, currentY, 5, 45, "F");
+            const members = (data.AllMembers || []).filter(
+                member => member.Relation !== "SELF"
+            );
 
+            // ---------- GUEST DETAILS ----------
+
+            let guestBoxY = currentY;
+
+            // Build Guest Table Data
+            let guestBody = [
+                [
+                    "1",
+                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
+                    data.Gender || "-",
+                    `${data.MobileNo || "-"}`,
+                    Formatter.formatAgeFromDOBOrAge(
+                        this._parseDate(data.DateOfBirth)
+                    ) || "-",
+                    "SELF"
+                ]
+            ];
+
+            members.forEach((member, index) => {
+
+                guestBody.push([
+                    (index + 2).toString(),
+                    `${member.Salutation || ""} ${member.Name || "-"}`,
+                    member.Gender || "-",
+                    member.MobileNo || "-",
+                    Formatter.formatAgeFromDOBOrAge(
+                        member.DateOfBirth
+                    ) || "-",
+                    member.Relation || "-"
+                ]);
+
+            });
+
+
+            // Guest Box
+            doc.setFillColor(...LIGHT_GRAY);
+            doc.setDrawColor(...BORDER_LIGHT);
+
+            doc.roundedRect(
+                15,
+                guestBoxY,
+                180,
+                25,
+                4,
+                4,
+                "FD"
+            );
+
+            // Accent bar
+            doc.setFillColor(...ACCENT_COLOR);
+            doc.rect(15, guestBoxY, 5, 25, "F");
+
+            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("GUEST DETAILS", 24, currentY + 8);
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(60, 60, 60);
-            doc.text(`Name: ${data.CustomerName || "Guest"}`, 24, currentY + 18);
-            doc.text(`Email: ${data.CustomerEmail || "N/A"}`, 24, currentY + 26);
-            doc.text(`Contact: ${data.MobileNo || "N/A"}`, 24, currentY + 34);
+            doc.setTextColor(...PRIMARY_COLOR);
 
-            // Stay Details Box
-            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-            doc.roundedRect(107, currentY, 88, 45, 4, 4, "FD");
+            doc.text(
+                "GUEST DETAILS",
+                24,
+                guestBoxY + 8
+            );
 
-            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.rect(107, currentY, 5, 45, "F");
 
+            // Guest Table
+            doc.autoTable({
+
+                startY: guestBoxY + 12,
+
+                margin: {
+                    left: 20,
+                    right: 15
+                },
+
+                head: [
+                    [
+                        "Sl.No",
+                        "Guest Name",
+                        "Gender",
+                        "Mobile",
+                        "Age",
+                        "Relation"
+                    ]
+                ],
+
+                body: guestBody,
+
+                theme: "grid",
+
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                    cellPadding: 2,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1
+                },
+
+                headStyles: {
+                    fillColor: PRIMARY_COLOR,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    halign: "center"
+                },
+
+                columnStyles: {
+                    0: {
+                        cellWidth: 15,
+                        halign: "center"
+                    },
+                    1: {
+                        cellWidth: 48
+                    },
+                    2: {
+                        cellWidth: 22,
+                        halign: "center"
+                    },
+                    3: {
+                        cellWidth: 32,
+                        halign: "center"
+                    },
+                    4: {
+                        cellWidth: 22,
+                        halign: "center"
+                    },
+                    5: {
+                        cellWidth: 28,
+                        halign: "center"
+                    }
+                }
+
+            });
+
+
+            // Dynamic Guest Box Height
+            let guestBoxHeight =
+                (doc.lastAutoTable.finalY - guestBoxY) + 10;
+
+
+            // Redraw Border
+            doc.setDrawColor(...BORDER_LIGHT);
+
+            doc.roundedRect(
+                15,
+                guestBoxY,
+                180,
+                guestBoxHeight,
+                4,
+                4,
+                "S"
+            );
+
+            // Full Accent Bar
+            doc.setFillColor(...ACCENT_COLOR);
+
+            doc.rect(
+                15,
+                guestBoxY,
+                5,
+                guestBoxHeight,
+                "F"
+            );
+
+
+            // Move Below Guest
+            currentY = guestBoxY + guestBoxHeight + 10;
+
+
+            // ---------- STAY DETAILS ----------
+            checkNewPage(55);
+
+            doc.setFillColor(...LIGHT_GRAY);
+            doc.setDrawColor(...BORDER_LIGHT);
+
+            // Reduced box height
+            doc.roundedRect(
+                15,
+                currentY,
+                180,
+                40,
+                4,
+                4,
+                "FD"
+            );
+
+            // Accent Bar
+            doc.setFillColor(...ACCENT_COLOR);
+            doc.rect(15, currentY, 5, 40, "F");
+
+            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("STAY DETAILS", 116, currentY + 8);
+            doc.setTextColor(...PRIMARY_COLOR);
+
+            doc.text("STAY DETAILS", 24, currentY + 7);
+
+            // LEFT SIDE
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(90, 90, 90);
+
+            doc.text("Check-in Date", 24, currentY + 16);
+            doc.text("Check-out Date", 24, currentY + 26);
 
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(60, 60, 60);
+            doc.setTextColor(50, 50, 50);
 
-            doc.text(`Check-in: ${booking.StartDate || "N/A"}`, 116, currentY + 18);
-            doc.text(`Check-out: ${booking.EndDate || "N/A"}`, 116, currentY + 26);
-            doc.text(`Room: ${booking.BedType || "N/A"}`, 116, currentY + 34);
+            doc.text(
+                booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-",
+                60,
+                currentY + 16
+            );
 
-            currentY += 55;
+            doc.text(
+                booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-",
+                60,
+                currentY + 26
+            );
+
+            // RIGHT SIDE
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(90, 90, 90);
+
+            doc.text("Room Type", 115, currentY + 16);
+            doc.text("No Of Guests", 115, currentY + 26);
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(50, 50, 50);
+
+            doc.text(
+                booking.BedType || "-",
+                150,
+                currentY + 16
+            );
+
+            doc.text(
+                String(booking.NoOfPersons || "-"),
+                150,
+                currentY + 26
+            );
+
+            // Next Section
+            currentY += 70;
 
             if (facilities.length > 0) {
 
@@ -6488,7 +6708,9 @@
                         `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
                     ]);
                 } else {
-                    tableBody = [["", "No facilities selected", "", "", "", "", ""]];
+                    tableBody = [
+                        ["", "No facilities selected", "", "", "", "", ""]
+                    ];
                 }
 
                 // Calculate if table will fit on current page
@@ -6500,8 +6722,13 @@
 
                 doc.autoTable({
                     startY: currentY,
-                    margin: { left: 15, right: 10 },
-                    head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
+                    margin: {
+                        left: 15,
+                        right: 10
+                    },
+                    head: [
+                        ['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                    ],
                     body: tableBody,
                     theme: 'striped',
 
@@ -6523,13 +6750,34 @@
                     },
 
                     columnStyles: {
-                        0: { cellWidth: 12, halign: "center" },
-                        1: { cellWidth: 48, halign: "left" },
-                        2: { cellWidth: 24, halign: "center" },
-                        3: { cellWidth: 24, halign: "center" },
-                        4: { cellWidth: 24, halign: "right" },
-                        5: { cellWidth: 18, halign: "center" },
-                        6: { cellWidth: 28, halign: "right" }
+                        0: {
+                            cellWidth: 12,
+                            halign: "center"
+                        },
+                        1: {
+                            cellWidth: 48,
+                            halign: "left"
+                        },
+                        2: {
+                            cellWidth: 24,
+                            halign: "center"
+                        },
+                        3: {
+                            cellWidth: 24,
+                            halign: "center"
+                        },
+                        4: {
+                            cellWidth: 24,
+                            halign: "right"
+                        },
+                        5: {
+                            cellWidth: 18,
+                            halign: "center"
+                        },
+                        6: {
+                            cellWidth: 28,
+                            halign: "right"
+                        }
                     }
                 });
 
@@ -6589,7 +6837,9 @@
                 }
 
                 doc.text(label, leftX, summaryY);
-                doc.text(value, rightX, summaryY, { align: "right" });
+                doc.text(value, rightX, summaryY, {
+                    align: "right"
+                });
                 summaryY += 7;
             };
 
@@ -6700,7 +6950,9 @@
             doc.text("Thank you for choosing us! We look forward to hosting you.", 15, currentY + 5);
 
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
+            doc.text("Premium Hospitality Experience", 195, currentY + 5, {
+                align: "right"
+            });
 
             // ✅ RETURN BASE64 (IMPORTANT CHANGE)
             return doc.output("datauristring").split(",")[1];
