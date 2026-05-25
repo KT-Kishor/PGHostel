@@ -1550,8 +1550,8 @@ sap.ui.define([
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-            var sBookingID = oBookingData.BookingID || "";
-            var sMemberID = oBookingData.MemberID || "";
+            var sBookingID =  btoa(oBookingData.BookingID.toString());
+            var sMemberID = btoa(oBookingData.MemberID.toString()); 
 
             if (!sBookingID) {
                 sap.m.MessageToast.show("BookingID not found for this booking");
