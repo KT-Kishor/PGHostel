@@ -278,11 +278,11 @@
                 />
                   <Label
         text="Add CouponCode"
-        class="sapUiSmallMarginEnd"
+        class="sapUiSmallMarginEnd" visible="false"
     />
                   <HBox
     alignItems="Center"
-    justifyContent="SpaceEvenly"
+    justifyContent="SpaceEvenly" visible="false"
 >
   
 
@@ -308,11 +308,11 @@
     />
 </HBox>
 
-                 <Label text="Discount Value" />
+                 <Label text="Discount Value" visible="false"/>
                 <Input
                     id="idD_editDiscountValue"
                     value="{edit>/CouponDiscount}"
-                    editable="false"
+                    editable="false" visible="false"
                 />
 
             </f:content>

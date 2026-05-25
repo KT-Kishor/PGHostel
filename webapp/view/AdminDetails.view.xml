@@ -1042,7 +1042,7 @@
                                 justifyContent="End"
                                 alignItems="Center"
                                 class="sapUiSmallMarginBottom"
-                                visible="false"
+                                visible="{VisibleModel>/visible}"
                             >
                                 <!-- Coupon Label -->
                                 <Label

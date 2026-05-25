@@ -117,9 +117,10 @@
                                 text="Duration"
                                 visible="{BookingView>/showDurationSelector}"
                             />
-                            <Select
+                            <ComboBox
                                 id="EditBookDuration_ID"
                                 class="boldSelectItems"
+                                width="100%"
                                 selectedKey="{HostelModel>/SelectedMonths}"
                                 items="{BookingView>/DurationOptions}"
                                 visible="{BookingView>/showDurationSelector}"
@@ -131,7 +132,7 @@
                                     key="{BookingView>key}"
                                     text="{BookingView>text}"
                                 />
-                            </Select>
+                            </ComboBox>
 
                             <Label
                                 text="Start Date"
@@ -219,22 +220,20 @@
                                 class="responsiveTable"
                             >
                                 <columns>
-                                    <Column
-                                        width="6rem"
+                                    <Column  
                                         visible="{BookingView>/showFamilySection}"
                                     >
                                         <Text text="Primary" />
                                     </Column>
 
                                     <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
+                                       
+                                        width="3rem"
                                     >
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
+                                      
                                     >
                                         <Text text="Age" />
                                     </Column>
@@ -245,14 +244,12 @@
                                         <Text text="Gender" />
                                     </Column>
                                     <Column
-                                        minScreenWidth="Tablet"
+                                             minScreenWidth="Tablet"
                                         demandPopin="true"
                                     >
                                         <Text text="Relationship" />
                                     </Column>
-                                    <Column width="6rem"
-                                        minScreenWidth="Tablet"
-    demandPopin="true">
+                                    <Column >
                                     </Column>
                                 </columns>
 
@@ -761,7 +758,7 @@
                                         </cells>
                                     </ColumnListItem>
 
-                                    <ColumnListItem
+                                    <!-- <ColumnListItem
                                         vAlign="Middle"
                                         visible="{= !!${HostelModel>/CustomerGSTIN} }"
                                     >
@@ -777,7 +774,7 @@
                                                 />
                                             </HBox>
                                         </cells>
-                                    </ColumnListItem>
+                                    </ColumnListItem> -->
 
                                     <ColumnListItem
                                         vAlign="Middle"

@@ -26,18 +26,18 @@
                         press="onAdminSIGNUP"
                         tooltip="{i18n>adminVendorRegistration}"
                         icon="sap-icon://employee"
-                        text="Admin / Vendor Registration"
+                        text="Vendor Registration"
                         class="fa-admin-btn"
                     />
                     <core:HTML
                         content="&lt;a href='https://www.instagram.com/' target='_blank'&gt;&lt;i class='fab fa-instagram social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"
                     />
-                    <core:HTML
+                    <!-- <core:HTML
                         content="&lt;a href='https://www.facebook.com/' target='_blank'&gt;&lt;i class='fab fa-facebook-f social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"
                     />
                     <core:HTML
                         content="&lt;a href='https://youtu.be/PdBkOcrmqbo?si=g48Lminu94ubTCYK' target='_blank'&gt;&lt;i class='fab fa-youtube social-icon'&gt;&lt;/i&gt;&lt;/a&gt;"
-                    />
+                    /> -->
                 </HBox>
             </HBox>
         </OverflowToolbar>
