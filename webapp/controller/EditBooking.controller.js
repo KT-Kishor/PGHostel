@@ -36,6 +36,21 @@ sap.ui.define([
                     this._resetBookingPageModels();
                 }.bind(this)
             });
+
+            const vm = this.getView().getModel("LoginViewModel");
+            vm.setProperty("/showOTPField", false); // show OTP input box only after Send OTP success
+            vm.setProperty("/isOtpEntered", false);
+            vm.setProperty("/canResendOTP", true);
+            vm.setProperty("/otpTimer", 0);
+            vm.setProperty("/otpButtonText", "Send OTP");
+            this.getView().setModel(new JSONModel({
+                fullname: "",
+                Email: "",
+                Mobileno: "",
+                password: "",
+                comfirmpass: "",
+                minDate: new Date(2000, 0, 1)
+            }), "LoginMode");
         },
 
         _onEditRouteMatched: async function (oEvent) {
@@ -4669,6 +4684,17 @@ sap.ui.define([
             vm.setProperty("/dialogTitle", "Reset Password"); //
         },
 
+        onUserlivechange: function(oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onEmailliveChange: function(oEvent) {
+            utils._LCvalidateEmail(oEvent);
+        },
+        onSigninPasswordLive: function(oEvent) {
+            utils._LCvalidatePassword(oEvent);
+        },
+
         SM_onTogglePasswordVisibility: function(oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
@@ -4676,9 +4702,264 @@ sap.ui.define([
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
+        _getLoginFragmentControl: function(localId) {
+            // 1) If you stored the fragment instance (best practice), use it
+            if (this._oLoginFragment && typeof this._oLoginFragment.byId === "function") {
+                const c = this._oLoginFragment.byId(localId);
+                if (c) {
+                    console.debug("found via this._oLoginFragment.byId", localId);
+                    return c;
+                }
+            }
 
-        onUserlivechange: function(oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
+            // 2) If you stored dialog instance but not fragment, try to infer prefix from dialog id
+            if (this._oLoginAlertDialog && typeof this._oLoginAlertDialog.getId === "function") {
+                try {
+                    // example dialog id: "__xmlview1--LoginAlertDialog--authDialog"
+                    const dialogId = this._oLoginAlertDialog.getId();
+                    // get the xmlview prefix (everything before "--LoginAlertDialog--authDialog")
+                    const parts = dialogId.split("--");
+                    if (parts.length >= 2) {
+                        // build prefix: first segment + "--LoginAlertDialog--"
+                        const prefix = parts[0] + "--LoginAlertDialog--";
+                        const full = prefix + localId; // __xmlview1--LoginAlertDialog--passwordStrengthText
+                        const c = sap.ui.getCore().byId(full);
+                        if (c) {
+                            console.debug("found via dialog prefix", full);
+                            return c;
+                        }
+                    }
+                } catch (e) {
+                    /* ignore */
+                }
+            }
+
+            // 3) Try Fragment.byId with raw fragment id (common)
+            try {
+                const c = sap.ui.core.Fragment.byId("LoginAlertDialog", localId);
+                if (c) {
+                    console.debug("found via Fragment.byId('LoginAlertDialog',...)", localId);
+                    return c;
+                }
+            } catch (e) {
+                /* ignore */
+            }
+
+            // 4) Try Fragment.byId with view-scoped id (if you used this.createId when creating fragment)
+            try {
+                if (this.createId) {
+                    const fragId = this.createId("LoginAlertDialog");
+                    const c = sap.ui.core.Fragment.byId(fragId, localId);
+                    if (c) {
+                        console.debug("found via Fragment.byId(this.createId('LoginAlertDialog'),...)", fragId, localId);
+                        return c;
+                    }
+                }
+            } catch (e) {
+                /* ignore */
+            }
+
+            // 5) Try view.byId (if fragment controls were placed inside view aggregation)
+            try {
+                const c = this.getView().byId(localId);
+                if (c) {
+                    console.debug("found via view.byId", localId);
+                    return c;
+                }
+            } catch (e) {
+                /* ignore */
+            }
+
+            // 6) Last resort: global core lookup for any control that endsWith the localId
+            const all = sap.ui.getCore().mElements; // internal map, useful for debugging only
+            for (const id in all) {
+                if (id.endsWith("--" + localId) || id.endsWith("-" + localId) || id === localId) {
+                    const c = sap.ui.getCore().byId(id);
+                    if (c) {
+                        console.debug("found via core fallback", id);
+                        return c;
+                    }
+                }
+            }
+
+            console.warn("Could not find login fragment control:", localId);
+            return null;
+        },
+
+        SM_onChnageSetAndConfirm: function(oEvent) {
+            const oInput = oEvent.getSource();
+            if (!oInput) {
+                return;
+            }
+
+            // get the unprefixed id (local id inside fragment)
+            const fullId = oInput.getId() || "";
+            const localId = fullId.split("--").pop();
+
+            let oStrengthText = null;
+            if (localId === "signUpPassword") {
+                oStrengthText = this._getLoginFragmentControl("passwordStrengthText");
+            } else if (localId === "newPass") {
+                oStrengthText = this._getLoginFragmentControl("fpPasswordStrengthText");
+            }
+
+            // Pass the actual input control and the strength text (may be null)
+            utils._LCvalidatePassword(oInput, oStrengthText);
+        },
+
+        SM_onGenerateForgotPassword: function() {
+            var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
+            var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpPasswordStrengthText");
+
+            if (!oPwdInput) {
+                console.error("❌ newPass input not found");
+                return;
+            }
+
+            //  Only generate + validate (NO copying here)
+            var pwd = utils._LCgenerateStrongPassword();
+            oPwdInput.setValue(pwd);
+            utils._LCvalidatePassword(oPwdInput, oStrength);
+        },
+        onSelectLoginMode: function(e) {
+            const vm = this.getView().getModel("LoginViewModel");
+            const mode = e.getSource().getText().toLowerCase();
+
+            vm.setProperty("/loginMode", mode);
+            vm.setProperty("/showOTPField", false);
+            vm.setProperty("/isOtpEntered", false);
+
+            // ✅ guarantee button has text
+            if (mode === "otp") {
+                vm.setProperty("/otpButtonText", "Send OTP");
+            }
+
+            const otpCtrl = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "signInOTP"
+            );
+            if (otpCtrl) {
+                otpCtrl.setValue("");
+                otpCtrl.setEnabled(false);
+            }
+
+            const passCtrl = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "signinPassword"
+            );
+            if (passCtrl) {
+                passCtrl.setValue("");
+                passCtrl.setValueState("None");
+            }
+        },
+
+        onDialogClose: function() {
+
+            const oEmail = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "emailInput"
+            );
+
+            const oOTP = sap.ui.core.Fragment.byId(
+                this.createId("LoginAlertDialog"),
+                "otpInput"
+            );
+
+            // ✅ Clear Email
+            if (oEmail) {
+                oEmail.setValue("");
+                oEmail.setValueState("None");
+                oEmail.setValueStateText("");
+            }
+
+            // ✅ Clear OTP
+            if (oOTP) {
+                oOTP.setValue("");
+                oOTP.setValueState("None");
+                oOTP.setValueStateText("");
+            }
+
+            // ✅ Close Dialog
+            if (this._oLoginAlertDialog) {
+                this._oLoginAlertDialog.close();
+            }
+        },
+        onLoginOtpLive: function(e) {
+            const vm = this.getView().getModel("LoginViewModel");
+            const input = e.getSource();
+
+            // allow only digits and enforce 6 max
+            let val = e.getParameter("value").replace(/\D/g, "");
+            if (val.length > 6) val = val.slice(0, 6);
+
+            input.setValue(val);
+
+            const isValid = val.length === 6;
+            vm.setProperty("/isOtpEntered", isValid);
+
+            if (val.length === 0) {
+                input.setValueState("None");
+            } else if (!isValid) {
+                input.setValueState("Error");
+                input.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
+            } else {
+                input.setValueState("None");
+            }
+        },
+        _addPasswordGenerateIcon: function() {
+
+            const aInputs = [
+                sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword"),
+                sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass")
+            ];
+
+            aInputs.forEach((oInput) => {
+
+                if (!oInput || oInput._hasCopyIcon) return;
+
+                oInput.addEndIcon({
+                    src: "sap-icon://copy",
+                    tooltip: "Copy password",
+                    press: this.SM_onCopyPassword.bind(this)
+                });
+
+                oInput._hasCopyIcon = true;
+            });
+        },
+
+        SM_onCopyPassword: function(oEvent) {
+            const oIcon = oEvent.getSource();
+            const oInput = oIcon.getParent();
+
+            if (!oInput || !oInput.getValue) return;
+
+            const pwd = oInput.getValue();
+
+            if (!pwd) {
+                MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
+                return;
+            }
+
+            navigator.clipboard.writeText(pwd)
+                .then(() => {
+                    MessageToast.show(this.i18nModel.getText("passwordCopied"));
+                })
+                .catch(() => {
+
+                    try {
+                        const oTemp = document.createElement("textarea");
+                        oTemp.value = pwd;
+                        document.body.appendChild(oTemp);
+                        oTemp.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(oTemp);
+
+                        MessageToast.show(this.i18nModel.getText("passwordCopied"));
+
+                    } catch (err) {
+                        MessageToast.show(this.i18nModel.getText("copyFailed"));
+                    }
+                });
         },
     });
 });
