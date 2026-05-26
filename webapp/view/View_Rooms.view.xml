@@ -31,7 +31,7 @@
 					class="vrObjectPageLayout roomsBgLayout">
 
 					<uxap:headerTitle>
-						<uxap:ObjectPageDynamicHeaderTitle>
+						<uxap:ObjectPageDynamicHeaderTitle visible="false">
 							<uxap:expandedHeading>
 								<HBox />
 							</uxap:expandedHeading>

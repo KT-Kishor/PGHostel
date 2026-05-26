@@ -266,8 +266,8 @@
                                                             id="idBedTypeFlex"
                                                             defaultSpan="XL3 L4 M6 S12"
                                                             containerQuery="true"
-                                                            hSpacing="2"
-                                                            vSpacing="2"
+                                                            hSpacing="1"
+                                                            vSpacing="1"
                                                             content="{path: 'VisibilityModel>/Branches'}"
                                                             visible="{= !${VisibilityModel>/NoData} }"
                                                         >

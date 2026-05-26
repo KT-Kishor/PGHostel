@@ -542,7 +542,10 @@ sap.ui.define([
                     AllSelectedFacilities: oCustomer.FacilityItems || [],
                     AllMembers: oCustomer.Members || [],
 
-                    Documents: oCustomer.Documents || []
+                    Documents: oCustomer.Documents || [],
+                    CustomerGSTIN : oCustomer.Bookings?.[0]?.CustomerGSTIN,
+                    CustCompanyName: oCustomer.Bookings?.[0]?.CustCompanyName,
+                    CustCompanyAddress : oCustomer.Bookings?.[0]?.CustCompanyAddress
                 };
                 const AllMembers = oCustomer.Members;
 
@@ -5544,30 +5547,68 @@ sap.ui.define([
             oInput.setShowValueHelp(false);
             this.getView().getModel("edit").setProperty("/CouponDiscount", "");
         },
-        onGSTBooking: function() {
+       onGSTBooking: function () {
 
-            var oCustomerModel = this.getView().getModel("CustomerData")
-            const CustData = this.getView().getModel("CustomerData").getData();
+    const CustData = this.getView().getModel("CustomerData").getData();
 
-            if (!this.GST_Dialog) {
-                var oView = this.getView();
-                this.GST_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.GST", this);
-                oView.addDependent(this.GST_Dialog);
-            }
-            sap.ui.getCore().byId("idBranchGSTNumber").setValueState("None").setValue(CustData.GSTIN || "");
-            sap.ui.getCore().byId("idGSTNumber").setValueState("None").setValue(CustData.GSTNumber || "");
+    if (!this.GST_Dialog) {
+        var oView = this.getView();
+        this.GST_Dialog = sap.ui.xmlfragment(
+            "sap.ui.com.project1.fragment.GST",
+            this
+        );
+        oView.addDependent(this.GST_Dialog);
+    }
 
-            sap.ui.getCore().byId("idGSTPercentage").setValueState("None").setValue(CustData.GSTValue || "");
-            sap.ui.getCore().byId("idGSTType").setSelectedIndex(CustData.GSTType ? CustData.GSTType === "IGST" ? 0 : 1 : 0);
+    // Set values
+    sap.ui.getCore().byId("idBranchGSTNumber")
+        .setValue(CustData.GSTIN || "");
 
-            if (sap.ui.getCore().byId("idBranchGSTNumber").getValue() === "") {
-                sap.ui.getCore().byId("idBranchGSTNumber").setVisible(false);
-            } else {
-                sap.ui.getCore().byId("idBranchGSTNumber").setVisible(true);
-            }
+    sap.ui.getCore().byId("idGSTNumber")
+        .setValue(CustData.CustomerGSTIN || "");
 
-            this.GST_Dialog.open();
-        },
+    sap.ui.getCore().byId("idGSTPercentage")
+        .setValue(CustData.GSTValue || "");
+
+    sap.ui.getCore().byId("idGSTType")
+        .setSelectedIndex(
+            CustData.GSTType === "CGST/SGST" ? 1 : 0
+        );
+
+    sap.ui.getCore().byId("idCompanyName")
+        .setValue(CustData.CustCompanyName || "");
+
+    sap.ui.getCore().byId("idCompanyAddress")
+        .setValue(CustData.CustCompanyAddress || "");
+
+    // Branch GST visibility
+    var bHasBranchGST = !!(
+        CustData.GSTIN ||
+        CustData.GSTValue ||
+        CustData.GSTType
+    );
+
+    sap.ui.getCore().byId("idBranchGSTNumber")
+        .setVisible(!!CustData.GSTIN);
+
+    sap.ui.getCore().byId("idGSTPercentage")
+        .setVisible(bHasBranchGST);
+
+    sap.ui.getCore().byId("idGSTType")
+        .setVisible(bHasBranchGST);
+
+    // ALWAYS show customer fields
+    sap.ui.getCore().byId("idGSTNumber")
+        .setVisible(true);
+
+    sap.ui.getCore().byId("idCompanyName")
+        .setVisible(true);
+
+    sap.ui.getCore().byId("idCompanyAddress")
+        .setVisible(true);
+
+    this.GST_Dialog.open();
+},
         GST_onCancelButtonPress: function() {
             this.GST_Dialog.close();
         },
@@ -5600,123 +5641,189 @@ sap.ui.define([
             oInput.setValueState("None");
             oInput.setValueStateText("");
         },
-        GST_onsavebuttonpress: function() {
-            var oView = sap.ui.getCore()
+        // GST_onsavebuttonpress: function() {
+        //      var oView = sap.ui.getCore()
 
-            if (
-                utils.onNumber(oView.byId("idGSTPercentage"), "ID")
-            ) {
-                var oCustomerModel = this.getView().getModel("CustomerData")
-                const CustData = this.getView().getModel("CustomerData").getData();
-                const oInput = sap.ui.getCore().byId("idGSTNumber").getValue() || "";
+        //     if (
+        //         utils.onNumber(oView.byId("idGSTPercentage"), "ID")
+        //     ) {
+        //         var oCustomerModel = this.getView().getModel("CustomerData")
+        //         const CustData = this.getView().getModel("CustomerData").getData();
+        //         const oInput = sap.ui.getCore().byId("idGSTNumber").getValue() || "";
 
-                var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
-                var oRadioGroup = sap.ui.getCore().byId("idGSTType");
+        //         var Percentage = sap.ui.getCore().byId("idGSTPercentage").getValue();
+        //         var oRadioGroup = sap.ui.getCore().byId("idGSTType");
 
-                var iIndex = oRadioGroup.getSelectedIndex();
-                var sValue = oRadioGroup.getButtons()[iIndex].getText();
-                // const sGSTNumber = oInput.getValue().trim().toUpperCase();
+        //         var iIndex = oRadioGroup.getSelectedIndex();
+        //         var sValue = oRadioGroup.getButtons()[iIndex].getText();
+        //         const sGSTNumber = oInput.getValue().trim().toUpperCase();
 
-                // const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
-                // if (!GST_REGEX.test(sGSTNumber)) {
-                //     oInput.setValueState("Error");
-                //     oInput.setValueStateText(this.i18nModel.getText("gstError"));
-                //     return;
-                // }
-                // oCustomerModel.setProperty("/GSTNumber", sGSTNumber);
-                // oCustomerModel.refresh(true);
+        //         const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/;
+        //         if (!GST_REGEX.test(sGSTNumber)) {
+        //             oInput.setValueState("Error");
+        //             oInput.setValueStateText(this.i18nModel.getText("gstError"));
+        //             return;
+        //         }
+        //         oCustomerModel.setProperty("/GSTNumber", sGSTNumber);
+        //         oCustomerModel.refresh(true);
 
-                //  var SubTotal =CustData.SubTotal
-                //             var CGST = SubTotal * Percentage / 100
+        //          var SubTotal =CustData.SubTotal
+        //                     var CGST = SubTotal * Percentage / 100
 
-                //                   let TotalAmount;
+        //                           let TotalAmount;
 
-                //                    if(sValue==="IGST"){
-                //                     TotalAmount = SubTotal + CGST;
-                //                 }else if(sValue==="CGST/SGST"){
-                //                     TotalAmount = SubTotal + CGST + CGST;
-                //                 }else{
-                //                     TotalAmount = SubTotal
-                //                 }
-                //                 if (CustData.CouponCode || this.Code) {
-                //                 var oCouponData = this.getView().getModel("CouponModel").getData();
-                //                 var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                //                 var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
-
-
-                //                 if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
-
-                //                     if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
-                //                          && CustData.Discount) {
-                //                         this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                //                         CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                //                         if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                //                             CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                //                         }
-                //                     } else {
-                //                         CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                //                     }
-
-                //                 }
-                //             }
+        //                            if(sValue==="IGST"){
+        //                             TotalAmount = SubTotal + CGST;
+        //                         }else if(sValue==="CGST/SGST"){
+        //                             TotalAmount = SubTotal + CGST + CGST;
+        //                         }else{
+        //                             TotalAmount = SubTotal
+        //                         }
+        //                         if (CustData.CouponCode || this.Code) {
+        //                         var oCouponData = this.getView().getModel("CouponModel").getData();
+        //                         var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
+        //                         var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
 
+        //                         if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
 
+        //                             if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
+        //                                  && CustData.Discount) {
+        //                                 this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
+        //                                 CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
+        //                                 if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
+        //                                     CustData.Discount = Number(oMatchedCoupon.UptoValue);
+        //                                 }
+        //                             } else {
+        //                                 CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
+        //                             }
 
-                //             if(sValue==="IGST"){
-                //             oCustomerModel.setProperty("/IGST", CGST)
-                //              oCustomerModel.setProperty("/GrandTotal", TotalAmount- Number(CustData.Discount) );
-                //             oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount)- CustData.PaymentPaid);
-                //               oCustomerModel.setProperty("/SGST", 0)
-                //             oCustomerModel.setProperty("/CGST", 0)
+        //                         }
+        //                     }
 
 
 
-                //             }else{
-                //             oCustomerModel.setProperty("/IGST", 0)
 
-                //              oCustomerModel.setProperty("/GrandTotal",TotalAmount- Number(CustData.Discount));
-                //             oCustomerModel.setProperty("/DueAmount",TotalAmount- Number(CustData.Discount) - CustData.PaymentPaid);
+        //                     if(sValue==="IGST"){
+        //                     oCustomerModel.setProperty("/IGST", CGST)
+        //                      oCustomerModel.setProperty("/GrandTotal", TotalAmount- Number(CustData.Discount) );
+        //                     oCustomerModel.setProperty("/DueAmount", TotalAmount - Number(CustData.Discount)- CustData.PaymentPaid);
+        //                       oCustomerModel.setProperty("/SGST", 0)
+        //                     oCustomerModel.setProperty("/CGST", 0)
 
-                //             }
 
-                //             oCustomerModel.setProperty("/SubTotal", SubTotal)
-                //               oCustomerModel.setProperty("/GSTValue", Percentage)
 
-                //             oCustomerModel.setProperty("/Discount", CustData.Discount)
-                var Payload = {
-                    "GSTType": sValue,
-                    "GSTValue": Percentage,
-                    "CustomerGSTIN": oInput ? oInput.trim().toUpperCase() : CustData.GSTNumber || ""
-                }
+        //                     }else{
+        //                     oCustomerModel.setProperty("/IGST", 0)
 
-                this.getBusyDialog()
+        //                      oCustomerModel.setProperty("/GrandTotal",TotalAmount- Number(CustData.Discount));
+        //                     oCustomerModel.setProperty("/DueAmount",TotalAmount- Number(CustData.Discount) - CustData.PaymentPaid);
 
-                this.ajaxUpdateWithJQuery("HM_Booking", {
-                        data: Payload,
-                        filters: {
-                            BookingID: CustData.BookingID
-                        }
-                    })
-                    .then(async () => {
+        //                     }
 
-                        // Refresh models
-                        await this.AD_onSearch();
-                        sap.m.MessageToast.show(this.i18nModel.getText("GST Details Saved Successfully"));
+        //                     oCustomerModel.setProperty("/SubTotal", SubTotal)
+        //                       oCustomerModel.setProperty("/GSTValue", Percentage)
 
-                        this.getView().getModel("VisibleModel").setProperty("/visible", false);
-                        this.byId("idMonthYearSelect").setVisible(false);
-                    })
-                    .catch(err => {
-                        sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
-                        console.error(err);
-                    });
-                this.GST_Dialog.close();
-            } else {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-                return;
-            }
-        },
+        //                     oCustomerModel.setProperty("/Discount", CustData.Discount)
+        //         var Payload = {
+        //             "GSTType": sValue,
+        //             "GSTValue": Percentage,
+        //             "CustomerGSTIN": oInput ? oInput.trim().toUpperCase() : CustData.GSTNumber || ""
+        //         }
+
+        //         this.getBusyDialog()
+
+        //         this.ajaxUpdateWithJQuery("HM_Booking", {
+        //                 data: Payload,
+        //                 filters: {
+        //                     BookingID: CustData.BookingID
+        //                 }
+        //             })
+        //             .then(async () => {
+
+        //                 // Refresh models
+        //                 await this.AD_onSearch();
+        //                 sap.m.MessageToast.show(this.i18nModel.getText("GST Details Saved Successfully"));
+
+        //                 this.getView().getModel("VisibleModel").setProperty("/visible", false);
+        //                 this.byId("idMonthYearSelect").setVisible(false);
+        //             })
+        //             .catch(err => {
+        //                 sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
+        //                 console.error(err);
+        //             });
+        //         this.GST_Dialog.close();
+        //     } else {
+        //         sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+        //         return;
+        //     }
+        // },
+        GST_onsavebuttonpress: function () {
+
+    const CustData = this.getView()
+        .getModel("CustomerData")
+        .getData();
+
+    var isMandatoryValid = (
+
+        utils._LCvalidateMandatoryField(
+            sap.ui.getCore().byId("idGSTNumber"),
+            "ID"
+        ) &&
+
+        utils._LCvalidateMandatoryField(
+            sap.ui.getCore().byId("idCompanyName"),
+            "ID"
+        ) &&
+
+        utils._LCvalidateMandatoryField(
+            sap.ui.getCore().byId("idCompanyAddress"),
+            "ID"
+        )
+
+    );
+
+    if (!isMandatoryValid) {
+        MessageToast.show(
+            this.i18nModel.getText("mandetoryFields")
+        );
+        return;
+    }
+
+    var payload = {
+        CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
+        CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
+        CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
+        BookingID: CustData.BookingID,
+    };
+
+    this.getBusyDialog();
+
+    var oBody = {
+                                data: payload,
+                                filters: {
+                                    BookingID: CustData.BookingID
+                                }
+                            };
+
+                            this.ajaxUpdateWithJQuery("HM_Booking", oBody).then(async () => {
+
+        await this.AD_onSearch();
+
+        MessageToast.show(
+            "Customer GST Details Saved Successfully"
+        );
+
+        this.GST_Dialog.close();
+
+    }).catch(err => {
+
+        MessageToast.show(
+            this.i18nModel.getText("errorSavingBooking")
+        );
+
+    });
+},
         onGSTTypeSelect: function(oEvent) {
             var oRadioGroup = oEvent.getSource();
 
@@ -5732,6 +5839,13 @@ sap.ui.define([
 
         onPercentagetLiveChange: function(oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
+        },
+
+        onchangeCompanyname: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
+        },
+        onchangeConpanyAddress: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         },
 
         // Signin section

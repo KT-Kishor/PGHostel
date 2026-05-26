@@ -1,25 +1,18 @@
 <c:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
-    xmlns:u="sap.ui.unified"
->
-    <Dialog
-        type="Message"
-        class="sapUiContentPadding"
-        contentWidth="28rem"
-        contentHeight="auto"
-    >
-        <customHeader>
-            <Bar class="barheader">
-                <contentMiddle>
-                    <Title text="Manage GST" />
-                </contentMiddle>
-            </Bar>
-        </customHeader>
-
-        <f:SimpleForm
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified">
+	<Dialog type="Message" class="sapUiContentPadding" contentWidth="28rem" contentHeight="auto">
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="Manage GST" />
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+		<f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
             labelSpanXL="4"
@@ -28,78 +21,56 @@
             labelSpanS="12"
             columnsXL="2"
             columnsL="2"
-            columnsM="1"
-        >
-            <f:content>
-             <Label
-                    text="Branch GSTIN"
-                    visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"
+            columnsM="1">
+			<f:content>
+				<Label text="Branch GSTIN" visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"/>
+				<Input id="idBranchGSTNumber" value="{GSTModel>/BranchGSTNumber}" editable="false"
+                    visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"/>
 
-                />
-                <Input
-                    id="idBranchGSTNumber"
-                    value="{GSTModel>/BranchGSTNumber}"
-                    editable="false"
-                    visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"
-                />
-                 <Label
-                    text="Cusomer GSTIN"
-                />
-                <Input
-                    id="idGSTNumber"
-                    value="{GSTModel>/GSTNumber}"
-                    placeholder="Enter GST number"
-                    maxLength="15"
-                    liveChange="onGSTInputLiveChange"
-                    valueStateText="Please enter a valid GST Number"
-                />
-                  <Label
-        text="GST Type"
-        required="true" />
+				<Label text="GST Type" visible="{= ${GSTModel>/GSTPercentage} ? true : false }"/>
+				<RadioButtonGroup id="idGSTType" columns="2" select="onGSTTypeSelect" editable="false" visible="{= ${GSTModel>/GSTPercentage} ? true : false }">
+					<buttons>
+						<RadioButton text="IGST" />
+						<RadioButton text="CGST/SGST" />
+					</buttons>
+				</RadioButtonGroup>
 
-    <RadioButtonGroup
-        id="idGSTType"
-        columns="2"
-        select="onGSTTypeSelect">
+				<Label text="GST Percentage" visible="{= ${GSTModel>/GSTPercentage} ? true : false }"/>
+				<Input id="idGSTPercentage" value="{GSTModel>/GSTPercentage}" placeholder="Enter GST percentage"
+                maxLength="5" liveChange="onPercentagetLiveChange" valueStateText="Please enter a valid GST Percentage" editable="false" visible="{= ${GSTModel>/GSTPercentage} ? true : false }"/>
 
-        <buttons>
-            <RadioButton text="IGST" />
-            <RadioButton text="CGST/SGST" />
-        </buttons>
+				<Label text="Cusomer GSTIN" required="true"/>
+				<Input id="idGSTNumber" value="{GSTModel>/CustomerGSTIN}" placeholder="Enter GST number"
+                maxLength="15" liveChange="onGSTInputLiveChange" valueStateText="Please enter a valid GST Number"/>
 
-    </RadioButtonGroup>
-       <Label
-                    text="GST Percentage"
-                    required="true"
-                />
-                <Input
-                    id="idGSTPercentage"
-                    value="{GSTModel>/GSTPercentage}"
-                    placeholder="Enter GST percentage"
-                    maxLength="5"
-                    liveChange="onPercentagetLiveChange"
-                    valueStateText="Please enter a valid GST Percentage"
-                />
-            </f:content>
-        </f:SimpleForm>
+				<Label text="Company Name" required="true"/>
+				<Input id="idCompanyName" value="{GSTModel>/CustCompanyName}" placeholder="Enter company name (minimum 3 characters)"
+                change="onchangeCompanyname" liveChange="onchangeCompanyname" valueStateText="Please enter a valid company name"
+                showValueStateMessage="true" maxLength="100"/>
 
-        <beginButton>
-            <Button
+				<Label text="Company Address" required="true"/>
+				<TextArea value="{GSTModel>/CustCompanyAddress}" placeholder="Enter complete company address" rows="3"
+                change="onchangeConpanyAddress" liveChange="onchangeConpanyAddress" valueStateText="Please enter a valid company address (minimum 10 characters)" showValueStateMessage="true" id="idCompanyAddress" maxLength="500" growing="true"
+                growingMaxLines="5"/>
+			</f:content>
+		</f:SimpleForm>
+		<beginButton>
+			<Button
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
                 press="GST_onsavebuttonpress"
                 id="GST_id_saveButton"
                 class="marginRight myUnifiedBtn"
             />
-        </beginButton>
-        <endButton>
-            <Button
+		</beginButton>
+		<endButton>
+			<Button
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="GST_onCancelButtonPress"
                 id="GST_id_CancelButton"
                 class="marginRight myUnifiedBtn"
             />
-        </endButton>
-    </Dialog>
+		</endButton>
+	</Dialog>
 </c:FragmentDefinition>
