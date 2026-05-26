@@ -4086,7 +4086,7 @@ sap.ui.define([
 
             var oView = this.getView();
             var vm = oView.getModel("LoginViewModel");
-            var oCustomerData = oView.getModel("CustomerData").getData();
+            var oCustomerData = oView.getModel("HostelModel").getData();
             var oFragment = this._oLoginAlertDialog;
 
             const isOTP = true; // since you only use OTP now
@@ -4148,52 +4148,20 @@ sap.ui.define([
 
                 // 2️⃣ Backend call
                 const payload = {
-                    CustomerID: oCustomerData.CustomerID,
+                    CustomerID: oCustomerData.UserID,
                     OTP: sOTP
                 };
 
                 await this.ajaxReadWithJQuery("HM_Customer", payload);
 
-                // ================= SUCCESS FLOW =================
-                var model = oView.getModel("Bookingmodel");
-                var data = oCustomerData;
+                // Set LoginModel after successful login
+                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
 
-                oView.getModel("VisibleModel").setProperty("/visible", true);
-
-                model.setProperty("/BedTypeName", data.BedType);
-                model.setProperty("/CouponCode", data.CouponCode);
-                model.setProperty("/UnitText", data.PaymentType);
-                model.setProperty("/StartDate", data.StartDate);
-                model.setProperty("/EndDate", data.EndDate);
-                model.setProperty("/CustomerName", data.CustomerName);
-                model.setProperty("/DateOfBirth", data.DateOfBirth);
-                model.setProperty("/Gender", data.Gender);
-                model.setProperty("/CustomerEmail", data.CustomerEmail);
-                model.setProperty("/Country", data.Country);
-                model.setProperty("/State", data.State);
-                model.setProperty("/City", data.City);
-                model.setProperty("/STDCode", data.STDCode);
-                model.setProperty("/MobileNo", data.MobileNo);
-                model.setProperty("/Salutation", data.Salutation);
-                model.setProperty("/Address", data.Address);
-
-                // Payment Type Logic
-                if (data.PaymentType === "Per Month") {
-                    model.setProperty("/UnitText", "monthly");
-                } else if (data.PaymentType === "Per Day") {
-                    model.setProperty("/UnitText", "daily");
-                } else if (data.PaymentType === "Per Year") {
-                    model.setProperty("/UnitText", "yearly");
-                }
-
-                if (data.PaymentType !== "Per Day") {
-                    this.byId("idMonthYearSelect").setVisible(false);
-                }
-
-                if (data.PaymentType === "Per Month" || data.PaymentType === "Per Year") {
-                    model.setProperty("/DurationUnit", data.Duration);
-                    this.byId("idMonthYearSelect").setVisible(true);
-                }
+                oLoginModel.setData({
+                    UserID: oCustomerData.UserID,
+                    CustomerEmail: sEmail,
+                    IsLoggedIn: true
+                });
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
@@ -4416,11 +4384,11 @@ sap.ui.define([
         },
 
         _verifyOTPWithBackend: async function(otp) {
-            var oCustomerData = this.getView().getModel("CustomerData").getData();
+            var oCustomerData = this.getView().getModel("HostelModel").getData();
             this.getBusyDialog()
             try {
                 const oPayload = {
-                    CustomerID: oCustomerData.CustomerID,
+                    CustomerID: oCustomerData.UserID,
                     OTP: otp.trim()
                 };
 
@@ -4445,7 +4413,7 @@ sap.ui.define([
                 "emailInput"
             );
 
-            var oCustomerData = this.getView().getModel("CustomerData").getData();
+            var oCustomerData = this.getView().getModel("HostelModel").getData();
             const sUserId = oEmailIDCtrl?.getValue()?.trim();
 
             // ================= VALIDATION =================
@@ -4455,7 +4423,7 @@ sap.ui.define([
             }
 
             const payload = {
-                CustomerID: oCustomerData.CustomerID,
+                CustomerID: oCustomerData.UserID,
                 CustomerEmail: sUserId,
                 Type: "BookingOTP"
             };
