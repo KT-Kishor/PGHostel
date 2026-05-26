@@ -37,12 +37,18 @@ sap.ui.define([
                 }.bind(this)
             });
 
-            const vm = this.getView().getModel("LoginViewModel");
-            vm.setProperty("/showOTPField", false); // show OTP input box only after Send OTP success
-            vm.setProperty("/isOtpEntered", false);
-            vm.setProperty("/canResendOTP", true);
-            vm.setProperty("/otpTimer", 0);
-            vm.setProperty("/otpButtonText", "Send OTP");
+            // Login View Model
+            var oLoginViewModel = new sap.ui.model.json.JSONModel({
+                showOTPField: false,
+                isOtpEntered: false,
+                canResendOTP: true,
+                otpTimer: 0,
+                otpButtonText: "Send OTP"
+            });
+
+            this.getView().setModel(oLoginViewModel, "LoginViewModel");
+
+            // Login Mode Model
             this.getView().setModel(new JSONModel({
                 fullname: "",
                 Email: "",
