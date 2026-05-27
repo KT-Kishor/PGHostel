@@ -5113,7 +5113,6 @@ sap.ui.define([
 
                 newSubtotal = subtotal - discountAmount;
 
-
                 // Update Model
                 oCustomerData.Discount = discountAmount.toFixed(2);
                 oCustomerData.SubTotal = newSubtotal;
@@ -8788,7 +8787,7 @@ sap.ui.define([
                     resizable: true,
 
                     horizontalScrolling: false,
-                    verticalScrolling: false,
+                    verticalScrolling: true,
 
                     contentPadding: "0rem",
 

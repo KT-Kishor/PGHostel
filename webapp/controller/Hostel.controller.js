@@ -125,6 +125,7 @@ sap.ui.define([
 
             if (sStoredTab === "idRooms") {
                 setTimeout(async () => {
+                    this.cityuse = true
                     await this._loadRoomsPageData();
                 }, 300);
 
@@ -1187,6 +1188,7 @@ sap.ui.define([
                         this.closeBusyDialog();
                     }
                 }
+                this.cityuse = false
                 await this._loadRoomsPageData();
             } else {
                 oFooterModel.setProperty("/showGlobalFooter", true);
@@ -2843,11 +2845,18 @@ sap.ui.define([
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
-                var FCity = data.find((item) => {
-                    return item.City === "Kalaburagi"
-                })
-                var city = FCity ? FCity.City : data[0].City;
-                var fCity = this.City ? this.City : city;
+                if (this.cityuse === false) {
+                    var FCity = data.find((item) => {
+                        return item.City === "Kalaburagi"
+                    })
+                    var city = FCity ? FCity.City : data[0].City;
+                    var fCity = this.City ? this.City : city;
+                } else {
+                    var City = data.find((item) => {
+                        return item.BranchID === this.getOwnerComponent().getModel("sPathModel").getData().Branch
+                    })
+                    var fCity = City.City;
+                }
 
                 var filter = {
                     flag: "true",
@@ -2860,8 +2869,11 @@ sap.ui.define([
                 this._populateUniqueFilterValues(data)
 
 
-
-                const sCity = this.City ? this.City : FCity ? FCity.City : data[0].City;
+                if (this.cityuse === false) {
+                    var sCity = this.City ? this.City : FCity ? FCity.City : data[0].City;
+                } else {
+                    var sCity = City ? City.City : data[0].City;
+                }
 
                 const aFiltered = oModelData.filter(item => item.City === sCity);
 
@@ -2891,6 +2903,8 @@ sap.ui.define([
                 this.byId("id_Roomtype").setBusy(false);
                 // ✅ show ROOMS footer after success OR failure
                 oFooterModel.setProperty("/showRoomsFooter", true);
+                oFooterModel.setProperty("/showGlobalFooter", false);
+
             }
         },
         _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
