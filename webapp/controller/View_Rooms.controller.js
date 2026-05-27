@@ -1169,6 +1169,13 @@ sap.ui.define([
                 oLoginModel.setProperty("/City", user.City || "");
                 oLoginModel.setProperty("/Address", user.Address || "");
                 oLoginModel.setProperty("/DateofBirth", this.Formatter.DateFormat(user.DateOfBirth) || "");
+                localStorage.setItem("isLoggedIn", "true");
+
+                localStorage.setItem("_x9A1p", user._x9A1p);
+                localStorage.setItem("_k7LmQ", user._k7LmQ);
+
+                localStorage.setItem("_aB39X", btoa(user.UserID));
+                localStorage.setItem("_mN72P", btoa(user.UserName));
                   
                 // Role Based Access
                 if (user.Role === "Customer") {
