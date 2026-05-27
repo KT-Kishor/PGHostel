@@ -873,7 +873,7 @@
                                     tooltip="Period"
                                 />
                             </Column>
-                            <Column
+                            <!-- <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
                             >
@@ -890,7 +890,7 @@
                                     text="Discount"
                                     tooltip="Discount"
                                 />
-                            </Column>
+                            </Column> -->
                             <Column
                                 minScreenWidth="Tablet"
                                 demandPopin="true"
@@ -949,11 +949,11 @@
 }"
                                     />
 
-                                    <Text text="{CustomerData>CouponCode}" />
+                                    <!-- <Text text="{CustomerData>CouponCode}" /> -->
 
-                                    <Text
+                                    <!-- <Text
                                         text="{CustomerData>CouponDiscount}"
-                                    />
+                                    /> -->
 
                                     <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
                                     <Text

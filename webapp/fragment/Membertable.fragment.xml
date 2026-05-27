@@ -63,7 +63,7 @@
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
                                 text="{BookingView>Documents/0/FileName}"
-                                press="MS_viewimage"
+                                press="MS_viewimagetable"
                                 class="documentLink"
                             />
                                 <Button

@@ -249,7 +249,7 @@
                     <Link
                         text="{BookingView>/NewMemberDraft/Documents/0/FileName}"
                         tooltip="{BookingView>/NewMemberDraft/Documents/0/FileName}"
-                        press="MS_viewimage"
+                        press="MS_viewimagefragment"
                         width="10rem"
                         class="automatedEllipsis documentLink"
                     />
