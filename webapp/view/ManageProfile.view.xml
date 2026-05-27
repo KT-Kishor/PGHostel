@@ -188,6 +188,9 @@
                             valueFormat="dd/MM/yyyy"
                             valueStateText="{i18n>enterDateofBirth}"
                             change="onChangeDOB"
+                            initialFocusedDateValue="{controller>/focusedDate}"
+                            minDate="{controller>/minDate}"
+                            maxDate="{controller>/maxdate}"
                         />
 
                         <Label

@@ -4581,51 +4581,40 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .defaultBGBlur {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+    position: relative;
+    overflow: hidden;
 }
 
 .defaultBGBlur::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("../image/BedHostel.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(8px);
-  transform: scale(1.08);
-  z-index: 0;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../image/BedHostel.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    transform: scale(1.08);
+    z-index: 0;
 }
 
 .defaultBGBlur::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  z-index: 0;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 0;
 }
 
-.defaultBGBlur>footer {
-  margin-top: auto;
-  position: relative;
-  z-index: 2;
-}
-
-.defaultBGBlur>* {
-  position: relative;
-  z-index: 1;
-}
-
-.defaultBGBlur {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* Keep page content above overlay */
+.defaultBGBlur .sapMPageHeader,
+.defaultBGBlur .sapMPageSubHeader,
+.defaultBGBlur .sapMPageContent,
+.defaultBGBlur .sapMPageFooter {
+    position: relative;
+    z-index: 1;
 }
 
 .customRoundedFlex {
