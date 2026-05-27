@@ -111,6 +111,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var LoginFunction = await this.commonLoginFunction("LoginPage");
+            this.closeBusyDialog();
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");
             if (oTabHeader) oTabHeader.setSelectedKey(sStoredTab);
@@ -228,105 +230,105 @@ sap.ui.define([
             );
 
             // -----------------------------
-// HANDLE POST LOGIN REDIRECTION
-// -----------------------------
-// const sRedirectFlag = sessionStorage.getItem("redirectAfterLogin");
+            // HANDLE POST LOGIN REDIRECTION
+            // -----------------------------
+            // const sRedirectFlag = sessionStorage.getItem("redirectAfterLogin");
 
-// if (sRedirectFlag === "bookingFlow") {
+            // if (sRedirectFlag === "bookingFlow") {
 
-//     // Clear flag
-//     sessionStorage.removeItem("redirectAfterLogin");
+            //     // Clear flag
+            //     sessionStorage.removeItem("redirectAfterLogin");
 
-//     // Restore booking data
-//     const sData = sessionStorage.getItem("pendingBookingData");
-//     if (sData) {
-//         const oData = JSON.parse(sData);
+            //     // Restore booking data
+            //     const sData = sessionStorage.getItem("pendingBookingData");
+            //     if (sData) {
+            //         const oData = JSON.parse(sData);
 
-//         let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
-//         if (!oGlobalModel) {
-//             oGlobalModel = new JSONModel({});
-//             sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
-//         }
+            //         let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
+            //         if (!oGlobalModel) {
+            //             oGlobalModel = new JSONModel({});
+            //             sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
+            //         }
 
-//         oGlobalModel.setData(oData, true);
+            //         oGlobalModel.setData(oData, true);
 
-//         // Also restore local model if needed
-//         if (this.oHostelModel) {
-//             this.oHostelModel.setData(oData, true);
-//         }
-//         sessionStorage.removeItem("pendingBookingData");
-//     }
+            //         // Also restore local model if needed
+            //         if (this.oHostelModel) {
+            //             this.oHostelModel.setData(oData, true);
+            //         }
+            //         sessionStorage.removeItem("pendingBookingData");
+            //     }
 
-//     // Reopen room detail fragment automatically
-//     setTimeout(() => {
-//         this._reopenRoomDetailAfterLogin();
-//     }, 300);
-// }
+            //     // Reopen room detail fragment automatically
+            //     setTimeout(() => {
+            //         this._reopenRoomDetailAfterLogin();
+            //     }, 300);
+            // }
 
-         this.onAfterAnimate()
+            this.onAfterAnimate()
         },
-onAfterAnimate: function () {
-    var oHome = this.byId("idHome");
-    var oComponent = this.getOwnerComponent();
+        onAfterAnimate: function () {
+            var oHome = this.byId("idHome");
+            var oComponent = this.getOwnerComponent();
 
-    oHome.setBusy(true);
+            oHome.setBusy(true);
 
-    var oInterval = setInterval(function () {
-        if (oComponent._imagesLoaded) {
-            clearInterval(oInterval);
+            var oInterval = setInterval(function () {
+                if (oComponent._imagesLoaded) {
+                    clearInterval(oInterval);
 
-            var aImages = oComponent._aPreloadedImages;
-            this._homeSliderIndex = 0;
+                    var aImages = oComponent._aPreloadedImages;
+                    this._homeSliderIndex = 0;
 
-            // Apply base styling and CSS transition for background-image
-            oHome.$().css({
-                "background-image": "url('" + aImages[0] + "')",
-                "background-size": "cover",
-                "background-position": "center",
-                "background-repeat": "no-repeat",
-                "transition": "background-image 0.8s ease-in-out" // Handles the smooth fade
-            });
+                    // Apply base styling and CSS transition for background-image
+                    oHome.$().css({
+                        "background-image": "url('" + aImages[0] + "')",
+                        "background-size": "cover",
+                        "background-position": "center",
+                        "background-repeat": "no-repeat",
+                        "transition": "background-image 0.8s ease-in-out" // Handles the smooth fade
+                    });
 
-            setTimeout(function () {
-                oHome.setBusy(false);
-            }, 300);
+                    setTimeout(function () {
+                        oHome.setBusy(false);
+                    }, 300);
 
-            // Clear any existing interval to prevent memory leaks
-            if (this._imageInterval) {
-                clearInterval(this._imageInterval);
-            }
+                    // Clear any existing interval to prevent memory leaks
+                    if (this._imageInterval) {
+                        clearInterval(this._imageInterval);
+                    }
 
-            // Slider
-         this._imageInterval = setInterval(function () {
+                    // Slider
+                    this._imageInterval = setInterval(function () {
 
-             this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
+                        this._homeSliderIndex = (this._homeSliderIndex + 1) % aImages.length;
 
-             var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
+                        var sNextImage = "url('" + aImages[this._homeSliderIndex] + "')";
 
-    // Preload image before applying
-    var img = new Image();
-             img.src = aImages[this._homeSliderIndex];
+                        // Preload image before applying
+                        var img = new Image();
+                        img.src = aImages[this._homeSliderIndex];
 
-    img.onload = function () {
+                        img.onload = function () {
 
-        var $home = oHome.$();
+                            var $home = oHome.$();
 
-        // Force smooth repaint trick
+                            // Force smooth repaint trick
 
-        // Apply new background
-        $home.css({
-            "background-image": sNextImage,
-            "background-size": "cover",
-            "background-position": "center",
-            "background-repeat": "no-repeat"
-        });
+                            // Apply new background
+                            $home.css({
+                                "background-image": sNextImage,
+                                "background-size": "cover",
+                                "background-position": "center",
+                                "background-repeat": "no-repeat"
+                            });
 
-    };
+                        };
 
-}.bind(this), 6000); ////6000
-        }   
-    }.bind(this), 50);
-},
+                    }.bind(this), 6000); ////6000
+                }
+            }.bind(this), 50);
+        },
 
         /* ── Home image slider pause / resume on input focus ── */
 
@@ -521,7 +523,7 @@ onAfterAnimate: function () {
         onConfirmBooking: function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
-         
+
             if (!bLoggedIn) {
                 MessageBox.information("Please log in to continue booking.", {
                     title: "Login Required",
@@ -1122,13 +1124,13 @@ onAfterAnimate: function () {
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
-                   if (this._imageInterval) {
-        clearInterval(this._imageInterval);
-                                            }
-               
+                if (this._imageInterval) {
+                    clearInterval(this._imageInterval);
+                }
+
                 oFooterModel.setProperty("/showGlobalFooter", false);
                 oFooterModel.setProperty("/showRoomsFooter", false);
-                
+
 
                 let oModel = this.getOwnerComponent().getModel("sBRModel");
 
@@ -1143,7 +1145,7 @@ onAfterAnimate: function () {
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
-                    
+
 
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
@@ -1151,21 +1153,21 @@ onAfterAnimate: function () {
                         oModel.setData(aData);
 
                         const oBranchCombo = this.byId("id_Branch");
-if (aData.length === 0) {
-    // Clear input first
-    oBranchCombo.setValue("");
-    
-    // Insert No Data item to dropdown
-    if (oBranchCombo.getItems().length === 0) {
-        oBranchCombo.insertItem(new sap.ui.core.ListItem({
-            key: "",
-            text: "No Data"
-        }), 0);
-    }
-} else {
-    // Clear any manual No Data items when real data loads
-    oBranchCombo.removeAllItems();
-}
+                        if (aData.length === 0) {
+                            // Clear input first
+                            oBranchCombo.setValue("");
+
+                            // Insert No Data item to dropdown
+                            if (oBranchCombo.getItems().length === 0) {
+                                oBranchCombo.insertItem(new sap.ui.core.ListItem({
+                                    key: "",
+                                    text: "No Data"
+                                }), 0);
+                            }
+                        } else {
+                            // Clear any manual No Data items when real data loads
+                            oBranchCombo.removeAllItems();
+                        }
 
                         // ✅ Handle No Data
                         if (!aData || aData.length === 0) {
@@ -1182,11 +1184,11 @@ if (aData.length === 0) {
                 oFooterModel.setProperty("/showGlobalFooter", true);
                 oFooterModel.setProperty("/showRoomsFooter", false);
             }
-            if(sKey === "idContact"){
+            if (sKey === "idContact") {
                 if (this._imageInterval) {
-        clearInterval(this._imageInterval);
+                    clearInterval(this._imageInterval);
+                }
             }
-        }
 
             if (sKey === "idHome") {
                 this.onAfterAnimate()
@@ -1293,20 +1295,20 @@ if (aData.length === 0) {
             this._oSignDialog.open();
         },
 
-      onDialogClose: function () {
-    this._resetOtpState();
+        onDialogClose: function () {
+            this._resetOtpState();
 
-    if (this._oSignDialog) {
-        this.getView().removeStyleClass("blur-background");
+            if (this._oSignDialog) {
+                this.getView().removeStyleClass("blur-background");
 
-        this._oSignDialog.close();   // Close first
-        this._oSignDialog.destroy(); // Destroy
+                this._oSignDialog.close();   // Close first
+                this._oSignDialog.destroy(); // Destroy
 
-        this._oSignDialog = null;    // 🔥 CRITICAL FIX
-    }
-          // Dialog was destroyed – afterClose won't fire, so resume slider directly
-          this._startHomeImageSlider();
-},
+                this._oSignDialog = null;    // 🔥 CRITICAL FIX
+            }
+            // Dialog was destroyed – afterClose won't fire, so resume slider directly
+            this._startHomeImageSlider();
+        },
 
         onSwitchToSignIn: function () {
             this.oViewModel.setProperty("/authFlow", "signin");
@@ -2735,19 +2737,15 @@ if (aData.length === 0) {
         },
         viewRooms: function (oEvent) {
             var oSource = oEvent.getSource();
-
-            // Get binding context of the clicked bed type
             var oCtx = oSource.getBindingContext("VisibilityModel");
-
-            if (!oCtx) {
-                return;
-            }
-
+            if (!oCtx) return;
             var oBranchData = oCtx.getObject();
-
-            this.getOwnerComponent().getRouter().navTo("RouteViewRooms", {
+            var oRouter = this.getOwnerComponent().getRouter();
+            var sHash = oRouter.getURL("RouteViewRooms", {
                 sPath: oBranchData.BranchID
             });
+            var sUrl = window.location.origin + window.location.pathname + "#" + sHash;
+            sap.m.URLHelper.redirect(sUrl, true);
         },
         onSearchRooms: async function () {
             this.iTop = 5
@@ -2913,7 +2911,7 @@ if (aData.length === 0) {
                     if (sBranchCode || BranchName) {
                         this.Branchlength = aBranchesData.length
                     }
-                  
+
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
 
@@ -2973,7 +2971,7 @@ if (aData.length === 0) {
                         Name: branch.Name,
                         City: branch.City,
                         Address: branch.Address,
-                        PropertyType:branch.PropertyType,
+                        PropertyType: branch.PropertyType,
                         LandMark: branch.LandMark,
                         Country: branch.Country,
                         GSTIN: branch.GSTIN,
@@ -2983,8 +2981,8 @@ if (aData.length === 0) {
                         Image: sImage,
                         TotalFeedbacks: branch.TotalFeedbacks,
                         AverageRating: branch.AverageRating,
-                        StartingPrice:branch.StartingPrice,
-                        Currency:branch.Currency
+                        StartingPrice: branch.StartingPrice,
+                        Currency: branch.Currency
                     };
                 });
                 this.Scity = Scity
@@ -3855,7 +3853,7 @@ if (aData.length === 0) {
                 }
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
-                
+
                 // if (!user?.UserID) {
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
@@ -3878,7 +3876,14 @@ if (aData.length === 0) {
                 oLoginModel.setProperty("/City", user.City || "");
                 oLoginModel.setProperty("/Address", user.Address || "");
                 oLoginModel.setProperty("/DateofBirth", this.Formatter.DateFormat(user.DateOfBirth) || "");
-                
+                debugger
+                localStorage.setItem("isLoggedIn", "true");
+
+                localStorage.setItem("_x9A1p", user._x9A1p);
+                localStorage.setItem("_k7LmQ", user._k7LmQ);
+
+                localStorage.setItem("_aB39X", btoa(user.UserID));
+                localStorage.setItem("_mN72P", btoa(user.UserName));
 
                 // Role Based Access
                 if (user.Role === "Customer") {
@@ -3893,10 +3898,10 @@ if (aData.length === 0) {
                 $C("signinPassword").setValue("");
                 $C("signInOTP").setValue("");
                 // Close dialog
-                if (this._oSignDialog){
+                if (this._oSignDialog) {
                     this.getView().removeStyleClass("blur-background");
-                    this._oSignDialog.close(),this._oSignDialog.destroy();
-        this._oSignDialog = null;
+                    this._oSignDialog.close(), this._oSignDialog.destroy();
+                    this._oSignDialog = null;
                 }
                 // Dialog was destroyed – afterClose won't fire, so resume slider directly
                 this._startHomeImageSlider();
@@ -4192,7 +4197,7 @@ if (aData.length === 0) {
 
             (sSelectedTab === "Payment") ? oProfileModel.setProperty("/paymentCount", length) : oProfileModel.setProperty("/bookingCount", length);
         },
-///
+        ///
         onAdminSIGNUP: function () {
             if (!this._oAdminSignup) {
                 this._oAdminSignup = sap.ui.xmlfragment("sap.ui.com.project1.fragment.AdminSignup", this);
@@ -4573,7 +4578,7 @@ if (aData.length === 0) {
                         onClose: () => {
                             this._oAdminSignup.close();
                         }
-                }
+                    }
                 );
 
             } catch (err) {
@@ -5069,7 +5074,7 @@ if (aData.length === 0) {
                     this._supportRequestDialog.attachAfterClose(() => {
                         this.HF_onCancelButtonPress();
                         this._startHomeImageSlider();
-                });
+                    });
 
                 }.bind(this));
 
@@ -5079,129 +5084,129 @@ if (aData.length === 0) {
             }
 
         },
-       HF_onCancelButtonPress: function () {
+        HF_onCancelButtonPress: function () {
 
-    const oView = this.getView();
+            const oView = this.getView();
 
-    // 1️⃣ Clear model data
-    const oSupportModel = oView.getModel("SupportModel");
-    if (oSupportModel) {
-        oSupportModel.setData({
-            IssueName: "",
-            IssueType: "",
-            IssueDescription: "",
-            RaisedBy: "",
-            Email: ""
-        });
-    }
+            // 1️⃣ Clear model data
+            const oSupportModel = oView.getModel("SupportModel");
+            if (oSupportModel) {
+                oSupportModel.setData({
+                    IssueName: "",
+                    IssueType: "",
+                    IssueDescription: "",
+                    RaisedBy: "",
+                    Email: ""
+                });
+            }
 
-    // 2️⃣ Clear uploaded images
-    const oUploaderData = oView.getModel("UploaderData");
-    if (oUploaderData) {
-        oUploaderData.setProperty("/attachments", []);
-    }
+            // 2️⃣ Clear uploaded images
+            const oUploaderData = oView.getModel("UploaderData");
+            if (oUploaderData) {
+                oUploaderData.setProperty("/attachments", []);
+            }
 
-    // 3️⃣ Clear tokens
-    const oTokenModel = oView.getModel("tokenModel");
-    if (oTokenModel) {
-        oTokenModel.setProperty("/tokens", []);
-    }
+            // 3️⃣ Clear tokens
+            const oTokenModel = oView.getModel("tokenModel");
+            if (oTokenModel) {
+                oTokenModel.setProperty("/tokens", []);
+            }
 
-    // 4️⃣ Reset ValueState
-    const aFields = [
-        "SR_id_IssueName",
-        "SR_id_IssueType",
-        "SR_id_IssueDescription",
-        "SR_id_RaisedBy",
-        "SR_id_Email"
-    ];
+            // 4️⃣ Reset ValueState
+            const aFields = [
+                "SR_id_IssueName",
+                "SR_id_IssueType",
+                "SR_id_IssueDescription",
+                "SR_id_RaisedBy",
+                "SR_id_Email"
+            ];
 
-    aFields.forEach(id => {
-        const oControl = sap.ui.getCore().byId(oView.createId(id));
-        if (oControl) {
-            oControl.setValueState("None");
-        }
-    });
+            aFields.forEach(id => {
+                const oControl = sap.ui.getCore().byId(oView.createId(id));
+                if (oControl) {
+                    oControl.setValueState("None");
+                }
+            });
 
-    // 5️⃣ Clear file uploader
-    const oUploader = sap.ui.getCore().byId(oView.createId("HFF_id_FileUploader1"));
-    if (oUploader) {
-        oUploader.clear();
-    }
+            // 5️⃣ Clear file uploader
+            const oUploader = sap.ui.getCore().byId(oView.createId("HFF_id_FileUploader1"));
+            if (oUploader) {
+                oUploader.clear();
+            }
 
-    // 6️⃣ Close dialog
-    this._supportRequestDialog.close();
+            // 6️⃣ Close dialog
+            this._supportRequestDialog.close();
 
-},
+        },
         onIssuenamechanges: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
         onFileSizeExceed: function (oEvent) {
-    const oFileUploader = oEvent.getSource();
-    const sFileName = oEvent.getParameter("fileName");
+            const oFileUploader = oEvent.getSource();
+            const sFileName = oEvent.getParameter("fileName");
 
-    sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
-},
-       onSupportrequestChange: function (oEvent) {
+            sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
+        },
+        onSupportrequestChange: function (oEvent) {
 
-    const oFiles = oEvent.getParameter("files");
-    if (!oFiles || oFiles.length === 0) return;
+            const oFiles = oEvent.getParameter("files");
+            if (!oFiles || oFiles.length === 0) return;
 
-    const oView = this.getView();
-    const oUploaderData = oView.getModel("UploaderData");
-    const oTokenModel = oView.getModel("tokenModel");
+            const oView = this.getView();
+            const oUploaderData = oView.getModel("UploaderData");
+            const oTokenModel = oView.getModel("tokenModel");
 
-    let aAttachments = oUploaderData.getProperty("/attachments") || [];
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
-if (aAttachments.length + oFiles.length > 3) {
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+            if (aAttachments.length + oFiles.length > 3) {
                 MessageToast.show("You can upload maximum 3 images only");
                 return;
             }
 
-    Array.from(oFiles).forEach((oFile) => {
+            Array.from(oFiles).forEach((oFile) => {
 
-        // Check duplicate file name
-        const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
-        if (bDuplicate) {
-            MessageToast.show("This file is already uploaded and cannot be uploaded again");
-            return;
-        }
-        // File type validation
-        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-            MessageToast.show("Only JPG, JPEG, PNG allowed");
-            return;
-        }
+                // Check duplicate file name
+                const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
+                if (bDuplicate) {
+                    MessageToast.show("This file is already uploaded and cannot be uploaded again");
+                    return;
+                }
+                // File type validation
+                if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                    MessageToast.show("Only JPG, JPEG, PNG allowed");
+                    return;
+                }
 
 
-        const oReader = new FileReader();
+                const oReader = new FileReader();
 
-        oReader.onload = (e) => {
+                oReader.onload = (e) => {
 
-            const sBase64 = e.target.result.split(",")[1];
+                    const sBase64 = e.target.result.split(",")[1];
 
-            aAttachments.push({
-                filename: oFile.name,
-                fileType: oFile.type,
-                content: sBase64
+                    aAttachments.push({
+                        filename: oFile.name,
+                        fileType: oFile.type,
+                        content: sBase64
+                    });
+
+                    aTokens.push({
+                        key: oFile.name,
+                        text: oFile.name
+                    });
+
+                    oUploaderData.setProperty("/attachments", aAttachments);
+                    oTokenModel.setProperty("/tokens", aTokens);
+
+                };
+
+                oReader.readAsDataURL(oFile);
+
             });
 
-            aTokens.push({
-                key: oFile.name,
-                text: oFile.name
-            });
+            oEvent.getSource().clear();
 
-            oUploaderData.setProperty("/attachments", aAttachments);
-            oTokenModel.setProperty("/tokens", aTokens);
-
-        };
-
-        oReader.readAsDataURL(oFile);
-
-    });
-
-    oEvent.getSource().clear();
-
-},
+        },
         onTokenDelete: function (oEvent) {
 
             const aDeletedTokens = oEvent.getParameter("tokens");
@@ -5305,7 +5310,7 @@ if (aAttachments.length + oFiles.length > 3) {
             this.closeBusyDialog()
             MessageToast.show("Support request submitted successfully");
 
-          this.HF_onCancelButtonPress()
+            this.HF_onCancelButtonPress()
         },
 
         onissuetypechanges: function (oEvent) {

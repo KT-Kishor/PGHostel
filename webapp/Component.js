@@ -25,10 +25,9 @@ sap.ui.define([
             init: async function () {
                 // call the base component's init function
                 UIComponent.prototype.init.apply(this, arguments);
-
-
                 // --- Global virtual keyboard / carousel slide blocker ---
                 window.isVirtualKeyboardActive = false;
+                this._initTabSession();
 
                 // Helper function to detect if an element accepts text input (triggers keyboard)
                 var fnIsInputField = function (el) {
@@ -74,38 +73,38 @@ sap.ui.define([
                 };
                 // --- End global override ---
 
-                 var aImages = [
-                sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
-                sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
-                sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
-                sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
-                sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
-            ];
+                var aImages = [
+                    sap.ui.require.toUrl("sap/ui/com/project1/image/BedHostel.png"),
+                    sap.ui.require.toUrl("sap/ui/com/project1/image/Home2.jpg"),
+                    sap.ui.require.toUrl("sap/ui/com/project1/image/Home3.jpg"),
+                    sap.ui.require.toUrl("sap/ui/com/project1/image/Home4.jpg"),
+                    sap.ui.require.toUrl("sap/ui/com/project1/image/Home5.jpg")
+                ];
 
-            this._aPreloadedImages = [];
-            this._imagesLoaded = false;
+                this._aPreloadedImages = [];
+                this._imagesLoaded = false;
 
-            var iLoaded = 0;
+                var iLoaded = 0;
 
-            aImages.forEach(function (sSrc) {
+                aImages.forEach(function (sSrc) {
 
-                var oImg = new Image();
+                    var oImg = new Image();
 
-                oImg.onload = function () {
+                    oImg.onload = function () {
 
-                    iLoaded++;
+                        iLoaded++;
 
-                    if (iLoaded === aImages.length) {
-                        this._imagesLoaded = true;
-                    }
+                        if (iLoaded === aImages.length) {
+                            this._imagesLoaded = true;
+                        }
 
-                }.bind(this);
+                    }.bind(this);
 
-                oImg.src = sSrc;
+                    oImg.src = sSrc;
 
-                this._aPreloadedImages.push(sSrc);
+                    this._aPreloadedImages.push(sSrc);
 
-            }.bind(this));
+                }.bind(this));
 
                 // enable routing
                 this.getRouter().initialize();
@@ -146,13 +145,99 @@ sap.ui.define([
 
                 const oAppStateModel = new JSONModel({
                     previousTab: "idHome", // default value
-                    });
+                });
                 this.setModel(oAppStateModel, "AppStateModel");
 
                 const oComplaintTypeModel = new sap.ui.model.json.JSONModel();
                 oComplaintTypeModel.loadData("model/ComplaintTypes.json");
                 this.setModel(oComplaintTypeModel, "ComplaintTypeModel");
             },
+            _initTabSession: function () {
+                // 1. Generate a unique ID for this tab instance for this session only
+                if (!sessionStorage.getItem("tabId")) {
+                    let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+                    if (activeTabs.length === 0) {
+                        localStorage.removeItem("isLoggedIn");
+                        localStorage.removeItem("_x9A1p");
+                        localStorage.removeItem("_k7LmQ");
+                        localStorage.removeItem("_aB39X");
+                        localStorage.removeItem("_mN72P");
+                        localStorage.removeItem("activeTabs");
+                        sessionStorage.setItem("tabId", Date.now().toString() + "_" + Math.random());
+                    }
+                }
+                this._tabId = sessionStorage.getItem("tabId");
+
+                // 2. Register this tab in localStorage
+                this._registerTab();
+
+                // 3. Attach standard listeners
+                window.addEventListener("beforeunload", this._removeTab.bind(this));
+                window.addEventListener("storage", this._onStorageChange.bind(this));
+            },
+
+            _registerTab: function () {
+                let tabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+
+                // Clean out any null/undefined values
+                tabs = tabs.filter(id => id);
+
+                // Add this tab if it isn't already tracked
+                if (!tabs.includes(this._tabId)) {
+                    tabs.push(this._tabId);
+                }
+
+                localStorage.setItem("activeTabs", JSON.stringify(tabs));
+            },
+
+            _removeTab: function () {
+                let tabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+
+                // Immediately remove this tab from the active list
+                tabs = tabs.filter(id => id !== this._tabId);
+                localStorage.setItem("activeTabs", JSON.stringify(tabs));
+
+                setTimeout(() => {
+                    const latestTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+
+                    // Only clear data if absolutely NO tabs are open anymore
+                    if (latestTabs.length === 0) {
+                        localStorage.removeItem("isLoggedIn");
+                        localStorage.removeItem("_x9A1p");
+                        localStorage.removeItem("_k7LmQ");
+                        localStorage.removeItem("_aB39X");
+                        localStorage.removeItem("_mN72P");
+                        localStorage.removeItem("activeTabs");
+                    }
+                }, 1500);
+            },
+
+            _onStorageChange: function (event) {
+                const aProtectedKeys = ["_x9A1p", "_k7LmQ", "_aB39X", "_mN72P"];
+                // Ignore tab handling keys
+                if (event.key === "activeTabs" || event.key === "tabId") return;
+                // Ignore unrelated keys
+                if (!aProtectedKeys.includes(event.key)) return;
+
+                // Ignore first login set
+                if (event.oldValue === null) return;
+
+                // Ignore app updates
+                if (window._isAppUpdatingStorage) return;
+                // Prevent multiple trigger
+                if (window._sessionLogoutRunning) return;
+
+                window._sessionLogoutRunning = true;
+                // Remove only login keys
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("_x9A1p");
+                localStorage.removeItem("_k7LmQ");
+                localStorage.removeItem("_aB39X");
+                localStorage.removeItem("_mN72P");
+
+                this.getRouter().navTo("RouteHostel");
+            },
+
             _fetchCommonData: async function (entityName, modelName, filter = "") {
                 // If already loaded, skip
                 if (this.getModel(modelName)) return;

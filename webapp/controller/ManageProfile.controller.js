@@ -43,11 +43,11 @@ sap.ui.define([
                 FileContent: "",
                 Documents: [],
                 isEditMode: false,
-                BookingID : "",
-                CustomerName : ""
+                BookingID: "",
+                CustomerName: ""
             }), "complaintTemp");
 
-            this.getView().setModel(new JSONModel({mode: "CREATE"}), "viewModel");
+            this.getView().setModel(new JSONModel({ mode: "CREATE" }), "viewModel");
 
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
@@ -56,7 +56,7 @@ sap.ui.define([
                 // maxDate: maxDate,
                 focusedDate: new Date(2000, 0, 1),
                 minDate: new Date(1950, 0, 1),
-                maxdate : new Date()
+                maxdate: new Date()
             });
             this.getView().setModel(oDateModel, "controller");
 
@@ -64,22 +64,17 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function () {
+        _onRouteMatched:async function () {
+            await this.commonLoginFunction("ManageProfile");
             this.ManageData();
-            this.commonLoginFunction()
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-
-            var model = new JSONModel({
-
-
-            });
+            var model = new JSONModel({});
             this.getView().setModel(model, "Member")
-
         },
 
         ManageData: async function () {
             // always read current user from models instead of relying solely on cached variable
-            let oUser = sap.ui.getCore().getModel("LoginModel")?.getData() ||
+            let oUser = this.getView().getModel("LoginModel")?.getData() ||
                 this.getOwnerComponent().getModel("UserModel")?.getData() ||
                 this._oLoggedInUser || {};
             // update cached copy so future calls are consistent
@@ -88,11 +83,9 @@ sap.ui.define([
 
             try {
                 if (!oUser || !oUser.UserID) {
-                    oUser = this.getOwnerComponent()
-                        .getModel("UserModel")
-                        ?.getData();
+                    oUser = this.getOwnerComponent().getModel("UserModel")?.getData();
                 }
-                const sUserID = oUser.UserID;
+                const sUserID = oUser.UserID || oUser.EmployeeID;
                 fullUserData = oUser;
                 const oTempModel = new JSONModel({
                     bookings: [],
@@ -114,62 +107,7 @@ sap.ui.define([
                 const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                // const aBookingData = aBookings.map(booking => {
-                //     const oStart = booking.StartDate ? new Date(booking.StartDate) : null;
-                //     if (oStart) {
-                //         oStart.setHours(0, 0, 0, 0);
-                //     }
-
-                //     const startDate = booking.StartDate ? new Date(booking.StartDate) : null;
-                //     const endDate = booking.EndDate ? new Date(booking.EndDate) : null;
-                //     if (startDate) startDate.setHours(0, 0, 0, 0);
-                //     if (endDate) endDate.setHours(0, 0, 0, 0);
-
-                //     let bookingGroup = "Others";
-                //     if (booking.Status === "Cancelled") {
-                //         bookingGroup = "Cancelled";
-                //     } else if (booking.Status === "Completed") {
-                //         bookingGroup = "Completed";
-                //     } else if (booking.Status === "New" || booking.Status === "Assigned") {
-                //         // Ongoing = Today is between StartDate & EndDate
-                //         if (startDate && endDate && startDate <= today && endDate >= today) {
-                //             bookingGroup = "Ongoing";
-                //             // Upcoming = Future StartDate
-                //         } else if (startDate && startDate > today) {
-                //             bookingGroup = "Upcoming";
-                //         }
-                //     }
-                //     let GSTValue = 0;
-                //     if (booking.GSTType === "IGST") {
-                //         GSTValue = Number(booking.GSTValue) / 100 || 0;
-                //     } else {
-                //         GSTValue = (Number(booking.GSTValue) + Number(booking.GSTValue)) / 100 || 0;
-                //     }
-
-                //     return {
-                //         bookingGroup: bookingGroup,
-                //         customerName: booking.Salutation + " " + booking.CustomerName,
-                //         room: booking.BedType || "",
-                //         Startdate: new Date(booking.StartDate).toLocaleDateString("en-GB"),
-                //         EndDate: booking.EndDate ? new Date(booking.EndDate).toLocaleDateString("en-GB") : "",
-                //         BookingDate: booking.BookingDate ? new Date(booking.BookingDate).toLocaleDateString("en-GB") : "",
-                //         // amount: (
-                //         //     (Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) +
-                //         //     ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) * GSTValue) - Number(booking.Discount || 0)
-                //         // ).toString() || "",
-                //         amount: (
-                //             ((Number(booking.TotalRoomprice || 0) + Number(booking.FacilityPrice || 0)) - Number(booking.Discount || 0)) * (1 + GSTValue)
-                //         ).toString() || "",
-
-                //         status: booking.Status,
-                //         currency: booking.Currency,
-                //         BookingID: booking.BookingID?.toString() || "",
-                //         MemberID: booking.MemberID || "",
-                //         CustomerName: booking.CustomerName || "",
-                //     }
-
-                // });
-
+               
                 const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
@@ -437,21 +375,21 @@ sap.ui.define([
         },
         onPreviewProfilePhoto: function () {
             const oProfileModel = this.getView().getModel("profileData");
-             const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
-              let sPhoto = oProfileModel.getProperty("/photo");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            let sPhoto = oProfileModel.getProperty("/photo");
             if (!sPhoto) {
                 sap.m.MessageToast.show(this.i18nModel.getText("noProfilePhotoAvailable"));
                 return;
             }
 
-             if (!sPhoto.startsWith("data:image")) {
-        sPhoto = "data:image/png;base64," + sPhoto;
-    }
+            if (!sPhoto.startsWith("data:image")) {
+                sPhoto = "data:image/png;base64," + sPhoto;
+            }
 
-    // ✅ 1) Update global model (this is the key line)
-    oLoginModel.setProperty("/Photo", sPhoto);
+            // ✅ 1) Update global model (this is the key line)
+            oLoginModel.setProperty("/Photo", sPhoto);
 
-      oProfileModel.setProperty("/photo", sPhoto);
+            oProfileModel.setProperty("/photo", sPhoto);
             if (!this._oPreviewDialog) {
                 this._oPreviewDialog = new sap.m.Dialog({
                     title: "Profile Photo",
@@ -554,9 +492,9 @@ sap.ui.define([
                 const base64 = fullDataURL.split(",")[1]; // remove prefix
 
                 const oModel = this.getView().getModel("profileData");
-                  const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 oModel.setProperty("/photo", fullDataURL);
-                 oLoginModel.setProperty("/Photo", fullDataURL);
+                oLoginModel.setProperty("/Photo", fullDataURL);
                 await this.updateUserPhoto({
                     fileName: file.name,
                     fileType: file.type,
@@ -567,13 +505,13 @@ sap.ui.define([
         },
         onRemovePhoto: async function () {
             const oModel = this.getView().getModel("profileData");
-             const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const initials = oModel.getProperty("/initials");
 
             oModel.setProperty("/photo", "");
             oModel.setProperty("/initials", initials);
 
-              oLoginModel.setProperty("/Photo", "");
+            oLoginModel.setProperty("/Photo", "");
             await this.updateUserPhoto({
                 fileName: "",
                 fileType: "",
@@ -660,14 +598,14 @@ sap.ui.define([
             var rawBase64 = base64Image.replace(`data:${mimeType};base64,`, "");
 
             var oModel = this.getView().getModel("profileData");
-            const oLoginModel  = this.getOwnerComponent().getModel("LoginModel");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             oModel.setProperty("/fileName", imageName);
             oModel.setProperty("/fileType", mimeType);
             oModel.setProperty("/fileContent", rawBase64);
 
             // Add this to update UI avatar
             oModel.setProperty("/photo", base64Image);
-             oLoginModel.setProperty("/Photo", base64Image);
+            oLoginModel.setProperty("/Photo", base64Image);
 
             // Upload to backend
             this.updateUserPhoto({
@@ -1550,8 +1488,8 @@ sap.ui.define([
         onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
-            var sBookingID =  btoa(oBookingData.BookingID.toString());
-            var sMemberID = btoa(oBookingData.MemberID.toString()); 
+            var sBookingID = btoa(oBookingData.BookingID.toString());
+            var sMemberID = btoa(oBookingData.MemberID.toString());
 
             if (!sBookingID) {
                 sap.m.MessageToast.show("BookingID not found for this booking");
@@ -1888,8 +1826,8 @@ sap.ui.define([
                     const oBranch = aBranchMaster.find(b => b.BranchID === sBranchCode);
 
                     return {
-                        BookingID : complain.BookingID || "",
-                        CustomerName : complain.CustomerName || "",
+                        BookingID: complain.BookingID || "",
+                        CustomerName: complain.CustomerName || "",
                         ComplaintID: complain.ComplaintID || complain.ComplainID || complain.ID || "",
                         ComplaintType: complain.ComplaintType || "",
                         Description: complain.Description || "",
@@ -2080,7 +2018,8 @@ sap.ui.define([
 
             // Reset Login State
             this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
-            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            // this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },
         onGlobalSearch: function (oEvent) {
@@ -2567,40 +2506,40 @@ sap.ui.define([
                 // Load customer booking data
                 if (this.BranchCode) {
 
-                this.onSearch().then(() => {
+                    this.onSearch().then(() => {
 
-                    const sCustomerName =
-                        (oComplaintData.CustomerName || "").trim();
+                        const sCustomerName =
+                            (oComplaintData.CustomerName || "").trim();
 
-                    const sBookingID =
-                        (oComplaintData.BookingID || "").trim();
+                        const sBookingID =
+                            (oComplaintData.BookingID || "").trim();
 
-                    // Update model
-                    oTempModel.setProperty("/CustomerName", sCustomerName);
-                    oTempModel.setProperty("/BookingID", sBookingID);
+                        // Update model
+                        oTempModel.setProperty("/CustomerName", sCustomerName);
+                        oTempModel.setProperty("/BookingID", sBookingID);
 
-                    sap.ui.getCore().applyChanges();
+                        sap.ui.getCore().applyChanges();
 
-                    // Get controls
-                    const oCustomerCombo =
-                        this._getComplaintControl("MP_id_AddCustComboBox");
+                        // Get controls
+                        const oCustomerCombo =
+                            this._getComplaintControl("MP_id_AddCustComboBox");
 
-                    const oBookingCombo =
-                        this._getComplaintControl("MP_id_AddBooking");
+                        const oBookingCombo =
+                            this._getComplaintControl("MP_id_AddBooking");
 
-                    // Force selected keys
-                    if (oCustomerCombo) {
-                        oCustomerCombo.setSelectedKey(sCustomerName);
-                        oCustomerCombo.setValue(sCustomerName);
-                    }
+                        // Force selected keys
+                        if (oCustomerCombo) {
+                            oCustomerCombo.setSelectedKey(sCustomerName);
+                            oCustomerCombo.setValue(sCustomerName);
+                        }
 
-                    if (oBookingCombo) {
-                        oBookingCombo.setSelectedKey(sBookingID);
-                        oBookingCombo.setValue(sBookingID);
-                    }
+                        if (oBookingCombo) {
+                            oBookingCombo.setSelectedKey(sBookingID);
+                            oBookingCombo.setValue(sBookingID);
+                        }
 
-                });
-            }
+                    });
+                }
 
             } else {
 
@@ -2730,8 +2669,8 @@ sap.ui.define([
                     FileName: "",
                     FileType: "",
                     FileContent: "",
-                    BookingID : "",
-                    CustomerName : "",
+                    BookingID: "",
+                    CustomerName: "",
                     Documents: [],
                     isEditMode: false
                 });
@@ -3009,8 +2948,8 @@ sap.ui.define([
                 FileName: oData.FileName || "",
                 FileType: oData.FileType || "",
                 File: oData.FileContent || "",
-                BookingID : oData.BookingID,
-                CustomerName : oData.CustomerName
+                BookingID: oData.BookingID,
+                CustomerName: oData.CustomerName
             };
 
 
@@ -3175,7 +3114,7 @@ sap.ui.define([
         },
 
         onChangeBookingID: function (oEvent) {
-        utils._LCstrictValidationComboBox(oEvent);
+            utils._LCstrictValidationComboBox(oEvent);
 
             const oCombo = oEvent.getSource();
             const sBookingID = oCombo.getSelectedKey();

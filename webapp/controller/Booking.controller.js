@@ -70,11 +70,14 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
-            if (performance.navigation && performance.navigation.type === 1) {
-                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo("RouteHostel", {}, true);
-            }
-            let oHostelModel = sap.ui.getCore().getModel("HostelModel");
+            await this.commonLoginFunction("Booking");
+
+            // if (performance.navigation && performance.navigation.type === 1) {
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RouteHostel", {}, true);
+            // }
+
+            let oHostelModel = sap.ui.getCore().getModel("HostelModel") || this.getView().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
             if (!oHostelModel) {
                 oHostelModel = new JSONModel({});
@@ -4812,7 +4815,7 @@
         },
 
         _prefillLoggedInUser: function () {
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oLoginModel = sap.ui.getCore().getModel("LoginModel") || this.getView().getModel("LoginModel");
             const oHostelModel = this.getView().getModel("HostelModel");
 
             if (!oLoginModel || !oHostelModel) {

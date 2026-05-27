@@ -4,7 +4,7 @@ sap.ui.define([
 ], function (Controller, MessageBox) {
   "use strict";
 
-  return Controller.extend("your.namespace.controller.App", {
+  return Controller.extend("sap.ui.com.project1.controller.App", {
 
     TIMEOUT_DURATION: 10 * 60 * 1000, // 15 minutes
     logoutTimer: null,
@@ -59,7 +59,7 @@ sap.ui.define([
       if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
         return;
       }
-
+      localStorage.clear();
       clearTimeout(this.logoutTimer);
       this.logoutTimer = null;
 
@@ -74,6 +74,7 @@ sap.ui.define([
           styleClass: "myUnifiedBtn",
           dependentOn: this.getView(),
           onClose: function () {
+            localStorage.clear();
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
             window.location.reload();
           }.bind(this)

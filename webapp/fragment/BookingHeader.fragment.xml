@@ -17,7 +17,7 @@
         </contentLeft>
         <contentRight>
             <Button
-                icon="sap-icon://home"
+                icon="sap-icon://log"
                 press="onHome"
             />
         </contentRight>

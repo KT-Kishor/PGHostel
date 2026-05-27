@@ -21,8 +21,8 @@ sap.ui.define([
             // View model for dialog state
             var oViewModel = new JSONModel({
                 DialogMode: "Add",        // "Add" or "Edit"
-                CurrentCoupon: {} 
-                        // bound to dialog
+                CurrentCoupon: {}
+                // bound to dialog
             });
             this.getView().setModel(oViewModel, "CouponView");
             if (!this.getView().getModel("CouponModel")) {
@@ -33,7 +33,7 @@ sap.ui.define([
                 CurrentCoupon: {},
                 isUptoEnabled: false,
                 isReq: false,
-                DiscountValueLabel:"Discount Value"
+                DiscountValueLabel: "Discount Value"
             }), "CouponView");
 
         },
@@ -47,20 +47,8 @@ sap.ui.define([
         },
 
         onHome: function () {
-            const oUser = this._oLoggedInUser;
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-
-            if (oUser && oUser.UserID) {
-                oUIModel.setProperty("/isLoggedIn", true);
-            } else {
-                oUIModel.setProperty("/isLoggedIn", false);
-            }
-
             this.getView().getModel("CouponModel").setData({});
-
-            this.getOwnerComponent()
-                .getRouter()
-                .navTo("RouteHostel", {}, true);
+            this.CommonLogoutFunction();
         },
 
         _onRouteMatched: async function () {
@@ -346,7 +334,7 @@ sap.ui.define([
             oViewModel.setProperty("/DialogMode", "Add");
             // ✅ Blank model → placeholders only
             oViewModel.setProperty("/CurrentCoupon", {
-                CouponCode:"",
+                CouponCode: "",
                 DiscountType: "",
                 DiscountValue: "",
                 UptoValue: "",
@@ -631,16 +619,16 @@ sap.ui.define([
             oInput.setValueState(sap.ui.core.ValueState.None);
             return true;
         },
-        onLiveChange_CouponCode:function(oEvent){
-          utils._LCvalidateMandatoryField(oEvent)
-           var oInput = oEvent.getSource();
-    var sValue = oEvent.getParameter("value");
+        onLiveChange_CouponCode: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
+            var oInput = oEvent.getSource();
+            var sValue = oEvent.getParameter("value");
 
-    // Convert to uppercase
-    var sUpper = sValue.toUpperCase();
+            // Convert to uppercase
+            var sUpper = sValue.toUpperCase();
 
-    // Update input value (this also updates the model because of two-way binding)
-    oInput.setValue(sUpper);
+            // Update input value (this also updates the model because of two-way binding)
+            oInput.setValue(sUpper);
         },
 
         onSaveCoupon: async function () {
@@ -704,81 +692,81 @@ sap.ui.define([
             if (sMode === "Add") {
                 oCoupon.Status = "Active";
             }
-           
+
             try {
                 if (sMode === "Add") {
 
-  // 🔹 Get data from CouponModel
-var oCouponModel = this.getView().getModel("CouponModel");
-var aCoupons =
-    oCouponModel.getProperty("/CouponList") ||
-    oCouponModel.getProperty("/results") ||
-    oCouponModel.getData() ||
-    [];
+                    // 🔹 Get data from CouponModel
+                    var oCouponModel = this.getView().getModel("CouponModel");
+                    var aCoupons =
+                        oCouponModel.getProperty("/CouponList") ||
+                        oCouponModel.getProperty("/results") ||
+                        oCouponModel.getData() ||
+                        [];
 
-// Normalize input
-var sNewCode = (oCoupon.CouponCode || "").trim().toLowerCase();
-var dToday = new Date();
+                    // Normalize input
+                    var sNewCode = (oCoupon.CouponCode || "").trim().toLowerCase();
+                    var dToday = new Date();
 
-// 🔹 Find matching coupons
-var sNewBranch = (oCoupon.BranchCode || "").trim().toLowerCase();
+                    // 🔹 Find matching coupons
+                    var sNewBranch = (oCoupon.BranchCode || "").trim().toLowerCase();
 
-var aMatchingCoupons = aCoupons.filter(function (item) {
-    return (
-        (item.CouponCode || "").trim().toLowerCase() === sNewCode &&
-        (item.BranchCode || "").trim().toLowerCase() === sNewBranch
-    );
-});
+                    var aMatchingCoupons = aCoupons.filter(function (item) {
+                        return (
+                            (item.CouponCode || "").trim().toLowerCase() === sNewCode &&
+                            (item.BranchCode || "").trim().toLowerCase() === sNewBranch
+                        );
+                    });
 
-if (aMatchingCoupons.length > 0) {
+                    if (aMatchingCoupons.length > 0) {
 
-    var dNewEnd = new Date(oCoupon.EndDate);
+                        var dNewEnd = new Date(oCoupon.EndDate);
 
-    var bInvalidEndDate = aMatchingCoupons.some(function (item) {
-        var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
+                        var bInvalidEndDate = aMatchingCoupons.some(function (item) {
+                            var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
 
-        return (
-            dExistingEnd &&
-            !isNaN(dExistingEnd) &&
-            dNewEnd < dExistingEnd //  NEW CONDITION
-        );
-    });
+                            return (
+                                dExistingEnd &&
+                                !isNaN(dExistingEnd) &&
+                                dNewEnd < dExistingEnd //  NEW CONDITION
+                            );
+                        });
 
-    //  Block if new end date is smaller than any existing
-    if (bInvalidEndDate) {
-        this.closeBusyDialog();
-        MessageBox.error("Coupon end date must be greater than existing coupon end date");
-        return;
-    }
+                        //  Block if new end date is smaller than any existing
+                        if (bInvalidEndDate) {
+                            this.closeBusyDialog();
+                            MessageBox.error("Coupon end date must be greater than existing coupon end date");
+                            return;
+                        }
 
-    //  Optional: keep your active check also
-    var dToday = new Date();
-    var bActiveExists = aMatchingCoupons.some(function (item) {
-        var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
-        return dExistingEnd && !isNaN(dExistingEnd) && dExistingEnd >= dToday;
-    });
+                        //  Optional: keep your active check also
+                        var dToday = new Date();
+                        var bActiveExists = aMatchingCoupons.some(function (item) {
+                            var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
+                            return dExistingEnd && !isNaN(dExistingEnd) && dExistingEnd >= dToday;
+                        });
 
-    if (bActiveExists) {
-        this.closeBusyDialog();
-        MessageBox.error("Coupon code already exists");
-        return;
-    }
+                        if (bActiveExists) {
+                            this.closeBusyDialog();
+                            MessageBox.error("Coupon code already exists");
+                            return;
+                        }
 
-}
+                    }
 
-//  If no match OR only expired → proceed with your code
-oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-oCoupon.CreatedBy =
-    oView.getModel("LoginModel")
-        ?.getProperty("/EmployeeName") || "system";
- this.getBusyDialog()
-await this.ajaxCreateWithJQuery("HM_Coupon", {
-    data: oCoupon
-});
+                    //  If no match OR only expired → proceed with your code
+                    oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+                    oCoupon.CreatedBy =
+                        oView.getModel("LoginModel")
+                            ?.getProperty("/EmployeeName") || "system";
+                    this.getBusyDialog()
+                    await this.ajaxCreateWithJQuery("HM_Coupon", {
+                        data: oCoupon
+                    });
 
-MessageToast.show(this.i18nModel.getText("couponcreatedsuccessfully"));
-this.closeBusyDialog()
-}else {
+                    MessageToast.show(this.i18nModel.getText("couponcreatedsuccessfully"));
+                    this.closeBusyDialog()
+                } else {
                     if (!oCoupon.CouponId) {
                         MessageBox.error(this.i18nModel.getText("updatefailedCouponIdmissing"));
                         return;
@@ -788,7 +776,7 @@ this.closeBusyDialog()
                             CouponId: oCoupon.CouponId
                         },
                         data: {
-                            
+
                             DiscountType: oCoupon.DiscountType,
                             DiscountValue: oCoupon.DiscountValue,
                             UptoValue: oCoupon.UptoValue,
@@ -950,39 +938,39 @@ this.closeBusyDialog()
 
         onChange_DiscountType: function (oEvent) {
 
-    utils._LCstrictValidationComboBox(oEvent);
+            utils._LCstrictValidationComboBox(oEvent);
 
-    const oVM = this.getView().getModel("CouponView");
-    const sKey = oEvent.getSource().getSelectedKey();
-    const oDiscountInput = this.byId("inDiscountValue");
+            const oVM = this.getView().getModel("CouponView");
+            const sKey = oEvent.getSource().getSelectedKey();
+            const oDiscountInput = this.byId("inDiscountValue");
 
-    // Reset value + state
-    oDiscountInput.setValue("");
-    oDiscountInput.setValueState(sap.ui.core.ValueState.None);
+            // Reset value + state
+            oDiscountInput.setValue("");
+            oDiscountInput.setValueState(sap.ui.core.ValueState.None);
 
-    if (sKey === "Percentage") {
+            if (sKey === "Percentage") {
 
-        oVM.setProperty("/isUptoEnabled", true);
-        oVM.setProperty("/isReq", true);
+                oVM.setProperty("/isUptoEnabled", true);
+                oVM.setProperty("/isReq", true);
 
-        oDiscountInput.setMaxLength(5);
+                oDiscountInput.setMaxLength(5);
 
-        // Change Label
-        oVM.setProperty("/DiscountValueLabel", "Percentage");
+                // Change Label
+                oVM.setProperty("/DiscountValueLabel", "Percentage");
 
-    } else {
+            } else {
 
-        oVM.setProperty("/isUptoEnabled", false);
-        oVM.setProperty("/isReq", false);
+                oVM.setProperty("/isUptoEnabled", false);
+                oVM.setProperty("/isReq", false);
 
-        oVM.setProperty("/CurrentCoupon/UptoValue", "");
+                oVM.setProperty("/CurrentCoupon/UptoValue", "");
 
-        oDiscountInput.setMaxLength(10);
+                oDiscountInput.setMaxLength(10);
 
-        // Change Label
-        oVM.setProperty("/DiscountValueLabel", "Discount Value");
-    }
-},
+                // Change Label
+                oVM.setProperty("/DiscountValueLabel", "Discount Value");
+            }
+        },
         onLiveChange_DiscountValue: function (oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
@@ -1132,56 +1120,56 @@ this.closeBusyDialog()
             }
         },
 
-       onDialogClose: function () {
-    var oView = this.getView();
+        onDialogClose: function () {
+            var oView = this.getView();
 
-    // 🔹 1. Clear ValueState for all fields
-    var aControls = [
-        "cbBranchCode",
-        "idCouponcode",
-        "cbDiscountType",
-        "inDiscountValue",
-        "inUptoValue",
-        "inMaxUses",
-        "inMinOrderValue",
-        "cbStatus",
-        "inDescription",
-        "dpStartDate",
-        "dpEndDate"
-    ];
+            // 🔹 1. Clear ValueState for all fields
+            var aControls = [
+                "cbBranchCode",
+                "idCouponcode",
+                "cbDiscountType",
+                "inDiscountValue",
+                "inUptoValue",
+                "inMaxUses",
+                "inMinOrderValue",
+                "cbStatus",
+                "inDescription",
+                "dpStartDate",
+                "dpEndDate"
+            ];
 
-    aControls.forEach(function (sId) {
-        var oControl = sap.ui.getCore().byId(oView.createId(sId));
-        if (oControl) {
-            oControl.setValueState("None");
-        }
-    });
+            aControls.forEach(function (sId) {
+                var oControl = sap.ui.getCore().byId(oView.createId(sId));
+                if (oControl) {
+                    oControl.setValueState("None");
+                }
+            });
 
-    // 🔹 2. Clear Model Data
-    var oVM = oView.getModel("CouponView");
-    oVM.setProperty("/CurrentCoupon", {
-        CouponCode: "",
-        DiscountType: "",
-        DiscountValue: "",
-        UptoValue: "",
-        MaxUses: "",
-        MinOrderValue: "",
-        Description: "",
-        StartDate: "",
-        EndDate: "",
-        BranchCode: "",
-        Status: ""
-    });
+            // 🔹 2. Clear Model Data
+            var oVM = oView.getModel("CouponView");
+            oVM.setProperty("/CurrentCoupon", {
+                CouponCode: "",
+                DiscountType: "",
+                DiscountValue: "",
+                UptoValue: "",
+                MaxUses: "",
+                MinOrderValue: "",
+                Description: "",
+                StartDate: "",
+                EndDate: "",
+                BranchCode: "",
+                Status: ""
+            });
 
-    // 🔹 3. Reset additional flags (important for UI)
-    oVM.setProperty("/isReq", false);
-    oVM.setProperty("/isUptoEnabled", false);
+            // 🔹 3. Reset additional flags (important for UI)
+            oVM.setProperty("/isReq", false);
+            oVM.setProperty("/isUptoEnabled", false);
 
-    // 🔹 4. Close Dialog
-    if (this._oCouponDialog) {
-        this._oCouponDialog.close();
-    }
-},
+            // 🔹 4. Close Dialog
+            if (this._oCouponDialog) {
+                this._oCouponDialog.close();
+            }
+        },
 
         async _loadRecipientContacts() {
             try {
