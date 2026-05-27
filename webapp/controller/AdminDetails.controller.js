@@ -606,6 +606,8 @@ sap.ui.define([
                     return item.BedTypeName === BedType;
                 });
 
+                oCustomerData.NoOfPersons=RoomBedprice[0].NoofPerson
+
                 // Set to new model
                 var oModel = new sap.ui.model.json.JSONModel(RoomBedprice);
                 this.getView().setModel(oModel, "Availablebedprice");
@@ -8541,6 +8543,7 @@ sap.ui.define([
         MS_viewimage: function() {
 
             const oDraft = this.getView().getModel("BookingView").getData().Members[0]
+
 
             const oDocument = oDraft?.Documents?.[0];
 

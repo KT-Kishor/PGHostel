@@ -708,6 +708,8 @@ sap.ui.define([
 
     CommonLogoutFunction: function () {
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+      const oUIModel = this.getOwnerComponent().getModel("UIModel");
+      oUIModel.setProperty("/isLoggedIn", false);
       if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/UserID", "");
@@ -715,31 +717,201 @@ sap.ui.define([
         oLoginModel.setProperty("/EmployeeName", "");
         oLoginModel.setProperty("/Role", "");
         oLoginModel.setProperty("/BranchCode", "");
+
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("_x9A1p");
+        localStorage.removeItem("_k7LmQ");
+        localStorage.removeItem("_aB39X");
+        localStorage.removeItem("_mN72P");
+        localStorage.removeItem("activeTabs");
       }
       this.getOwnerComponent().getRouter().navTo("RouteHostel");
     },
 
-    commonLoginFunction: function (value) {
-      return new Promise((resolve) => {
-        const oModel = this.getOwnerComponent().getModel("LoginModel");
-        const TileModel = this.getView().getModel("TileVisibility");
 
+    initializeLoginModel: function () {
+      let oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+      if (!oLoginModel) {
+        oLoginModel = new JSONModel({
+          // Database connection
+          url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
+          headers: {
+            name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+            password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+            "Content-Type": "application/json"
+          },
+          isRadioVisible: false
+        });
+        this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
+      }
+    },
+    commonLoginFunction: async function (value) {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      this.getView().getModel("UIModel").setProperty("/isLoggedIn", isLoggedIn === "true");
+      // Check local login session
+      if (isLoggedIn !== "true") {
+        this.getRouter().navTo("RouteHostel");
+        return false;
+      }
+
+      try {
+        // Open Busy Dialog
+        if (this.openBusyDialog) this.openBusyDialog();
+
+        // Initialize Login Model
+        this.initializeLoginModel();
+
+        // Get Local Storage Data
+        const sEncodedEmployeeID = localStorage.getItem("_aB39X");
+        const sEncodedEmployeeName = localStorage.getItem("_mN72P");
+
+        // Validate Local Storage
+        if (!sEncodedEmployeeID || !sEncodedEmployeeName) {
+          this.closeBusyDialog();
+          this.getRouter().navTo("RouteHostel");
+          return false;
+        }
+
+        let sEmployeeID = "";
+        let sEmployeeName = "";
+
+        // Decode Base64 Safely
+        try {
+          sEmployeeID = atob(sEncodedEmployeeID);
+          sEmployeeName = atob(sEncodedEmployeeName);
+        } catch (e) {
+          localStorage.clear();
+          this.closeBusyDialog();
+          sap.m.MessageToast.show("Session Invalid");
+          this.getRouter().navTo("RouteHostel");
+          return false;
+        }
+
+        // Get Encrypted Values
+        const sEncryptedEmployeeID = localStorage.getItem("_x9A1p");
+        const sEncryptedEmployeeName = localStorage.getItem("_k7LmQ");
+
+        // Validate Encrypted Values
+        if (!sEncryptedEmployeeID || !sEncryptedEmployeeName) {
+          localStorage.clear();
+          this.closeBusyDialog();
+          sap.m.MessageToast.show("Session Invalid");
+          this.getRouter().navTo("RouteHostel");
+          return false;
+        }
+
+        // Compare bcrypt values
+        const bEmployeeIDMatch = dcodeIO.bcrypt.compareSync(sEmployeeID, sEncryptedEmployeeID);
+
+        const bEmployeeNameMatch = dcodeIO.bcrypt.compareSync(sEmployeeName, sEncryptedEmployeeName);
+
+        // Invalid Session
+        if (!bEmployeeIDMatch || !bEmployeeNameMatch) {
+          localStorage.clear();
+          this.closeBusyDialog();
+          sap.m.MessageToast.show("Session Invalid");
+          this.getRouter().navTo("RouteHostel");
+          return false;
+        }
+
+        // Backend Validation
+        const result = await this.ajaxReadWithJQuery("HM_Login", {
+          UserID: sEmployeeID,
+          UserName: sEmployeeName
+        });
+
+        // Validate Response
+        if (!result || !result.data || result.data.length === 0) {
+          localStorage.clear();
+          this.closeBusyDialog();
+          this.getRouter().navTo("RouteHostel");
+          return false;
+        }
+
+        // Get User Object
+        const user = result.data;
+
+        // Login Model
+        let oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+
+        let oHostelModel = new sap.ui.model.json.JSONModel({});
+        this.getOwnerComponent().setModel(oHostelModel, "HostelModel")
+
+        if (!oLoginModel) {
+          oLoginModel = new sap.ui.model.json.JSONModel({});
+          this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
+        }
+
+        // Set User Data
+        oLoginModel.setProperty("/EmployeeID", user.UserID || "");
+        oLoginModel.setProperty("/UserID", user.UserID || "");
+        oLoginModel.setProperty("/Salutation", user.Salutation || "");
+        oLoginModel.setProperty("/EmployeeName", user.UserName || "");
+        oLoginModel.setProperty("/UserName", user.UserName || "");
+        oLoginModel.setProperty("/EmailID", user.EmailID || "");
+        oLoginModel.setProperty("/Role", user.Role || "");
+        oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
+        oLoginModel.setProperty("/STDCode", user.STDCode || "");
+        oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
+        oLoginModel.setProperty("/Gender", user.Gender || "");
+        oLoginModel.setProperty("/Country", user.Country || "");
+        oLoginModel.setProperty("/State", user.State || "");
+        oLoginModel.setProperty("/City", user.City || "");
+        oLoginModel.setProperty("/Address", user.Address || "");
+        oLoginModel.setProperty("/DateofBirth", user.DateOfBirth ? this.Formatter.DateFormat(user.DateOfBirth) : "");
+
+        this.getView().getModel("UIModel").setProperty("/isLoggedIn", true);
+
+        oHostelModel.setProperty("/UserID", user.UserID);
+        oHostelModel.setProperty("/Salutation", user.Salutation);
+        oHostelModel.setProperty("/STDCode", user.STDCode || "");
+        oHostelModel.setProperty("/Gender", user.Gender || "");
+        oHostelModel.setProperty("/DateOfBirth", user.DateOfBirth ? this.Formatter.DateFormat(user.DateOfBirth) : "");
+        oHostelModel.setProperty("/FullName", user.UserName || "");
+        oHostelModel.setProperty("/CustomerEmail", user.EmailID || "");
+        oHostelModel.setProperty("/MobileNo", user.MobileNo || "");
+        oHostelModel.setProperty("/Country", user.Country || "");
+        oHostelModel.setProperty("/State", user.State || "");
+        oHostelModel.setProperty("/City", user.City || "");
+        oHostelModel.setProperty("/Address", user.Address || "");
+
+        // If already logged in and opening Login Page
+        if (value === "Booking") return true;
+
+        if (isLoggedIn === "true" && value === "LoginPage" || value === "TilePage" || value === "ManageProfile") {
+          this.closeBusyDialog();
+
+          if (value === "ManageProfile") {
+            this.getRouter().navTo("RouteManageProfile");
+          } else if (user.Role === "Customer") {
+            this.getRouter().navTo("RouteHostel");
+          } else {
+            this.getRouter().navTo("TilePage");
+          }
+          return true;
+        }
+
+        // App Visibility Model
+        const oView = this.getView && this.getView();
+        const TileModel = this.getView().getModel("TileVisibility")
+
+        // Helper Fail Function
         const fail = () => {
-          this.closeBusyDialog()
-          this.getOwnerComponent().getRouter().navTo("RouteHostel");
-          resolve(false);
+          this.closeBusyDialog();
+          this.getRouter().navTo("RouteHostel");
+          return false;
         };
 
-        if (!oModel) return fail();
-
-        const userId = oModel.getProperty("/EmployeeID");
-        const userName = oModel.getProperty("/UserName");
+        // Validate User
+        const userId = oLoginModel.getProperty("/EmployeeID");
+        const userName = oLoginModel.getProperty("/EmployeeName");
 
         if (!userId || !userName) {
           return fail();
         }
 
-        if (value && TileModel) {
+        // Tile Permission Check
+        if (value && TileModel && value !== "LoginPage" && value !== "TilePage" && value === "ManageProfile") {
 
           const tileMap = {
             "ManageCustomer": "/ManageCustomer",
@@ -764,53 +936,21 @@ sap.ui.define([
 
           const modelPath = tileMap[value];
 
+          // Access Denied
           if (modelPath && TileModel.getProperty(modelPath) === "0") {
             return fail();
           }
         }
-        resolve(true);
-      });
-    },
 
-    compressBase64: function (base64) {
-      // Base64 → binary
-      const binary = atob(base64);
-      const len = binary.length;
-      const bytes = new Uint8Array(len);
+        this.closeBusyDialog();
+        return true;
 
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binary.charCodeAt(i);
+      } catch (error) {
+        localStorage.clear();
+        this.closeBusyDialog();
+        this.getRouter().navTo("RouteHostel");
+        return false;
       }
-
-      // gzip compress (browser)
-      const compressed = window.pako.gzip(bytes);
-
-      // compressed → Base64
-      let compressedBinary = "";
-      compressed.forEach(b => {
-        compressedBinary += String.fromCharCode(b);
-      });
-
-      return btoa(compressedBinary);
-    },
-
-    decompressBase64: function (base64) {
-      const binary = atob(base64);
-      const len = binary.length;
-      const bytes = new Uint8Array(len);
-
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-
-      const decompressed = window.pako.ungzip(bytes);
-
-      let resultBinary = "";
-      decompressed.forEach(b => {
-        resultBinary += String.fromCharCode(b);
-      });
-
-      return btoa(resultBinary);
     },
 
     // @BaseController.js  —  TOUR GUIDE section(v6)
@@ -930,9 +1070,9 @@ sap.ui.define([
     // ─── MOBILE: open invisible → measure → pin top or bottom → ONE scroll → reveal
 
 
-    
 
-   
+
+
 
 
 
@@ -1057,13 +1197,13 @@ sap.ui.define([
 
 
 
-    
 
 
 
 
 
-    
+
+
 
 
 

@@ -4154,6 +4154,9 @@ sap.ui.define([
 
                 await this.ajaxReadWithJQuery("HM_Customer", payload);
 
+                oCustomerData.CustomerEmail = sEmail;
+                oView.getModel("HostelModel").setData(oCustomerData);
+
                 // Set LoginModel after successful login
                 const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
 

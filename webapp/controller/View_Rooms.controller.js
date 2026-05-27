@@ -2015,7 +2015,7 @@ sap.ui.define([
 
         onConfirmBooking: async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
+            const bLoggedIn = localStorage.getItem("isLoggedIn");
 
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oUser = oLoginModel?.getData?.() || {};
@@ -2025,13 +2025,6 @@ sap.ui.define([
             // -------------------------
             if (!bLoggedIn) {
 
-                //             // STEP 1: Save current booking state
-                // const oLocalData = this.oHostelModel?.getData() || {};
-
-                // sessionStorage.setItem("pendingBookingData", JSON.stringify(oLocalData));
-
-                // // STEP 2: Set navigation intent flag
-                // sessionStorage.setItem("redirectAfterLogin", "bookingFlow");
                 MessageBox.information(
                     "Please log in to continue booking.",
                     {
@@ -2042,8 +2035,6 @@ sap.ui.define([
                         onClose: function () {
                             this.onpressLogin();
                             // this.getOwnerComponent().getRouter().navTo("RouteHostel");
-
-
                         }.bind(this)
                     }
                 );
@@ -2054,24 +2045,18 @@ sap.ui.define([
             const oLocalModel = this.oHostelModel;
             const oData = oLocalModel?.getData?.() || {};
 
-            // MemberList will be loaded in background on the booking page
-            // to avoid blocking navigation. Set empty array initially.
             let aMember = [];
 
             // -------------------------
             // BASIC VALIDATIONS
             // -------------------------
             if (!oData.Visible) {
-                MessageToast.show(
-                    this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom")
-                );
+                MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
                 return;
             }
 
             if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
-                MessageToast.show(
-                    this.i18nModel.getText("pleaseselectpricingplanbeforebooking")
-                );
+                MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
                 return;
             }
 

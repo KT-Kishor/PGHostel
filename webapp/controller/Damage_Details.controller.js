@@ -296,8 +296,7 @@ sap.ui.define([
         },
 
         onHome: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
+            this.CommonLogoutFunction();
         },
         DM_onPressAddDamageItems: function () {
             var oModel = this.getView().getModel("DamageModel");

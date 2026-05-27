@@ -67,18 +67,7 @@ sap.ui.define([
             return uniqueValues;
         },
         onHome: function () {
-            const oUser = this._oLoggedInUser;
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-
-            if (oUser && oUser.UserID) {
-                oUIModel.setProperty("/isLoggedIn", true);
-            } else {
-                oUIModel.setProperty("/isLoggedIn", false);
-            }
-
-            this.getOwnerComponent()
-                .getRouter()
-                .navTo("RouteHostel", {}, true);
+            this.CommonLogoutFunction();
         },
 
         _onRouteMatched: async function () {

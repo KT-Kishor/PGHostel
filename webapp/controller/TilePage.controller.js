@@ -60,7 +60,7 @@ sap.ui.define([
         AppVisibilityReadCall: async function () {
             try {
                 this.getBusyDialog()
-                this.commonLoginFunction();
+                this.commonLoginFunction("TilePage");
                 const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 let filter = { Role: oLoginModel.getProperty("/Role") }
                 const oData = await this.ajaxReadWithJQuery("HM_AppVisibility", filter);
