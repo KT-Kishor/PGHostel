@@ -7,11 +7,11 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../model/formatter",
     "../utils/validation",
-], function (BaseController, Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter, utils) {
+], function(BaseController, Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter, utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageProfile", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             const oView = this.getView();
             // Login form model
             oView.setModel(new JSONModel({
@@ -47,7 +47,9 @@ sap.ui.define([
                 CustomerName: ""
             }), "complaintTemp");
 
-            this.getView().setModel(new JSONModel({ mode: "CREATE" }), "viewModel");
+            this.getView().setModel(new JSONModel({
+                mode: "CREATE"
+            }), "viewModel");
 
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
@@ -64,7 +66,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched:async function () {
+        _onRouteMatched: async function() {
             await this.commonLoginFunction("ManageProfile");
             this.ManageData();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -72,7 +74,7 @@ sap.ui.define([
             this.getView().setModel(model, "Member")
         },
 
-        ManageData: async function () {
+        ManageData: async function() {
             // always read current user from models instead of relying solely on cached variable
             let oUser = this.getView().getModel("LoginModel")?.getData() ||
                 this.getOwnerComponent().getModel("UserModel")?.getData() ||
@@ -99,7 +101,9 @@ sap.ui.define([
                 this.getView().setModel(oTempModel, "profileData");
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
 
-                const filter = { UserID: sUserID }
+                const filter = {
+                    UserID: sUserID
+                }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
 
@@ -107,7 +111,7 @@ sap.ui.define([
                 const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-               
+
                 const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
@@ -139,7 +143,10 @@ sap.ui.define([
                     bookings: aBookingData,
                     bookingCount: aBookingData.length,
                     selectedTab: "Booking History",
-                    aCustomers: aBookingData.map(booking => ({ BookingID: booking.BookingID, customerName: booking.customerName })),
+                    aCustomers: aBookingData.map(booking => ({
+                        BookingID: booking.BookingID,
+                        customerName: booking.customerName
+                    })),
                     facility: [],
                     isTableBusy: false
                 });
@@ -178,31 +185,12 @@ sap.ui.define([
             }
         },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        _formatDisplayDate: function (sDate) {
+        _formatDisplayDate: function(sDate) {
             if (!sDate) {
                 return "";
             }
 
             const oDate = new Date(sDate);
-
             if (isNaN(oDate.getTime())) {
                 return "";
             }
@@ -210,7 +198,7 @@ sap.ui.define([
             return oDate.toLocaleDateString("en-GB");
         },
 
-        _getBookingGroup: function (booking) {
+        _getBookingGroup: function(booking) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -250,7 +238,7 @@ sap.ui.define([
             return "Others";
         },
 
-        _calculateBookingAmount: function (booking) {
+        _calculateBookingAmount: function(booking) {
             let GSTValue = 0;
 
             if (booking.GSTType === "IGST") {
@@ -268,7 +256,7 @@ sap.ui.define([
             return amount.toString();
         },
 
-        _normalizeBookingData: function (booking) {
+        _normalizeBookingData: function(booking) {
             const sCustomerName = [
                 booking.Salutation || "",
                 booking.CustomerName || ""
@@ -297,25 +285,7 @@ sap.ui.define([
             };
         },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        _applyCountryStateCityFilters: function () {
+        _applyCountryStateCityFilters: function() {
 
             const oModel = this.getView().getModel("profileData");
             if (!oModel) return;
@@ -361,7 +331,8 @@ sap.ui.define([
             oStateCB.setValue(sState);
             oSourceCB.setValue(sSource);
         },
-        onNavBack: function () {
+
+        onNavBack: function() {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
@@ -373,7 +344,8 @@ sap.ui.define([
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteHostel");
         },
-        onPreviewProfilePhoto: function () {
+
+        onPreviewProfilePhoto: function() {
             const oProfileModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             let sPhoto = oProfileModel.getProperty("/photo");
@@ -386,7 +358,7 @@ sap.ui.define([
                 sPhoto = "data:image/png;base64," + sPhoto;
             }
 
-            // ✅ 1) Update global model (this is the key line)
+            // 1) Update global model (this is the key line)
             oLoginModel.setProperty("/Photo", sPhoto);
 
             oProfileModel.setProperty("/photo", sPhoto);
@@ -413,7 +385,7 @@ sap.ui.define([
             this._oPreviewDialog.open();
         },
 
-        onPressAvatarEdit: function (oEvent) {
+        onPressAvatarEdit: function(oEvent) {
             this._oAvatarActionSheet = new sap.m.ActionSheet({
                 buttons: [
                     new sap.m.Button({
@@ -438,13 +410,14 @@ sap.ui.define([
             this.getView().addDependent(this._oAvatarActionSheet);
             this._oAvatarActionSheet.openBy(oEvent.getSource());
         },
-        onTakePhoto: function () {
+
+        onTakePhoto: function() {
             if (!this.oCameraDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.ui.com.project1.fragment.SelfieCam",
                     controller: this,
                 }).then(
-                    function (oDialog) {
+                    function(oDialog) {
                         this.oCameraDialog = oDialog;
                         this.getView().addDependent(this.oCameraDialog);
                         this.oCameraDialog.attachAfterOpen(this._StartCamera.bind(this));
@@ -456,7 +429,8 @@ sap.ui.define([
                 this.oCameraDialog.open();
             }
         },
-        onUploadPhoto: function () {
+
+        onUploadPhoto: function() {
             const uploader = this.byId("id_fileUploaderAvatar1");
             if (!uploader) return;
 
@@ -468,11 +442,12 @@ sap.ui.define([
                 uploader.setValue("");
                 oInput.value = "";
                 oInput.accept = "image/*";
-                oInput.capture = "";   // remove camera request → gallery
+                oInput.capture = ""; // remove camera request → gallery
                 oInput.click();
             }, 200);
         },
-        onAvatarFileSelected: function (oEvent) {
+
+        onAvatarFileSelected: function(oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
             const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -503,7 +478,8 @@ sap.ui.define([
             };
             reader.readAsDataURL(file);
         },
-        onRemovePhoto: async function () {
+
+        onRemovePhoto: async function() {
             const oModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const initials = oModel.getProperty("/initials");
@@ -518,7 +494,8 @@ sap.ui.define([
                 fileContent: ""
             });
         },
-        _StartCamera: function () {
+
+        _StartCamera: function() {
             var oVideo = document.getElementById("video");
             if (!oVideo) return;
 
@@ -544,7 +521,9 @@ sap.ui.define([
             // Always create a new Camera instance when starting
             this.camera = new Camera(oVideo, {
                 onFrame: async () => {
-                    await this.selfieSegmentation.send({ image: oVideo });
+                    await this.selfieSegmentation.send({
+                        image: oVideo
+                    });
                 },
                 width: 640,
                 height: 480,
@@ -552,7 +531,7 @@ sap.ui.define([
             this.camera.start();
         },
 
-        _StopCamera: function () {
+        _StopCamera: function() {
             if (this.camera) {
                 this.camera.stop();
                 this.camera = null;
@@ -566,7 +545,8 @@ sap.ui.define([
                 oVideo.srcObject = null;
             }
         },
-        IC_onCapturePress: function () {
+
+        IC_onCapturePress: function() {
             var oVideo = document.getElementById("video");
 
             if (!oVideo || !this.latestSegmentation) return;
@@ -617,13 +597,19 @@ sap.ui.define([
             this._StopCamera();
             this.oCameraDialog.close();
         },
-        IC_onPressCloseCameraDialog: function () {
+
+        IC_onPressCloseCameraDialog: function() {
             this._StopCamera();
             if (this.oCameraDialog) {
                 this.oCameraDialog.close();
             }
         },
-        updateUserPhoto: async function ({ fileName, fileType, fileContent }) {
+
+        updateUserPhoto: async function({
+            fileName,
+            fileType,
+            fileContent
+        }) {
             try {
                 const sUserID = this._oLoggedInUser?.UserID;
                 const payload = {
@@ -632,7 +618,9 @@ sap.ui.define([
                         FileType: fileType,
                         FileContent: fileContent
                     },
-                    filters: { UserID: sUserID }
+                    filters: {
+                        UserID: sUserID
+                    }
                 };
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 this._oLoggedInUser.FileContent = fileContent;
@@ -650,15 +638,15 @@ sap.ui.define([
             }
         },
 
-        onUserlivechange: function (oEvent) {
+        onUserlivechange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onEmailliveChange: function (oEvent) {
+        onEmailliveChange: function(oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
-        onChangeDOB: function (oEventOrControl) {
+        onChangeDOB: function(oEventOrControl) {
             const oDP = (typeof oEventOrControl.getSource === "function") ? oEventOrControl.getSource() : oEventOrControl;
             if (!oDP) return false;
             const v = oDP.getDateValue();
@@ -692,7 +680,8 @@ sap.ui.define([
 
             return true;
         },
-        onAreaSelectionChange: function (oEvent) {
+
+        onAreaSelectionChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
             const oRoomType = this.byId("id_Roomtype");
@@ -704,7 +693,8 @@ sap.ui.define([
                 oRoomType.setEnabled(true);
             }
         },
-        onProfileDialogClose: function () {
+
+        onProfileDialogClose: function() {
             const oModel = this.getView().getModel("profileData");
 
             if (this._originalProfileData) {
@@ -716,7 +706,8 @@ sap.ui.define([
             //  IMPORTANT: clear old backup
             this._originalProfileData = null;
         },
-        _resetValidationStates: function () {
+
+        _resetValidationStates: function() {
             const aControls = [
                 "id_Name1",
                 "id_mail1",
@@ -742,7 +733,7 @@ sap.ui.define([
             });
         },
 
-        onPressAddMember: function () {
+        onPressAddMember: function() {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -799,7 +790,7 @@ sap.ui.define([
             this.UD_Dialog.open();
         },
 
-        onEditMemberFromDialog: function (oEvent) {
+        onEditMemberFromDialog: function(oEvent) {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -848,9 +839,9 @@ sap.ui.define([
                 Name: oData.Name || "",
                 Relation: oData.Relation || "",
                 Gender: oData.Gender || "",
-                DateOfBirth: oData.DateOfBirth
-                    ? oData.DateOfBirth.split("-").reverse().join("/")
-                    : "",
+                DateOfBirth: oData.DateOfBirth ?
+                    oData.DateOfBirth.split("-").reverse().join("/") :
+                    "",
                 DocumentType: oData.DocumentType || "",
                 DocumentName: oData.FileName || "",
                 Document: oData.Attachment || "",
@@ -876,12 +867,11 @@ sap.ui.define([
             this.UD_Dialog.open();
         },
 
-        onCloseDialog: function () {
+        onCloseDialog: function() {
             this.UD_Dialog.close();
         },
 
-        onNewMemberDocumentTypeChange: function (oEvent) {
-
+        onNewMemberDocumentTypeChange: function(oEvent) {
             const oComboBox = oEvent.getSource();
             const sValue = String(oComboBox.getValue() || "").trim();
 
@@ -895,7 +885,7 @@ sap.ui.define([
             return utils._LCstrictValidationComboBox(oComboBox, "ID");
         },
 
-        onFacilityFileChange: function (oEvent) {
+        onFacilityFileChange: function(oEvent) {
 
             const oFileUploader = oEvent.getSource();
             const oModel = this.getView().getModel("Member");
@@ -932,9 +922,9 @@ sap.ui.define([
 
             const sFileName = oFile.name || "";
 
-            const sExt = sFileName.includes(".")
-                ? sFileName.split(".").pop().toLowerCase()
-                : "";
+            const sExt = sFileName.includes(".") ?
+                sFileName.split(".").pop().toLowerCase() :
+                "";
 
             const bAllowedExt = [
                 "jpg",
@@ -958,7 +948,7 @@ sap.ui.define([
 
             const oReader = new FileReader();
 
-            oReader.onload = function (oLoadEvent) {
+            oReader.onload = function(oLoadEvent) {
 
                 const sBase64 = String(
                     oLoadEvent.target.result || ""
@@ -982,7 +972,7 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
-        onMemberFileSizeExceed: function (oEvent) {
+        onMemberFileSizeExceed: function(oEvent) {
 
             const sFileName = oEvent.getParameter("fileName") || "File";
 
@@ -993,16 +983,12 @@ sap.ui.define([
             oEvent.getSource().clear();
         },
 
-        onPreviewMemberDocument: function () {
-
-            const oDoc = this.getView()
-                .getModel("Member")
-                .getData();
-
+        onPreviewMemberDocument: function() {
+            const oDoc = this.getView().getModel("Member").getData();
             this._previewDocument(oDoc);
         },
 
-        _previewDocument: function (oDoc) {
+        _previewDocument: function(oDoc) {
             const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
 
             if (!sRawSource) {
@@ -1012,7 +998,7 @@ sap.ui.define([
 
             const aDataUrlParts = /^data:([^;]+);base64,(.+)$/i.exec(sRawSource);
             const sRawBase64 = aDataUrlParts ? aDataUrlParts[2] : sRawSource;
-            const normalizeBase64 = function (sValue) {
+            const normalizeBase64 = function(sValue) {
                 let sNormalized = String(sValue || "").replace(/\s/g, "").replace(/-/g, "+").replace(/_/g, "/");
                 const iRemainder = sNormalized.length % 4;
 
@@ -1023,7 +1009,7 @@ sap.ui.define([
                 return sNormalized;
             };
 
-            const autoDecodeBase64 = function (sValue) {
+            const autoDecodeBase64 = function(sValue) {
                 if (!sValue) {
                     return "";
                 }
@@ -1105,11 +1091,11 @@ sap.ui.define([
                     })],
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function () {
+                        press: function() {
                             oDialog.close();
                         }
                     }).addStyleClass("myUnifiedBtn"),
-                    afterClose: function () {
+                    afterClose: function() {
                         oDialog.destroy();
                     }
                 });
@@ -1152,7 +1138,9 @@ sap.ui.define([
                     aByteArrays.push(new Uint8Array(aByteNumbers));
                 }
 
-                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
+                const oBlob = new Blob(aByteArrays, {
+                    type: "application/pdf"
+                });
 
                 if (this._customerPreviewUrl) {
                     URL.revokeObjectURL(this._customerPreviewUrl);
@@ -1180,11 +1168,11 @@ sap.ui.define([
                     })],
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function () {
+                        press: function() {
                             oPdfDialog.close();
                         }
                     }).addStyleClass("myUnifiedBtn"),
-                    afterClose: function () {
+                    afterClose: function() {
                         if (this._customerPreviewUrl) {
                             URL.revokeObjectURL(this._customerPreviewUrl);
                             this._customerPreviewUrl = null;
@@ -1202,7 +1190,7 @@ sap.ui.define([
             MessageToast.show("Unsupported document format.");
         },
 
-        onDeleteMemberDocument: function () {
+        onDeleteMemberDocument: function() {
 
             const oModel = this.getView().getModel("Member");
 
@@ -1225,42 +1213,17 @@ sap.ui.define([
             this._selectedFile = null;
         },
 
-        savepress: function () {
+        savepress: function() {
 
             var oView = sap.ui.getCore();
+            var oMember = this.getView().getModel("Member").getData();
 
-            var oMember = this.getView()
-                .getModel("Member")
-                .getData();
-
-            if (
-                utils._LCstrictValidationComboBox(
-                    oView.byId("idSelect"),
-                    "ID"
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    oView.byId("MM_id_MemberName"),
-                    "ID"
-                ) &&
-                utils._LCvalidateDate(
-                    oView.byId("MemberDOB"),
-                    "ID"
-                ) &&
-                utils._LCstrictValidationComboBox(
-                    oView.byId("MemberGenderCombo"),
-                    "ID"
-                ) &&
-                (
-                    oMember.Relation === "Self" ||
-                    utils._LCstrictValidationComboBox(
-                        oView.byId("MemberRelationCombo"),
-                        "ID"
-                    )
-                ) &&
-                utils._LCstrictValidationComboBox(
-                    oView.byId("idDocumentType"),
-                    "ID"
-                )
+            if (utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"),  "ID") &&
+                utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"),"ID") &&
+                (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"), "ID")) &&
+                utils._LCstrictValidationComboBox(oView.byId("idDocumentType"), "ID")
             ) {
 
                 if (!oMember.DocumentType) {
@@ -1288,28 +1251,17 @@ sap.ui.define([
                         Relation: oMember.Relation,
                         Gender: oMember.Gender,
                         UserID: oMember.UserID,
-                        DateOfBirth: oMember.DateOfBirth
-                            ? oMember.DateOfBirth
-                                .split("/")
-                                .reverse()
-                                .join("-")
-                            : "",
+                        DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
                         Documents: [{
-                            DocumentID:
-                                this._mode === "UPDATE"
-                                    ? this._existingFileData.DocumentID
-                                    : "",
+                            DocumentID: this._mode === "UPDATE" ?
+                                this._existingFileData.DocumentID :
+                                "",
 
                             MemberID: oMember.MemberID,
-
                             UserID: oMember.UserID,
-
                             DocumentType: oMember.DocumentType,
-
                             FileName: oMember.DocumentName,
-
                             FileType: oMember.FileType,
-
                             File: oMember.File
                         }]
                     }]
@@ -1325,14 +1277,16 @@ sap.ui.define([
             }
         },
 
-        _uploadDocument: function (oDoc) {
+        _uploadDocument: function(oDoc) {
             this.getBusyDialog();
 
             const isCreate = this._mode === "CREATE";
 
-            const oPromise = isCreate
-                ? this.ajaxCreateWithJQuery("HM_MemberDocument", { data: [oDoc] })
-                : this.ajaxUpdateWithJQuery("HM_MemberDocument", {
+            const oPromise = isCreate ?
+                this.ajaxCreateWithJQuery("HM_MemberDocument", {
+                    data: [oDoc]
+                }) :
+                this.ajaxUpdateWithJQuery("HM_MemberDocument", {
                     data: [oDoc],
                     filters: {
                         DocumentID: this._existingFileData.DocumentID
@@ -1350,13 +1304,12 @@ sap.ui.define([
             });
         },
 
-        _generateMemberID: function (oBookingView) {
+        _generateMemberID: function(oBookingView) {
             const sUserID = this.getView().getModel("profileData").getData().UserID || ""
             const aMasterMembers = this.getView().getModel("profileData").getData().Members || [];
 
-
             // Filter members that match the UserID pattern (e.g., "00013_XX")
-            const aUserMembers = aMasterMembers.filter(function (oMember) {
+            const aUserMembers = aMasterMembers.filter(function(oMember) {
                 if (!oMember.MemberID) return false;
                 return String(oMember.MemberID).startsWith(sUserID + "_");
             });
@@ -1365,7 +1318,7 @@ sap.ui.define([
 
             if (aUserMembers.length > 0) {
                 // Extract suffixes and find the maximum
-                aUserMembers.forEach(function (oMember) {
+                aUserMembers.forEach(function(oMember) {
                     const sMemberID = String(oMember.MemberID || "");
                     const aParts = sMemberID.split("_");
                     if (aParts.length === 2) {
@@ -1387,7 +1340,8 @@ sap.ui.define([
 
             return sNewMemberID;
         },
-        onNewMemberSalutationChange: function (oEvent) {
+
+        onNewMemberSalutationChange: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.byId("idSelect");
@@ -1410,20 +1364,20 @@ sap.ui.define([
             // Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
-        onNewMemberNameChange: function (oEvent) {
+        onNewMemberNameChange: function(oEvent) {
             return utils._LCvalidateName(oEvent);
         },
-        onNewMemberDOBChange: function (oEvent) {
+        onNewMemberDOBChange: function(oEvent) {
             utils._LCvalidateDate(oEvent);
         },
-        onNewMemberGenderChange: function (oEvent) {
+        onNewMemberGenderChange: function(oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
-        onNewMemberRelationChange: function (oEvent) {
+        onNewMemberRelationChange: function(oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
 
-        onEditSaveProfile: async function () {
+        onEditSaveProfile: async function() {
             const oModel = this.getView().getModel("profileData");
             var data = oModel.getData()
             const isEditMode = oModel.getProperty("/isEditMode");
@@ -1462,7 +1416,9 @@ sap.ui.define([
                     Country: oModel.getProperty("/Country"),
                     STDCode: oModel.getProperty("/STDCode")
                 },
-                filters: { UserID: oModel.getProperty("/UserID") }
+                filters: {
+                    UserID: oModel.getProperty("/UserID")
+                }
             };
 
             try {
@@ -1485,7 +1441,7 @@ sap.ui.define([
             }
         },
 
-        onPressBookingRow: function (oEvent) {
+        onPressBookingRow: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
             var sBookingID = btoa(oBookingData.BookingID.toString());
@@ -1503,11 +1459,14 @@ sap.ui.define([
             });
         },
 
-        onPressManageInvoice: function (oEvent) {
-            this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", { sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo), dash: "Customerinvoice" });
+        onPressManageInvoice: function(oEvent) {
+            this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo),
+                dash: "Customerinvoice"
+            });
         },
 
-        calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
+        calculateTotals: function(aPersons, sStartDate, sEndDate, RoomPrice) {
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
@@ -1560,7 +1519,7 @@ sap.ui.define([
         },
 
         // 🗓️ Helper date parser
-        _parseDate: function (sDate) {
+        _parseDate: function(sDate) {
             if (!sDate) return null;
 
             // If it's already a Date object
@@ -1576,11 +1535,12 @@ sap.ui.define([
                 return new Date(sDate);
             }
         },
-        onTableUpdateFinished: function () {
+
+        onTableUpdateFinished: function() {
             this._updateRowCount();
         },
 
-        _updateRowCount: function () {
+        _updateRowCount: function() {
             const oProfileModel = this.getView().getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
             let oTable;
@@ -1614,7 +1574,8 @@ sap.ui.define([
                 oProfileModel.setProperty("/memberCount", length);
             }
         },
-        onTableSelect: async function (oEvent) {
+
+        onTableSelect: async function(oEvent) {
             const sKey = oEvent ? oEvent.getParameter("key") : "Members";
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
@@ -1634,7 +1595,9 @@ sap.ui.define([
                         return;
                     }
 
-                    const resp = await this.ajaxReadWithJQuery("HM_ManageInvoice", { UserID: sUserID });
+                    const resp = await this.ajaxReadWithJQuery("HM_ManageInvoice", {
+                        UserID: sUserID
+                    });
                     const aInvoiceData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
 
                     const aPayments = aInvoiceData.map(inv => ({
@@ -1666,8 +1629,7 @@ sap.ui.define([
             // When Damage tab selected, fetch damages and bind
             else if (sKey === "Damage") {
                 await this._loadDamage();
-            }
-            else if (sKey === "Members") {
+            } else if (sKey === "Members") {
                 // await this._loadMembers();
                 this.getBusyDialog();
                 const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
@@ -1676,7 +1638,9 @@ sap.ui.define([
                     return;
                 }
 
-                const resp = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
+                const resp = await this.ajaxReadWithJQuery("HM_MemberDocument", {
+                    UserID: sUserID
+                });
                 // New structure: { success: true, data: [...], UserDocuments: [...] }
                 const aMemberData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
                 const aUserDocuments = resp.data[0].Documents;
@@ -1735,7 +1699,8 @@ sap.ui.define([
                 this.closeBusyDialog()
             }
         },
-        _loadBookings: async function () {
+
+        _loadBookings: async function() {
             const oModel = this.getView().getModel("profileData");
             const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -1746,7 +1711,9 @@ sap.ui.define([
 
             try {
                 this.getBusyDialog();
-                const filter = { UserID: sUserID };
+                const filter = {
+                    UserID: sUserID
+                };
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
 
@@ -1796,7 +1763,7 @@ sap.ui.define([
             }
         },
 
-        _loadComplaints: async function (bSilent) {
+        _loadComplaints: async function(bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -1810,13 +1777,15 @@ sap.ui.define([
             try {
                 if (!bSilent) this.getBusyDialog();
 
-                const resp = await this.ajaxReadWithJQuery("HM_Complaint", { UserID: sUserID });
+                const resp = await this.ajaxReadWithJQuery("HM_Complaint", {
+                    UserID: sUserID
+                });
 
                 // Normalize response shapes: {data:[...]}, {data:{...}}, or legacy keys
-                const aRaw = Array.isArray(resp?.data) ? resp.data
-                    : (resp?.data ? [resp.data]
-                        : (Array.isArray(resp?.ComplaintData) ? resp.ComplaintData
-                            : (Array.isArray(resp?.commentData) ? resp.commentData : [])));
+                const aRaw = Array.isArray(resp?.data) ? resp.data :
+                    (resp?.data ? [resp.data] :
+                        (Array.isArray(resp?.ComplaintData) ? resp.ComplaintData :
+                            (Array.isArray(resp?.commentData) ? resp.commentData : [])));
 
                 const oBRModel = this.getOwnerComponent().getModel("sBRModel");
                 const aBranchMaster = oBRModel?.getProperty("/") || [];
@@ -1861,7 +1830,7 @@ sap.ui.define([
             }
         },
 
-        _loadDamage: async function (bSilent) {
+        _loadDamage: async function(bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -1876,7 +1845,9 @@ sap.ui.define([
                 this.getBusyDialog();
 
                 // Backend returns: { success:true, data:{ HM_Damage:[...], HM_DamageItem:[...] } }
-                const resp = await this.ajaxReadWithJQuery("getHM_DamageBoth", { UserID: sUserID });
+                const resp = await this.ajaxReadWithJQuery("getHM_DamageBoth", {
+                    UserID: sUserID
+                });
 
 
                 const aHeader = resp?.data?.HM_Damage || [];
@@ -1889,7 +1860,9 @@ sap.ui.define([
                 const mHeaderByDamageId = new Map();
                 aHeader.forEach(h => {
                     const sDamageID = h.DamageID || "";
-                    if (!sDamageID) { return; }
+                    if (!sDamageID) {
+                        return;
+                    }
 
                     const sBranchCode = h.BranchCode || "";
                     const oBranch = aBranchMaster.find(b => b.BranchID === sBranchCode);
@@ -1920,7 +1893,9 @@ sap.ui.define([
                 const mItemsByDamageId = new Map();
                 aItems.forEach(it => {
                     const sDamageID = it.DamageID || "";
-                    if (!sDamageID) { return; }
+                    if (!sDamageID) {
+                        return;
+                    }
                     if (!mItemsByDamageId.has(sDamageID)) {
                         mItemsByDamageId.set(sDamageID, []);
                     }
@@ -1995,7 +1970,7 @@ sap.ui.define([
             }
         },
 
-        onlogout: function () {
+        onlogout: function() {
 
             // clear profile model and cached user info so next login starts fresh
             // remove any profile data both locally and globally
@@ -2022,7 +1997,7 @@ sap.ui.define([
             this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },
-        onGlobalSearch: function (oEvent) {
+        onGlobalSearch: function(oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
 
             const oProfileModel = this.getView().getModel("profileData");
@@ -2121,7 +2096,8 @@ sap.ui.define([
             oBinding.filter(aFilters);
             this._updateRowCount();
         },
-        onCountrySelectionChange: function (oEvent) {
+
+        onCountrySelectionChange: function(oEvent) {
             const oCountry = oEvent.getSource();
             const oModel = this.getView().getModel("profileData");
 
@@ -2186,7 +2162,8 @@ sap.ui.define([
                 ]);
             }
         },
-        CC_onChangeState: function (oEvent) {
+
+        CC_onChangeState: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("profileData");
@@ -2226,7 +2203,7 @@ sap.ui.define([
             ]);
         },
 
-        CC_onChangeCity: function (oEvent) {
+        CC_onChangeCity: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("profileData");
@@ -2246,7 +2223,7 @@ sap.ui.define([
             // Save in model
             oModel.setProperty("/City", sCityName);
         },
-        _onProfileSTDChange: function () {
+        _onProfileSTDChange: function() {
             const oSTD = this.byId("id_std1");
             const oMobile = this.byId("id_phone1");
 
@@ -2261,7 +2238,7 @@ sap.ui.define([
             }
         },
 
-        MPonMobileLivechnage: function (oEvent) {
+        MPonMobileLivechnage: function(oEvent) {
             const oInput = oEvent.getSource();
             const oSTD = this.byId("id_std1");
             //const oMobile = this.byId("id_phone1"); // not needed here
@@ -2308,7 +2285,8 @@ sap.ui.define([
                 oInput.setValueState("None");
             }
         },
-        _prepareBranchComboData: function (aBookingData) {
+
+        _prepareBranchComboData: function(aBookingData) {
 
             if (!Array.isArray(aBookingData)) {
                 return [];
@@ -2320,8 +2298,8 @@ sap.ui.define([
             const aUniqueBranchCodes = [
                 ...new Set(
                     aAssigned
-                        .map(b => b.BranchCode)
-                        .filter(Boolean)
+                    .map(b => b.BranchCode)
+                    .filter(Boolean)
                 )
             ];
             // 3. Get Branch Master data from global model
@@ -2337,23 +2315,23 @@ sap.ui.define([
             });
             return aFinal;
         },
-        _prepareAssignedRoomData: function (aBookingData) {
+        _prepareAssignedRoomData: function(aBookingData) {
             if (!Array.isArray(aBookingData)) {
                 return [];
             }
 
             const oUnique = new Set();
             return aBookingData
-                .filter(function (oBooking) {
+                .filter(function(oBooking) {
                     return oBooking.Status?.toLowerCase() === "assigned" && oBooking.BranchCode && oBooking.RoomNo;
                 })
-                .map(function (oBooking) {
+                .map(function(oBooking) {
                     return {
                         BranchCode: String(oBooking.BranchCode || "").trim(),
                         RoomNo: String(oBooking.RoomNo || "").trim()
                     };
                 })
-                .filter(function (oRoom) {
+                .filter(function(oRoom) {
                     if (!oRoom.BranchCode || !oRoom.RoomNo) {
                         return false;
                     }
@@ -2366,8 +2344,7 @@ sap.ui.define([
                 });
         },
 
-
-        _setComplaintRoomComboData: function (sBranchCode, sSelectedRoomNo) {
+        _setComplaintRoomComboData: function(sBranchCode, sSelectedRoomNo) {
             const oView = this.getView();
             const oProfileModel = oView.getModel("profileData");
             const oTempModel = oView.getModel("complaintTemp");
@@ -2380,10 +2357,10 @@ sap.ui.define([
             const sRoomNo = (sSelectedRoomNo || "").trim();
             const aAssignedRooms = oProfileModel.getProperty("/AsgnRoomNo") || [];
             const aRoomCombo = sBranch ? aAssignedRooms
-                .filter(function (oRoom) {
+                .filter(function(oRoom) {
                     return oRoom.BranchCode === sBranch;
                 })
-                .map(function (oRoom) {
+                .map(function(oRoom) {
                     return {
                         RoomNo: oRoom.RoomNo
                     };
@@ -2395,7 +2372,7 @@ sap.ui.define([
             if (aRoomCombo.length === 1) {
                 sNewRoom = aRoomCombo[0].RoomNo;
             } else {
-                const bValidRoom = sRoomNo && aRoomCombo.some(function (oRoom) {
+                const bValidRoom = sRoomNo && aRoomCombo.some(function(oRoom) {
                     return oRoom.RoomNo === sRoomNo;
                 });
                 if (!bValidRoom) sNewRoom = "";
@@ -2410,11 +2387,11 @@ sap.ui.define([
             }
         },
 
-        onPressRaiseComplaint: function () {
+        onPressRaiseComplaint: function() {
             this._openComplaintDialog(); // no data → create mode
         },
 
-        _openComplaintDialog: function (oComplaintData) {
+        _openComplaintDialog: function(oComplaintData) {
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oProfileModel = oView.getModel("profileData");
@@ -2465,8 +2442,8 @@ sap.ui.define([
                 const sExistingFileName = oComplaintData.FileName || "";
                 const sExistingFileType = oComplaintData.FileType || "";
 
-                const aDocuments = sExistingFileName
-                    ? [{
+                const aDocuments = sExistingFileName ?
+                    [{
                         FileName: sExistingFileName,
                         DocumentType: sExistingFileType,
                         FileType: sExistingFileType,
@@ -2474,8 +2451,8 @@ sap.ui.define([
                         Base64: base64File,
                         size: fileSize,
                         // DocType: "Attachment"
-                    }]
-                    : [];
+                    }] :
+                    [];
 
                 // Set edit data
                 oTempModel.setData({
@@ -2546,9 +2523,9 @@ sap.ui.define([
                 const aBranches = oProfileModel.getProperty("/BranchCombo") || [];
 
                 const sDefaultBranchCode =
-                    aBranches.length === 1
-                        ? aBranches[0].BranchCode
-                        : "";
+                    aBranches.length === 1 ?
+                    aBranches[0].BranchCode :
+                    "";
 
                 // Reset for new complaint
                 oTempModel.setData({
@@ -2587,9 +2564,9 @@ sap.ui.define([
                 }
             }
 
-            const sDialogTitle = oComplaintData
-                ? "Edit Complaint"
-                : "Raise New Complaint";
+            const sDialogTitle = oComplaintData ?
+                "Edit Complaint" :
+                "Raise New Complaint";
 
             const fnUpdateUI = () => {
 
@@ -2620,7 +2597,7 @@ sap.ui.define([
                 Fragment.load({
                     name: "sap.ui.com.project1.fragment.Complaint",
                     controller: this
-                }).then(function (oDialog) {
+                }).then(function(oDialog) {
 
                     this._oComplaintDialog = oDialog;
 
@@ -2641,7 +2618,7 @@ sap.ui.define([
             }
         },
 
-        onCloseComplaintDialog: function () {
+        onCloseComplaintDialog: function() {
 
             if (this._oComplaintDialog) {
                 this._oComplaintDialog.close();
@@ -2690,13 +2667,13 @@ sap.ui.define([
 
             this._resetComplaintValidationStates();
         },
-        _getComplaintControl: function (sId) {
+        _getComplaintControl: function(sId) {
             return sap.ui.getCore().byId(sId) || this.byId(sId);
         },
-        _resetComplaintValidationStates: function () {
+        _resetComplaintValidationStates: function() {
 
             const aControls = [
-                this._getComplaintControl("idBranchCombo"),      // ← Added
+                this._getComplaintControl("idBranchCombo"), // ← Added
                 this._getComplaintControl("idComplaintType"),
                 this._getComplaintControl("idComplaintRoom"),
                 this._getComplaintControl("idComplaintDesc"),
@@ -2705,7 +2682,7 @@ sap.ui.define([
 
             ];
 
-            aControls.forEach(function (oControl) {
+            aControls.forEach(function(oControl) {
                 if (oControl && oControl.setValueState) {
                     oControl.setValueState("None");
                     // oControl.setValueStateText("");
@@ -2713,7 +2690,7 @@ sap.ui.define([
             });
         },
 
-        onExit: function () {
+        onExit: function() {
             if (this._oComplaintDialog) {
                 this._oComplaintDialog.destroy();
                 this._oComplaintDialog = null;
@@ -2724,17 +2701,17 @@ sap.ui.define([
                 this._oComplaintPreviewDialog = null;
             }
         },
-        onComplaintTypeChange: function (oEvent) {
+        onComplaintTypeChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-        onComplaintRoomChange: function (oEvent) {
+        onComplaintRoomChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
-        onComplaintDescLiveChange: function (oEvent) {
+        onComplaintDescLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onComplaintFileChange: function (oEvent) {
+        onComplaintFileChange: function(oEvent) {
             const oUploader = oEvent.getSource();
             const file = oEvent.getParameter("files")[0];
             if (!file) {
@@ -2795,7 +2772,7 @@ sap.ui.define([
             };
             reader.readAsDataURL(file);
         },
-        onComplaintDeleteDoc: function () {
+        onComplaintDeleteDoc: function() {
             const oTempModel = this.getView().getModel("complaintTemp");
             oTempModel.setProperty("/Documents", []);
             oTempModel.setProperty("/FileName", "");
@@ -2807,8 +2784,8 @@ sap.ui.define([
                 oUploader.clear();
             }
         },
-        onComplaintPreviewDoc: function (oEvent) {
-            const autoDecodeBase64 = function (sBase64) {
+        onComplaintPreviewDoc: function(oEvent) {
+            const autoDecodeBase64 = function(sBase64) {
                 if (!sBase64 || typeof sBase64 !== "string") {
                     return "";
                 }
@@ -2850,7 +2827,7 @@ sap.ui.define([
                 // Create a temporary image to detect orientation and dimensions
                 const oImg = new Image();
 
-                oImg.onload = function () {
+                oImg.onload = function() {
 
                     const viewportW = window.innerWidth * 0.8;
                     const viewportH = window.innerHeight * 0.8;
@@ -2906,7 +2883,7 @@ sap.ui.define([
 
             MessageToast.show("Preview not supported for this file type.");
         },
-        onSaveComplaint: async function () {
+        onSaveComplaint: async function() {
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oData = oTempModel.getData();
@@ -2944,15 +2921,13 @@ sap.ui.define([
                 Status: "Pending",
                 ComplaintRaisedDate: sToday,
                 RoomNo: oData.RoomNo,
-                BranchCode: sBranchCode,   // ← from ComboBox ONLY
+                BranchCode: sBranchCode, // ← from ComboBox ONLY
                 FileName: oData.FileName || "",
                 FileType: oData.FileType || "",
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
                 CustomerName: oData.CustomerName
             };
-
-
 
             let payload;
             if (oData.ComplaintID) {
@@ -2961,15 +2936,19 @@ sap.ui.define([
                         ComplaintType: sComplaintType,
                         Description: oData.Description,
                         RoomNo: oData.RoomNo,
-                        BranchCode: sBranchCode,   // ← also here
+                        BranchCode: sBranchCode, // ← also here
                         FileName: oData.FileName || "",
                         FileType: oData.FileType || "",
                         File: oData.FileContent || ""
                     },
-                    filters: { ComplaintID: oData.ComplaintID }
+                    filters: {
+                        ComplaintID: oData.ComplaintID
+                    }
                 };
             } else {
-                payload = { data: payloadData };
+                payload = {
+                    data: payloadData
+                };
             }
 
             try {
@@ -2983,9 +2962,9 @@ sap.ui.define([
                 }
                 this._oComplaintDialog.close();
 
-                const sSuccessMsg = oData.ComplaintID
-                    ? (this.i18nModel.getText("complaintUpdatedSuccessfully"))
-                    : (this.i18nModel.getText("complaintSavedSuccessfully"));
+                const sSuccessMsg = oData.ComplaintID ?
+                    (this.i18nModel.getText("complaintUpdatedSuccessfully")) :
+                    (this.i18nModel.getText("complaintSavedSuccessfully"));
                 MessageToast.show(sSuccessMsg);
                 oView.getModel("profileData")?.setProperty("/selectedTab", "Complaints");
                 this.byId("id_tabBar1")?.setSelectedKey("Complaints");
@@ -3004,12 +2983,12 @@ sap.ui.define([
             }
         },
         // Helper to refresh complaints table after save
-        _refreshComplaints: async function () {
+        _refreshComplaints: async function() {
             // Backward-compatible: keep existing call sites after save/update
             await this._loadComplaints(true);
         },
 
-        onPressComplaintRow: function (oEvent) {
+        onPressComplaintRow: function(oEvent) {
             const oContext = oEvent.getSource().getBindingContext("profileData");
             const oComplaint = oContext.getObject();
 
@@ -3026,20 +3005,20 @@ sap.ui.define([
             this._openComplaintDialog(oComplaint);
         },
 
-        onComBranch: async function (oEvent) {
+        onComBranch: async function(oEvent) {
             const oBranchCombo = oEvent.getSource();
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
             const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
             this.BranchCode = sBranchCode; // Store globally if needed elsewhere
             this._setComplaintRoomComboData(sBranchCode, ""); // Store globally if needed elsewhere
-            this.getView().setModel(new JSONModel([]), "customerbookingdata");  // Clear previous customer/booking data
+            this.getView().setModel(new JSONModel([]), "customerbookingdata"); // Clear previous customer/booking data
 
             if (sBranchCode) {
                 await this.onSearch();
             }
         },
 
-        onSearch: function () {
+        onSearch: function() {
 
             return new Promise((resolve, reject) => {
 
@@ -3066,11 +3045,9 @@ sap.ui.define([
                         // Clean values
                         aData = aData.map(item => ({
                             ...item,
-                            CustomerName:
-                                (item.CustomerName || "").trim(),
+                            CustomerName: (item.CustomerName || "").trim(),
 
-                            BookingID:
-                                (item.BookingID || "").trim()
+                            BookingID: (item.BookingID || "").trim()
                         }));
 
                         this.getView().setModel(
@@ -3096,7 +3073,7 @@ sap.ui.define([
             });
         },
 
-        onChangeAddCustomer: function (oEvent) {
+        onChangeAddCustomer: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
             const oCombo = oEvent.getSource();
             const sCustomer = oCombo.getSelectedKey();
@@ -3113,7 +3090,7 @@ sap.ui.define([
             }
         },
 
-        onChangeBookingID: function (oEvent) {
+        onChangeBookingID: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
 
             const oCombo = oEvent.getSource();
@@ -3130,7 +3107,7 @@ sap.ui.define([
             }
         },
 
-        HF_viewimage: function (oEvent) {
+        HF_viewimage: function(oEvent) {
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
                 b64 = b64.replace(/\s/g, "");
@@ -3139,9 +3116,9 @@ sap.ui.define([
                 for (let i = 0; i < 5; i++) {
                     try {
                         if (
-                            last.startsWith("iVB") ||   // PNG
-                            last.startsWith("/9j") ||   // JPG
-                            last.startsWith("JVBER")   // PDF
+                            last.startsWith("iVB") || // PNG
+                            last.startsWith("/9j") || // JPG
+                            last.startsWith("JVBER") // PDF
                         ) {
                             return last;
                         }
@@ -3206,12 +3183,12 @@ sap.ui.define([
 
                         beginButton: new sap.m.Button({
                             text: "Close",
-                            press: function () {
+                            press: function() {
                                 this._oHFPreviewDialog.close();
                             }.bind(this)
                         }).addStyleClass("myUnifiedBtn"),
 
-                        afterClose: function () {
+                        afterClose: function() {
                             this._oHFPreviewDialog.destroy();
                             this._oHFPreviewDialog = null;
                         }.bind(this)
@@ -3251,7 +3228,7 @@ sap.ui.define([
                             }
                         }),
 
-                        afterClose: function () {
+                        afterClose: function() {
                             this._oHFPreviewDialog.destroy();
                             this._oHFPreviewDialog = null;
                         }.bind(this)
@@ -3276,7 +3253,9 @@ sap.ui.define([
                     byteArrays.push(new Uint8Array(byteNumbers));
                 }
 
-                const blob = new Blob(byteArrays, { type: sMimeType });
+                const blob = new Blob(byteArrays, {
+                    type: sMimeType
+                });
 
                 if (this._previewUrl) {
                     URL.revokeObjectURL(this._previewUrl);
