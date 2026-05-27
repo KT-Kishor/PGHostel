@@ -521,7 +521,11 @@ formatAgeFromDOBOrAge: function (sDateValue) {
     let birthDate;
     if (typeof sDateValue === 'string') {
         // Handle YYYY-MM-DD format from backend (e.g., "2016-04-19")
-        const parts = sDateValue.split("-");
+         let parts
+        if(sDateValue.includes("/")) {
+            sDateValue.split("/").reverse().join("-"); // Convert "19/04/2016" to "2016-04-19"
+        }
+         parts = sDateValue.split("-");
         if (parts.length === 3) {
             birthDate = new Date(parts[0], parts[1] - 1, parts[2]);
         } else {

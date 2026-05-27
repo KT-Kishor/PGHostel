@@ -8,13 +8,13 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/ui/model/Filter",
 
-], function(BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast, FilterOperator, Filter) {
+], function (BaseController, Formatter, JSONModel, MessageBox, utils, MessageToast, FilterOperator, Filter) {
     "use strict";
     const $C = (id) => this.getView().byId(id);
 
     return BaseController.extend("sap.ui.com.project1.controller.AdminDetails", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             this.getView().setModel(new JSONModel({
                 mode: "CREATE"
             }), "viewModel");
@@ -31,7 +31,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteAdminDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function(oEvent) {
+        _onRouteMatched: async function (oEvent) {
             if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
@@ -163,7 +163,7 @@ sap.ui.define([
 
         },
 
-        valuestate: function() {
+        valuestate: function () {
             this.getView().byId("Ad_id_RoomType").setValueState("None")
             this.getView().byId("idPaymentMethod1").setValueState("None")
             this.getView().byId("Ad_id_editStartDate").setValueState("None")
@@ -178,7 +178,7 @@ sap.ui.define([
             this.getView().byId("CD_ID_idPhone").setValueState("None")
         },
 
-        OnRoom: function() {
+        OnRoom: function () {
             return new Promise((resolve, reject) => {
                 this.ajaxReadWithJQuery("HM_Rooms", "")
                     .then(oData => {
@@ -190,7 +190,7 @@ sap.ui.define([
             });
         },
 
-        getBranchHotelData: function(filter) {
+        getBranchHotelData: function (filter) {
             return new Promise((resolve, reject) => {
                 this.ajaxReadWithJQuery("getBranchHotelData", filter)
                     .then(oData => {
@@ -200,7 +200,7 @@ sap.ui.define([
                     .catch(reject);
             });
         },
-        Coupon: function() {
+        Coupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             const filter = {
                 CouponCode: oCustomerData.CouponCode || "",
@@ -214,7 +214,7 @@ sap.ui.define([
             });
         },
 
-        onChekout: function() {
+        onChekout: function () {
             var data = this.getView().getModel("CustomerData").getData()
 
             if (!this.CK_Dialog) {
@@ -228,12 +228,12 @@ sap.ui.define([
             this.CK_Dialog.open();
         },
 
-        Ck_onCancelButtonPress: function() {
+        Ck_onCancelButtonPress: function () {
             this.CK_Dialog.close();
 
         },
 
-        Ck_onsavebuttonpress: async function() {
+        Ck_onsavebuttonpress: async function () {
             // Get edited data from Bookingmodel
             var oBookingData = this.getView().getModel("Bookingmodel").getData();
 
@@ -256,11 +256,11 @@ sap.ui.define([
             // Send payload
             this.getBusyDialog()
             await this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [Payload],
-                    filters: {
-                        BookingID: oCustomerModel.BookingID
-                    }
-                })
+                data: [Payload],
+                filters: {
+                    BookingID: oCustomerModel.BookingID
+                }
+            })
                 .then(() => {
                     sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
                 });
@@ -272,7 +272,7 @@ sap.ui.define([
             this.CK_Dialog.close();
         },
 
-        applyCountryStateCityFilters: async function() {
+        applyCountryStateCityFilters: async function () {
             const oModel = this.getView().getModel("CustomerData");
             const oCountryCB = this.byId("CC_id_Country");
             const oStateCB = this.byId("CC_id_State");
@@ -311,7 +311,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource || "");
         },
 
-        Facilitysearch: async function(sBranchCode, Deposit) {
+        Facilitysearch: async function (sBranchCode, Deposit) {
 
             const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", {
                 BranchCode: sBranchCode
@@ -324,7 +324,7 @@ sap.ui.define([
 
             // 🚀 If extrabed <= 0 → remove Extra Bed
             if (Deposit && Deposit.ExtraBed <= 0) {
-                aFilteredFacilities = aFacilities.filter(function(oItem) {
+                aFilteredFacilities = aFacilities.filter(function (oItem) {
                     return oItem.Type !== "Extra Bed";
                 });
             }
@@ -335,7 +335,7 @@ sap.ui.define([
             return aFilteredFacilities;
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
 
             var oViewModel = this.getView().getModel("VisibleModel");
             var bIsEditMode = oViewModel && oViewModel.getProperty("/visible");
@@ -347,7 +347,7 @@ sap.ui.define([
                     this.i18nModel.getText("ConfirmActionTitle"),
                     this.i18nModel.getText("backConfirmation"),
 
-                    function() {
+                    function () {
 
                         oViewModel.setProperty("/Edit", false);
                         this.getView().getModel("VisibleModel").setProperty("/visible", true);
@@ -436,7 +436,7 @@ sap.ui.define([
             }
         },
 
-        onHome: function() {
+        onHome: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
@@ -449,7 +449,7 @@ sap.ui.define([
             oRouter.navTo("RouteHostel")
         },
 
-        AD_onSearch: async function() {
+        AD_onSearch: async function () {
             try {
                 this.getBusyDialog()
                 const filter = {
@@ -531,9 +531,9 @@ sap.ui.define([
                     GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
-                    PropertySTD : Branch.STD || "",
-                    PropertyMobileNo : Branch.Contact || "",
-                    PropertyEmail : Branch.EmailID || "",
+                    PropertySTD: Branch.STD || "",
+                    PropertyMobileNo: Branch.Contact || "",
+                    PropertyEmail: Branch.EmailID || "",
                     GSTNumber: oCustomer.Bookings?.[0]?.CustomerGSTIN || "",
                     MemberID: oCustomer.Bookings?.[0]?.MemberID || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
@@ -543,9 +543,9 @@ sap.ui.define([
                     AllMembers: oCustomer.Members || [],
 
                     Documents: oCustomer.Documents || [],
-                    CustomerGSTIN : oCustomer.Bookings?.[0]?.CustomerGSTIN,
+                    CustomerGSTIN: oCustomer.Bookings?.[0]?.CustomerGSTIN,
                     CustCompanyName: oCustomer.Bookings?.[0]?.CustCompanyName,
-                    CustCompanyAddress : oCustomer.Bookings?.[0]?.CustCompanyAddress
+                    CustCompanyAddress: oCustomer.Bookings?.[0]?.CustCompanyAddress
                 };
                 const AllMembers = oCustomer.Members;
 
@@ -594,7 +594,7 @@ sap.ui.define([
                 var aAllRooms = this.getView().getModel("Availablebeds").getData();
 
                 // Filter by BranchCode
-                var aFilteredRooms = aAllRooms.filter(function(room) {
+                var aFilteredRooms = aAllRooms.filter(function (room) {
                     return room.BranchCode === sBranchCode;
                 });
 
@@ -602,11 +602,11 @@ sap.ui.define([
                 this.getView().getModel("Availablebeds").setData(aFilteredRooms);
 
                 // Now filter by BedTypeName for Availablebedprice
-                var RoomBedprice = aFilteredRooms.filter(function(item) {
+                var RoomBedprice = aFilteredRooms.filter(function (item) {
                     return item.BedTypeName === BedType;
                 });
 
-                oCustomerData.NoOfPersons=RoomBedprice[0].NoofPerson
+                oCustomerData.NoOfPersons = RoomBedprice[0].NoofPerson
 
                 // Set to new model
                 var oModel = new sap.ui.model.json.JSONModel(RoomBedprice);
@@ -709,7 +709,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function(aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -893,12 +893,12 @@ sap.ui.define([
             };
         },
 
-        _parseDate: function(sDate) {
+        _parseDate: function (sDate) {
             const aParts = sDate.split("/");
             return new Date(aParts[2], aParts[1] - 1, aParts[0]);
         },
 
-        Ad_onPressEdit: async function() {
+        Ad_onPressEdit: async function () {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("visiablityPlay");
             const bEditMode = oVisibilityModel.getProperty("/editable");
@@ -945,7 +945,7 @@ sap.ui.define([
             }
         },
 
-        onAddFacilityDetails: function() {
+        onAddFacilityDetails: function () {
             // this.edit=true
             var data = this.getView().getModel("Bookingmodel").getData()
             this._editIndex = undefined;
@@ -987,13 +987,13 @@ sap.ui.define([
 
         },
 
-        onEditDialogClose: function() {
+        onEditDialogClose: function () {
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
             this.iCount = 1;
             this.HM_Dialog.close();
         },
 
-        onFacilityChange: function(oEvent) {
+        onFacilityChange: function (oEvent) {
 
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             sap.ui.getCore().byId("editquantity").setVisible(false)
@@ -1076,20 +1076,20 @@ sap.ui.define([
                 sap.ui.getCore().byId("editquantity").setEditable(true)
             }
             var _aOriginalRateTypes = [{
-                    "RateType": "Per Day"
-                },
-                {
-                    "RateType": "Per Hour"
-                },
-                {
-                    "RateType": "Per Month"
-                },
-                {
-                    "RateType": "Per Year"
-                },
-                {
-                    "RateType": "Unit Price"
-                }
+                "RateType": "Per Day"
+            },
+            {
+                "RateType": "Per Hour"
+            },
+            {
+                "RateType": "Per Month"
+            },
+            {
+                "RateType": "Per Year"
+            },
+            {
+                "RateType": "Unit Price"
+            }
             ]
             // 7. Filter RateType based on facility price AND booking unitText
             var aFilteredRateTypes = _aOriginalRateTypes.filter(rt => {
@@ -1111,7 +1111,7 @@ sap.ui.define([
 
             // 9. Show UnitType dropdown
         },
-        onPeriodTypeSelect: function(oEvent) {
+        onPeriodTypeSelect: function (oEvent) {
             var selectedKey = oEvent.getSource().getSelectedIndex();
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             if (selectedKey === 1) {
@@ -1127,7 +1127,7 @@ sap.ui.define([
             }
 
         },
-        onquantityInputChange: function(oEvent) {
+        onquantityInputChange: function (oEvent) {
             var editdata = this.getView().getModel("edit")
             var data = this.getView().getModel("Facilities").getData()
             var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
@@ -1144,13 +1144,13 @@ sap.ui.define([
             this.getView().getModel("edit").setProperty("/Price", Total)
 
         },
-        onMemberNameChange: function(oEvent) {
+        onMemberNameChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             if (this.getView().getModel("edit").getProperty("/UnitText") === "Package Price" || this.getView().getModel("edit").getProperty("/UnitText") === "Unit Price") {
                 this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
             }
         },
-        UnitTextChange: function() {
+        UnitTextChange: function () {
             sap.ui.getCore().byId("idMonthYearSelectFragment").setVisible(false);
 
             var editdata = this.getView().getModel("edit")
@@ -1202,7 +1202,7 @@ sap.ui.define([
 
         },
 
-        onUnitTextChange: function(oEvent, flag) {
+        onUnitTextChange: function (oEvent, flag) {
 
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             var editdata = this.getView().getModel("edit")
@@ -1306,7 +1306,7 @@ sap.ui.define([
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
         },
 
-        onEditDateChange: function(oEvent) {
+        onEditDateChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oModel = this.getView().getModel("edit");
             let sUnit = oModel.getProperty("/UnitText") || "Unit Price";
@@ -1428,7 +1428,7 @@ sap.ui.define([
             sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
 
-        onMonthYearChange: function(oEvent) {
+        onMonthYearChange: function (oEvent) {
             const oModel = this.getView().getModel("edit");
             const iCount = Number(oEvent.getSource().getSelectedKey());
 
@@ -1475,11 +1475,11 @@ sap.ui.define([
             oModel.setProperty("/CouponDiscount", "")
             sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
-        onQuantityLiveChange: function(oEvent) {
+        onQuantityLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onEditFacilitySave: function() {
+        onEditFacilitySave: function () {
             var oCustomerModel = this.getView().getModel("CustomerData");
             var oCustomerData = oCustomerModel.getData();
             var oPayload = this.getView().getModel("edit").getData();
@@ -1896,7 +1896,7 @@ sap.ui.define([
 
             // Recalculate totals
             var total = 0;
-            oCustomerData.AllSelectedFacilities.forEach(function(fac) {
+            oCustomerData.AllSelectedFacilities.forEach(function (fac) {
                 total += Number(fac.TotalAmount) || 0;
             });
 
@@ -1931,7 +1931,7 @@ sap.ui.define([
 
         },
 
-        onEditBooking: async function() {
+        onEditBooking: async function () {
 
             this.applyCountryStateCityFilters();
 
@@ -1983,15 +1983,15 @@ sap.ui.define([
                 oMobile.setMaxLength(18);
             }
 
-            var filteredBeds = aAvailableBeds.filter(function(bed) {
+            var filteredBeds = aAvailableBeds.filter(function (bed) {
 
-                var assignedCount = oCustomer.filter(function(cust) {
+                var assignedCount = oCustomer.filter(function (cust) {
                     return cust.BranchCode === bed.BranchCode &&
                         cust.BedType === bed.BedTypeName &&
                         cust.Status === "Assigned";
                 }).length;
 
-                var customerHasThisBed = oCustomer.some(function(cust) {
+                var customerHasThisBed = oCustomer.some(function (cust) {
                     return cust.BookingID === data.BookingID &&
                         cust.BedType === bed.BedTypeName &&
                         (cust.Status === "Assigned" || cust.Status === "New" || cust.Status === "Confirmed");
@@ -2058,7 +2058,7 @@ sap.ui.define([
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
         },
 
-        onBookingEditDateChange: function(oEvent) {
+        onBookingEditDateChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var oCustomerModel = this.getView().getModel("CustomerData");
@@ -2309,14 +2309,14 @@ sap.ui.define([
             oBookingModel.refresh();
         },
 
-        _formatDate: function(oDate) {
+        _formatDate: function (oDate) {
             var yyyy = oDate.getFullYear();
             var mm = String(oDate.getMonth() + 1).padStart(2, '0');
             var dd = String(oDate.getDate()).padStart(2, '0');
             return `${yyyy}-${mm}-${dd}`;
         },
 
-        onBookMonthYearChange: function(oEvent) {
+        onBookMonthYearChange: function (oEvent) {
             const oModel = this.getView().getModel("Bookingmodel");
             const oCustomerData = this.getView().getModel("CustomerData");
             var CustData = this.getView().getModel("CustomerData").getData()
@@ -2456,7 +2456,7 @@ sap.ui.define([
 
         },
 
-        onCancelBooking: function() {
+        onCancelBooking: function () {
             this.valuestate()
             this.getView().getModel("VisibleModel").setProperty("/visible", false)
             this.byId("idMonthYearSelect").setVisible(false)
@@ -2485,7 +2485,7 @@ sap.ui.define([
             this.getView().getModel("CustomerData").refresh(true);
         },
 
-        onEditFacilityDetails: function() {
+        onEditFacilityDetails: function () {
             // this.edit=false
             var data = this.getView().getModel("Bookingmodel").getData()
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
@@ -2648,20 +2648,20 @@ sap.ui.define([
             }
 
             var _aOriginalRateTypes = [{
-                    "RateType": "Per Day"
-                },
-                {
-                    "RateType": "Per Hour"
-                },
-                {
-                    "RateType": "Per Month"
-                },
-                {
-                    "RateType": "Per Year"
-                },
-                {
-                    "RateType": "Unit Price"
-                }
+                "RateType": "Per Day"
+            },
+            {
+                "RateType": "Per Hour"
+            },
+            {
+                "RateType": "Per Month"
+            },
+            {
+                "RateType": "Per Year"
+            },
+            {
+                "RateType": "Unit Price"
+            }
 
             ]
             // 7. Filter RateType based on facility price AND booking unitText
@@ -2690,7 +2690,7 @@ sap.ui.define([
             sap.ui.getCore().byId("editEndDate").setValueState("None")
         },
 
-        onDeleteFacilityDetails: function() {
+        onDeleteFacilityDetails: function () {
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
 
@@ -2725,41 +2725,41 @@ sap.ui.define([
             if (sFacilityID) {
                 sap.m.MessageBox.confirm(
                     "Are you sure you want to Delete this Facility?", {
-                        title: "Confirm Delete",
-                        actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-                        styleClass: "myUnifiedBtn",
-                        onClose: function(oAction) {
-                            if (oAction === sap.m.MessageBox.Action.OK) {
+                    title: "Confirm Delete",
+                    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (oAction) {
+                        if (oAction === sap.m.MessageBox.Action.OK) {
 
-                                // Backend call
-                                that.getBusyDialog()
-                                that.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
-                                        filters: {
-                                            FacilityID: sFacilityID
-                                        }
-                                    })
-                                    .then(function() {
-                                        // Remove from model
-                                        if (deleteIndex > -1) {
-                                            aFacilities.splice(deleteIndex, 1);
-                                        }
+                            // Backend call
+                            that.getBusyDialog()
+                            that.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
+                                filters: {
+                                    FacilityID: sFacilityID
+                                }
+                            })
+                                .then(function () {
+                                    // Remove from model
+                                    if (deleteIndex > -1) {
+                                        aFacilities.splice(deleteIndex, 1);
+                                    }
 
-                                        that._recalculateFacilityTotals(oCustomerData);
-                                        that.closeBusyDialog()
+                                    that._recalculateFacilityTotals(oCustomerData);
+                                    that.closeBusyDialog()
 
-                                        // Force UI update
-                                        oCustomerModel.refresh(true);
-                                        oTable.removeSelections(true);
+                                    // Force UI update
+                                    oCustomerModel.refresh(true);
+                                    oTable.removeSelections(true);
 
-                                        sap.m.MessageToast.show(this.i18nModel.getText("facilityDeletedSuccessfully"));
-                                    })
-                                    .catch(function() {
-                                        sap.m.MessageToast.show(this.i18nModel.getText("failedtoDeleteFacilityfromServer"));
-                                    });
+                                    sap.m.MessageToast.show(this.i18nModel.getText("facilityDeletedSuccessfully"));
+                                })
+                                .catch(function () {
+                                    sap.m.MessageToast.show(this.i18nModel.getText("failedtoDeleteFacilityfromServer"));
+                                });
 
-                            }
                         }
                     }
+                }
                 );
 
                 return;
@@ -2779,9 +2779,9 @@ sap.ui.define([
         },
 
         // Helper: Total Calculation
-        _recalculateFacilityTotals: function(oCustomerData) {
+        _recalculateFacilityTotals: function (oCustomerData) {
             var total = 0;
-            (oCustomerData.AllSelectedFacilities || []).forEach(function(fac) {
+            (oCustomerData.AllSelectedFacilities || []).forEach(function (fac) {
                 total += Number(fac.TotalAmount) || 0;
             });
             oCustomerData.TotalFacilityPrice = total;
@@ -2836,7 +2836,7 @@ sap.ui.define([
             // oCustomerData.GrandTotal = total + (oCustomerData.RentPrice || 0);
         },
 
-        onRoomDurationChange: function(oEvent) {
+        onRoomDurationChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oSelectedItem = oEvent.getParameter("selectedItem");
 
@@ -2983,7 +2983,7 @@ sap.ui.define([
             }
         },
 
-        onRoomBedChange: function(oEvent) {
+        onRoomBedChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oSelectedItem = oEvent.getParameter("selectedItem");
 
@@ -3175,7 +3175,7 @@ sap.ui.define([
             }
         },
 
-        onEditTimeChange: function(oEvent) {
+        onEditTimeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oModel = this.getView().getModel("edit");
             var oData = oModel.getData();
@@ -3212,7 +3212,7 @@ sap.ui.define([
             oModel.setProperty("/TotalHour", formatted);
         },
 
-        onCountrySelectionChange: function(oEvent) {
+        onCountrySelectionChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oView = this.getView();
             const oModel = oView.getModel("Bookingmodel");
@@ -3257,7 +3257,7 @@ sap.ui.define([
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
         },
-        onSTDChange: function(oEvent) {
+        onSTDChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oSTD = this.byId("CC_id_STDCode");
@@ -3274,7 +3274,7 @@ sap.ui.define([
             }
 
         },
-        onAdminChangeSalutation: function(oEvent) {
+        onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.getView().byId("Ad_id_gender");
@@ -3298,7 +3298,7 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        CC_onChangeState: function(oEvent) {
+        CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oView = this.getView();
             const oModel = oView.getModel("Bookingmodel");
@@ -3328,13 +3328,13 @@ sap.ui.define([
             ]);
         },
 
-        onChange: function(oEvent) {
+        onChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
 
-        onmobileChange: function(oEvent) {
+        onmobileChange: function (oEvent) {
             utils.onNumber(oEvent);
 
             const oSTD = this.byId("CC_id_STDCode");
@@ -3365,16 +3365,16 @@ sap.ui.define([
             }
         },
 
-        onChangemail: function(oEvent) {
+        onChangemail: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
-        onDateChange: function(oEvent) {
+        onDateChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateDate(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
-        onPaymentTypeSelect: function(oEvent) {
+        onPaymentTypeSelect: function (oEvent) {
 
             this.index = oEvent.getSource().getSelectedIndex();
 
@@ -3519,8 +3519,8 @@ sap.ui.define([
                 totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ?
                     Number(CustomerData.PaymentPaid || 0) > Gst + baseAmount - Number(CustomerData.Discount) ?
 
-                    Number(CustomerData.PaymentPaid || 0) - Gst + baseAmount - Number(CustomerData.Discount) :
-                    Gst + baseAmount - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount)
+                        Number(CustomerData.PaymentPaid || 0) - Gst + baseAmount - Number(CustomerData.Discount) :
+                        Gst + baseAmount - Number(CustomerData.PaymentPaid || 0) - Number(CustomerData.Discount)
 
                     :
                     Gst + baseAmount - Number(CustomerData.Discount) || 0
@@ -3573,7 +3573,7 @@ sap.ui.define([
                 totalPersonsMonthly
             );
         },
-        _togglePaymentSections: function(isUPI, isCard, isPayOnCheckIn) {
+        _togglePaymentSections: function (isUPI, isCard, isPayOnCheckIn) {
 
             const oUPI = sap.ui.getCore().byId("idUPISection1");
             const oCard = sap.ui.getCore().byId("idCardSection1");
@@ -3603,7 +3603,7 @@ sap.ui.define([
                 "idCardCVV1"
             ];
 
-            aFields.forEach(function(sId) {
+            aFields.forEach(function (sId) {
 
                 const oControl = sap.ui.getCore().byId(sId);
 
@@ -3616,7 +3616,7 @@ sap.ui.define([
 
             });
         },
-        onMemberSearch: function(oEvent) {
+        onMemberSearch: function (oEvent) {
             var sQuery = oEvent.getParameter("newValue") ||
                 oEvent.getParameter("query") || "";
 
@@ -3647,7 +3647,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onSaveBooking: function() {
+        onSaveBooking: function () {
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -3681,39 +3681,39 @@ sap.ui.define([
             // confirmation
             sap.m.MessageBox.confirm(
                 "Some facilities are assigned to different members and will be removed. Do you want to continue?", {
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    emphasizedAction: sap.m.MessageBox.Action.YES,
-                    styleClass: "myUnifiedBtn",
-                    onClose: async function(oAction) {
-                        if (oAction !== sap.m.MessageBox.Action.YES) {
-                            return;
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                emphasizedAction: sap.m.MessageBox.Action.YES,
+                styleClass: "myUnifiedBtn",
+                onClose: async function (oAction) {
+                    if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return;
+                    }
+
+                    // 1. update UI first
+                    oModel.setProperty("/AllSelectedFacilities", toKeep);
+
+                    // 2. delete backend records sequentially or parallel
+
+                    const deletePromises = toDelete.map(f => {
+                        if (f.FacilityID) {
+                            return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
+                                filters: {
+                                    FacilityID: f.FacilityID
+                                }
+                            });
                         }
+                    });
 
-                        // 1. update UI first
-                        oModel.setProperty("/AllSelectedFacilities", toKeep);
+                    await Promise.all(deletePromises);
 
-                        // 2. delete backend records sequentially or parallel
+                    // 3. NOW proceed to next step
+                    this.onSaveBooking1();
 
-                        const deletePromises = toDelete.map(f => {
-                            if (f.FacilityID) {
-                                return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
-                                    filters: {
-                                        FacilityID: f.FacilityID
-                                    }
-                                });
-                            }
-                        });
-
-                        await Promise.all(deletePromises);
-
-                        // 3. NOW proceed to next step
-                        this.onSaveBooking1();
-
-                    }.bind(this)
-                }
+                }.bind(this)
+            }
             );
         },
-        HM_ConfirmRoom: async function(oEvent) {
+        HM_ConfirmRoom: async function (oEvent) {
             var ID = this.getView().getModel("CustomerData").getData()
 
 
@@ -3733,9 +3733,9 @@ sap.ui.define([
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.GrandTotal || 0,
                 PropertyName: ID.BranchName || "",
-                PropertySTD : ID.PropertySTD || "",
-                PropertyMobileNo : ID.PropertyMobileNo || "",
-                PropertyEmail : ID.PropertyEmail || "",
+                PropertySTD: ID.PropertySTD || "",
+                PropertyMobileNo: ID.PropertyMobileNo || "",
+                PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
                 pdfAttachment: {
                     fileName: "BookingVoucher.pdf",
@@ -3755,21 +3755,21 @@ sap.ui.define([
 
             sap.m.MessageBox.confirm(
                 "Are you sure you want to confirm this room booking?", {
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    emphasizedAction: sap.m.MessageBox.Action.YES,
-                    styleClass: "myUnifiedBtn",
-                    onClose: async function(oAction) {
-                        if (oAction === sap.m.MessageBox.Action.YES) {
-                            that.getBusyDialog();
-                            await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
-                            that.AD_onSearch();
-                        }
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                emphasizedAction: sap.m.MessageBox.Action.YES,
+                styleClass: "myUnifiedBtn",
+                onClose: async function (oAction) {
+                    if (oAction === sap.m.MessageBox.Action.YES) {
+                        that.getBusyDialog();
+                        await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
+                        that.AD_onSearch();
                     }
                 }
+            }
             );
         },
 
-        HM_RejectRoom: function(oEvent) {
+        HM_RejectRoom: function (oEvent) {
             this.ID = this.getView().getModel("CustomerData").getData()
 
 
@@ -3784,7 +3784,7 @@ sap.ui.define([
             this.RB_Dialog.open();
 
         },
-        onRejectSave: async function() {
+        onRejectSave: async function () {
 
             var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
 
@@ -3821,9 +3821,9 @@ sap.ui.define([
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.RentPrice || 0,
                 PropertyName: ID.BranchName,
-                PropertySTD : ID.PropertySTD || "",
-                PropertyMobileNo : ID.PropertyMobileNo || "",
-                PropertyEmail : ID.PropertyEmail || "",
+                PropertySTD: ID.PropertySTD || "",
+                PropertyMobileNo: ID.PropertyMobileNo || "",
+                PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType
             };
 
@@ -3844,14 +3844,14 @@ sap.ui.define([
 
         },
 
-        onRejectCancel: function() {
+        onRejectCancel: function () {
             this.RB_Dialog.close();
         },
-        onRejectReasonChange: function(oEvent) {
+        onRejectReasonChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
         },
-        onSaveBooking1: function() {
+        onSaveBooking1: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
@@ -3946,169 +3946,169 @@ sap.ui.define([
                     "The following facilities have dates outside the booking period:\n\n" +
                     invalidFacilities.map(name => `• ${name}`).join("\n") +
                     `\n\nDo you want to auto-adjust facility dates to match booking period?`, {
-                        icon: sap.m.MessageBox.Icon.WARNING,
-                        title: "Date Mismatch",
-                        actions: ["Change", "Cancel"],
-                        emphasizedAction: "Change",
-                        styleClass: "myUnifiedBtn",
-                        onClose: function(oAction) {
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    title: "Date Mismatch",
+                    actions: ["Change", "Cancel"],
+                    emphasizedAction: "Change",
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (oAction) {
 
-                            if (oAction === "Change") {
+                        if (oAction === "Change") {
 
-                                let bookingStart = that._parseDate(Bookingdata.StartDate);
-                                let bookingEnd = that._parseDate(Bookingdata.EndDate);
+                            let bookingStart = that._parseDate(Bookingdata.StartDate);
+                            let bookingEnd = that._parseDate(Bookingdata.EndDate);
 
-                                // ✅ Safety: prevent negative dates
-                                if (bookingEnd < bookingStart) {
-                                    sap.m.MessageToast.show("End date cannot be before start date");
-                                    return;
+                            // ✅ Safety: prevent negative dates
+                            if (bookingEnd < bookingStart) {
+                                sap.m.MessageToast.show("End date cannot be before start date");
+                                return;
+                            }
+
+                            // ✅ IMPORTANT: make sure this is LET (not const)
+                            let facilityItems = CustomerData.AllSelectedFacilities || [];
+
+                            // ✅ Remove duplicate Package Price items
+                            facilityItems = facilityItems.filter((item, index, self) => {
+
+                                if (item.UnitText?.toLowerCase() !== "package price") {
+                                    return true;
                                 }
 
-                                // ✅ IMPORTANT: make sure this is LET (not const)
-                                let facilityItems = CustomerData.AllSelectedFacilities || [];
+                                const firstIndex = self.findIndex(x =>
+                                    x.FacilityName === item.FacilityName &&
+                                    x.MemberName === item.MemberName &&
+                                    x.UnitText?.toLowerCase() === "package price"
+                                );
 
-                                // ✅ Remove duplicate Package Price items
-                                facilityItems = facilityItems.filter((item, index, self) => {
+                                return index === firstIndex;
+                            });
 
-                                    if (item.UnitText?.toLowerCase() !== "package price") {
-                                        return true;
-                                    }
+                            let totalFacilityPrice = 0;
 
-                                    const firstIndex = self.findIndex(x =>
-                                        x.FacilityName === item.FacilityName &&
-                                        x.MemberName === item.MemberName &&
-                                        x.UnitText?.toLowerCase() === "package price"
-                                    );
+                            facilityItems.forEach(item => {
 
-                                    return index === firstIndex;
-                                });
+                                let oSelectedFacility = aFacilities.find(f =>
+                                    f.FacilityName === item.FacilityName
+                                );
 
-                                let totalFacilityPrice = 0;
+                                // ✅ Update dates
+                                item.StartDate = Bookingdata.StartDate;
+                                item.EndDate = Bookingdata.EndDate;
 
-                                facilityItems.forEach(item => {
+                                let diffTime = bookingEnd - bookingStart;
 
-                                    let oSelectedFacility = aFacilities.find(f =>
-                                        f.FacilityName === item.FacilityName
-                                    );
+                                // ✅ Always at least 1 day
+                                let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-                                    // ✅ Update dates
-                                    item.StartDate = Bookingdata.StartDate;
-                                    item.EndDate = Bookingdata.EndDate;
+                                let unit = item.UnitText?.toLowerCase();
+                                let price = Number(item.Price || 0);
+                                let total = 0;
 
-                                    let diffTime = bookingEnd - bookingStart;
+                                if (unit === "per day") {
 
-                                    // ✅ Always at least 1 day
-                                    let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                                    total = item.quantity ?
+                                        item.quantity * diffDays * price :
+                                        diffDays * price;
 
-                                    let unit = item.UnitText?.toLowerCase();
-                                    let price = Number(item.Price || 0);
-                                    let total = 0;
+                                    item.TotalDays = diffDays;
 
-                                    if (unit === "per day") {
+                                } else if (unit === "per hour") {
 
-                                        total = item.quantity ?
-                                            item.quantity * diffDays * price :
-                                            diffDays * price;
+                                    let hours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
-                                        item.TotalDays = diffDays;
+                                    total = item.quantity ?
+                                        item.quantity * hours * price :
+                                        hours * price;
 
-                                    } else if (unit === "per hour") {
+                                } else if (unit === "per month") {
 
-                                        let hours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
+                                    let months = CustomerData.PaymentType === "yearly" ?
+                                        CustomerData.Duration * 12 :
+                                        CustomerData.Duration;
 
-                                        total = item.quantity ?
-                                            item.quantity * hours * price :
-                                            hours * price;
+                                    total = item.quantity ?
+                                        item.quantity * months * price :
+                                        months * price;
 
-                                    } else if (unit === "per month") {
+                                    item.TotalMonths = months;
 
-                                        let months = CustomerData.PaymentType === "yearly" ?
-                                            CustomerData.Duration * 12 :
-                                            CustomerData.Duration;
+                                } else if (unit === "per year") {
 
-                                        total = item.quantity ?
-                                            item.quantity * months * price :
-                                            months * price;
+                                    let years = CustomerData.Duration;
 
-                                        item.TotalMonths = months;
+                                    total = item.quantity ?
+                                        item.quantity * years * price :
+                                        years * price;
 
-                                    } else if (unit === "per year") {
+                                    item.TotalYears = years;
 
-                                        let years = CustomerData.Duration;
+                                } else if (unit === "unit price" || unit === "package price") {
 
-                                        total = item.quantity ?
-                                            item.quantity * years * price :
-                                            years * price;
+                                    if (item.FacilityChargeType === "Entire Booking") {
 
-                                        item.TotalYears = years;
+                                        total = price;
 
-                                    } else if (unit === "unit price" || unit === "package price") {
+                                    } else {
 
-                                        if (item.FacilityChargeType === "Entire Booking") {
+                                        if (oSelectedFacility?.MinimumQty &&
+                                            item.SelectionMode === "PERSON_QTY") {
 
-                                            total = price;
+                                            total = price * diffDays;
+
+                                        } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
+                                            total = price * Number(item.quantity || 1);
 
                                         } else {
 
-                                            if (oSelectedFacility?.MinimumQty &&
-                                                item.SelectionMode === "PERSON_QTY") {
-
-                                                total = price * diffDays;
-
-                                            } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
-                                                total = price * Number(item.quantity || 1);
-
-                                            } else {
-
-                                                total = price * Number(item.quantity || 1) * diffDays;
-                                            }
+                                            total = price * Number(item.quantity || 1) * diffDays;
                                         }
                                     }
-
-                                    // ✅ Fixed coupon logic
-                                    item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
-                                        total - Number(item.CouponDiscount) :
-                                        total;
-
-                                    totalFacilityPrice += item.TotalAmount;
-                                });
-
-                                // ✅ Update totals
-                                CustomerData.TotalFacilityPrice = totalFacilityPrice;
-
-                                let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
-
-                                if (CustomerData.GSTType === "CGST/SGST") {
-
-                                    CustomerData.GrandTotal =
-                                        baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
-
-                                } else if (CustomerData.GSTType === "IGST") {
-
-                                    CustomerData.GrandTotal =
-                                        baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
-
-                                } else {
-
-                                    CustomerData.GrandTotal = baseAmount;
                                 }
 
-                                // ✅ Due amount
-                                CustomerData.DueAmount = CustomerData.PaymentPaid ?
-                                    CustomerData.GrandTotal - CustomerData.PaymentPaid :
-                                    CustomerData.GrandTotal;
+                                // ✅ Fixed coupon logic
+                                item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
+                                    total - Number(item.CouponDiscount) :
+                                    total;
 
-                                // ✅ Assign back (important)
-                                CustomerData.AllSelectedFacilities = facilityItems;
+                                totalFacilityPrice += item.TotalAmount;
+                            });
 
-                                // ✅ Refresh model
-                                that.getView().getModel("CustomerData").refresh(true);
+                            // ✅ Update totals
+                            CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                                // ✅ Save
-                                that.onSaveBooking();
+                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+
+                            if (CustomerData.GSTType === "CGST/SGST") {
+
+                                CustomerData.GrandTotal =
+                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+
+                            } else if (CustomerData.GSTType === "IGST") {
+
+                                CustomerData.GrandTotal =
+                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
+
+                            } else {
+
+                                CustomerData.GrandTotal = baseAmount;
                             }
+
+                            // ✅ Due amount
+                            CustomerData.DueAmount = CustomerData.PaymentPaid ?
+                                CustomerData.GrandTotal - CustomerData.PaymentPaid :
+                                CustomerData.GrandTotal;
+
+                            // ✅ Assign back (important)
+                            CustomerData.AllSelectedFacilities = facilityItems;
+
+                            // ✅ Refresh model
+                            that.getView().getModel("CustomerData").refresh(true);
+
+                            // ✅ Save
+                            that.onSaveBooking();
                         }
                     }
+                }
                 );
 
                 return;
@@ -4161,163 +4161,163 @@ sap.ui.define([
 
                 sap.m.MessageBox.confirm(
                     "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.", {
-                        title: "Upgrade Required",
-                        actions: ["Extend Now", "Maybe Later"],
-                        emphasizedAction: sap.m.MessageBox.Action.OK,
-                        styleClass: "myUnifiedBtn",
+                    title: "Upgrade Required",
+                    actions: ["Extend Now", "Maybe Later"],
+                    emphasizedAction: sap.m.MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
 
-                        onClose: function(sAction) {
+                    onClose: function (sAction) {
 
-                            if (sAction === "Extend Now") {
+                        if (sAction === "Extend Now") {
 
-                                let bookingEndDate = that._parseDate(Bookingdata.EndDate);
+                            let bookingEndDate = that._parseDate(Bookingdata.EndDate);
 
-                                if (!bookingEndDate) {
-                                    sap.m.MessageToast.show("Invalid End Date");
+                            if (!bookingEndDate) {
+                                sap.m.MessageToast.show("Invalid End Date");
+                                return;
+                            }
+
+                            // ✅ IMPORTANT: use LET (not const)
+                            let facilityItems = CustomerData.AllSelectedFacilities || [];
+
+                            let totalFacilityPrice = 0;
+
+                            facilityItems.forEach(item => {
+
+                                let startDate = that._parseDate(item.StartDate);
+
+                                if (!startDate) {
                                     return;
                                 }
 
-                                // ✅ IMPORTANT: use LET (not const)
-                                let facilityItems = CustomerData.AllSelectedFacilities || [];
+                                let oSelectedFacility = aFacilities.find(f =>
+                                    f.FacilityName === item.FacilityName
+                                );
 
-                                let totalFacilityPrice = 0;
+                                // ✅ Update End Date
+                                item.EndDate = Bookingdata.EndDate;
 
-                                facilityItems.forEach(item => {
+                                let diffTime = bookingEndDate - startDate;
 
-                                    let startDate = that._parseDate(item.StartDate);
+                                // ✅ Prevent negative / zero
+                                let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-                                    if (!startDate) {
-                                        return;
-                                    }
+                                let unit = item.UnitText?.toLowerCase();
+                                let price = Number(item.Price || 0);
+                                let total = 0;
 
-                                    let oSelectedFacility = aFacilities.find(f =>
-                                        f.FacilityName === item.FacilityName
-                                    );
+                                if (unit === "per day") {
 
-                                    // ✅ Update End Date
-                                    item.EndDate = Bookingdata.EndDate;
+                                    total = item.quantity ?
+                                        item.quantity * diffDays * price :
+                                        diffDays * price;
 
-                                    let diffTime = bookingEndDate - startDate;
+                                    item.TotalDays = diffDays;
 
-                                    // ✅ Prevent negative / zero
-                                    let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                                } else if (unit === "per hour") {
 
-                                    let unit = item.UnitText?.toLowerCase();
-                                    let price = Number(item.Price || 0);
-                                    let total = 0;
+                                    let diffHours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
-                                    if (unit === "per day") {
+                                    total = item.quantity ?
+                                        item.quantity * diffHours * price :
+                                        diffHours * price;
 
-                                        total = item.quantity ?
-                                            item.quantity * diffDays * price :
-                                            diffDays * price;
+                                } else if (unit === "per month") {
 
-                                        item.TotalDays = diffDays;
+                                    let months = CustomerData.PaymentType === "yearly" ?
+                                        CustomerData.Duration * 12 :
+                                        CustomerData.Duration;
 
-                                    } else if (unit === "per hour") {
+                                    total = item.quantity ?
+                                        item.quantity * months * price :
+                                        months * price;
 
-                                        let diffHours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
+                                    item.TotalMonths = months;
 
-                                        total = item.quantity ?
-                                            item.quantity * diffHours * price :
-                                            diffHours * price;
+                                } else if (unit === "per year") {
 
-                                    } else if (unit === "per month") {
+                                    let years = CustomerData.Duration;
 
-                                        let months = CustomerData.PaymentType === "yearly" ?
-                                            CustomerData.Duration * 12 :
-                                            CustomerData.Duration;
+                                    total = item.quantity ?
+                                        item.quantity * years * price :
+                                        years * price;
 
-                                        total = item.quantity ?
-                                            item.quantity * months * price :
-                                            months * price;
+                                    item.TotalYears = years;
 
-                                        item.TotalMonths = months;
+                                } else if (unit === "unit price" || unit === "package price") {
 
-                                    } else if (unit === "per year") {
+                                    if (item.FacilityChargeType === "Entire Booking") {
 
-                                        let years = CustomerData.Duration;
+                                        total = price;
 
-                                        total = item.quantity ?
-                                            item.quantity * years * price :
-                                            years * price;
+                                    } else {
 
-                                        item.TotalYears = years;
+                                        if (oSelectedFacility?.MinimumQty &&
+                                            item.SelectionMode === "PERSON_QTY") {
 
-                                    } else if (unit === "unit price" || unit === "package price") {
+                                            total = price * diffDays;
 
-                                        if (item.FacilityChargeType === "Entire Booking") {
-
-                                            total = price;
+                                        } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
+                                            total = price * Number(item.quantity || 1);
 
                                         } else {
 
-                                            if (oSelectedFacility?.MinimumQty &&
-                                                item.SelectionMode === "PERSON_QTY") {
-
-                                                total = price * diffDays;
-
-                                            } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
-                                                total = price * Number(item.quantity || 1);
-
-                                            } else {
-
-                                                total = price * Number(item.quantity || 1) * diffDays;
-                                            }
-
+                                            total = price * Number(item.quantity || 1) * diffDays;
                                         }
+
                                     }
-
-                                    // ✅ FIXED coupon logic (important)
-                                    item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
-                                        total - Number(item.CouponDiscount) :
-                                        total;
-
-                                    totalFacilityPrice += item.TotalAmount;
-                                });
-
-                                // ✅ Update totals
-                                CustomerData.TotalFacilityPrice = totalFacilityPrice;
-
-                                let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
-
-                                if (CustomerData.GSTType === "CGST/SGST") {
-
-                                    CustomerData.GrandTotal =
-                                        baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
-
-                                } else if (CustomerData.GSTType === "IGST") {
-
-                                    CustomerData.GrandTotal =
-                                        baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
-
-                                } else {
-
-                                    CustomerData.GrandTotal = baseAmount;
                                 }
 
-                                // ✅ Due
-                                CustomerData.DueAmount = CustomerData.PaymentPaid ?
-                                    CustomerData.GrandTotal - CustomerData.PaymentPaid :
-                                    CustomerData.GrandTotal;
+                                // ✅ FIXED coupon logic (important)
+                                item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
+                                    total - Number(item.CouponDiscount) :
+                                    total;
 
-                                // ✅ Assign back (important)
-                                CustomerData.AllSelectedFacilities = facilityItems;
+                                totalFacilityPrice += item.TotalAmount;
+                            });
 
-                                // ✅ Refresh
-                                that.getView().getModel("CustomerData").refresh(true);
+                            // ✅ Update totals
+                            CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                                that.call = false;
+                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
 
-                                that.onSaveBooking();
+                            if (CustomerData.GSTType === "CGST/SGST") {
+
+                                CustomerData.GrandTotal =
+                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+
+                            } else if (CustomerData.GSTType === "IGST") {
+
+                                CustomerData.GrandTotal =
+                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
 
                             } else {
 
-                                that.call = true;
-                                that.onSaveBooking();
+                                CustomerData.GrandTotal = baseAmount;
                             }
+
+                            // ✅ Due
+                            CustomerData.DueAmount = CustomerData.PaymentPaid ?
+                                CustomerData.GrandTotal - CustomerData.PaymentPaid :
+                                CustomerData.GrandTotal;
+
+                            // ✅ Assign back (important)
+                            CustomerData.AllSelectedFacilities = facilityItems;
+
+                            // ✅ Refresh
+                            that.getView().getModel("CustomerData").refresh(true);
+
+                            that.call = false;
+
+                            that.onSaveBooking();
+
+                        } else {
+
+                            that.call = true;
+                            that.onSaveBooking();
                         }
                     }
+                }
                 );
 
                 return;
@@ -4503,11 +4503,11 @@ sap.ui.define([
             this.getBusyDialog()
 
             this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [Payload],
-                    filters: {
-                        BookingID: CustomerData.BookingID
-                    }
-                })
+                data: [Payload],
+                filters: {
+                    BookingID: CustomerData.BookingID
+                }
+            })
                 .then(async () => {
 
                     // Refresh models
@@ -4527,12 +4527,12 @@ sap.ui.define([
                 });
 
         },
-        onTransactionIDChange: function(oEvent) {
+        onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
-        onSubmitPress: function() {
+        onSubmitPress: function () {
             const oPaymentModel = this.getView().getModel("PaymentModel");
             const paymentType = oPaymentModel.getProperty("/PaymentType");
             const isPayOnCheckIn = paymentType === "PayOnCheckIn";
@@ -4552,23 +4552,23 @@ sap.ui.define([
             this.onSaveBooking();
 
         },
-        onPaymentClose: function() {
+        onPaymentClose: function () {
             this.flag = false
             this.call = false
             if (this.PP_Dialog) {
                 this.PP_Dialog.close();
             }
         },
-        oneditsavebooking: function(Payload) {
+        oneditsavebooking: function (Payload) {
             var CustomerData = this.getView().getModel("CustomerData").getData();
 
             this.getBusyDialog()
             this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [Payload],
-                    filters: {
-                        BookingID: CustomerData.BookingID
-                    }
-                })
+                data: [Payload],
+                filters: {
+                    BookingID: CustomerData.BookingID
+                }
+            })
                 .then(() => {
 
                     // Refresh models
@@ -4584,101 +4584,101 @@ sap.ui.define([
                 });
         },
 
-        onPressCancelBooking: async function(oEvent) {
+        onPressCancelBooking: async function (oEvent) {
             var oHostelModel = this.getView().getModel("CustomerData");
             var oData = oHostelModel.getData();
             var that = this;
 
             sap.m.MessageBox.confirm(
                 "Are you sure you want to cancel this Booking?", {
-                    title: "Confirm Cancellation",
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                    styleClass: "myUnifiedBtn",
-                    onClose: async function(oAction) {
-                        if (oAction !== sap.m.MessageBox.Action.YES) {
-                            return;
+                title: "Confirm Cancellation",
+                icon: sap.m.MessageBox.Icon.WARNING,
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                styleClass: "myUnifiedBtn",
+                onClose: async function (oAction) {
+                    if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return;
+                    }
+
+                    try {
+                        var today = new Date();
+                        var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
+
+                        //------ Booking Payload including Status and CancelDate ------
+                        const bookingData = [{
+                            BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
+                            RoomPrice: oData.RoomPrice || "0",
+                            NoOfPersons: oData.noofperson || 1,
+                            StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+                            Status: "Cancelled", // UPDATED
+                            CancelDate: sCancelDate, // UPDATED
+                            PaymentType: oData.PaymentType || "",
+                            BedType: oData.BedType || ""
+                        }];
+
+                        //------ Facility Payload ------
+                        const facilityData = [];
+                        if (oData.AllSelectedFacilities?.length > 0) {
+                            oData.AllSelectedFacilities.forEach(fac => {
+                                facilityData.push({
+                                    FacilityName: fac.FacilityName,
+                                    FacilitiPrice: fac.Price,
+                                    StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                                    EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+                                    PaidStatus: "Cancelled" // UPDATED (optional)
+                                });
+                            });
                         }
 
-                        try {
-                            var today = new Date();
-                            var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
+                        //------ Final Payload ------
+                        const personData = [{
+                            Salutation: oData.Salutation || "",
+                            CustomerName: oData.FullName || "",
+                            UserID: oData.UserID || "",
+                            STDCode: oData.STDCode || "",
+                            MobileNo: oData.MobileNo || "",
+                            Gender: oData.Gender || "",
+                            DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                            CustomerEmail: oData.CustomerEmail || "",
+                            Country: oData.Country || "",
+                            State: oData.State || "",
+                            City: oData.City || "",
+                            PermanentAddress: oData.Address || "",
+                            Booking: bookingData, // Making sure included
+                            FacilityItems: facilityData
+                        }];
 
-                            //------ Booking Payload including Status and CancelDate ------
-                            const bookingData = [{
-                                BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
-                                RoomPrice: oData.RoomPrice || "0",
-                                NoOfPersons: oData.noofperson || 1,
-                                StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                Status: "Cancelled", // UPDATED
-                                CancelDate: sCancelDate, // UPDATED
-                                PaymentType: oData.PaymentType || "",
-                                BedType: oData.BedType || ""
-                            }];
+                        that.getBusyDialog()
+                        const custid = oData.BookingID; // FIXED
 
-                            //------ Facility Payload ------
-                            const facilityData = [];
-                            if (oData.AllSelectedFacilities?.length > 0) {
-                                oData.AllSelectedFacilities.forEach(fac => {
-                                    facilityData.push({
-                                        FacilityName: fac.FacilityName,
-                                        FacilitiPrice: fac.Price,
-                                        StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                        EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                        PaidStatus: "Cancelled" // UPDATED (optional)
-                                    });
-                                });
+                        await that.ajaxUpdateWithJQuery("HM_Customer", {
+                            data: personData,
+                            filters: {
+                                BookingID: custid
                             }
+                        });
 
-                            //------ Final Payload ------
-                            const personData = [{
-                                Salutation: oData.Salutation || "",
-                                CustomerName: oData.FullName || "",
-                                UserID: oData.UserID || "",
-                                STDCode: oData.STDCode || "",
-                                MobileNo: oData.MobileNo || "",
-                                Gender: oData.Gender || "",
-                                DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
-                                CustomerEmail: oData.CustomerEmail || "",
-                                Country: oData.Country || "",
-                                State: oData.State || "",
-                                City: oData.City || "",
-                                PermanentAddress: oData.Address || "",
-                                Booking: bookingData, // Making sure included
-                                FacilityItems: facilityData
-                            }];
+                        await that.AD_onSearch();
+                        that.getView().getModel("VisibleModel").setProperty("/visible", false);
+                        that.byId("idMonthYearSelect").setVisible(false);
+                        sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));
 
-                            that.getBusyDialog()
-                            const custid = oData.BookingID; // FIXED
+                        // Hide Extra Buttons after Cancel
+                        that.byId("idedit")?.setVisible(false);
+                        that.byId("idcancel")?.setVisible(false);
 
-                            await that.ajaxUpdateWithJQuery("HM_Customer", {
-                                data: personData,
-                                filters: {
-                                    BookingID: custid
-                                }
-                            });
-
-                            await that.AD_onSearch();
-                            that.getView().getModel("VisibleModel").setProperty("/visible", false);
-                            that.byId("idMonthYearSelect").setVisible(false);
-                            sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));
-
-                            // Hide Extra Buttons after Cancel
-                            that.byId("idedit")?.setVisible(false);
-                            that.byId("idcancel")?.setVisible(false);
-
-                        } catch (err) {
-                            that.closeBusyDialog()
-                            sap.m.MessageToast.show(err.message || err.responseText);
-                        } finally {}
-                    }
+                    } catch (err) {
+                        that.closeBusyDialog()
+                        sap.m.MessageToast.show(err.message || err.responseText);
+                    } finally { }
                 }
+            }
             );
         },
 
-        onFacilityFileChange: function(oEvent) {
+        onFacilityFileChange: function (oEvent) {
             var oFileUploader = oEvent.getSource();
             var aFiles = oEvent.getParameter("files"); // selected files
             var oCustomerModel = this.getView().getModel("CustomerData");
@@ -4749,7 +4749,7 @@ sap.ui.define([
             this.UD_Dialog.close();
         },
 
-        onDocumentDelete: function(oEvent) {
+        onDocumentDelete: function (oEvent) {
             var oCustomerModel = this.getView().getModel("CustomerData");
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
             var oItem = oEvent.getParameter("listItem");
@@ -4763,31 +4763,31 @@ sap.ui.define([
             if (oDoc.DocumentID) {
                 MessageBox.confirm(
                     "This Document is already Saved. Do you want to Delete it?", {
-                        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                        styleClass: "myUnifiedBtn",
-                        onClose: function(sAction) {
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (sAction) {
 
-                            if (sAction === MessageBox.Action.YES) {
-                                that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
-                                        filters: {
-                                            DocumentID: oDoc.DocumentID
-                                        }
-                                    })
-                                    .then(function() {
-                                        // Remove from model
-                                        aDocs.splice(iIndex, 1);
-                                        oCustomerModel.setProperty("/Documents", aDocs);
-                                        oCustomerModel.refresh(true)
+                        if (sAction === MessageBox.Action.YES) {
+                            that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
+                                filters: {
+                                    DocumentID: oDoc.DocumentID
+                                }
+                            })
+                                .then(function () {
+                                    // Remove from model
+                                    aDocs.splice(iIndex, 1);
+                                    oCustomerModel.setProperty("/Documents", aDocs);
+                                    oCustomerModel.refresh(true)
 
-                                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                                    sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
 
-                                    })
-                                    .catch(function() {
-                                        sap.m.MessageToast.show(this.i18nModel.getText("failedDeleteDocumentfromServer"));
-                                    });
-                            }
+                                })
+                                .catch(function () {
+                                    sap.m.MessageToast.show(this.i18nModel.getText("failedDeleteDocumentfromServer"));
+                                });
                         }
                     }
+                }
                 );
             } else {
                 // No DocumentID → only local delete
@@ -4799,7 +4799,7 @@ sap.ui.define([
             }
         },
 
-        onFileNameLinkPress: function(oEvent) {
+        onFileNameLinkPress: function (oEvent) {
 
             function autoDecodeBase64(b64) {
                 if (!b64) return "";
@@ -5089,8 +5089,8 @@ sap.ui.define([
                 // Discount calculation
                 if (
                     String(oCoupon.DiscountType || "")
-                    .trim()
-                    .toLowerCase() === "percentage"
+                        .trim()
+                        .toLowerCase() === "percentage"
                 ) {
 
                     discountAmount =
@@ -5113,20 +5113,37 @@ sap.ui.define([
 
                 newSubtotal = subtotal - discountAmount;
 
-                var cgst = newSubtotal * 0.09;
-                var sgst = newSubtotal * 0.09;
-                var grandTotal = newSubtotal + cgst + sgst;
-                var dueAmount = newSubtotal + cgst + sgst;
 
                 // Update Model
                 oCustomerData.Discount = discountAmount.toFixed(2);
                 oCustomerData.SubTotal = newSubtotal;
+                oCustomerData.CouponCode = sEnteredCode;
+
+                let grandTotal;
+                let cgst;
+                let sgst;
+                let igst;   
+
+            if (oCustomerData.GSTType === "CGST/SGST") {
+                cgst = newSubtotal * oCustomerData.GSTValue/100;
+                sgst = newSubtotal * oCustomerData.GSTValue/100;
                 oCustomerData.CGST = cgst;
                 oCustomerData.SGST = sgst;
+                grandTotal = newSubtotal + cgst + sgst;
+
+            }else if (oCustomerData.GSTType === "IGST") {
+                igst = newSubtotal * Number(oCustomerData.GSTValue)/100;
+
+                oCustomerData.IGST = igst;
+                grandTotal = newSubtotal + igst;
+
+            }else{
+                grandTotal = newSubtotal;
+            }
                 oCustomerData.GrandTotal = grandTotal;
-                oCustomerData.CouponCode = sEnteredCode;
-                oCustomerData.DueAmount = dueAmount;
-                
+                oCustomerData.DueAmount = grandTotal - (oCustomerData.PaymentPaid || 0);
+
+
 
                 this.getView().getModel("CustomerData").refresh(true);
 
@@ -5148,10 +5165,10 @@ sap.ui.define([
             }
 
             const today = new Date();
-            today.setHours(0,0,0,0);
+            today.setHours(0, 0, 0, 0);
 
             const endDate = new Date(sEndDate);
-            endDate.setHours(0,0,0,0);
+            endDate.setHours(0, 0, 0, 0);
 
             return endDate < today;
         },
@@ -5163,10 +5180,10 @@ sap.ui.define([
             }
 
             const today = new Date();
-            today.setHours(0,0,0,0);
+            today.setHours(0, 0, 0, 0);
 
             const startDate = new Date(sStartDate);
-            startDate.setHours(0,0,0,0);
+            startDate.setHours(0, 0, 0, 0);
 
             return startDate > today;
         },
@@ -5187,17 +5204,17 @@ sap.ui.define([
             if (bookingStart.includes("/")) {
                 bookingStart =
                     bookingStart.split("/")
-                    .reverse()
-                    .join("-");
+                        .reverse()
+                        .join("-");
             }
 
             const bookingDate = new Date(bookingStart);
             const couponStart = new Date(oCoupon.StartDate);
             const couponEnd = new Date(oCoupon.EndDate);
 
-            bookingDate.setHours(0,0,0,0);
-            couponStart.setHours(0,0,0,0);
-            couponEnd.setHours(0,0,0,0);
+            bookingDate.setHours(0, 0, 0, 0);
+            couponStart.setHours(0, 0, 0, 0);
+            couponEnd.setHours(0, 0, 0, 0);
 
             if (
                 bookingDate < couponStart ||
@@ -5213,7 +5230,7 @@ sap.ui.define([
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var edit = this.getView().getModel("edit").getData();
 
-            var sEnteredCode =(edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode")?.getValue() || "").trim();
+            var sEnteredCode = (edit.CouponCode || sap.ui.getCore().byId("ID_editCouponCode")?.getValue() || "").trim();
 
             if (!sEnteredCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseEnterCouponCode"));
@@ -5289,9 +5306,9 @@ sap.ui.define([
 
                         let iUsedCount =
                             oCustomerData.AllSelectedFacilities
-                            .filter(f =>
-                                f.CouponCode === item.CouponCode
-                            ).length;
+                                .filter(f =>
+                                    f.CouponCode === item.CouponCode
+                                ).length;
 
                         if (
                             iUsedCount >=
@@ -5357,12 +5374,12 @@ sap.ui.define([
                 if (edit.UnitText === "Per Month") {
 
                     subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) * Number(edit.quantity)
-                     : Number(edit.Price) * (edit.TotalUnits || 1);
+                        : Number(edit.Price) * (edit.TotalUnits || 1);
 
                 } else if (edit.UnitText === "Per Year") {
 
                     subtotal = Number(edit.quantity) ? Number(edit.Price) * (edit.TotalUnits || 1) *
-                    Number(edit.quantity) : Number(edit.Price) * (edit.TotalUnits || 1);
+                        Number(edit.quantity) : Number(edit.Price) * (edit.TotalUnits || 1);
 
                 } else if (edit.UnitText === "Per Day") {
 
@@ -5423,8 +5440,8 @@ sap.ui.define([
 
                 if (
                     String(oCoupon.DiscountType || "")
-                    .trim()
-                    .toLowerCase() === "percentage"
+                        .trim()
+                        .toLowerCase() === "percentage"
                 ) {
 
                     discountAmount =
@@ -5462,8 +5479,8 @@ sap.ui.define([
                     .setProperty(
                         "/EndDate",
                         edit.EndDate.split("-")
-                        .reverse()
-                        .join("/")
+                            .reverse()
+                            .join("/")
                     );
 
             } catch (oError) {
@@ -5485,18 +5502,34 @@ sap.ui.define([
             let rent = Number(oCustomerData.RentPrice || 0);
             let facility = Number(oCustomerData.TotalFacilityPrice || 0);
             let subtotal = rent + facility;
-            let cgst = subtotal * 0.09;
-            let sgst = subtotal * 0.09;
-            let grandTotal = subtotal + cgst + sgst;
-            let dueAmount = subtotal + cgst + sgst;
+            let cgst;
+            let sgst;
+            let igst;
 
             // Completely remove coupon discount
             oCustomerData.Discount = 0;
             oCustomerData.SubTotal = subtotal;
-            oCustomerData.CGST = cgst;
-            oCustomerData.SGST = sgst;
+
+            let grandTotal;
+
+            if (oCustomerData.GSTType === "CGST/SGST") {
+                cgst = subtotal * oCustomerData.GSTValue/100;
+                sgst = subtotal * oCustomerData.GSTValue/100;
+                oCustomerData.CGST = cgst;
+                oCustomerData.SGST = sgst;
+                grandTotal = subtotal + cgst + sgst;
+
+            }else if (oCustomerData.GSTType === "IGST") {
+                igst = subtotal * Number(oCustomerData.GSTValue)/100;
+
+                oCustomerData.IGST = igst;
+                grandTotal = subtotal + igst;
+
+            }else{
+                grandTotal = subtotal;
+            }
             oCustomerData.GrandTotal = grandTotal;
-            oCustomerData.DueAmount = dueAmount;
+            oCustomerData.DueAmount = oCustomerData.GrandTotal - oCustomerData.PaymentPaid;
 
             this.getView().getModel("CustomerData").refresh(true);
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
@@ -5509,7 +5542,7 @@ sap.ui.define([
             }
         },
 
-        onUploadDocumentFile: function() {
+        onUploadDocumentFile: function () {
             if (!this.UD_Dialog) {
                 var oView = this.getView();
                 this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Upload", this);
@@ -5531,17 +5564,17 @@ sap.ui.define([
             this.UD_Dialog.open();
         },
 
-        onCloseDialog: function() {
+        onCloseDialog: function () {
             this.UD_Dialog.close();
         },
 
-        onCouponLiveChange: function(oEvent) {
+        onCouponLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oInput.getValue();
             // Show icon only if there is value
             oInput.setShowValueHelp(!!sValue);
         },
-        oncancelFacilityCoupon: function(oEvent) {
+        oncancelFacilityCoupon: function (oEvent) {
 
             var oInput = oEvent.getSource();
 
@@ -5549,72 +5582,72 @@ sap.ui.define([
             oInput.setShowValueHelp(false);
             this.getView().getModel("edit").setProperty("/CouponDiscount", "");
         },
-       onGSTBooking: function () {
+        onGSTBooking: function () {
 
-    const CustData = this.getView().getModel("CustomerData").getData();
+            const CustData = this.getView().getModel("CustomerData").getData();
 
-    if (!this.GST_Dialog) {
-        var oView = this.getView();
-        this.GST_Dialog = sap.ui.xmlfragment(
-            "sap.ui.com.project1.fragment.GST",
-            this
-        );
-        oView.addDependent(this.GST_Dialog);
-    }
+            if (!this.GST_Dialog) {
+                var oView = this.getView();
+                this.GST_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.GST",
+                    this
+                );
+                oView.addDependent(this.GST_Dialog);
+            }
 
-    // Set values
-    sap.ui.getCore().byId("idBranchGSTNumber")
-        .setValue(CustData.GSTIN || "");
+            // Set values
+            sap.ui.getCore().byId("idBranchGSTNumber")
+                .setValue(CustData.GSTIN || "");
 
-    sap.ui.getCore().byId("idGSTNumber")
-        .setValue(CustData.CustomerGSTIN || "");
+            sap.ui.getCore().byId("idGSTNumber")
+                .setValue(CustData.CustomerGSTIN || "");
 
-    sap.ui.getCore().byId("idGSTPercentage")
-        .setValue(CustData.GSTValue || "");
+            sap.ui.getCore().byId("idGSTPercentage")
+                .setValue(CustData.GSTValue || "");
 
-    sap.ui.getCore().byId("idGSTType")
-        .setSelectedIndex(
-            CustData.GSTType === "CGST/SGST" ? 1 : 0
-        );
+            sap.ui.getCore().byId("idGSTType")
+                .setSelectedIndex(
+                    CustData.GSTType === "CGST/SGST" ? 1 : 0
+                );
 
-    sap.ui.getCore().byId("idCompanyName")
-        .setValue(CustData.CustCompanyName || "");
+            sap.ui.getCore().byId("idCompanyName")
+                .setValue(CustData.CustCompanyName || "");
 
-    sap.ui.getCore().byId("idCompanyAddress")
-        .setValue(CustData.CustCompanyAddress || "");
+            sap.ui.getCore().byId("idCompanyAddress")
+                .setValue(CustData.CustCompanyAddress || "");
 
-    // Branch GST visibility
-    var bHasBranchGST = !!(
-        CustData.GSTIN ||
-        CustData.GSTValue ||
-        CustData.GSTType
-    );
+            // Branch GST visibility
+            var bHasBranchGST = !!(
+                CustData.GSTIN ||
+                CustData.GSTValue ||
+                CustData.GSTType
+            );
 
-    sap.ui.getCore().byId("idBranchGSTNumber")
-        .setVisible(!!CustData.GSTIN);
+            sap.ui.getCore().byId("idBranchGSTNumber")
+                .setVisible(!!CustData.GSTIN);
 
-    sap.ui.getCore().byId("idGSTPercentage")
-        .setVisible(bHasBranchGST);
+            sap.ui.getCore().byId("idGSTPercentage")
+                .setVisible(bHasBranchGST);
 
-    sap.ui.getCore().byId("idGSTType")
-        .setVisible(bHasBranchGST);
+            sap.ui.getCore().byId("idGSTType")
+                .setVisible(bHasBranchGST);
 
-    // ALWAYS show customer fields
-    sap.ui.getCore().byId("idGSTNumber")
-        .setVisible(true);
+            // ALWAYS show customer fields
+            sap.ui.getCore().byId("idGSTNumber")
+                .setVisible(true);
 
-    sap.ui.getCore().byId("idCompanyName")
-        .setVisible(true);
+            sap.ui.getCore().byId("idCompanyName")
+                .setVisible(true);
 
-    sap.ui.getCore().byId("idCompanyAddress")
-        .setVisible(true);
+            sap.ui.getCore().byId("idCompanyAddress")
+                .setVisible(true);
 
-    this.GST_Dialog.open();
-},
-        GST_onCancelButtonPress: function() {
+            this.GST_Dialog.open();
+        },
+        GST_onCancelButtonPress: function () {
             this.GST_Dialog.close();
         },
-        onGSTInputLiveChange: function(oEvent) {
+        onGSTInputLiveChange: function (oEvent) {
             const oInput = oEvent ?
                 oEvent.getSource() :
                 sap.ui.getCore().byId(this.getView().createId("idGSTNumber"));
@@ -5762,71 +5795,71 @@ sap.ui.define([
         // },
         GST_onsavebuttonpress: function () {
 
-    const CustData = this.getView()
-        .getModel("CustomerData")
-        .getData();
+            const CustData = this.getView()
+                .getModel("CustomerData")
+                .getData();
 
-    var isMandatoryValid = (
+            var isMandatoryValid = (
 
-        utils._LCvalidateMandatoryField(
-            sap.ui.getCore().byId("idGSTNumber"),
-            "ID"
-        ) &&
+                utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId("idGSTNumber"),
+                    "ID"
+                ) &&
 
-        utils._LCvalidateMandatoryField(
-            sap.ui.getCore().byId("idCompanyName"),
-            "ID"
-        ) &&
+                utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId("idCompanyName"),
+                    "ID"
+                ) &&
 
-        utils._LCvalidateMandatoryField(
-            sap.ui.getCore().byId("idCompanyAddress"),
-            "ID"
-        )
+                utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId("idCompanyAddress"),
+                    "ID"
+                )
 
-    );
+            );
 
-    if (!isMandatoryValid) {
-        MessageToast.show(
-            this.i18nModel.getText("mandetoryFields")
-        );
-        return;
-    }
+            if (!isMandatoryValid) {
+                MessageToast.show(
+                    this.i18nModel.getText("mandetoryFields")
+                );
+                return;
+            }
 
-    var payload = {
-        CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
-        CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
-        CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
-        BookingID: CustData.BookingID,
-    };
+            var payload = {
+                CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
+                CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
+                CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
+                BookingID: CustData.BookingID,
+            };
 
-    this.getBusyDialog();
+            this.getBusyDialog();
 
-    var oBody = {
-                                data: payload,
-                                filters: {
-                                    BookingID: CustData.BookingID
-                                }
-                            };
+            var oBody = {
+                data: payload,
+                filters: {
+                    BookingID: CustData.BookingID
+                }
+            };
 
-                            this.ajaxUpdateWithJQuery("HM_Booking", oBody).then(async () => {
+            this.ajaxUpdateWithJQuery("HM_Booking", oBody).then(async () => {
 
-        await this.AD_onSearch();
+                await this.AD_onSearch();
 
-        MessageToast.show(
-            "Customer GST Details Saved Successfully"
-        );
+                MessageToast.show(
+                    "Customer GST Details Saved Successfully"
+                );
 
-        this.GST_Dialog.close();
+                this.GST_Dialog.close();
 
-    }).catch(err => {
+            }).catch(err => {
 
-        MessageToast.show(
-            this.i18nModel.getText("errorSavingBooking")
-        );
+                MessageToast.show(
+                    this.i18nModel.getText("errorSavingBooking")
+                );
 
-    });
-},
-        onGSTTypeSelect: function(oEvent) {
+            });
+        },
+        onGSTTypeSelect: function (oEvent) {
             var oRadioGroup = oEvent.getSource();
 
             // Selected index (0 or 1)
@@ -5839,7 +5872,7 @@ sap.ui.define([
             console.log(sSelectedText); // "IGST" or "CGST / SGST"
         },
 
-        onPercentagetLiveChange: function(oEvent) {
+        onPercentagetLiveChange: function (oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
@@ -5852,7 +5885,7 @@ sap.ui.define([
 
         // Signin section
 
-        onSignIn: async function() {
+        onSignIn: async function () {
 
             var oView = this.getView();
             var vm = oView.getModel("LoginViewModel");
@@ -5986,7 +6019,7 @@ sap.ui.define([
                 }
             }
         },
-        onSubmitNewPassword: async function() {
+        onSubmitNewPassword: async function () {
             const oNew = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             const oConf = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass");
 
@@ -6075,7 +6108,7 @@ sap.ui.define([
             }
         },
 
-        _startOtpTimer: function() {
+        _startOtpTimer: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             this._clearOtpTimer();
@@ -6108,14 +6141,14 @@ sap.ui.define([
             }, 1000);
         },
 
-        _clearOtpTimer: function() {
+        _clearOtpTimer: function () {
             if (this._otpInterval) {
                 clearInterval(this._otpInterval);
                 this._otpInterval = null;
             }
         },
 
-        _resetOtpState: function() {
+        _resetOtpState: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             this._clearOtpTimer();
@@ -6139,7 +6172,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
         },
 
-        onValidateUser: async function() {
+        onValidateUser: async function () {
             const oEmailCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId");
             const isValid =
                 utils._LCvalidateEmail(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId"), "ID")
@@ -6185,7 +6218,7 @@ sap.ui.define([
             }
         },
 
-        _verifyOTPWithBackend: async function(otp) {
+        _verifyOTPWithBackend: async function (otp) {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             this.getBusyDialog()
             try {
@@ -6208,7 +6241,7 @@ sap.ui.define([
             }
         },
 
-        onPressOTP: async function() {
+        onPressOTP: async function () {
 
             const oEmailIDCtrl = sap.ui.core.Fragment.byId(
                 this.createId("LoginAlertDialog"),
@@ -6296,11 +6329,11 @@ sap.ui.define([
         },
 
 
-        onShowForgotUser: function() {
+        onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
         },
 
-        _onVerifyOTP: async function() {
+        _onVerifyOTP: async function () {
             const vm = this.getView().getModel("LoginViewModel");
             const flow = vm.getProperty("/authFlow");
 
@@ -6373,7 +6406,7 @@ sap.ui.define([
 
             }
         },
-        _startOtpCooldown: function(iSeconds = 20) {
+        _startOtpCooldown: function (iSeconds = 20) {
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
@@ -6401,7 +6434,7 @@ sap.ui.define([
             }, 1000);
         },
 
-        _resetOtpCooldown: function() {
+        _resetOtpCooldown: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             if (this._otpInterval) {
@@ -6412,7 +6445,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             vm.setProperty("/canResendOTP", false);
         },
-        _clearAllAuthFields: function() {
+        _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
                 "fpEmailId", "fpOTP",
@@ -6429,7 +6462,7 @@ sap.ui.define([
             this._oResetUser = null;
         },
 
-        onBackToLogin: function() {
+        onBackToLogin: function () {
             // Clean auth data & any internal flags
             this._clearAllAuthFields();
 
@@ -6452,7 +6485,7 @@ sap.ui.define([
             this._resetOtpState();
 
         },
-        onForgotPassword: function() {
+        onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             vm.setProperty("/authFlow", "forgot");
@@ -6460,7 +6493,7 @@ sap.ui.define([
             vm.setProperty("/dialogTitle", "Reset Password"); //
         },
 
-        SM_onTogglePasswordVisibility: function(oEvent) {
+        SM_onTogglePasswordVisibility: function (oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
 
@@ -6468,7 +6501,7 @@ sap.ui.define([
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
 
-        onUserlivechange: function(oEvent) {
+        onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
@@ -6630,7 +6663,7 @@ sap.ui.define([
         //         this.closeBusyDialog()
         //     }
         // },
-        onChangeState: function(oEvent) {
+        onChangeState: function (oEvent) {
             const oState = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -6669,7 +6702,7 @@ sap.ui.define([
             ]);
         },
 
-        onChangeCity: function(oEvent) {
+        onChangeCity: function (oEvent) {
             const oCity = oEvent.getSource();
             const oModel = this.getView().getModel("LoginMode");
 
@@ -6706,7 +6739,7 @@ sap.ui.define([
             oModel.setProperty("/City", sCityText);
         },
 
-        FSM_onConfirm: function(oEvent) {
+        FSM_onConfirm: function (oEvent) {
             const oInput = oEvent?.getSource();
             if (!oInput) return false;
 
@@ -6732,7 +6765,7 @@ sap.ui.define([
             return true;
         },
 
-        onChangeSalutation: function(oEvent) {
+        onChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpGender");
@@ -6751,11 +6784,11 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onChangeDOB: function(oEventOrControl) {
+        onChangeDOB: function (oEventOrControl) {
             const oDP =
                 (typeof oEventOrControl.getSource === "function") ?
-                oEventOrControl.getSource() :
-                oEventOrControl;
+                    oEventOrControl.getSource() :
+                    oEventOrControl;
 
             if (!oDP) return false;
 
@@ -6795,7 +6828,7 @@ sap.ui.define([
             return true;
         },
 
-        onCityChange: function(oEvent) {
+        onCityChange: function (oEvent) {
             const oCity = oEvent.getSource();
 
             // Sanitize manual typing
@@ -6829,11 +6862,11 @@ sap.ui.define([
             oModel.setProperty("/City", sCityText);
         },
 
-        onChangeGender: function(oEvent) {
+        onChangeGender: function (oEvent) {
             utils._LCstrictValidationSelect(oEvent.getSource());
         },
 
-        onMobileLivechnage: function(oEvent) {
+        onMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
 
             // Digits only
@@ -6885,11 +6918,11 @@ sap.ui.define([
         //     }
         // },
 
-        onAddressChange: function() {
+        onAddressChange: function () {
             utils._LCvalidateAddress(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpAddress"));
         },
 
-        onChangeCountry: function(oEvent) {
+        onChangeCountry: function (oEvent) {
             const oCountry = oEvent.getSource();
             oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
 
@@ -6950,11 +6983,11 @@ sap.ui.define([
             }
         },
 
-        _LCvalidateName: function(oEvent) {
+        _LCvalidateName: function (oEvent) {
             utils._LCvalidateName(oEvent);
         },
 
-        onSwitchToSignIn: function() {
+        onSwitchToSignIn: function () {
             const vm = this.getView().getModel("LoginViewModel");
             // -------------------------
             // FLOW RESET
@@ -6973,14 +7006,14 @@ sap.ui.define([
             // RESET SIGN-IN FIELDS
             // -------------------------
             ["signInuserid", "signInusername", "signinPassword", "signInOTP"]
-            .forEach(id => {
-                const c = sap.ui.getCore().byId(id);
-                if (c) {
-                    c.setValue("");
-                    c.setValueState("None");
-                    c.setValueStateText("");
-                }
-            });
+                .forEach(id => {
+                    const c = sap.ui.getCore().byId(id);
+                    if (c) {
+                        c.setValue("");
+                        c.setValueState("None");
+                        c.setValueStateText("");
+                    }
+                });
 
             sap.ui.getCore().byId("signinPassword")?.setEnabled(true);
             sap.ui.getCore().byId("signInOTP")?.setEnabled(false);
@@ -6990,23 +7023,23 @@ sap.ui.define([
             // RESET FORGOT FIELDS
             // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
-            .forEach(id => {
-                const c = sap.ui.getCore().byId(id);
-                if (c) {
-                    c.setValue("");
-                    c.setValueState("None");
-                    c.setValueStateText("");
-                }
-            });
+                .forEach(id => {
+                    const c = sap.ui.getCore().byId(id);
+                    if (c) {
+                        c.setValue("");
+                        c.setValueState("None");
+                        c.setValueStateText("");
+                    }
+                });
 
             // -------------------------
             // 🚫 DISABLE FORGOT FORM
             // -------------------------
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
-            .forEach(id => {
-                const c = sap.ui.getCore().byId(id);
-                if (c) c.setEnabled(false);
-            });
+                .forEach(id => {
+                    const c = sap.ui.getCore().byId(id);
+                    if (c) c.setEnabled(false);
+                });
 
             // -------------------------
             // PANELS
@@ -7051,21 +7084,21 @@ sap.ui.define([
         //     this._addPasswordGenerateIcon();
         // },
 
-        onEmailliveChange: function(oEvent) {
+        onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
-        onSigninPasswordLive: function(oEvent) {
+        onSigninPasswordLive: function (oEvent) {
             utils._LCvalidatePassword(oEvent);
         },
 
-        SM_onTogglePasswordVisibility: function(oEvent) {
+        SM_onTogglePasswordVisibility: function (oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
 
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-        _getLoginFragmentControl: function(localId) {
+        _getLoginFragmentControl: function (localId) {
             // 1) If you stored the fragment instance (best practice), use it
             if (this._oLoginFragment && typeof this._oLoginFragment.byId === "function") {
                 const c = this._oLoginFragment.byId(localId);
@@ -7149,7 +7182,7 @@ sap.ui.define([
             return null;
         },
 
-        SM_onChnageSetAndConfirm: function(oEvent) {
+        SM_onChnageSetAndConfirm: function (oEvent) {
             const oInput = oEvent.getSource();
             if (!oInput) {
                 return;
@@ -7170,7 +7203,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
 
-        SM_onGenerateForgotPassword: function() {
+        SM_onGenerateForgotPassword: function () {
             var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpPasswordStrengthText");
 
@@ -7184,7 +7217,7 @@ sap.ui.define([
             oPwdInput.setValue(pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-        onSelectLoginMode: function(e) {
+        onSelectLoginMode: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const mode = e.getSource().getText().toLowerCase();
 
@@ -7216,7 +7249,7 @@ sap.ui.define([
             }
         },
 
-        onDialogClose: function() {
+        onDialogClose: function () {
 
             const oEmail = sap.ui.core.Fragment.byId(
                 this.createId("LoginAlertDialog"),
@@ -7247,7 +7280,7 @@ sap.ui.define([
                 this._oLoginAlertDialog.close();
             }
         },
-        onLoginOtpLive: function(e) {
+        onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const input = e.getSource();
 
@@ -7269,7 +7302,7 @@ sap.ui.define([
                 input.setValueState("None");
             }
         },
-        _addPasswordGenerateIcon: function() {
+        _addPasswordGenerateIcon: function () {
 
             const aInputs = [
                 sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword"),
@@ -7290,7 +7323,7 @@ sap.ui.define([
             });
         },
 
-        SM_onCopyPassword: function(oEvent) {
+        SM_onCopyPassword: function (oEvent) {
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent();
 
@@ -7325,14 +7358,14 @@ sap.ui.define([
                 });
         },
 
-        onGeneratePDF: async function() {
+        onGeneratePDF: async function () {
             const data = this.getView().getModel("CustomerData").getData();
 
-            let filter = {BranchID: [data.BranchCode]};
+            let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];
 
-            const {jsPDF} = window.jspdf;
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
@@ -7642,7 +7675,7 @@ sap.ui.define([
                 ACCENT_COLOR[2]
             );
 
-            doc.rect(15, currentY, 5, 55,"F");
+            doc.rect(15, currentY, 5, 55, "F");
 
             // Title
             doc.setFont("helvetica", "bold");
@@ -8012,7 +8045,7 @@ sap.ui.define([
             return doc.output("datauristring").split(",")[1];
         },
 
-        onAddNewMemberFromDialog: function() {
+        onAddNewMemberFromDialog: function () {
             this._mode = "CREATE";
             this._sEditPath = null;
 
@@ -8065,7 +8098,7 @@ sap.ui.define([
             this.MM_Dialog.open();
         },
 
-        onEditMemberFromDialog: function(oEvent) {
+        onEditMemberFromDialog: function (oEvent) {
 
             if (!this.MM_Dialog) {
 
@@ -8129,11 +8162,11 @@ sap.ui.define([
             this.MM_Dialog.open();
         },
 
-        onCloseNewMemberDialog: function() {
+        onCloseNewMemberDialog: function () {
             this.MM_Dialog.close();
         },
 
-        onNewMemberDocumentTypeChange: function(oEvent) {
+        onNewMemberDocumentTypeChange: function (oEvent) {
 
             const oComboBox = oEvent.getSource();
 
@@ -8149,7 +8182,7 @@ sap.ui.define([
             return utils._LCstrictValidationComboBox(oComboBox, "ID");
         },
 
-        onFileUpload: function(oEvent) {
+        onFileUpload: function (oEvent) {
 
             const oFileUploader = oEvent.getSource();
 
@@ -8205,7 +8238,7 @@ sap.ui.define([
 
             const oReader = new FileReader();
 
-            oReader.onload = function(oLoadEvent) {
+            oReader.onload = function (oLoadEvent) {
 
                 const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
 
@@ -8222,7 +8255,7 @@ sap.ui.define([
             oReader.readAsDataURL(oFile);
         },
 
-        onMemberFileSizeExceed: function(oEvent) {
+        onMemberFileSizeExceed: function (oEvent) {
 
             const sFileName = oEvent.getParameter("fileName") || "File";
 
@@ -8233,7 +8266,7 @@ sap.ui.define([
             oEvent.getSource().clear();
         },
 
-        onRemoveButtonPress: function() {
+        onRemoveButtonPress: function () {
 
             const oModel = this.getView().getModel("BookingView");
             oModel.setProperty("/NewMemberDraft/Documents/0/FileName", "");
@@ -8249,16 +8282,16 @@ sap.ui.define([
             }
         },
 
-        onSaveNewMember: function() {
+        onSaveNewMember: function () {
 
             var oView = sap.ui.getCore();
 
             var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
 
             if (utils._LCstrictValidationComboBox(
-                    oView.byId("AD_idSelect"),
-                    "ID"
-                ) &&
+                oView.byId("AD_idSelect"),
+                "ID"
+            ) &&
 
                 utils._LCvalidateMandatoryField(
                     oView.byId("AD_id_MemberName"),
@@ -8361,7 +8394,7 @@ sap.ui.define([
             }
         },
 
-        _uploadNewMemberDocument: function(oDoc) {
+        _uploadNewMemberDocument: function (oDoc) {
 
             this.getBusyDialog();
 
@@ -8377,18 +8410,18 @@ sap.ui.define([
             const oPromise = isCreate ?
                 this.ajaxCreateWithJQuery(
                     "HM_MemberDocument", {
-                        data: [oDoc]
-                    }
+                    data: [oDoc]
+                }
                 )
 
                 :
                 this.ajaxUpdateWithJQuery(
                     "HM_MemberDocument", {
-                        data: [oDoc],
-                        filters: {
-                            DocumentID: oDraft.Documents?.[0]?.DocumentID
-                        }
+                    data: [oDoc],
+                    filters: {
+                        DocumentID: oDraft.Documents?.[0]?.DocumentID
                     }
+                }
                 );
 
             oPromise.then(() => {
@@ -8447,7 +8480,7 @@ sap.ui.define([
             });
         },
 
-        _generateMemberID: function() {
+        _generateMemberID: function () {
 
             const sUserID = this.getView().getModel("CustomerData").getData().UserID || "";
 
@@ -8456,7 +8489,7 @@ sap.ui.define([
                 this.getView().getModel("BookingView").getProperty("/Members") || [];
 
             // FILTER CHILD MEMBERS
-            const aUserMembers = aMasterMembers.filter(function(oMember) {
+            const aUserMembers = aMasterMembers.filter(function (oMember) {
 
                 if (!oMember.MemberID) {
                     return false;
@@ -8468,7 +8501,7 @@ sap.ui.define([
 
             let iMaxSuffix = 0;
 
-            aUserMembers.forEach(function(oMember) {
+            aUserMembers.forEach(function (oMember) {
 
                 const sMemberID =
                     String(oMember.MemberID || "");
@@ -8498,12 +8531,12 @@ sap.ui.define([
             // FORMAT: 01, 02, 03...
             const sFormattedSuffix =
                 String(iNewSuffix)
-                .padStart(2, "0");
+                    .padStart(2, "0");
 
             return sUserID + "_" + sFormattedSuffix;
         },
 
-        onNewMemberSalutationChange: function(oEvent) {
+        onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.byId("AD_idSelect");
@@ -8527,23 +8560,37 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
 
-        onNewMemberNameChange: function(oEvent) {
+        onNewMemberNameChange: function (oEvent) {
             return utils._LCvalidateName(oEvent);
         },
-        onNewMemberDOBChange: function(oEvent) {
+        onNewMemberDOBChange: function (oEvent) {
             utils._LCvalidateDate(oEvent);
         },
-        onNewMemberGenderChange: function(oEvent) {
+        onNewMemberGenderChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
-        onNewMemberRelationChange: function(oEvent) {
+        onNewMemberRelationChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
 
-        MS_viewimage: function() {
+        MS_viewimagetable: function (oEvent) {
+            this.tableview = true
+            this.MS_viewimage(oEvent)
+        },
+        MS_viewimagefragment: function (oEvent) {
+            this.tableview = false
+            this.MS_viewimage(oEvent)
+        },
 
-            const oDraft = this.getView().getModel("BookingView").getData().Members[0]
-
+        MS_viewimage: function (oEvent) {
+            let oDraft;
+            if (this.tableview === true) {
+                oDraft = oEvent.getSource()
+                    .getBindingContext("BookingView")
+                    ?.getObject();
+            } else {
+                oDraft = this.getView().getModel("BookingView").getProperty("/NewMemberDraft")
+            }
 
             const oDocument = oDraft?.Documents?.[0];
 
@@ -8563,7 +8610,7 @@ sap.ui.define([
             });
         },
 
-        _previewDocument: function(oDoc) {
+        _previewDocument: function (oDoc) {
 
             const sRawSource = String(
                 oDoc?.File ||
@@ -8590,7 +8637,7 @@ sap.ui.define([
                 aDataUrlParts[2] :
                 sRawSource;
 
-            const normalizeBase64 = function(sValue) {
+            const normalizeBase64 = function (sValue) {
 
                 let sNormalized = String(sValue || "")
                     .replace(/\s/g, "")
@@ -8610,7 +8657,7 @@ sap.ui.define([
                 return sNormalized;
             };
 
-            const autoDecodeBase64 = function(sValue) {
+            const autoDecodeBase64 = function (sValue) {
 
                 if (!sValue) {
                     return "";
@@ -8757,13 +8804,13 @@ sap.ui.define([
 
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function() {
+                        press: function () {
 
                             oDialog.close();
                         }
                     }).addStyleClass("myUnifiedBtn"),
 
-                    afterClose: function() {
+                    afterClose: function () {
 
                         oDialog.destroy();
                     }
@@ -8831,8 +8878,8 @@ sap.ui.define([
 
                 const oBlob = new Blob(
                     aByteArrays, {
-                        type: "application/pdf"
-                    }
+                    type: "application/pdf"
+                }
                 );
 
                 if (this._previewUrl) {
@@ -8883,13 +8930,13 @@ sap.ui.define([
 
                     beginButton: new sap.m.Button({
                         text: "Close",
-                        press: function() {
+                        press: function () {
 
                             oPdfDialog.close();
                         }
                     }).addStyleClass("myUnifiedBtn"),
 
-                    afterClose: function() {
+                    afterClose: function () {
 
                         if (this._previewUrl) {
 
@@ -8919,7 +8966,7 @@ sap.ui.define([
             );
         },
 
-        onUploadDocumentFile: async function() {
+        onUploadDocumentFile: async function () {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -8957,7 +9004,7 @@ sap.ui.define([
             if (oCustomerData.MemberID) {
                 aSelectedMemberIds = oCustomerData.MemberID
                     .split(",")
-                    .map(function(id) {
+                    .map(function (id) {
                         return id.trim();
                     });
             }
@@ -8982,9 +9029,9 @@ sap.ui.define([
                 this.getView().setModel(oMemberModel, "BookingView");
 
                 // Wait for table binding
-                setTimeout(function() {
+                setTimeout(function () {
 
-                    oTable.getItems().forEach(function(oItem) {
+                    oTable.getItems().forEach(function (oItem) {
 
                         var oData = oItem
                             .getBindingContext("BookingView")
@@ -9006,7 +9053,7 @@ sap.ui.define([
 
             this.closeBusyDialog();
         },
-        onMemberSelectionChange: function(oEvent) {
+        onMemberSelectionChange: function (oEvent) {
 
             var oTable = oEvent.getSource();
 
@@ -9032,10 +9079,10 @@ sap.ui.define([
                 oTable.setSelectedItem(oItem, false);
             }
         },
-        onCloseMemberSelectionDialog: function() {
+        onCloseMemberSelectionDialog: function () {
             this.UD_Dialog.close();
         },
-        onMemberSearch: function(oEvent) {
+        onMemberSearch: function (oEvent) {
             const sValue = String(oEvent.getParameter("newValue") || oEvent.getParameter("query") || "").trim();
             const oTable = sap.ui.getCore().byId("abmemberSelectTable");
             const oBinding = oTable && oTable.getBinding("items");
@@ -9061,7 +9108,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onConfirmMemberSelection: function() {
+        onConfirmMemberSelection: function () {
 
             var oView = this.getView();
             var oTable = sap.ui.getCore().byId("abmemberSelectTable");
@@ -9094,14 +9141,14 @@ sap.ui.define([
             }
 
             // push documents
-            aSelectedItems.forEach(function(oItem) {
+            aSelectedItems.forEach(function (oItem) {
 
                 var oContext = oItem.getBindingContext("BookingView");
                 var oData = oContext.getObject();
 
                 var aMemberDocs = oData.Documents || [];
 
-                aMemberDocs.forEach(function(doc) {
+                aMemberDocs.forEach(function (doc) {
 
                     aDocs.push({
                         DocumentID: doc.DocumentID,
