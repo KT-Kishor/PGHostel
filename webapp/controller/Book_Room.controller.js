@@ -3431,6 +3431,13 @@ sap.ui.define([
                 oLoginModel.setProperty("/Address", oMatchedUser.Address);
                 oLoginModel.setProperty("/STDCode", oMatchedUser.STDCode);
                 oLoginModel.setProperty("/Salutation", oMatchedUser.Salutation);
+                localStorage.setItem("isLoggedIn", "true");
+
+                localStorage.setItem("_x9A1p", user._x9A1p);
+                localStorage.setItem("_k7LmQ", user._k7LmQ);
+
+                localStorage.setItem("_aB39X", btoa(user.UserID));
+                localStorage.setItem("_mN72P", btoa(user.UserName));
 
                 if (oMatchedUser.FileContent) {
 

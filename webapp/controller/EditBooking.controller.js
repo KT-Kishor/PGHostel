@@ -64,6 +64,7 @@ sap.ui.define([
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             //     oRouter.navTo("RouteHostel", {}, true);
             // }
+            await this.commonLoginFunction("Booking");
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
             var sMemberID = oArgs.MemberID ? atob(decodeURIComponent(oArgs.MemberID)) : "";
@@ -4170,13 +4171,6 @@ sap.ui.define([
                     UserID: oCustomerData.UserID,
                     CustomerEmail: sEmail,
                     IsLoggedIn: true,
-                    url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
-                    headers: {
-                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
-                        "Content-Type": "application/json"
-                    },
-                    isRadioVisible: false
                 });
 
                 // ================= RESET =================
