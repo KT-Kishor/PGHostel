@@ -16,6 +16,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.getView().setModel(new JSONModel({}), "HostelModel");
+
             var LoginFUnction = await this.commonLoginFunction("ManageCustomer");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -45,6 +47,7 @@ sap.ui.define([
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             }
+
 
             await this._loadBranchCode()
             await this.Cust_read(true)
