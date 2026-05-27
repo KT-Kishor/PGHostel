@@ -122,6 +122,14 @@ sap.ui.define([
                 const oPage = this.byId(sStoredTab);
                 if (oPage) oNavContainer.to(oPage);
             }
+
+            if (sStoredTab === "idRooms") {
+                setTimeout(async () => {
+                    await this._loadRoomsPageData();
+                }, 300);
+
+            }
+
             sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
