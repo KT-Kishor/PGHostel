@@ -228,7 +228,7 @@
 
                                     <Column
                                        
-                                        width="3rem"
+                                        width="6rem"
                                     >
                                         <Text text="Full Name" />
                                     </Column>
