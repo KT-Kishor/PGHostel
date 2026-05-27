@@ -1792,7 +1792,13 @@ sap.ui.define([
                 return false;
             }
 
-            if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
+            // if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
+            //     MessageToast.show("Please complete contact details before payment");
+            //     return false;
+            // }
+
+            var sEmail = oModel.getProperty("/CustomerEmail")?.trim();
+            if (!sEmail) {
                 MessageToast.show("Please complete contact details before payment");
                 return false;
             }
@@ -4163,7 +4169,14 @@ sap.ui.define([
                 oLoginModel.setData({
                     UserID: oCustomerData.UserID,
                     CustomerEmail: sEmail,
-                    IsLoggedIn: true
+                    IsLoggedIn: true,
+                    url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
+                    headers: {
+                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                        "Content-Type": "application/json"
+                    },
+                    isRadioVisible: false
                 });
 
                 // ================= RESET =================
