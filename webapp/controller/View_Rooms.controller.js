@@ -70,6 +70,7 @@ sap.ui.define([
             //        this._oBookingDateDialog.open();
 
             this.sPath = oEvent.getParameter("arguments").sPath;
+            this.getOwnerComponent().setModel(new JSONModel({Branch: this.sPath }), "sPathModel");
 
             // Fetch branch data for the specific BranchID
             await this._loadBranchData();

@@ -71,7 +71,6 @@ sap.ui.define([
 
             var model1 = new JSONModel({
 
-
             });
             this.getView().setModel(model1, "HostelModel")
 
@@ -97,7 +96,6 @@ sap.ui.define([
                 GSt: false,
                 IsCouponApplied: false,
                 showCancelButton: false
-
             });
             this.getView().setModel(model, "VisibleModel")
             this._sLoggedUserID = "";
@@ -200,6 +198,7 @@ sap.ui.define([
                     .catch(reject);
             });
         },
+
         Coupon: function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             const filter = {
@@ -230,7 +229,6 @@ sap.ui.define([
 
         Ck_onCancelButtonPress: function () {
             this.CK_Dialog.close();
-
         },
 
         Ck_onsavebuttonpress: async function () {
@@ -241,27 +239,39 @@ sap.ui.define([
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
             // Refresh model to update UI bindings
 
-            var Payload = {
-                "Booking": [{
-                    "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
-                    "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
-                    "Status": "Completed",
-                    "CustomerName": oCustomerModel.CustomerName,
-                    "CustomerEmail": oCustomerModel.CustomerEmail,
-                    "BookingID": oCustomerModel.BookingID,
-                    "RoomNo": oCustomerModel.RoomNo
-                }]
-            };
+             var Payload = {
+                    "Booking": [{
+                        "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
+                        "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
+                        "Status": "Completed",
+                        "CustomerName": oCustomerModel.CustomerName,
+                        "CustomerEmail": oCustomerModel.CustomerEmail,
+                        "BookingID": oCustomerModel.BookingID,
+                        "RoomNo": oCustomerModel.RoomNo
+                    }]
+                };
 
-            // Send payload
-            this.getBusyDialog()
-            await this.ajaxUpdateWithJQuery("HM_Customer", {
-                data: [Payload],
-                filters: {
-                    BookingID: oCustomerModel.BookingID
-                }
-            })
-                .then(() => {
+                var payload2 = {
+                    "Area": oCustomerModel.BranchName || "",
+                    "PropertySTD": oCustomerModel.PropertySTD || "",
+                    "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
+                    "PropertyEmail": oCustomerModel.PropertyEmail || "",
+                    "PropertyType": oCustomerModel.PropertyType || ""
+                };
+
+                // Merge both
+                var finalPayload = {
+                    ...Payload,
+                    ...payload2
+                };
+
+                this.getBusyDialog();
+                await this.ajaxUpdateWithJQuery("HM_Customer", {
+                    data: [finalPayload],
+                    filters: {
+                        BookingID: oCustomerModel.BookingID
+                    }
+                }).then(() => {
                     sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
                 });
 
@@ -322,7 +332,7 @@ sap.ui.define([
 
             let aFilteredFacilities = aFacilities;
 
-            // 🚀 If extrabed <= 0 → remove Extra Bed
+            // If extrabed <= 0 → remove Extra Bed
             if (Deposit && Deposit.ExtraBed <= 0) {
                 aFilteredFacilities = aFacilities.filter(function (oItem) {
                     return oItem.Type !== "Extra Bed";
@@ -336,52 +346,41 @@ sap.ui.define([
         },
 
         onNavBack: function () {
-
             var oViewModel = this.getView().getModel("VisibleModel");
             var bIsEditMode = oViewModel && oViewModel.getProperty("/visible");
 
             // Ask confirmation only in edit mode
             if (bIsEditMode) {
-
                 this.showConfirmationDialog(
                     this.i18nModel.getText("ConfirmActionTitle"),
                     this.i18nModel.getText("backConfirmation"),
 
                     function () {
-
                         oViewModel.setProperty("/Edit", false);
                         this.getView().getModel("VisibleModel").setProperty("/visible", true);
 
                         if (this._fromRoute === "Dashboard") {
                             this.getOwnerComponent().getRouter().navTo("RouteDashboard");
                         } else {
-
                             const oLoginModel = this.getView().getModel("LoginModel");
                             const sRole = oLoginModel?.getProperty("/Role") || "";
                             const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
 
                             if (sRole === "Customer") {
-
                                 this._sLoggedUserID = sEmpID;
-
                                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
                                 oUIModel.setProperty("/isLoggedIn", true);
-
                                 this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
-
                             } else if (
                                 sRole === "Admin" ||
                                 sRole === "Branch Manager" ||
                                 sRole === "Front Office Employee" ||
                                 sRole === "SuperAdmin"
                             ) {
-
                                 this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
                                     sPath: "DetailsPage"
                                 });
-
                             } else {
-
                                 this.getOwnerComponent().getRouter().navTo("RouteHostel");
                             }
 
@@ -392,7 +391,6 @@ sap.ui.define([
                 );
 
             } else {
-
                 // Direct navigation when not in edit mode
                 if (this._fromRoute === "Dashboard") {
 
@@ -405,7 +403,6 @@ sap.ui.define([
                     const sEmpID = oLoginModel?.getProperty("/EmployeeID") || "";
 
                     if (sRole === "Customer") {
-
                         this._sLoggedUserID = sEmpID;
 
                         const oUIModel = this.getOwnerComponent().getModel("UIModel");
@@ -419,7 +416,6 @@ sap.ui.define([
                         sRole === "Front Office Employee" ||
                         sRole === "SuperAdmin"
                     ) {
-
                         this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
                             sPath: "DetailsPage"
                         });
@@ -590,7 +586,6 @@ sap.ui.define([
                 var BedType = oCustomer.Bookings?.[0]?.BedType
                 var PaymentType = oCustomer.Bookings?.[0]?.PaymentType
 
-
                 var aAllRooms = this.getView().getModel("Availablebeds").getData();
 
                 // Filter by BranchCode
@@ -650,7 +645,6 @@ sap.ui.define([
                         Duration = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
                         DurationUnit = Duration === 1 ? "Day" : "Days";
 
-
                     } else if (paymentType === "per month") {
                         const years = end.getFullYear() - start.getFullYear();
                         const months = end.getMonth() - start.getMonth();
@@ -663,7 +657,6 @@ sap.ui.define([
 
                         Duration = totalMonths;
                         DurationUnit = Duration === 1 ? "Month" : "Months";
-
 
                     } else if (paymentType === "per year") {
                         let years = end.getFullYear() - start.getFullYear();
@@ -678,7 +671,6 @@ sap.ui.define([
 
                         Duration = years;
                         DurationUnit = Duration === 1 ? "Year" : "Years";
-
                     }
                 }
                 oCustomerData.RentPrice = Duration * roomRentPrice;
@@ -744,9 +736,7 @@ sap.ui.define([
 
                     let fTotal = 0;
 
-                    // -------------------------------
                     // Facility specific dates
-                    // -------------------------------
                     const facStart = new Date(f.StartDate);
                     const facEnd = new Date(f.EndDate);
 
@@ -755,9 +745,7 @@ sap.ui.define([
                         return;
                     }
 
-                    // -------------------------------
                     // Calculate Days
-                    // -------------------------------
                     facStart.setHours(0, 0, 0, 0);
                     facEnd.setHours(0, 0, 0, 0);
                     const dayDiff = facEnd - facStart;
@@ -774,9 +762,7 @@ sap.ui.define([
                     //     return;
                     // } 
 
-                    // -------------------------------
                     // Calculate Months
-                    // -------------------------------
                     let months =
                         (facEnd.getFullYear() - facStart.getFullYear()) * 12 +
                         (facEnd.getMonth() - facStart.getMonth());
@@ -788,15 +774,11 @@ sap.ui.define([
                     const totalMonths = Math.max(months, 1);
 
 
-                    // -------------------------------
                     // Calculate Years
-                    // -------------------------------
                     const years = Math.floor(months / 12);
                     const totalYears = Math.max(years, 1);
 
-                    // -------------------------------
                     // Apply Billing Logic
-                    // -------------------------------
                     if (unit === "Per Day") {
                         fTotal = fPrice;
                         totalFacilityPricePerDay += fPrice;
@@ -818,9 +800,8 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-                    // -------------------------------
+                    
                     // Store final facility record
-                    // -------------------------------
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
                         FacilityName: f.FacilityName,
@@ -851,7 +832,6 @@ sap.ui.define([
 
                 });
             });
-
 
             const FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
             this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
@@ -980,7 +960,6 @@ sap.ui.define([
             sap.ui.getCore().byId("editquantity").setValueState("None")
             sap.ui.getCore().byId("editMembername").setVisible(false).setSelectedKey("").setValueState("None")
 
-
             sap.ui.getCore().byId("idMonthYearSelectFragment").setSelectedKey("1")
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
@@ -998,7 +977,6 @@ sap.ui.define([
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             sap.ui.getCore().byId("editquantity").setVisible(false)
             sap.ui.getCore().byId("id_Period").setVisible(false)
-
 
             var Data = this.getView().getModel("CustomerData").getData()
 
@@ -1056,7 +1034,6 @@ sap.ui.define([
                 sap.ui.getCore().byId("idUnitType").setVisible(false).setSelectedKey("")
                 sap.ui.getCore().byId("editquantity").setEditable(false)
 
-
                 this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
                 this.UnitTextChange()
             } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
@@ -1111,6 +1088,7 @@ sap.ui.define([
 
             // 9. Show UnitType dropdown
         },
+
         onPeriodTypeSelect: function (oEvent) {
             var selectedKey = oEvent.getSource().getSelectedIndex();
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
@@ -1123,10 +1101,9 @@ sap.ui.define([
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editDays").setVisible(true)
-
             }
-
         },
+
         onquantityInputChange: function (oEvent) {
             var editdata = this.getView().getModel("edit")
             var data = this.getView().getModel("Facilities").getData()
@@ -1138,18 +1115,19 @@ sap.ui.define([
 
             var value = sap.ui.getCore().byId("editquantity").getValue()
 
-
             var Total = value * FPrice.UnitPrice
 
             this.getView().getModel("edit").setProperty("/Price", Total)
 
         },
+
         onMemberNameChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             if (this.getView().getModel("edit").getProperty("/UnitText") === "Package Price" || this.getView().getModel("edit").getProperty("/UnitText") === "Unit Price") {
                 this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
             }
         },
+
         UnitTextChange: function () {
             sap.ui.getCore().byId("idMonthYearSelectFragment").setVisible(false);
 
@@ -1158,16 +1136,12 @@ sap.ui.define([
             var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
             var SAdditionalText = sap.ui.getCore().byId("editFacilityName").getSelectedItem().getAdditionalText()
 
-
-
             var Duration = "Unit Price";
 
             var FPrice = data.find((item) => {
                 return item.FacilityName === Sfacilityname && item.FacilityChargeType === SAdditionalText
             })
             editdata.setProperty("/Currency", FPrice.Currency)
-
-
 
             if (Duration === "Unit Price") {
                 editdata.setProperty("/Price", FPrice.MinimumPrice)
@@ -1177,7 +1151,6 @@ sap.ui.define([
                 } else {
                     sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(1)
                 }
-
 
                 var Bookingdata = this.getView().getModel("Bookingmodel").getData();
                 if (FPrice.FacilityChargeType !== "Daily") {
@@ -1193,13 +1166,8 @@ sap.ui.define([
                     sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
                     sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                     sap.ui.getCore().byId("editDays").setVisible(true)
-
                 }
-
             }
-
-
-
         },
 
         onUnitTextChange: function (oEvent, flag) {
@@ -1209,10 +1177,8 @@ sap.ui.define([
             var data = this.getView().getModel("Facilities").getData()
             var Sfacilityname = sap.ui.getCore().byId("editFacilityName").getValue() || editdata.getProperty("/FacilityName")
 
-
             // var Duration = sap.ui.getCore().byId("idUnitType")?.getSelectedKey();
             var Duration = editdata.getProperty("/UnitText")
-
 
             var FPrice = data.find((item) => {
                 return item.FacilityName === Sfacilityname
@@ -1231,18 +1197,14 @@ sap.ui.define([
                 // sap.ui.getCore().byId("editHours").setVisible(true)
                 editdata.setProperty("/UnitText", Duration)
                 sap.ui.getCore().byId("editEndDate").setValue("")
-
-
             }
             if (Duration === "Per Month") {
                 editdata.setProperty("/Price", FPrice.PerMonthPrice)
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
-
             }
             if (Duration === "Per Year") {
                 editdata.setProperty("/Price", FPrice.PerYearPrice)
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
-
             }
             if (Duration === "Unit Price" && FPrice.SelectionMode === "PERSON_QTY") {
                 editdata.setProperty("/Price", FPrice.MinimumPrice)
@@ -1252,7 +1214,6 @@ sap.ui.define([
                 } else {
                     sap.ui.getCore().byId("id_Period").setVisible(true).setSelectedIndex(1)
                 }
-
 
                 var Bookingdata = this.getView().getModel("Bookingmodel").getData();
                 if (FPrice.FacilityChargeType !== "Daily") {
@@ -1270,9 +1231,6 @@ sap.ui.define([
                     sap.ui.getCore().byId("editDays").setVisible(true)
 
                 }
-
-
-
 
             } else if (FPrice.SelectionMode === "QTY" && FPrice.UnitPrice !== "0") {
                 editdata.setProperty("/Price", FPrice.UnitPrice)
@@ -1313,7 +1271,6 @@ sap.ui.define([
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
 
-
             if (sUnit === "Package Price") {
                 sUnit = "Unit Price"
             }
@@ -1334,7 +1291,7 @@ sap.ui.define([
 
             if (!iCount || iCount <= 0) return;
 
-            // ✅ Correct date conversion
+            // Correct date conversion
             if (sStartDate.includes("/")) {
                 sStartDate = sStartDate.split("/").reverse().join("-");
 
@@ -1355,8 +1312,6 @@ sap.ui.define([
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
             //   var oEndDatePicker = sap.ui.getCore().byId("editEndDate");
-
-
 
             // if (oEndDatePicker) {
             //     var oDate = new Date(sStartDate);
@@ -1475,6 +1430,7 @@ sap.ui.define([
             oModel.setProperty("/CouponDiscount", "")
             sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
+
         onQuantityLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
@@ -1646,7 +1602,6 @@ sap.ui.define([
             var iHours = Number(oPayload.TotalHour) || 0; // ← NEW for Per Hour
             var iquantity = Number(oPayload.quantity) || ""; // ← NEW for Per Hour
 
-
             var finalPrice = 0;
             const iCount = oPayload.TotalHour || 1;
 
@@ -1721,13 +1676,11 @@ sap.ui.define([
 
             oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
-
             oPayload.SelectionMode = selectionmode
 
             if (oPayload.SelectionMode === "PERSON_QTY") {
                 oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
             }
-
 
             if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
                 oPayload.UnitText = "Package Price"
@@ -1738,7 +1691,6 @@ sap.ui.define([
             if (!oCustomerData.AllSelectedFacilities) {
                 oCustomerData.AllSelectedFacilities = [];
             }
-
 
             const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
                 item.FacilityName === oPayload.FacilityName &&
@@ -1755,7 +1707,7 @@ sap.ui.define([
 
                 const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
 
-                    // ✅ Only check for SAME member
+                    // Only check for SAME member
                     if (item.MemberName !== oPayload.MemberName) {
                         return false;
                     }
@@ -1763,7 +1715,7 @@ sap.ui.define([
                     const oldStart = this._parseDate(item.StartDate);
                     const oldEnd = this._parseDate(item.EndDate);
 
-                    // ✅ Block ONLY if dates overlap
+                    // Block ONLY if dates overlap
                     const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityChargeType === "DAILY" && item.FacilityName === oPayload.FacilityName;
 
                     return isOverlap;
@@ -1786,7 +1738,7 @@ sap.ui.define([
             //                 const oldStart = this._parseDate(item.StartDate);
             //                 const oldEnd = this._parseDate(item.EndDate);
 
-            //                 // ✅ Block ONLY if dates overlap
+            //                 //  Block ONLY if dates overlap
             //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
 
             //                 return isOverlap;
@@ -1804,7 +1756,7 @@ sap.ui.define([
 
             // const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
 
-            //     // ✅ Skip same row while editing
+            //     //  Skip same row while editing
             //     if (this.edit === false && index === this._editIndex) {
             //         return false;
             //     }
@@ -1833,7 +1785,7 @@ sap.ui.define([
 
             //             const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
 
-            //                 // ✅ Only check for SAME member
+            //                 //  Only check for SAME member
             //                 if (item.MemberName !== oPayload.MemberName) {
             //                     return false;
             //                 }
@@ -1841,7 +1793,7 @@ sap.ui.define([
             //                 const oldStart = this._parseDate(item.StartDate);
             //                 const oldEnd = this._parseDate(item.EndDate);
 
-            //                 // ✅ Block ONLY if dates overlap
+            //                 //  Block ONLY if dates overlap
             //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
 
             //                 return isOverlap;
@@ -1862,7 +1814,7 @@ sap.ui.define([
             //                     return false;
             //                 }
 
-            //     // ✅ Skip same row while editing
+            //     //  Skip same row while editing
             //     if (this.edit === false && index === this._editIndex) {
             //         return false;
             //     }
@@ -1902,8 +1854,6 @@ sap.ui.define([
 
             oCustomerData.TotalFacilityPrice = total;
 
-
-
             oCustomerData.RentPrice = oCustomerData.RentPrice || 0;
             oCustomerData.SubTotal = (total + (oCustomerData.RentPrice || 0)) - Number(oCustomerData.Discount);
 
@@ -1928,11 +1878,9 @@ sap.ui.define([
             sap.m.MessageToast.show(this.i18nModel.getText("facilityUpdatedSuccessfully"));
 
             this._editIndex = undefined;
-
         },
 
         onEditBooking: async function () {
-
             this.applyCountryStateCityFilters();
 
             const oMobile = this.byId("CD_ID_idPhone");
@@ -1960,10 +1908,7 @@ sap.ui.define([
                 return;
             }
 
-            // ------------------------------
             // USER IS LOGGED IN → CONTINUE
-            // ------------------------------
-
             this.getBusyDialog();
 
             const response = await this.ajaxReadWithJQuery("HM_Customer", "");
@@ -2125,7 +2070,6 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
                 oCustomerModel.setProperty("/Duration", diffDays);
-
 
                 var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
                 // if (CustData.CouponCode || this.Code) {
@@ -2451,9 +2395,6 @@ sap.ui.define([
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
             oCustomerData.setProperty("/Duration", iCount)
-
-
-
         },
 
         onCancelBooking: function () {
@@ -2536,12 +2477,11 @@ sap.ui.define([
                     var iMonths =
                         (oEnd.getFullYear() - oStart.getFullYear());
 
-
                 }
 
             }
 
-            // 👉 STORE INDEX for update later
+            //  STORE INDEX for update later
             this._editIndex = Number(oContext.getPath().split("/").pop());
 
             // Load data into edit model
@@ -2979,7 +2919,6 @@ sap.ui.define([
                 oCustomerModel.setProperty("/SubTotal", SubTotal)
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
-
             }
         },
 
@@ -3169,9 +3108,6 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
                 oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
-
-
-
             }
         },
 
@@ -3257,6 +3193,7 @@ sap.ui.define([
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
         },
+
         onSTDChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
@@ -3274,11 +3211,12 @@ sap.ui.define([
             }
 
         },
+
         onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = this.getView().byId("Ad_id_gender");
-            // 🔥 Clear salutation error immediately
+            //  Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
             // Reset gender first
@@ -3294,7 +3232,7 @@ sap.ui.define([
             }
             // Dr. → manual gender selection
 
-            // ✅ Strict validation (CONTROL, not event)
+            //  Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
 
@@ -3374,6 +3312,7 @@ sap.ui.define([
             utils._LCvalidateDate(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
         },
+
         onPaymentTypeSelect: function (oEvent) {
 
             this.index = oEvent.getSource().getSelectedIndex();
@@ -3410,8 +3349,6 @@ sap.ui.define([
 
 
                 baseAmount = CustomerData.GrandTotal || 0;
-
-
 
                 totalPersonsMonthly = Number(CustomerData.PaymentPaid || 0) ? baseAmount - Number(CustomerData.PaymentPaid || 0) : baseAmount
 
@@ -3616,6 +3553,7 @@ sap.ui.define([
 
             });
         },
+
         onMemberSearch: function (oEvent) {
             var sQuery = oEvent.getParameter("newValue") ||
                 oEvent.getParameter("query") || "";
@@ -3713,6 +3651,7 @@ sap.ui.define([
             }
             );
         },
+
         HM_ConfirmRoom: async function (oEvent) {
             var ID = this.getView().getModel("CustomerData").getData()
 
@@ -3772,7 +3711,6 @@ sap.ui.define([
         HM_RejectRoom: function (oEvent) {
             this.ID = this.getView().getModel("CustomerData").getData()
 
-
             if (!this.RB_Dialog) {
                 this.RB_Dialog = sap.ui.xmlfragment(
                     "sap.ui.com.project1.fragment.RejectDesc",
@@ -3784,6 +3722,7 @@ sap.ui.define([
             this.RB_Dialog.open();
 
         },
+
         onRejectSave: async function () {
 
             var rejectReason = sap.ui.getCore().byId("idRejectReason").getValue();
@@ -3801,7 +3740,6 @@ sap.ui.define([
                 );
                 return;
             }
-
 
             var ID = this.ID;
 
@@ -3847,19 +3785,18 @@ sap.ui.define([
         onRejectCancel: function () {
             this.RB_Dialog.close();
         },
+
         onRejectReasonChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
         },
+
         onSaveBooking1: function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
             var oFacilitiesModel = this.getView().getModel("Facilities");
             var aFacilities = oFacilitiesModel.getData();
-
-
-
 
             const oHostelModel = this.getView().getModel("HostelModel");
 
@@ -3887,8 +3824,6 @@ sap.ui.define([
 
             const documents = CustomerData.Documents || [];
 
-
-
             var paymentMap = {
                 "monthly": "Per Month",
                 "yearly": "Per Year",
@@ -3897,13 +3832,12 @@ sap.ui.define([
 
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
-
             if (paymentMap[unit] === "Per Day") {
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Year")) {
                     sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.", {
                         styleClass: "myUnifiedBtn"
                     });
-                    return; // ⛔ stop save
+                    return; //  stop save
                 }
             }
             if (paymentMap[unit] === "Per Month") {
@@ -3911,12 +3845,9 @@ sap.ui.define([
                     sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.", {
                         styleClass: "myUnifiedBtn"
                     });
-                    return; // ⛔ stop save
+                    return; //  stop save
                 }
             }
-
-
-
 
             const invalidFacilities = [];
 
@@ -3926,8 +3857,6 @@ sap.ui.define([
                 const facilityStart = this._parseDate(item.StartDate);
                 const facilityEnd = this._parseDate(item.EndDate);
 
-
-
                 // Validation: must be inside booking period
                 if (
                     facilityStart < this._parseDate(Bookingdata.StartDate) ||
@@ -3935,7 +3864,6 @@ sap.ui.define([
                 ) {
                     invalidFacilities.push(item.FacilityName);
                 }
-
             }
 
             if (invalidFacilities.length > 0) {
@@ -3958,16 +3886,16 @@ sap.ui.define([
                             let bookingStart = that._parseDate(Bookingdata.StartDate);
                             let bookingEnd = that._parseDate(Bookingdata.EndDate);
 
-                            // ✅ Safety: prevent negative dates
+                            //  Safety: prevent negative dates
                             if (bookingEnd < bookingStart) {
                                 sap.m.MessageToast.show("End date cannot be before start date");
                                 return;
                             }
 
-                            // ✅ IMPORTANT: make sure this is LET (not const)
+                            //  IMPORTANT: make sure this is LET (not const)
                             let facilityItems = CustomerData.AllSelectedFacilities || [];
 
-                            // ✅ Remove duplicate Package Price items
+                            //  Remove duplicate Package Price items
                             facilityItems = facilityItems.filter((item, index, self) => {
 
                                 if (item.UnitText?.toLowerCase() !== "package price") {
@@ -3991,13 +3919,13 @@ sap.ui.define([
                                     f.FacilityName === item.FacilityName
                                 );
 
-                                // ✅ Update dates
+                                //  Update dates
                                 item.StartDate = Bookingdata.StartDate;
                                 item.EndDate = Bookingdata.EndDate;
 
                                 let diffTime = bookingEnd - bookingStart;
 
-                                // ✅ Always at least 1 day
+                                //  Always at least 1 day
                                 let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
                                 let unit = item.UnitText?.toLowerCase();
@@ -4065,7 +3993,7 @@ sap.ui.define([
                                     }
                                 }
 
-                                // ✅ Fixed coupon logic
+                                //  Fixed coupon logic
                                 item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
                                     total - Number(item.CouponDiscount) :
                                     total;
@@ -4073,7 +4001,7 @@ sap.ui.define([
                                 totalFacilityPrice += item.TotalAmount;
                             });
 
-                            // ✅ Update totals
+                            //  Update totals
                             CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
                             let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
@@ -4093,18 +4021,18 @@ sap.ui.define([
                                 CustomerData.GrandTotal = baseAmount;
                             }
 
-                            // ✅ Due amount
+                            //  Due amount
                             CustomerData.DueAmount = CustomerData.PaymentPaid ?
                                 CustomerData.GrandTotal - CustomerData.PaymentPaid :
                                 CustomerData.GrandTotal;
 
-                            // ✅ Assign back (important)
+                            //  Assign back (important)
                             CustomerData.AllSelectedFacilities = facilityItems;
 
-                            // ✅ Refresh model
+                            //  Refresh model
                             that.getView().getModel("CustomerData").refresh(true);
 
-                            // ✅ Save
+                            //  Save
                             that.onSaveBooking();
                         }
                     }
@@ -4177,7 +4105,7 @@ sap.ui.define([
                                 return;
                             }
 
-                            // ✅ IMPORTANT: use LET (not const)
+                            //  IMPORTANT: use LET (not const)
                             let facilityItems = CustomerData.AllSelectedFacilities || [];
 
                             let totalFacilityPrice = 0;
@@ -4194,12 +4122,12 @@ sap.ui.define([
                                     f.FacilityName === item.FacilityName
                                 );
 
-                                // ✅ Update End Date
+                                //  Update End Date
                                 item.EndDate = Bookingdata.EndDate;
 
                                 let diffTime = bookingEndDate - startDate;
 
-                                // ✅ Prevent negative / zero
+                                //  Prevent negative / zero
                                 let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
                                 let unit = item.UnitText?.toLowerCase();
@@ -4268,7 +4196,7 @@ sap.ui.define([
                                     }
                                 }
 
-                                // ✅ FIXED coupon logic (important)
+                                //  FIXED coupon logic (important)
                                 item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
                                     total - Number(item.CouponDiscount) :
                                     total;
@@ -4276,7 +4204,7 @@ sap.ui.define([
                                 totalFacilityPrice += item.TotalAmount;
                             });
 
-                            // ✅ Update totals
+                            //  Update totals
                             CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
                             let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
@@ -4296,15 +4224,15 @@ sap.ui.define([
                                 CustomerData.GrandTotal = baseAmount;
                             }
 
-                            // ✅ Due
+                            //  Due
                             CustomerData.DueAmount = CustomerData.PaymentPaid ?
                                 CustomerData.GrandTotal - CustomerData.PaymentPaid :
                                 CustomerData.GrandTotal;
 
-                            // ✅ Assign back (important)
+                            //  Assign back (important)
                             CustomerData.AllSelectedFacilities = facilityItems;
 
-                            // ✅ Refresh
+                            //  Refresh
                             that.getView().getModel("CustomerData").refresh(true);
 
                             that.call = false;
@@ -4428,7 +4356,8 @@ sap.ui.define([
                     "GSTType": CustomerData.GSTType,
                     "GSTValue": CustomerData.GSTValue,
                     "MemberID": memberIds,
-                    "AdminUpdated": "YES"
+                    "AdminUpdated": "YES",
+                    "Status" : CustomerData.Status
 
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
@@ -4647,7 +4576,12 @@ sap.ui.define([
                             City: oData.City || "",
                             PermanentAddress: oData.Address || "",
                             Booking: bookingData, // Making sure included
-                            FacilityItems: facilityData
+                            FacilityItems: facilityData,
+                            Area: oData.BranchName || "",
+                            PropertySTD: oData.PropertySTD || "",
+                            PropertyMobileNo: oData.PropertyMobileNo || "",
+                            PropertyEmail: oData.PropertyEmail || "",
+                            PropertyType: oData.PropertyType,
                         }];
 
                         that.getBusyDialog()
@@ -5112,7 +5046,6 @@ sap.ui.define([
                 discountAmount = Math.min(discountAmount, subtotal);
 
                 newSubtotal = subtotal - discountAmount;
-
 
                 // Update Model
                 oCustomerData.Discount = discountAmount.toFixed(2);
@@ -6199,7 +6132,7 @@ sap.ui.define([
                     this._oResetUser = {
                         EmailID: sEmail
                     };
-                    // ✅ Start resend cooldown
+                    //  Start resend cooldown
                     this._startOtpCooldown(20);
 
 
@@ -6263,7 +6196,7 @@ sap.ui.define([
                 Type: "BookingOTP"
             };
 
-            // ✅ Proper BusyDialog
+            //  Proper BusyDialog
 
             this.getBusyDialog()
             try {
@@ -6301,7 +6234,7 @@ sap.ui.define([
                     this._startOtpTimer?.();
 
                 } else {
-                    // ✅ SHOW BACKEND MESSAGE
+                    //  SHOW BACKEND MESSAGE
                     this.closeBusyDialog()
                     MessageToast.show(
                         oResp.message || this.i18nModel.getText("usernotFoundUnabletoSendOTP")
@@ -6312,7 +6245,7 @@ sap.ui.define([
 
                 this.closeBusyDialog()
 
-                // ✅ SMART ERROR HANDLING
+                //  SMART ERROR HANDLING
                 MessageToast.show(this.i18nModel.getText("invalidCredentialsPleasetryagain"));
 
                 // if (err?.responseJSON?.message) {
@@ -6672,7 +6605,7 @@ sap.ui.define([
 
             utils._LCvalidateMandatoryField(oEvent);
 
-            // ✅ ALWAYS WRITE TO MODEL
+            //  ALWAYS WRITE TO MODEL
             const sStateText =
                 oState.getSelectedItem()?.getText() ||
                 oState.getValue() ||
@@ -6730,7 +6663,7 @@ sap.ui.define([
 
             utils._LCvalidateMandatoryField(oEvent);
 
-            // ✅ ALWAYS WRITE TO MODEL
+            //  ALWAYS WRITE TO MODEL
             const sCityText =
                 oCity.getSelectedItem()?.getText() ||
                 oCity.getValue() ||
@@ -6813,7 +6746,7 @@ sap.ui.define([
                 return false;
             }
 
-            // ✅ Valid DOB
+            //  Valid DOB
             oDP.setValueState("None");
 
             // 🔥 push to model (LoginMode>/DateOfBirth) in yyyy-MM-dd
@@ -6878,7 +6811,7 @@ sap.ui.define([
                 stdRaw.replace(/\s+/g, "") :
                 "+" + stdRaw.replace(/\s+/g, "");
 
-            // ✅ NEW RULE:
+            //  NEW RULE:
             // Don't show error for empty untouched field
             if (val.length === 0) {
                 oInput.setValueState("None");
@@ -7225,7 +7158,7 @@ sap.ui.define([
             vm.setProperty("/showOTPField", false);
             vm.setProperty("/isOtpEntered", false);
 
-            // ✅ guarantee button has text
+            //  guarantee button has text
             if (mode === "otp") {
                 vm.setProperty("/otpButtonText", "Send OTP");
             }
@@ -7261,21 +7194,21 @@ sap.ui.define([
                 "otpInput"
             );
 
-            // ✅ Clear Email
+            //  Clear Email
             if (oEmail) {
                 oEmail.setValue("");
                 oEmail.setValueState("None");
                 oEmail.setValueStateText("");
             }
 
-            // ✅ Clear OTP
+            //  Clear OTP
             if (oOTP) {
                 oOTP.setValue("");
                 oOTP.setValueState("None");
                 oOTP.setValueStateText("");
             }
 
-            // ✅ Close Dialog
+            //  Close Dialog
             if (this._oLoginAlertDialog) {
                 this._oLoginAlertDialog.close();
             }
@@ -8788,7 +8721,7 @@ sap.ui.define([
                     resizable: true,
 
                     horizontalScrolling: false,
-                    verticalScrolling: false,
+                    verticalScrolling: true,
 
                     contentPadding: "0rem",
 
