@@ -7296,6 +7296,8 @@ sap.ui.define([
             let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];
+            const checkinTime = company.CheckinTime || "11:00 AM";
+            const checkoutTime = company.CheckoutTime || "10:00 PM";
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
@@ -7941,7 +7943,7 @@ sap.ui.define([
             const infoItems = [
                 "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
                 "• GST invoice available at the property upon request",
-                "• Check-in: 12:00 PM | Check-out: 10:00 AM",
+                `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
                 "• Early check-in/late check-out subject to availability"
             ];
 

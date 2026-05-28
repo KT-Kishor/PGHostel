@@ -43,7 +43,7 @@
                                 placeholder="{i18n>selectBranch}"
                                 selectedKey=""
                                 showSecondaryValues="true"
-                                showClearIcon="true"
+                                showClearIcon="true" 
 
                             >
                                 <core:ListItem
