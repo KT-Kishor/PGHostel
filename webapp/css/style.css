@@ -6684,3 +6684,15 @@ html, body {
     padding-right: 0.5rem !important;
   }
 }
+/* Desktop */
+.responsiveUploadBtn {
+    justify-content: flex-end;
+}
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+
+    .responsiveUploadBtn {
+        justify-content: flex-start !important;
+    }
+}

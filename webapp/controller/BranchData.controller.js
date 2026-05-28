@@ -119,49 +119,85 @@ sap.ui.define([
             });
         },
 
-        Onsearch: async function() {
-            const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
-            var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey()
+       Onsearch: async function() {
 
-            var filter = {
-                UserID: oLoginmodel.EmployeeID
+    this.getBusyDialog();
+
+    try {
+
+        const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+        var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey();
+
+        var filter = {
+            UserID: oLoginmodel.EmployeeID
+        };
+
+        var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter);
+
+        var oFCIAerData = Array.isArray(LoginData.data) ?
+            LoginData.data : [LoginData.data];
+
+        const oExistingModel = oFCIAerData[0];
+
+        const oView = this.getView();
+
+        let filters = {};
+
+        if (oLoginmodel.Role === "Admin") {
+
+            filters.BranchID = Branch ?
+                Branch : oExistingModel.BranchCode;
+
+            filters.Role = "Admin";
+
+        } else if (oExistingModel.Role === "SuperAdmin") {
+
+            filters.BranchID = "";
+
+        } else {
+
+            filters.BranchID = oLoginmodel.BranchCode;
+        }
+
+        let sCustomerName = oView.byId("MD_id_BranchCode")
+            .getValue()?.trim();
+
+        let sPincode = oView.byId("MD_id_SearchField")
+            .getValue()?.trim();
+
+        if (sCustomerName) {
+
+            if (sCustomerName.includes(" - ")) {
+                sCustomerName = sCustomerName.split(" - ")[0];
             }
 
-            var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter)
-            var oFCIAerData = Array.isArray(LoginData.data) ? LoginData.data : [LoginData.data];
-            const oExistingModel = oFCIAerData[0];
-            const oView = this.getView();
+            filters.SearchText = sCustomerName;
+        }
 
-            let filters = {};
+        if (sPincode) {
+            filters.Pincode = sPincode;
+        }
 
-            if (oLoginmodel.Role === "Admin") {
-                filters.BranchID = Branch ? Branch : oExistingModel.BranchCode;
-                filters.Role = "Admin"
-            } else if (oExistingModel.Role === "SuperAdmin") {
-                filters.BranchID = "";
-            } else {
-                filters.BranchID = oLoginmodel.BranchCode;
-            }
+        var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
 
-            let sCustomerName = oView.byId("MD_id_BranchCode").getValue()?.trim();
-            let sPincode = oView.byId("MD_id_SearchField").getValue()?.trim();
+        var aBranchData = Array.isArray(oData.data) ?
+            oData.data : [oData.data];
 
-            if (sCustomerName) {
-                if (sCustomerName.includes(" - ")) {
-                    sCustomerName = sCustomerName.split(" - ")[0];
-                }
-                filters.SearchText = sCustomerName;
-            }
+        this.getView().setModel(
+            new sap.ui.model.json.JSONModel(aBranchData),
+            "branchModel"
+        );
 
-            if (sPincode) {
-                filters.Pincode = sPincode;
-            }
-            var oData = await this.ajaxReadWithJQuery("HM_Branch", filters)
-            var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data];
-            this.getView().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel");
-            var model = new sap.ui.model.json.JSONModel(aBranchData);
-            this.getOwnerComponent().setModel(model, "mainModel")
-        },
+        var model = new sap.ui.model.json.JSONModel(aBranchData);
+
+        this.getOwnerComponent().setModel(model, "mainModel");
+
+    } finally {
+
+        this.closeBusyDialog();
+    }
+},
 
         MD_onPressClear: function() {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")

@@ -337,7 +337,7 @@
 		<HBox width="100%" justifyContent="SpaceBetween">
 			<!-- LEFT SIDE (LOGO) -->
 			<VBox width="48%">
-				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
+				<HBox justifyContent="End" class="sapUiSmallMarginBottom responsiveUploadBtn" >
 					<u:FileUploader
                         id="BD_id_FileUploader"
                         fileSizeExceed="onFileSizeExceeds"
@@ -372,7 +372,7 @@
             <Text text="{i18n>FileSize}" />
         </Column>
 
-        <Column hAlign="Center" width="6rem">
+        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
             <Text text="Action" />
         </Column>
     </columns>
@@ -440,7 +440,7 @@
             <Text text="{i18n>FileSize}" />
         </Column>
 
-        <Column hAlign="Center" width="6rem">
+        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
             <Text text="Action" />
         </Column>
     </columns>
