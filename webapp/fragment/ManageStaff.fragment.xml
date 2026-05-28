@@ -260,7 +260,7 @@
                     rows="3"
                     maxLength="120"
                     value="{MDmodel>/Address}"
-                    liveChange="onAddressChange"
+                    change="onAddressChange"
                     placeholder="{i18n>placeHolderAddress}"
                 />
 			</f:SimpleForm>

@@ -166,7 +166,7 @@
                 text="Please add at least one image. Only JPG, JPEG, or PNG files up to 2 MB are allowed."
                 showIcon="true"
                 type="Warning"
-                class="sapUiTinyMarginBottom sapUiSmallMarginEnd"
+                class="sapUiSmallMargin"
             />
       
         <Label text=""/>

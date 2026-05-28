@@ -43,6 +43,8 @@
                                 placeholder="{i18n>selectBranch}"
                                 selectedKey=""
                                 showSecondaryValues="true"
+                                showClearIcon="true" 
+
                             >
                                 <core:ListItem
                                     key="{Branchmodel>BranchID}"
@@ -64,6 +66,8 @@
                                 id="fStatus"
                                 width="100%"
                                 placeholder="{i18n>selectStatus}"
+                                showClearIcon="true"
+
                             >
                                 <!-- <core:Item key="" text="All"/> -->
                                 <core:Item
@@ -87,12 +91,14 @@
                         groupName="Group"
                         label="{i18n>CDDiscountType}"
                         visibleInFilterBar="true"
+
                     >
                         <fb:control>
                             <ComboBox
                                 id="fDiscountType"
                                 width="100%"
                                 placeholder="{i18n>selectDiscountType}"
+                                showClearIcon="true"
                             >
                                 <!-- <core:Item key="" text="All"/> -->
                                 <core:Item

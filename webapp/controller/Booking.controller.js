@@ -6341,6 +6341,8 @@
             };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0] || {};
+            const checkinTime = company.CheckinTime || "11:00 AM";
+            const checkoutTime = company.CheckoutTime || "10:00 PM";
 
             const {
                 jsPDF
@@ -6393,7 +6395,7 @@
             doc.setTextColor(...PRIMARY_COLOR);
 
             doc.text(
-                `Booked On: ${data.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`,
+                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`,
                 148,
                 15
             );
@@ -6926,7 +6928,7 @@
             const infoItems = [
                 "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
                 "• GST invoice available at the property upon request",
-                "• Check-in: 12:00 PM | Check-out: 10:00 AM",
+                `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
                 "• Early check-in/late check-out subject to availability"
             ];
 

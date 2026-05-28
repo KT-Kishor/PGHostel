@@ -489,18 +489,18 @@ sap.ui.define([
                 return;
             }
 
-            const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
-            if (!oPenalty.getValue() && oPenalty.getValue() !== "0") {
-                oPenalty.setValueState("Error");
-                oPenalty.setValueStateText(this.i18nModel.getText("enterPenalty"));
-                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                return;
-            }
-            if (oPenalty.getValueState() === "Error") {
-                oPenalty.focus();
-                sap.m.MessageToast.show("Please correct the Penalty amount");
-                return;
-            }
+            // const oPenalty = sap.ui.getCore().byId(oView.createId("BD_idPenalty"));
+            // if (!oPenalty.getValue() && oPenalty.getValue() !== "0") {
+            //     oPenalty.setValueState("Error");
+            //     oPenalty.setValueStateText(this.i18nModel.getText("enterPenalty"));
+            //     sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+            //     return;
+            // }
+            // if (oPenalty.getValueState() === "Error") {
+            //     oPenalty.focus();
+            //     sap.m.MessageToast.show("Please correct the Penalty amount");
+            //     return;
+            // }
 
             const aCountries = this.getOwnerComponent().getModel("CountryModel").getData();
             const aStates = this.getOwnerComponent().getModel("StateModel").getData();
@@ -537,18 +537,29 @@ sap.ui.define([
                 return;
             }
 
-            const oStartingPrice = sap.ui.getCore().byId(oView.createId("BD_id_StartingPrice"));
-            if (!oStartingPrice.getValue() && oStartingPrice.getValue() !== "0") {
-                oStartingPrice.setValueState("Error");
-                oStartingPrice.setValueStateText(this.i18nModel.getText("enterStartingPrice"));
-                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                return;
-            }
-            if (oStartingPrice.getValueState() === "Error") {
-                oStartingPrice.focus();
-                sap.m.MessageToast.show("Please correct the staring price amount");
-                return;
-            }
+           const oStartingPrice = sap.ui.getCore().byId(oView.createId("BD_id_StartingPrice"));
+const sValue = oStartingPrice.getValue();
+const fValue = parseFloat(sValue);
+
+// Empty validation
+if (sValue === "" || sValue === null || sValue === undefined) {
+    oStartingPrice.setValueState("Error");
+    oStartingPrice.setValueStateText(this.i18nModel.getText("enterStartingPrice"));
+    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+    return;
+}
+
+// Zero or negative validation
+if (isNaN(fValue) || fValue <= 0) {
+    oStartingPrice.setValueState("Error");
+    oStartingPrice.setValueStateText("Starting price must be greater than 0");
+    oStartingPrice.focus();
+     MessageToast.show("Starting price must be greater than 0");
+    return;
+}
+
+// Clear error if valid
+oStartingPrice.setValueState("None");
 
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
@@ -1654,7 +1665,8 @@ sap.ui.define([
 
         MC_ValidateGstNumber: function(oEvent) {
             const oInput = oEvent ? oEvent.getSource() : sap.ui.getCore().byId(this.getView().createId("MC_id_CustomGst"));
-            const sValue = oInput.getValue().trim();
+            const sValue = oInput.getValue().toUpperCase();
+            oInput.setValue(sValue);
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
             const previousGST = dataModel.getProperty("/GSTIN_PREV");

@@ -3465,6 +3465,8 @@ sap.ui.define([
             };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0] || {};
+            const checkinTime = company.CheckinTime || "11:00 AM";
+            const checkoutTime = company.CheckoutTime || "10:00 PM";
 
             const {
                 jsPDF
@@ -3561,21 +3563,20 @@ sap.ui.define([
 
             checkNewPage(100);
 
-            const members = (data.AllMembers || []).filter(
-                member => member.Relation !== "SELF"
+            // Remove duplicate SELF members safely
+            const members = (data.AllMembers || []).filter(member =>
+                (member.Relation || "")
+                    .trim()
+                    .toUpperCase() !== "SELF"
             );
 
-            // ---------- GUEST DETAILS ----------
-
-            let guestBoxY = currentY;
-
-            // Build Guest Table Data
+            // Guest Table Data
             let guestBody = [
                 [
                     "1",
                     `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
                     data.Gender || "-",
-                    `${data.MobileNo || "-"}`,
+                    `${data.STDCode || "+91"} ${data.MobileNo || "-"}`,
                     Formatter.formatAgeFromDOBOrAge(
                         this._parseDate(data.DateOfBirth)
                     ) || "-",
@@ -3583,10 +3584,11 @@ sap.ui.define([
                 ]
             ];
 
+            // Additional Members
             members.forEach((member, index) => {
 
                 guestBody.push([
-                    (index + 2).toString(),
+                    String(index + 2),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
                     member.MobileNo || "-",
@@ -4050,7 +4052,7 @@ sap.ui.define([
             const infoItems = [
                 "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
                 "• GST invoice available at the property upon request",
-                "• Check-in: 12:00 PM | Check-out: 10:00 AM",
+                `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
                 "• Early check-in/late check-out subject to availability"
             ];
 
@@ -4170,6 +4172,13 @@ sap.ui.define([
                     UserID: oCustomerData.UserID,
                     CustomerEmail: sEmail,
                     IsLoggedIn: true,
+                    url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
+                    headers: {
+                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
+                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u",
+                        "Content-Type": "application/json"
+                    },
+                    isRadioVisible: false
                 });
 
                 // ================= RESET =================

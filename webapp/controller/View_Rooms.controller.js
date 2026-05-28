@@ -1847,7 +1847,7 @@ sap.ui.define([
                 oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
-            // 🔥 STRICT validation while typing
+            //  STRICT validation while typing
             const isValid = utils._LCvalidateISDmobile(oInput, std);
 
             if (!isValid) {
@@ -1977,7 +1977,7 @@ sap.ui.define([
             }
 
             // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
-            oConf.setValueState("None");
+            oConf.setValueState("None");    
             // oConf.setValueStateText("Passwords matched");
             this.getBusyDialog();
             try {
