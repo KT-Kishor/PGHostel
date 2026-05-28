@@ -3570,6 +3570,8 @@ sap.ui.define([
                     .toUpperCase() !== "SELF"
             );
 
+            let guestBoxY = currentY;
+
             // Guest Table Data
             let guestBody = [
                 [
