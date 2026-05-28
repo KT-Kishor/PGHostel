@@ -4852,22 +4852,54 @@ sap.ui.define([
             return aPayloadDocs;
         },
 
-        onAdminDeleteDoc: function (oEvent) {
-            const oModel = this.getView().getModel("AdminSignupModel");
-            const table = $C("adminAttachmentTable");
-            const oCtx = oEvent.getParameter("listItem").getBindingContext("AdminSignupModel");
-            const doc = oCtx.getObject(); // ✅ define first
-            // 🧹 Cleanup preview blob
-            if (doc.PreviewUrl) URL.revokeObjectURL(doc.PreviewUrl);
+ onAdminDeleteDoc: function (oEvent) {
 
-            const index = parseInt(oCtx.getPath().split("/").pop(), 10);
-            const docs = oModel.getProperty("/Documents") || [];
-            docs.splice(index, 1);
-            oModel.setProperty("/Documents", docs);
-            oModel.setProperty("/DocTypeEnabled", true);
-            // 🔴 If no documents left → show error highlight
-            if (docs.length === 0) table?.addStyleClass("fileErrorHighlight");
-        },
+    const oView = this.getView();
+    const oModel = oView.getModel("AdminSignupModel");
+    const table = $C("adminAttachmentTable");
+
+    // Get button
+    const oButton = oEvent.getSource();
+
+    // Get row item
+    const oItem = oButton.getParent();
+
+    // Get binding context
+    const oCtx = oItem.getBindingContext("AdminSignupModel");
+
+    if (!oCtx) {
+        return;
+    }
+
+    const doc = oCtx.getObject();
+
+    // Cleanup preview blob
+    if (doc.PreviewUrl) {
+        URL.revokeObjectURL(doc.PreviewUrl);
+    }
+
+    // Get index from binding path
+    const iIndex = parseInt(
+        oCtx.getPath().split("/").pop(),
+        10
+    );
+
+    // Get documents
+    const docs = oModel.getProperty("/Documents") || [];
+
+    // Remove only selected row
+    docs.splice(iIndex, 1);
+
+    // Update model
+    oModel.setProperty("/Documents", docs);
+
+    oModel.setProperty("/DocTypeEnabled", true);
+
+    // Highlight if empty
+    if (docs.length === 0) {
+        table?.addStyleClass("fileErrorHighlight");
+    }
+},
 
         onAdminDocTypeSelected: function () {
             const uploader = $C("hiddenAdminUploader");

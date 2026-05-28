@@ -1,0 +1,7 @@
+[
+    { "key": "new", "text": "New" },
+    { "key": "active", "text": "Active" },
+    { "key": "resubmitted", "text": "Resubmitted" },
+    { "key": "sendback", "text": "Send Back" },
+    { "key": "approved", "text": "Approved" }
+]

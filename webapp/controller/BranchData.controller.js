@@ -176,7 +176,7 @@ sap.ui.define([
                 const oTable = oView.byId("id_MD_Table");
                 const oBinding = oTable.getBinding("items");
 
-               let sCustomerName = oView.byId("MD_id_BranchCode").getSelectedKey().trim();
+                let sCustomerName = oView.byId("MD_id_BranchCode").getValue().trim().toLowerCase();
                 let sPincode = oView.byId("MD_id_SearchField").getValue().trim();
 
                 let aFilters = [];
@@ -1499,34 +1499,38 @@ oStartingPrice.setValueState("None");
         },
 
         onTokenDelete: function(oEvent) {
-            const oTable = oEvent.getSource();
-            const oItem = oEvent.getParameter("listItem");
 
-            const oModel = this.getView().getModel("UploaderData");
-            let aData = oModel.getProperty("/attachmentslogo");
-            // let aData1 = oModel.getProperty("/attachmentimage");
+    const oButton = oEvent.getSource();
+    const oItem = oButton.getParent();
+    const oTable = this.byId("idUploadTable");
 
-            const iIndex = oTable.indexOfItem(oItem);
-            if (iIndex > -1) {
-                aData.splice(iIndex, 1);
-                oModel.setProperty("/attachmentslogo", aData);
-                // oModel.setProperty("/attachmentimage", aData1);
-            }
-        },
+    const oModel = this.getView().getModel("UploaderData");
+    let aData = oModel.getProperty("/attachmentslogo");
 
+    const iIndex = oTable.indexOfItem(oItem);
+
+    if (iIndex > -1) {
+        aData.splice(iIndex, 1);
+        oModel.setProperty("/attachmentslogo", aData);
+    }
+},
         onTokenImageDelete: function(oEvent) {
-            const oTable = oEvent.getSource();
-            const oItem = oEvent.getParameter("listItem");
+    const oButton = oEvent.getSource();
+    const oItem = oButton.getParent();
+    const oTable = this.byId("idUploadTable1");
 
-            const oModel = this.getView().getModel("UploaderData");
-            let aData = oModel.getProperty("/attachmentimage");
+    const oModel = this.getView().getModel("UploaderData");
+    let aData = oModel.getProperty("/attachmentimage");
 
-            const iIndex = oTable.indexOfItem(oItem);
-            if (iIndex > -1) {
-                aData.splice(iIndex, 1);
-                oModel.setProperty("/attachmentimage", aData);
-            }
-        },
+    const iIndex = oTable.indexOfItem(oItem);
+
+    if (iIndex > -1) {
+        aData.splice(iIndex, 1);
+        oModel.setProperty("/attachmentimage", aData);
+    }
+},
+
+      
 
         onpressbranchlogo: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");

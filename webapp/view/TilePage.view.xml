@@ -27,6 +27,50 @@
             />
 		</headerContent>
 		<content>
+
+        <VBox class="categoryBlock sapUiMediumMarginTop"
+              visible="{= ${TileVisibility>/ManageBranch} !== 0 || ${TileVisibility>/ManageVendor} !== 0 || ${TileVisibility>/ManageBedType} !== 0 }">
+				<Title
+                text="{i18n>vendorrgistration}"
+                level="H2"
+                class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
+            />
+
+            <FlexBox
+                wrap="Wrap"
+                alignItems="Start"
+                justifyContent="Start"
+                width="100%"
+                class="tileContainer1"
+            >
+
+            <GenericTile
+                    id="id6roomTile"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>manageVendors}"
+                    press="TileV_onpressManageVendor"
+                >
+						<TileContent unit="{i18n>vendorDirectory}">
+							<ImageContent src="sap-icon://kpi-managing-my-area" />
+						</TileContent>
+					</GenericTile>
+
+
+
+            </FlexBox>
+
+
+
+            </VBox>
+
+
+
+
+
+
+
+        
 			<VBox class="categoryBlock sapUiMediumMarginTop"
               visible="{= ${TileVisibility>/ManageBranch} !== 0 || ${TileVisibility>/ManageVendor} !== 0 || ${TileVisibility>/ManageBedType} !== 0 }">
 				<Title
@@ -118,17 +162,7 @@
 							<ImageContent src="sap-icon://employee" />
 						</TileContent>
 					</GenericTile>
-					<GenericTile
-                    id="id6roomTile"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiTinyMargin glassTile"
-                    header="{i18n>manageVendors}"
-                    press="TileV_onpressManageVendor"
-                >
-						<TileContent unit="{i18n>vendorDirectory}">
-							<ImageContent src="sap-icon://kpi-managing-my-area" />
-						</TileContent>
-					</GenericTile>
+					
 					<GenericTile
                     id="idSupportTile"
                     visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"

@@ -177,7 +177,7 @@
                 class="sapUiSmallMarginEnd"
             >
                 <u:FileUploader
-                    id="BT_id_FileUploader"
+                    id="BT_id_FileUploader1"
                     fileType="jpg,jpeg,png"
                     multiple="true"
                     sameFilenameAllowed="false"
@@ -194,9 +194,9 @@
             <Table
                 id="id_Bed_AttachmentTable"
                 items="{UploaderData>/attachments}"
-                mode="Delete"
+               
                 popinLayout="Block"
-                delete="onTokenDelete"
+               
                 width="100%"
             >
                 <columns>
@@ -220,6 +220,13 @@
                     >
                         <Text text="{i18n>FileSize}" />
                     </Column>
+                    <Column
+                        demandPopin="true"
+                        hAlign="Center"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text text="Action" />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -227,6 +234,12 @@
                             <Text text="{UploaderData>filename}" />
                             <Text text="{UploaderData>fileType}" />
                             <Text text="{UploaderData>size}" />
+                             <Button
+                    icon="sap-icon://delete"
+                    type="Transparent"
+                    tooltip="Delete"
+                    press="onTokenDelete"
+                />
                         </cells>
                     </ColumnListItem>
                 </items>

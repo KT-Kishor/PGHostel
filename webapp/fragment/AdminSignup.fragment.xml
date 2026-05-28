@@ -309,8 +309,6 @@ filterSecondaryValues="true"
         <Table
             id="adminAttachmentTable"
             items="{AdminSignupModel>/Documents}"
-            mode="Delete"
-            delete="onAdminDeleteDoc"
             sticky="ColumnHeaders,HeaderToolbar"
             width="100%"
         >
@@ -329,7 +327,7 @@ filterSecondaryValues="true"
                         selectedKey="{AdminSignupModel>/CurrentDocType}"
                         enabled="{AdminSignupModel>/DocTypeEnabled}"
                         placeholder="{i18n>selectDocument}"
-                        width="250px"
+                       
                     >
                         <core:ListItem
                             key="Aadhar Card"
@@ -386,6 +384,13 @@ filterSecondaryValues="true"
                 >
                     <Text text="{i18n>size}" />
                 </Column>
+                <Column
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    popinDisplay="Inline"
+                >
+                    <Text text="Action" />
+                </Column>
             </columns>
             <items>
                 <ColumnListItem>
@@ -403,6 +408,9 @@ filterSecondaryValues="true"
                         <Text
                             text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
                         />
+                        <Button
+                            icon="sap-icon://delete"
+                            press="onAdminDeleteDoc"/>
                     </cells>
                 </ColumnListItem>
             </items>

@@ -629,34 +629,45 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
         },
 
-        onTokenDelete: function(oEvent) {
-            const oView = this.getView();
-            const oTokenModel = oView.getModel("tokenModel");
-            const oUploaderData = oView.getModel("UploaderData");
+ onTokenDelete: function(oEvent) {
 
-            let aTokens = oTokenModel.getProperty("/tokens") || [];
-            let aAttachments = oUploaderData.getProperty("/attachments") || [];
+    const oView = this.getView();
 
-            const oListItem = oEvent.getParameter("listItem");
-            if (oListItem) {
-                const oCtx = oListItem.getBindingContext("UploaderData");
-                const sFileName = oCtx.getProperty("filename");
+    const oTokenModel = oView.getModel("tokenModel");
+    const oUploaderData = oView.getModel("UploaderData");
 
-                aAttachments = aAttachments.filter(file => file.filename !== sFileName);
-                aTokens = aTokens.filter(token => token.key !== sFileName);
-            }
-            const aDeletedTokens = oEvent.getParameter("tokens");
-            if (aDeletedTokens) {
-                aDeletedTokens.forEach((oDeletedToken) => {
-                    const sKey = oDeletedToken.getKey();
-                    aTokens = aTokens.filter(token => token.key !== sKey);
-                    aAttachments = aAttachments.filter(file => file.filename !== sKey);
-                });
-            }
-            oTokenModel.setProperty("/tokens", aTokens);
-            oUploaderData.setProperty("/attachments", aAttachments);
-            this.byId("id_fileUploader").clear();
-        },
+    let aTokens = oTokenModel.getProperty("/tokens") || [];
+    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+
+    // Get pressed button
+    const oButton = oEvent.getSource();
+
+    // Get current row
+    const oItem = oButton.getParent();
+
+    // Get binding context
+    const oCtx = oItem.getBindingContext("UploaderData");
+
+    if (oCtx) {
+
+        // Get selected row index
+        const iIndex = parseInt(
+            oCtx.getPath().split("/").pop(),
+            10
+        );
+
+        // Remove only selected attachment
+        aAttachments.splice(iIndex, 1);
+
+        // Remove matching token only for selected row
+        aTokens.splice(iIndex, 1);
+    }
+
+    oTokenModel.setProperty("/tokens", aTokens);
+    oUploaderData.setProperty("/attachments", aAttachments);
+
+    this.byId("id_fileUploader").clear();
+},
 
         onFacilityFileChange: function(oEvent) {
             const oFiles = oEvent.getParameter("files");

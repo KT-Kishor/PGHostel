@@ -236,8 +236,8 @@
 			<Table
                 id="id_AttachmentTable"
                 items="{UploaderData>/attachments}"
-                mode="Delete"
-                delete="onTokenDelete"
+                
+              
                 width="100%"
                 popinLayout="Block"
             >
@@ -262,6 +262,13 @@
                     >
 						<Text text="{i18n>FileSize}" />
 					</Column>
+					<Column
+                        hAlign="Center"
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+						<Text text="Action" />
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
@@ -269,6 +276,10 @@
 							<Text text="{UploaderData>filename}" />
 							<Text text="{UploaderData>fileType}" />
 							<Text text="{UploaderData>size}" />
+							<Button
+                                icon="sap-icon://delete"
+                                press="onTokenDelete"
+                            />
 						</cells>
 					</ColumnListItem>
 				</items>
