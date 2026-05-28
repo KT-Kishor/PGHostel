@@ -13,7 +13,7 @@
         title="{i18n>myAccount}"
         showNavButton="true"
         navButtonPress="onNavBack"
-        class="defaultBGBlur"
+        class="defaultBGBlur sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
     >
         <customHeader>
             <Bar class="barheader">
