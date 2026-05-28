@@ -14,7 +14,6 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
-            this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("DamageDashboard");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -479,7 +478,7 @@ sap.ui.define([
 
                 if (flag === "true" &&  this.sPath==="TilePage") {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
-                } else if (!this._originalRoomdata) {
+                } else if (!this._originalRoomdata || this._originalRoomdata.length === 0) {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
                 }
 
