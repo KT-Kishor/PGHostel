@@ -275,7 +275,7 @@
 				</ComboBox>
 				<Label
                     text="{i18n>penalty}"
-                    required="true"
+                   
                 />
 				<Input
                     id="BD_idPenalty"
@@ -330,7 +330,7 @@
                     showIcon="true"
                     visible="{= !${editableModel>/isEdit}}"
                     enableFormattedText="true"
-                    class="sapUiSmallMarginBottom sapUiSmallMarginEnd"
+                    class="sapUiSmallMargin"
                 />
 		<Label text=""/>
 		<!-- 🔹 SIDE BY SIDE LAYOUT -->
