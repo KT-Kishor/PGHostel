@@ -176,7 +176,7 @@ sap.ui.define([
                 const oTable = oView.byId("id_MD_Table");
                 const oBinding = oTable.getBinding("items");
 
-                let sCustomerName = oView.byId("MD_id_BranchCode").getValue().trim().toLowerCase();
+               let sCustomerName = oView.byId("MD_id_BranchCode").getSelectedKey().trim();
                 let sPincode = oView.byId("MD_id_SearchField").getValue().trim();
 
                 let aFilters = [];
