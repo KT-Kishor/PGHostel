@@ -3942,11 +3942,10 @@ sap.ui.define([
 
                                 } else if (unit === "per hour") {
 
-                                    let hours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
                                     total = item.quantity ?
-                                        item.quantity * hours * price :
-                                        hours * price;
+                                        item.quantity *  Number(item.TotalHour) * price * diffDays :
+                                        Number(item.TotalHour) * price * diffDays;
 
                                 } else if (unit === "per month") {
 
@@ -4144,11 +4143,11 @@ sap.ui.define([
 
                                 } else if (unit === "per hour") {
 
-                                    let diffHours = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60)));
 
                                     total = item.quantity ?
-                                        item.quantity * diffHours * price :
-                                        diffHours * price;
+                                        item.quantity * Number(item.TotalHour) * price * diffDays :
+                                        Number(item.TotalHour) * price * diffDays;
+
 
                                 } else if (unit === "per month") {
 

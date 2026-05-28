@@ -32,7 +32,9 @@
 				<Label text="{i18n>MSbranchCode}" required="true"/>
 				<ComboBox id="HFF_id_BranchCode" placeholder="Select Property Name" selectedKey="{HostelFeaturesModel>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
                 valueStateText="Select Property Name">
-					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID}" additionalText="{BranchModel>Name}"/>
+					<core:ListItem    key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"/>
 				</ComboBox>
 				<!-- Facility Name -->
 				<Label text="{i18n>amenitiesName}" required="true"/>

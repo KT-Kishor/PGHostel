@@ -1075,7 +1075,7 @@ sap.ui.define([
         },
 
         onLiveChange_MinAmount: function (oEvent) {
-            utils._LCvalidateAmount(oEvent);
+            utils.onNumber(oEvent);
         },
 
         onChange_Status: function (oEvent) {

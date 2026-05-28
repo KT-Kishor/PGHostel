@@ -125,7 +125,7 @@
                         placeholder="{i18n>enterMinimumOrderValue}"
                         id="inMinOrderValue"
                         value="{CouponView>/CurrentCoupon/MinOrderValue}"
-                        type="Number"
+                        maxLength="8"
                         liveChange="onLiveChange_MinAmount"
                         valueStateText="{i18n>enterMinOrderValue}"
                     />
