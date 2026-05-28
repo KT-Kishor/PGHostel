@@ -4612,8 +4612,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .defaultBGBlur>footer {
-  margin-top: auto;
-  position: relative;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   z-index: 2;
 }
 
