@@ -6393,7 +6393,7 @@
             doc.setTextColor(...PRIMARY_COLOR);
 
             doc.text(
-                `Booked On: ${data.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`,
+                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`,
                 148,
                 15
             );
