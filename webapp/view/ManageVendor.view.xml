@@ -132,7 +132,6 @@
                     </Column>
                     <Column
                         demandPopin="true"
-                        minScreenWidth="Tablet"
                     >
                         <Text
                             text="{i18n>MVgender}"
@@ -163,7 +162,6 @@
                     </Column>
 					  <Column
                         demandPopin="true"
-                        minScreenWidth="Tablet"
                     >
                         <Text
                             text="{i18n>city}"
