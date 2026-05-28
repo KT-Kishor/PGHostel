@@ -1654,7 +1654,8 @@ sap.ui.define([
 
         MC_ValidateGstNumber: function(oEvent) {
             const oInput = oEvent ? oEvent.getSource() : sap.ui.getCore().byId(this.getView().createId("MC_id_CustomGst"));
-            const sValue = oInput.getValue().trim();
+            const sValue = oInput.getValue().toUpperCase();
+            oInput.setValue(sValue);
             const dataModel = this.getView().getModel("MDmodel");
             const visiModel = this.getView().getModel("visiblePlay");
             const previousGST = dataModel.getProperty("/GSTIN_PREV");
