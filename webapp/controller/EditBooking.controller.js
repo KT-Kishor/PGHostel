@@ -64,7 +64,6 @@ sap.ui.define([
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             //     oRouter.navTo("RouteHostel", {}, true);
             // }
-            await this.commonLoginFunction("Booking");
             var oArgs = oEvent.getParameter("arguments") || {};
             var sBookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
             var sMemberID = oArgs.MemberID ? atob(decodeURIComponent(oArgs.MemberID)) : "";
