@@ -196,5 +196,22 @@
                 </items>
             </Table>
         </content>
+          <footer>
+            <Bar>
+                <contentLeft>
+                    <Image
+                        src="../image/TransparentKTlogo.png"
+                        width="30px"
+                        height="30px"
+                    />
+                    <Link
+                        text="{i18n>devlopby}"
+                        href="https://kalpavrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </contentLeft>
+            </Bar>
+        </footer>
     </Page>
 </mvc:View>

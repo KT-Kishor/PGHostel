@@ -4582,15 +4582,17 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
 .defaultBGBlur {
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 100dvh; /* better for iPhone */
+  -webkit-overflow-scrolling: touch; /* smooth iOS scrolling */
 }
 
 .defaultBGBlur::before {
   content: "";
-  position: absolute;
+  position: fixed; /* important for iPhone */
   inset: 0;
   background-image: url("../image/BedHostel.png");
   background-size: cover;
@@ -4598,41 +4600,39 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   background-repeat: no-repeat;
   filter: blur(8px);
   transform: scale(1.08);
-  z-index: 0;
+  z-index: -2;
 }
 
 .defaultBGBlur::after {
   content: "";
-  position: absolute;
+  position: fixed; /* important */
   inset: 0;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  z-index: 0;
+  z-index: -1;
 }
 
-.defaultBGBlur>footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 2;
-}
-
-.defaultBGBlur>* {
+.defaultBGBlur > * {
   position: relative;
   z-index: 1;
 }
 
-.defaultBGBlur {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+/* Footer */
+.defaultBGBlur > footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
 }
 
+/* Page content */
 .defaultBGBlur .sapMPageEnableScrolling {
-  padding-bottom: 60px;
+  padding-bottom: 70px;
   box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .customRoundedFlex {

@@ -362,6 +362,19 @@
 		</ObjectPageLayout>
 		<m:footer>
 			<m:Bar id="MV_id_FooterBar">
+            <m:contentLeft>
+                    <m:Image
+                        src="../image/TransparentKTlogo.png"
+                        width="30px"
+                        height="30px"
+                    />
+                    <m:Link
+                        text="{i18n>devlopby}"
+                        href="https://kalpavrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </m:contentLeft>
 				<m:contentRight>
 					<m:Button
                         id="MV_id_ApproveButton"
