@@ -1147,9 +1147,11 @@ sap.ui.define([
                     oModel = new JSONModel([]);
                     this.getOwnerComponent().setModel(oModel, "sBRModel");
                 }
+                 var BranchNewData=this.getOwnerComponent().getModel("branchModel1");
+
 
                 let aData = oModel.getData();
-                if (!aData || aData.length === 0) {
+                if ((!aData || aData.length === 0) && BranchNewData) {
                     this.byId("idBedTypeFlex").setBusy(true);
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
@@ -1159,6 +1161,8 @@ sap.ui.define([
                     try {
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
                         aData = response?.data || [];
+                        this.Branchlength = aData.length;
+
                         oModel.setData(aData);
 
                         const oBranchCombo = this.byId("id_Branch");
@@ -2761,15 +2765,15 @@ sap.ui.define([
             this.iTop = 5
             this.iSkip = 0
             this.flag = true
-            const oContainer = this.byId("idBedTypeFlex");
-            oContainer.setBusy(true);
+            // const oContainer = this.byId("idBedTypeFlex");
+            // oContainer.setBusy(true);
 
             // City
             var oBranchcity = this.byId("id_Branch").getSelectedKey() || this.byId("id_Branch").getValue();
 
             if (!oBranchcity) {
                 MessageToast.show(this.i18nModel.getText("pleaseSelectCity"));
-                oContainer.setBusy(false);
+                // oContainer.setBusy(false);
                 this.byId("id_Branch").setValueState("Error");
                 return;
             }
@@ -2787,20 +2791,25 @@ sap.ui.define([
             if (sSelectedBranch && !validArea) {
                 // User typed something, but it does not match the list
                 MessageToast.show(this.i18nModel.getText("pleaseselectlocality"));
-                oContainer.setBusy(false);
+                // oContainer.setBusy(false);
                 return;
             }
             // If locality is empty, keep it empty (search by city only)
             var finalBranch = validArea ? validArea.LandMark : "";
             if (finalBranch === "") this.byId("id_Area").setValueState("None");
             this.isInitialLoad = false;
+            this.isShowmore = true;
+
 
             try {
+                this.getBusyDialog()
                 await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
+                this.closeBusyDialog()
+
             } catch (e) {
                 console.log(e);
             } finally {
-                oContainer.setBusy(false);
+                // oContainer.setBusy(false);
             }
         },
         onViewMoreRooms: async function () {
@@ -2811,6 +2820,8 @@ sap.ui.define([
             const oContainer = this.byId("idViewMoreBusy")
             oContainer.setBusy(true)
             this.isInitialLoad = false;
+            this.isShowmore=false
+
 
             await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
             oContainer.setBusy(false);
@@ -2833,7 +2844,7 @@ sap.ui.define([
 
             this.roomtype = false
 
-            this.byId("idBedTypeFlex").setBusy(true);
+            // this.byId("idBedTypeFlex").setBusy(true);
             this.byId("id_Branch").setBusy(true).setValueState("None");;
             this.byId("id_Area").setBusy(true);
             this.byId("id_Roomtype").setBusy(true);
@@ -2864,8 +2875,12 @@ sap.ui.define([
                     skip: this.iSkip,
                     City: fCity
                 }
+                this.getBusyDialog()
                 var oModelData = await this.Branch(filter);
+
+                this.closeBusyDialog()
                 this.isInitialLoad = true;
+                this.isShowmore=false
                 this._populateUniqueFilterValues(data)
 
 
@@ -2881,6 +2896,7 @@ sap.ui.define([
 
 
                 if (aFiltered.length === 0 || sCity) {
+
                     await this._loadFilteredData(sCity, "", "");
                 } else {
                     await this._loadFilteredData(this.City, "", "");
@@ -2912,11 +2928,11 @@ sap.ui.define([
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
             var data = this.getOwnerComponent().getModel("sBRModel").getData()
-
-            var Branchdata = data.filter((item) => {
+                var Branchdata = data.filter((item) => {
                 return item.City === Scity
             })
             this.Branchlength = Branchdata.length
+         
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -2930,10 +2946,27 @@ sap.ui.define([
                     });
                     aBranchesData = response?.data || [];
                     // this.Branchlength = aBranchesData.length || 0;
-                    if (sBranchCode || BranchName) {
-                        this.Branchlength = aBranchesData.length
-                    }
+                   
+                     if(this.getOwnerComponent().getModel("branchModel1")){
+                        let oBRModel = this.getOwnerComponent().getModel("branchModel1");
+                        let existingBranchData = oBRModel.getData() || [];
+                           var Branchdata = existingBranchData.filter((item) => {
+                return item.City === Scity
+            })
+                        this.Branchlength = Branchdata.length
 
+                     }
+                      if(this.isShowmore===true){
+ var data = this.getOwnerComponent().getModel("sBRModel").getData()
+                var Branchdata = data.filter((item) => {
+                return item.City === Scity
+            })
+          
+            this.Branchlength = Branchdata.length
+                     };
+                         if (sBranchCode || BranchName) {
+                        this.Branchlength = aBranchesData.length
+                     }
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
 
@@ -2949,6 +2982,7 @@ sap.ui.define([
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
+                      
                 }
                 let aFilteredBranches = [];
                 if (Scity && !sBranchCode) {
@@ -3026,7 +3060,7 @@ sap.ui.define([
 
             } catch (err) {
                 MessageToast.show("Failed to load branch data");
-            }
+            } 
         },
 
         onBookNow: function (oEvent) {

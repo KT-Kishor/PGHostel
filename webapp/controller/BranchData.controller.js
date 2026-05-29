@@ -192,13 +192,13 @@ sap.ui.define([
         var model = new sap.ui.model.json.JSONModel(aBranchData);
 
         this.getOwnerComponent().setModel(model, "mainModel");
-
+        this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel1");
     } finally {
 
         this.closeBusyDialog();
     }
 },
-
+          
         MD_onPressClear: function() {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
             this.getView().byId("MD_id_SearchField").setValue("");
