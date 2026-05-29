@@ -5032,7 +5032,7 @@ width: 44px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 45px;
+  margin-top: 35px;
 }
 
 .BranchCard .sapMCrsl,
@@ -6695,4 +6695,8 @@ html, body {
     .responsiveUploadBtn {
         justify-content: flex-start !important;
     }
+}
+
+.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+  width:180px !important;
 }
