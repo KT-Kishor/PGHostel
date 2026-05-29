@@ -1152,7 +1152,7 @@ sap.ui.define([
 
                 let aData = oModel.getData();
                 if (BranchNewData) {
-                    this.byId("idBedTypeFlex").setBusy(true);
+                    // this.byId("idBedTypeFlex").setBusy(true);
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
@@ -2915,7 +2915,7 @@ sap.ui.define([
             } catch (error) {
                 console.log("Error loading Rooms:", error);
             } finally {
-                this.byId("idBedTypeFlex").setBusy(false);
+                // this.byId("idBedTypeFlex").setBusy(false);
                 this.byId("id_Branch").setBusy(false);
                 this.byId("id_Area").setBusy(false);
                 this.byId("id_Roomtype").setBusy(false);
@@ -2950,7 +2950,7 @@ sap.ui.define([
                     // this.Branchlength = aBranchesData.length || 0;
                    
                      if(this.getOwnerComponent().getModel("branchModel1")){
-                        let oBRModel = this.getOwnerComponent().getModel("branchModel1");
+                        let oBRModel = this.getOwnerComponent().getModel("sBRModel");
                         let existingBranchData = oBRModel.getData() || [];
                            var Branchdata = existingBranchData.filter((item) => {
                 return item.City === Scity
