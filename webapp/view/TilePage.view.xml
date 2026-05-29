@@ -350,17 +350,35 @@
             class="guideButtonLarge myunifiedBtn"
         />
 		</content>
-		<footer>
-			<OverflowToolbar>
-				<ToolbarSpacer />
-				<Button
-                    text="{i18n>raisebug}"
-                    tooltip="{i18n>proceedToPay}"
-                    visible="{OBTNModel>/Submit}"
-                    class="myUnifiedBtn sapUiMediumMarginEnd"
-                    press="onPressbugs"
-                />
-			</OverflowToolbar>
-		</footer>
+        <footer>
+    <OverflowToolbar>
+
+        <Image
+            src="../image/TransparentKTlogo.png"
+            width="30px"
+            height="30px"
+        />
+
+        <Link
+            text="{i18n>devlopby}"
+            href="https://kalpavrikshatechnologies.com/"
+            target="_blank"
+            class="customLinkWhiteBg"
+        />
+
+        <ToolbarSpacer />
+
+        <Button
+            text="{i18n>raisebug}"
+            tooltip="{i18n>proceedToPay}"
+            visible="false"
+            class="myUnifiedBtn sapUiMediumMarginEnd"
+            press="onPressbugs"
+        />
+
+         <!-- visible="{OBTNModel>/Submit}" -->
+
+    </OverflowToolbar>
+</footer>
 	</Page>
 </mvc:View>

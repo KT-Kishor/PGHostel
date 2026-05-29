@@ -712,10 +712,13 @@ sap.ui.define([
                 }
             });
 
-            // Single selection & assigned → stop
+           // Single selection & assigned → stop
             if (aSelectedItems.length === 1 && aAssignedBeds.length === 1) {
                 sap.m.MessageBox.warning(
-                    "Cannot delete! Selected bed is already assigned."
+                    "Cannot delete! Selected bed is already assigned.",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
                 return;
             }
@@ -723,7 +726,10 @@ sap.ui.define([
             // All selected beds are assigned
             if (aDeletableBeds.length === 0) {
                 sap.m.MessageBox.warning(
-                    "All selected beds are already assigned and cannot be deleted."
+                    "All selected beds are already assigned and cannot be deleted.",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
                 );
                 return;
             }
