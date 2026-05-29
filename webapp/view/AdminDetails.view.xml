@@ -1318,13 +1318,13 @@
                         press="onGSTBooking"
                         visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                     />
                     <Button
                         text="{i18n>MSedit}"
                         id="idedit"
                         tooltip="{i18n>MSedit}"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                         press="onEditBooking"
                         visible="{=
                                  ${CustomerData>/Status} !== 'Cancelled'
@@ -1350,14 +1350,14 @@
                         text="{i18n>cancelBooking}"
                         press="onPressCancelBooking"
                         visible="{= ${CustomerData>/Status} === 'Confirmed' &amp;&amp; ${CustomerData>/Status} !== 'New' &amp;&amp; !${VisibleModel>/visible} &amp;&amp; !${VisibleModel>/showCancelButton} }"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                     />
 
                     <Button
                         text="{i18n>checkOut}"
                         id="idCheckout"
                         tooltip="{i18n>checkOut}"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                         press="onChekout"
                         visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible} &amp;&amp; ${CustomerData>/Status} !== 'New'
@@ -1370,7 +1370,7 @@
                         tooltip="Submit"
                         press="onSaveBooking"
                         visible="{VisibleModel>/visible}"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                     />
 
                     <Button
@@ -1379,7 +1379,7 @@
                         tooltip="{i18n>CancelButton}"
                         press="onCancelBooking"
                         visible="{VisibleModel>/visible}"
-                        class="sapUiSmallMarginBegin myUnifiedBtn"
+                        class="myUnifiedBtn"
                     />
 
                     <!-- <Button id="idgeneratePDFbtn" text="{i18n>GeneratePDF}" tooltip="{i18n>GeneratePDF}" press="onGeneratePDF" class="sapUiSmallMarginBegin myUnifiedBtn" visible="{= !${VisibleModel>/visible}}" /> -->
