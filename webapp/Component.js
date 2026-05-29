@@ -8,8 +8,9 @@ sap.ui.define([
     "sap/ui/com/project1/model/models",
     "sap/ui/model/json/JSONModel",
     "sap/m/Carousel",
+    "sap/ui/core/Fragment"
 ],
-    function (UIComponent, Device, models, JSONModel, Carousel) {
+    function (UIComponent, Device, models, JSONModel, Carousel, Fragment) {
         "use strict";
 
         return UIComponent.extend("sap.ui.com.project1.Component", {
@@ -23,6 +24,7 @@ sap.ui.define([
              * @override
              */
             init: async function () {
+                try{
                 // call the base component's init function
                 UIComponent.prototype.init.apply(this, arguments);
                 // --- Global virtual keyboard / carousel slide blocker ---
@@ -131,7 +133,7 @@ sap.ui.define([
                     isRadioVisible: false
                 });
                 this.setModel(omodel, "LoginModel");
-                this.getRootControl().setBusy(true);
+                await this.showBusyDialog();
                 this._fetchCommonData("City", "CityModel");
                 this._fetchCommonData("State", "StateModel");
                 this._fetchCommonData("Country", "CountryModel");
@@ -139,10 +141,7 @@ sap.ui.define([
                 this._fetchCommonData("HM_FacilityType", "FacilityTypeModel");
                 this._fetchCommonData("HM_AmenitiName", "AmenityNameModel");
 
-
                 await this._fetchCommonData("HM_BranchData", "sBRModel");
-                this.getRootControl().setBusy(false);
-
                 const oAppStateModel = new JSONModel({
                     previousTab: "idHome", // default value
                 });
@@ -151,6 +150,11 @@ sap.ui.define([
                 const oComplaintTypeModel = new sap.ui.model.json.JSONModel();
                 oComplaintTypeModel.loadData("model/ComplaintTypes.json");
                 this.setModel(oComplaintTypeModel, "ComplaintTypeModel");
+                } catch (error) {
+                    MessageToast.show(error.responseText);
+                } finally {
+                    this.closeBusyDialog()
+                }
             },
             _initTabSession: function () {
                 // 1. Generate a unique ID for this tab instance for this session only
@@ -236,6 +240,26 @@ sap.ui.define([
                 localStorage.removeItem("_mN72P");
 
                 this.getRouter().navTo("RouteHostel");
+            },
+
+            showBusyDialog: async function () {
+
+                if (!this._pBusyDialog) {
+
+                    this._pBusyDialog = Fragment.load({
+                        name: "sap.ui.com.project1.fragment.BusyIndicator"
+                    });
+                }
+
+                this.oBusyDialog = await this._pBusyDialog;
+                this.oBusyDialog.open();
+            },
+
+            closeBusyDialog: function () {
+
+                if (this.oBusyDialog) {
+                    this.oBusyDialog.close();
+                }
             },
 
             _fetchCommonData: async function (entityName, modelName, filter = "") {
