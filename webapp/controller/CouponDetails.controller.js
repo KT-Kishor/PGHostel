@@ -1584,17 +1584,19 @@ sap.ui.define([
             }
 
             return (
-                `🎉 ${sBranchName} Special Deal! 🎊\n\n` +
+                `🎉 StayVriksha – ${sBranchName} Special Deal! 🎊\n\n` +
                 `Don't miss out on this exclusive coupon 🎉\n\n` +
                 `🔑 Code: ${oCoupon.CouponCode}\n` +
                 `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
                 `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
                 sDiscountDetailLine + // 🔥 Yahan dynamic line add hogi
-                `\nUse this coupon during booking and save instantly 🙌\n\n` +
-                `Terms: \n` +
-                ` • New bookings only\n` +
-                ` • No other offers applicable\n\n` +
-                `— ${sBranchName} Management`
+                `\nUse this coupon while booking with StayVriksha and enjoy instant savings! 🙌\n\n` +
+                `📌 Terms & Conditions:: \n` +
+                ` • Applicable for new bookings only\n` +
+                ` • Cannot be combined with other offers or promotions\n\n` +
+                ` • Book now and grab the deal before it ends! 🚀\n\n` +
+                
+                `— StayVriksha | ${sBranchName} Management`
             );
         },
         _buildCouponShareMessageEmail: function (oCoupon) {
