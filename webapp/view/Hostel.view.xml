@@ -270,9 +270,11 @@
                                                             vSpacing="1"
                                                             content="{path: 'VisibilityModel>/Branches'}"
                                                             visible="{= !${VisibilityModel>/NoData} }"
+                                                             class="sapUiSmallMarginTop"
+
                                                         >
                                                             <VBox
-                                                                class="BranchCard"
+                                                                class="BranchCard sapUiTinyMargin"
                                                             >
                                                                 <!-- ===== IMAGE CAROUSEL ===== -->
                                                                 <Carousel
@@ -394,7 +396,7 @@
 
                                                     <VBox
                                                         alignItems="Center"
-                                                        class="sapUiLargeMarginTop sapUiTinyMarginBottom"
+                                                        class="sapUiTinyMarginTop"
                                                         visible="{VisibilityModel>/ShowViewMore}"
                                                     >
                                                         <Link
