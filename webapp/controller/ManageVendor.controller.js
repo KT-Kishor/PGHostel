@@ -13,6 +13,7 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -66,7 +67,7 @@ sap.ui.define([
                     BranchID: aBranchCodes
                 };
             }
-            this.getBusyDialog()
+            // this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -106,7 +107,7 @@ sap.ui.define([
             if (sStatus) {
                 filters.Status = sStatus;
             }
-            this.getBusyDialog()
+            if(flag === true) this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
 
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];

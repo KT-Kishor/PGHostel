@@ -80,8 +80,8 @@ sap.ui.define([
                     imageTokens: []
                 }), "tokenImageModel");
                 this.onClearAndSearch("MD_id_Filterbar");
-                await this.Onsearch();
                 await this.Customerdata()
+                await this.Onsearch();
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
