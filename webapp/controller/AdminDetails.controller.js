@@ -239,41 +239,41 @@ sap.ui.define([
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
             // Refresh model to update UI bindings
 
-             var Payload = {
-                    "Booking": [{
-                        "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
-                        "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
-                        "Status": "Completed",
-                        "CustomerName": oCustomerModel.CustomerName,
-                        "CustomerEmail": oCustomerModel.CustomerEmail,
-                        "BookingID": oCustomerModel.BookingID,
-                        "RoomNo": oCustomerModel.RoomNo
-                    }]
-                };
+            var Payload = {
+                "Booking": [{
+                    "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
+                    "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
+                    "Status": "Completed",
+                    "CustomerName": oCustomerModel.CustomerName,
+                    "CustomerEmail": oCustomerModel.CustomerEmail,
+                    "BookingID": oCustomerModel.BookingID,
+                    "RoomNo": oCustomerModel.RoomNo
+                }]
+            };
 
-                var payload2 = {
-                    "Area": oCustomerModel.BranchName || "",
-                    "PropertySTD": oCustomerModel.PropertySTD || "",
-                    "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
-                    "PropertyEmail": oCustomerModel.PropertyEmail || "",
-                    "PropertyType": oCustomerModel.PropertyType || ""
-                };
+            var payload2 = {
+                "Area": oCustomerModel.BranchName || "",
+                "PropertySTD": oCustomerModel.PropertySTD || "",
+                "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
+                "PropertyEmail": oCustomerModel.PropertyEmail || "",
+                "PropertyType": oCustomerModel.PropertyType || ""
+            };
 
-                // Merge both
-                var finalPayload = {
-                    ...Payload,
-                    ...payload2
-                };
+            // Merge both
+            var finalPayload = {
+                ...Payload,
+                ...payload2
+            };
 
-                this.getBusyDialog();
-                await this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [finalPayload],
-                    filters: {
-                        BookingID: oCustomerModel.BookingID
-                    }
-                }).then(() => {
-                    sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
-                });
+            this.getBusyDialog();
+            await this.ajaxUpdateWithJQuery("HM_Customer", {
+                data: [finalPayload],
+                filters: {
+                    BookingID: oCustomerModel.BookingID
+                }
+            }).then(() => {
+                sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
+            });
 
             // Refresh models
             this.AD_onSearch();
@@ -800,7 +800,7 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-                    
+
                     // Store final facility record
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
@@ -3944,7 +3944,7 @@ sap.ui.define([
 
 
                                     total = item.quantity ?
-                                        item.quantity *  Number(item.TotalHour) * price * diffDays :
+                                        item.quantity * Number(item.TotalHour) * price * diffDays :
                                         Number(item.TotalHour) * price * diffDays;
 
                                 } else if (unit === "per month") {
@@ -4356,7 +4356,7 @@ sap.ui.define([
                     "GSTValue": CustomerData.GSTValue,
                     "MemberID": memberIds,
                     "AdminUpdated": "YES",
-                    "Status" : CustomerData.Status,
+                    "Status": CustomerData.Status,
                     "BookingID": CustomerData.BookingID
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
@@ -5054,24 +5054,24 @@ sap.ui.define([
                 let grandTotal;
                 let cgst;
                 let sgst;
-                let igst;   
+                let igst;
 
-            if (oCustomerData.GSTType === "CGST/SGST") {
-                cgst = newSubtotal * oCustomerData.GSTValue/100;
-                sgst = newSubtotal * oCustomerData.GSTValue/100;
-                oCustomerData.CGST = cgst;
-                oCustomerData.SGST = sgst;
-                grandTotal = newSubtotal + cgst + sgst;
+                if (oCustomerData.GSTType === "CGST/SGST") {
+                    cgst = newSubtotal * oCustomerData.GSTValue / 100;
+                    sgst = newSubtotal * oCustomerData.GSTValue / 100;
+                    oCustomerData.CGST = cgst;
+                    oCustomerData.SGST = sgst;
+                    grandTotal = newSubtotal + cgst + sgst;
 
-            }else if (oCustomerData.GSTType === "IGST") {
-                igst = newSubtotal * Number(oCustomerData.GSTValue)/100;
+                } else if (oCustomerData.GSTType === "IGST") {
+                    igst = newSubtotal * Number(oCustomerData.GSTValue) / 100;
 
-                oCustomerData.IGST = igst;
-                grandTotal = newSubtotal + igst;
+                    oCustomerData.IGST = igst;
+                    grandTotal = newSubtotal + igst;
 
-            }else{
-                grandTotal = newSubtotal;
-            }
+                } else {
+                    grandTotal = newSubtotal;
+                }
                 oCustomerData.GrandTotal = grandTotal;
                 oCustomerData.DueAmount = grandTotal - (oCustomerData.PaymentPaid || 0);
 
@@ -5445,19 +5445,19 @@ sap.ui.define([
             let grandTotal;
 
             if (oCustomerData.GSTType === "CGST/SGST") {
-                cgst = subtotal * oCustomerData.GSTValue/100;
-                sgst = subtotal * oCustomerData.GSTValue/100;
+                cgst = subtotal * oCustomerData.GSTValue / 100;
+                sgst = subtotal * oCustomerData.GSTValue / 100;
                 oCustomerData.CGST = cgst;
                 oCustomerData.SGST = sgst;
                 grandTotal = subtotal + cgst + sgst;
 
-            }else if (oCustomerData.GSTType === "IGST") {
-                igst = subtotal * Number(oCustomerData.GSTValue)/100;
+            } else if (oCustomerData.GSTType === "IGST") {
+                igst = subtotal * Number(oCustomerData.GSTValue) / 100;
 
                 oCustomerData.IGST = igst;
                 grandTotal = subtotal + igst;
 
-            }else{
+            } else {
                 grandTotal = subtotal;
             }
             oCustomerData.GrandTotal = grandTotal;
@@ -8473,7 +8473,7 @@ sap.ui.define([
         onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("AD_idSelect");
+            const oGender = sap.ui.getCore().byId("AD_id_MemberGenderCombo");
             // Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
@@ -9080,10 +9080,9 @@ sap.ui.define([
                 var oContext = oItem.getBindingContext("BookingView");
                 var oData = oContext.getObject();
 
-                var aMemberDocs = oData.Documents || [];
+                var doc = oData.Documents[0];
 
-                aMemberDocs.forEach(function (doc) {
-
+                if (doc) {
                     aDocs.push({
                         DocumentID: doc.DocumentID,
                         DocumentType: doc.DocumentType,
@@ -9093,8 +9092,7 @@ sap.ui.define([
                         FileType: doc.FileType,
                         File: doc.File
                     });
-
-                });
+                }
             });
 
             this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
