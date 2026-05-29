@@ -276,8 +276,6 @@ sap.ui.define([
                 Type: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID
             };
 
-            delete payload.BranchName;
-
             const isUpdate = !!data.UserID;
 
             this.getBusyDialog()

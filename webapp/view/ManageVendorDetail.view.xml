@@ -124,6 +124,20 @@
                                             valueStateText="{i18n>MSenterValidEmail}"
                                         />
 										<m:Label
+                                            text="{i18n>Status}"
+                                          
+                                        />
+										<m:Input
+                                            value="{AdminSignupModel>/Status}"
+                                            type="Text"
+                                            maxLength="50"
+                                            placeholder="{i18n>enterStatus}"
+                                            liveChange="onAdminLiveValidate"
+                                            editable="false"
+                                            id="MV_id_status"
+                                            valueStateText="{i18n>MSenterValidEmail}"
+                                        />
+										<m:Label
                                             text="{i18n>MVDcountry}"
                                             required="true"
                                         />

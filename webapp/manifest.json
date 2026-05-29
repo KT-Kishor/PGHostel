@@ -107,6 +107,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/SelectionModeModel.json",
         "preload": true
+      },
+      "Vendorstatus": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/vendorstatus.json",
+        "preload": true
       }
     },
     "resources": {

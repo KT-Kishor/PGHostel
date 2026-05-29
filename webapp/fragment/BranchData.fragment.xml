@@ -337,7 +337,7 @@
 		<HBox width="100%" justifyContent="SpaceBetween">
 			<!-- LEFT SIDE (LOGO) -->
 			<VBox width="48%">
-				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
+				<HBox justifyContent="End" class="sapUiSmallMarginBottom responsiveUploadBtn" >
 					<u:FileUploader
                         id="BD_id_FileUploader"
                         fileSizeExceed="onFileSizeExceeds"
@@ -355,32 +355,52 @@
                     />
 				</HBox>
 				<Table
-                    items="{UploaderData>/attachmentslogo}"
-                    mode="Delete"
-                    delete="onTokenDelete"
-                    width="100%"
-                >
-					<columns>
-						<Column demandPopin="true" >
-							<Text text="{i18n>filename}" />
-						</Column>
-						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
-							<Text text="{i18n>FileType}" />
-						</Column>
-						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
-							<Text text="{i18n>FileSize}" />
-						</Column>
-					</columns>
-					<items>
-						<ColumnListItem>
-							<cells>
-								<Text text="{UploaderData>filename}" />
-								<Text text="{UploaderData>fileType}" />
-								<Text text="{path: 'UploaderData>size', formatter: '.Formatter.formatFileSize'}"/>
-							</cells>
-						</ColumnListItem>
-					</items>
-				</Table>
+    id="idUploadTable"
+    items="{UploaderData>/attachmentslogo}"
+    width="100%"
+>
+    <columns>
+        <Column demandPopin="true">
+            <Text text="{i18n>logoname}" />
+        </Column>
+
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet">
+            <Text text="{i18n>FileType}" />
+        </Column>
+
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet">
+            <Text text="{i18n>FileSize}" />
+        </Column>
+
+        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
+            <Text text="Action" />
+        </Column>
+    </columns>
+
+    <items>
+        <ColumnListItem>
+            <cells>
+                <Text text="{UploaderData>filename}" />
+
+                <Text text="{UploaderData>fileType}" />
+
+                <Text
+                    text="{
+                        path: 'UploaderData>size',
+                        formatter: '.Formatter.formatFileSize'
+                    }"
+                />
+
+                <Button
+                    icon="sap-icon://delete"
+                    type="Transparent"
+                    tooltip="Delete"
+                    press="onTokenDelete"
+                />
+            </cells>
+        </ColumnListItem>
+    </items>
+</Table>
 			</VBox>
 			<!-- RIGHT SIDE (IMAGE) -->
 			<VBox width="48%">
@@ -402,7 +422,54 @@
                         class="sapUiSmallMarginEnd"
                     />
 				</HBox>
-				<Table
+                <Table
+    id="idUploadTabl1"
+    items="{UploaderData>/attachmentimage}"
+    width="100%"
+>
+    <columns>
+        <Column demandPopin="true">
+            <Text text="{i18n>homeimage}" />
+        </Column>
+
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet">
+            <Text text="{i18n>FileType}" />
+        </Column>
+
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet">
+            <Text text="{i18n>FileSize}" />
+        </Column>
+
+        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
+            <Text text="Action" />
+        </Column>
+    </columns>
+
+    <items>
+        <ColumnListItem>
+            <cells>
+                <Text text="{UploaderData>filename}" />
+
+                <Text text="{UploaderData>fileType}" />
+
+                <Text
+                    text="{
+                        path: 'UploaderData>size',
+                        formatter: '.Formatter.formatFileSize'
+                    }"
+                />
+
+                <Button
+                    icon="sap-icon://delete"
+                    type="Transparent"
+                    tooltip="Delete"
+                    press="onTokenImageDelete"
+                />
+            </cells>
+        </ColumnListItem>
+    </items>
+</Table>
+				<!-- <Table
                     items="{UploaderData>/attachmentimage}"
                     mode="Delete"
                     delete="onTokenImageDelete"
@@ -410,7 +477,7 @@
                 >
 					<columns>
 						<Column demandPopin="true" >
-							<Text text="{i18n>filename}" />
+							<Text text="{i18n>homeimage}" />
 						</Column>
 						<Column hAlign="Center" demandPopin="true"  minScreenWidth="Tablet" >
 							<Text text="{i18n>FileType}" />
@@ -428,7 +495,7 @@
 							</cells>
 						</ColumnListItem>
 					</items>
-				</Table>
+				</Table> -->
 			</VBox>
 		</HBox>
 		<beginButton>

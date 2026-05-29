@@ -58,12 +58,12 @@
                         <fb:control>
                             <ComboBox
                                 id="MV_id_Status"
-                                items="{mainModel>/}"
+                                items="{Vendorstatus>/}"
                                 showClearIcon="true"
                             >
                                 <core:Item
-                                    key="{mainModel>Status}"
-                                    text="{mainModel>Status}"
+                                    key="{Vendorstatus>key}"
+                                    text="{Vendorstatus>text}"
                                 />
                             </ComboBox>
                         </fb:control>

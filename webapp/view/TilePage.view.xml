@@ -27,6 +27,72 @@
             />
 		</headerContent>
 		<content>
+
+        <VBox class="categoryBlock sapUiMediumMarginTop"
+              visible="{= ${TileVisibility>/ManageVendor} !== 0 }">
+				<Title
+                text="{i18n>vendorrgistration}"
+                level="H2"
+                class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
+            />
+
+            <FlexBox
+                wrap="Wrap"
+                alignItems="Start"
+                justifyContent="Start"
+                width="100%"
+                class="tileContainer1"
+            >
+
+            <GenericTile
+                    id="id6roomTile"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>manageVendors}"
+                    press="TileV_onpressManageVendor"
+                >
+						<TileContent unit="{i18n>vendorDirectory}">
+							<ImageContent src="sap-icon://kpi-managing-my-area" />
+						</TileContent>
+					</GenericTile>
+
+                    <GenericTile
+                    id="idSupportTile"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>supportVendor}"
+                    press="TileV_onpressSupportVendor"
+                >
+						<TileContent unit="{i18n>managesupport}">
+							<ImageContent src="sap-icon://headset"/>
+						</TileContent>
+					</GenericTile>
+					<GenericTile
+                    id="idRaiseBug"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>Bug Details}"
+                    press="TileV_onpressBugRaiseVendor"
+                >
+						<TileContent unit="{i18n>managebugs}">
+							<ImageContent src="sap-icon://message-error"/>
+						</TileContent>
+					</GenericTile>
+					<GenericTile
+                    id="idmanageAds"
+                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>manageAds}"
+                    press="TileV_onpressManageAds"
+                >
+						<TileContent unit="{i18n>managebugs}">
+							<ImageContent src="sap-icon://manager-insight"/>
+						</TileContent>
+					</GenericTile>
+            </FlexBox>
+            </VBox>
+
+
 			<VBox class="categoryBlock sapUiMediumMarginTop"
               visible="{= ${TileVisibility>/ManageBranch} !== 0 || ${TileVisibility>/ManageVendor} !== 0 || ${TileVisibility>/ManageBedType} !== 0 }">
 				<Title
@@ -116,50 +182,6 @@
                 >
 						<TileContent unit="{i18n>staffDirectory}">
 							<ImageContent src="sap-icon://employee" />
-						</TileContent>
-					</GenericTile>
-					<GenericTile
-                    id="id6roomTile"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiTinyMargin glassTile"
-                    header="{i18n>manageVendors}"
-                    press="TileV_onpressManageVendor"
-                >
-						<TileContent unit="{i18n>vendorDirectory}">
-							<ImageContent src="sap-icon://kpi-managing-my-area" />
-						</TileContent>
-					</GenericTile>
-					<GenericTile
-                    id="idSupportTile"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiTinyMargin glassTile"
-                    header="{i18n>supportVendor}"
-                    press="TileV_onpressSupportVendor"
-                >
-						<TileContent unit="{i18n>managesupport}">
-							<ImageContent src="sap-icon://headset"/>
-						</TileContent>
-					</GenericTile>
-					<GenericTile
-                    id="idRaiseBug"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiTinyMargin glassTile"
-                    header="{i18n>Bug Details}"
-                    press="TileV_onpressBugRaiseVendor"
-                >
-						<TileContent unit="{i18n>managebugs}">
-							<ImageContent src="sap-icon://message-error"/>
-						</TileContent>
-					</GenericTile>
-					<GenericTile
-                    id="idmanageAds"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
-                    class="sapUiTinyMargin glassTile"
-                    header="{i18n>manageAds}"
-                    press="TileV_onpressManageAds"
-                >
-						<TileContent unit="{i18n>managebugs}">
-							<ImageContent src="sap-icon://manager-insight"/>
 						</TileContent>
 					</GenericTile>
 				</FlexBox>
@@ -328,17 +350,35 @@
             class="guideButtonLarge myunifiedBtn"
         />
 		</content>
-		<footer>
-			<OverflowToolbar>
-				<ToolbarSpacer />
-				<Button
-                    text="{i18n>raisebug}"
-                    tooltip="{i18n>proceedToPay}"
-                    visible="{OBTNModel>/Submit}"
-                    class="myUnifiedBtn sapUiMediumMarginEnd"
-                    press="onPressbugs"
-                />
-			</OverflowToolbar>
-		</footer>
+        <footer>
+    <OverflowToolbar>
+
+        <Image
+            src="../image/TransparentKTlogo.png"
+            width="30px"
+            height="30px"
+        />
+
+        <Link
+            text="{i18n>devlopby}"
+            href="https://kalpavrikshatechnologies.com/"
+            target="_blank"
+            class="customLinkWhiteBg"
+        />
+
+        <ToolbarSpacer />
+
+        <Button
+            text="{i18n>raisebug}"
+            tooltip="{i18n>proceedToPay}"
+            visible="false"
+            class="myUnifiedBtn sapUiMediumMarginEnd"
+            press="onPressbugs"
+        />
+
+         <!-- visible="{OBTNModel>/Submit}" -->
+
+    </OverflowToolbar>
+</footer>
 	</Page>
 </mvc:View>

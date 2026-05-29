@@ -4630,6 +4630,11 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   min-height: 100vh;
 }
 
+.defaultBGBlur .sapMPageEnableScrolling {
+  padding-bottom: 60px;
+  box-sizing: border-box;
+}
+
 .customRoundedFlex {
   border-radius: 12px;
   background-color: white;
@@ -6678,4 +6683,16 @@ html, body {
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
   }
+}
+/* Desktop */
+.responsiveUploadBtn {
+    justify-content: flex-end;
+}
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+
+    .responsiveUploadBtn {
+        justify-content: flex-start !important;
+    }
 }
