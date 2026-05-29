@@ -307,7 +307,7 @@
                                                                                 class="BranchCardImage"
                                                                                 decorative="false"
                                                                             />
-                                                                            <!-- <CustomListItem type="Active" press=".onRatingPress" visible="{= ${VisibilityModel>TotalFeedbacks} > 0 }" tooltip="Tap to See Reviews"><HBox class="ratingOverlay" alignItems="Center"><RatingIndicator value="{VisibilityModel>AverageRating}" maxValue="5" enabled="false" iconSize="0.8rem" /><Text text="({VisibilityModel>TotalFeedbacks})" class="ratingCountText" /></HBox></CustomListItem> -->
+                                                                            
                                                                         </VBox>
                                                                     </pages>
                                                                 </Carousel>
@@ -394,7 +394,7 @@
 
                                                     <VBox
                                                         alignItems="Center"
-                                                        class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+                                                        class="sapUiLargeMarginTop sapUiTinyMarginBottom"
                                                         visible="{VisibilityModel>/ShowViewMore}"
                                                     >
                                                         <Link
@@ -421,9 +421,7 @@
                                     </ScrollContainer>
                                 </VBox>
                             </Page>
-                            <!-- <ScrollContainer id="idFacilities" horizontal="false" vertical="true" height="100%" class="Products_list sapUiTinyMargin">
-                        <core:Fragment fragmentName="sap.ui.com.project1.fragment.HomePage" type="XML" />
-                    </ScrollContainer> -->
+                           
                             <ScrollContainer
                                 id="idContact"
                                 horizontal="false"
