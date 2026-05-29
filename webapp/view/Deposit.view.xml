@@ -189,7 +189,7 @@
                 path: 'DepositDate',
                 descending: true
             }
-        ]
+        ],groupHeaderFactory: '.getGroupHeader'
     }"
                 mode="MultiSelect"
                 sticky="ColumnHeaders,HeaderToolbar"

@@ -22,6 +22,9 @@ sap.ui.define([
             this.getView().byId("SP_id_Status").setSelectedKey("")
             this.CD_read()
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
         SP_onPressClear: function () {
             this.getView().byId("SP_id_RaisedBy").setSelectedKey("")

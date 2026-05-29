@@ -24,14 +24,18 @@ sap.ui.define([
                    this.onClearAndSearch("MV_id_FilterbarEmployee");
                 }
                 await this._loadBranchCode();
+                
                 await this.Onsearch("true");
+                
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
+                 this.getGroupHeader();
                 this.closeBusyDialog()
             }
         },
+        
 
         _initEmptyMDModel: function () {
             const emptyData = {
@@ -228,6 +232,9 @@ sap.ui.define([
             //         });
             // }
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
         FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");

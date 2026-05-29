@@ -145,7 +145,8 @@
                 items="{path: 'HostelModel>/',  sorter: [{
                     path: 'BranchName', group: true },
 					    { path: 'BookingDate', descending: true },
-						 { path: 'CustomerID', descending: true }]}"
+						 { path: 'CustomerID', descending: true }],
+                    groupHeaderFactory: '.getGroupHeader'}"
             >
 				<headerToolbar>
 					<OverflowToolbar>

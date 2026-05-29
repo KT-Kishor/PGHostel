@@ -274,7 +274,7 @@
 
                                                         >
                                                             <VBox
-                                                                class="BranchCard sapUiTinyMargin"
+                                                                class="BranchCard sapUiTinyMargin sapUiTinyMargin"
                                                             >
                                                                 <!-- ===== IMAGE CAROUSEL ===== -->
                                                                 <Carousel

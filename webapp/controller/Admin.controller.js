@@ -72,6 +72,9 @@ sap.ui.define([
             this.getView().setModel(model, "Visiblemodel")
             this.BedTypedetails();
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];

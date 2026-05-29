@@ -535,9 +535,9 @@ sap.ui.define([
                         draggable: true,
                         resizable: true,
                         contentWidth: "50%",
-                        contentHeight: "50%",
-                        horizontalScrolling: true,
-                        verticalScrolling: false,
+                        contentHeight: "90%",
+                        horizontalScrolling: false,
+                        verticalScrolling: true,
                         contentPadding: "0rem",
                         endButton: new sap.m.Button({
                             text: "Close",

@@ -1553,7 +1553,7 @@ oStartingPrice.setValueState("None");
         onTokenImageDelete: function(oEvent) {
     const oButton = oEvent.getSource();
     const oItem = oButton.getParent();
-    const oTable = this.byId("idUploadTable1");
+    const oTable = this.byId("idUploadTabl1");
 
     const oModel = this.getView().getModel("UploaderData");
     let aData = oModel.getProperty("/attachmentimage");

@@ -58,9 +58,13 @@ sap.ui.define([
                 this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
+                 this.getGroupHeader();
                 this.closeBusyDialog()
             }
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
         FC_onSearch: async function() {
             var aFilterItems = this.byId("FO_id_FilterbarEmployee").getFilterGroupItems();

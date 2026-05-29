@@ -50,6 +50,9 @@ sap.ui.define([
             await this.Onsearch("true")
             this.readCustomerData();
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         HM_GenearteDamage: function () {
 
             this.getOwnerComponent().getRouter().navTo("RouteDamageDetails", { sPath: "Damage" });

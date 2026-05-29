@@ -6693,7 +6693,7 @@ html, body {
 @media screen and (max-width: 600px) {
 
     .responsiveUploadBtn {
-        justify-content: flex-start !important;
+        justify-content: center !important;
     }
 }
 

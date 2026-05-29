@@ -56,6 +56,7 @@ sap.ui.define([
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
+                 this.getGroupHeader();
                 this.closeBusyDialog()
             }
         },
@@ -87,6 +88,9 @@ sap.ui.define([
                 this.closeBusyDialog()
             }).catch(() => this.closeBusyDialog())
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();

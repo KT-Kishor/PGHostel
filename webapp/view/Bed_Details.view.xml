@@ -106,7 +106,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'BedDetails>/', sorter: {path: 'BranchName',descending: false,group: true}}"
+                items="{path: 'BedDetails>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
             >
                 <headerToolbar>
                     <OverflowToolbar>

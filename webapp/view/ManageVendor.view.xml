@@ -95,7 +95,14 @@
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'mainModel>/'}"
+               items="{
+    path: 'mainModel>/',
+    sorter: {
+        path: 'BranchID',
+        group: false
+    },
+    groupHeaderFactory: '.getGroupHeader'
+}"
             >
                 <headerToolbar>
                     <OverflowToolbar>

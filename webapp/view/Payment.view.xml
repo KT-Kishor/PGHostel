@@ -77,7 +77,7 @@
                 mode="None"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'mainModel>/', sorter: [{path: 'BranchName', group: true}, {path: 'Date', descending: true}]}">
+                items="{path: 'mainModel>/', sorter: [{path: 'BranchName', group: true}, {path: 'Date', descending: true}],groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>invoicePaymentTitle} ({= ${mainModel>/}.length})"/>
