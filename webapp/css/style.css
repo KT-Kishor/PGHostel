@@ -4918,7 +4918,6 @@ width: 44px !important;
     display: flex;
     flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-bottom: -42px !important;
 }
 
 .BranchCard:hover {
@@ -6696,4 +6695,8 @@ html, body {
     .responsiveUploadBtn {
         justify-content: flex-start !important;
     }
+}
+
+.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+  width:180px !important;
 }

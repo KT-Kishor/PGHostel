@@ -327,7 +327,7 @@ filterSecondaryValues="true"
                         selectedKey="{AdminSignupModel>/CurrentDocType}"
                         enabled="{AdminSignupModel>/DocTypeEnabled}"
                         placeholder="{i18n>selectDocument}"
-                       
+                       width="180px"
                     >
                         <core:ListItem
                             key="Aadhar Card"
