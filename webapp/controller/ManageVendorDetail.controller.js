@@ -578,6 +578,12 @@ sap.ui.define([
                     URL.revokeObjectURL(this._previewUrl);
                 }
                 this._previewUrl = URL.createObjectURL(blob);
+                if (sap.ui.Device.system.phone) {
+
+    window.open(this._previewUrl, "_blank");
+
+    return;
+}
                 this._oAdminPreviewDialog.addContent(
                     new sap.ui.core.HTML({
                         sanitizeContent: false,
