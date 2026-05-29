@@ -37,6 +37,9 @@ sap.ui.define([
             this.getView().setModel(new JSONModel([]), "CustomerFilterModel");
             this.getView().setModel(new JSONModel([]), "BookingFilterModel");
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         _getUniqueValuesFromDepositData: function (propertyName) {
             const oModel = this.getView().getModel("DepositModel");
             const aData = oModel.getData();

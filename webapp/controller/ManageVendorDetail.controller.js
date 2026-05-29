@@ -25,6 +25,7 @@ sap.ui.define([
             try {
                 // var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 // if (!LoginFUnction) return;
+                 this.getBusyDialog();
                 var Layout = this.byId("MV_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("MV_id_OrderHeaderSection1"));
                 this.commonLoginFunction();
@@ -42,7 +43,6 @@ sap.ui.define([
                 await this._loadVendorDetails(this.sUserID);
                 this._applyCountryStateCityFilters();
                 this._makeDatePickersReadOnly(["MV_id_VendorDOB"]);
-                this.closeBusyDialog()
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -156,8 +156,6 @@ sap.ui.define([
                 oModel.setData(oAdminData);
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("vendorLoadError"));
-            } finally {
-                this.closeBusyDialog()
             }
         },
 
@@ -537,9 +535,9 @@ sap.ui.define([
                         draggable: true,
                         resizable: true,
                         contentWidth: "50%",
-                        contentHeight: "50%",
-                        horizontalScrolling: true,
-                        verticalScrolling: false,
+                        contentHeight: "90%",
+                        horizontalScrolling: false,
+                        verticalScrolling: true,
                         contentPadding: "0rem",
                         endButton: new sap.m.Button({
                             text: "Close",

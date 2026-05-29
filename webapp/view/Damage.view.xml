@@ -89,7 +89,7 @@
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
-				items="{path:'Damage>/', sorter: {path:'BranchName',descending: false,group: true}}">
+				items="{path:'Damage>/', sorter: {path:'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>

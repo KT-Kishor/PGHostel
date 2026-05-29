@@ -372,7 +372,7 @@
             <Text text="{i18n>FileSize}" />
         </Column>
 
-        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet" >
             <Text text="Action" />
         </Column>
     </columns>
@@ -440,7 +440,7 @@
             <Text text="{i18n>FileSize}" />
         </Column>
 
-        <Column hAlign="Center"  minScreenWidth="Tablet" width="6rem">
+        <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet" >
             <Text text="Action" />
         </Column>
     </columns>

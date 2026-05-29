@@ -41,10 +41,14 @@ sap.ui.define([
             await this._loadBranchCode()
             await this.Onsearch()
             this.Customerdata()
+             this.getGroupHeader();
 
             //  this.closeBusyDialog()
 
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         Customerdata: function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];

@@ -61,7 +61,7 @@
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'mainModel>/', sorter: {path: 'Role',descending: false,group: true}}">
+                items="{path: 'mainModel>/', sorter: {path: 'Role',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>MSstaffheading} ({= ${mainModel>/}.length})"/>

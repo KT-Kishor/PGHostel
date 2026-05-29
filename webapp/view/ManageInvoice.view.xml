@@ -88,7 +88,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="CI_id_InvoiceTable" sticky="ColumnHeaders,HeaderToolbar"
-                items="{path: 'ManageInvoiceModel>/', sorter: { path: 'BranchName', descending: false, group: true }}">
+                items="{path: 'ManageInvoiceModel>/', sorter: { path: 'BranchName', descending: false, group: true },groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${ManageInvoiceModel>/}.length})"/>

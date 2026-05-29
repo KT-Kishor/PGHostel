@@ -403,7 +403,6 @@
         <Table
             id="Id_ProfileaTable1"
             visible="{= ${profileData>/selectedTab} === 'Booking History' }"
-            busy="{profileData>/isTableBusy}"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
             noDataText="No booking history found"
@@ -458,7 +457,6 @@
         <Table
             id="Id_MemberTable"
             visible="{= ${profileData>/selectedTab} === 'Members' }"
-            busy="{profileData>/isTableBusy}"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
             noDataText="No Member history found"
@@ -594,7 +592,6 @@
         <Table
             id="Id_CompmaintTable"
             visible="{= ${profileData>/selectedTab} === 'Complaints' }"
-            busy="{profileData>/isTableBusy}"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
             noDataText="No complaints found"

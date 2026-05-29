@@ -89,7 +89,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true}}">
+                items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"/>

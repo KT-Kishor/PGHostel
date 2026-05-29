@@ -65,7 +65,7 @@
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'SupportModel>/',sorter: {path: 'Status', group: true}}" >
+                items="{path: 'SupportModel>/',sorter: {path: 'Status', group: true},groupHeaderFactory: '.getGroupHeader'}" >
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${SupportModel>/}.length})"/>

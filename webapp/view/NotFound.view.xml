@@ -13,5 +13,11 @@
                 title="Page Not Found"
                 description="The link you followed is invalid or expired." />
 		</content>
+        <footer>
+			<core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.AppFooter"
+                type="XML"
+            />
+		</footer>
 	</Page>
 </mvc:View>

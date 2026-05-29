@@ -4356,8 +4356,8 @@ sap.ui.define([
                     "GSTValue": CustomerData.GSTValue,
                     "MemberID": memberIds,
                     "AdminUpdated": "YES",
-                    "Status" : CustomerData.Status
-
+                    "Status" : CustomerData.Status,
+                    "BookingID": CustomerData.BookingID
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
                     // Normalize UnitText for facility as well

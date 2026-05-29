@@ -13,6 +13,7 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -23,14 +24,18 @@ sap.ui.define([
                    this.onClearAndSearch("MV_id_FilterbarEmployee");
                 }
                 await this._loadBranchCode();
+                
                 await this.Onsearch("true");
+                
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
+                 this.getGroupHeader();
                 this.closeBusyDialog()
             }
         },
+        
 
         _initEmptyMDModel: function () {
             const emptyData = {
@@ -66,7 +71,7 @@ sap.ui.define([
                     BranchID: aBranchCodes
                 };
             }
-            this.getBusyDialog()
+            // this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -106,7 +111,7 @@ sap.ui.define([
             if (sStatus) {
                 filters.Status = sStatus;
             }
-            this.getBusyDialog()
+            if(flag === true) this.getBusyDialog()
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
 
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];
@@ -227,6 +232,9 @@ sap.ui.define([
             //         });
             // }
         },
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
 
         FC_onPressClear: function () {
             this.getView().byId("MV_id_UserID").setSelectedKey("");

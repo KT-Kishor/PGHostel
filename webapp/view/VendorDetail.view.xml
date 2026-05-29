@@ -389,5 +389,22 @@
 				</ObjectPageSection>
 			</sections>
 		</ObjectPageLayout>
+        <m:footer>
+			<m:Bar>
+            <m:contentLeft>
+                    <m:Image
+                        src="../image/TransparentKTlogo.png"
+                        width="30px"
+                        height="30px"
+                    />
+                    <m:Link
+                        text="{i18n>devlopby}"
+                        href="https://kalpavrikshatechnologies.com/"
+                        target="_blank"
+                        class="customLinkWhiteBg"
+                    />
+                </m:contentLeft>
+			</m:Bar>
+		</m:footer>
 	</m:Page>
 </mvc:View>

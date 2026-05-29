@@ -37,10 +37,14 @@ sap.ui.define([
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
+                
                 this.closeBusyDialog()
             }
         },
-
+           
+         getGroupHeader: function (oGroup) {
+                    return this.getStyledGroupHeader(oGroup);
+                },
         _initEmptyMDModel: function() {
             const emptyData = {
                 Salutation: "",

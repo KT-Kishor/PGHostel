@@ -67,6 +67,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function() {
+            this.getBusyDialog()
             await this.commonLoginFunction("ManageProfile");
             this.ManageData();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -94,12 +95,13 @@ sap.ui.define([
                     Payments: [],
                     Members: [],
                     isEditMode: false,
-                    selectedTab: "Booking History",
-                    isTableBusy: true
+                    selectedTab: "Booking History"
                 });
 
                 this.getView().setModel(oTempModel, "profileData");
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
+
+                this.getBusyDialog()
 
                 const filter = {
                     UserID: sUserID
@@ -147,8 +149,7 @@ sap.ui.define([
                         BookingID: booking.BookingID,
                         customerName: booking.customerName
                     })),
-                    facility: [],
-                    isTableBusy: false
+                    facility: [],                    
                 });
                 this.getView().setModel(oProfileModel, "profileData");
                 oProfileModel.refresh(true);
@@ -160,7 +161,6 @@ sap.ui.define([
                 }, 0);
 
                 oProfileModel.setProperty("/isEditMode", false);
-                oProfileModel.setProperty("/isTableBusy", false);
 
             } catch (err) {
                 const oProfileModel = new sap.ui.model.json.JSONModel({

@@ -43,7 +43,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="id_facilityTable" sticky="ColumnHeaders,HeaderToolbar" mode="MultiSelect"
-            width="auto" busyIndicatorDelay="0" items="{path: 'Facilities>/', sorter: {path: 'BranchName',descending: false,group: true}}">
+            width="auto" busyIndicatorDelay="0" items="{path: 'Facilities>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>facilities} ({= ${Facilities>/}.length})"/>

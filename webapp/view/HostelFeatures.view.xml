@@ -83,7 +83,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true}}"
+                items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
             >
                 <headerToolbar>
                     <OverflowToolbar>
