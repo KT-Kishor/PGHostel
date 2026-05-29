@@ -1151,7 +1151,7 @@ sap.ui.define([
 
 
                 let aData = oModel.getData();
-                if ((!aData || aData.length === 0) && BranchNewData) {
+                if (BranchNewData) {
                     this.byId("idBedTypeFlex").setBusy(true);
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
@@ -1162,6 +1162,8 @@ sap.ui.define([
                         const response = await this.ajaxReadWithJQuery("HM_Branch", "");
                         aData = response?.data || [];
                         this.Branchlength = aData.length;
+
+                        this.getOwnerComponent().getModel("sBRModel").setData(aData)
 
                         oModel.setData(aData);
 
