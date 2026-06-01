@@ -1247,11 +1247,10 @@ sap.ui.define([
                 sap.ui.getCore().byId("id_Period").setVisible(false)
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
                 if (Duration !== "Per Month" && Duration !== "Per Year") {
-                    sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                    sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 } else {
-                    sap.ui.getCore().byId("editStartDate").setEditable(false).setValue("")
+                    sap.ui.getCore().byId("editEndDate").setEditable(false).setValue("")
                 }
-                sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else {
                 sap.ui.getCore().byId("editquantity").setVisible(false)
@@ -3590,7 +3589,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onSaveBooking: function () {
+        onSaveBooking:async function () {
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -3617,7 +3616,7 @@ sap.ui.define([
 
             if (toDelete.length === 0) {
                 // nothing to delete → directly proceed
-                this.onSaveBooking1();
+               await this.onSaveBooking1();
                 return;
             }
 
@@ -4327,6 +4326,18 @@ sap.ui.define([
                 }
             }
 
+            var aDraftData = this.getView().getModel("DraftModel")?this.getView().getModel("DraftModel").getData() : "";
+
+           delete  aDraftData.Documents
+
+           var aDraftData =[aDraftData]
+
+
+// Collect all MemberIDs from DraftModel
+var aDraftMemberIds = aDraftData.map(function (item) {
+    return item.MemberID;
+});
+
             var Payload = {
                 "CustomerName": Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
@@ -4389,18 +4400,22 @@ sap.ui.define([
                         MemberID: item.MemberID
                     };
                 }),
-                "Documents": CustomerData.Documents.map(item => {
-                    // Normalize UnitText for facility as well
-                    return {
-                        DocumentID: item.DocumentID,
-                        DocumentType: item.DocumentType,
-                        FileName: item.FileName,
-                        FileType: item.FileType,
-                        File: item.File,
-                        UserID: CustomerData.UserID,
-                        MemberID: item.MemberID
-                    };
-                })
+                "Documents": CustomerData.Documents
+        .filter(function (item) {
+            // Skip if MemberID exists in DraftModel
+            return !aDraftMemberIds.includes(item.MemberID);
+        })
+        .map(function (item) {
+            return {
+                DocumentID: item.DocumentID,
+                DocumentType: item.DocumentType,
+                FileName: item.FileName,
+                FileType: item.FileType,
+                File: item.File,
+                UserID: CustomerData.UserID,
+                MemberID: item.MemberID
+            };
+        })
             };
 
 
@@ -8305,7 +8320,8 @@ sap.ui.define([
             const oDraft = oModel.getProperty(
                 "/NewMemberDraft"
             );
-
+    var DModel = new sap.ui.model.json.JSONModel(oDraft);
+this.getView().setModel(DModel, "DraftModel");
             const oPromise = isCreate ?
                 this.ajaxCreateWithJQuery(
                     "HM_MemberDocument", {
@@ -8342,10 +8358,8 @@ sap.ui.define([
                         aMembers
                     );
                 }
-
                 // ================= UPDATE =================
                 else {
-
                     if (this._sEditPath) {
 
                         oModel.setProperty(
@@ -8354,7 +8368,7 @@ sap.ui.define([
                         );
                     }
                 }
-
+          
                 oModel.refresh(true);
 
                 this.MM_Dialog.close();

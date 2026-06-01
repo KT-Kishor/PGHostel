@@ -2773,15 +2773,22 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   fill: white !important;
 }
 
-.customPanelHeader .sapMPanelHdr {
-  background-color: #1bb2bf !important;
-  color: white !important;
-  font-weight: bold !important;
-  border-radius: 0 !important;
+.customPanelHeader {
+    width: 100% !important;
+    border-radius: 0 !important;
 }
 
-.customPanelHeader {
-  border-radius: 0 !important;
+.customPanelHeader .sapMPanelHdr {
+    background-color: #1bb2bf !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.customPanelHeader .sapMPanelContent {
+    padding: 0 !important;
 }
 
 .sapMWizardStep .sapMWizardStepTitle {
