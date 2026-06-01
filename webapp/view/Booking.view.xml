@@ -302,7 +302,7 @@
                             <Table
                                 items="{BookingView>/FamilyMembers}"
                                 noDataText="No members selected"
-                                class="responsiveTable"
+                                class="responsiveTable occupantMembersTable "
                             >
                                 <columns>
                                     <Column
@@ -356,10 +356,10 @@
                                                 visible="{BookingView>/showFamilySection}"
                                             />
 
-                                            <Text
+                                            <Text  class="occupantFullNameCell"
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
                                             />
-                                            <Text
+                                            <Text class="occupantFullNameCell"
                                                 text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
                                             />
 

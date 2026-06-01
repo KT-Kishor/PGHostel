@@ -6812,3 +6812,11 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
   fill: #ffffff !important;
   text-shadow: none !important;
 }
+/* Mobile occupant table alignment */
+@media (max-width: 600px) {
+  .occupantMembersTable .occupantFullNameCell,
+  .occupantMembersTable .occupantFullNameHeader {
+    display: inline-block !important;
+    margin-left: 0.5rem !important;
+  }
+}
