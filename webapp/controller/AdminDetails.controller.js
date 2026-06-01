@@ -8761,7 +8761,7 @@ sap.ui.define([
 
             // ================= PDF PREVIEW =================
 
-            if (sMimeType === "application/pdf") {
+           if (sMimeType === "application/pdf") {
 
                 let sByteChars = "";
 
@@ -8826,71 +8826,25 @@ sap.ui.define([
                 this._previewUrl =
                     URL.createObjectURL(oBlob);
 
-                const oPdfDialog = new sap.m.Dialog({
-
-                    title: oDoc.FileName ||
-                        oDoc.DocumentName ||
-                        "Document Preview",
-
-                    stretch: true,
-
-                    draggable: true,
-                    resizable: true,
-
-                    contentWidth: "60%",
-                    contentHeight: "60%",
-
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-
-                    contentPadding: "0rem",
-
-                    content: [
-                        new sap.ui.core.HTML({
-                            sanitizeContent: false,
-                            content: `
-                            <div style="width:100%;height:100%;overflow:hidden;">
-                                <iframe
-                                    src="${this._previewUrl}"
-                                    style="width:100%;
-                                    height:calc(100vh - 100px);
-                                    border:none;
-                                    display:block;">
-                                </iframe>
-                            </div>
-                        `
-                        })
-                    ],
-
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-
-                            oPdfDialog.close();
-                        }
-                    }).addStyleClass("myUnifiedBtn"),
-
-                    afterClose: function () {
-
-                        if (this._previewUrl) {
-
-                            URL.revokeObjectURL(
-                                this._previewUrl
-                            );
-
-                            this._previewUrl = null;
-                        }
-
-                        oPdfDialog.destroy();
-
-                    }.bind(this)
+                // Create the native SAPUI5 PDF Viewer control
+                const oPdfViewer = new sap.m.PDFViewer({
+                    source: this._previewUrl,
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    height: "auto"
                 });
 
-                this.getView().addDependent(
-                    oPdfDialog
-                );
+                // Correct lifecycle hook: Override destroy to clean up the blob memory safely
+                const fnOriginalDestroy = oPdfViewer.destroy;
+                oPdfViewer.destroy = function () {
+                    if (this._previewUrl) {
+                        URL.revokeObjectURL(this._previewUrl);
+                        this._previewUrl = null;
+                    }
+                    fnOriginalDestroy.apply(oPdfViewer, arguments);
+                }.bind(this);
 
-                oPdfDialog.open();
+                // Open on all devices
+                oPdfViewer.open();
 
                 return;
             }

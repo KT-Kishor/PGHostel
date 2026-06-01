@@ -4943,152 +4943,173 @@ sap.ui.define([
         },
 
         onAdminPreviewDoc: function (oEvent) {
-            function autoDecodeBase64(b64) {
-                if (!b64) return "";
-                b64 = b64.replace(/\s/g, "");
-                let last = b64;
 
-                for (let i = 0; i < 5; i++) {
-                    try {
-                        if (
-                            last.startsWith("iVB") || // PNG
-                            last.startsWith("/9j") || // JPG
-                            last.startsWith("JVBER") // PDF
-                        ) {
-                            return last;
-                        }
-                        last = atob(last);
-                    } catch (e) {
-                        break;
-                    }
-                }
-                return last;
-            }
-            const oDoc = oEvent.getSource()
-                .getBindingContext("AdminSignupModel")
-                ?.getObject();
+    function autoDecodeBase64(b64) {
+        if (!b64) return "";
 
-            if (!oDoc || !oDoc.File) return MessageBox.error(this.i18nModel.getText("nodocfound"));
-            const sBase64 = autoDecodeBase64(oDoc.File);
-            let sMimeType = "application/octet-stream";
-            if (sBase64.startsWith("iVB")) {
-                sMimeType = "image/png";
-            } else if (sBase64.startsWith("/9j")) {
-                sMimeType = "image/jpeg";
-            } else if (sBase64.startsWith("JVBER")) {
-                sMimeType = "application/pdf";
-            }
-            if (sMimeType.startsWith("image/")) {
-                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-                if (!this._previewDialog) {
-                    const oFlex = new sap.m.FlexBox({
-                        width: "100%",
-                        height: "100%",
-                        renderType: "Div",
-                        justifyContent: "Center",
-                        alignItems: "Center",
-                        items: [
-                            new sap.m.Image({
-                                id: this.createId("adminDocPreviewImage"),
-                                densityAware: false,
-                                width: "100%",
-                                height: "100%",
-                                style: "object-fit: contain; display:block;"
-                            })
-                        ]
-                    });
+        b64 = b64.replace(/\s/g, "");
+        let last = b64;
 
-                    this._previewDialog = new sap.m.Dialog({
-                        title: oDoc.FileName || "Document Image",
-                        contentWidth: "50%",
-                        contentHeight: "60%",
-                        draggable: true,
-                        resizable: true,
-                        contentPadding: "0rem",
-                        horizontalScrolling: false,
-                        verticalScrolling: true,
-                        content: [oFlex],
-                        beginButton: new sap.m.Button({
-                            text: "Close",
-                            press: () => this._previewDialog.close()
-                        }),
-                        afterClose: () => {
-                            this._previewDialog.destroy();
-                            this._previewDialog = null;
-                        }
-                    });
-                    this.getView().addDependent(this._previewDialog);
-                } else {
-                    this._previewDialog.setTitle(oDoc.FileName || "Document Image");
+        for (let i = 0; i < 5; i++) {
+            try {
+                if (
+                    last.startsWith("iVB") ||   // PNG
+                    last.startsWith("/9j") ||   // JPG
+                    last.startsWith("JVBER")    // PDF
+                ) {
+                    return last;
                 }
-                this.byId("adminDocPreviewImage").setSrc(sImageSrc);
-                this._previewDialog.open();
-                return;
+                last = atob(last);
+            } catch (e) {
+                break;
             }
-            if (sMimeType === "application/pdf") {
-                if (!this._previewDialog) {
-                    this._previewDialog = new sap.m.Dialog({
-                        title: oDoc.FileName || "Document Preview",
-                        stretch: true,
-                        draggable: true,
-                        resizable: true,
-                        contentWidth: "50%",
-                        contentHeight: "50%",
-                        horizontalScrolling: true,
-                        verticalScrolling: false,
-                        contentPadding: "0rem",
-                        endButton: new sap.m.Button({
-                            text: "Close",
-                            press: () => {
-                                if (this._previewUrl) {
-                                    URL.revokeObjectURL(this._previewUrl);
-                                    this._previewUrl = null;
-                                }
-                                this._previewDialog.close();
-                            }
-                        }),
-                        afterClose: () => {
-                            this._previewDialog.destroy();
-                            this._previewDialog = null;
-                        }
-                    });
-                    this.getView().addDependent(this._previewDialog);
-                }
-                this._previewDialog.removeAllContent();
-                const byteChars = atob(sBase64);
-                const byteArrays = [];
-                for (let offset = 0; offset < byteChars.length; offset += 512) {
-                    const slice = byteChars.slice(offset, offset + 512);
-                    const byteNumbers = new Array(slice.length);
-                    for (let i = 0; i < slice.length; i++) {
-                        byteNumbers[i] = slice.charCodeAt(i);
-                    }
-                    byteArrays.push(new Uint8Array(byteNumbers));
-                }
-                const blob = new Blob(byteArrays, {
-                    type: sMimeType
-                });
-                if (this._previewUrl) URL.revokeObjectURL(this._previewUrl);
+        }
 
-                this._previewUrl = URL.createObjectURL(blob);
-                this._previewDialog.addContent(
-                    new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-            <div style="width:100%; height:100%; overflow:hidden;">
-                <iframe
-                    src="${this._previewUrl}"
-                    style="width:100%; height:calc(100vh - 100px); border:none; display:block;">
-                </iframe>
-            </div>
-        `
-                    })
-                );
-                this._previewDialog.open();
-                return;
+        return last;
+    }
+
+    const oDoc = oEvent.getSource()
+        .getBindingContext("AdminSignupModel")
+        ?.getObject();
+
+    if (!oDoc || !oDoc.File) {
+        sap.m.MessageBox.error(
+            this.i18nModel.getText("nodocfound")
+        );
+        return;
+    }
+
+    const sBase64 = autoDecodeBase64(oDoc.File);
+
+    let sMimeType = "application/octet-stream";
+
+    if (sBase64.startsWith("iVB")) {
+        sMimeType = "image/png";
+    } else if (sBase64.startsWith("/9j")) {
+        sMimeType = "image/jpeg";
+    } else if (sBase64.startsWith("JVBER")) {
+        sMimeType = "application/pdf";
+    }
+
+    // ===========================
+    // IMAGE PREVIEW
+    // ===========================
+    if (sMimeType.startsWith("image/")) {
+
+        const sImageSrc =
+            `data:${sMimeType};base64,${sBase64}`;
+
+        if (!this._previewDialog) {
+
+            this._oPreviewImage = new sap.m.Image({
+                densityAware: false,
+                width: "100%",
+                height: "100%"
+            });
+
+            const oFlex = new sap.m.FlexBox({
+                width: "100%",
+                height: "100%",
+                justifyContent: "Center",
+                alignItems: "Center",
+                items: [this._oPreviewImage]
+            });
+
+            this._previewDialog = new sap.m.Dialog({
+                title: oDoc.FileName || "Document Image",
+                stretch: sap.ui.Device.system.phone,
+                contentWidth: "50%",
+                contentHeight: "60%",
+                contentPadding: "0rem",
+                horizontalScrolling: false,
+                verticalScrolling: false,
+                content: [oFlex],
+
+                beginButton: new sap.m.Button({
+                    text: "Close",
+                    press: function () {
+                        this._previewDialog.close();
+                    }.bind(this)
+                })
+            });
+
+            this.getView().addDependent(
+                this._previewDialog
+            );
+        }
+
+        this._previewDialog.setTitle(
+            oDoc.FileName || "Document Image"
+        );
+
+        this._oPreviewImage.setSrc(sImageSrc);
+
+        this._previewDialog.open();
+
+        return;
+    }
+
+    // ===========================
+    // PDF PREVIEW
+    // ===========================
+    if (sMimeType === "application/pdf") {
+
+        const byteCharacters = atob(sBase64);
+        const byteArrays = [];
+
+        for (
+            let offset = 0;
+            offset < byteCharacters.length;
+            offset += 512
+        ) {
+
+            const slice = byteCharacters.slice(
+                offset,
+                offset + 512
+            );
+
+            const byteNumbers =
+                new Array(slice.length);
+
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] =
+                    slice.charCodeAt(i);
             }
-            MessageToast.show("Preview not supported.");
-        },
+
+            byteArrays.push(
+                new Uint8Array(byteNumbers)
+            );
+        }
+
+        const blob = new Blob(
+            byteArrays,
+            {
+                type: "application/pdf"
+            }
+        );
+
+        if (this._previewUrl) {
+            URL.revokeObjectURL(
+                this._previewUrl
+            );
+        }
+
+        this._previewUrl =
+            URL.createObjectURL(blob);
+
+        // Open PDF in new tab
+        window.open(
+            this._previewUrl,
+            "_blank"
+        );
+
+        return;
+    }
+
+    sap.m.MessageToast.show(
+        "Preview not supported."
+    );
+},
 
         onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();

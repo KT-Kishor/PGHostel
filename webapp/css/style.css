@@ -2601,6 +2601,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     text-align: center;
     width: 100%;
     font-size: 14px;
+    color:#000 !important;
   }
 
   .footer-social {
@@ -4426,20 +4427,13 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     width: 10rem;
     font-size: 3rem;
 } */
-/* .customLinkWhiteBg,
-.customLinkWhiteBg:active,
-.customLinkWhiteBg:focus,
-.customLinkWhiteBg:visited {
-    outline: none;
-    color:#0070c9;
-    background: white;
-} */
+
 .customLinkWhiteBg.sapMLnk,
 .customLinkWhiteBg.sapMLnk:focus,
 .customLinkWhiteBg.sapMLnk:active,
 .customLinkWhiteBg.sapMLnk:visited,
 .customLinkWhiteBg.sapMLnk:hover {
-  color: #0070c9 !important;
+  color: #000000 !important;
   background-color: white !important;
   outline: none !important;
   box-shadow: none !important;
@@ -6698,5 +6692,16 @@ html, body {
 }
 
 .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
-  width:180px !important;
+  width:250px !important;
+}
+.adminPreviewImage {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+.adminPreviewImage img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
 }

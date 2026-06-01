@@ -487,13 +487,12 @@ sap.ui.define([
                         justifyContent: "Center",
                         alignItems: "Center",
                         items: [
-                            new sap.m.Image({
-                                id: this.createId("adminDocPreviewImage"),
-                                densityAware: false,
-                                width: "100%",
-                                height: "100%",
-                                style: "object-fit: contain; display:block;"
-                            })
+                          new sap.m.Image({
+    id: this.createId("adminDocPreviewImage"),
+    densityAware: false,
+    width: "100%",
+    decorative: false
+}).addStyleClass("adminPreviewImage")
                         ]
                     });
                     this._oAdminPreviewDialog = new sap.m.Dialog({
@@ -527,75 +526,39 @@ sap.ui.define([
                 this._oAdminPreviewDialog.open();
                 return;
             }
-            if (sMimeType === "application/pdf") {
-                if (!this._oAdminPreviewDialog) {
-                    this._oAdminPreviewDialog = new sap.m.Dialog({
-                        title: "Document Preview",
-                        stretch: true,
-                        draggable: true,
-                        resizable: true,
-                        contentWidth: "50%",
-                        contentHeight: "90%",
-                        horizontalScrolling: false,
-                        verticalScrolling: true,
-                        contentPadding: "0rem",
-                        endButton: new sap.m.Button({
-                            text: "Close",
-                            press: () => {
-                                if (this._previewUrl) {
-                                    URL.revokeObjectURL(this._previewUrl);
-                                    this._previewUrl = null;
-                                }
-                                this._oAdminPreviewDialog.close();
-                            }
-                        }),
+           if (sMimeType === "application/pdf") {
 
-                        afterClose: function () {
-                            this._oAdminPreviewDialog.destroy();
-                            this._oAdminPreviewDialog = null;
-                        }.bind(this)
-                    });
-                    this.getView().addDependent(this._oAdminPreviewDialog);
-                }
-                this._oAdminPreviewDialog.removeAllContent();
-                const byteCharacters = atob(sBase64);
-                const byteArrays = [];
+    const byteCharacters = atob(sBase64);
+    const byteArrays = [];
 
-                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                    const slice = byteCharacters.slice(offset, offset + 512);
-                    const byteNumbers = new Array(slice.length);
-                    for (let i = 0; i < slice.length; i++) {
-                        byteNumbers[i] = slice.charCodeAt(i);
-                    }
-                    byteArrays.push(new Uint8Array(byteNumbers));
-                }
-                const blob = new Blob(byteArrays, {
-                    type: sMimeType
-                });
-                if (this._previewUrl) {
-                    URL.revokeObjectURL(this._previewUrl);
-                }
-                this._previewUrl = URL.createObjectURL(blob);
-                if (sap.ui.Device.system.phone) {
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
 
+        const slice = byteCharacters.slice(offset, offset + 512);
+
+        const byteNumbers = new Array(slice.length);
+
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    const blob = new Blob(byteArrays, {
+        type: "application/pdf"
+    });
+
+    if (this._previewUrl) {
+        URL.revokeObjectURL(this._previewUrl);
+    }
+
+    this._previewUrl = URL.createObjectURL(blob);
+
+    // Open PDF in new tab
     window.open(this._previewUrl, "_blank");
 
     return;
 }
-                this._oAdminPreviewDialog.addContent(
-                    new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-                            <iframe
-                                src="${this._previewUrl}"
-                                style="width:100%; height:600px; border:none; display:block;">
-                            </iframe>
-                        `
-                    })
-                );
-                this._oAdminPreviewDialog.open();
-                return;
-            }
             sap.m.MessageToast.show("Preview not supported.");
         },
 
