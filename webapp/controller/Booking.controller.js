@@ -6409,6 +6409,7 @@ return;
             var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
 
             let guestBody = [];
+            let guestBoxY = currentY;
 
             Memberdata.forEach((member, index) => {
                 guestBody.push([
