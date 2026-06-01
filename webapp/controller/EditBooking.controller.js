@@ -2796,45 +2796,134 @@ sap.ui.define([
          * This is needed to handle facilities with multiple UnitText variants
          * (e.g., "Extra Pillow" with both "Per Day" and "Per Month" pricing).
          */
+        // _findAllSelectedFacilitiesForEdit: function (oFacility, aSelectedFacilities) {
+        //     aSelectedFacilities = Array.isArray(aSelectedFacilities) ? aSelectedFacilities : [];
+
+        //     var sFacilityId = String(oFacility.ID || oFacility.FacilityID || "").trim();
+        //     var sFacilityNameKey = this._normalizeEditFacilityKey(oFacility.FacilityName || oFacility.Type || "");
+        //     var aMatches = [];
+
+        //     // Try matching by catalog FacilityID first
+        //     if (sFacilityId) {
+        //         aSelectedFacilities.forEach(function (oSelected) {
+        //             var sSelectedCatalogId = String(oSelected.CatalogFacilityID || "").trim();
+        //             var sSelectedFacilityId = String(oSelected.FacilityID || oSelected.ID || "").trim();
+        //             if (sSelectedCatalogId === sFacilityId || sSelectedFacilityId === sFacilityId) {
+        //                 if (aMatches.indexOf(oSelected) < 0) {
+        //                     aMatches.push(oSelected);
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     // Fall back to name matching if no ID matches found
+        //     if (aMatches.length === 0 && sFacilityNameKey) {
+        //         aSelectedFacilities.forEach(function (oSelected) {
+        //             var sSelectedNameKey = this._normalizeEditFacilityKey(oSelected.FacilityName || oSelected.Type || "");
+        //             if (sSelectedNameKey && (
+        //                 sSelectedNameKey === sFacilityNameKey ||
+        //                 sSelectedNameKey.indexOf(sFacilityNameKey) >= 0 ||
+        //                 sFacilityNameKey.indexOf(sSelectedNameKey) >= 0
+        //             )) {
+        //                 if (aMatches.indexOf(oSelected) < 0) {
+        //                     aMatches.push(oSelected);
+        //                 }
+        //             }
+        //         }.bind(this));
+        //     }
+
+        //     return aMatches;
+        // },
+
         _findAllSelectedFacilitiesForEdit: function (oFacility, aSelectedFacilities) {
             aSelectedFacilities = Array.isArray(aSelectedFacilities) ? aSelectedFacilities : [];
 
-            var sFacilityId = String(oFacility.ID || oFacility.FacilityID || "").trim();
-            var sFacilityNameKey = this._normalizeEditFacilityKey(oFacility.FacilityName || oFacility.Type || "");
+            var sCatalogId = String(oFacility.ID || oFacility.CatalogFacilityID || "").trim();
+            var sCatalogMode = String(oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility) || "")
+                .trim()
+                .toUpperCase();
+
+            var fnStripUnitSuffix = function (sValue) {
+                // Handles display names like "AC (Per Month)"
+                return String(sValue || "").replace(/\s*\([^)]*\)\s*$/, "");
+            };
+
+            var fnKey = function (sValue) {
+                return this._normalizeEditFacilityKey(fnStripUnitSuffix(sValue));
+            }.bind(this);
+
+            var aCatalogNameKeys = [
+                fnKey(oFacility.FacilityName),
+                fnKey(oFacility.Type)
+            ].filter(function (sKey, iIndex, aList) {
+                return sKey && aList.indexOf(sKey) === iIndex;
+            });
+
+            var fnGetSelectedNameKeys = function (oSelected) {
+                return [
+                    fnKey(oSelected.FacilityName),
+                    fnKey(oSelected.Type),
+                    fnKey(oSelected.DisplayFacilityName)
+                ].filter(function (sKey, iIndex, aList) {
+                    return sKey && aList.indexOf(sKey) === iIndex;
+                });
+            };
+
+            var fnModeMatches = function (oSelected) {
+                var sSelectedMode = String(oSelected.SelectionMode || "").trim().toUpperCase();
+
+                // If old saved data has no SelectionMode, allow name/catalog match.
+                // If it has SelectionMode, it must match the catalog mode.
+                return !sSelectedMode || !sCatalogMode || sSelectedMode === sCatalogMode;
+            };
+
+            var fnNameMatchesExactly = function (oSelected) {
+                var aSelectedNameKeys = fnGetSelectedNameKeys(oSelected);
+
+                return aSelectedNameKeys.some(function (sSelectedKey) {
+                    return aCatalogNameKeys.indexOf(sSelectedKey) >= 0;
+                });
+            };
+
             var aMatches = [];
 
-            // Try matching by catalog FacilityID first
-            if (sFacilityId) {
+            var fnAddMatch = function (oSelected) {
+                if (aMatches.indexOf(oSelected) < 0) {
+                    aMatches.push(oSelected);
+                }
+            };
+
+            // 1. Strong match: selected item carries the real catalog id.
+            if (sCatalogId) {
                 aSelectedFacilities.forEach(function (oSelected) {
-                    var sSelectedCatalogId = String(oSelected.CatalogFacilityID || "").trim();
-                    var sSelectedFacilityId = String(oSelected.FacilityID || oSelected.ID || "").trim();
-                    if (sSelectedCatalogId === sFacilityId || sSelectedFacilityId === sFacilityId) {
-                        if (aMatches.indexOf(oSelected) < 0) {
-                            aMatches.push(oSelected);
-                        }
+                    var sSelectedCatalogId = String(
+                        oSelected.CatalogFacilityID ||
+                        oSelected.CatalogID ||
+                        ""
+                    ).trim();
+
+                    if (
+                        sSelectedCatalogId &&
+                        sSelectedCatalogId === sCatalogId &&
+                        fnModeMatches(oSelected)
+                    ) {
+                        fnAddMatch(oSelected);
                     }
                 });
             }
 
-            // Fall back to name matching if no ID matches found
-            if (aMatches.length === 0 && sFacilityNameKey) {
+            // 2. Fallback: exact normalized name match + SelectionMode match.
+            // No substring matching, because "AC" is inside "Laundry package".
+            if (aMatches.length === 0 && aCatalogNameKeys.length > 0) {
                 aSelectedFacilities.forEach(function (oSelected) {
-                    var sSelectedNameKey = this._normalizeEditFacilityKey(oSelected.FacilityName || oSelected.Type || "");
-                    if (sSelectedNameKey && (
-                        sSelectedNameKey === sFacilityNameKey ||
-                        sSelectedNameKey.indexOf(sFacilityNameKey) >= 0 ||
-                        sFacilityNameKey.indexOf(sSelectedNameKey) >= 0
-                    )) {
-                        if (aMatches.indexOf(oSelected) < 0) {
-                            aMatches.push(oSelected);
-                        }
+                    if (fnModeMatches(oSelected) && fnNameMatchesExactly(oSelected)) {
+                        fnAddMatch(oSelected);
                     }
-                }.bind(this));
+                });
             }
 
             return aMatches;
         },
-
         /**
          * Build a single processed facility entry from a catalog facility and a selected facility match.
          * Extracted from _processFacilitiesForEdit to support 1:N mapping for UnitText variants.
