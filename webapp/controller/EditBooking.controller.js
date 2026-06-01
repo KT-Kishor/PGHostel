@@ -3597,39 +3597,22 @@ sap.ui.define([
 
             checkNewPage(100);
 
-            // Remove duplicate SELF members safely
-            const members = (data.AllMembers || []).filter(member =>
-                (member.Relation || "")
-                    .trim()
-                    .toUpperCase() !== "SELF"
-            );
+            // ---------- GUEST DETAILS ----------
 
             let guestBoxY = currentY;
 
-            // Guest Table Data
-            let guestBody = [
-                [
-                    "1",
-                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
-                    data.Gender || "-",
-                    `${data.STDCode || "+91"} ${data.MobileNo || "-"}`,
-                    Formatter.formatAgeFromDOBOrAge(
-                        this._parseDate(data.DateOfBirth)
-                    ) || "-",
-                    "SELF"
-                ]
-            ];
+            var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
 
-            // Additional Members
-            members.forEach((member, index) => {
+            let guestBody = [];
 
+            Memberdata.forEach((member, index) => {
                 guestBody.push([
-                    String(index + 2),
+                    (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
                     member.MobileNo || "-",
                     Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth
+                        member.Age
                     ) || "-",
                     member.Relation || "-"
                 ]);

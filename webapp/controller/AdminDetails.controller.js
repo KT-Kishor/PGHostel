@@ -7385,39 +7385,24 @@ sap.ui.define([
 
             checkNewPage(80);
 
-            // Remove duplicate SELF from members
-            const members = (data.AllMembers || []).filter(member =>
-                member.Relation !== "SELF"
-            );
-
+            // Guest Members from AllMembers only
+            const members = data.AllMembers || [];
 
             // ---------- GUEST DETAILS ----------
 
             let guestBoxY = currentY;
 
-            // Guest Table Data
-            let guestBody = [
-                [
-                    "1",
-                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
-                    data.Gender || "-",
-                    `${data.STDCode || "+91"} ${data.MobileNo || "-"}`,
-                    Formatter.formatAgeFromDOBOrAge(
-                        this._parseDate(data.DateOfBirth)
-                    ) || "-",
-                    "SELF"
-                ]
-            ];
+            let guestBody = [];
 
-            // Additional Members
             members.forEach((member, index) => {
+
                 guestBody.push([
-                    (index + 2).toString(),
+                    (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    "-",
+                    `${member.STDCode || "+91"} ${member.MobileNo || "-"}`,
                     Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth
+                        member.DateOfBirth || member.Age
                     ) || "-",
                     member.Relation || "-"
                 ]);

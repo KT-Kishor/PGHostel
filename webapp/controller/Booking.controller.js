@@ -6406,37 +6406,18 @@ return;
 
             checkNewPage(100);
 
-            const members = (data.AllMembers || []).filter(
-                member => member.Relation !== "SELF"
-            );
+            var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
 
-            // ---------- GUEST DETAILS ----------
+            let guestBody = [];
 
-            let guestBoxY = currentY;
-
-            // Build Guest Table Data
-            let guestBody = [
-                [
-                    "1",
-                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
-                    data.Gender || "-",
-                    `${data.MobileNo || "-"}`,
-                    Formatter.formatAgeFromDOBOrAge(
-                        this._parseDate(data.DateOfBirth)
-                    ) || "-",
-                    "SELF"
-                ]
-            ];
-
-            members.forEach((member, index) => {
-
+            Memberdata.forEach((member, index) => {
                 guestBody.push([
-                    (index + 2).toString(),
+                    (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
                     member.MobileNo || "-",
                     Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth
+                        member.Age
                     ) || "-",
                     member.Relation || "-"
                 ]);
