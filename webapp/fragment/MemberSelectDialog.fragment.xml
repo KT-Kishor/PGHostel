@@ -12,7 +12,7 @@
         resizable="true"
     >
         <customHeader>
-            <OverflowToolbar>
+            <OverflowToolbar class="memberDialogHeader">
                 <Title text="Select Members" />
                 <ToolbarSpacer />
                 <Button

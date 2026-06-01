@@ -6705,3 +6705,110 @@ html, body {
     height: 100% !important;
     object-fit: contain !important;
 }
+/* Header toolbar background */
+.memberSelectDialog .memberDialogHeader.sapMTB,
+.memberSelectDialog .memberDialogHeader.sapMIBar,
+.memberSelectDialog .memberDialogHeader.sapMOTB,
+.memberSelectDialog .memberDialogHeader {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  background-color: #008b96 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Header title white */
+.memberSelectDialog .memberDialogHeader .sapMTitle,
+.memberSelectDialog .memberDialogHeader .sapMTitle bdi,
+.memberSelectDialog .memberDialogHeader .sapMText,
+.memberSelectDialog .memberDialogHeader .sapMLabel {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Normal Add New Member button in header */
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnInner {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnContent,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnContent bdi,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapUiIcon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots button: default state */
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnDefault,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnHoverable {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots icon: default state */
+.memberSelectDialog .memberDialogHeader .sapMBtnTransparent > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnTransparent > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapUiIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapUiIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots button: hover/focus/active/pressed */
+html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed:not(.sapMBtnDisabled),
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn:focus .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnInner {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots icon: hover/focus/active/pressed */
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Extra fallback for UI5 overflow button generated IDs/classes */
+.memberSelectDialog .memberDialogHeader [id*="overflow"] .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader [id*="overflow"] .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader [id*="overflowButton"] .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader [id*="overflowButton"] .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMOTBOverflowButton .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMOTBOverflowButton .sapMBtnIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
