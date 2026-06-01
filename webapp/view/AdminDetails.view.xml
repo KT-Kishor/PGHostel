@@ -326,6 +326,7 @@
                     </f:SimpleForm>
                 </Panel>
             </VBox>
+           
             <VBox>
                 <Panel
                     headerText="{= 'Personal Information - ' + ${CustomerData>/CustomerName} }"
@@ -392,7 +393,7 @@
                                 <layoutData>
                                     <f:ColumnElementData
                                         cellsSmall="3"
-                                        cellsLarge="1.8"
+                                        cellsLarge="2"
                                     />
                                 </layoutData>
                             </Select>
@@ -603,6 +604,8 @@
                                 maxLength="150"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_Address"
+                                width="70%"
+                                rows="3"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
                                 placeholder="Enter address"
@@ -702,15 +705,17 @@
                             </FlexBox>
                         </VBox>
                     </FlexBox>
+                 
                     <VBox class="sapUiMediumMarginBottom">
                         <Panel
                             headerText="{i18n>customerDocuments}"
                             expandable="false"
                             class="customPanelHeader"
                         >
+                    
+
                             <Table
                                 id="Ad_id_idFacilityRoomTableDetails1"
-                                width="100%"
                                 class="sapUiSmallMarginTop"
                                 items="{path: 'CustomerData>/Documents'}"
                                 delete="onDocumentDelete"

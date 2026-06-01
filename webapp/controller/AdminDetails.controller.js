@@ -1200,7 +1200,7 @@ sap.ui.define([
             }
             if (Duration === "Per Month") {
                 editdata.setProperty("/Price", FPrice.PerMonthPrice)
-                sap.ui.getCore().byId("editEndDate").setEditable(false)
+                sap.ui.getCore().byId("editEndDate").setEditable(false).setValue("")
             }
             if (Duration === "Per Year") {
                 editdata.setProperty("/Price", FPrice.PerYearPrice)
@@ -1246,6 +1246,11 @@ sap.ui.define([
                 sap.ui.getCore().byId("editquantity").setVisible(true).setValue("")
                 sap.ui.getCore().byId("id_Period").setVisible(false)
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                if (Duration !== "Per Month" && Duration !== "Per Year") {
+                    sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
+                } else {
+                    sap.ui.getCore().byId("editStartDate").setEditable(false).setValue("")
+                }
                 sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else {
@@ -4744,7 +4749,7 @@ sap.ui.define([
                         if (
                             last.startsWith("iVB") || // PNG
                             last.startsWith("/9j") || // JPG
-                            last.startsWith("JVBER") // PDF
+                            last.startsWith("JVBER")
                         ) {
                             return last;
                         }
@@ -5537,6 +5542,8 @@ sap.ui.define([
             sap.ui.getCore().byId("idGSTPercentage")
                 .setValue(CustData.GSTValue || "");
 
+
+
             sap.ui.getCore().byId("idGSTType")
                 .setSelectedIndex(
                     CustData.GSTType === "CGST/SGST" ? 1 : 0
@@ -5559,10 +5566,10 @@ sap.ui.define([
                 .setVisible(!!CustData.GSTIN);
 
             sap.ui.getCore().byId("idGSTPercentage")
-                .setVisible(bHasBranchGST);
+                .setVisible(!!CustData.GSTValue && CustData.GSTValue !== "0");
 
             sap.ui.getCore().byId("idGSTType")
-                .setVisible(bHasBranchGST);
+                .setVisible(!!CustData.GSTType);
 
             // ALWAYS show customer fields
             sap.ui.getCore().byId("idGSTNumber")
@@ -8058,8 +8065,8 @@ sap.ui.define([
             }
 
             var oRelationCombo = sap.ui.getCore().byId("AD_id_MemberRelationCombo");
-            if (oCopyData.Relation === "Self") {
-                oRelationCombo.setValue("Self");
+            if (oCopyData.Relation === "SELF") {
+                oRelationCombo.setValue("SELF");
             }
 
             // Format DOB
@@ -8207,40 +8214,13 @@ sap.ui.define([
 
             var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
 
-            if (utils._LCstrictValidationComboBox(
-                oView.byId("AD_idSelect"),
-                "ID"
-            ) &&
-
-                utils._LCvalidateMandatoryField(
-                    oView.byId("AD_id_MemberName"),
-                    "ID"
-                ) &&
-
-                utils._LCvalidateDate(
-                    oView.byId("AD_id_MemberDOB"),
-                    "ID"
-                ) &&
-
-                utils._LCstrictValidationComboBox(
-                    oView.byId("AD_id_MemberGenderCombo"),
-                    "ID"
-                ) &&
-
-                (
-                    oMember.Relation === "Self" ||
-
-                    utils._LCstrictValidationComboBox(
-                        oView.byId("AD_id_MemberRelationCombo"),
-                        "ID"
-                    )
-                ) &&
-
-                utils._LCstrictValidationComboBox(
-                    oView.byId("AD_id_DocumentType"),
-                    "ID"
-                )
-
+            if (utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"),"ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"),"ID") &&
+                utils._LCvalidateDate( oView.byId("AD_id_MemberDOB"),"ID") &&
+                utils._LCstrictValidationComboBox(    oView.byId("AD_id_MemberGenderCombo"),"ID" ) &&
+                (oMember.Relation === "SELF" ||
+                    utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID" )
+                ) &&utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"),"ID")
             ) {
 
                 // ================= DOCUMENT VALIDATION =================
@@ -8746,7 +8726,7 @@ sap.ui.define([
 
             // ================= PDF PREVIEW =================
 
-           if (sMimeType === "application/pdf") {
+            if (sMimeType === "application/pdf") {
 
                 let sByteChars = "";
 
