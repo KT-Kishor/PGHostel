@@ -4,27 +4,26 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/export/Spreadsheet",
     "../model/formatter"
-], function (BaseController, utils, MessageToast,
+], function(BaseController, utils, MessageToast,
     Spreadsheet, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.Bed_Details", {
         Formatter: Formatter,
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function (oEvent) {
+        _onRouteMatched: async function(oEvent) {
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
-
+                this.getBusyDialog();
                 var oView = this.getView();
                 var oModel = oView.getModel("BedDetails");
                 var sPath = oEvent.getParameter("arguments").sPath;
 
                 if (sPath === "Tile Page") {
                     this.onClearAndSearch("BD_id_FilterbarEmployee");
-
                 }
 
                 if (!oModel) {
@@ -38,6 +37,7 @@ sap.ui.define([
                     ACType: "",
                 });
                 this.getView().setModel(model, "BedModel")
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oTokenModel = new sap.ui.model.json.JSONModel({
                     tokens: []
@@ -50,17 +50,18 @@ sap.ui.define([
                 this.getView().setModel(oTokenModel, "tokenModel");
                 this.getView().setModel(oUploaderData, "UploaderData");
                 await this._loadBranchCode()
-                await this.Onsearch(true)
+                await this.Onsearch("true")
                 this.Customerdata()
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                 this.getGroupHeader();
+                this.getGroupHeader();
                 this.closeBusyDialog()
             }
         },
-        Customerdata: function () {
+
+        Customerdata: function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -84,15 +85,14 @@ sap.ui.define([
 
                 const oModel = new sap.ui.model.json.JSONModel(response.Customers);
                 this.getView().setModel(oModel, "HostelModel");
-
-                this.closeBusyDialog()
             }).catch(() => this.closeBusyDialog())
         },
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
 
-        _loadBranchCode: async function () {
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
+
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -114,7 +114,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
                 const oView = this.getView();
 
@@ -132,7 +131,8 @@ sap.ui.define([
                 sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
-        onPriceInputLiveChange: function (oEvent) {
+
+        onPriceInputLiveChange: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
 
@@ -152,10 +152,9 @@ sap.ui.define([
             }
 
             oInput.setValue(sValue);
-
         },
 
-        HM_RoomDetails: function (oEvent) {
+        HM_RoomDetails: function(oEvent) {
             if (this.ARD_Dialog) {
                 this.ARD_Dialog.destroy();
                 this.ARD_Dialog = null;
@@ -179,30 +178,30 @@ sap.ui.define([
                 isFileUploaded: false
             });
 
-            var aControls = this.ARD_Dialog.findAggregatedObjects(true, function (oControl) {
+            var aControls = this.ARD_Dialog.findAggregatedObjects(true, function(oControl) {
                 return oControl instanceof sap.m.Input ||
                     oControl instanceof sap.m.ComboBox ||
                     oControl instanceof sap.m.Select ||
                     oControl instanceof sap.m.TextArea;
             });
 
-            aControls.forEach(function (oControl) {
+            aControls.forEach(function(oControl) {
                 oControl.setValueState("None");
             });
             this.ARD_Dialog.open();
         },
 
-        onNoOfPersonInputLiveChange: function (oEvent) {
+        onNoOfPersonInputLiveChange: function(oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
-        onLivehange: function (oEvent) {
+        onLivehange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        BT_onsavebuttonpress: async function () {
+        BT_onsavebuttonpress: async function() {
             var oView = this.getView();
             var Payload = oView.getModel("BedModel").getData();
             const oUploaderData = oView.getModel("UploaderData");
@@ -233,7 +232,7 @@ sap.ui.define([
                 }
 
                 var aBedDetails = oView.getModel("BedDetails").getData() || "";
-                var bDuplicate = aBedDetails.some(function (bed) {
+                var bDuplicate = aBedDetails.some(function(bed) {
                     // skip the same record in edit mode
                     if (Payload.ID && bed.ID === Payload.ID) {
                         return false;
@@ -309,47 +308,46 @@ sap.ui.define([
             }
         },
 
- onTokenDelete: function (oEvent) {
+        onTokenDelete: function(oEvent) {
+            const oView = this.getView();
 
-    const oView = this.getView();
+            const oTokenModel = oView.getModel("tokenModel");
+            const oUploaderData = oView.getModel("UploaderData");
 
-    const oTokenModel = oView.getModel("tokenModel");
-    const oUploaderData = oView.getModel("UploaderData");
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
 
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
-    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            // Get pressed button
+            const oButton = oEvent.getSource();
 
-    // Get pressed button
-    const oButton = oEvent.getSource();
+            // Get row item
+            const oItem = oButton.getParent();
 
-    // Get row item
-    const oItem = oButton.getParent();
+            // Get binding context
+            const oCtx = oItem.getBindingContext("UploaderData");
 
-    // Get binding context
-    const oCtx = oItem.getBindingContext("UploaderData");
+            if (oCtx) {
 
-    if (oCtx) {
+                // Get selected row index
+                const iIndex = parseInt(
+                    oCtx.getPath().split("/").pop(),
+                    10
+                );
 
-        // Get selected row index
-        const iIndex = parseInt(
-            oCtx.getPath().split("/").pop(),
-            10
-        );
+                // Remove only selected attachment
+                aAttachments.splice(iIndex, 1);
 
-        // Remove only selected attachment
-        aAttachments.splice(iIndex, 1);
+                // Remove only selected token
+                aTokens.splice(iIndex, 1);
+            }
 
-        // Remove only selected token
-        aTokens.splice(iIndex, 1);
-    }
+            oTokenModel.setProperty("/tokens", aTokens);
+            oUploaderData.setProperty("/attachments", aAttachments);
 
-    oTokenModel.setProperty("/tokens", aTokens);
-    oUploaderData.setProperty("/attachments", aAttachments);
+            this.byId("BT_id_FileUploader1").clear();
+        },
 
-    this.byId("BT_id_FileUploader1").clear();
-},
-
-        onFacilityFileChange: function (oEvent) {
+        onFacilityFileChange: function(oEvent) {
             var oUploader = oEvent.getSource();
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
@@ -432,14 +430,14 @@ sap.ui.define([
             oUploader.clear();
         },
 
-        formatFileSize: function (bytes) {
+        formatFileSize: function(bytes) {
             if (!bytes) return "0 Bytes";
             const sizes = ["Bytes", "KB", "MB", "GB"];
             let i = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
         },
 
-        BT_onCancelButtonPress: function () {
+        BT_onCancelButtonPress: function() {
             this.ARD_Dialog.close();
             if (this.ARD_Dialog) {
                 this.ARD_Dialog.destroy();
@@ -447,21 +445,20 @@ sap.ui.define([
             }
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("BedDetails").setData({});
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
             this.getView().getModel("BedDetails").setData({});
         },
 
-        Onsearch: function (flag) {
+        Onsearch: function(flag) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
-
 
             var oView = this.getView();
             var oTable = oView.byId("id_BedTable");
@@ -471,7 +468,7 @@ sap.ui.define([
                 oView.byId("PO_id_CustomerName").getValue();
             var sCustomerID = oView.byId("PO_id_CompanyName").getSelectedKey() ||
                 oView.byId("PO_id_CompanyName").getValue();
-                  var sBranch = oView.byId("PO_id_Branch").getSelectedKey() ||
+            var sBranch = oView.byId("PO_id_Branch").getSelectedKey() ||
                 oView.byId("PO_id_Branch").getValue();
 
             let aBranchCodes = [];
@@ -487,12 +484,16 @@ sap.ui.define([
             let filters = {};
 
             if (oExistingModel.Role === "Admin") {
-                filters = { BranchCode: aBranchCodes };
+                filters = {
+                    BranchCode: aBranchCodes
+                };
                 filters.Role = "Admin";
             } else if (oExistingModel.Role === "SuperAdmin") {
                 filters.BranchCode = "";
             } else {
-                filters = { BranchCode: oExistingModel.BranchCode };
+                filters = {
+                    BranchCode: oExistingModel.BranchCode
+                };
             }
 
             if (sCustomerName) filters.Name = sCustomerName;
@@ -555,70 +556,63 @@ sap.ui.define([
                 });
         },
 
-      _populateUniqueFilterValues: function (data) {
+        _populateUniqueFilterValues: function(data) {
+            let oView = this.getView();
 
-    let oView = this.getView();
+            // ===== Customer Unique =====
+            let oCustomerCombo = oView.byId("PO_id_CustomerName");
+            oCustomerCombo.destroyItems();
 
-    // ===== Customer Unique =====
-    let oCustomerCombo = oView.byId("PO_id_CustomerName");
-    oCustomerCombo.destroyItems();
+            let uniqueCustomers = new Set();
 
-    let uniqueCustomers = new Set();
-
-    data.forEach(item => {
-        if (item.Name) {
-            uniqueCustomers.add(item.Name);
-        }
-    });
-
-    Array.from(uniqueCustomers)
-        .sort()
-        .forEach(name => {
-            oCustomerCombo.addItem(
-                new sap.ui.core.Item({
-                    key: name,
-                    text: name
-                })
-            );
-        });
-
-    // ===== Branch Unique =====
-    let oBranchCombo = oView.byId("PO_id_Branch");
-    oBranchCombo.destroyItems();
-
-    let uniqueBranches = new Map();
-
-    data.forEach(item => {
-
-        if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
-
-            uniqueBranches.set(item.BranchID, {
-                BranchID: item.BranchID,
-                BranchName: item.BranchName,
-                City: item.City
+            data.forEach(item => {
+                if (item.Name) {
+                    uniqueCustomers.add(item.Name);
+                }
             });
 
-        }
+            Array.from(uniqueCustomers).sort().forEach(name => {
+                    oCustomerCombo.addItem(
+                        new sap.ui.core.Item({
+                            key: name,
+                            text: name
+                        })
+                    );
+                });
 
-    });
+            // ===== Branch Unique =====
+            let oBranchCombo = oView.byId("PO_id_Branch");
+            oBranchCombo.destroyItems();
 
-    Array.from(uniqueBranches.values())
-        .sort((a, b) => a.BranchID.localeCompare(b.BranchID))
-        .forEach(item => {
+            let uniqueBranches = new Map();
 
-            oBranchCombo.addItem(
-                new sap.ui.core.ListItem({
-                    key: item.BranchID,
-                    text: item.BranchID + " - " + item.BranchName,
-                    additionalText: item.City
-                })
-            );
+            data.forEach(item => {
 
-        });
+                if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
 
-},
+                    uniqueBranches.set(item.BranchID, {
+                        BranchID: item.BranchID,
+                        BranchName: item.BranchName,
+                        City: item.City
+                    });
 
-        HM_onSearch: function () {
+                }
+            });
+
+            Array.from(uniqueBranches.values()).sort((a, b) => a.BranchID.localeCompare(b.BranchID)).forEach(item => {
+                    oBranchCombo.addItem(
+                        new sap.ui.core.ListItem({
+                            key: item.BranchID,
+                            text: item.BranchID + " - " + item.BranchName,
+                            additionalText: item.City
+                        })
+                    );
+
+                });
+
+        },
+
+        HM_onSearch: function() {
             var oView = this.getView();
             var oTable = oView.byId("id_BedTable");
             var oBinding = oTable.getBinding("items");
@@ -643,14 +637,14 @@ sap.ui.define([
             oBinding.filter(oCombinedFilter);
         },
 
-        PO_onPressClear: function () {
+        PO_onPressClear: function() {
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.getView().byId("PO_id_CompanyName").setSelectedKey("")
             this.getView().byId("PO_id_Branch").setSelectedKey("")
 
         },
 
-        onbranchChange: function (oEvent) {
+        onbranchChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             const sBranchCode = oEvent.getSource().getSelectedKey();
             var oCurrencyModel = this.getView().getModel("BranchModel").getData();
@@ -667,11 +661,11 @@ sap.ui.define([
             this.getView().getModel("BedModel").setProperty("/DepositCurrency", Currency.currency);
         },
 
-        onNameInputLiveChange: function (oEvent) {
+        onNameInputLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
 
-        onColumnListItemPress: function (oEvent) {
+        onColumnListItemPress: function(oEvent) {
             var BEdID = oEvent.getSource().getBindingContext("BedDetails").getObject().ID;
             var onav = this.getOwnerComponent().getRouter()
             onav.navTo("RouteRoomImages", {
@@ -679,7 +673,7 @@ sap.ui.define([
             })
         },
 
-        HM_DeleteDetails: function () {
+        HM_DeleteDetails: function() {
             var CustData = this.getView().getModel("HostelModel").getData();
             var table = this.byId("id_BedTable");
             var aSelectedItems = table.getSelectedItems();
@@ -716,11 +710,10 @@ sap.ui.define([
                 }
             });
 
-           // Single selection & assigned → stop
+            // Single selection & assigned → stop
             if (aSelectedItems.length === 1 && aAssignedBeds.length === 1) {
                 sap.m.MessageBox.warning(
-                    "Cannot delete! Selected bed is already assigned.",
-                    {
+                    "Cannot delete! Selected bed is already assigned.", {
                         styleClass: "myUnifiedBtn"
                     }
                 );
@@ -730,8 +723,7 @@ sap.ui.define([
             // All selected beds are assigned
             if (aDeletableBeds.length === 0) {
                 sap.m.MessageBox.warning(
-                    "All selected beds are already assigned and cannot be deleted.",
-                    {
+                    "All selected beds are already assigned and cannot be deleted.", {
                         styleClass: "myUnifiedBtn"
                     }
                 );
@@ -750,8 +742,7 @@ sap.ui.define([
                 sMessage += `\nThese beds cannot be deleted because they are currently assigned to: ${sBedNamesA}.`;
             }
             sap.m.MessageBox.confirm(
-                sMessage,
-                {
+                sMessage, {
                     title: "Confirm Deletion",
                     icon: sap.m.MessageBox.Icon.WARNING,
                     actions: [
@@ -759,8 +750,8 @@ sap.ui.define([
                         sap.m.MessageBox.Action.CANCEL
                     ],
                     styleClass: "myUnifiedBtn",
-                    onClose: async function (sAction) {
-                         // Remove selection on Cancel
+                    onClose: async function(sAction) {
+                        // Remove selection on Cancel
                         if (sAction === sap.m.MessageBox.Action.CANCEL) {
                             table.removeSelections(true);
                             return;
@@ -778,7 +769,9 @@ sap.ui.define([
                                         method: "DELETE",
                                         contentType: "application/json",
                                         data: JSON.stringify({
-                                            filters: { ID: data.ID }
+                                            filters: {
+                                                ID: data.ID
+                                            }
                                         }),
                                         headers: {
                                             name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
@@ -807,11 +800,12 @@ sap.ui.define([
                 }
             );
         },
-        onDepositCurrency: function (oEvent) {
+        
+        onDepositCurrency: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        BD_onDownload: function () {
+        BD_onDownload: function() {
             const oModel = this.byId("id_BedTable").getModel("BedDetails").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
@@ -838,52 +832,52 @@ sap.ui.define([
             };
             MessageToast.show(this.i18nModel.getText("downloadingRoomDetails"));
             const oSheet = new Spreadsheet(oSettings);
-            oSheet.build().finally(function () {
+            oSheet.build().finally(function() {
                 oSheet.destroy();
             });
         },
 
-        createTableSheet: function () {
+        createTableSheet: function() {
             return [{
-                label: "Hostel Name",
-                property: "BranchName",
-                type: "string"
-            },
-            {
-                label: "Bed Type",
-                property: "Name",
-                type: "string"
-            },
-            {
-                label: "Room Type",
-                property: "ACType",
-                type: "string"
-            },
-            {
-                label: "No of Rooms",
-                property: "MaxBeds",
-                type: "string"
-            },
-            {
-                label: "No of Persons",
-                property: "NoOfPerson",
-                type: "string"
-            },
-            {
-                label: "Extra Bed",
-                property: "ExtraBed",
-                type: "string"
-            },
-            {
-                label: "Deposit Amount",
-                property: "Deposit",
-                type: "string"
-            },
-            {
-                label: "Description",
-                property: "Description",
-                type: "string"
-            }
+                    label: "Hostel Name",
+                    property: "BranchName",
+                    type: "string"
+                },
+                {
+                    label: "Bed Type",
+                    property: "Name",
+                    type: "string"
+                },
+                {
+                    label: "Room Type",
+                    property: "ACType",
+                    type: "string"
+                },
+                {
+                    label: "No of Rooms",
+                    property: "MaxBeds",
+                    type: "string"
+                },
+                {
+                    label: "No of Persons",
+                    property: "NoOfPerson",
+                    type: "string"
+                },
+                {
+                    label: "Extra Bed",
+                    property: "ExtraBed",
+                    type: "string"
+                },
+                {
+                    label: "Deposit Amount",
+                    property: "Deposit",
+                    type: "string"
+                },
+                {
+                    label: "Description",
+                    property: "Description",
+                    type: "string"
+                }
             ]
         },
     });

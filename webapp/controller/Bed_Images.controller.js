@@ -15,54 +15,55 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
-                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
+                var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
                 var Layout = this.byId("ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
+                this.getBusyDialog()
 
                 var model = new sap.ui.model.json.JSONModel({
                     Edit: false,
                     save: false
-
                 });
                 this.getView().setModel(model, "editable")
+
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
                 var BedImageModel = new sap.ui.model.json.JSONModel({
                     BranchCode: "",
                     Name: "",
                     ACType: "",
-
                 });
                 this.getView().setModel(BedImageModel, "BedImageModel")
-
-                 
 
                 this.BedID = oEvent.getParameter("arguments").sPath;
                 await this._loadBranchCode()
                 await this.Onsearch()
-                  var aInputIds = [
-                "idRoomType12",
-                "idBedType",
-                "idRoomtype",
-                "idR",
-                "id_MaxBeds",
-                "id_Description"
-            ];
+                var aInputIds = [
+                    "idRoomType12",
+                    "idBedType",
+                    "idRoomtype",
+                    "idR",
+                    "id_MaxBeds",
+                    "id_Description"
+                ];
 
-            aInputIds.forEach(function (sId) {
-                var oInput = this.getView().byId(sId);
-                if (oInput && oInput.setValueState) {
-                    oInput.setValueState("None");
-                }
-            }.bind(this));
+                aInputIds.forEach(function(sId) {
+                    var oInput = this.getView().byId(sId);
+                    if (oInput && oInput.setValueState) {
+                        oInput.setValueState("None");
+                    }
+                }.bind(this));
                 await this.refershModel(this.BedID)
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
-            } finally {}
+            } finally {
+                this.closeBusyDialog()
+            }
         },
 
-        _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -78,26 +79,19 @@ sap.ui.define([
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
                 filters.BranchID = aBranchCodes;
-                filters.Role ="Admin";
-            } else if (oExistingModel.Role === "SuperAdmin" ) {
-                    filters.BranchID = "";
-            } else{
+                filters.Role = "Admin";
+            } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.BranchID = "";
+            } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
 
                 const oView = this.getView();
-
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
-
-                const aBranches = Array.isArray(oResponse?.data) ?
-                    oResponse.data :
-                    (oResponse?.data ? [oResponse.data] : []);
-
+                const aBranches = Array.isArray(oResponse?.data) ?  oResponse.data : (oResponse?.data ? [oResponse.data] : []);
                 const oBranchModel = new sap.ui.model.json.JSONModel(aBranches);
                 oView.setModel(oBranchModel, "BranchModel");
-
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -112,21 +106,18 @@ sap.ui.define([
                 this.getView().setModel(model, "BedDetails")
             })
         },
-          onDepositCurrency: function (oEvent) {
+
+        onDepositCurrency: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        refershModel: async function (sBedID) {
-            this.getBusyDialog()
+        refershModel: async function(sBedID) {
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BedType", {
                     ID: sBedID
                 });
 
-                const aData = Array.isArray(oResponse?.data)
-                    ? oResponse.data
-                    : [oResponse.data];
-
+                const aData = Array.isArray(oResponse?.data) ? oResponse.data : [oResponse.data];
                 const oBedData = aData[0] || {};
 
                 // 1️⃣ Set main Bed data
@@ -137,8 +128,8 @@ sap.ui.define([
 
                 for (let i = 1; i <= 5; i++) {
                     const sPhoto = oBedData[`Photo${i}`];
-                    const sName  = oBedData[`Photo${i}Name`];
-                    const sType  = oBedData[`Photo${i}Type`];
+                    const sName = oBedData[`Photo${i}Name`];
+                    const sType = oBedData[`Photo${i}Type`];
 
                     if (sPhoto) {
                         aDisplayImages.push({
@@ -216,42 +207,45 @@ sap.ui.define([
             oModel.setProperty("/DisplayImages", aImages);
         },
 
-       BI_onButtonPress: function () {
+        BI_onButtonPress: function() {
 
-    var oViewModel = this.getView().getModel("editable");
+            var oViewModel = this.getView().getModel("editable");
 
-    // Check edit mode
-    var bIsEditMode = oViewModel.getProperty("/Edit");
+            // Check edit mode
+            var bIsEditMode = oViewModel.getProperty("/Edit");
 
-    if (bIsEditMode) {
+            if (bIsEditMode) {
 
-        // Ask confirmation only in edit mode
-        this.showConfirmationDialog(
-            this.i18nModel.getText("ConfirmActionTitle"),
-            this.i18nModel.getText("backConfirmation"),
+                // Ask confirmation only in edit mode
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
 
-            function () {
+                    function() {
 
-                // Reset edit mode
-                oViewModel.setProperty("/Edit", false);
-                oViewModel.setProperty("/save", false);
+                        // Reset edit mode
+                        oViewModel.setProperty("/Edit", false);
+                        oViewModel.setProperty("/save", false);
 
-                // Navigate back
+                        // Navigate back
+                        this.getRouter().navTo("RouteBedDetails", {
+                            sPath: "Beddetails"
+                        });
+                        this.getView().getModel("BedImageModel").setData({});
+                        this.getView().getModel("DisplayImagesModel").setData({});
+
+                    }.bind(this)
+                );
+
+            } else {
+                // Direct navigation when not editing
                 this.getRouter().navTo("RouteBedDetails", {
                     sPath: "Beddetails"
                 });
-
-            }.bind(this)
-        );
-
-    } else {
-
-        // Direct navigation when not editing
-        this.getRouter().navTo("RouteBedDetails", {
-            sPath: "Beddetails"
-        });
-    }
-},
+                this.getView().getModel("BedImageModel").setData({});
+                this.getView().getModel("DisplayImagesModel").setData({});
+            }
+        },
 
         onbranchChange: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
@@ -260,7 +254,8 @@ sap.ui.define([
         onNameInputLiveChange: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
-        onNumber: function (oEvent) {
+
+        onNumber: function(oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
@@ -275,16 +270,16 @@ sap.ui.define([
                 utils.onNumber(oView.byId("idR"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("id_MaxBeds"), "ID") &&
                 utils.onNumber(oView.byId("id_DepositAmount"), "ID") &&
-                 utils._LCstrictValidationComboBox(oView.byId("id_DepositCurrency"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("id_DepositCurrency"), "ID") &&
 
                 utils._LCvalidateMandatoryField(oView.byId("id_Description"), "ID")
             ) {
                 var aBedDetails = oView.getModel("BedDetails").getData();
 
 
-              var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
+                var attachments = oView.getModel("DisplayImagesModel").getData().DisplayImages || [];
 
-                var uploadedImages = attachments.filter(function (item) {
+                var uploadedImages = attachments.filter(function(item) {
                     return !item.isPlaceholder;
                 });
 
@@ -304,8 +299,7 @@ sap.ui.define([
 
                 if (bDuplicate) {
                     sap.m.MessageToast.show(
-                        this.i18nModel.getText("bedwithSameBedTypeBranchCodeACTypeAlreadyExists"
-                    ));
+                        this.i18nModel.getText("bedwithSameBedTypeBranchCodeACTypeAlreadyExists"));
                     return;
                 }
 
@@ -336,11 +330,11 @@ sap.ui.define([
                         Name: Payload.Name.trim(),
                         ACType: Payload.ACType,
                         NoOfPerson: Payload.NoOfPerson.trim(),
-                        ExtraBed:Payload.ExtraBed,
+                        ExtraBed: Payload.ExtraBed,
                         MaxBeds: Payload.MaxBeds.trim(),
                         Deposit: Payload.Deposit.trim(),
                         DepositCurrency: Payload.DepositCurrency,
-                        Description: Payload.Description    
+                        Description: Payload.Description
 
                     },
                     Attachment: {
@@ -489,7 +483,8 @@ sap.ui.define([
 
             oReader.readAsDataURL(oFile);
         },
-          onPriceInputLiveChange: function (oEvent) {
+
+        onPriceInputLiveChange: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
 
@@ -509,7 +504,6 @@ sap.ui.define([
             }
 
             oInput.setValue(sValue);
-
         },
 
         onImagePress: function(oEvent) {
