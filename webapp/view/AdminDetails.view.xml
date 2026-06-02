@@ -326,6 +326,7 @@
                     </f:SimpleForm>
                 </Panel>
             </VBox>
+           
             <VBox>
                 <Panel
                     headerText="{= 'Personal Information - ' + ${CustomerData>/CustomerName} }"
@@ -368,6 +369,7 @@
                                 text="{i18n>fullname}"
                             />
                             <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
+                            
                             <Select
                                 selectedKey="{Bookingmodel>/Salutation}"
                                 visible="{VisibleModel>/visible}"
@@ -391,8 +393,8 @@
                                 />
                                 <layoutData>
                                     <f:ColumnElementData
-                                        cellsSmall="3"
-                                        cellsLarge="1.8"
+                                        cellsSmall="2"
+                                        cellsLarge="2"
                                     />
                                 </layoutData>
                             </Select>
@@ -421,7 +423,7 @@
                                 text="{i18n>MVDDOB}"
                             />
                             <DatePicker
-                                width="40%"
+                                width="50%"
                                 value="{Bookingmodel>/DateOfBirth}"
                                 displayFormat="dd/MM/yyyy"
                                 valueFormat="dd/MM/yyyy"
@@ -445,7 +447,7 @@
                                 text="{i18n>MVgender}"
                             />
                             <ComboBox
-                                width="40%"
+                                width="50%"
                                 selectedKey="{Bookingmodel>/Gender}"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_gender"
@@ -481,7 +483,7 @@
                                 text="{i18n>email}"
                             />
                             <Input
-                                width="40%"
+                                width="50%"
                                 value="{Bookingmodel>/CustomerEmail}"
                                 type="Email"
                                 maxLength="50"
@@ -506,7 +508,7 @@
                                 text="{i18n>MVDcountry}"
                             />
                             <ComboBox
-                                width="40%"
+                                width="50%"
                                 id="CC_id_Country"
                                 change="MC_onChangeCountry"
                                 placeholder="{i18n>enterCountry}"
@@ -537,7 +539,7 @@
                                 text="{i18n>MVDstate}"
                             />
                             <ComboBox
-                                width="40%"
+                                width="50%"
                                 id="CC_id_State"
                                 change="CC_onChangeState"
                                 placeholder="{i18n>enterState}"
@@ -565,7 +567,7 @@
                                 text="{i18n>city}"
                             />
                             <ComboBox
-                                width="40%"
+                                width="50%"
                                 id="CC_id_City"
                                 change="onChange"
                                 valueStateText="{i18n>cityValueText}"
@@ -603,6 +605,8 @@
                                 maxLength="150"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_Address"
+                                width="50%"
+                                rows="3"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
                                 placeholder="Enter address"
@@ -645,7 +649,7 @@
                                 />
                                 <layoutData>
                                     <f:ColumnElementData
-                                        cellsSmall="3"
+                                        cellsSmall="2"
                                         cellsLarge="2"
                                     />
                                 </layoutData>
@@ -658,7 +662,7 @@
                                 liveChange="onmobileChange"
                                 valueStateText="{i18n>enterContactNumber}"
                                 visible="{VisibleModel>/visible}"
-                                width="50%"
+                                width="40%"
                             />
                         </f:content>
                     </f:SimpleForm>
@@ -702,15 +706,17 @@
                             </FlexBox>
                         </VBox>
                     </FlexBox>
+                 
                     <VBox class="sapUiMediumMarginBottom">
                         <Panel
                             headerText="{i18n>customerDocuments}"
                             expandable="false"
                             class="customPanelHeader"
                         >
+                    
+
                             <Table
                                 id="Ad_id_idFacilityRoomTableDetails1"
-                                width="100%"
                                 class="sapUiSmallMarginTop"
                                 items="{path: 'CustomerData>/Documents'}"
                                 delete="onDocumentDelete"
@@ -794,6 +800,7 @@
                         busyIndicatorDelay="0"
                         inset="false"
                         selectionChange="onTableSelection"
+                        width="100%"
                     >
                         <headerToolbar>
                             <Toolbar>

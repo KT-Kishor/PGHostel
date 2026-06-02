@@ -31,7 +31,7 @@
                 columnsXL="2"
                 columnsL="2"
                 columnsM="1"
-                class="sapUiTinyMargin">
+               >
                 <!-- Salutation + Name -->
                 <HBox width="100%">
                     <VBox width="35%">
@@ -44,7 +44,7 @@
                             selectedKey="{BookingView>/NewMemberDraft/Salutation}"
                             placeholder="Select salutation"
                             valueStateText="Please select salutation"
-                            change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                            change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
                         >
                             <core:Item
                                 key="Mr."
@@ -80,7 +80,7 @@
                             valueStateText="Please enter a valid full name"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
-                            maxLength="35" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                            maxLength="35" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
                         />
                     </VBox>
                 </HBox>
@@ -96,7 +96,7 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNewMemberDOBChange"
-                    valueStateText="Age must be between 0 and 100 years" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                    valueStateText="Age must be between 0 and 100 years" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
                      initialFocusedDateValue="{controller>/focusedDate}"
                      minDate="{controller>/minDate}"
                     maxDate="{controller>/maxdate}"
@@ -112,7 +112,7 @@
                     selectedKey="{BookingView>/NewMemberDraft/Gender}"
                     placeholder="Select gender"
                     valueStateText="Please select gender"
-                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
                 >
                     <core:Item
                         key="Male"
@@ -138,7 +138,7 @@
                     selectedKey="{BookingView>/NewMemberDraft/Relation}"
                     placeholder="Select relationship"
                     valueStateText="Please select relationship"
-                    change="onNewMemberRelationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                    change="onNewMemberRelationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
                 >
                     <core:Item
                         key="Spouse"
@@ -269,12 +269,14 @@
             <Button
                 text="Save"
                 press="onSaveNewMember"
+                class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
                 text="Cancel"
                 press="onCloseNewMemberDialog"
+                class="myUnifiedBtn"
             />
         </endButton>
     </Dialog>

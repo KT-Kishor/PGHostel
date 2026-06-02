@@ -2601,6 +2601,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     text-align: center;
     width: 100%;
     font-size: 14px;
+    color:#000 !important;
   }
 
   .footer-social {
@@ -2772,15 +2773,22 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   fill: white !important;
 }
 
-.customPanelHeader .sapMPanelHdr {
-  background-color: #1bb2bf !important;
-  color: white !important;
-  font-weight: bold !important;
-  border-radius: 0 !important;
+.customPanelHeader {
+    width: 100% !important;
+    border-radius: 0 !important;
 }
 
-.customPanelHeader {
-  border-radius: 0 !important;
+.customPanelHeader .sapMPanelHdr {
+    background-color: #1bb2bf !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.customPanelHeader .sapMPanelContent {
+    padding: 0 !important;
 }
 
 .sapMWizardStep .sapMWizardStepTitle {
@@ -4426,20 +4434,13 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     width: 10rem;
     font-size: 3rem;
 } */
-/* .customLinkWhiteBg,
-.customLinkWhiteBg:active,
-.customLinkWhiteBg:focus,
-.customLinkWhiteBg:visited {
-    outline: none;
-    color:#0070c9;
-    background: white;
-} */
+
 .customLinkWhiteBg.sapMLnk,
 .customLinkWhiteBg.sapMLnk:focus,
 .customLinkWhiteBg.sapMLnk:active,
 .customLinkWhiteBg.sapMLnk:visited,
 .customLinkWhiteBg.sapMLnk:hover {
-  color: #0070c9 !important;
+  color: #000000 !important;
   background-color: white !important;
   outline: none !important;
   box-shadow: none !important;
@@ -6698,5 +6699,131 @@ html, body {
 }
 
 .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
-  width:180px !important;
+  width:250px !important;
+}
+.adminPreviewImage {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+.adminPreviewImage img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+/* Header toolbar background */
+.memberSelectDialog .memberDialogHeader.sapMTB,
+.memberSelectDialog .memberDialogHeader.sapMIBar,
+.memberSelectDialog .memberDialogHeader.sapMOTB,
+.memberSelectDialog .memberDialogHeader {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  background-color: #008b96 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Header title white */
+.memberSelectDialog .memberDialogHeader .sapMTitle,
+.memberSelectDialog .memberDialogHeader .sapMTitle bdi,
+.memberSelectDialog .memberDialogHeader .sapMText,
+.memberSelectDialog .memberDialogHeader .sapMLabel {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Normal Add New Member button in header */
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnInner {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnContent,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnContent bdi,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapUiIcon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots button: default state */
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnDefault,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnHoverable {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots icon: default state */
+.memberSelectDialog .memberDialogHeader .sapMBtnTransparent > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnTransparent > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMBtnTransparent > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapUiIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner > .sapUiIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots button: hover/focus/active/pressed */
+html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed:not(.sapMBtnDisabled),
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn:focus .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnInner {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Generated OverflowToolbar three-dots icon: hover/focus/active/pressed */
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed > .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtnInner.sapMToggleBtnPressed > .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn:hover .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn:active .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMBtn.sapMBtnActive .sapMBtnIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Extra fallback for UI5 overflow button generated IDs/classes */
+.memberSelectDialog .memberDialogHeader [id*="overflow"] .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader [id*="overflow"] .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader [id*="overflowButton"] .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader [id*="overflowButton"] .sapMBtnIcon::before,
+.memberSelectDialog .memberDialogHeader .sapMOTBOverflowButton .sapMBtnIcon,
+.memberSelectDialog .memberDialogHeader .sapMOTBOverflowButton .sapMBtnIcon::before {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  text-shadow: none !important;
+}
+/* Mobile occupant table alignment */
+@media (max-width: 600px) {
+  .occupantMembersTable .occupantFullNameCell,
+  .occupantMembersTable .occupantFullNameHeader {
+    display: inline-block !important;
+    margin-left: 0.5rem !important;
+  }
 }

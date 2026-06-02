@@ -1386,133 +1386,133 @@ sap.ui.define([
      getStyledGroupHeader: function (oGroup) {
       const statusStyles = {
         "New": {
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Offer Sent": { 
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Send Back": { 
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Resubmitted": { 
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         
         "Rejected": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
           // rgb(255 70 70), rgb(250 16 16));
         },
         "Saved": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Onboarded": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Training Completed": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Draft": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Submitted": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Approved": {
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Revised": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Send back by manager": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Send back by account": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Send to account": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Active": {
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Inactive": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Asset Assigned": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Returned": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Transferred": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Available": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Trashed": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Assigned": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Admin": {
-          background: "#bdf4f9",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Paid": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Open": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Re Open": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "In Progress": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Fixed": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Resolved": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Not Required": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
         "Move ": {
-          background: "#d6e6eb",
+          background: "#00b6c6",
           textColor: "#000000"
         },
 
@@ -1521,7 +1521,7 @@ sap.ui.define([
       };
 
       const defaultStyle = {
-        background: "#bdf4f9",
+        background: "#00b6c6",
         textColor: "#000000"
       };
 

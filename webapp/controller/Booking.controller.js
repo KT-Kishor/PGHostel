@@ -3410,14 +3410,7 @@
                     sMimeType = "application/pdf";
                 }
             }
-            //     fileType: oDoc?.FileType || oDoc?.MimeType || "",
-            //     detectedMimeType: sMimeType,
-            //     rawSourcePrefix: sRawSource.slice(0, 120),
-            //     rawSourceLength: sRawSource.length,
-            //     hasDataUrlPrefix: !!aDataUrlParts,
-            //     normalizedBase64Prefix: sBase64.slice(0, 120),
-            //     normalizedBase64Length: sBase64.length
-            // });
+           
 
             if (sMimeType.indexOf("image/") === 0) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
@@ -3500,42 +3493,16 @@
 
                 this._customerPreviewUrl = URL.createObjectURL(oBlob);
 
-                const oPdfDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
-                    stretch: true,
-                    draggable: true,
-                    resizable: true,
-                    contentWidth: "60%",
-                    contentHeight: "60%",
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-                    contentPadding: "0rem",
-                    content: [new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-                            <div style="width:100%;height:100%;overflow:hidden;">
-                                <iframe src="${this._customerPreviewUrl}" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
-                            </div>
-                        `
-                    })],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            oPdfDialog.close();
-                        }
-                    }).addStyleClass("myUnifiedBtn"),
-                    afterClose: function () {
-                        if (this._customerPreviewUrl) {
-                            URL.revokeObjectURL(this._customerPreviewUrl);
-                            this._customerPreviewUrl = null;
-                        }
+               if (this._customerPreviewUrl) {
+    URL.revokeObjectURL(this._customerPreviewUrl);
+}
 
-                        oPdfDialog.destroy();
-                    }.bind(this)
-                });
+this._customerPreviewUrl = URL.createObjectURL(oBlob);
 
-                this.getView().addDependent(oPdfDialog);
-                oPdfDialog.open();
+// Open PDF in new browser tab
+window.open(this._customerPreviewUrl, "_blank");
+
+return;
                 return;
             }
 
@@ -6439,37 +6406,19 @@
 
             checkNewPage(100);
 
-            const members = (data.AllMembers || []).filter(
-                member => member.Relation !== "SELF"
-            );
+            var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
 
-            // ---------- GUEST DETAILS ----------
-
+            let guestBody = [];
             let guestBoxY = currentY;
 
-            // Build Guest Table Data
-            let guestBody = [
-                [
-                    "1",
-                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
-                    data.Gender || "-",
-                    `${data.MobileNo || "-"}`,
-                    Formatter.formatAgeFromDOBOrAge(
-                        this._parseDate(data.DateOfBirth)
-                    ) || "-",
-                    "SELF"
-                ]
-            ];
-
-            members.forEach((member, index) => {
-
+            Memberdata.forEach((member, index) => {
                 guestBody.push([
-                    (index + 2).toString(),
+                    (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
                     member.MobileNo || "-",
                     Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth
+                        member.Age
                     ) || "-",
                     member.Relation || "-"
                 ]);

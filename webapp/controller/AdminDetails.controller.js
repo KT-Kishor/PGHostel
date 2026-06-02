@@ -239,41 +239,41 @@ sap.ui.define([
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
             // Refresh model to update UI bindings
 
-             var Payload = {
-                    "Booking": [{
-                        "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
-                        "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
-                        "Status": "Completed",
-                        "CustomerName": oCustomerModel.CustomerName,
-                        "CustomerEmail": oCustomerModel.CustomerEmail,
-                        "BookingID": oCustomerModel.BookingID,
-                        "RoomNo": oCustomerModel.RoomNo
-                    }]
-                };
+            var Payload = {
+                "Booking": [{
+                    "StartDate": oBookingData.StartDate.split('/').reverse().join('-'),
+                    "EndDate": oBookingData.EndDate.split('/').reverse().join('-'),
+                    "Status": "Completed",
+                    "CustomerName": oCustomerModel.CustomerName,
+                    "CustomerEmail": oCustomerModel.CustomerEmail,
+                    "BookingID": oCustomerModel.BookingID,
+                    "RoomNo": oCustomerModel.RoomNo
+                }]
+            };
 
-                var payload2 = {
-                    "Area": oCustomerModel.BranchName || "",
-                    "PropertySTD": oCustomerModel.PropertySTD || "",
-                    "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
-                    "PropertyEmail": oCustomerModel.PropertyEmail || "",
-                    "PropertyType": oCustomerModel.PropertyType || ""
-                };
+            var payload2 = {
+                "Area": oCustomerModel.BranchName || "",
+                "PropertySTD": oCustomerModel.PropertySTD || "",
+                "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
+                "PropertyEmail": oCustomerModel.PropertyEmail || "",
+                "PropertyType": oCustomerModel.PropertyType || ""
+            };
 
-                // Merge both
-                var finalPayload = {
-                    ...Payload,
-                    ...payload2
-                };
+            // Merge both
+            var finalPayload = {
+                ...Payload,
+                ...payload2
+            };
 
-                this.getBusyDialog();
-                await this.ajaxUpdateWithJQuery("HM_Customer", {
-                    data: [finalPayload],
-                    filters: {
-                        BookingID: oCustomerModel.BookingID
-                    }
-                }).then(() => {
-                    sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
-                });
+            this.getBusyDialog();
+            await this.ajaxUpdateWithJQuery("HM_Customer", {
+                data: [finalPayload],
+                filters: {
+                    BookingID: oCustomerModel.BookingID
+                }
+            }).then(() => {
+                sap.m.MessageToast.show(this.i18nModel.getText("customerCompletedsuccessfully"))
+            });
 
             // Refresh models
             this.AD_onSearch();
@@ -800,7 +800,7 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-                    
+
                     // Store final facility record
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
@@ -1200,7 +1200,7 @@ sap.ui.define([
             }
             if (Duration === "Per Month") {
                 editdata.setProperty("/Price", FPrice.PerMonthPrice)
-                sap.ui.getCore().byId("editEndDate").setEditable(false)
+                sap.ui.getCore().byId("editEndDate").setEditable(false).setValue("")
             }
             if (Duration === "Per Year") {
                 editdata.setProperty("/Price", FPrice.PerYearPrice)
@@ -1246,7 +1246,11 @@ sap.ui.define([
                 sap.ui.getCore().byId("editquantity").setVisible(true).setValue("")
                 sap.ui.getCore().byId("id_Period").setVisible(false)
                 sap.ui.getCore().byId("editStartDate").setEditable(true).setValue("")
-                sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
+                if (Duration !== "Per Month" && Duration !== "Per Year") {
+                    sap.ui.getCore().byId("editEndDate").setEditable(true).setValue("")
+                } else {
+                    sap.ui.getCore().byId("editEndDate").setEditable(false).setValue("")
+                }
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else {
                 sap.ui.getCore().byId("editquantity").setVisible(false)
@@ -3585,7 +3589,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onSaveBooking: function () {
+        onSaveBooking:async function () {
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -3612,7 +3616,7 @@ sap.ui.define([
 
             if (toDelete.length === 0) {
                 // nothing to delete → directly proceed
-                this.onSaveBooking1();
+               await this.onSaveBooking1();
                 return;
             }
 
@@ -3944,7 +3948,7 @@ sap.ui.define([
 
 
                                     total = item.quantity ?
-                                        item.quantity *  Number(item.TotalHour) * price * diffDays :
+                                        item.quantity * Number(item.TotalHour) * price * diffDays :
                                         Number(item.TotalHour) * price * diffDays;
 
                                 } else if (unit === "per month") {
@@ -4322,6 +4326,18 @@ sap.ui.define([
                 }
             }
 
+            var aDraftData = this.getView().getModel("DraftModel")?this.getView().getModel("DraftModel").getData() : "";
+
+           delete  aDraftData.Documents
+
+           var aDraftData =[aDraftData]
+
+
+// Collect all MemberIDs from DraftModel
+var aDraftMemberIds = aDraftData.map(function (item) {
+    return item.MemberID;
+});
+
             var Payload = {
                 "CustomerName": Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
@@ -4356,7 +4372,7 @@ sap.ui.define([
                     "GSTValue": CustomerData.GSTValue,
                     "MemberID": memberIds,
                     "AdminUpdated": "YES",
-                    "Status" : CustomerData.Status,
+                    "Status": CustomerData.Status,
                     "BookingID": CustomerData.BookingID
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
@@ -4384,18 +4400,22 @@ sap.ui.define([
                         MemberID: item.MemberID
                     };
                 }),
-                "Documents": CustomerData.Documents.map(item => {
-                    // Normalize UnitText for facility as well
-                    return {
-                        DocumentID: item.DocumentID,
-                        DocumentType: item.DocumentType,
-                        FileName: item.FileName,
-                        FileType: item.FileType,
-                        File: item.File,
-                        UserID: CustomerData.UserID,
-                        MemberID: item.MemberID
-                    };
-                })
+                "Documents": CustomerData.Documents
+        .filter(function (item) {
+            // Skip if MemberID exists in DraftModel
+            return !aDraftMemberIds.includes(item.MemberID);
+        })
+        .map(function (item) {
+            return {
+                DocumentID: item.DocumentID,
+                DocumentType: item.DocumentType,
+                FileName: item.FileName,
+                FileType: item.FileType,
+                File: item.File,
+                UserID: CustomerData.UserID,
+                MemberID: item.MemberID
+            };
+        })
             };
 
 
@@ -4744,7 +4764,7 @@ sap.ui.define([
                         if (
                             last.startsWith("iVB") || // PNG
                             last.startsWith("/9j") || // JPG
-                            last.startsWith("JVBER") // PDF
+                            last.startsWith("JVBER")
                         ) {
                             return last;
                         }
@@ -5054,24 +5074,24 @@ sap.ui.define([
                 let grandTotal;
                 let cgst;
                 let sgst;
-                let igst;   
+                let igst;
 
-            if (oCustomerData.GSTType === "CGST/SGST") {
-                cgst = newSubtotal * oCustomerData.GSTValue/100;
-                sgst = newSubtotal * oCustomerData.GSTValue/100;
-                oCustomerData.CGST = cgst;
-                oCustomerData.SGST = sgst;
-                grandTotal = newSubtotal + cgst + sgst;
+                if (oCustomerData.GSTType === "CGST/SGST") {
+                    cgst = newSubtotal * oCustomerData.GSTValue / 100;
+                    sgst = newSubtotal * oCustomerData.GSTValue / 100;
+                    oCustomerData.CGST = cgst;
+                    oCustomerData.SGST = sgst;
+                    grandTotal = newSubtotal + cgst + sgst;
 
-            }else if (oCustomerData.GSTType === "IGST") {
-                igst = newSubtotal * Number(oCustomerData.GSTValue)/100;
+                } else if (oCustomerData.GSTType === "IGST") {
+                    igst = newSubtotal * Number(oCustomerData.GSTValue) / 100;
 
-                oCustomerData.IGST = igst;
-                grandTotal = newSubtotal + igst;
+                    oCustomerData.IGST = igst;
+                    grandTotal = newSubtotal + igst;
 
-            }else{
-                grandTotal = newSubtotal;
-            }
+                } else {
+                    grandTotal = newSubtotal;
+                }
                 oCustomerData.GrandTotal = grandTotal;
                 oCustomerData.DueAmount = grandTotal - (oCustomerData.PaymentPaid || 0);
 
@@ -5445,19 +5465,19 @@ sap.ui.define([
             let grandTotal;
 
             if (oCustomerData.GSTType === "CGST/SGST") {
-                cgst = subtotal * oCustomerData.GSTValue/100;
-                sgst = subtotal * oCustomerData.GSTValue/100;
+                cgst = subtotal * oCustomerData.GSTValue / 100;
+                sgst = subtotal * oCustomerData.GSTValue / 100;
                 oCustomerData.CGST = cgst;
                 oCustomerData.SGST = sgst;
                 grandTotal = subtotal + cgst + sgst;
 
-            }else if (oCustomerData.GSTType === "IGST") {
-                igst = subtotal * Number(oCustomerData.GSTValue)/100;
+            } else if (oCustomerData.GSTType === "IGST") {
+                igst = subtotal * Number(oCustomerData.GSTValue) / 100;
 
                 oCustomerData.IGST = igst;
                 grandTotal = subtotal + igst;
 
-            }else{
+            } else {
                 grandTotal = subtotal;
             }
             oCustomerData.GrandTotal = grandTotal;
@@ -5537,6 +5557,8 @@ sap.ui.define([
             sap.ui.getCore().byId("idGSTPercentage")
                 .setValue(CustData.GSTValue || "");
 
+
+
             sap.ui.getCore().byId("idGSTType")
                 .setSelectedIndex(
                     CustData.GSTType === "CGST/SGST" ? 1 : 0
@@ -5559,10 +5581,10 @@ sap.ui.define([
                 .setVisible(!!CustData.GSTIN);
 
             sap.ui.getCore().byId("idGSTPercentage")
-                .setVisible(bHasBranchGST);
+                .setVisible(!!CustData.GSTValue && CustData.GSTValue !== "0");
 
             sap.ui.getCore().byId("idGSTType")
-                .setVisible(bHasBranchGST);
+                .setVisible(!!CustData.GSTType);
 
             // ALWAYS show customer fields
             sap.ui.getCore().byId("idGSTNumber")
@@ -7385,39 +7407,24 @@ sap.ui.define([
 
             checkNewPage(80);
 
-            // Remove duplicate SELF from members
-            const members = (data.AllMembers || []).filter(member =>
-                member.Relation !== "SELF"
-            );
-
+            // Guest Members from AllMembers only
+            const members = data.AllMembers || [];
 
             // ---------- GUEST DETAILS ----------
 
             let guestBoxY = currentY;
 
-            // Guest Table Data
-            let guestBody = [
-                [
-                    "1",
-                    `${data.Salutation || "Mr."} ${data.CustomerName || "-"}`,
-                    data.Gender || "-",
-                    `${data.STDCode || "+91"} ${data.MobileNo || "-"}`,
-                    Formatter.formatAgeFromDOBOrAge(
-                        this._parseDate(data.DateOfBirth)
-                    ) || "-",
-                    "SELF"
-                ]
-            ];
+            let guestBody = [];
 
-            // Additional Members
             members.forEach((member, index) => {
+
                 guestBody.push([
-                    (index + 2).toString(),
+                    (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    "-",
+                    `${member.STDCode || "+91"} ${member.MobileNo || "-"}`,
                     Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth
+                        member.DateOfBirth || member.Age
                     ) || "-",
                     member.Relation || "-"
                 ]);
@@ -8073,8 +8080,8 @@ sap.ui.define([
             }
 
             var oRelationCombo = sap.ui.getCore().byId("AD_id_MemberRelationCombo");
-            if (oCopyData.Relation === "Self") {
-                oRelationCombo.setValue("Self");
+            if (oCopyData.Relation === "SELF") {
+                oRelationCombo.setValue("SELF");
             }
 
             // Format DOB
@@ -8222,40 +8229,13 @@ sap.ui.define([
 
             var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
 
-            if (utils._LCstrictValidationComboBox(
-                oView.byId("AD_idSelect"),
-                "ID"
-            ) &&
-
-                utils._LCvalidateMandatoryField(
-                    oView.byId("AD_id_MemberName"),
-                    "ID"
-                ) &&
-
-                utils._LCvalidateDate(
-                    oView.byId("AD_id_MemberDOB"),
-                    "ID"
-                ) &&
-
-                utils._LCstrictValidationComboBox(
-                    oView.byId("AD_id_MemberGenderCombo"),
-                    "ID"
-                ) &&
-
-                (
-                    oMember.Relation === "Self" ||
-
-                    utils._LCstrictValidationComboBox(
-                        oView.byId("AD_id_MemberRelationCombo"),
-                        "ID"
-                    )
-                ) &&
-
-                utils._LCstrictValidationComboBox(
-                    oView.byId("AD_id_DocumentType"),
-                    "ID"
-                )
-
+            if (utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"),"ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"),"ID") &&
+                utils._LCvalidateDate( oView.byId("AD_id_MemberDOB"),"ID") &&
+                utils._LCstrictValidationComboBox(    oView.byId("AD_id_MemberGenderCombo"),"ID" ) &&
+                (oMember.Relation === "SELF" ||
+                    utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID" )
+                ) &&utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"),"ID")
             ) {
 
                 // ================= DOCUMENT VALIDATION =================
@@ -8340,7 +8320,8 @@ sap.ui.define([
             const oDraft = oModel.getProperty(
                 "/NewMemberDraft"
             );
-
+    var DModel = new sap.ui.model.json.JSONModel(oDraft);
+this.getView().setModel(DModel, "DraftModel");
             const oPromise = isCreate ?
                 this.ajaxCreateWithJQuery(
                     "HM_MemberDocument", {
@@ -8377,10 +8358,8 @@ sap.ui.define([
                         aMembers
                     );
                 }
-
                 // ================= UPDATE =================
                 else {
-
                     if (this._sEditPath) {
 
                         oModel.setProperty(
@@ -8389,7 +8368,7 @@ sap.ui.define([
                         );
                     }
                 }
-
+          
                 oModel.refresh(true);
 
                 this.MM_Dialog.close();
@@ -8473,7 +8452,7 @@ sap.ui.define([
         onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("AD_idSelect");
+            const oGender = sap.ui.getCore().byId("AD_id_MemberGenderCombo");
             // Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
@@ -8826,71 +8805,25 @@ sap.ui.define([
                 this._previewUrl =
                     URL.createObjectURL(oBlob);
 
-                const oPdfDialog = new sap.m.Dialog({
-
-                    title: oDoc.FileName ||
-                        oDoc.DocumentName ||
-                        "Document Preview",
-
-                    stretch: true,
-
-                    draggable: true,
-                    resizable: true,
-
-                    contentWidth: "60%",
-                    contentHeight: "60%",
-
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-
-                    contentPadding: "0rem",
-
-                    content: [
-                        new sap.ui.core.HTML({
-                            sanitizeContent: false,
-                            content: `
-                            <div style="width:100%;height:100%;overflow:hidden;">
-                                <iframe
-                                    src="${this._previewUrl}"
-                                    style="width:100%;
-                                    height:calc(100vh - 100px);
-                                    border:none;
-                                    display:block;">
-                                </iframe>
-                            </div>
-                        `
-                        })
-                    ],
-
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-
-                            oPdfDialog.close();
-                        }
-                    }).addStyleClass("myUnifiedBtn"),
-
-                    afterClose: function () {
-
-                        if (this._previewUrl) {
-
-                            URL.revokeObjectURL(
-                                this._previewUrl
-                            );
-
-                            this._previewUrl = null;
-                        }
-
-                        oPdfDialog.destroy();
-
-                    }.bind(this)
+                // Create the native SAPUI5 PDF Viewer control
+                const oPdfViewer = new sap.m.PDFViewer({
+                    source: this._previewUrl,
+                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
+                    height: "auto"
                 });
 
-                this.getView().addDependent(
-                    oPdfDialog
-                );
+                // Correct lifecycle hook: Override destroy to clean up the blob memory safely
+                const fnOriginalDestroy = oPdfViewer.destroy;
+                oPdfViewer.destroy = function () {
+                    if (this._previewUrl) {
+                        URL.revokeObjectURL(this._previewUrl);
+                        this._previewUrl = null;
+                    }
+                    fnOriginalDestroy.apply(oPdfViewer, arguments);
+                }.bind(this);
 
-                oPdfDialog.open();
+                // Open on all devices
+                oPdfViewer.open();
 
                 return;
             }
@@ -9080,10 +9013,9 @@ sap.ui.define([
                 var oContext = oItem.getBindingContext("BookingView");
                 var oData = oContext.getObject();
 
-                var aMemberDocs = oData.Documents || [];
+                var doc = oData.Documents[0];
 
-                aMemberDocs.forEach(function (doc) {
-
+                if (doc) {
                     aDocs.push({
                         DocumentID: doc.DocumentID,
                         DocumentType: doc.DocumentType,
@@ -9093,8 +9025,7 @@ sap.ui.define([
                         FileType: doc.FileType,
                         File: doc.File
                     });
-
-                });
+                }
             });
 
             this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
