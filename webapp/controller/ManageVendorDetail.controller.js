@@ -115,8 +115,6 @@ sap.ui.define([
 
         _loadVendorDetails: async function (sUserID) {
             try {
-                this.getBusyDialog()
-
                 const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
                     UserID: sUserID
                 });
@@ -212,7 +210,12 @@ sap.ui.define([
         },
 
         onFileSizeExceeds: function () {
-            sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+            var oUploader = sap.ui.getCore().byId("VN_id_FileUploader");
+            var iMaxSize = oUploader.getMaximumFileSize();
+
+            sap.m.MessageToast.show(
+                "File size exceeds " + iMaxSize + " MB. Please upload a smaller file."
+            );
         },
 
         BI_onEditButtonPress: function () {
@@ -355,7 +358,7 @@ sap.ui.define([
             this.getView().getModel("editable").setProperty("/hasSelection", bHasSelection);
         },
 
-        onAdminDeleteFiles: function () {
+        onAdminDeleteFiles: async function () {
             const oTable = this.byId("MV_id_adminAttachmentTable");
             const oSelectedItem = oTable.getSelectedItem();
 
@@ -384,13 +387,13 @@ sap.ui.define([
                                 UserID: sUserID
                             }
                         });
-                        this._loadVendorDetails(sUserID); // refresh attachment list
+                        await this._loadVendorDetails(sUserID); // refresh attachment list
+                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                         fnResetSelection();
                     } catch (err) {
                         sap.m.MessageToast.show(err.message || "Delete failed");
                     } finally {
                         this.closeBusyDialog()
-                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                     }
                 },
                 () => {
@@ -488,11 +491,11 @@ sap.ui.define([
                         alignItems: "Center",
                         items: [
                           new sap.m.Image({
-    id: this.createId("adminDocPreviewImage"),
-    densityAware: false,
-    width: "100%",
-    decorative: false
-}).addStyleClass("adminPreviewImage")
+                                id: this.createId("adminDocPreviewImage"),
+                                densityAware: false,
+                                width: "100%",
+                                decorative: false
+                            }).addStyleClass("adminPreviewImage")
                         ]
                     });
                     this._oAdminPreviewDialog = new sap.m.Dialog({
@@ -526,39 +529,39 @@ sap.ui.define([
                 this._oAdminPreviewDialog.open();
                 return;
             }
-           if (sMimeType === "application/pdf") {
+            if (sMimeType === "application/pdf") {
 
-    const byteCharacters = atob(sBase64);
-    const byteArrays = [];
+            const byteCharacters = atob(sBase64);
+            const byteArrays = [];
 
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
 
-        const slice = byteCharacters.slice(offset, offset + 512);
+                const slice = byteCharacters.slice(offset, offset + 512);
 
-        const byteNumbers = new Array(slice.length);
+                const byteNumbers = new Array(slice.length);
 
-        for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                byteArrays.push(new Uint8Array(byteNumbers));
+            }
+
+            const blob = new Blob(byteArrays, {
+                type: "application/pdf"
+            });
+
+            if (this._previewUrl) {
+                URL.revokeObjectURL(this._previewUrl);
+            }
+
+            this._previewUrl = URL.createObjectURL(blob);
+
+            // Open PDF in new tab
+            window.open(this._previewUrl, "_blank");
+
+            return;
         }
-
-        byteArrays.push(new Uint8Array(byteNumbers));
-    }
-
-    const blob = new Blob(byteArrays, {
-        type: "application/pdf"
-    });
-
-    if (this._previewUrl) {
-        URL.revokeObjectURL(this._previewUrl);
-    }
-
-    this._previewUrl = URL.createObjectURL(blob);
-
-    // Open PDF in new tab
-    window.open(this._previewUrl, "_blank");
-
-    return;
-}
             sap.m.MessageToast.show("Preview not supported.");
         },
 
@@ -680,24 +683,34 @@ sap.ui.define([
             return true;
         },
 
-        onAdminChangeSalutation: function (oEvent) {
+        onAdminChangeSalutation: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("MV_id_Gender");
-            oSalutation.setValueState("None");
 
-            if (!oGender) return;
-            // Reset gender first
+            // Gender control from the same view
+            const oGender = this.byId("MV_id_Gender");
+
+            if (!oGender) {
+                console.error(this.i18nModel.getText("nogenderselect"));
+                return;
+            }
+
+            // Reset gender
             oGender.setSelectedKey("");
             oGender.setEnabled(true);
-            // Auto-map gender
+
+            // Auto-select based on salutation
             if (sKey === "Mr.") {
                 oGender.setSelectedKey("Male");
                 oGender.setEnabled(false);
             } else if (sKey === "Ms." || sKey === "Mrs.") {
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
+            } else if (sKey === "Other.") {
+                oGender.setSelectedKey("Other");
+                oGender.setEnabled(false);
             }
+
             utils._LCstrictValidationSelect(oSalutation);
         },
 
@@ -842,6 +855,11 @@ sap.ui.define([
         },
 
         onUploadDocumentFile: function () {
+            const oTable = this.byId("MV_id_adminAttachmentTable");
+            if (oTable) {
+                oTable.removeSelections(true);
+            }
+
             if (this.UD_Dialog) {
                 this.UD_Dialog.destroy();
                 this.UD_Dialog = null;
