@@ -5420,17 +5420,26 @@ return;
 
         _getCouponBaseAmount: function () {
             const oModel = this.getView().getModel("HostelModel");
-            const sPlan = oModel.getProperty("/SelectedPriceType");
             const fRoomPrice = this._toNumber(oModel.getProperty("/RoomPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
-            const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
-
-            if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
-                return Number(((fRoomPrice + fFacilityPrice) / iDuration).toFixed(2));
-            }
 
             return Number((fRoomPrice + fFacilityPrice).toFixed(2));
         },
+
+
+        // _getCouponBaseAmount: function () {
+        //     const oModel = this.getView().getModel("HostelModel");
+        //    // const sPlan = oModel.getProperty("/SelectedPriceType");
+        //     const fRoomPrice = this._toNumber(oModel.getProperty("/RoomPrice"));
+        //     const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
+        //     // const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+        //     // if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
+        //     //     return Number(((fRoomPrice + fFacilityPrice) / iDuration).toFixed(2));
+        //     // }
+
+        //     return Number((fRoomPrice + fFacilityPrice).toFixed(2));
+        // },
 
         _shouldSplitOnlinePayment: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
