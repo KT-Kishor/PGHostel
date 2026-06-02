@@ -1384,161 +1384,32 @@ sap.ui.define([
     },
 
      getStyledGroupHeader: function (oGroup) {
-      const statusStyles = {
-        "New": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Offer Sent": { 
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Send Back": { 
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Resubmitted": { 
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        
-        "Rejected": {
-          background: "#00b6c6",
-          textColor: "#000000"
-          // rgb(255 70 70), rgb(250 16 16));
-        },
-        "Saved": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Onboarded": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Training Completed": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Draft": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Submitted": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Approved": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Revised": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Send back by manager": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Send back by account": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Send to account": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Active": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Inactive": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Asset Assigned": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Returned": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Transferred": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Available": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Trashed": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Assigned": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Admin": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Paid": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Open": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Re Open": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "In Progress": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Fixed": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Resolved": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Not Required": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
-        "Move ": {
-          background: "#00b6c6",
-          textColor: "#000000"
-        },
 
-
-
-      };
-
-      const defaultStyle = {
-        background: "#00b6c6",
-        textColor: "#000000"
-      };
-
-      const currentStyle = statusStyles[oGroup.key] || defaultStyle;
-
-      const oHeader = new sap.m.GroupHeaderListItem({ title: oGroup.key });
-
-      oHeader._customBackground = currentStyle.background;
-      oHeader._customTextColor = currentStyle.textColor;
-
-      oHeader.addEventDelegate({
-        onAfterRendering: function () {
-          this.$().css("background", this._customBackground);
-          this.$().css("color", this._customTextColor);
+        if (!oGroup) {
+            return new sap.m.GroupHeaderListItem({
+                title: ""
+            });
         }
-      }, oHeader);
-      return oHeader;
-    },
+
+        const defaultStyle = {
+            background: "#00b6c6",
+            textColor: "#000000"
+        };
+
+        const oHeader = new sap.m.GroupHeaderListItem({
+            title: oGroup.key
+        });
+
+        oHeader.addEventDelegate({
+            onAfterRendering: function () {
+                this.$().css({
+                    "background": defaultStyle.background,
+                    "color": defaultStyle.textColor
+                });
+            }
+        }, oHeader);
+
+        return oHeader;
+    }
   })
 });

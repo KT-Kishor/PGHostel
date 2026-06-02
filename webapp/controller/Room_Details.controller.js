@@ -41,7 +41,7 @@ sap.ui.define([
             await this._loadBranchCode()
             await this.Onsearch()
             this.Customerdata()
-             this.getGroupHeader();
+             
 
             //  this.closeBusyDialog()
 

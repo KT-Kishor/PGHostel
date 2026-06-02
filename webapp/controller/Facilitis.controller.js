@@ -59,7 +59,7 @@ sap.ui.define([
                 this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                this.getGroupHeader();
+                
                 this.closeBusyDialog()
             }
         },
