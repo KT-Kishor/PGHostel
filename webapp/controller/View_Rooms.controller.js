@@ -2670,6 +2670,7 @@ sap.ui.define([
                 this.getView().addDependent(this._oEnquiry);
             }
             this._oEnquiry.open();
+            this.byId("id_enq_MobileNo").setMaxLength(10)
         },
 
         E_onCancelButtonPress: function () {
@@ -2816,6 +2817,7 @@ sap.ui.define([
         ADMIN_onChangeSTD: function (oEvent) {
             const oSTD = oEvent.getSource();
             const oMobile = this.byId("id_enq_MobileNo");
+            oMobile.setValue("")
             const sKey = oSTD.getSelectedKey();
             const sMobileValue = (oMobile.getValue() || "").trim();
 

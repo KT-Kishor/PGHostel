@@ -2562,7 +2562,7 @@ sap.ui.define([
 
             if (!oSelectedFacility) return;
             // 5. Get booking unitText
-            var oBookingModel = this.getView().getModel("edit");
+            var oBookingModel = this.getView().getModel("Bookingmodel");
             var sUnitText = oBookingModel.getProperty("/UnitText"); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
