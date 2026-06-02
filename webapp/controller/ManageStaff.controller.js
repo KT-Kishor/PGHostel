@@ -27,6 +27,7 @@ sap.ui.define([
             try {
                 var LoginFUnction = await this.commonLoginFunction("ManageStaff");
                 if (!LoginFUnction) return;
+                this.getBusyDialog()
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
                 this.onClearAndSearch("MS_id_FilterbarEmployee");
@@ -37,14 +38,14 @@ sap.ui.define([
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-                
                 this.closeBusyDialog()
             }
         },
-           
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
+
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
+
         _initEmptyMDModel: function() {
             const emptyData = {
                 Salutation: "",
@@ -90,8 +91,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = aBranchCodes;
             }
-
-            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -306,8 +305,9 @@ sap.ui.define([
                 this.FD_onCancelButtonPress();
                 await this.Onsearch("true");
             } catch (err) {
-                this.closeBusyDialog()
-                sap.m.MessageToast.show(err.message || err.responseText);
+                this.closeBusyDialog();
+                const sMsg = err.responseText ? JSON.parse(err.responseText).message : err.message;
+                sap.m.MessageToast.show(sMsg);
             } finally {
                 this.closeBusyDialog()
             }
