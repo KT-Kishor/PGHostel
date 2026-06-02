@@ -40,7 +40,7 @@
                     id="editFacilityName"
                     placeholder="{i18n>selectFacility}"
                     items="{Facilities>/}"
-                    value="{edit>/FacilityName}"
+                    selectedKey="{edit>/FacilityName}"
                     selectionChange="onFacilityChange"
                     width="100%"
                     valueStateText="{i18n>pleaseSelectFacilityName}"
