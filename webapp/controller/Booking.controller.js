@@ -198,7 +198,10 @@
                     Document: "",
                     File: "",
                     FileType: "",
+                    DocumentID: "",
                     DocumentFile: null,
+                    Documents: [],
+                    PendingDeletedDocumentIDs: [],
                     IsEditMode: false
                 },
                 NewMemberDialogTitle: "Add New Member",
@@ -2317,6 +2320,7 @@
                 DocumentID: "",
                 DocumentFile: null,
                 Documents: [],
+                PendingDeletedDocumentIDs: [],
                 IsEditMode: false
             };
         },
@@ -2392,6 +2396,7 @@
                 DocumentID: sDocumentID,
                 DocumentFile: null,
                 Documents: aDocuments,
+                PendingDeletedDocumentIDs: Array.isArray(oMember.PendingDeletedDocumentIDs) ? oMember.PendingDeletedDocumentIDs.slice() : [],
                 IsPrimary: !!oMember.IsPrimary
             };
         },
@@ -3307,17 +3312,57 @@
         onDeleteNewMemberDocument: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oFileUploader = this.byId("newMemberFileUploader");
+            const oDraft = oBookingView.getProperty("/NewMemberDraft") || {};
 
+            const sDocumentID = String(oDraft.DocumentID || "").trim();
+            const bSavedDocument = !!(oDraft.IsEditMode && sDocumentID);
+
+            let aPendingDeletedDocumentIDs = Array.isArray(oDraft.PendingDeletedDocumentIDs)
+                ? oDraft.PendingDeletedDocumentIDs.slice()
+                : [];
+
+            let aDocuments = Array.isArray(oDraft.Documents)
+                ? oDraft.Documents.slice()
+                : [];
+
+            // Existing backend document: do not delete immediately.
+            // Mark it for deletion. Actual backend delete happens on Update Member.
+            if (bSavedDocument && aPendingDeletedDocumentIDs.indexOf(sDocumentID) < 0) {
+                aPendingDeletedDocumentIDs.push(sDocumentID);
+            }
+
+            // Remove deleted document from local draft Documents array
+            if (sDocumentID) {
+                aDocuments = aDocuments.filter(function (oDocument) {
+                    return String(oDocument && oDocument.DocumentID || "").trim() !== sDocumentID;
+                });
+            } else {
+                // Newly uploaded unsaved file: local remove only
+                aDocuments = [];
+            }
+
+            oBookingView.setProperty("/NewMemberDraft/PendingDeletedDocumentIDs", aPendingDeletedDocumentIDs);
+            oBookingView.setProperty("/NewMemberDraft/Documents", aDocuments);
+
+            // Clear current document UI fields
+            oBookingView.setProperty("/NewMemberDraft/DocumentID", "");
             oBookingView.setProperty("/NewMemberDraft/DocumentName", "");
             oBookingView.setProperty("/NewMemberDraft/DocumentFile", null);
             oBookingView.setProperty("/NewMemberDraft/Document", "");
             oBookingView.setProperty("/NewMemberDraft/File", "");
             oBookingView.setProperty("/NewMemberDraft/FileType", "");
             oBookingView.setProperty("/NewMemberDraft/DocumentType", "");
+
             oBookingView.refresh(true);
 
             if (oFileUploader) {
                 oFileUploader.clear();
+            }
+
+            if (bSavedDocument) {
+                MessageToast.show("Document will be deleted when you update the member.");
+            } else {
+                MessageToast.show("Document removed.");
             }
         },
 
@@ -3762,12 +3807,41 @@ return;
 
             return sNewMemberID;
         },
+        _deletePendingMemberDocuments: async function (aDocumentIDs) {
+            const aUniqueDocumentIDs = [];
 
+            (Array.isArray(aDocumentIDs) ? aDocumentIDs : []).forEach(function (sDocumentID) {
+                sDocumentID = String(sDocumentID || "").trim();
+
+                if (sDocumentID && aUniqueDocumentIDs.indexOf(sDocumentID) < 0) {
+                    aUniqueDocumentIDs.push(sDocumentID);
+                }
+            });
+
+            for (let i = 0; i < aUniqueDocumentIDs.length; i += 1) {
+                await this.ajaxDeleteWithJQuery("HM_CustomerDocument", {
+                    filters: {
+                        DocumentID: aUniqueDocumentIDs[i]
+                    }
+                });
+            }
+        },
         _saveMemberToBackend: async function (oMember, bIsEditMode) {
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
-            const bIsSelfMember = oMember && (oMember.id === "SELF" || String(oMember.Relation || "").trim().toLowerCase() === "self");
-            const sMemberID = bIsSelfMember ? (oMember.MemberID || sUserID) : (oMember.MemberID || oMember.id || "");
+
+            const bIsSelfMember = oMember && (
+                oMember.id === "SELF" ||
+                String(oMember.Relation || "").trim().toLowerCase() === "self"
+            );
+
+            const sMemberID = bIsSelfMember
+                ? (oMember.MemberID || sUserID)
+                : (oMember.MemberID || oMember.id || "");
+
+            const aDeletedDocumentIDs = Array.isArray(oMember.PendingDeletedDocumentIDs)
+                ? oMember.PendingDeletedDocumentIDs.slice()
+                : [];
 
             const oMemberData = {
                 MemberID: sMemberID,
@@ -3776,31 +3850,43 @@ return;
                 DateOfBirth: oMember.Age || "",
                 Relation: bIsSelfMember ? "Self" : (oMember.Relation || ""),
                 Gender: oMember.Gender || "",
-                // IsPrimary: !!oMember.IsPrimary,
                 UserID: sUserID
             };
 
-            const aExistingDocuments = Array.isArray(oMember.Documents) ? oMember.Documents : [];
-            const aDocuments = aExistingDocuments.map(function (oDocument) {
-                const oDocumentData = {
-                    DocumentType: oDocument.DocumentType || "",
-                    FileName: oDocument.FileName || oDocument.DocumentName || "",
-                    FileType: (oDocument.File || oDocument.Document) ? (oDocument.FileType || "") : "",
-                    MemberID: oDocument.MemberID || sMemberID,
-                    UserID: oDocument.UserID || sUserID,
-                    File: oDocument.File || oDocument.Document || ""
-                };
+            const aExistingDocuments = Array.isArray(oMember.Documents)
+                ? oMember.Documents
+                : [];
 
-                if (oDocument.DocumentID) {
-                    oDocumentData.DocumentID = oDocument.DocumentID;
-                }
+            // Keep existing documents except the ones user removed in edit mode
+            const aDocuments = aExistingDocuments
+                .filter(function (oDocument) {
+                    const sExistingDocumentID = String(oDocument && oDocument.DocumentID || "").trim();
 
-                return oDocumentData;
-            }).filter(function (oDocument) {
-                return !!(oDocument.File || oDocument.FileName);
-            });
+                    return !sExistingDocumentID || aDeletedDocumentIDs.indexOf(sExistingDocumentID) < 0;
+                })
+                .map(function (oDocument) {
+                    const oDocumentData = {
+                        DocumentType: oDocument.DocumentType || "",
+                        FileName: oDocument.FileName || oDocument.DocumentName || "",
+                        FileType: (oDocument.File || oDocument.Document) ? (oDocument.FileType || "") : "",
+                        MemberID: oDocument.MemberID || sMemberID,
+                        UserID: oDocument.UserID || sUserID,
+                        File: oDocument.File || oDocument.Document || ""
+                    };
+
+                    if (oDocument.DocumentID) {
+                        oDocumentData.DocumentID = oDocument.DocumentID;
+                    }
+
+                    return oDocumentData;
+                })
+                .filter(function (oDocument) {
+                    return !!(oDocument.File || oDocument.FileName);
+                });
 
             // Merge the document currently shown in the dialog into the payload.
+            // If the user removed the old document and uploaded a new file,
+            // the old DocumentID will not be reused.
             if (oMember.File || oMember.DocumentName) {
                 const oCurrentDocument = {
                     DocumentType: oMember.DocumentType || "",
@@ -3811,7 +3897,11 @@ return;
                     File: oMember.File || oMember.Document || ""
                 };
 
-                if (bIsEditMode && oMember.DocumentID) {
+                if (
+                    bIsEditMode &&
+                    oMember.DocumentID &&
+                    aDeletedDocumentIDs.indexOf(String(oMember.DocumentID || "").trim()) < 0
+                ) {
                     oCurrentDocument.DocumentID = oMember.DocumentID;
                 }
 
@@ -3820,7 +3910,8 @@ return;
                         return oDocument.DocumentID === oCurrentDocument.DocumentID;
                     }
 
-                    return String(oDocument.DocumentType || "").trim() === String(oCurrentDocument.DocumentType || "").trim();
+                    return String(oDocument.DocumentType || "").trim() ===
+                        String(oCurrentDocument.DocumentType || "").trim();
                 });
 
                 if (iExistingIndex >= 0) {
@@ -3830,7 +3921,6 @@ return;
                 }
             }
 
-            // Nest Documents inside Members array
             const aMembers = [];
 
             if (oMemberData.Name) {
@@ -3855,96 +3945,108 @@ return;
 
             try {
                 const sEndpoint = "HM_MemberDocument";
-                const oResponse = bIsEditMode ?
-                    await this.ajaxUpdateWithJQuery(sEndpoint, oPayload) :
-                    await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
+
+                // Important:
+                // In edit mode, delete removed backend document first,
+                // then continue with the normal update flow.
+                if (bIsEditMode && aDeletedDocumentIDs.length > 0) {
+                    await this._deletePendingMemberDocuments(aDeletedDocumentIDs);
+                }
+
+                const oResponse = bIsEditMode
+                    ? await this.ajaxUpdateWithJQuery(sEndpoint, oPayload)
+                    : await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
 
                 // Fetch member documents from backend after create/update
-                const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
-                // print oDocumentsResponse on console
+                const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", {
+                    UserID: sUserID
+                });
 
-                // Update MemberList in HostelModel with fresh data from backend
                 if (oDocumentsResponse && oDocumentsResponse.data) {
-                    const aMemberList = Array.isArray(oDocumentsResponse.data) ? oDocumentsResponse.data : [];
+                    const aMemberList = Array.isArray(oDocumentsResponse.data)
+                        ? oDocumentsResponse.data
+                        : [];
+
                     const oHostelModel = this.getView().getModel("HostelModel");
                     const oBookingView = this.getView().getModel("BookingView");
 
-                    // Update HostelModel's MemberList with fresh backend data
                     oHostelModel.setProperty("/MemberList", aMemberList);
 
-                    // Get current selection state
                     const aSelectedMembers = oBookingView.getProperty("/FamilyMembers") || [];
 
-                    // Helper to check if a member is a Self member (case-insensitive)
                     function isSelfMember(oMember) {
                         const sRelation = String(oMember.Relation || "").trim().toLowerCase();
                         return sRelation === "self";
                     }
 
-                    // Normalize selected members' ids: if a member is a Self member, treat its id as "SELF"
-                    // This ensures selection mapping works correctly after normalization
-                    const aNormalizedSelectedMembers = aSelectedMembers.map(oMember => {
+                    const aNormalizedSelectedMembers = aSelectedMembers.map(function (oMember) {
                         if (isSelfMember(oMember)) {
-                            return Object.assign({}, oMember, { id: "SELF" });
+                            return Object.assign({}, oMember, {
+                                id: "SELF"
+                            });
                         }
+
                         return oMember;
                     });
 
-                    const aSelectedIds = new Set(aNormalizedSelectedMembers.map(m => m.id));
+                    const aSelectedIds = new Set(aNormalizedSelectedMembers.map(function (oMember) {
+                        return oMember.id;
+                    }));
+
                     const oCurrentPrimary = aNormalizedSelectedMembers.find(function (oMember) {
                         return oMember && oMember.IsPrimary === true;
                     }) || {};
+
                     const sCurrentPrimaryId = oCurrentPrimary.id;
 
-                    // Create fresh MasterMembers from backend data + SELF, preserving selection
                     const oSelfRecord = this._getPrimaryMemberRecord();
 
-                    // Filter out any Self members from backend data to avoid duplication
-                    // (the backend may already have a Self member with Relation "Self")
-                    // Also capture selection state from any Self member before filtering
                     let bSelfSelectedFromBackend = false;
 
                     const aFilteredMemberList = aMemberList.filter(function (oMember) {
                         if (isSelfMember(oMember)) {
-                            // Capture selection state before filtering (Selected is a UI field that might be present)
                             bSelfSelectedFromBackend = bSelfSelectedFromBackend || oMember.Selected === true;
-                            return false; // filter out
+                            return false;
                         }
+
                         return true;
                     });
 
-                    // Apply captured selection state to the fresh SELF record
                     if (bSelfSelectedFromBackend) {
                         oSelfRecord.Selected = true;
                     }
 
-                    const aAllMembers = [oSelfRecord, ...aFilteredMemberList];
+                    const aAllMembers = [oSelfRecord].concat(aFilteredMemberList);
 
-                    // Normalize all members
-                    const aNormalizedMembers = aAllMembers.map((oMember, iIndex) => {
+                    const aNormalizedMembers = aAllMembers.map(function (oMember, iIndex) {
                         const oNormalized = this._normalizeMemberRecord(oMember, iIndex);
-                        // Preserve selection if this member was previously selected
+
                         if (aSelectedIds.has(oNormalized.id)) {
                             oNormalized.Selected = true;
                         }
+
                         if (sCurrentPrimaryId && oNormalized.id === sCurrentPrimaryId) {
                             oNormalized.IsPrimary = true;
                         }
-                        return oNormalized;
-                    });
 
-                    // Update MasterMembers
+                        return oNormalized;
+                    }.bind(this));
+
                     oBookingView.setProperty("/MasterMembers", aNormalizedMembers);
 
-                    // Update FamilyMembers with selected members
                     const aUpdatedSelectedMembers = aNormalizedMembers
-                        .filter(oMember => oMember.Selected)
-                        .map(oMember => Object.assign({}, oMember, { Selected: true }));
+                        .filter(function (oMember) {
+                            return oMember.Selected;
+                        })
+                        .map(function (oMember) {
+                            return Object.assign({}, oMember, {
+                                Selected: true
+                            });
+                        });
 
                     oBookingView.setProperty("/FamilyMembers", aUpdatedSelectedMembers);
                     oHostelModel.setProperty("/FamilyMembers", aUpdatedSelectedMembers);
 
-                    // Sync primary member and refresh UI
                     this._syncPrimaryMemberInFamilyMembers();
                     oBookingView.refresh(true);
                 }
@@ -5420,17 +5522,26 @@ return;
 
         _getCouponBaseAmount: function () {
             const oModel = this.getView().getModel("HostelModel");
-            const sPlan = oModel.getProperty("/SelectedPriceType");
             const fRoomPrice = this._toNumber(oModel.getProperty("/RoomPrice"));
             const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
-            const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
-
-            if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
-                return Number(((fRoomPrice + fFacilityPrice) / iDuration).toFixed(2));
-            }
 
             return Number((fRoomPrice + fFacilityPrice).toFixed(2));
         },
+
+
+        // _getCouponBaseAmount: function () {
+        //     const oModel = this.getView().getModel("HostelModel");
+        //    // const sPlan = oModel.getProperty("/SelectedPriceType");
+        //     const fRoomPrice = this._toNumber(oModel.getProperty("/RoomPrice"));
+        //     const fFacilityPrice = this._toNumber(oModel.getProperty("/TotalFacilityPrice"));
+        //     // const iDuration = parseInt(oModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+
+        //     // if ((sPlan === "Per Month" || sPlan === "Per Year") && iDuration > 0) {
+        //     //     return Number(((fRoomPrice + fFacilityPrice) / iDuration).toFixed(2));
+        //     // }
+
+        //     return Number((fRoomPrice + fFacilityPrice).toFixed(2));
+        // },
 
         _shouldSplitOnlinePayment: function () {
             const oHostelModel = this.getView().getModel("HostelModel");
@@ -6303,17 +6414,13 @@ return;
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
-            let filter = {
-                BranchID: [booking.BranchCode]
-            };
+            let filter = { BranchID: [booking.BranchCode]};
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0] || {};
             const checkinTime = company.CheckinTime || "11:00 AM";
             const checkoutTime = company.CheckoutTime || "10:00 PM";
 
-            const {
-                jsPDF
-            } = window.jspdf;
+            const {  jsPDF} = window.jspdf;
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
@@ -6361,11 +6468,7 @@ return;
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
 
-            doc.text(
-                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`,
-                148,
-                15
-            );
+            doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15);
 
             currentY = 40;
 
@@ -6416,10 +6519,7 @@ return;
                     (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    member.MobileNo || "-",
-                    Formatter.formatAgeFromDOBOrAge(
-                        member.Age
-                    ) || "-",
+                    Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
                     member.Relation || "-"
                 ]);
 
@@ -6430,15 +6530,7 @@ return;
             doc.setFillColor(...LIGHT_GRAY);
             doc.setDrawColor(...BORDER_LIGHT);
 
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                25,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
 
             // Accent bar
             doc.setFillColor(...ACCENT_COLOR);
@@ -6450,38 +6542,27 @@ return;
 
             doc.setTextColor(...PRIMARY_COLOR);
 
-            doc.text(
-                "GUEST DETAILS",
-                24,
-                guestBoxY + 8
-            );
+            doc.text("GUEST DETAILS", 24, guestBoxY + 8);
 
 
             // Guest Table
             doc.autoTable({
-
                 startY: guestBoxY + 12,
-
                 margin: {
                     left: 20,
                     right: 15
                 },
-
                 head: [
                     [
                         "Sl.No",
                         "Guest Name",
                         "Gender",
-                        "Mobile",
                         "Age",
                         "Relation"
                     ]
                 ],
-
                 body: guestBody,
-
                 theme: "grid",
-
                 styles: {
                     font: "helvetica",
                     fontSize: 8,
@@ -6489,14 +6570,12 @@ return;
                     lineColor: [220, 220, 220],
                     lineWidth: 0.1
                 },
-
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
                     textColor: [255, 255, 255],
                     fontStyle: "bold",
                     halign: "center"
                 },
-
                 columnStyles: {
                     0: {
                         cellWidth: 15,
@@ -6514,11 +6593,7 @@ return;
                         halign: "center"
                     },
                     4: {
-                        cellWidth: 22,
-                        halign: "center"
-                    },
-                    5: {
-                        cellWidth: 28,
+                        cellWidth: 30,
                         halign: "center"
                     }
                 }
@@ -6527,38 +6602,20 @@ return;
 
 
             // Dynamic Guest Box Height
-            let guestBoxHeight =
-                (doc.lastAutoTable.finalY - guestBoxY) + 10;
-
+            let guestBoxHeight =  (doc.lastAutoTable.finalY - guestBoxY) + 10;
 
             // Redraw Border
             doc.setDrawColor(...BORDER_LIGHT);
 
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                guestBoxHeight,
-                4,
-                4,
-                "S"
-            );
+            doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
 
             // Full Accent Bar
             doc.setFillColor(...ACCENT_COLOR);
 
-            doc.rect(
-                15,
-                guestBoxY,
-                5,
-                guestBoxHeight,
-                "F"
-            );
-
+            doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
             // Move Below Guest
             currentY = guestBoxY + guestBoxHeight + 10;
-
 
             // ---------- STAY DETAILS ----------
             checkNewPage(55);
@@ -6567,15 +6624,7 @@ return;
             doc.setDrawColor(...BORDER_LIGHT);
 
             // Reduced box height
-            doc.roundedRect(
-                15,
-                currentY,
-                180,
-                40,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect( 15, currentY, 180, 40, 4, 4, "FD");
 
             // Accent Bar
             doc.setFillColor(...ACCENT_COLOR);
@@ -6599,15 +6648,11 @@ return;
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-",
-                60,
+            doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60,
                 currentY + 16
             );
 
-            doc.text(
-                booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-",
-                60,
+            doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60,
                 currentY + 26
             );
 
@@ -6621,15 +6666,11 @@ return;
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                booking.BedType || "-",
-                150,
+            doc.text(booking.BedType || "-", 150,
                 currentY + 16
             );
 
-            doc.text(
-                String(booking.NoOfPersons || "-"),
-                150,
+            doc.text(String(booking.NoOfPersons || "-"), 150,
                 currentY + 26
             );
 

@@ -85,22 +85,11 @@
                                             placeholder="Mr."
                                             valueStateText="{i18n>MVDsalutation}"
                                         >
-												<core:ListItem
-                                                key="Mr."
-                                                text="Mr."
-                                            />
-												<core:ListItem
-                                                key="Ms."
-                                                text="Ms."
-                                            />
-												<core:ListItem
-                                                key="Mrs."
-                                                text="Mrs."
-                                            />
-												<core:ListItem
-                                                key="Dr."
-                                                text="Dr."
-                                            />
+                                            <core:Item key="" text="Select Gender"/>
+											<core:ListItem key="Mr." text="Mr."/>
+											<core:ListItem key="Ms." text="Ms."/>
+											<core:ListItem key="Mrs." text="Mrs."/>
+											<core:ListItem key="Dr." text="Dr."/>
 											</m:ComboBox>
 											<m:Input
                                             value="{AdminSignupModel>/VendorName}"

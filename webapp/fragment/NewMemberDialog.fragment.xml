@@ -6,7 +6,7 @@
 >
     <Dialog
         id="newMemberDialog"
-        class="newMemberDialog"
+        class="newMemberDialog newMemberDialogWithMargin"
         contentWidth="32rem"
         stretch="{= ${device>/system/phone} }"
         draggable="true"
@@ -40,7 +40,7 @@
                 emptySpanS="0"
                 adjustLabelSpan="false"
                 singleContainerFullSize="true"
-                class="sapUiTinyMargin"
+                class="sapUiTinyMargin newMemberFormWithRightPadding"
             >
                 <HBox
                     width="100%"
@@ -164,7 +164,7 @@
                 <HBox
                     width="100%"
                     fitContainer="true"
-                    wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                    wrap="NoWrap"
                     alignItems="Center"
                 >
                     <ComboBox
@@ -175,8 +175,9 @@
                         valueStateText="Please select a valid document type"
                         selectionChange="onNewMemberDocumentTypeChange"
                         change="onNewMemberDocumentTypeChange"
-                        width="{= ${device>/system/phone} ? '100%' : '12rem'}"
+                        width="{= ${device>/system/phone} ? '45%' : '100%'}"
                         class="sapUiTinyMarginEnd"
+                        visible="{= !${BookingView>/NewMemberDraft/DocumentName} }"
                     >
                         <core:Item
                             key="{BookingView>key}"
@@ -186,7 +187,7 @@
 
                     <unified:FileUploader
                         id="newMemberFileUploader"
-                        width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+                        width="{= ${device>/system/phone} ? '100%' : '100%'}"
                         visible="{= !${BookingView>/NewMemberDraft/DocumentName} }"
                         buttonOnly="true"
                         maximumFileSize="2"
@@ -213,6 +214,7 @@
                         visible="{= !!${BookingView>/NewMemberDraft/DocumentName} }"
                         alignItems="Center"
                         wrap="{= ${device>/system/phone} ? 'Wrap' : 'NoWrap'}"
+                        class="sapUiTinyMarginBegin"
                     >
                         <Link
                             text="{path: 'BookingView>/NewMemberDraft/DocumentName', formatter: '.formatDocumentFileName'}"

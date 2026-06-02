@@ -2562,7 +2562,7 @@ sap.ui.define([
 
             if (!oSelectedFacility) return;
             // 5. Get booking unitText
-            var oBookingModel = this.getView().getModel("edit");
+            var oBookingModel = this.getView().getModel("Bookingmodel");
             var sUnitText = oBookingModel.getProperty("/UnitText"); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
 
@@ -7422,7 +7422,6 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                     (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    `${member.STDCode || "+91"} ${member.MobileNo || "-"}`,
                     Formatter.formatAgeFromDOBOrAge(
                         member.DateOfBirth || member.Age
                     ) || "-",
@@ -7445,15 +7444,7 @@ var aDraftMemberIds = aDraftData.map(function (item) {
             );
 
             // temporary height
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                25,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
 
 
             // Title
@@ -7471,29 +7462,22 @@ var aDraftMemberIds = aDraftData.map(function (item) {
 
             // Guest Table
             doc.autoTable({
-
                 startY: guestBoxY + 15,
-
                 margin: {
                     left: 20,
                     right: 15
                 },
-
                 head: [
                     [
                         "Sl.No",
                         "Guest Name",
                         "Gender",
-                        "Mobile",
                         "DOB",
                         "Relation"
                     ]
                 ],
-
                 body: guestBody,
-
                 theme: "grid",
-
                 styles: {
                     font: "helvetica",
                     fontSize: 8,
@@ -7502,7 +7486,6 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                     lineWidth: 0.1,
                     valign: "middle"
                 },
-
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
                     textColor: [255, 255, 255],
@@ -7510,7 +7493,6 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                     halign: "center",
                     fontSize: 9
                 },
-
                 columnStyles: {
                     0: {
                         cellWidth: 15,
@@ -7528,11 +7510,7 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                         halign: "center"
                     },
                     4: {
-                        cellWidth: 28,
-                        halign: "center"
-                    },
-                    5: {
-                        cellWidth: 28,
+                        cellWidth: 30,
                         halign: "center"
                     }
                 }
@@ -7541,8 +7519,7 @@ var aDraftMemberIds = aDraftData.map(function (item) {
 
 
             // Calculate exact box height
-            let guestBoxHeight =
-                (doc.lastAutoTable.finalY - guestBoxY) + 12;
+            let guestBoxHeight =  (doc.lastAutoTable.finalY - guestBoxY) + 12;
 
 
             // Draw final border
@@ -7552,15 +7529,7 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                 BORDER_LIGHT[2]
             );
 
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                guestBoxHeight,
-                4,
-                4,
-                "S"
-            );
+            doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
 
             // Accent Bar — full height
             doc.setFillColor(
@@ -7569,19 +7538,11 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                 ACCENT_COLOR[2]
             );
 
-            doc.rect(
-                15,
-                guestBoxY,
-                5,
-                guestBoxHeight,
-                "F"
-            );
+            doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
 
             // Small clean spacing before Stay Details
             currentY = guestBoxY + guestBoxHeight + 12;
-
-
 
             // ---------- STAY DETAILS ----------
             checkNewPage(60);
@@ -7598,15 +7559,7 @@ var aDraftMemberIds = aDraftData.map(function (item) {
                 BORDER_LIGHT[2]
             );
 
-            doc.roundedRect(
-                15,
-                currentY,
-                180,
-                55,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
 
 
             // Accent Bar
@@ -7647,24 +7600,17 @@ var aDraftMemberIds = aDraftData.map(function (item) {
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                `${data.StartDate || "-"}`,
-                60,
+            doc.text(`${data.StartDate || "-"}`, 60,
                 currentY + 22
             );
 
-            doc.text(
-                `${data.EndDate || "-"}`,
-                60,
+            doc.text( `${data.EndDate || "-"}`, 60,
                 currentY + 34
             );
 
-            doc.text(
-                `${data.Duration || "0"} ${data.DurationUnit || ""}`,
-                60,
+            doc.text( `${data.Duration || "0"} ${data.DurationUnit || ""}`, 60,
                 currentY + 46
             );
-
 
             // RIGHT SIDE
             doc.setFont("helvetica", "bold");
@@ -7677,21 +7623,15 @@ var aDraftMemberIds = aDraftData.map(function (item) {
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                `${data.BedType || "-"}`,
-                150,
+            doc.text( `${data.BedType || "-"}`, 150,
                 currentY + 22
             );
 
-            doc.text(
-                `${data.NoOfPersons || "-"}`,
-                150,
+            doc.text(`${data.NoOfPersons || "-"}`, 150,
                 currentY + 34
             );
 
-            doc.text(
-                `${data.Status || "-"}`,
-                150,
+            doc.text( `${data.Status || "-"}`, 150,
                 currentY + 46
             );
 

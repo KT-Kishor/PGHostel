@@ -72,6 +72,7 @@ sap.ui.define([
             this.getView().setModel(model, "Visiblemodel")
             this.BedTypedetails();
         },
+        
          getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
                 },

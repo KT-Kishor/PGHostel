@@ -82,10 +82,8 @@
 						<Text text="{i18n>unitPrice}" tooltip="{i18n>unitPrice}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-    <Text
-        text="{i18n>facilityDetails}"
-        tooltip="{i18n>facilityDetails}" />
-</Column>
+						<Text text="{i18n>facilityDetails}" tooltip="{i18n>facilityDetails}" />
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem type="Navigation" press="FD_onFacilityRowPress">
@@ -98,17 +96,16 @@
 							<Text text="{parts: ['Facilities>PerYearPrice','Facilities>Currency'], formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{path:'Facilities>SelectionMode', formatter: '.Formatter.formatSelectionMode'}" />
 							<Text text="{parts: ['Facilities>UnitPrice','Facilities>Currency'], formatter: '.Formatter.formatPrice'}"/>
-							<Text
-    text="{
-        parts: [
-            'Facilities>MinimumQty',
-            'Facilities>MinimumPrice',
-            'Facilities>Currency',
-            'Facilities>FacilityChargeType'
-        ],
-        formatter: '.Formatter.formatFacilityDetails'
-    }"
-/>
+							<Text text="{
+											parts: [
+												'Facilities>MinimumQty',
+												'Facilities>MinimumPrice',
+												'Facilities>Currency',
+												'Facilities>FacilityChargeType'
+											],
+											formatter: '.Formatter.formatFacilityDetails'
+										}"
+									/>
 						</cells>
 					</ColumnListItem>
 				</items>

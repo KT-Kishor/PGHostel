@@ -646,7 +646,7 @@ formatBranchNames: function (sBranchCodes, aBranches) {
         var sDisplayChargeType =
             oChargeTypeMap[sChargeType] || sChargeType;
 
-        aText.push("charged " + sDisplayChargeType);
+        aText.push("Charged " + sDisplayChargeType);
     }
 
     // If no values available

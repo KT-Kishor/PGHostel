@@ -1,5 +1,4 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.FacilitiesDetails"
+<mvc:View controllerName="sap.ui.com.project1.controller.FacilitiesDetails"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:m="sap.m"
 	xmlns:suite="sap.suite.ui.commons"
@@ -13,26 +12,14 @@
     height="100%"
 	xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
-	xmlns:u="sap.ui.unified"
->
-	<m:Page
-        navButtonPress="BI_onButtonPress"
-        showNavButton="true"
-        title="{i18n>facilityDetails}"
-    >
+	xmlns:u="sap.ui.unified">
+	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>facilityDetails}">
 		<m:headerContent>
-			<core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
 		</m:headerContent>
 		<ObjectPageLayout id="FD_id_ObjectPageLayout">
 			<sections>
-				<ObjectPageSection
-                    titleUppercase="false"
-                    id="FD_id_OrderHeaderSection1"
-                    title="{i18n>facilityInformation}"
-                >
+				<ObjectPageSection titleUppercase="false" id="FD_id_OrderHeaderSection1" title="{i18n>facilityInformation}">
 					<subSections>
 						<ObjectPageSubSection id="FD_id_dsd1">
 							<blocks>
@@ -53,8 +40,7 @@
                                     columnsXL="3"
                                     columnsL="2"
                                     columnsM="2"
-                                    singleContainerFullSize="false"
-                                >
+                                    singleContainerFullSize="false">
 									<f:content>
 										<!-- Branch Code -->
 										<m:Label
@@ -334,7 +320,6 @@
                                                 icon="sap-icon://delete"
                                                 visible="{= ${editable>/Edit} === true &amp;&amp; ${DisplayImagesModel>isPlaceholder} === false }"
                                                 press=".onDeleteImage"
-                                                type="Reject"
                                                 tooltip="{i18n>deleteImage}"
                                                 width="100%"
                                             />

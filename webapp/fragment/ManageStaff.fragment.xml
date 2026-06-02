@@ -132,7 +132,7 @@
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     selectionChange=".onbranchChange"
-                    valueStateText="Select Property Name"
+                    valueStateText="Select property name"
                 >
 					<core:ListItem
                         key="{BranchModel>BranchID}"

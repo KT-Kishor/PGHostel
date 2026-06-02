@@ -308,11 +308,25 @@ sap.ui.define([
             }
         },
         
-        createGroupHeader: function(oGroup) {
-            return new sap.m.GroupHeaderListItem({
+        createGroupHeader: function (oGroup) {
+            var oHeader = new sap.m.GroupHeaderListItem({
                 title: oGroup.text,
                 uppercase: false
             });
+
+            oHeader.addEventDelegate({
+                onAfterRendering: function () {
+
+                // Entire row background
+                this.$().css("background-color", "#00b6c6");
+
+                // Text color → Black
+                    this.$().find("*").css("color", "#000000");
+
+                }
+            }, oHeader);
+
+            return oHeader;
         },
 
         onNavBack: function() {

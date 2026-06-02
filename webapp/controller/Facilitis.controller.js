@@ -16,6 +16,7 @@ sap.ui.define([
         _onRouteMatched: async function(oEvent) {
             var LoginFUnction = await this.commonLoginFunction("ManageFacility");
             if (!LoginFUnction) return;
+             this.getBusyDialog();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle(); // Get i18n model
 
             var model = new JSONModel({
@@ -58,13 +59,14 @@ sap.ui.define([
                 this.closeBusyDialog()
                 MessageToast.show(err.message || err.responseText);
             } finally {
-                 this.getGroupHeader();
+                
                 this.closeBusyDialog()
             }
         },
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
+
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
 
         FC_onSearch: async function() {
             var aFilterItems = this.byId("FO_id_FilterbarEmployee").getFilterGroupItems();
@@ -88,11 +90,10 @@ sap.ui.define([
                 if (sValue) params[sKey] = sValue;
             });
 
+            params.showBusy = true;
             await this.readCallForFacilities(params).catch((error) => {
                 MessageToast.show(error.message || error.responseText);
-            }).finally(() => {
-                this.closeBusyDialog()
-            });
+            })
         },
 
         readCallForFacilities: async function(filter) {
@@ -126,7 +127,9 @@ sap.ui.define([
                 }
             }
 
-            this.getBusyDialog()
+            if (filter.showBusy) {
+                this.getBusyDialog();
+            }
             try {
                 const oData = await this.ajaxReadWithJQuery("HM_ExtraFacilities", filter);
                 let responseData = [];
@@ -162,8 +165,9 @@ sap.ui.define([
                     this.getView().setModel(new JSONModel(facilitiesData), "facilitiesDataModelInitial");
                 }
             } catch (error) {
+                this.closeBusyDialog()
                 MessageToast.show(error.message || error.responseText);
-            } finally {
+            } finally{
                 this.closeBusyDialog()
             }
         },
@@ -189,7 +193,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -382,7 +385,7 @@ sap.ui.define([
                 }
             }
 
-            const isDuplicate = aFacilitiesData.some(function (facility) {
+            const isDuplicate = aFacilitiesData.some(function(facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false;
 
                 return (
@@ -616,7 +619,6 @@ sap.ui.define([
             if (!oModel) return;
 
             var sSelectionMode = oModel.getProperty("/SelectionMode");
-
             var bIsUnitPriceMode = sSelectionMode === "PERSON_QTY";
 
             if (bIsUnitPriceMode) {
@@ -633,45 +635,33 @@ sap.ui.define([
             MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
         },
 
- onTokenDelete: function(oEvent) {
+        onTokenDelete: function(oEvent) {
+            const oView = this.getView();
 
-    const oView = this.getView();
+            const oTokenModel = oView.getModel("tokenModel");
+            const oUploaderData = oView.getModel("UploaderData");
 
-    const oTokenModel = oView.getModel("tokenModel");
-    const oUploaderData = oView.getModel("UploaderData");
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
 
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
-    let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            const oButton = oEvent.getSource();  // Get pressed button
+            const oItem = oButton.getParent(); // Get current row
+            const oCtx = oItem.getBindingContext("UploaderData");   // Get binding context
 
-    // Get pressed button
-    const oButton = oEvent.getSource();
+            if (oCtx) {
+                const iIndex = parseInt(   // Get selected row index
+                    oCtx.getPath().split("/").pop(),
+                    10
+                );
 
-    // Get current row
-    const oItem = oButton.getParent();
+                aAttachments.splice(iIndex, 1);  // Remove only selected attachment
+                aTokens.splice(iIndex, 1); // Remove matching token only for selected row
+            }
 
-    // Get binding context
-    const oCtx = oItem.getBindingContext("UploaderData");
-
-    if (oCtx) {
-
-        // Get selected row index
-        const iIndex = parseInt(
-            oCtx.getPath().split("/").pop(),
-            10
-        );
-
-        // Remove only selected attachment
-        aAttachments.splice(iIndex, 1);
-
-        // Remove matching token only for selected row
-        aTokens.splice(iIndex, 1);
-    }
-
-    oTokenModel.setProperty("/tokens", aTokens);
-    oUploaderData.setProperty("/attachments", aAttachments);
-
-    this.byId("id_fileUploader").clear();
-},
+            oTokenModel.setProperty("/tokens", aTokens);
+            oUploaderData.setProperty("/attachments", aAttachments);
+            this.byId("id_fileUploader").clear();
+        },
 
         onFacilityFileChange: function(oEvent) {
             const oFiles = oEvent.getParameter("files");
@@ -791,10 +781,9 @@ sap.ui.define([
                                 that.closeBusyDialog()
                                 MessageToast.show(err.message || err.responseText);
                             } finally {
-                                that.closeBusyDialog()
-
-                                MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); // Use 'that' here
+                                sap.m.MessageToast.show(that.i18nModel.getText("facilitiesdeletedsuccessfully")); 
                                 oTable.removeSelections(true);
+                                that.closeBusyDialog()
                             }
                         } else {
                             oTable.removeSelections(true);
@@ -879,9 +868,7 @@ sap.ui.define([
             oSheet.build().then(() => {
                 MessageToast.show(this.i18nModel.getText("MSdownloadedsuccess"));
             }).catch((oError) => {
-                MessageToast.show(
-                    this.i18nModel.getText("MSdownloadfailed") || "Download failed"
-                );
+                MessageToast.show(this.i18nModel.getText("MSdownloadfailed") || "Download failed");
             }).finally(() => {
                 this.closeBusyDialog()
                 oSheet.destroy();

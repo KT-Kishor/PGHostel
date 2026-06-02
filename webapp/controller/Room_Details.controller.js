@@ -41,7 +41,7 @@ sap.ui.define([
             await this._loadBranchCode()
             await this.Onsearch()
             this.Customerdata()
-             this.getGroupHeader();
+             
 
             //  this.closeBusyDialog()
 
@@ -846,6 +846,11 @@ sap.ui.define([
                     ],
                     styleClass: "myUnifiedBtn",
                     onClose: async function (sAction) {
+                         // Remove selection on Cancel
+                        if (sAction === sap.m.MessageBox.Action.CANCEL) {
+                            table.removeSelections(true);
+                            return;
+                        }
                         if (sAction === sap.m.MessageBox.Action.OK) {
                             this.getBusyDialog()
                             try {

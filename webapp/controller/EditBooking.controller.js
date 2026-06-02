@@ -3583,17 +3583,13 @@ sap.ui.define([
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
-            let filter = {
-                BranchID: [booking.BranchCode]
-            };
+           let filter = { BranchID: [booking.BranchCode]};
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0] || {};
             const checkinTime = company.CheckinTime || "11:00 AM";
             const checkoutTime = company.CheckoutTime || "10:00 PM";
 
-            const {
-                jsPDF
-            } = window.jspdf;
+           const {  jsPDF} = window.jspdf;
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
@@ -3641,11 +3637,7 @@ sap.ui.define([
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
 
-            doc.text(
-                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`,
-                148,
-                15
-            );
+            doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15);
 
             currentY = 40;
 
@@ -3699,13 +3691,9 @@ sap.ui.define([
                     (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    member.MobileNo || "-",
-                    Formatter.formatAgeFromDOBOrAge(
-                        member.Age
-                    ) || "-",
+                    Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
                     member.Relation || "-"
                 ]);
-
             });
 
 
@@ -3713,15 +3701,7 @@ sap.ui.define([
             doc.setFillColor(...LIGHT_GRAY);
             doc.setDrawColor(...BORDER_LIGHT);
 
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                25,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
 
             // Accent bar
             doc.setFillColor(...ACCENT_COLOR);
@@ -3733,38 +3713,27 @@ sap.ui.define([
 
             doc.setTextColor(...PRIMARY_COLOR);
 
-            doc.text(
-                "GUEST DETAILS",
-                24,
-                guestBoxY + 8
-            );
-
+            doc.text("GUEST DETAILS", 24, guestBoxY + 8);
 
             // Guest Table
             doc.autoTable({
-
                 startY: guestBoxY + 12,
-
                 margin: {
                     left: 20,
                     right: 15
                 },
-
                 head: [
                     [
                         "Sl.No",
                         "Guest Name",
                         "Gender",
-                        "Mobile",
                         "Age",
                         "Relation"
                     ]
                 ],
 
                 body: guestBody,
-
                 theme: "grid",
-
                 styles: {
                     font: "helvetica",
                     fontSize: 8,
@@ -3772,14 +3741,12 @@ sap.ui.define([
                     lineColor: [220, 220, 220],
                     lineWidth: 0.1
                 },
-
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
                     textColor: [255, 255, 255],
                     fontStyle: "bold",
                     halign: "center"
                 },
-
                 columnStyles: {
                     0: {
                         cellWidth: 15,
@@ -3797,10 +3764,6 @@ sap.ui.define([
                         halign: "center"
                     },
                     4: {
-                        cellWidth: 22,
-                        halign: "center"
-                    },
-                    5: {
                         cellWidth: 28,
                         halign: "center"
                     }
@@ -3810,38 +3773,21 @@ sap.ui.define([
 
 
             // Dynamic Guest Box Height
-            let guestBoxHeight =
-                (doc.lastAutoTable.finalY - guestBoxY) + 10;
+            let guestBoxHeight =  (doc.lastAutoTable.finalY - guestBoxY) + 10;
 
 
             // Redraw Border
             doc.setDrawColor(...BORDER_LIGHT);
 
-            doc.roundedRect(
-                15,
-                guestBoxY,
-                180,
-                guestBoxHeight,
-                4,
-                4,
-                "S"
-            );
+            doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
 
             // Full Accent Bar
             doc.setFillColor(...ACCENT_COLOR);
 
-            doc.rect(
-                15,
-                guestBoxY,
-                5,
-                guestBoxHeight,
-                "F"
-            );
-
+            doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
             // Move Below Guest
             currentY = guestBoxY + guestBoxHeight + 10;
-
 
             // ---------- STAY DETAILS ----------
             checkNewPage(55);
@@ -3850,15 +3796,7 @@ sap.ui.define([
             doc.setDrawColor(...BORDER_LIGHT);
 
             // Reduced box height
-            doc.roundedRect(
-                15,
-                currentY,
-                180,
-                40,
-                4,
-                4,
-                "FD"
-            );
+            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
 
             // Accent Bar
             doc.setFillColor(...ACCENT_COLOR);
@@ -3882,15 +3820,11 @@ sap.ui.define([
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-",
-                60,
+            doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60,
                 currentY + 16
             );
 
-            doc.text(
-                booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-",
-                60,
+            doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60,
                 currentY + 26
             );
 
@@ -3904,15 +3838,11 @@ sap.ui.define([
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
 
-            doc.text(
-                booking.BedType || "-",
-                150,
+            doc.text(booking.BedType || "-", 150,
                 currentY + 16
             );
 
-            doc.text(
-                String(booking.NoOfPersons || "-"),
-                150,
+            doc.text(String(booking.NoOfPersons || "-"), 150,
                 currentY + 26
             );
 
@@ -4192,7 +4122,7 @@ sap.ui.define([
                 align: "right"
             });
 
-             // ✅ RETURN BASE64 (IMPORTANT CHANGE)
+             // RETURN BASE64 (IMPORTANT CHANGE)
             return doc.output("datauristring").split(",")[1];
         },
 

@@ -13,10 +13,12 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
+                this.getBusyDialog()
                 var LoginFUnction = await this.commonLoginFunction("ManageFacility");
                 if (!LoginFUnction) return;
                 var Layout = this.byId("FD_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("FD_id_OrderHeaderSection1"));
+                this.getBusyDialog()
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oEditableModel = new JSONModel({
@@ -45,8 +47,6 @@ sap.ui.define([
                     FacilityChargeType: ""
                 });
                 this.getView().setModel(oFacilityModel, "FacilitiesModel"); // Reset facility model
-
-                this.getBusyDialog()
                 this.BedID = oEvent.getParameter("arguments").sPath;
                 await this._loadBranchCode()
                 await this.Onsearch()
@@ -54,7 +54,9 @@ sap.ui.define([
                 this.closeBusyDialog()
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
-            } finally {}
+            } finally {
+                this.closeBusyDialog()
+            }
         },
 
         _loadBranchCode: async function() {
@@ -79,9 +81,7 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
-                this.commonLoginFunction();
 
                 const oView = this.getView();
 
@@ -134,44 +134,44 @@ sap.ui.define([
             //     value: "Facilities",
             //     sPath: "FacilitiesDetails"
             // });
-             var oViewModel = this.getView().getModel("editable");
+            var oViewModel = this.getView().getModel("editable");
 
-    // Check edit mode
-    var bIsEditMode = oViewModel.getProperty("/Edit");
+            // Check edit mode
+            var bIsEditMode = oViewModel.getProperty("/Edit");
 
-    if (bIsEditMode) {
+            if (bIsEditMode) {
 
-        // Ask confirmation only in edit mode
-        this.showConfirmationDialog(
-            this.i18nModel.getText("ConfirmActionTitle"),
-            this.i18nModel.getText("backConfirmation"),
+                // Ask confirmation only in edit mode
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
 
-            function () {
+                    function() {
 
-                // Reset edit mode
-                oViewModel.setProperty("/Edit", false);
-                oViewModel.setProperty("/save", false);
+                        // Reset edit mode
+                        oViewModel.setProperty("/Edit", false);
+                        oViewModel.setProperty("/save", false);
 
-                // Navigate back
+                        // Navigate back
+                        this.getRouter().navTo("RouteFacilitis", {
+                            value: "Facilities",
+                            sPath: "FacilitiesDetails"
+                        });
+                        this.getView().getModel("Facilities").setData({});
+                        this.getView().getModel("DisplayImagesModel").setData({});
+
+                    }.bind(this)
+                );
+            } else {
+                // Direct navigation when not editing
                 this.getRouter().navTo("RouteFacilitis", {
                     value: "Facilities",
-                sPath: "FacilitiesDetails"
+                    sPath: "FacilitiesDetails"
                 });
                 this.getView().getModel("Facilities").setData({});
-            this.getView().getModel("DisplayImagesModel").setData({});
+                this.getView().getModel("DisplayImagesModel").setData({});
+            }
 
-            }.bind(this)
-        );
-    }else {
-        // Direct navigation when not editing
-        this.getRouter().navTo("RouteFacilitis", {
-            value: "Facilities",
-            sPath: "FacilitiesDetails"
-        });
-        this.getView().getModel("Facilities").setData({});
-            this.getView().getModel("DisplayImagesModel").setData({});
-    }
-            
         },
 
         onFacilitybranchChange: function(oEvent) {
@@ -223,7 +223,7 @@ sap.ui.define([
 
             var sFacilityID = oSelectedItem.getKey();
             sFacilityID = parseInt(sFacilityID, 10);
-            this._filterSelectionModes(sFacilityID);
+            // this._filterSelectionModes(sFacilityID);
             this._syncFacilityPricingFields();
         },
 
@@ -263,14 +263,7 @@ sap.ui.define([
         onSelectionModeChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
-
-            if (oInput.getValue() === "") {
-                oInput.setValueState("None");
-            }
-
-            var oModel = this.getView().getModel("FacilitiesModel");
-            var sMode = oModel.getProperty("/SelectionMode");
-
+            if (oInput.getValue() === "") oInput.setValueState("None");
             this._syncFacilityPricingFields();
         },
 
@@ -280,7 +273,9 @@ sap.ui.define([
 
             var sSelectionMode = oModel.getProperty("/SelectionMode");
 
-            if (bIsUnit) {
+            var bIsUnitPriceMode = sSelectionMode === "PERSON_QTY";
+
+            if (bIsUnitPriceMode) {
                 oModel.setProperty("/PerHourPrice", "");
                 oModel.setProperty("/PerDayPrice", "");
                 oModel.setProperty("/PerMonthPrice", "");
@@ -420,24 +415,24 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
             ) {
 
-            const sSelectionMode = String(Payload.SelectionMode || "").toUpperCase().trim();
-            const isPersonQty = sSelectionMode === "PERSON_QTY";
+                const sSelectionMode = String(Payload.SelectionMode || "").toUpperCase().trim();
+                const isPersonQty = sSelectionMode === "PERSON_QTY";
 
-            const isLaundryOrIroning =
-                Payload.Type === "Laundry Service" ||
-                Payload.Type === "Ironing Service";
+                const isLaundryOrIroning =
+                    Payload.Type === "Laundry Service" ||
+                    Payload.Type === "Ironing Service";
 
-            // Require UnitPrice only when NOT PERSON_QTY and is Laundry/Ironing
-            if (!isPersonQty && isLaundryOrIroning &&
-                (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
+                // Require UnitPrice only when NOT PERSON_QTY and is Laundry/Ironing
+                if (!isPersonQty && isLaundryOrIroning &&
+                    (!Payload.UnitPrice || Number(Payload.UnitPrice) === 0)) {
 
-                const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID");
+                    const isValid = utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("FD_id_UnitPrice")), "ID");
 
-                if (!isValid) {
-                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                    return;
+                    if (!isValid) {
+                        MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                        return;
+                    }
                 }
-            }
 
                 if (bIsUnit) {
                     //  PERSON_QTY FLOW

@@ -151,8 +151,6 @@ sap.ui.define([
 
         _loadVendorDetails: async function (sUserID) {
             try {
-                this.getBusyDialog()
-
                 const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
                     UserID: sUserID
                 });
@@ -248,8 +246,13 @@ sap.ui.define([
             reader.readAsDataURL(oFile);
         },
 
-        onFileSizeExceeds: function () {
-            sap.m.MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
+         onFileSizeExceeds: function () {
+            var oUploader = sap.ui.getCore().byId("VN_id_FileUploader");
+            var iMaxSize = oUploader.getMaximumFileSize();
+
+            sap.m.MessageToast.show(
+                "File size exceeds " + iMaxSize + " MB. Please upload a smaller file."
+            );
         },
 
         BI_onEditButtonPress: function () {
@@ -364,9 +367,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
                 return false;
-            } finally {
-                this.closeBusyDialog()
-            }
+            } 
         },
 
         onAdminSelectionChange: function (oEvent) {
@@ -376,7 +377,7 @@ sap.ui.define([
             this.getView().getModel("editable").setProperty("/hasSelection", bHasSelection);
         },
 
-        onAdminDeleteFiles: function () {
+        onAdminDeleteFiles: async function () {
             const oTable = this.byId("V_id_adminAttachmentTable");
             const oSelectedItem = oTable.getSelectedItem();
 
@@ -405,13 +406,13 @@ sap.ui.define([
                                 UserID: sUserID
                             }
                         });
-                        this._loadVendorDetails(sUserID); // refresh attachment list
+                        await this._loadVendorDetails(sUserID); // refresh attachment list
+                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                         fnResetSelection();
                     } catch (err) {
                         sap.m.MessageToast.show(err.message || "Delete failed");
                     } finally {
-                        this.closeBusyDialog()
-                        sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                        this.closeBusyDialog()  
                     }
                 },
                 () => {
@@ -482,12 +483,12 @@ sap.ui.define([
                 return last;
             }
             const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel")?.getObject();
-
             if (!oDoc || !oDoc.File) {
                 sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
                 return;
             }
             const sBase64 = autoDecodeBase64(oDoc.File);
+
             let sMimeType = "application/octet-stream";
             if (sBase64.startsWith("iVB")) {
                 sMimeType = "image/png";
@@ -496,10 +497,9 @@ sap.ui.define([
             } else if (sBase64.startsWith("JVBER")) {
                 sMimeType = "application/pdf";
             }
-
             if (sMimeType.startsWith("image/")) {
-                let sImageSrc = `data:${sMimeType};base64,${sBase64}`;
 
+                let sImageSrc = `data:${sMimeType};base64,${sBase64}`;
                 if (!this._oAdminPreviewDialog) {
 
                     const oFlex = new sap.m.FlexBox({
@@ -509,16 +509,14 @@ sap.ui.define([
                         justifyContent: "Center",
                         alignItems: "Center",
                         items: [
-                            new sap.m.Image({
+                          new sap.m.Image({
                                 id: this.createId("adminDocPreviewImage"),
                                 densityAware: false,
                                 width: "100%",
-                                height: "100%",
-                                style: "object-fit: contain; display:block;"
-                            })
+                                decorative: false
+                            }).addStyleClass("adminPreviewImage")
                         ]
                     });
-
                     this._oAdminPreviewDialog = new sap.m.Dialog({
                         title: oDoc.FileName || "Document Image",
                         contentWidth: "50%",
@@ -552,89 +550,69 @@ sap.ui.define([
             }
 
             if (sMimeType === "application/pdf") {
-                if (!this._oAdminPreviewDialog) {
-                    this._oAdminPreviewDialog = new sap.m.Dialog({
-                        title: "Document Preview",
-                        stretch: true,
-                        draggable: true,
-                        resizable: true,
-                        contentWidth: "50%",
-                        contentHeight: "50%",
-                        horizontalScrolling: true,
-                        verticalScrolling: false,
-                        contentPadding: "0rem",
-                        endButton: new sap.m.Button({
-                            text: "Close",
-                            press: () => {
-                                if (this._previewUrl) {
-                                    URL.revokeObjectURL(this._previewUrl);
-                                    this._previewUrl = null;
-                                }
-                                this._oAdminPreviewDialog.close();
-                            }
-                        }),
-                        afterClose: function () {
-                            this._oAdminPreviewDialog.destroy();
-                            this._oAdminPreviewDialog = null;
-                        }.bind(this)
-                    });
-                    this.getView().addDependent(this._oAdminPreviewDialog);
-                }
-                this._oAdminPreviewDialog.removeAllContent();
+
                 const byteCharacters = atob(sBase64);
                 const byteArrays = [];
 
                 for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+
                     const slice = byteCharacters.slice(offset, offset + 512);
+
                     const byteNumbers = new Array(slice.length);
+
                     for (let i = 0; i < slice.length; i++) {
                         byteNumbers[i] = slice.charCodeAt(i);
                     }
+
                     byteArrays.push(new Uint8Array(byteNumbers));
                 }
+
                 const blob = new Blob(byteArrays, {
-                    type: sMimeType
+                    type: "application/pdf"
                 });
+
                 if (this._previewUrl) {
                     URL.revokeObjectURL(this._previewUrl);
                 }
+
                 this._previewUrl = URL.createObjectURL(blob);
 
-                this._oAdminPreviewDialog.addContent(
-                    new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-                            <iframe
-                                src="${this._previewUrl}"
-                                style="width:100%; height:600px; border:none; display:block;">
-                            </iframe>
-                        `
-                    })
-                );
-                this._oAdminPreviewDialog.open();
+                // Open PDF in new tab
+                window.open(this._previewUrl, "_blank");
+
                 return;
             }
             sap.m.MessageToast.show("Preview not supported.");
         },
 
-        onAdminChangeSalutation: function (oEvent) {
+        onAdminChangeSalutation: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("V_id_Gender");
-            oSalutation.setValueState("None");
 
-            if (!oGender) return;
-            // Reset gender first
+            // Gender control from the same view
+            const oGender = this.byId("V_id_Gender");
+
+            if (!oGender) {
+                console.error(this.i18nModel.getText("nogenderselect"));
+                return;
+            }
+
+            // Reset gender
             oGender.setSelectedKey("");
             oGender.setEnabled(true);
-            // Auto-map gender
+
+            // Auto-select based on salutation
             if (sKey === "Mr.") {
                 oGender.setSelectedKey("Male");
                 oGender.setEnabled(false);
             } else if (sKey === "Ms." || sKey === "Mrs.") {
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
+            } else if (sKey === "Other.") {
+                oGender.setSelectedKey("Other");
+                oGender.setEnabled(false);
             }
+
             utils._LCstrictValidationSelect(oSalutation);
         },
 
@@ -792,6 +770,11 @@ sap.ui.define([
         },
 
         onUploadDocumentFile: function () {
+            const oTable = this.byId("V_id_adminAttachmentTable");
+            if (oTable) {
+                oTable.removeSelections(true);
+            }
+
             if (this.UD_Dialog) {
                 this.UD_Dialog.destroy();
                 this.UD_Dialog = null;

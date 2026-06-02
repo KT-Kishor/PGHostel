@@ -81,11 +81,14 @@
                 <u:FileUploader
                     id="VN_id_FileUploader"
                     fileType="jpg,jpeg,png,PDF"
-                    sameFilenameAllowed="false"
+                    sameFilenameAllowed="true"
                     change="onFacilityFileChange"
                     visible="{VisibleModel>/visible}"
                     class="myUnifiedBtn"
                     width="100%"
+                    fileSizeExceed="onFileSizeExceeds"
+                    maximumFileSize="2"
+                    multiple="false"
                 />
             </f:content>
         </f:SimpleForm>

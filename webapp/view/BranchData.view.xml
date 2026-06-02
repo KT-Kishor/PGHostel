@@ -1,21 +1,17 @@
 <mvc:View
     controllerName="sap.ui.com.project1.controller.BranchData"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
     displayBlock="true"
-    busyIndicatorDelay="0"
->
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
+    busyIndicatorDelay="0">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
                 id="MD_id_Filterbar"
                 persistencyKey="myPersKey"
                 useToolbar="false"
@@ -24,51 +20,46 @@
                 search="MD_onSearch"
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
-                class="filterBarTheme"
-            >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Name"
                         label="{i18n>MSbranchCode}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
                                 id="MD_id_BranchCode"
                                 items="{branchModel>/}"
                                 showSecondaryValues="true"
                                 showClearIcon="true"
-                                width="100%"
-                            >
-                                <core:ListItem
+                                width="100%">
+								<core:ListItem
                                     key="{branchModel>BranchID}"
                                     text="{branchModel>BranchID} - {branchModel>Name}"
-                                    additionalText="{branchModel>City}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
+                                    additionalText="{branchModel>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Pincode"
                         label="{i18n>placeholderSearch}"
                         groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <SearchField
+                        visibleInFilterBar="true">
+						<fb:control>
+							<SearchField
                                 id="MD_id_SearchField"
                                 width="250px"
                                 liveChange="onGlobalSearch"
                                 placeholder="{i18n>pinCode}"
                             />
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table
                 id="id_MD_Table"
                 mode="MultiSelect"
                 sticky="ColumnHeaders,HeaderToolbar"
@@ -79,210 +70,126 @@
                 selectionChange="MC_onTableSelectionChange"
                 items="{ path: 'mainModel>/',
                 templateShareable: false }"
-                updateFinished="onTableUpdateFinished"
-            >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title
-                            text="{i18n>branchDetails} ({mainModel>/count})"
-                        />
-                        <ToolbarSpacer />
-                        <Button
+                updateFinished="onTableUpdateFinished">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>branchDetails} ({mainModel>/count})"/>
+						<ToolbarSpacer />
+						<Button
                             text="{i18n>MSadd}"
                             tooltip="{i18n>MSadd}"
                             press="MD_AddButtonPress"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"/>
+						<Button
                             text="{i18n>MSedit}"
                             tooltip="{i18n>MSedit}"
                             press="MD_UpdateTableRow"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button
                             text="{i18n>MSdelete}"
                             tooltip="{i18n>deleteSelectedBranch}"
                             press="MD_DeleteRow"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"
-                        />
-                        <Button
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"/>
+						<Button
                             text="{i18n>download}"
                             icon="sap-icon://excel-attachment"
                             tooltip="{i18n>downloadBranchData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>MSbranchlogo}"
-                            tooltip="{i18n>MSbranchlogo}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        width="10rem"
-                    >
-                        <Text
-                            text="{i18n>MSbranchCode}"
-                            tooltip="{i18n>MSbranchCode}"
-                        />
-                    </Column>
-
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="Property Type"
-                            tooltip="Property Type"
-                        />
-                    </Column>
-
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="GSTIN"
-                            tooltip="GSTIN"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>penalty}"
-                            tooltip="{i18n>penalty}"
-                        />
-                    </Column>
-                    <!-- <Column demandPopin="true">
-                        <Text
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>MSbranchlogo}" tooltip="{i18n>MSbranchlogo}"/>
+					</Column>
+					<Column demandPopin="true" width="10rem">
+						<Text text="{i18n>MSbranchCode}" tooltip="{i18n>MSbranchCode}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="Property Type"  tooltip="Property Type"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="GSTIN" tooltip="GSTIN"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>penalty}" tooltip="{i18n>penalty}"/>
+					</Column>
+					<!-- <Column demandPopin="true"><Text
                             text="{i18n>branchName}"
                             tooltip="{i18n>branchName}"
-                        />
-                    </Column> -->
-                    <Column
+                        /></Column> -->
+					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
+						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
+					</Column>
+					<!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
-                        width="20%"
-                        hAlign="Center"
-                    >
-                        <Text
-                            text="{i18n>address}"
-                            tooltip="{i18n>address}"
-                            textAlign="Center"
-                            width="100%"
-                        />
-                    </Column>
-                    <!-- <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
+                    ><Text
                             text="Landmark"
                             tooltip="Landmark"
-                        />
-                    </Column> -->
-
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>pinCode}"
-                            tooltip="{i18n>pinCode}"
-                        />
-                    </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>contactNumber}"
-                            tooltip="{i18n>contactNumber}"
-                        />
-                    </Column>
-
-                    <!-- <Column demandPopin="true">
-                        <Text
+                        /></Column> -->
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>pinCode}" tooltip="{i18n>pinCode}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>contactNumber}" tooltip="{i18n>contactNumber}" />
+					</Column>
+					<!-- <Column demandPopin="true"><Text
                             text="{i18n>logo}"
                             tooltip="{i18n>logo}"
-                        />
-                    </Column> -->
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>image}"
-                            tooltip="{i18n>image}"
-                        />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <HBox alignItems="Center">
-                                <Avatar
+                        /></Column> -->
+					<Column demandPopin="true">
+						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<HBox alignItems="Center">
+								<Avatar
                                     src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
                                     displayShape="Circle"
                                     displaySize="L"
                                     press="onpressbranchlogo"
                                     fallbackIcon="sap-icon://attachment-photo"
-                                    class="sapUiTinyMarginEnd"
-                                />
-                            </HBox>
-
-                            <Text
-                                text="{= ${mainModel>Name} + '(' + ${mainModel>BranchID} + ')' }"
-                            />
-
-                            <Text text="{mainModel>PropertyType}" />
-
-                            <VBox>
-                                <Text text="{mainModel>GSTIN}" />
-                                <Text
-                                    text="{= ${mainModel>Type} + ' : ' + ${mainModel>Value} }"
-                                    visible="{= !!${mainModel>Value} }"
-                                />
-                                <!-- <Text
+                                    class="sapUiTinyMarginEnd" />
+							</HBox>
+							<Text text="{= ${mainModel>Name} + '(' + ${mainModel>BranchID} + ')' }"/>
+							<Text text="{mainModel>PropertyType}" />
+							<VBox>
+								<Text text="{mainModel>GSTIN}" />
+								<Text text="{= ${mainModel>Type} + ' : ' + ${mainModel>Value} }" 
+                                visible="{= !!${mainModel>Value} }"/>
+								<!-- <Text
                                     text="{= ${mainModel>Value} + '%'}"
                                     visible="{= !!${mainModel>Value} }"
                                 /> -->
-                            </VBox>
-
-                            <Text
+							</VBox>
+							<Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
-                            <Text
+							<Text
                                 text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
                                 wrapping="true"
                             />
-                            <Text text="{mainModel>Pincode}" />
-                            <Text text="{mainModel>STD} {mainModel>Contact}" />
-                            <!-- <Link
+							<Text text="{mainModel>Pincode}" />
+							<Text text="{mainModel>STD} {mainModel>Contact}" />
+							<!-- <Link
                                 text="{i18n>view}"
                                 press="HF_viewroom"
                             /> -->
-                            <Link
-                                text="{i18n>view}"
-                                press="HF_viewimage"
-                            />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
-        </footer>
-    </Page>
+							<Link text="{i18n>view}" press="HF_viewimage"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
 </mvc:View>

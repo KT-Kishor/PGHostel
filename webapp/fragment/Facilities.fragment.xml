@@ -7,14 +7,14 @@
 	xmlns:mvc="sap.ui.core.mvc">
 	<Dialog id="FacilitiesDialog"
     title="{i18n>addfacilities}"
-    contentWidth="80%"
-        >
+    contentWidth="80%">
 		<f:SimpleForm
             editable="true"
-                layout="ColumnLayout"
-               labelSpanXL="12" labelSpanL="12" labelSpanM="12"
-         labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2"
-         columnsL="2" columnsM="1">
+            layout="ColumnLayout"
+            labelSpanXL="12" labelSpanL="12" labelSpanM="12"
+            labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" 
+            emptySpanL="0" emptySpanM="0" emptySpanS="0" 
+            columnsXL="2" columnsL="2" columnsM="1">
 			<f:content>
 				<Label
                     text="{i18n>MSbranchCode}"
@@ -22,12 +22,12 @@
                 />
 				<ComboBox
                     id="idRoomType123"
-                    placeholder="Select Property Name"
+                    placeholder="Select property name"
                     selectedKey="{FacilitiesModel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     change=".onFacilitybranchChange"
-                    valueStateText="Select Property Name"
+                    valueStateText="Select property name"
                 >
 					<core:ListItem
                         key="{BranchModel>BranchID}"
@@ -88,8 +88,8 @@
 				<Input
                     id="idMinimumQuantity"
                     value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Maximum Quantity"
-                    valueStateText="Enter Maximum Quantity"
+                    placeholder="Enter maximum quantity"
+                    valueStateText="Enter maximum quantity"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="2"
@@ -108,8 +108,8 @@
 				<Input
                     id="idMinimumPrice"
                     value="{FacilitiesModel>/MinimumPrice}"
-                    placeholder="Enter Minimum Price"
-                    valueStateText="Enter Minimum Price"
+                    placeholder="Enter minimum price"
+                    valueStateText="Enter minimum price"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="10"
