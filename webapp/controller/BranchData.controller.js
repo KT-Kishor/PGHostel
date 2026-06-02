@@ -31,7 +31,7 @@ sap.ui.define([
                 CheckinTime: "",
                 CheckoutTime: "",
                 Penalty: "",
-                StartingPrice : "",
+                StartingPrice: "",
             });
             this.getView().setModel(oMDmodel, "MDmodel");
             var oeditable = new sap.ui.model.json.JSONModel({
@@ -119,86 +119,83 @@ sap.ui.define([
             });
         },
 
-       Onsearch: async function() {
+        Onsearch: async function() {
+            try {
 
-    this.getBusyDialog();
+                const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
 
-    try {
+                var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey();
 
-        const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
+                var filter = {
+                    UserID: oLoginmodel.EmployeeID
+                };
 
-        var Branch = this.getView().byId("MD_id_BranchCode").getSelectedKey();
+                var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter);
 
-        var filter = {
-            UserID: oLoginmodel.EmployeeID
-        };
+                var oFCIAerData = Array.isArray(LoginData.data) ?
+                    LoginData.data : [LoginData.data];
 
-        var LoginData = await this.ajaxReadWithJQuery("HM_CustomerContact", filter);
+                const oExistingModel = oFCIAerData[0];
 
-        var oFCIAerData = Array.isArray(LoginData.data) ?
-            LoginData.data : [LoginData.data];
+                const oView = this.getView();
 
-        const oExistingModel = oFCIAerData[0];
+                let filters = {};
 
-        const oView = this.getView();
+                if (oLoginmodel.Role === "Admin") {
 
-        let filters = {};
+                    filters.BranchID = Branch ?
+                        Branch : oExistingModel.BranchCode;
 
-        if (oLoginmodel.Role === "Admin") {
+                    filters.Role = "Admin";
 
-            filters.BranchID = Branch ?
-                Branch : oExistingModel.BranchCode;
+                } else if (oExistingModel.Role === "SuperAdmin") {
 
-            filters.Role = "Admin";
+                    filters.BranchID = "";
 
-        } else if (oExistingModel.Role === "SuperAdmin") {
+                } else {
 
-            filters.BranchID = "";
+                    filters.BranchID = oLoginmodel.BranchCode;
+                }
 
-        } else {
+                let sCustomerName = oView.byId("MD_id_BranchCode")
+                    .getValue()?.trim();
 
-            filters.BranchID = oLoginmodel.BranchCode;
-        }
+                let sPincode = oView.byId("MD_id_SearchField")
+                    .getValue()?.trim();
 
-        let sCustomerName = oView.byId("MD_id_BranchCode")
-            .getValue()?.trim();
+                if (sCustomerName) {
 
-        let sPincode = oView.byId("MD_id_SearchField")
-            .getValue()?.trim();
+                    if (sCustomerName.includes(" - ")) {
+                        sCustomerName = sCustomerName.split(" - ")[0];
+                    }
 
-        if (sCustomerName) {
+                    filters.SearchText = sCustomerName;
+                }
 
-            if (sCustomerName.includes(" - ")) {
-                sCustomerName = sCustomerName.split(" - ")[0];
+                if (sPincode) {
+                    filters.Pincode = sPincode;
+                }
+
+                var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
+
+                var aBranchData = Array.isArray(oData.data) ?
+                    oData.data : [oData.data];
+
+                this.getView().setModel(
+                    new sap.ui.model.json.JSONModel(aBranchData),
+                    "branchModel"
+                );
+
+                var model = new sap.ui.model.json.JSONModel(aBranchData);
+
+                this.getOwnerComponent().setModel(model, "mainModel");
+                this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel1");
+            } finally {
+
+
             }
+        },
 
-            filters.SearchText = sCustomerName;
-        }
-
-        if (sPincode) {
-            filters.Pincode = sPincode;
-        }
-
-        var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
-
-        var aBranchData = Array.isArray(oData.data) ?
-            oData.data : [oData.data];
-
-        this.getView().setModel(
-            new sap.ui.model.json.JSONModel(aBranchData),
-            "branchModel"
-        );
-
-        var model = new sap.ui.model.json.JSONModel(aBranchData);
-
-        this.getOwnerComponent().setModel(model, "mainModel");
-        this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel1");
-    } finally {
-
-        this.closeBusyDialog();
-    }
-},
-          
         MD_onPressClear: function() {
             this.getView().byId("MD_id_BranchCode").setSelectedKey("")
             this.getView().byId("MD_id_SearchField").setValue("");
@@ -448,7 +445,7 @@ sap.ui.define([
                 Type: "",
                 Value: "",
                 Penalty: "",
-                StartingPrice : "",
+                StartingPrice: "",
                 CheckinTime: "",
                 CheckoutTime: ""
             });
@@ -573,29 +570,29 @@ sap.ui.define([
                 return;
             }
 
-           const oStartingPrice = sap.ui.getCore().byId(oView.createId("BD_id_StartingPrice"));
-const sValue = oStartingPrice.getValue();
-const fValue = parseFloat(sValue);
+            const oStartingPrice = sap.ui.getCore().byId(oView.createId("BD_id_StartingPrice"));
+            const sValue = oStartingPrice.getValue();
+            const fValue = parseFloat(sValue);
 
-// Empty validation
-if (sValue === "" || sValue === null || sValue === undefined) {
-    oStartingPrice.setValueState("Error");
-    oStartingPrice.setValueStateText(this.i18nModel.getText("enterStartingPrice"));
-    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-    return;
-}
+            // Empty validation
+            if (sValue === "" || sValue === null || sValue === undefined) {
+                oStartingPrice.setValueState("Error");
+                oStartingPrice.setValueStateText(this.i18nModel.getText("enterStartingPrice"));
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
 
-// Zero or negative validation
-if (isNaN(fValue) || fValue <= 0) {
-    oStartingPrice.setValueState("Error");
-    oStartingPrice.setValueStateText("Starting price must be greater than 0");
-    oStartingPrice.focus();
-     MessageToast.show("Starting price must be greater than 0");
-    return;
-}
+            // Zero or negative validation
+            if (isNaN(fValue) || fValue <= 0) {
+                oStartingPrice.setValueState("Error");
+                oStartingPrice.setValueStateText("Starting price must be greater than 0");
+                oStartingPrice.focus();
+                MessageToast.show("Starting price must be greater than 0");
+                return;
+            }
 
-// Clear error if valid
-oStartingPrice.setValueState("None");
+            // Clear error if valid
+            oStartingPrice.setValueState("None");
 
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
@@ -660,16 +657,16 @@ oStartingPrice.setValueState("None");
                 oUploaderModel.refresh(true);
 
                 oView.getModel("UploadModel").setData({
-                  Photo1: "",
-                  Photo1Type: "",
-                  Photo1Name: ""
-                 });
+                    Photo1: "",
+                    Photo1Type: "",
+                    Photo1Name: ""
+                });
 
                 oView.getModel("imageModel").setData({
-                     Attachment: "",
-                     AttachmentType: "",
-                     AttachmentName: ""
-                   });
+                    Attachment: "",
+                    AttachmentType: "",
+                    AttachmentName: ""
+                });
                 this.oDialog.close();
                 sap.m.MessageToast.show(
                     this.isEdit ? this.i18nModel.getText("branchUpdatedSuccessfully") : this.i18nModel.getText("branchaddedSuccessfully"));
@@ -703,7 +700,7 @@ oStartingPrice.setValueState("None");
                     Pincode: "",
                     Contact: "",
                     Penalty: "",
-                    StartingPrice : ""
+                    StartingPrice: ""
                 });
             }
 
@@ -800,7 +797,7 @@ oStartingPrice.setValueState("None");
             oInput.setValueStateText("");
         },
 
-        onPriceInputLiveChange : function(oEvent) {
+        onPriceInputLiveChange: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
             sValue = sValue.replace(/[^0-9.]/g, "");
@@ -954,6 +951,10 @@ oStartingPrice.setValueState("None");
                     styleClass: "myUnifiedBtn",
 
                     onClose: async (sAction) => {
+                         if (sAction === sap.m.MessageBox.Action.NO) {
+                            oTable.removeSelections(true);
+                            return;
+                        }
                         if (sAction === sap.m.MessageBox.Action.YES) {
                             this.getBusyDialog()
 
@@ -1101,7 +1102,7 @@ oStartingPrice.setValueState("None");
                 CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
                 Penalty: oData.Penalty,
-                StartingPrice : oData.StartingPrice
+                StartingPrice: oData.StartingPrice
             });
 
             this.isEdit = true;
@@ -1156,7 +1157,7 @@ oStartingPrice.setValueState("None");
                 BD_id_CheckInTime: "enterCheckInTime",
                 BD_id_CheckOutTime: "enterCheckOutTime",
                 BD_idPenalty: "enterPenalty",
-                BD_id_StartingPrice : "enterStartingPrice"
+                BD_id_StartingPrice: "enterStartingPrice"
 
             };
 
@@ -1536,37 +1537,37 @@ oStartingPrice.setValueState("None");
 
         onTokenDelete: function(oEvent) {
 
-    const oButton = oEvent.getSource();
-    const oItem = oButton.getParent();
-    const oTable = this.byId("idUploadTable");
+            const oButton = oEvent.getSource();
+            const oItem = oButton.getParent();
+            const oTable = this.byId("idUploadTable");
 
-    const oModel = this.getView().getModel("UploaderData");
-    let aData = oModel.getProperty("/attachmentslogo");
+            const oModel = this.getView().getModel("UploaderData");
+            let aData = oModel.getProperty("/attachmentslogo");
 
-    const iIndex = oTable.indexOfItem(oItem);
+            const iIndex = oTable.indexOfItem(oItem);
 
-    if (iIndex > -1) {
-        aData.splice(iIndex, 1);
-        oModel.setProperty("/attachmentslogo", aData);
-    }
-},
+            if (iIndex > -1) {
+                aData.splice(iIndex, 1);
+                oModel.setProperty("/attachmentslogo", aData);
+            }
+        },
         onTokenImageDelete: function(oEvent) {
-    const oButton = oEvent.getSource();
-    const oItem = oButton.getParent();
-    const oTable = this.byId("idUploadTabl1");
+            const oButton = oEvent.getSource();
+            const oItem = oButton.getParent();
+            const oTable = this.byId("idUploadTabl1");
 
-    const oModel = this.getView().getModel("UploaderData");
-    let aData = oModel.getProperty("/attachmentimage");
+            const oModel = this.getView().getModel("UploaderData");
+            let aData = oModel.getProperty("/attachmentimage");
 
-    const iIndex = oTable.indexOfItem(oItem);
+            const iIndex = oTable.indexOfItem(oItem);
 
-    if (iIndex > -1) {
-        aData.splice(iIndex, 1);
-        oModel.setProperty("/attachmentimage", aData);
-    }
-},
+            if (iIndex > -1) {
+                aData.splice(iIndex, 1);
+                oModel.setProperty("/attachmentimage", aData);
+            }
+        },
 
-      
+
 
         onpressbranchlogo: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
