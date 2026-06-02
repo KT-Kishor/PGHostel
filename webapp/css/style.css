@@ -6704,9 +6704,9 @@ html, body {
     }
 }
 
-.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+/* .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
   width:250px !important;
-}
+} */
 .adminPreviewImage {
     width: 100% !important;
     height: 100% !important;
