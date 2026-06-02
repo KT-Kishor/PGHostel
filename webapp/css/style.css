@@ -33,7 +33,13 @@
     border-radius: 12px !important;
     overflow: hidden;
 }
+.newMemberDialogWithMargin {
+    margin-right: 1rem !important;
+}
 
+.newMemberFormWithRightPadding {
+    padding-right: 1rem !important;
+}
 /* Header Gradient for Dialogs */
 .memberSelectDialog .sapMDialogTitle,
 .newMemberDialog .sapMDialogTitle {
@@ -6738,6 +6744,18 @@ html, body {
   color: #ffffff !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+/* Box-shadow on Add New Member button - high specificity to beat UI5 defaults */
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn .sapMBtnInner.sapMBtnHoverable,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn .sapMBtnInner.sapMBtnDefault,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn .sapMBtnInner.sapMBtnTransparent,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn:hover .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn:focus .sapMBtnInner,
+.memberSelectDialog .memberDialogHeader .myUnifiedBtn.sapMBtn:active .sapMBtnInner {
+  box-shadow: 5px 4px 12px 2px #006c75 !important;
+  /* border: 2px solid #003d42 !important; */
+  border-radius: 6px !important;
 }
 
 .memberSelectDialog .memberDialogHeader .myUnifiedBtn .sapMBtnContent,
