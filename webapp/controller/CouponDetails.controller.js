@@ -8,19 +8,19 @@ sap.ui.define([
     "../model/formatter",
     "../utils/validation",
     "sap/m/MessageToast"
-], function (BaseController, JSONModel, Fragment, MessageBox, Spreadsheet, exportLibrary, Formatter, utils, MessageToast) {
+], function(BaseController, JSONModel, Fragment, MessageBox, Spreadsheet, exportLibrary, Formatter, utils, MessageToast) {
     "use strict";
     var EdmType = exportLibrary.EdmType;
     return BaseController.extend("sap.ui.com.project1.controller.CouponDetails", {
         Formatter: Formatter,
         _isDateRangeCleared: false,
 
-        onInit: function () {
+        onInit: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("RouteCouponDetails").attachPatternMatched(this._onRouteMatched, this);
             // View model for dialog state
             var oViewModel = new JSONModel({
-                DialogMode: "Add",        // "Add" or "Edit"
+                DialogMode: "Add", // "Add" or "Edit"
                 CurrentCoupon: {}
                 // bound to dialog
             });
@@ -35,9 +35,9 @@ sap.ui.define([
                 isReq: false,
                 DiscountValueLabel: "Discount Value"
             }), "CouponView");
-
         },
-        _buildBranchMap: function () {
+
+        _buildBranchMap: function() {
             const aBranches = this.getView().getModel("Branchmodel").getData() || [];
             this._branchMap = {};
 
@@ -46,17 +46,17 @@ sap.ui.define([
             });
         },
 
-        onHome: function () {
+        onHome: function() {
             this.getView().getModel("CouponModel").setData({});
             this.CommonLogoutFunction();
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             var LoginFUnction = await this.commonLoginFunction("ManageCoupon");
             if (!LoginFUnction) return;
 
 
-            // 🔑 Bind LoginModel to the view (same pattern as other controller)
+            //  Bind LoginModel to the view (same pattern as other controller)
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
                 this.getView().setModel(
@@ -67,34 +67,33 @@ sap.ui.define([
             } else {
                 this._oLoggedInUser = {};
             }
-            console.log("this._oLoggedInUser", this._oLoggedInUser);
+
             this.onClearAndSearch("couponFilterBar");
             await this._loadBranchCode();
             this._buildBranchMap();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             const sBRModel = this.getView().getModel("Branchmodel").getData();
 
-            this._allowedBranches = sBRModel
-                .map(item => item.BranchID)
-                .join(",");
+            this._allowedBranches = sBRModel.map(item => item.BranchID).join(",");
             // fire-and-forget background load
             this._loadRecipientContacts();
 
-            const { fyStart, fyEnd } = this._getFinancialYearDates();
+            const {
+                fyStart,
+                fyEnd
+            } = this._getFinancialYearDates();
             const oRange = this.byId("fEndRange");
 
             oRange.setDateValue(fyStart);
             oRange.setSecondDateValue(fyEnd);
             this._isDateRangeCleared = false;
 
-
             // single visible data load
             await this.onCouponSearch();
         },
 
-        onCouponSearch: async function () {
+        onCouponSearch: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
-
             try {
                 this.getBusyDialog()
                 const oFilterBar = this.byId("couponFilterBar");
@@ -137,7 +136,10 @@ sap.ui.define([
 
                 } else {
                     // Default → Financial Year
-                    const { fyStart, fyEnd } = this._getFinancialYearDates();
+                    const {
+                        fyStart,
+                        fyEnd
+                    } = this._getFinancialYearDates();
 
                     sStartDate = oDateFormat.format(fyStart);
                     sEndDate = oDateFormat.format(fyEnd);
@@ -171,19 +173,19 @@ sap.ui.define([
                             const sValue = ctrl.getValue()?.trim();
                             const sSelectedKey = ctrl.getSelectedKey();
 
-                            // 🟢 Case 1: user did NOT touch the field at all
+                            //  Case 1: user did NOT touch the field at all
                             if (!sValue && !sSelectedKey) {
                                 // keep default allowed branches
                                 break;
                             }
 
-                            // 🔴 Case 3: user typed something but did NOT select a valid branch
+                            //  Case 3: user typed something but did NOT select a valid branch
                             if (sValue && !sSelectedKey) {
                                 params.BranchCode = "__INVALID__"; // force no data
                                 break;
                             }
 
-                            // 🟢 Case 2: valid branch selected
+                            //  Case 2: valid branch selected
                             if (this._allowedBranches?.split(",").includes(sSelectedKey)) {
                                 params.BranchCode = sSelectedKey;
                             } else {
@@ -208,20 +210,14 @@ sap.ui.define([
                 });
 
                 this.getView().getModel("CouponModel").setData(aData);
-
-
             } catch (err) {
-                sap.m.MessageBox.error(
-                    err?.responseJSON?.message ||
-                    err?.message ||
-                    "Failed to filter coupons."
-                );
+                sap.m.MessageBox.error(err?.responseJSON?.message || err?.message || "Failed to filter coupons.");
             } finally {
                 this.closeBusyDialog()
             }
         },
 
-        _getFinancialYearDates: function () {
+        _getFinancialYearDates: function() {
             const now = new Date();
             const currentYear = now.getFullYear();
 
@@ -229,20 +225,23 @@ sap.ui.define([
 
             // FY = April 1 → March 31
             if (now.getMonth() >= 3) {
-                fyStart = new Date(currentYear, 3, 1);      // April 1 (this year)
+                fyStart = new Date(currentYear, 3, 1); // April 1 (this year)
                 fyEnd = new Date(currentYear + 1, 2, 31); // March 31 (next year)
             } else {
-                fyStart = new Date(currentYear - 1, 3, 1);  // April 1 (last year)
-                fyEnd = new Date(currentYear, 2, 31);     // March 31 (this year)
+                fyStart = new Date(currentYear - 1, 3, 1); // April 1 (last year)
+                fyEnd = new Date(currentYear, 2, 31); // March 31 (this year)
             }
 
             fyStart.setHours(0, 0, 0, 0);
             fyEnd.setHours(0, 0, 0, 0);
 
-            return { fyStart, fyEnd };
+            return {
+                fyStart,
+                fyEnd
+            };
         },
 
-        _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             this.getBusyDialog()
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -280,7 +279,7 @@ sap.ui.define([
             }
         },
 
-        _syncBranchInEditMode: function () {
+        _syncBranchInEditMode: function() {
             const oView = this.getView();
             const oVM = oView.getModel("CouponView");
             const sBranchCode = oVM.getProperty("/CurrentCoupon/BranchCode");
@@ -308,15 +307,15 @@ sap.ui.define([
                 oBranchCB.setSelectedItem(oMatch);
             }
         },
-
-        createGroupHeader: function (oGroup) {
+        
+        createGroupHeader: function(oGroup) {
             return new sap.m.GroupHeaderListItem({
                 title: oGroup.text,
                 uppercase: false
             });
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oHistory = sap.ui.core.routing.History.getInstance();
             var sPreviousHash = oHistory.getPreviousHash();
             if (sPreviousHash !== undefined) {
@@ -326,13 +325,12 @@ sap.ui.define([
                 oRouter.navTo("TilePage", {}, true);
             }
             this.getView().getModel("CouponModel").setData({});
-
         },
 
-        onAddCoupon: function () {
+        onAddCoupon: function() {
             var oViewModel = this.getView().getModel("CouponView");
             oViewModel.setProperty("/DialogMode", "Add");
-            // ✅ Blank model → placeholders only
+            //  Blank model → placeholders only
             oViewModel.setProperty("/CurrentCoupon", {
                 CouponCode: "",
                 DiscountType: "",
@@ -355,7 +353,7 @@ sap.ui.define([
             this._openCouponDialog();
         },
 
-        onEditCoupon: function () {
+        onEditCoupon: function() {
             var oTable = this.getView().byId("couponTable");
             var oItem = oTable.getSelectedItem();
             var aSel = oTable.getSelectedItems();
@@ -363,7 +361,7 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("pleaseselectonecoupontoedit"));
                 return;
             }
-            var oItem = aSel[0];   // safe to use
+            var oItem = aSel[0]; // safe to use
             var oCtx = oItem.getBindingContext("CouponModel");
             var oData = Object.assign({}, oCtx.getObject());
             var oViewModel = this.getView().getModel("CouponView");
@@ -372,8 +370,7 @@ sap.ui.define([
             this._openCouponDialog();
         },
 
-
-        onDeleteCoupon: async function () {
+        onDeleteCoupon: async function() {
             var oTable = this.getView().byId("couponTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -388,15 +385,14 @@ sap.ui.define([
 
             const sCouponText = aCouponCodes.join(", ");
             MessageBox.confirm(
-                `Are you sure you want to delete the following ${sLabel}?\n\n ${sLabel}: ${sCouponText}`,
-                {
+                `Are you sure you want to delete the following ${sLabel}?\n\n ${sLabel}: ${sCouponText}`, {
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
                     styleClass: "myUnifiedBtn",
-                    onClose: async function (sAction) {
+                    onClose: async function(sAction) {
 
-                        // ✅ ALWAYS clear selection (YES or NO)
+                        //  ALWAYS clear selection (YES or NO)
                         oTable.removeSelections(true);
 
                         if (sAction !== MessageBox.Action.YES) {
@@ -430,15 +426,13 @@ sap.ui.define([
             );
         },
 
-        onDownloadCoupons: function () {
+        onDownloadCoupons: function() {
             var oTable = this.getView().byId("couponTable");
             var oModel = oTable.getModel("CouponModel");
             var oData = oModel.getData();
 
             // normalize data
-            var aData = Array.isArray(oData)
-                ? oData
-                : oData?.results || [];
+            var aData = Array.isArray(oData) ? oData : oData?.results || [];
 
             if (aData.length === 0) {
                 sap.m.MessageToast.show(
@@ -491,13 +485,10 @@ sap.ui.define([
             ];
         },
 
-
-        _openCouponDialog: async function () {
+        _openCouponDialog: async function() {
             const oView = this.getView();
 
-            // --------------------------------------------------
             // 1. Load dialog once
-            // --------------------------------------------------
             if (!this._oCouponDialog) {
                 this._oCouponDialog = await Fragment.load({
                     id: oView.getId(),
@@ -517,9 +508,7 @@ sap.ui.define([
                 this._oCouponDialog.attachAfterClose(this._clearTableSelection.bind(this));
             }
 
-            // --------------------------------------------------
             // 2. Resolve dialog state from model
-            // --------------------------------------------------
             const oVM = oView.getModel("CouponView");
             const sMode = oVM.getProperty("/DialogMode");
             const sDiscountType = oVM.getProperty("/CurrentCoupon/DiscountType");
@@ -528,9 +517,7 @@ sap.ui.define([
             oVM.setProperty("/isUptoEnabled", sDiscountType === "Percentage");
             oVM.setProperty("/isReq", sDiscountType === "Percentage");
 
-            // --------------------------------------------------
             // 3. Mode-specific UI sync
-            // --------------------------------------------------
             if (sMode === "Add") {
                 // Reset branch selection visually
                 oVM.setProperty("/CurrentCoupon/BranchCode", "");
@@ -547,9 +534,7 @@ sap.ui.define([
                 this._syncBranchInEditMode();
             }
 
-            // --------------------------------------------------
             // 4. Date constraints (always enforced)
-            // --------------------------------------------------
             const oToday = new Date();
             oToday.setHours(0, 0, 0, 0);
 
@@ -563,23 +548,24 @@ sap.ui.define([
                 oEndDP.setMinDate(oToday);
             }
 
-            // --------------------------------------------------
             // 5. Open dialog (once, intentionally)
-            // --------------------------------------------------
             this._oCouponDialog.open();
         },
 
-        _showTableRowsBusy: function (bBusy) {
+        _showTableRowsBusy: function(bBusy) {
             var oTable = this.byId("couponTable");
             var oDom = oTable.$().find(".sapMListItems").get(0);
             if (!oDom) return;
             if (bBusy) {
-                sap.ui.core.BusyIndicator.show(0, { domRef: oDom });
+                sap.ui.core.BusyIndicator.show(0, {
+                    domRef: oDom
+                });
             } else {
                 this.closeBusyDialog()
             }
         },
-        _validateDiscountValueLogic: function () {
+
+        _validateDiscountValueLogic: function() {
             const oView = this.getView();
             const oVM = oView.getModel("CouponView");
 
@@ -619,7 +605,8 @@ sap.ui.define([
             oInput.setValueState(sap.ui.core.ValueState.None);
             return true;
         },
-        onLiveChange_CouponCode: function (oEvent) {
+
+        onLiveChange_CouponCode: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
@@ -631,54 +618,25 @@ sap.ui.define([
             oInput.setValue(sUpper);
         },
 
-        onSaveCoupon: async function () {
+        onSaveCoupon: async function() {
             var oView = this.getView();
             var oVM = oView.getModel("CouponView");
             var sMode = oVM.getProperty("/DialogMode");
             var oCoupon = Object.assign({}, oVM.getProperty("/CurrentCoupon"));
             let bValid =
-                utils._LCstrictValidationComboBox(
-                    sap.ui.getCore().byId(oView.createId("cbBranchCode")), "ID"
-                )
-                &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("idCouponcode")), "ID"
-                ) &&
-                utils._LCstrictValidationComboBox(
-                    sap.ui.getCore().byId(oView.createId("cbDiscountType")), "ID"
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("inDiscountValue")), "ID"
-                ) &&
-                this._validateDiscountValueLogic()
-                &&
-                (
-                    oCoupon.DiscountType !== "Percentage" ||
-                    utils._LCvalidateMandatoryField(
-                        sap.ui.getCore().byId(oView.createId("inUptoValue")), "ID"
-                    )
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("inMaxUses")), "ID"
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("inMinOrderValue")), "ID"
-                ) &&
-                (
-                    sMode === "Add" ||
-                    utils._LCstrictValidationComboBox(
-                        sap.ui.getCore().byId(oView.createId("cbStatus")), "ID"
-                    )
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("inDescription")), "ID"
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("dpStartDate")), "ID"
-                ) &&
-                utils._LCvalidateMandatoryField(
-                    sap.ui.getCore().byId(oView.createId("dpEndDate")), "ID"
-                );
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("cbBranchCode")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idCouponcode")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("cbDiscountType")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inDiscountValue")), "ID") &&
+                this._validateDiscountValueLogic() &&
+                (oCoupon.DiscountType !== "Percentage" || utils._LCvalidateMandatoryField(
+                    sap.ui.getCore().byId(oView.createId("inUptoValue")), "ID")) &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inMaxUses")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inMinOrderValue")), "ID") &&
+                (sMode === "Add" || utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("cbStatus")), "ID")) &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inDescription")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("dpStartDate")), "ID") &&
+                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("dpEndDate")), "ID");
             if (!bValid) {
                 MessageToast.show(this.i18nModel.getText("MSfillallfields"));
                 return;
@@ -696,22 +654,21 @@ sap.ui.define([
             try {
                 if (sMode === "Add") {
 
-                    // 🔹 Get data from CouponModel
+                    //  Get data from CouponModel
                     var oCouponModel = this.getView().getModel("CouponModel");
                     var aCoupons =
                         oCouponModel.getProperty("/CouponList") ||
                         oCouponModel.getProperty("/results") ||
-                        oCouponModel.getData() ||
-                        [];
+                        oCouponModel.getData() || [];
 
                     // Normalize input
                     var sNewCode = (oCoupon.CouponCode || "").trim().toLowerCase();
                     var dToday = new Date();
 
-                    // 🔹 Find matching coupons
+                    //  Find matching coupons
                     var sNewBranch = (oCoupon.BranchCode || "").trim().toLowerCase();
 
-                    var aMatchingCoupons = aCoupons.filter(function (item) {
+                    var aMatchingCoupons = aCoupons.filter(function(item) {
                         return (
                             (item.CouponCode || "").trim().toLowerCase() === sNewCode &&
                             (item.BranchCode || "").trim().toLowerCase() === sNewBranch
@@ -722,7 +679,7 @@ sap.ui.define([
 
                         var dNewEnd = new Date(oCoupon.EndDate);
 
-                        var bInvalidEndDate = aMatchingCoupons.some(function (item) {
+                        var bInvalidEndDate = aMatchingCoupons.some(function(item) {
                             var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
 
                             return (
@@ -741,7 +698,7 @@ sap.ui.define([
 
                         //  Optional: keep your active check also
                         var dToday = new Date();
-                        var bActiveExists = aMatchingCoupons.some(function (item) {
+                        var bActiveExists = aMatchingCoupons.some(function(item) {
                             var dExistingEnd = item.EndDate ? new Date(item.EndDate) : null;
                             return dExistingEnd && !isNaN(dExistingEnd) && dExistingEnd >= dToday;
                         });
@@ -758,7 +715,7 @@ sap.ui.define([
                     oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
                     oCoupon.CreatedBy =
                         oView.getModel("LoginModel")
-                            ?.getProperty("/EmployeeName") || "system";
+                        ?.getProperty("/EmployeeName") || "system";
                     this.getBusyDialog()
                     await this.ajaxCreateWithJQuery("HM_Coupon", {
                         data: oCoupon
@@ -788,9 +745,7 @@ sap.ui.define([
                             MinOrderValue: oCoupon.MinOrderValue,
                             Status: oCoupon.Status,
                             CreatedAt: oCoupon.CreatedAt,
-                            CreatedBy:
-                                oView.getModel("LoginModel")
-                                    ?.getProperty("/EmployeeName") || oCoupon.CreatedBy
+                            CreatedBy: oView.getModel("LoginModel")?.getProperty("/EmployeeName") || oCoupon.CreatedBy
                         }
                     });
                     MessageToast.show(this.i18nModel.getText("couponupdatedsuccessfully"));
@@ -801,15 +756,13 @@ sap.ui.define([
                 this.onCouponSearch();
 
             } catch (err) {
-                MessageBox.error(
-                    err?.responseJSON?.message || "Failed to save coupon."
-                );
+                MessageBox.error(err?.responseJSON?.message || "Failed to save coupon.");
             } finally {
                 this.closeBusyDialog()
             }
         },
 
-        onDialogAfterClose: function () {
+        onDialogAfterClose: function() {
             const oVM = this.getView().getModel("CouponView");
             // Reset model
             oVM.setProperty("/CurrentCoupon", {
@@ -834,7 +787,7 @@ sap.ui.define([
             this._clearTableSelection();
         },
 
-        _resetDialogValueStates: function () {
+        _resetDialogValueStates: function() {
             const oView = this.getView();
             const aFieldIds = [
                 "idCouponcode",
@@ -857,25 +810,28 @@ sap.ui.define([
                 }
             });
         },
-        onLiveChange_Description: function (oEvent) {
+
+        onLiveChange_Description: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-        onLiveChange_UptoValue: function (oEvent) {
+
+        onLiveChange_UptoValue: function(oEvent) {
             utils._LCvalidateAmount(oEvent);
         },
-        onDateRangeChange: function () {
+
+        onDateRangeChange: function() {
             // Intentionally empty
             // Prevents FilterBar auto-search cascade
         },
 
-        _applyCouponGroupingAndSorting: function () {
+        _applyCouponGroupingAndSorting: function() {
             const oTable = this.byId("couponTable");
             const oBinding = oTable.getBinding("items");
 
             if (!oBinding) return;
 
             oBinding.sort([
-                new sap.ui.model.Sorter("StatusOrder", false, function (oCtx) {
+                new sap.ui.model.Sorter("StatusOrder", false, function(oCtx) {
                     return {
                         key: oCtx.getProperty("StatusOrder"),
                         text: oCtx.getProperty("Status") + " Coupons"
@@ -886,7 +842,7 @@ sap.ui.define([
             ]);
         },
 
-        _normalizeCouponResult: function (oResult) {
+        _normalizeCouponResult: function(oResult) {
             let aData = Array.isArray(oResult?.data) ? oResult.data : (oResult?.data ? [oResult.data] : []);
             const mPriority = {
                 Active: 1,
@@ -903,7 +859,7 @@ sap.ui.define([
             }));
         },
 
-        onBranchSelect: function (oEvent) {
+        onBranchSelect: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
             const oItem = oEvent.getParameter("selectedItem");
             if (!oItem) return;
@@ -913,11 +869,11 @@ sap.ui.define([
 
             const oBranch = oCtx.getObject();
 
-            // ✅ single source of truth
+            //  single source of truth
             this.getView().getModel("CouponView").setProperty("/CurrentCoupon/BranchCode", oBranch.BranchCode || oBranch.BranchID);
         },
 
-        onClearCoupons: function () {
+        onClearCoupons: function() {
             // Clear non-date filters
             this.byId("fStatus").setSelectedKey("");
             this.byId("fDiscountType").setSelectedKey("");
@@ -934,10 +890,7 @@ sap.ui.define([
             this._isDateRangeCleared = true;
         },
 
-
-
-        onChange_DiscountType: function (oEvent) {
-
+        onChange_DiscountType: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
 
             const oVM = this.getView().getModel("CouponView");
@@ -971,7 +924,8 @@ sap.ui.define([
                 oVM.setProperty("/DiscountValueLabel", "Discount Value");
             }
         },
-        onLiveChange_DiscountValue: function (oEvent) {
+
+        onLiveChange_DiscountValue: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
             const sType = this.byId("cbDiscountType").getSelectedKey();
@@ -1001,7 +955,7 @@ sap.ui.define([
 
             const fVal = parseFloat(sValue);
 
-            // 🔴 Percentage rules
+            //  Percentage rules
             if (sType === "Percentage") {
                 if (isNaN(fVal) || fVal <= 0 || fVal > 99.99) {
                     oInput.setValueState(sap.ui.core.ValueState.Error);
@@ -1012,7 +966,7 @@ sap.ui.define([
                 }
             }
 
-            // 🔴 Fixed amount rules
+            //  Fixed amount rules
             if (sType === "Fixed Amount") {
                 if (isNaN(fVal) || fVal <= 0) {
                     oInput.setValueState(sap.ui.core.ValueState.Error);
@@ -1023,21 +977,19 @@ sap.ui.define([
                 }
             }
 
-            // ✅ Valid
+            //  Valid
             oInput.setValueState(sap.ui.core.ValueState.None);
         },
 
-
-
         // ===== All numeric fields =====
-        onLiveChange_Number_MinOne: function (oEvent) {
+        onLiveChange_Number_MinOne: function(oEvent) {
             const oInput = oEvent.getSource();
             let sValue = oInput.getValue();
 
-            // ❌ Remove anything that is not a digit
+            //  Remove anything that is not a digit
             sValue = sValue.replace(/\D/g, "");
 
-            // ❌ Remove leading zeros (except single digit)
+            //  Remove leading zeros (except single digit)
             sValue = sValue.replace(/^0+/, "");
 
             oInput.setValue(sValue);
@@ -1052,12 +1004,11 @@ sap.ui.define([
                 return;
             }
 
-            // ✅ Natural number confirmed
+            //  Natural number confirmed
             oInput.setValueState(sap.ui.core.ValueState.None);
         },
 
-
-        onLiveChange_Number_AllowZero: function (oEvent) {
+        onLiveChange_Number_AllowZero: function(oEvent) {
             const oInput = oEvent.getSource();
             const sValue = oInput.getValue().trim();
             if (!/^\d*$/.test(sValue)) {
@@ -1074,15 +1025,15 @@ sap.ui.define([
             oInput.setValueState(sap.ui.core.ValueState.None);
         },
 
-        onLiveChange_MinAmount: function (oEvent) {
+        onLiveChange_MinAmount: function(oEvent) {
             utils.onNumber(oEvent);
         },
 
-        onChange_Status: function (oEvent) {
+        onChange_Status: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
 
-        onChange_Date: function (oEvent) {
+        onChange_Date: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oView = this.getView();
 
@@ -1113,17 +1064,17 @@ sap.ui.define([
             }
         },
 
-        _clearTableSelection: function () {
+        _clearTableSelection: function() {
             var oTable = this.byId("couponTable");
             if (oTable) {
                 oTable.removeSelections(true);
             }
         },
 
-        onDialogClose: function () {
+        onDialogClose: function() {
             var oView = this.getView();
 
-            // 🔹 1. Clear ValueState for all fields
+            //  1. Clear ValueState for all fields
             var aControls = [
                 "cbBranchCode",
                 "idCouponcode",
@@ -1138,14 +1089,14 @@ sap.ui.define([
                 "dpEndDate"
             ];
 
-            aControls.forEach(function (sId) {
+            aControls.forEach(function(sId) {
                 var oControl = sap.ui.getCore().byId(oView.createId(sId));
                 if (oControl) {
                     oControl.setValueState("None");
                 }
             });
 
-            // 🔹 2. Clear Model Data
+            //  2. Clear Model Data
             var oVM = oView.getModel("CouponView");
             oVM.setProperty("/CurrentCoupon", {
                 CouponCode: "",
@@ -1161,11 +1112,11 @@ sap.ui.define([
                 Status: ""
             });
 
-            // 🔹 3. Reset additional flags (important for UI)
+            //  3. Reset additional flags (important for UI)
             oVM.setProperty("/isReq", false);
             oVM.setProperty("/isUptoEnabled", false);
 
-            // 🔹 4. Close Dialog
+            //  4. Close Dialog
             if (this._oCouponDialog) {
                 this._oCouponDialog.close();
             }
@@ -1178,9 +1129,11 @@ sap.ui.define([
 
                 // Decide filter STRICTLY by role
                 const oFilter =
-                    sRole === "SuperAdmin"
-                        ? {} // backend returns everything
-                        : { BranchCode: this._allowedBranches };
+                    sRole === "SuperAdmin" ? {} // backend returns everything
+                    :
+                    {
+                        BranchCode: this._allowedBranches
+                    };
 
                 console.log("HM_CustomerContact filter:", oFilter);
 
@@ -1212,18 +1165,14 @@ sap.ui.define([
                 return aContacts;
 
             } catch (err) {
-
-                sap.m.MessageBox.error(
-                    err?.responseJSON?.message || "Failed to load contacts."
-                );
+                sap.m.MessageBox.error(err?.responseJSON?.message || "Failed to load contacts.");
                 return [];
-
             } finally {
                 this.closeBusyDialog()
             }
         },
 
-        onCouponSelectionChange: function (oEvent) {
+        onCouponSelectionChange: function(oEvent) {
             const oTable = oEvent.getSource();
             const aSel = oTable.getSelectedItems();
             const oShareBtn = this.byId("btnShareCoupon");
@@ -1239,7 +1188,7 @@ sap.ui.define([
             oShareBtn.setEnabled(oCoupon.Status === "Active");
         },
 
-        onShareCoupon: async function () {
+        onShareCoupon: async function() {
             const oTable = this.byId("couponTable");
             const aSel = oTable ? oTable.getSelectedItems() : [];
 
@@ -1251,7 +1200,7 @@ sap.ui.define([
             const oCtx = aSel[0].getBindingContext("CouponModel");
             const oCoupon = oCtx.getObject();
 
-            // 🔒 HARD BUSINESS RULE
+            //  HARD BUSINESS RULE
             if (oCoupon.Status !== "Active") {
                 sap.m.MessageToast.show(this.i18nModel.getText("onlyACTIVEcouponsshared"));
                 return;
@@ -1286,7 +1235,7 @@ sap.ui.define([
             this._oShareDialog.open();
         },
 
-        onRoleChange: function (e) {
+        onRoleChange: function(e) {
             const sRole = e.getSource().getSelectedKey();
             const aUsers = this._aAllRecipients.filter(r => r.Role === sRole);
             this.getView().getModel("RecipientModel").setData(aUsers);
@@ -1294,7 +1243,7 @@ sap.ui.define([
             this.byId("cbUser").setSelectedKeys([]);
         },
 
-        onConfirmShareCoupon: async function () {
+        onConfirmShareCoupon: async function() {
             const oView = this.getView();
             const oRole = sap.ui.getCore().byId(oView.createId("cbRole"));
             const oMCB = sap.ui.getCore().byId(oView.createId("cbUser"));
@@ -1333,7 +1282,9 @@ sap.ui.define([
 
             try {
                 this.getBusyDialog()
-                await this.ajaxCreateWithJQuery("CouponCodeEmail", { users: aUsers });
+                await this.ajaxCreateWithJQuery("CouponCodeEmail", {
+                    users: aUsers
+                });
                 MessageToast.show(this.i18nModel.getText("couponsent"));
                 this._oShareDialog.close();
             } catch (err) {
@@ -1343,15 +1294,15 @@ sap.ui.define([
             }
         },
 
-        onCloseShareDialog: function () {
+        onCloseShareDialog: function() {
             this._oShareDialog.close();
         },
 
-        onRoleLiveChange: function (e) {
+        onRoleLiveChange: function(e) {
             utils._LCstrictValidationComboBox(e);
         },
 
-        onUserSelectionChange: function () {
+        onUserSelectionChange: function() {
             const oMCB = this.byId("cbUser");
             const bValid = oMCB.getSelectedKeys().length > 0;
             if (!bValid) {
@@ -1362,7 +1313,7 @@ sap.ui.define([
             }
         },
 
-        onManualEmailLiveChange: function (e) {
+        onManualEmailLiveChange: function(e) {
             const oInput = e.getSource();
             const sVal = oInput.getValue().trim();
             if (!sVal) {
@@ -1372,7 +1323,7 @@ sap.ui.define([
             utils._LCvalidateEmail(e);
         },
 
-        onShareDialogAfterClose: function () {
+        onShareDialogAfterClose: function() {
             const oView = this.getView();
             const oRole = sap.ui.getCore().byId(oView.createId("cbRole"));
             const oMCB = sap.ui.getCore().byId(oView.createId("cbUser"));
@@ -1404,14 +1355,14 @@ sap.ui.define([
             this._clearTableSelection();
             this._oCouponToShare = null;
 
-            // 🔒 REQUIRED UX RESET
+            //  REQUIRED UX RESET
             const oShareBtn = this.byId("btnShareCoupon");
             if (oShareBtn) {
                 oShareBtn.setEnabled(false);
             }
         },
 
-        onShareCouponPress: function (oEvent) {
+        onShareCouponPress: function(oEvent) {
             const oTable = this.byId("couponTable");
             const aSel = oTable.getSelectedItems();
 
@@ -1469,14 +1420,14 @@ sap.ui.define([
                 placement: sap.m.PlacementType.Bottom,
                 showHeader: false,
                 contentWidth: "180px",
-                afterClose: function () {
+                afterClose: function() {
                     this._clearTableSelection();
                 }.bind(this),
                 content: [
                     new sap.m.List({
                         items: [
 
-                            // ✅ WhatsApp
+                            //  WhatsApp
                             createItem("image/Whatsapp.png", "WhatsApp", () => {
                                 window.open(
                                     "https://api.whatsapp.com/send?text=" +
@@ -1486,7 +1437,7 @@ sap.ui.define([
                                 this._oSharePopover.close();
                             }),
 
-                            // // ✅ Facebook
+                            // //  Facebook
                             // createItem("image/Facebook.png", "Facebook", () => {
                             //     navigator.clipboard.writeText(sMessage);
                             //     sap.m.MessageToast.show(
@@ -1497,7 +1448,7 @@ sap.ui.define([
                             // }),
 
 
-                            // // ✅ Instagram (copy-based)
+                            // //  Instagram (copy-based)
                             // createItem("image/Instagram.png", "Instagram", () => {
                             //     navigator.clipboard.writeText(sMessage);
                             //     sap.m.MessageToast.show(
@@ -1506,10 +1457,10 @@ sap.ui.define([
                             //     this._oSharePopover.close();
                             // }),
 
-                            // ✅ EMAIL → TRIGGERS EXISTING FLOW
+                            //  EMAIL → TRIGGERS EXISTING FLOW
                             createItem("image/Email.png", "Email to Customers", () => {
                                 this._oSharePopover.close();
-                                this.onShareCoupon(); // 🔥 THIS is the key
+                                this.onShareCoupon(); //  THIS is the key
                             }),
 
                             createItem("image/Mail.png", "Email", () => {
@@ -1521,7 +1472,7 @@ sap.ui.define([
                             }),
 
 
-                            // ✅ SMS
+                            //  SMS
                             createItem("image/sms.png", "Text SMS", () => {
                                 window.location.href =
                                     "sms:?body=" +
@@ -1529,7 +1480,7 @@ sap.ui.define([
                                 this._oSharePopover.close();
                             }),
 
-                            // ✅ Copy link
+                            //  Copy link
                             createItem("image/Link.png", "Copy Coupon Details", () => {
                                 navigator.clipboard.writeText(sMessage);
                                 sap.m.MessageToast.show("Coupon Details copied");
@@ -1547,7 +1498,7 @@ sap.ui.define([
         //     const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
         //     const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-        //     // 🔥 Check for Max Discount
+        //     //  Check for Max Discount
         //     let sMaxDiscountLine = "";
         //     if (oCoupon.DiscountType === "Percentage" && oCoupon.UptoValue) {
         //         sMaxDiscountLine = `💰 Max Discount: ${oCoupon.UptoValue}\n`;
@@ -1556,10 +1507,10 @@ sap.ui.define([
         //     return (
         //         `🎉 ${sBranchName} Special Deal! 🎊\n\n` +
         //         `Don't miss out on this exclusive coupon 🎉\n\n` +
-        //         `🔑 Code: ${oCoupon.CouponCode}\n` +
+        //         ` Code: ${oCoupon.CouponCode}\n` +
         //         `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
         //         `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
-        //         sMaxDiscountLine + // 🔥 Inserted here
+        //         sMaxDiscountLine + //  Inserted here
         //         `\nUse this coupon during booking and save instantly 🙌\n\n` +
         //         `Terms: \n` +
         //         ` • New bookings only\n` +
@@ -1569,12 +1520,12 @@ sap.ui.define([
         // },
 
 
-        _buildCouponShareMessage: function (oCoupon) {
+        _buildCouponShareMessage: function(oCoupon) {
             const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-            // 🔥 Dynamic Discount Line Logic
+            //  Dynamic Discount Line Logic
             let sDiscountDetailLine = "";
             if (oCoupon.DiscountType === "Percentage") {
                 sDiscountDetailLine = oCoupon.UptoValue ? `💰 Max Discount: ${oCoupon.UptoValue}\n` : "";
@@ -1589,22 +1540,23 @@ sap.ui.define([
                 `🔑 Code: ${oCoupon.CouponCode}\n` +
                 `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
                 `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
-                sDiscountDetailLine + // 🔥 Yahan dynamic line add hogi
+                sDiscountDetailLine + 
                 `\nUse this coupon while booking with StayVriksha and enjoy instant savings! 🙌\n\n` +
                 `📌 Terms & Conditions:: \n` +
                 ` • Applicable for new bookings only\n` +
                 ` • Cannot be combined with other offers or promotions\n\n` +
                 ` • Book now and grab the deal before it ends! 🚀\n\n` +
-                
+
                 `— StayVriksha | ${sBranchName} Management`
             );
         },
-        _buildCouponShareMessageEmail: function (oCoupon) {
+
+        _buildCouponShareMessageEmail: function(oCoupon) {
             const sBranchName = this._branchMap?.[oCoupon.BranchCode] || "Our Hostel";
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-            // 🔥 Dynamic Discount Text for Email body
+            //  Dynamic Discount Text for Email body
             let sOfferText = "";
             if (oCoupon.DiscountType === "Percentage") {
                 sOfferText = oCoupon.UptoValue ? ` Maximum discount up to ${oCoupon.UptoValue}` : "";
@@ -1615,7 +1567,7 @@ sap.ui.define([
             return (
                 `Dear Customer,\n\n` +
                 `We are pleased to share with you the coupon code:  ${oCoupon.CouponCode}, with a ${sOfferText}\n\n` +
-                // `We are pleased to share you coupon code: ${oCoupon.CouponCode} and ${sOfferText}\n\n` + // 🔥 Updated logic
+                // `We are pleased to share you coupon code: ${oCoupon.CouponCode} and ${sOfferText}\n\n` + //  Updated logic
                 `You can use this coupon during the booking creation process ` +
                 `to avail the applicable discount.\n` +
                 `Please ensure to enter the code correctly at the time of booking.\n\n` +
@@ -1648,7 +1600,7 @@ sap.ui.define([
 
         //     return (
         //         `Dear Customer,\n\n` +
-        //         `We are pleased to share your coupon code: ${oCoupon.CouponCode}${sMaxDiscountText}\n\n` + // 🔥 Added here
+        //         `We are pleased to share your coupon code: ${oCoupon.CouponCode}${sMaxDiscountText}\n\n` + //  Added here
         //         // `Coupon Code: ${oCoupon.CouponCode}\n\n` +
         //         `You can use this coupon during the booking creation process ` +
         //         `to avail the applicable discount.\n` +
