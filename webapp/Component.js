@@ -134,14 +134,16 @@ sap.ui.define([
                 });
                 this.setModel(omodel, "LoginModel");
                 await this.showBusyDialog();
-                this._fetchCommonData("City", "CityModel");
-                this._fetchCommonData("State", "StateModel");
-                this._fetchCommonData("Country", "CountryModel");
-                this._fetchCommonData("Currency", "CurrencyModel");
-                this._fetchCommonData("HM_FacilityType", "FacilityTypeModel");
-                this._fetchCommonData("HM_AmenitiName", "AmenityNameModel");
 
-                await this._fetchCommonData("HM_BranchData", "sBRModel");
+                await Promise.all([
+                    this._fetchCommonData("City","CityModel"),
+                    this._fetchCommonData("State","StateModel"),
+                    this._fetchCommonData("Country","CountryModel"),
+                    this._fetchCommonData("Currency","CurrencyModel"),
+                    this._fetchCommonData("HM_FacilityType","FacilityTypeModel"),
+                    this._fetchCommonData("HM_AmenitiName","AmenityNameModel"),
+                    this._fetchCommonData("HM_BranchData","sBRModel")
+                ]);
                 const oAppStateModel = new JSONModel({
                     previousTab: "idHome", // default value
                 });
@@ -156,28 +158,48 @@ sap.ui.define([
                     this.closeBusyDialog()
                 }
             },
-            _initTabSession: function () {
-                // 1. Generate a unique ID for this tab instance for this session only
+           _initTabSession: function () {
+
+                // Always create tabId if missing
                 if (!sessionStorage.getItem("tabId")) {
-                    let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+
+                    let activeTabs = JSON.parse(
+                        localStorage.getItem("activeTabs") || "[]"
+                    );
+
+                    // First app launch → clear old stale session
                     if (activeTabs.length === 0) {
+
                         localStorage.removeItem("isLoggedIn");
                         localStorage.removeItem("_x9A1p");
                         localStorage.removeItem("_k7LmQ");
                         localStorage.removeItem("_aB39X");
                         localStorage.removeItem("_mN72P");
                         localStorage.removeItem("activeTabs");
-                        sessionStorage.setItem("tabId", Date.now().toString() + "_" + Math.random());
                     }
+
+                    sessionStorage.setItem(
+                        "tabId",
+                        Date.now() + "_" + Math.random().toString(36)
+                    );
                 }
+
                 this._tabId = sessionStorage.getItem("tabId");
 
-                // 2. Register this tab in localStorage
+                // Register current tab
                 this._registerTab();
 
-                // 3. Attach standard listeners
-                window.addEventListener("beforeunload", this._removeTab.bind(this));
-                window.addEventListener("storage", this._onStorageChange.bind(this));
+                // Cross-tab storage sync
+                window.addEventListener(
+                    "storage",
+                    this._onStorageChange.bind(this)
+                );
+
+                // Mobile-safe cleanup
+                window.addEventListener(
+                    "pagehide",
+                    this._removeTab.bind(this)
+                );
             },
 
             _registerTab: function () {
