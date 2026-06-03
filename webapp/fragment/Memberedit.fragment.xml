@@ -25,17 +25,14 @@
             
             </Bar>
         </customHeader>
-        <f:SimpleForm
-            editable="true"
-            layout="ResponsiveGridLayout"
-            labelSpanXL="4"
-            labelSpanL="3"
-            labelSpanM="4"
-            labelSpanS="12"
-            columnsXL="2"
-            columnsL="2"
-            columnsM="1"
-        >
+       <f:SimpleForm
+                editable="true"
+                layout="ResponsiveGridLayout"
+                width="100%"
+                columnsXL="2"
+                columnsL="2"
+                columnsM="1"
+               >
             <f:content>
                 <HBox
                     width="100%"

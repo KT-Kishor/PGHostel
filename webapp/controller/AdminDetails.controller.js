@@ -4942,7 +4942,7 @@ sap.ui.define([
                 if (sap.ui.Device.system.phone) {
                     const oLink = document.createElement("a");
                     oLink.href = sBlobUrl;
-                    oLink.download = sFileName;
+                    oLink.download = oDoc.FileName;
                     document.body.appendChild(oLink);
                     oLink.click();
                     document.body.removeChild(oLink);
@@ -7618,20 +7618,24 @@ sap.ui.define([
                         cellWidth: 15,
                         halign: "center"
                     },
+
                     1: {
-                        cellWidth: 60        // Guest Name
+                        cellWidth: 58   // 48 + 10
                     },
+
                     2: {
-                        cellWidth: 25,
-                        halign: "center"     // Gender
+                        cellWidth: 26,  // 22 + 4
+                        halign: "center"
                     },
+
                     3: {
-                        cellWidth: 30,
-                        halign: "center"     // Age
+                        cellWidth: 38,  // 32 + 6
+                        halign: "center"
                     },
+
                     4: {
-                        cellWidth: 35,
-                        halign: "center"     // Relation
+                        cellWidth: 30,  // 28 + 2
+                        halign: "center"
                     }
                 }
             });
