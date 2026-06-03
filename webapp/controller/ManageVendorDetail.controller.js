@@ -672,15 +672,13 @@ sap.ui.define([
 
                 oDialog.setContentWidth("85%");
                 oDialog.setContentHeight("90%");
-
                 oHtml.setContent(sIframe);
-
                 oHtml.setVisible(true);
-
                 oDialog.open();
-
                 return;
             }
+
+            this.onDownloadPreview();
 
             MessageToast.show("Preview not supported.");
         },
@@ -740,31 +738,6 @@ sap.ui.define([
                 this._oPreviewDialog.close();
                 this._oPreviewDialog.destroy();
                 this._oPreviewDialog = null;
-            }
-        },
-
-        onDownloadPreview: function() {
-            if (!this._pdfBlobUrl) {
-                MessageToast.show("No file available for download.");
-                return;
-            }
-
-            const oLink = document.createElement("a");
-            oLink.href = this._pdfBlobUrl;
-            oLink.download = this._sPreviewFileName || "Document.pdf";
-            document.body.appendChild(oLink);
-            oLink.click();
-            document.body.removeChild(oLink);
-        },
-
-        onClosePreview: function() {
-            if (this._pdfBlobUrl) {
-                URL.revokeObjectURL(this._pdfBlobUrl);
-                this._pdfBlobUrl = null;
-            }
-
-            if (this._oPreviewDialog) {
-                this._oPreviewDialog.close();
             }
         },
 
