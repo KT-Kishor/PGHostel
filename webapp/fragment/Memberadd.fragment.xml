@@ -25,12 +25,22 @@
         </customHeader>
         <content>
             <f:SimpleForm
-                editable="true"
+                  editable="true"
                 layout="ResponsiveGridLayout"
                 width="100%"
                 columnsXL="2"
                 columnsL="2"
                 columnsM="1"
+                labelSpanXL="4"
+                labelSpanL="4"
+                labelSpanM="12"
+                labelSpanS="12"
+                emptySpanXL="1"
+                emptySpanL="1"
+                emptySpanM="0"
+                emptySpanS="0"
+                adjustLabelSpan="false"
+                singleContainerFullSize="true"
                >
                 <!-- Salutation + Name -->
                 <HBox width="100%">
@@ -182,6 +192,7 @@
                 <HBox
                     width="100%"
                     alignItems="Center"
+
                 >
 
                 <!-- Document Type -->
@@ -192,8 +203,8 @@
                         valueStateText="{i18n>selectIDProof}"
                         selectionChange="onNewMemberDocumentTypeChange"
                         change="onNewMemberDocumentTypeChange"
-                        width="{= ${device>/system/phone} ? '100%' : '12rem'}"
-                        class="sapUiTinyMarginEnd"
+                        width="{= ${device>/system/phone} ? '80%' : '12rem'}"
+                        class="sapUiSmallMarginEnd"
                     >
                         <core:Item
                             key="Aadhar Card"

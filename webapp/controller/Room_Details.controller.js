@@ -601,6 +601,9 @@ sap.ui.define([
             delete Payload.Description;
             delete Payload.editable
             delete Payload.BranchName
+            delete Payload.City
+
+
 
             var aRoomDetails = oRoomDetailsModel.getData();
             var aBedTypes = oBedTypeModel.getData();
@@ -627,7 +630,7 @@ sap.ui.define([
 
                 Payload.NoofPerson = parseInt(Noofper.NoOfPerson) || 0;
                 Payload.ExtraBed = parseInt(Payload.ExtraBed) || 0;
-                Payload.Price = Payload.Price || 0;
+                Payload.Price = parseInt(Payload.Price) || 0;
                 Payload.MonthPrice = parseInt(Payload.MonthPrice) || 0;
                 Payload.YearPrice = parseInt(Payload.YearPrice) || 0;
 
