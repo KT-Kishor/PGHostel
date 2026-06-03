@@ -4755,27 +4755,58 @@ sap.ui.define([
         onFileNameLinkPress: async function (oEvent) {
 
             function autoDecodeBase64(b64) {
-                if (!b64) return "";
-                b64 = b64.replace(/\s/g, "");
-                let last = b64;
 
-                for (let i = 0; i < 5; i++) {
+                if (!b64) {
+                    return "";
+                }
+
+                b64 = b64.replace(/\s/g, "");
+
+                let current = b64;
+
+                for (let i = 0; i < 10; i++) {
+
+                    // Already detected actual file
+                    if (
+                        current.startsWith("iVB") ||     // PNG
+                        current.startsWith("/9j") ||     // JPG
+                        current.startsWith("JVBER")      // PDF
+                    ) {
+                        return current;
+                    }
+
                     try {
-                        if (
-                            last.startsWith("iVB") || // PNG
-                            last.startsWith("/9j") || // JPG
-                            last.startsWith("JVBER")
-                        ) {
-                            return last;
+
+                        const decoded = atob(current);
+
+                        // PDF raw bytes
+                        if (decoded.startsWith("%PDF")) {
+                            return current;
                         }
-                        last = atob(last);
+
+                        // PNG raw bytes
+                        if (decoded.charCodeAt(0) === 137) {
+                            return current;
+                        }
+
+                        // JPEG raw bytes
+                        if (
+                            decoded.charCodeAt(0) === 255 &&
+                            decoded.charCodeAt(1) === 216
+                        ) {
+                            return current;
+                        }
+
+                        // Continue decoding next layer
+                        current = decoded.replace(/\s/g, "");
+
                     } catch (e) {
                         break;
                     }
                 }
-                return last;
-            }
 
+                return current;
+            }
 
             const oDoc = oEvent.getSource()
                 .getBindingContext("CustomerData")

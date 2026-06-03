@@ -181,19 +181,48 @@ sap.ui.define([
                 var aBranchData = Array.isArray(oData.data) ?
                     oData.data : [oData.data];
 
-                this.getView().setModel(
-                    new sap.ui.model.json.JSONModel(aBranchData),
-                    "branchModel"
-                );
+                if (!this._originalBranchData) {
+                    this._originalBranchData = aBranchData;
+                }
 
-                var model = new sap.ui.model.json.JSONModel(aBranchData);
-
-                this.getOwnerComponent().setModel(model, "mainModel");
+                this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aBranchData), "mainModel");
                 this.getOwnerComponent().setModel(new sap.ui.model.json.JSONModel(aBranchData), "branchModel1");
-            } finally {
+                this._populateBranchFilterValues(this._originalBranchData);
+            } finally {}
+        },
 
+        _populateBranchFilterValues: function(data) {
 
-            }
+            var oCombo = this.byId("MD_id_BranchCode");
+
+            if (!oCombo) return;
+
+            oCombo.destroyItems();
+
+            let uniqueBranches = {};
+
+            data.forEach(item => {
+
+                if (item.BranchID && !uniqueBranches[item.BranchID]) {
+                    uniqueBranches[item.BranchID] = item;
+                }
+
+            });
+
+            Object.values(uniqueBranches)
+                .sort((a,b)=>a.BranchID.localeCompare(b.BranchID))
+                .forEach(item => {
+
+                    oCombo.addItem(
+                        new sap.ui.core.ListItem({
+                            key: item.BranchID,
+                            text: item.BranchID + " - " + item.Name,
+                            additionalText: item.City
+                        })
+                    );
+
+                });
+
         },
 
         MD_onPressClear: function() {
