@@ -302,24 +302,22 @@
                             <Table
                                 items="{BookingView>/FamilyMembers}"
                                 noDataText="No members selected"
-                                class="responsiveTable occupantMembersTable "
+                                class="familyMembersTable"
                             >
                                 <columns>
                                     <Column
-                                        
+                                            id="primaryColumn"
+                                            width="6rem"
                                         visible="{BookingView>/showFamilySection}"
                                     >
                                         <Text text="Primary" />
                                     </Column>
 
-                                    <Column
-                                        width="6rem"
-                                   >
-
+                                    <Column id="nameColumn">
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column
-                                      
+                                       
                                     >
                                         <Text text="Age" />
                                     </Column>
@@ -341,7 +339,7 @@
                                         <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
                                             <Text text="Document" />
                                         </Column> -->
-                                    <Column >
+                                    <Column width="6rem" id="actionColumn"  > 
                                        
                                     </Column>
                                 </columns>
@@ -356,11 +354,13 @@
                                                 visible="{BookingView>/showFamilySection}"
                                             />
 
-                                            <Text  class="occupantFullNameCell"
+                                            <Text  
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
+                                                wrapping="true"
                                             />
-                                            <Text class="occupantFullNameCell"
+                                            <Text 
                                                 text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                                                wrapping="true"
                                             />
 
                                             <!-- <Select selectedKey="{BookingView>Gender}" items="{BookingView>/GenderOptions}">

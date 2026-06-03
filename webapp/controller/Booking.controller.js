@@ -38,6 +38,16 @@
                 }.bind(this)
             });
 
+            this._fnTableResizeHandler =
+                this._updateTableColumnWidths.bind(this);
+
+            this._updateTableColumnWidths();
+
+            window.addEventListener(
+                "resize",
+                this._fnTableResizeHandler
+            );
+
         },
         onAfterRendering: function () {
             this._startAllCarouselsAutoSlide(3000);
@@ -47,6 +57,20 @@
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
         },
 
+        _updateTableColumnWidths: function () {
+            var oPrimaryColumn = this.byId("primaryColumn");
+            var oActionColumn = this.byId("actionColumn");
+
+            var bMobile = sap.ui.Device.system.phone;
+
+            if (oPrimaryColumn) {
+                oPrimaryColumn.setWidth(bMobile ? "3rem" : "6rem");
+            }
+
+            if (oActionColumn) {
+                oActionColumn.setWidth(bMobile ? "3rem" : "6rem");
+            }
+        },
         onExit: function () {
             if (this._fnFacilityResizeHandler) {
                 sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
@@ -65,6 +89,13 @@
                     }
                 });
                 this._adCarouselPauseResumeHandlers = null;
+            }
+            if (this._fnTableResizeHandler) {
+                window.removeEventListener(
+                    "resize",
+                    this._fnTableResizeHandler
+                );
+                this._fnTableResizeHandler = null;
             }
 
             BaseController.prototype.onExit.call(this);

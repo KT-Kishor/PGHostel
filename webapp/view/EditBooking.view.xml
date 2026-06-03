@@ -217,19 +217,18 @@
                             <Table
                                 items="{BookingView>/FamilyMembers}"
                                 noDataText="No members selected"
-                                class="responsiveTable occupantMembersTable"
+                                class="familyMembersTable"
                             >
                                 <columns>
-                                    <Column  
+                                    <Column
+                                         id="EditprimaryColumn"
+                                            width="6rem"
                                         visible="{BookingView>/showFamilySection}"
                                     >
                                         <Text text="Primary" />
                                     </Column>
 
-                                    <Column
-                                       
-                                        width="6rem"
-                                    >
+                                    <Column id="EditnameColumn">
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column
@@ -249,7 +248,7 @@
                                     >
                                         <Text text="Relationship" />
                                     </Column>
-                                    <Column >
+                                    <Column width="6rem" id="EditactionColumn"  >
                                     </Column>
                                 </columns>
 
@@ -264,14 +263,16 @@
                                                 enabled="{BookingView>/editModeEnabled}"
                                             />
 
-                                            <Text  class="occupantFullNameCell"
+                                            <Text  
                                                 text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
+                                                wrapping="true"
                                             />
-                                            <Text class="occupantFullNameCell"
+                                            <Text 
                                                 text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                                                wrapping="true"
                                             />
 
-                                           <Text text="{BookingView>Gender}" />
+                                            <Text text="{BookingView>Gender}" />
                                             <Text
                                                 text="{BookingView>Relation}"
                                             />
