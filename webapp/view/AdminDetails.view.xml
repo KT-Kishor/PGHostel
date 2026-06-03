@@ -393,7 +393,7 @@
                                 />
                                 <layoutData>
                                     <f:ColumnElementData
-                                        cellsSmall="2"
+                                        cellsSmall="3"
                                         cellsLarge="2"
                                     />
                                 </layoutData>
@@ -649,7 +649,7 @@
                                 />
                                 <layoutData>
                                     <f:ColumnElementData
-                                        cellsSmall="2"
+                                        cellsSmall="3"
                                         cellsLarge="2"
                                     />
                                 </layoutData>

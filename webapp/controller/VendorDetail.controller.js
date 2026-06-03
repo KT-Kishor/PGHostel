@@ -623,48 +623,36 @@ sap.ui.define([
         
             // PDF PREVIEW
             if (sMimeType === "application/pdf") {
-
                 const byteCharacters = atob(sBase64);
-
                 const byteArrays = [];
 
                 for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-
-                    const slice =
-                        byteCharacters.slice(
-                            offset,
-                            offset + 512
-                        );
-
-                    const byteNumbers =
-                        new Array(slice.length);
-
-                    for (
-                        let i = 0; i < slice.length; i++
-                    ) {
-
-                        byteNumbers[i] =
-                            slice.charCodeAt(i);
+                    const slice =byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
                     }
 
-                    byteArrays.push(
-                        new Uint8Array(byteNumbers)
-                    );
+                    byteArrays.push(new Uint8Array(byteNumbers));
                 }
 
-                const blob = new Blob(
-                    byteArrays, {
-                        type: "application/pdf"
-                    }
-                );
-
-                const sBlobUrl =
-                    URL.createObjectURL(blob);
-
+                const blob = new Blob(byteArrays, { type: "application/pdf"});
+                const sBlobUrl = URL.createObjectURL(blob);
                 this._pdfBlobUrl = sBlobUrl;
 
-                const sIframe = `
+                if (sap.ui.Device.system.phone) {
+                    const oLink = document.createElement("a");
+                    oLink.href = sBlobUrl;
+                    oLink.download = sFileName;
+                    document.body.appendChild(oLink);
+                    oLink.click();
+                    document.body.removeChild(oLink);
 
+                    MessageToast.show("File downloaded successfully");
+                    return;
+            }
+
+                const sIframe = `
                 <div style="
                 width:100%;
                 height:100%;
@@ -740,9 +728,7 @@ sap.ui.define([
         },
 
         onClosePreview: function() {
-
             if (this._pdfBlobUrl) {
-
                 URL.revokeObjectURL(
                     this._pdfBlobUrl
                 );

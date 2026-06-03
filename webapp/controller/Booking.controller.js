@@ -6545,22 +6545,19 @@ return;
             doc.text("GUEST DETAILS", 24, guestBoxY + 8);
 
 
-            // Guest Table
             doc.autoTable({
                 startY: guestBoxY + 12,
                 margin: {
                     left: 20,
                     right: 15
                 },
-                head: [
-                    [
-                        "Sl.No",
-                        "Guest Name",
-                        "Gender",
-                        "Age",
-                        "Relation"
-                    ]
-                ],
+                head: [[
+                    "Sl.No",
+                    "Guest Name",
+                    "Gender",
+                    "Age",
+                    "Relation"
+                ]],
                 body: guestBody,
                 theme: "grid",
                 styles: {
@@ -6572,7 +6569,7 @@ return;
                 },
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
-                    textColor: [255, 255, 255],
+                    textColor: [255,255,255],
                     fontStyle: "bold",
                     halign: "center"
                 },
@@ -6582,22 +6579,21 @@ return;
                         halign: "center"
                     },
                     1: {
-                        cellWidth: 48
+                        cellWidth: 60        // Guest Name
                     },
                     2: {
-                        cellWidth: 22,
-                        halign: "center"
+                        cellWidth: 25,
+                        halign: "center"     // Gender
                     },
                     3: {
-                        cellWidth: 32,
-                        halign: "center"
+                        cellWidth: 30,
+                        halign: "center"     // Age
                     },
                     4: {
-                        cellWidth: 30,
-                        halign: "center"
+                        cellWidth: 35,
+                        halign: "center"     // Relation
                     }
                 }
-
             });
 
 

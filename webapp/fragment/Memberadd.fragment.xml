@@ -44,7 +44,7 @@
                             selectedKey="{BookingView>/NewMemberDraft/Salutation}"
                             placeholder="Select salutation"
                             valueStateText="Please select salutation"
-                            change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
+                            change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                         >
                             <core:Item
                                 key="Mr."
@@ -80,7 +80,7 @@
                             valueStateText="Please enter a valid full name"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
-                            maxLength="35" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
+                            maxLength="35" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                         />
                     </VBox>
                 </HBox>
@@ -96,7 +96,7 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNewMemberDOBChange"
-                    valueStateText="Age must be between 0 and 100 years" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
+                    valueStateText="Age must be between 0 and 100 years" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                      initialFocusedDateValue="{controller>/focusedDate}"
                      minDate="{controller>/minDate}"
                     maxDate="{controller>/maxdate}"
@@ -112,7 +112,7 @@
                     selectedKey="{BookingView>/NewMemberDraft/Gender}"
                     placeholder="Select gender"
                     valueStateText="Please select gender"
-                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
+                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                 >
                     <core:Item
                         key="Male"
@@ -138,7 +138,7 @@
                     selectedKey="{BookingView>/NewMemberDraft/Relation}"
                     placeholder="Select relationship"
                     valueStateText="Please select relationship"
-                    change="onNewMemberRelationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'SELF' }"
+                    change="onNewMemberRelationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                 >
                     <core:Item
                         key="Spouse"
