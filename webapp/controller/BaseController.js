@@ -1063,19 +1063,7 @@ sap.ui.define([
       }
     },
 
-
-
-
-
     // ─── MOBILE: open invisible → measure → pin top or bottom → ONE scroll → reveal
-
-
-
-
-
-
-
-
 
     _openMobileStep: function (oPopover, oAnchor) {
       var that = this;
@@ -1192,23 +1180,6 @@ sap.ui.define([
 
       oPopover.openBy(oAnchor);
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // ─── Helper: scroll container by delta, then callback ────────────────────────
     _scrollBy: function (oDomRef, iDelta, fnCallback) {

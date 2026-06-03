@@ -6704,9 +6704,9 @@ html, body {
     }
 }
 
-.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+/* .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
   width:250px !important;
-}
+} */
 .adminPreviewImage {
     width: 100% !important;
     height: 100% !important;
@@ -6844,4 +6844,10 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
     display: inline-block !important;
     margin-left: 0.5rem !important;
   }
+}
+
+.imagePreviewFit{
+    width:100%;
+    height:100%;
+    object-fit:contain;
 }
