@@ -8348,7 +8348,7 @@ sap.ui.define([
                 }
 
                 if (
-                    this._mode === "CREATE" &&
+                    (this._mode === "CREATE" || this._mode === "UPDATE") &&
                     !oMember.Documents[0].File
                 ) {
 
@@ -8666,37 +8666,64 @@ sap.ui.define([
 
             const autoDecodeBase64 = function (sValue) {
 
-                if (!sValue) {
-                    return "";
+            if (!sValue) {
+                return "";
+            }
+
+            let current = String(sValue)
+                .replace(/\s/g, "");
+
+            for (let i = 0; i < 10; i++) {
+
+                // Already detected encoded file signatures
+                if (
+                    current.startsWith("iVB") ||      // PNG
+                    current.startsWith("/9j") ||      // JPG
+                    current.startsWith("JVBER") ||    // PDF
+                    current.startsWith("UklGR")       // WEBP
+                ) {
+                    return current;
                 }
 
-                let sDecoded = String(sValue)
-                    .replace(/\s/g, "");
+                try {
 
-                for (let i = 0; i < 5; i++) {
+                    const decoded = atob(current);
 
-                    if (
-                        sDecoded.startsWith("iVB") ||
-                        sDecoded.startsWith("/9j") ||
-                        sDecoded.startsWith("JVBER") ||
-                        sDecoded.startsWith("UklGR")
-                    ) {
-
-                        return sDecoded;
+                    // RAW PDF bytes
+                    if (decoded.startsWith("%PDF")) {
+                        return btoa(decoded);
                     }
 
-                    try {
+                    // RAW PNG bytes
+                    if (
+                        decoded.length > 4 &&
+                        decoded.charCodeAt(0) === 137 &&
+                        decoded.charCodeAt(1) === 80
+                    ) {
+                        return btoa(decoded);
+                    }
 
-                        sDecoded = atob(sDecoded);
+                    // RAW JPEG bytes
+                    if (
+                        decoded.length > 3 &&
+                        decoded.charCodeAt(0) === 255 &&
+                        decoded.charCodeAt(1) === 216
+                    ) {
+                        return btoa(decoded);
+                    }
+
+                    current = decoded.replace(/\s/g, "");
 
                     } catch (e) {
 
-                        break;
-                    }
-                }
+                                console.error("Decode failed:", e);
 
-                return sDecoded;
-            };
+                                break;
+                            }
+                        }
+
+                        return current;
+                    };
 
             const sBase64 = normalizeBase64(
                 autoDecodeBase64(sRawBase64)

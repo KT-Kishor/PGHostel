@@ -56,8 +56,61 @@ sap.ui.define([
                 comfirmpass: "",
                 minDate: new Date(2000, 0, 1)
             }), "LoginMode");
-        },
+          
 
+       
+            this._fnTableResizeHandler =
+                this._updateTableColumnWidths.bind(this);
+
+            this._updateTableColumnWidths();
+
+            window.addEventListener(
+                "resize",
+                this._fnTableResizeHandler
+            );
+            
+        },
+        onExit: function () {
+
+            if (this._fnTableResizeHandler) {
+
+                window.removeEventListener(
+                    "resize",
+                    this._fnTableResizeHandler
+                );
+
+                this._fnTableResizeHandler = null;
+            }
+
+            BookingController.prototype.onExit.apply(
+                this,
+                arguments
+            );
+        },
+        _updateTableColumnWidths: function () {
+
+            var bMobile = sap.ui.Device.system.phone;
+
+            var oPrimaryColumn = this.byId("EditprimaryColumn");
+            var oActionColumn = this.byId("EditactionColumn");
+
+            if (oPrimaryColumn) {
+                oPrimaryColumn.setWidth(
+                    bMobile ? "3rem" : "6rem"
+                );
+            }
+
+            if (oActionColumn) {
+                oActionColumn.setWidth(
+                    bMobile ? "3rem" : "6rem"
+                );
+            }
+        },
+        onAfterRendering: function () {
+            BookingController.prototype.onAfterRendering.apply(this, arguments);
+
+            this._updateTableColumnWidths();
+        },
         _onEditRouteMatched: async function (oEvent) {
             // if (performance.navigation && performance.navigation.type === 1) {
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
