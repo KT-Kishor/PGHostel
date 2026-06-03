@@ -6845,3 +6845,9 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
     margin-left: 0.5rem !important;
   }
 }
+
+.imagePreviewFit{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
