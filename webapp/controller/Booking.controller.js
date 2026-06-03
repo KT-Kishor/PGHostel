@@ -101,6 +101,7 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
+            this.getBusyDialog();
             await this.commonLoginFunction("Booking");
 
             // if (performance.navigation && performance.navigation.type === 1) {

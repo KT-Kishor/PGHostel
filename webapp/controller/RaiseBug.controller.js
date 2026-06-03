@@ -15,6 +15,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog();
             var LoginFUnction = await this.commonLoginFunction("ManageVendor");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

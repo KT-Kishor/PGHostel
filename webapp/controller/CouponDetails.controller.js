@@ -52,6 +52,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function() {
+             this.getBusyDialog();
             var LoginFUnction = await this.commonLoginFunction("ManageCoupon");
             if (!LoginFUnction) return;
 
@@ -242,7 +243,7 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function() {
-            this.getBusyDialog()
+           
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -1138,7 +1139,6 @@ sap.ui.define([
 
         async _loadRecipientContacts() {
             try {
-                this.getBusyDialog()
                 const sRole = this._oLoggedInUser?.Role || "";
 
                 // Decide filter STRICTLY by role

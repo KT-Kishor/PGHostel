@@ -15,9 +15,9 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
-                this.getBusyDialog();
                 var oView = this.getView();
                 var oModel = oView.getModel("BedDetails");
                 var sPath = oEvent.getParameter("arguments").sPath;

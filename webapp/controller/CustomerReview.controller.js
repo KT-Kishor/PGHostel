@@ -11,12 +11,12 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            this.getBusyDialog()
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             // this.commonLoginFunction();
             this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
             this._resetFiltersOnEntry();
             this._setDefaultDateRange();
-            this.getBusyDialog()
             await this._loadCustomers();
             await this._buildBranchMap();
             await this._loadCustomerReviews();

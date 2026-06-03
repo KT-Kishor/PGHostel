@@ -15,11 +15,11 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
+                 this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
                 var Layout = this.byId("ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("purchaseOrderHeaderSection1"));
-                this.getBusyDialog()
 
                 var model = new sap.ui.model.json.JSONModel({
                     Edit: false,

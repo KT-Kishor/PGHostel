@@ -14,6 +14,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("DamageDashboard");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -78,7 +79,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);

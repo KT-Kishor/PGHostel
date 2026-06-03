@@ -25,9 +25,9 @@ sap.ui.define([
 
         _onRouteMatched: async function() {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageStaff");
                 if (!LoginFUnction) return;
-                this.getBusyDialog()
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
                 this.onClearAndSearch("MS_id_FilterbarEmployee");

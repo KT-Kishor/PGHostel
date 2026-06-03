@@ -16,9 +16,9 @@ sap.ui.define([
             },
 
             _onRouteMatched: async function(oEvent) {
+                this.getBusyDialog()
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
-                this.getBusyDialog()
                 var sArg = oEvent.getParameter("arguments").sPath;
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";

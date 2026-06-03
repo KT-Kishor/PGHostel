@@ -879,8 +879,6 @@ sap.ui.define([
         if (value === "Booking") return true;
 
         if (isLoggedIn === "true" && value === "LoginPage" || value === "TilePage" || value === "ManageProfile") {
-          this.closeBusyDialog();
-
           if (value === "ManageProfile") {
             this.getRouter().navTo("RouteManageProfile");
           } else if (user.Role === "Customer") {
@@ -942,7 +940,6 @@ sap.ui.define([
           }
         }
 
-        this.closeBusyDialog();
         return true;
 
       } catch (error) {

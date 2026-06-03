@@ -14,6 +14,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("ManageRooms");
             if (!LoginFUnction) return;
 
@@ -36,15 +37,11 @@ sap.ui.define([
             });
             this.getView().setModel(model, "RoomModel")
             this.onClearAndSearch("RD_id_FilterbarEmployee");
-            this.getBusyDialog()
             await this.BedTypedetails()
             await this._loadBranchCode()
             await this.Onsearch()
             this.Customerdata()
-             
-
             //  this.closeBusyDialog()
-
         },
          getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
