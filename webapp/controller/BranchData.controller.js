@@ -1582,35 +1582,64 @@ sap.ui.define([
             if (sBase64 && !sBase64.startsWith("data:image")) {
                 sBase64 = "data:image/jpeg;base64," + sBase64;
             }
-            var oImage = new sap.m.Image({
-                src: sBase64,
-                densityAware: false,
-                decorative: false,
-                width: "100%",
-                height: "100%",
-                style: "object-fit: contain; display:block; margin:0; padding:0;"
-            });
+             const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${oData.Photo1Type || "image/jpeg"};base64,${sBase64}`;
 
-            var oDialog = new sap.m.Dialog({
-                title: sPhotoName,
-                contentWidth: "50%",
-                contentHeight: "60%",
-                horizontalScrolling: false,
-                verticalScrolling: false,
-                content: [oImage],
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: function() {
-                        oDialog.close();
+
+                // Create a temporary image to detect orientation and dimensions
+                const oImg = new Image();
+
+                oImg.onload = function () {
+
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+
+                    const imgRatio = oImg.width / oImg.height;
+
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
                     }
-                }).addStyleClass("myUnifiedBtn"),
-                afterClose: function() {
-                    oDialog.destroy();
-                }
-            }).addStyleClass("barheader");
 
-            oDialog.addStyleClass("ImageDialogNoPadding");
-            oDialog.open();
+                    const oHtml = new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+            <div class="preview-image-container">
+                <img src="${sImageSrc}" />
+            </div>
+        `
+                    });
+
+                    this._oComplaintPreviewDialog = new sap.m.Dialog({
+                        title: sPhotoName || "Document Preview",
+                        contentWidth: finalWidth + "px",
+                        contentHeight: finalHeight + "px",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        horizontalScrolling: false,
+                        verticalScrolling: false,
+                        content: [oHtml],
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            addstyleClass: "myUnifiedBtn",
+                            press: () => this._oComplaintPreviewDialog.close()
+                        }),
+                        afterClose: () => {
+                            this._oComplaintPreviewDialog.destroy();
+                            this._oComplaintPreviewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._oComplaintPreviewDialog);
+                    this._oComplaintPreviewDialog.open();
+
+                }.bind(this);
+
+                oImg.src = sImageSrc;
+                return;
         },
 
         HF_viewimage: function(oEvent) {
@@ -1626,35 +1655,64 @@ sap.ui.define([
             if (sBase64 && !sBase64.startsWith("data:image")) {
                 sBase64 = "data:image/jpeg;base64," + sBase64;
             }
-            var oImage = new sap.m.Image({
-                src: sBase64,
-                densityAware: false,
-                decorative: false,
-                width: "100%",
-                height: "100%",
-                style: "object-fit: contain; display:block; margin:0; padding:0;"
-            });
+            const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${oData.Photo1Type || "image/jpeg"};base64,${sBase64}`;
 
-            var oDialog = new sap.m.Dialog({
-                title: sPhotoName,
-                contentWidth: "50%",
-                contentHeight: "60%",
-                horizontalScrolling: false,
-                verticalScrolling: false,
-                content: [oImage],
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: function() {
-                        oDialog.close();
+
+                // Create a temporary image to detect orientation and dimensions
+                const oImg = new Image();
+
+                oImg.onload = function () {
+
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+
+                    const imgRatio = oImg.width / oImg.height;
+
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
                     }
-                }).addStyleClass("myUnifiedBtn"),
-                afterClose: function() {
-                    oDialog.destroy();
-                }
-            }).addStyleClass("barheader");
 
-            oDialog.addStyleClass("ImageDialogNoPadding");
-            oDialog.open();
+                    const oHtml = new sap.ui.core.HTML({
+                        sanitizeContent: false,
+                        content: `
+            <div class="preview-image-container">
+                <img src="${sImageSrc}" />
+            </div>
+        `
+                    });
+
+                    this._oComplaintPreviewDialog = new sap.m.Dialog({
+                        title: sPhotoName || "Document Preview",
+                        contentWidth: finalWidth + "px",
+                        contentHeight: finalHeight + "px",
+                        draggable: true,
+                        resizable: true,
+                        contentPadding: "0rem",
+                        horizontalScrolling: false,
+                        verticalScrolling: false,
+                        content: [oHtml],
+                        beginButton: new sap.m.Button({
+                            text: "Close",
+                            addstyleClass: "myUnifiedBtn",
+                            press: () => this._oComplaintPreviewDialog.close()
+                        }),
+                        afterClose: () => {
+                            this._oComplaintPreviewDialog.destroy();
+                            this._oComplaintPreviewDialog = null;
+                        }
+                    });
+
+                    this.getView().addDependent(this._oComplaintPreviewDialog);
+                    this._oComplaintPreviewDialog.open();
+
+                }.bind(this);
+
+                oImg.src = sImageSrc;
+                return;
         },
 
         HF_viewroom: function(oEvent) {

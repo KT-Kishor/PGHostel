@@ -326,7 +326,7 @@
                     </f:SimpleForm>
                 </Panel>
             </VBox>
-           
+
             <VBox>
                 <Panel
                     headerText="{= 'Personal Information - ' + ${CustomerData>/CustomerName} }"
@@ -369,7 +369,7 @@
                                 text="{i18n>fullname}"
                             />
                             <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
-                            
+
                             <Select
                                 selectedKey="{Bookingmodel>/Salutation}"
                                 visible="{VisibleModel>/visible}"
@@ -706,15 +706,13 @@
                             </FlexBox>
                         </VBox>
                     </FlexBox>
-                 
+
                     <VBox class="sapUiMediumMarginBottom">
                         <Panel
                             headerText="{i18n>customerDocuments}"
                             expandable="false"
                             class="customPanelHeader"
                         >
-                    
-
                             <Table
                                 id="Ad_id_idFacilityRoomTableDetails1"
                                 class="sapUiSmallMarginTop"
@@ -880,23 +878,11 @@
                                     tooltip="Period"
                                 />
                             </Column>
-                            <!-- <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="Coupon Code"
-                                    tooltip="Coupon Code"
-                                />
+                            <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="Coupon Code" tooltip="Coupon Code" />
                             </Column>
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="Discount"
-                                    tooltip="Discount"
-                                />
+                            <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="Discount" tooltip="Discount" />
                             </Column> -->
                             <Column
                                 minScreenWidth="Tablet"
@@ -958,9 +944,7 @@
 
                                     <!-- <Text text="{CustomerData>CouponCode}" /> -->
 
-                                    <!-- <Text
-                                        text="{CustomerData>CouponDiscount}"
-                                    /> -->
+                                    <!-- <Text text="{CustomerData>CouponDiscount}" /> -->
 
                                     <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
                                     <Text
@@ -1044,10 +1028,13 @@
                                 />
                             </HBox>
                             <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
-                            <HBox
+
+                            <FlexBox
                                 width="100%"
                                 justifyContent="End"
                                 alignItems="Center"
+                                wrap="Wrap"
+                                renderType="Div"
                                 class="sapUiSmallMarginBottom"
                                 visible="{VisibleModel>/visible}"
                             >
@@ -1078,7 +1065,7 @@
                                     class="sapUiTinyMarginEnd myUnifiedBtn"
                                     visible="{= !${VisibleModel>/IsCouponApplied} }"
                                 />
-                            </HBox>
+                            </FlexBox>
                             <!-- <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CouponCode} ? true : false }">
                                 <Label text="{i18n>couponCode}" class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel" />
                                 <Text class="amountText totalColumnBold1" text="{
