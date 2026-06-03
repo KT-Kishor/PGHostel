@@ -7586,20 +7586,18 @@ sap.ui.define([
 
             // Guest Table
             doc.autoTable({
-                startY: guestBoxY + 15,
+                startY: guestBoxY + 12,
                 margin: {
                     left: 20,
                     right: 15
                 },
-                head: [
-                    [
-                        "Sl.No",
-                        "Guest Name",
-                        "Gender",
-                        "DOB",
-                        "Relation"
-                    ]
-                ],
+                head: [[
+                    "Sl.No",
+                    "Guest Name",
+                    "Gender",
+                    "Age",
+                    "Relation"
+                ]],
                 body: guestBody,
                 theme: "grid",
                 styles: {
@@ -7607,15 +7605,13 @@ sap.ui.define([
                     fontSize: 8,
                     cellPadding: 2,
                     lineColor: [220, 220, 220],
-                    lineWidth: 0.1,
-                    valign: "middle"
+                    lineWidth: 0.1
                 },
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
-                    textColor: [255, 255, 255],
+                    textColor: [255,255,255],
                     fontStyle: "bold",
-                    halign: "center",
-                    fontSize: 9
+                    halign: "center"
                 },
                 columnStyles: {
                     0: {
@@ -7623,22 +7619,21 @@ sap.ui.define([
                         halign: "center"
                     },
                     1: {
-                        cellWidth: 48
+                        cellWidth: 60        // Guest Name
                     },
                     2: {
-                        cellWidth: 20,
-                        halign: "center"
+                        cellWidth: 25,
+                        halign: "center"     // Gender
                     },
                     3: {
-                        cellWidth: 32,
-                        halign: "center"
+                        cellWidth: 30,
+                        halign: "center"     // Age
                     },
                     4: {
-                        cellWidth: 30,
-                        halign: "center"
+                        cellWidth: 35,
+                        halign: "center"     // Relation
                     }
                 }
-
             });
 
 
