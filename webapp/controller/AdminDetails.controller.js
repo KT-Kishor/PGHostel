@@ -4942,7 +4942,7 @@ sap.ui.define([
                 if (sap.ui.Device.system.phone) {
                     const oLink = document.createElement("a");
                     oLink.href = sBlobUrl;
-                    oLink.download = sFileName;
+                    oLink.download = oDoc.FileName;
                     document.body.appendChild(oLink);
                     oLink.click();
                     document.body.removeChild(oLink);
