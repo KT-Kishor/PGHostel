@@ -112,6 +112,7 @@ sap.ui.define([
             this._updateTableColumnWidths();
         },
         _onEditRouteMatched: async function (oEvent) {
+            // await this.commonLoginFunction("Booking");
             // if (performance.navigation && performance.navigation.type === 1) {
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             //     oRouter.navTo("RouteHostel", {}, true);
@@ -328,6 +329,7 @@ sap.ui.define([
 
                 var oEditData = this._normalizeBookingEditData(oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs);
                 var fPaymentPaidAmount = this._getEditPaymentPaidAmount(aExistingPayments);
+                oEditData.CustomerEmail = this.CustomerEmail || "";
 
                 oHostelModel.setData(oEditData);
                 oHostelModel.setProperty("/IsEditMode", true);
@@ -4291,8 +4293,7 @@ sap.ui.define([
 
                 await this.ajaxReadWithJQuery("HM_Customer", payload);
 
-                // oCustomerData.CustomerEmail = sEmail;
-                // oView.getModel("HostelModel").setData(oCustomerData);
+                this.CustomerEmail = sEmail;
 
                 // Update UIModel also
                 const oUIModel = this.getOwnerComponent().getModel("UIModel");
