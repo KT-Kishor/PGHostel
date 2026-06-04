@@ -122,7 +122,9 @@
                     selectedKey="{BookingView>/NewMemberDraft/Gender}"
                     placeholder="Select gender"
                     valueStateText="Please select gender"
-                    change="onNewMemberGenderChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                    change="onNewMemberGenderChange" 
+                    editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
+                    enabled="{= ${BookingView>/NewMemberDraft/Salutation} === 'Dr.' }"
                 >
                     <core:Item
                         key="Male"
