@@ -18,7 +18,6 @@ sap.ui.define([
                 if (!LoginFUnction) return;
                 var Layout = this.byId("FD_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("FD_id_OrderHeaderSection1"));
-                this.getBusyDialog()
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 const oEditableModel = new JSONModel({

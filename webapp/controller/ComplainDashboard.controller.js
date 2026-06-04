@@ -41,8 +41,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog()
             this.sPath = oEvent.getParameter("arguments").sPath;
-
             var LoginFunction = await this.commonLoginFunction("ComplainDashboard");
             if (!LoginFunction) return;
             this._ViewDatePickersReadOnly(["CD_branchFilter", "CD_complain_Date", "CD_statusFilter"], this.getView());

@@ -35,7 +35,10 @@ sap.ui.define([
             this._setStepsGuideButtonVisible(true);
         },
 
-        _onRouteMatched: function () {
+        _onRouteMatched: async function () {
+            this.getBusyDialog()
+            var LoginFUnction = await this.commonLoginFunction("TilePage");
+            if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
              this.getView().setModel(
                 new JSONModel({
@@ -59,8 +62,6 @@ sap.ui.define([
 
         AppVisibilityReadCall: async function () {
             try {
-                this.getBusyDialog()
-                this.commonLoginFunction("TilePage");
                 const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 let filter = { Role: oLoginModel.getProperty("/Role") }
                 const oData = await this.ajaxReadWithJQuery("HM_AppVisibility", filter);

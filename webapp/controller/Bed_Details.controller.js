@@ -15,9 +15,9 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
-                this.getBusyDialog();
                 var oView = this.getView();
                 var oModel = oView.getModel("BedDetails");
                 var sPath = oEvent.getParameter("arguments").sPath;
@@ -50,7 +50,7 @@ sap.ui.define([
                 this.getView().setModel(oTokenModel, "tokenModel");
                 this.getView().setModel(oUploaderData, "UploaderData");
                 await this._loadBranchCode()
-                await this.Onsearch("true")
+                await this.Onsearch("true", true);
                 this.Customerdata()
             } catch (err) {
                 this.closeBusyDialog()
@@ -456,7 +456,7 @@ sap.ui.define([
             this.getView().getModel("BedDetails").setData({});
         },
 
-        Onsearch: function(flag) {
+        Onsearch: function(flag, bBusyAlreadyOpen) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -500,7 +500,9 @@ sap.ui.define([
             if (sCustomerID) filters.ACType = sCustomerID;
             if (sBranch) filters.BranchCode = sBranch.split('-')[0];
 
-            this.getBusyDialog()
+            if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
 
             return this.ajaxReadWithJQuery("HM_BedType", filters)
                 .then((oData) => {

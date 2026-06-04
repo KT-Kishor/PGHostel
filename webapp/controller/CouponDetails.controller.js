@@ -52,6 +52,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function() {
+             this.getBusyDialog();
             var LoginFUnction = await this.commonLoginFunction("ManageCoupon");
             if (!LoginFUnction) return;
 
@@ -89,13 +90,12 @@ sap.ui.define([
             this._isDateRangeCleared = false;
 
             // single visible data load
-            await this.onCouponSearch();
+            await this.onCouponSearch("true", true);
         },
 
-        onCouponSearch: async function() {
+        onCouponSearch: async function(flag, bBusyAlreadyOpen) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             try {
-                this.getBusyDialog()
                 const oFilterBar = this.byId("couponFilterBar");
                 const aItems = oFilterBar.getFilterGroupItems();
                 const oRange = this.byId("fEndRange");
@@ -196,6 +196,9 @@ sap.ui.define([
                     }
                 });
 
+                 if (!bBusyAlreadyOpen) {
+                    this.getBusyDialog();
+                }
                 // ================= API Call =================
                 const oResult = await this.ajaxReadWithJQuery("HM_Coupon", params);
 
@@ -242,7 +245,7 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function() {
-            this.getBusyDialog()
+           
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -1138,7 +1141,6 @@ sap.ui.define([
 
         async _loadRecipientContacts() {
             try {
-                this.getBusyDialog()
                 const sRole = this._oLoggedInUser?.Role || "";
 
                 // Decide filter STRICTLY by role

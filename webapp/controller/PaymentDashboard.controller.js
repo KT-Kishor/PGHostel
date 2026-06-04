@@ -94,6 +94,7 @@ sap.ui.define([
             });
         },
         _onObjectMatched: async function () {
+            this.getBusyDialog();
             var LoginFunction = await this.commonLoginFunction("PaymentDashboard");
             if (!LoginFunction) return;
 

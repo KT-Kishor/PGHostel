@@ -25,14 +25,14 @@ sap.ui.define([
 
         _onRouteMatched: async function() {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageStaff");
                 if (!LoginFUnction) return;
-                this.getBusyDialog()
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 this._initEmptyMDModel();
                 this.onClearAndSearch("MS_id_FilterbarEmployee");
                 await this._loadBranchCode();
-                await this.Onsearch("true");
+                await this.Onsearch("true", true);
                 this._makeDatePickersReadOnly(["MS_id_signUpDOB"]);
             } catch (err) {
                 this.closeBusyDialog()
@@ -313,7 +313,7 @@ sap.ui.define([
             }
         },
 
-        Onsearch: function(flag) {
+         Onsearch: function(flag, bBusyAlreadyOpen) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
@@ -361,7 +361,9 @@ sap.ui.define([
                 filters.City = sCity;
             }
 
-            this.getBusyDialog()
+            if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];
 

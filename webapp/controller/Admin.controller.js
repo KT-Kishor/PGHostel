@@ -16,6 +16,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+            this.getBusyDialog();
             this.getView().setModel(new JSONModel({}), "HostelModel");
 
             var LoginFUnction = await this.commonLoginFunction("ManageCustomer");
@@ -50,7 +51,7 @@ sap.ui.define([
 
 
             await this._loadBranchCode()
-            await this.Cust_read(true)
+            await this.Cust_read(true, true);
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 var model = new JSONModel(oFCIAerData);
@@ -75,7 +76,8 @@ sap.ui.define([
         
          getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
-                },
+        },
+        
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -97,7 +99,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -159,9 +160,11 @@ sap.ui.define([
             }
         },
 
-        Cust_read: function (flag) {
+        Cust_read: function (flag, bBusyAlreadyOpen) {
             try {
-                this.getBusyDialog()
+                 if (!bBusyAlreadyOpen) {
+                    this.getBusyDialog();
+                }
 
                 const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 

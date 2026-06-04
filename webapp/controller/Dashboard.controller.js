@@ -15,7 +15,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
-            this.getBusyDialog();;
+            this.getBusyDialog();
             try {
                 this.commonLoginFunction();
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();

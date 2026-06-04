@@ -101,6 +101,7 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
+            // this.getBusyDialog();
             await this.commonLoginFunction("Booking");
 
             // if (performance.navigation && performance.navigation.type === 1) {
@@ -2890,177 +2891,12 @@
             }
         },
         MS_viewimage: function (oEvent) {
-            const oPreviewContext = oEvent.getSource().getBindingContext("BookingView");
-            const oPreviewData = oPreviewContext?.getObject();
-
-            this._previewDocument(oPreviewData);
-            return;
-
-            function autoDecodeBase64(b64) {
-                if (!b64) return "";
-                b64 = b64.replace(/\s/g, "");
-                // If already starts with known signatures, assume it's single-encoded
-                if (b64.startsWith("iVB") || b64.startsWith("/9j") || b64.startsWith("JVBER")) {
-                    return b64;
-                }
-                // Otherwise try decode once
-                try {
-                    return atob(b64);
-                } catch (e) {
-                    // If decode fails, return original (might be already decoded)
-                    return b64;
-                }
-            }
-
-            // ✅ Get clicked row data
-            const oContext = oEvent.getSource().getBindingContext("BookingView");
-            const oData = oContext?.getObject();
-
-            if (!oData || !oData.Document) {
+            const oPreviewData = oEvent.getSource().getBindingContext("BookingView")?.getObject();
+            if (!oPreviewData || !oPreviewData.Document) {
                 sap.m.MessageToast.show("No document found");
                 return;
             }
-
-            const sBase64 = autoDecodeBase64(oData.Document);
-
-            // ✅ Detect MIME type
-            let sMimeType = "application/octet-stream";
-
-            if (sBase64.startsWith("iVB")) {
-                sMimeType = "image/png";
-            } else if (sBase64.startsWith("/9j")) {
-                sMimeType = "image/jpeg";
-            } else if (sBase64.startsWith("JVBER")) {
-                sMimeType = "application/pdf";
-            }
-
-            // ================= IMAGE PREVIEW =================
-            if (sMimeType.startsWith("image/")) {
-
-                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-
-                if (!this._oPreviewDialog) {
-
-                    const oFlex = new sap.m.FlexBox({
-                        width: "100%",
-                        height: "100%",
-                        justifyContent: "Center",
-                        alignItems: "Center",
-                        items: [
-                            new sap.m.Image(this.createId("previewImage"), {
-                                width: "100%",
-                                height: "100%",
-                                densityAware: false
-                            })
-                        ]
-                    });
-
-                    this._oPreviewDialog = new sap.m.Dialog({
-                        title: oData.DocumentName || "Image Preview",
-                        contentWidth: "50%",
-                        contentHeight: "60%",
-                        draggable: true,
-                        resizable: true,
-                        contentPadding: "0rem",
-                        content: [oFlex],
-
-                        beginButton: new sap.m.Button({
-                            text: "Close",
-                            press: function () {
-                                this._oPreviewDialog.close();
-                            }.bind(this)
-                        }).addStyleClass("myUnifiedBtn"),
-
-                        afterClose: function () {
-                            this._oPreviewDialog.destroy();
-                            this._oPreviewDialog = null;
-                        }.bind(this)
-                    });
-
-                    this.getView().addDependent(this._oPreviewDialog);
-                } else {
-                    this._oPreviewDialog.setTitle(oData.DocumentName || "Image Preview");
-                }
-
-                this.byId("previewImage").setSrc(sImageSrc);
-                this._oPreviewDialog.open();
-                return;
-            }
-
-            // ================= PDF PREVIEW =================
-            if (sMimeType === "application/pdf") {
-
-                if (!this._oPreviewDialog) {
-                    this._oPreviewDialog = new sap.m.Dialog({
-                        title: oData.DocumentName || "Document Preview",
-                        stretch: true,
-                        draggable: true,
-                        resizable: true,
-                        contentWidth: "50%",
-                        contentHeight: "60%",
-                        contentPadding: "0rem",
-
-                        endButton: new sap.m.Button({
-                            text: "Close",
-                            press: () => {
-                                if (this._previewUrl) {
-                                    URL.revokeObjectURL(this._previewUrl);
-                                    this._previewUrl = null;
-                                }
-                                this._oPreviewDialog.close();
-                            }
-                        }).addStyleClass("myUnifiedBtn"),
-
-                        afterClose: function () {
-                            this._oPreviewDialog.destroy();
-                            this._oPreviewDialog = null;
-                        }.bind(this)
-                    });
-
-                    this.getView().addDependent(this._oPreviewDialog);
-                }
-
-                this._oPreviewDialog.removeAllContent();
-
-                const byteCharacters = atob(sBase64);
-                const byteArrays = [];
-
-                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                    const slice = byteCharacters.slice(offset, offset + 512);
-                    const byteNumbers = new Array(slice.length);
-
-                    for (let i = 0; i < slice.length; i++) {
-                        byteNumbers[i] = slice.charCodeAt(i);
-                    }
-
-                    byteArrays.push(new Uint8Array(byteNumbers));
-                }
-
-                const blob = new Blob(byteArrays, { type: sMimeType });
-
-                if (this._previewUrl) {
-                    URL.revokeObjectURL(this._previewUrl);
-                }
-
-                this._previewUrl = URL.createObjectURL(blob);
-
-                this._oPreviewDialog.addContent(
-                    new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-                    <iframe
-                        src="${this._previewUrl}"
-                        style="width:100%; height:600px; border:none;">
-                    </iframe>
-                `
-                    })
-                );
-
-                this._oPreviewDialog.open();
-                return;
-            }
-
-            sap.m.MessageToast.show("Preview not supported.");
+            this._openDocumentPreview(oPreviewData);
         },
 
         onMemberDialogTableUpdateFinished: function () {
@@ -3419,170 +3255,171 @@
         },
 
         _previewDocument: function (oDoc) {
-            const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
+            this._openDocumentPreview(oDoc);
+        },
 
+        _openDocumentPreview: async function (oDoc) {
+            function autoDecodeBase64(b64) {
+                if (!b64) { return ""; }
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (last.startsWith("iVB") || last.startsWith("/9j") || last.startsWith("JVBER")) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return last;
+            }
+
+            const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
             if (!sRawSource) {
                 MessageToast.show("No document to preview.");
                 return;
             }
 
-            const aDataUrlParts = /^data:([^;]+);base64,(.+)$/i.exec(sRawSource);
-            const sRawBase64 = aDataUrlParts ? aDataUrlParts[2] : sRawSource;
-            const normalizeBase64 = function (sValue) {
-                let sNormalized = String(sValue || "").replace(/\s/g, "").replace(/-/g, "+").replace(/_/g, "/");
-                const iRemainder = sNormalized.length % 4;
+            let sBase64 = autoDecodeBase64(sRawSource);
+            let sMimeType = "application/octet-stream";
+            if (sBase64.startsWith("iVB")) { sMimeType = "image/png"; }
+            else if (sBase64.startsWith("/9j")) { sMimeType = "image/jpeg"; }
+            else if (sBase64.startsWith("JVBER")) { sMimeType = "application/pdf"; }
 
-                if (iRemainder) {
-                    sNormalized += "=".repeat(4 - iRemainder);
-                }
+            const sFileName = oDoc?.FileName || oDoc?.DocumentName || "Document Preview";
 
-                return sNormalized;
-            };
+            this._sPreviewFileName = sFileName;
+            this._sPreviewMimeType = sMimeType;
+            this._sPreviewBase64 = sBase64;
 
-            const autoDecodeBase64 = function (sValue) {
-                if (!sValue) {
-                    return "";
-                }
-
-                let sDecoded = String(sValue).replace(/\s/g, "");
-                // If already starts with known signatures, assume it's single-encoded
-                if (sDecoded.startsWith("iVB") || sDecoded.startsWith("/9j") || sDecoded.startsWith("JVBER")) {
-                    return sDecoded;
-                }
-                // Otherwise try decode once
-                try {
-                    return atob(sDecoded);
-                } catch (e) {
-                    // If decode fails, return original (might be already decoded)
-                    return sDecoded;
-                }
-            };
-
-            const sBase64 = normalizeBase64(autoDecodeBase64(sRawBase64));
-            let sMimeType = String(oDoc.FileType || oDoc.MimeType || "").toLowerCase().trim();
-
-            if (!sMimeType && aDataUrlParts) {
-                sMimeType = String(aDataUrlParts[1] || "").toLowerCase();
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
             }
 
-            if (sMimeType === "pdf" || sMimeType === ".pdf") {
-                sMimeType = "application/pdf";
-            } else if (sMimeType === "jpg" || sMimeType === "jpeg" || sMimeType === ".jpg" || sMimeType === ".jpeg") {
-                sMimeType = "image/jpeg";
-            } else if (sMimeType === "png" || sMimeType === ".png") {
-                sMimeType = "image/png";
-            } else if (sMimeType === "webp" || sMimeType === ".webp") {
-                sMimeType = "image/webp";
+            if (!this._oPreviewDialog) {
+                this._oPreviewDialog = await sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.DocumentPreview",
+                    controller: this,
+                });
+                this.getView().addDependent(this._oPreviewDialog);
             }
 
-            if (!sMimeType) {
-                if (sBase64.startsWith("iVB")) {
-                    sMimeType = "image/png";
-                } else if (sBase64.startsWith("/9j")) {
-                    sMimeType = "image/jpeg";
-                } else if (sBase64.startsWith("UklGR")) {
-                    sMimeType = "image/webp";
-                } else if (sBase64.startsWith("JVBER")) {
-                    sMimeType = "application/pdf";
-                }
-            }
-           
+            const oDialog = sap.ui.core.Fragment.byId(this.getView().getId(), "previewDialog");
+            const oImage = sap.ui.core.Fragment.byId(this.getView().getId(), "previewImage");
+            const oHtml = sap.ui.core.Fragment.byId(this.getView().getId(), "previewHtml");
 
-            if (sMimeType.indexOf("image/") === 0) {
+            oDialog.setTitle(sFileName);
+            oImage.setVisible(false);
+            oHtml.setVisible(false);
+            oHtml.setContent("");
+
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            if (sMimeType.startsWith("image/")) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
-                const oImage = new sap.m.Image({
-                    densityAware: false,
-                    width: "100%",
-                    height: "100%"
-                });
-
-                const oDialog = new sap.m.Dialog({
-                    title: oDoc.FileName || oDoc.DocumentName || "Document Preview",
-                    contentWidth: "50%",
-                    contentHeight: "60%",
-                    draggable: true,
-                    resizable: true,
-                    horizontalScrolling: false,
-                    verticalScrolling: false,
-                    contentPadding: "0rem",
-                    content: [new sap.m.FlexBox({
-                        width: "100%",
-                        height: "100%",
-                        justifyContent: "Center",
-                        alignItems: "Center",
-                        items: [oImage]
-                    })],
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: function () {
-                            oDialog.close();
-                        }
-                    }).addStyleClass("myUnifiedBtn"),
-                    afterClose: function () {
-                        oDialog.destroy();
+                const oImg = new Image();
+                oImg.onload = function () {
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+                    const imgRatio = oImg.width / oImg.height;
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
                     }
-                });
-
-                this.getView().addDependent(oDialog);
-                oImage.setSrc(sImageSrc);
-                oDialog.open();
+                    oDialog.setContentWidth(finalWidth + "px");
+                    oDialog.setContentHeight(finalHeight + "px");
+                    oImage.setSrc(sImageSrc);
+                    oImage.setVisible(true);
+                    oDialog.open();
+                }.bind(this);
+                oImg.src = sImageSrc;
                 return;
             }
 
             if (sMimeType === "application/pdf") {
-                let sByteChars = "";
+                const byteCharacters = atob(sBase64);
+                const byteArrays = [];
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+                const blob = new Blob(byteArrays, { type: "application/pdf" });
+                const sBlobUrl = URL.createObjectURL(blob);
+                this._pdfBlobUrl = sBlobUrl;
 
-                try {
-                    sByteChars = atob(sBase64);
-                } catch (oError) {
-                    console.error("[Booking] PDF preview decode failed", {
-                        error: oError?.message || oError,
-                        fileName: oDoc?.FileName || oDoc?.DocumentName || "",
-                        fileType: oDoc?.FileType || oDoc?.MimeType || "",
-                        rawSourcePrefix: sRawSource.slice(0, 200),
-                        rawSourceLength: sRawSource.length,
-                        normalizedBase64Prefix: sBase64.slice(0, 200),
-                        normalizedBase64Length: sBase64.length
-                    });
-                    MessageToast.show("PDF content is not valid base64. Check console.");
+                if (sap.ui.Device.system.phone) {
+                    const oLink = document.createElement("a");
+                    oLink.href = sBlobUrl;
+                    oLink.download = sFileName;
+                    document.body.appendChild(oLink);
+                    oLink.click();
+                    document.body.removeChild(oLink);
+                    MessageToast.show("File downloaded successfully");
                     return;
                 }
 
-                const aByteArrays = [];
-
-                for (let iOffset = 0; iOffset < sByteChars.length; iOffset += 512) {
-                    const sSlice = sByteChars.slice(iOffset, iOffset + 512);
-                    const aByteNumbers = new Array(sSlice.length);
-
-                    for (let i = 0; i < sSlice.length; i++) {
-                        aByteNumbers[i] = sSlice.charCodeAt(i);
-                    }
-
-                    aByteArrays.push(new Uint8Array(aByteNumbers));
-                }
-
-                const oBlob = new Blob(aByteArrays, { type: "application/pdf" });
-
-                if (this._customerPreviewUrl) {
-                    URL.revokeObjectURL(this._customerPreviewUrl);
-                }
-
-                this._customerPreviewUrl = URL.createObjectURL(oBlob);
-
-               if (this._customerPreviewUrl) {
-    URL.revokeObjectURL(this._customerPreviewUrl);
-}
-
-this._customerPreviewUrl = URL.createObjectURL(oBlob);
-
-// Open PDF in new browser tab
-window.open(this._customerPreviewUrl, "_blank");
-
-return;
+                const sIframe = '<div style="width:100%;height:100%;overflow:hidden;display:flex;"><iframe src="' + sBlobUrl + '#toolbar=0&navpanes=0&scrollbar=0" style="border:none;width:100%;height:100%;display:block;overflow:hidden;" scrolling="auto" allowfullscreen></iframe></div>';
+                oDialog.setContentWidth("85%");
+                oDialog.setContentHeight("90%");
+                oHtml.setContent(sIframe);
+                oHtml.setVisible(true);
+                oDialog.open();
                 return;
             }
 
-            MessageToast.show("Unsupported document format.");
+            this.onDownloadPreview();
+            MessageToast.show("Preview not supported.");
+        },
+
+        onDownloadPreview: function () {
+            if (!this._sPreviewBase64) {
+                MessageToast.show("No file available for download.");
+                return;
+            }
+            let sDownloadUrl = "";
+            if (this._sPreviewMimeType === "application/pdf") {
+                sDownloadUrl = this._pdfBlobUrl;
+            } else if (this._sPreviewMimeType.startsWith("image/")) {
+                sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
+            }
+            if (!sDownloadUrl) {
+                MessageToast.show("Download not supported.");
+                return;
+            }
+            const oLink = document.createElement("a");
+            oLink.href = sDownloadUrl;
+            oLink.download = this._sPreviewFileName || "Document";
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onClosePreview: function () {
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+            this._sPreviewBase64 = null;
+            this._sPreviewMimeType = null;
+            this._sPreviewFileName = null;
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
         },
 
         onNewMemberNameChange: function (oEvent) {
@@ -5293,7 +5130,9 @@ return;
                 const aCoupons = oResponse?.data || [];
 
                 oMatchedCoupon = aCoupons.find(function (oCoupon) {
-                    return String(oCoupon.CouponCode || "").trim() === sEnteredCode;
+                    var sCouponBranchCode = String(oCoupon.BranchCode || "").trim();
+                    return String(oCoupon.CouponCode || "").trim() === sEnteredCode
+                        && sCouponBranchCode === sBranchCode;
                 });
 
                 if (!oMatchedCoupon) {

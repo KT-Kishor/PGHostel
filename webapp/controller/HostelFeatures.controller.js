@@ -13,6 +13,7 @@ sap.ui.define([
 
         _onRouteMatched: async function () {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
                 if (!LoginFUnction) return;
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
@@ -38,7 +39,7 @@ sap.ui.define([
 
                 this.onClearAndSearch("HF_id_FilterbarEmployee");
                 await this._loadBranchCode()
-                await this.Onsearch("true");
+                await this.Onsearch("true", true);
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -73,7 +74,6 @@ sap.ui.define([
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
             }
-            this.getBusyDialog()
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
                 const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
@@ -303,7 +303,7 @@ sap.ui.define([
             });
         },
 
- Onsearch: function (flag) {
+ Onsearch: function(flag, bBusyAlreadyOpen) {
 
     const oExistingModel = this.getOwnerComponent()
         .getModel("LoginModel")
@@ -376,7 +376,9 @@ sap.ui.define([
         filters.BranchCode = sBranchCode;
     }
 
-    this.getBusyDialog();
+     if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
 
     return this.ajaxReadWithJQuery(
         "HM_HostelFeatures",

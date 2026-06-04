@@ -70,9 +70,7 @@ sap.ui.define([
                 this.getView().setModel(oBranchModel, "BranchModel");
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
-            } finally {
-                this.closeBusyDialog()
-            }
+            } finally {}
         },
 
         prepareMasterFilterData: function (aData) {

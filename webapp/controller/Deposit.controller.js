@@ -74,6 +74,7 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("ManageSecurityDeposit");
             if (!LoginFUnction) return;
 
@@ -115,7 +116,6 @@ sap.ui.define([
         },
 
         _loadBranchCode: async function () {
-            this.getBusyDialog()
 
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];

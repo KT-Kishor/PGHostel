@@ -20,6 +20,28 @@
     text-decoration: underline !important;
 }
 
+.documentLink:active,
+.documentLink:focus {
+    color: #008b96 !important;
+    background-color: transparent !important;
+    outline: none !important;
+}
+
+.documentLink:active:hover,
+.documentLink:focus:hover {
+    color: #006470 !important;
+}
+
+.memberSelectDialog .sapMLnk:active,
+.memberSelectDialog .sapMLnk:focus,
+.newMemberDialog .sapMLnk:active,
+.newMemberDialog .sapMLnk:focus {
+    color: #008b96 !important;
+    background-color: transparent !important;
+    outline: none !important;
+    text-decoration: none !important;
+}
+
 /* Bold Select Items Styling */
 .boldSelectItems .sapMSelectListItemBase {
     font-family: 'Poppins', sans-serif !important;
@@ -2607,7 +2629,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     text-align: center;
     width: 100%;
     font-size: 14px;
-    color:#000 !important;
   }
 
   .footer-social {

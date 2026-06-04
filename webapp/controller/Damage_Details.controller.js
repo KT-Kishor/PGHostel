@@ -19,9 +19,9 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             try {
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageFacility");
                 if (!LoginFUnction) return;
-                this.getBusyDialog();
 
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 var sDamageID = decodeURIComponent(oEvent.getParameter("arguments").sPath);

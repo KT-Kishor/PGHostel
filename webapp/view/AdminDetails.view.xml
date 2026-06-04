@@ -136,7 +136,7 @@
                                 selectedKey="{Bookingmodel>/BedTypeName}"
                                 selectionChange="onRoomBedChange"
                                 valueStateText="{i18n>selectRoomType}"
-                                width="40%"
+                                width="55%"
                             >
                                 <core:ListItem
                                     key="{Availablebeds>BedTypeName}"
@@ -181,7 +181,7 @@
                                 showClearIcon="true"
                                 placeholder="{i18n>selectPaymentMethod}"
                                 selectedKey="{Bookingmodel>/UnitText}"
-                                width="40%"
+                                width="55%"
                                 selectionChange="onRoomDurationChange"
                                 visible="{VisibleModel>/visible}"
                                 valueStateText="{i18n>selectPaymentType}"
@@ -228,7 +228,7 @@
                                 valueFormat="dd/MM/yyyy"
                                 change="onBookingEditDateChange"
                                 valueStateText="{i18n>selectStartDate}"
-                                width="40%"
+                                width="55%"
                             />
 
                             <!-- Month/Year Select -->
@@ -238,7 +238,7 @@
                             />
                             <Select
                                 id="idMonthYearSelect"
-                                width="40%"
+                                width="55%"
                                 visible="{= ${Bookingmodel>/UnitText} !== 'daily'}"
                                 selectedKey="{Bookingmodel>/DurationUnit}"
                                 change=".onBookMonthYearChange"
@@ -311,7 +311,7 @@
                                 displayFormat="dd/MM/yyyy"
                                 valueFormat="dd/MM/yyyy"
                                 change="onBookingEditDateChange"
-                                width="40%"
+                                width="55%"
                             />
 
                             <Label
@@ -405,7 +405,7 @@
                                 id="AD_id_CustomerName"
                                 valueStateText="{i18n>enterCustomerName}"
                                 liveChange="onChange"
-                                width="40%"
+                                width="41.5%"
                                 placeholder="Enter full name"
                             />
 
@@ -423,7 +423,7 @@
                                 text="{i18n>MVDDOB}"
                             />
                             <DatePicker
-                                width="50%"
+                                width="55%"
                                 value="{Bookingmodel>/DateOfBirth}"
                                 displayFormat="dd/MM/yyyy"
                                 valueFormat="dd/MM/yyyy"
@@ -447,7 +447,7 @@
                                 text="{i18n>MVgender}"
                             />
                             <ComboBox
-                                width="50%"
+                                width="55%"
                                 selectedKey="{Bookingmodel>/Gender}"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_gender"
@@ -483,7 +483,7 @@
                                 text="{i18n>email}"
                             />
                             <Input
-                                width="50%"
+                                width="55%"
                                 value="{Bookingmodel>/CustomerEmail}"
                                 type="Email"
                                 maxLength="50"
@@ -508,7 +508,7 @@
                                 text="{i18n>MVDcountry}"
                             />
                             <ComboBox
-                                width="50%"
+                                width="55%"
                                 id="CC_id_Country"
                                 change="MC_onChangeCountry"
                                 placeholder="{i18n>enterCountry}"
@@ -539,7 +539,7 @@
                                 text="{i18n>MVDstate}"
                             />
                             <ComboBox
-                                width="50%"
+                                width="55%"
                                 id="CC_id_State"
                                 change="CC_onChangeState"
                                 placeholder="{i18n>enterState}"
@@ -567,7 +567,7 @@
                                 text="{i18n>city}"
                             />
                             <ComboBox
-                                width="50%"
+                                width="55%"
                                 id="CC_id_City"
                                 change="onChange"
                                 valueStateText="{i18n>cityValueText}"
@@ -605,7 +605,7 @@
                                 maxLength="150"
                                 visible="{VisibleModel>/visible}"
                                 id="Ad_id_Address"
-                                width="50%"
+                                width="55%"
                                 rows="3"
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
@@ -662,7 +662,7 @@
                                 liveChange="onmobileChange"
                                 valueStateText="{i18n>enterContactNumber}"
                                 visible="{VisibleModel>/visible}"
-                                width="40%"
+                                width="41.5%"
                             />
                         </f:content>
                     </f:SimpleForm>

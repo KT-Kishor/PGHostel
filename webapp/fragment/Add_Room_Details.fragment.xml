@@ -190,7 +190,7 @@
                     change="onACtypeChange"
                     placeholder="{i18n>selectCurrency}"
                     showSecondaryValues="true"
-                    editable="{RoomModel>/editable}"
+                    editable="false"
                 >
                     <core:ListItem
                         key="{CountryModel>currency}"
