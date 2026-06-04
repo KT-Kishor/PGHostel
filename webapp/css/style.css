@@ -634,7 +634,7 @@
 }
 
 .vrIdentityRow {
-    min-width: 31rem;
+    min-width: 20rem;
     max-width: 32rem;
     align-items: flex-start !important;
 }
