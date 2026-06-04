@@ -411,6 +411,7 @@
                                                 </VBox>
                                                 <VBox
                                                     visible="{FooterModel>/showRoomsFooter}"
+                                                    class="footer-shell"
                                                 >
                                                     <core:Fragment
                                                         id="roomsFooter"
@@ -446,7 +447,7 @@
                             />
                         </pages>
                     </NavContainer>
-                    <VBox visible="{FooterModel>/showGlobalFooter}">
+                    <VBox visible="{FooterModel>/showGlobalFooter}" class="footer-shell">
                         <core:Fragment
                             id="globalFooter"
                             fragmentName="sap.ui.com.project1.fragment.Footer"

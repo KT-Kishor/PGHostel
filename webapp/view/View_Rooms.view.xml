@@ -8,6 +8,7 @@
 	xmlns:fb="sap.ui.comp.filterbar"
 	displayBlock="true"
 	height="100%"
+	class="hideVendorReg"
 	busyIndicatorDelay="0">
 	<VBox height="100%">
 		<Page
@@ -377,7 +378,7 @@
 				</uxap:ObjectPageLayout>
 			</content>
 		</Page>
-		<VBox visible="{FooterModel>/showGlobalFooter}">
+		<VBox visible="{FooterModel>/showGlobalFooter}" class="footer-shell">
 			<core:Fragment
 				fragmentName="sap.ui.com.project1.fragment.Footer"
 				type="XML" />
