@@ -90,13 +90,12 @@ sap.ui.define([
             this._isDateRangeCleared = false;
 
             // single visible data load
-            await this.onCouponSearch();
+            await this.onCouponSearch("true", true);
         },
 
-        onCouponSearch: async function() {
+        onCouponSearch: async function(flag, bBusyAlreadyOpen) {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             try {
-                this.getBusyDialog()
                 const oFilterBar = this.byId("couponFilterBar");
                 const aItems = oFilterBar.getFilterGroupItems();
                 const oRange = this.byId("fEndRange");
@@ -197,6 +196,9 @@ sap.ui.define([
                     }
                 });
 
+                 if (!bBusyAlreadyOpen) {
+                    this.getBusyDialog();
+                }
                 // ================= API Call =================
                 const oResult = await this.ajaxReadWithJQuery("HM_Coupon", params);
 

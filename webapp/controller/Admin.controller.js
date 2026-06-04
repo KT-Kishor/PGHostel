@@ -51,7 +51,7 @@ sap.ui.define([
 
 
             await this._loadBranchCode()
-            await this.Cust_read(true)
+            await this.Cust_read(true, true);
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 var model = new JSONModel(oFCIAerData);
@@ -160,9 +160,11 @@ sap.ui.define([
             }
         },
 
-        Cust_read: function (flag) {
+        Cust_read: function (flag, bBusyAlreadyOpen) {
             try {
-                this.getBusyDialog()
+                 if (!bBusyAlreadyOpen) {
+                    this.getBusyDialog();
+                }
 
                 const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
 

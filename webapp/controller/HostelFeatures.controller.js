@@ -39,7 +39,7 @@ sap.ui.define([
 
                 this.onClearAndSearch("HF_id_FilterbarEmployee");
                 await this._loadBranchCode()
-                await this.Onsearch("true");
+                await this.Onsearch("true", true);
             } catch (err) {
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
@@ -303,7 +303,7 @@ sap.ui.define([
             });
         },
 
- Onsearch: function (flag) {
+ Onsearch: function(flag, bBusyAlreadyOpen) {
 
     const oExistingModel = this.getOwnerComponent()
         .getModel("LoginModel")
@@ -376,7 +376,9 @@ sap.ui.define([
         filters.BranchCode = sBranchCode;
     }
 
-    this.getBusyDialog();
+     if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
 
     return this.ajaxReadWithJQuery(
         "HM_HostelFeatures",

@@ -25,7 +25,7 @@ sap.ui.define([
                 }
                 await this._loadBranchCode();
                 
-                await this.Onsearch("true");
+                await this.Onsearch("true", true);
                 
             } catch (err) {
                 this.closeBusyDialog()
@@ -83,7 +83,7 @@ sap.ui.define([
             }
         },
 
-        Onsearch: function (flag) {
+         Onsearch: function(flag, bBusyAlreadyOpen) {
             var oView = this.getView();
             // Read FilterBar inputs
             var sUserID = oView.byId("MV_id_UserID").getSelectedKey() ||
@@ -111,7 +111,9 @@ sap.ui.define([
             if (sStatus) {
                 filters.Status = sStatus;
             }
-            if(flag === true) this.getBusyDialog()
+             if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
             return this.ajaxReadWithJQuery("HM_StaffContact", filters).then((oData) => {
 
                 const response = Array.isArray(oData.data) ? oData.data : [oData.data];

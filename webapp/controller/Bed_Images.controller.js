@@ -15,7 +15,7 @@ sap.ui.define([
 
         _onRouteMatched: async function(oEvent) {
             try {
-                 this.getBusyDialog();
+                this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageBedType");
                 if (!LoginFUnction) return;
                 var Layout = this.byId("ObjectPageLayout");

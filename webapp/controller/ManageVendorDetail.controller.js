@@ -267,6 +267,13 @@ sap.ui.define([
                 // === EDIT MODE ===
                 oEditableModel.setProperty("/Edit", true);
                 oEditableModel.setProperty("/Save", true);
+
+                const oSalutation = this.getView().byId("MV_id_adminSalutation")
+                if (oSalutation) {
+                    this.onAdminChangeSalutation({
+                        getSource: () => oSalutation
+                    });
+                }
             } else {
                 // === SAVE MODE ===
                 const bSaved = await this.BT_onsavebuttonpress(); // ✅ await result

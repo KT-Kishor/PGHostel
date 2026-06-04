@@ -39,7 +39,7 @@ sap.ui.define([
             this.onClearAndSearch("RD_id_FilterbarEmployee");
             await this.BedTypedetails()
             await this._loadBranchCode()
-            await this.Onsearch()
+            await this.Onsearch("true", true);
             this.Customerdata()
             //  this.closeBusyDialog()
         },
@@ -899,7 +899,8 @@ sap.ui.define([
             );
         },
 
-        Onsearch: function (flag) {
+        Onsearch: function (flag, bBusyAlreadyOpen) {
+            
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -946,7 +947,9 @@ sap.ui.define([
                 filters.BranchCode = sBranchCode.split('-')[0];
             }
 
-            this.getBusyDialog()
+             if (!bBusyAlreadyOpen) {
+                this.getBusyDialog();
+            }
             this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
 
                 const roomData = Array.isArray(oData.commentData) ? oData.commentData : [];
