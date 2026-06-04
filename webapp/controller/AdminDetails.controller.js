@@ -5107,7 +5107,7 @@ sap.ui.define([
                 var aCoupon = Array.isArray(oData.data) ? oData.data : [oData.data];
 
                 var oCoupon = aCoupon.find(c =>
-                    String(c.CouponCode || "").trim() === sEnteredCode
+                    String(c.CouponCode || "").trim() === sEnteredCode && c.BranchCode === oCustomerData.BranchCode
                 );
 
                 // Coupon exists

@@ -9,7 +9,7 @@
         id="abnewMemberDialog"
         class="newMemberDialog"
         contentWidth="32rem"
-        stretch="{= ${device>/system/phone} }"
+        stretch="false"
         draggable="true"
         resizable="false"
         showHeader="true"
