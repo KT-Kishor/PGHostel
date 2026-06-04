@@ -2296,8 +2296,10 @@ sap.ui.define([
                 oTable = this.byId("Id_ProfileaTable1");
             } else if (sSelectedTab === "Complaints") {
                 oTable = this.byId("Id_CompmaintTable");
-            } else if (sSelectedTab === "Damage") {
+} else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
+            } else if (sSelectedTab === "Members") {
+                oTable = this.byId("Id_MemberTable");
             }
             if (!oTable) {
                 return;
@@ -2372,6 +2374,31 @@ sap.ui.define([
                                 new sap.ui.model.Filter("Quantity", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Cost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                            ],
+                            and: false
+                        })
+                    ];
+                } else if (sSelectedTab === "Members") {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter("Salutation", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Name", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Relation", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter({
+                                    path: "DateOfBirth",
+                                    test: function(sDateOfBirth) {
+                                        if (!sDateOfBirth) return false;
+                                        const today = new Date();
+                                        const birth = new Date(sDateOfBirth);
+                                        let age = today.getFullYear() - birth.getFullYear();
+                                        const m = today.getMonth() - birth.getMonth();
+                                        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                                            age--;
+                                        }
+                                        return age.toString().includes(sQuery);
+                                    }
+                                })
                             ],
                             and: false
                         })
