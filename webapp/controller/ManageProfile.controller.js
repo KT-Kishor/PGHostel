@@ -2257,7 +2257,6 @@ sap.ui.define([
         },
 
         onlogout: function() {
-
             // clear profile model and cached user info so next login starts fresh
             // remove any profile data both locally and globally
             this.getView().getModel("profileData").setData({});
@@ -2268,17 +2267,17 @@ sap.ui.define([
                 oUserModel.setData({});
             }
 
-            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-            if (oLoginModel) {
-                oLoginModel.setProperty("/EmployeeID", "");
-                // oLoginModel.setProperty("/UserID", "");
-                oLoginModel.setProperty("/UserName", "");
-                oLoginModel.setProperty("/EmployeeName", "");
-                oLoginModel.setProperty("/EmailID", "");
-            }
+            // const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            // if (oLoginModel) {
+            //     oLoginModel.setProperty("/EmployeeID", "");
+            //     // oLoginModel.setProperty("/UserID", "");
+            //     oLoginModel.setProperty("/UserName", "");
+            //     oLoginModel.setProperty("/EmployeeName", "");
+            //     oLoginModel.setProperty("/EmailID", "");
+            // }
 
-            // Reset Login State
-            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
+            // // Reset Login State
+            // this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
             // this.getOwnerComponent().getRouter().navTo("RouteHostel");
             this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));

@@ -7558,296 +7558,159 @@ sap.ui.define([
 
             currentY += 55;
 
-            // ========== GUEST & STAY DETAILS ==========
-
-            checkNewPage(80);
-
-            // Guest Members from AllMembers only
-            const members = data.AllMembers || [];
-
-            // ---------- GUEST DETAILS ----------
-
+            // ========== GUEST DETAILS ==========
+            checkNewPage(40);
             let guestBoxY = currentY;
-
+            const members = data.AllMembers || [];
             let guestBody = [];
 
             members.forEach((member, index) => {
-
                 guestBody.push([
                     (index + 1).toString(),
                     `${member.Salutation || ""} ${member.Name || "-"}`,
                     member.Gender || "-",
-                    Formatter.formatAgeFromDOBOrAge(
-                        member.DateOfBirth || member.Age
-                    ) || "-",
+                    Formatter.formatAgeFromDOBOrAge(member.DateOfBirth || member.Age) || "-",
                     member.Relation || "-"
                 ]);
             });
 
-
-            // Background Box
-            doc.setFillColor(
-                LIGHT_GRAY[0],
-                LIGHT_GRAY[1],
-                LIGHT_GRAY[2]
-            );
-
-            doc.setDrawColor(
-                BORDER_LIGHT[0],
-                BORDER_LIGHT[1],
-                BORDER_LIGHT[2]
-            );
-
-            // temporary height
-            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
-
-
-            // Title
+            // Title Block
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("GUEST DETAILS", 24, guestBoxY + 8);
 
-            doc.setTextColor(
-                PRIMARY_COLOR[0],
-                PRIMARY_COLOR[1],
-                PRIMARY_COLOR[2]
-            );
-
-            doc.text("GUEST DETAILS", 24, guestBoxY + 10);
-
-
-            // Guest Table
+            // Guest Table Render
             doc.autoTable({
                 startY: guestBoxY + 12,
-                margin: {
-                    left: 20,
-                    right: 15
-                },
-                head: [[
-                    "Sl.No",
-                    "Guest Name",
-                    "Gender",
-                    "Age",
-                    "Relation"
-                ]],
+                margin: { left: 20, right: 15 },
+                head: [["Sl.No", "Guest Name", "Gender", "Age", "Relation"]],
                 body: guestBody,
                 theme: "grid",
                 styles: {
                     font: "helvetica",
                     fontSize: 8,
-                    cellPadding: 2,
+                    cellPadding: 3,
                     lineColor: [220, 220, 220],
                     lineWidth: 0.1
                 },
                 headStyles: {
                     fillColor: PRIMARY_COLOR,
-                    textColor: [255,255,255],
+                    textColor: [255, 255, 255],
                     fontStyle: "bold",
                     halign: "center"
                 },
                 columnStyles: {
-                    0: {
-                        cellWidth: 15,
-                        halign: "center"
-                    },
-
-                    1: {
-                        cellWidth: 58   // 48 + 10
-                    },
-
-                    2: {
-                        cellWidth: 26,  // 22 + 4
-                        halign: "center"
-                    },
-
-                    3: {
-                        cellWidth: 38,  // 32 + 6
-                        halign: "center"
-                    },
-
-                    4: {
-                        cellWidth: 30,  // 28 + 2
-                        halign: "center"
-                    }
+                    0: { cellWidth: 15, halign: "center" },
+                    1: { cellWidth: 'auto' }, // Let name scale dynamically
+                    2: { cellWidth: 25, halign: "center" },
+                    3: { cellWidth: 25, halign: "center" },
+                    4: { cellWidth: 30, halign: "center" }
                 }
             });
 
-
-            // Calculate exact box height
-            let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 12;
-
-
-            // Draw final border
-            doc.setDrawColor(
-                BORDER_LIGHT[0],
-                BORDER_LIGHT[1],
-                BORDER_LIGHT[2]
-            );
-
+            // Dynamic surrounding frame calculation
+            let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 6;
+        
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
             doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-
-            // Accent Bar — full height
-            doc.setFillColor(
-                ACCENT_COLOR[0],
-                ACCENT_COLOR[1],
-                ACCENT_COLOR[2]
-            );
-
+            
+            // Colored Side Bar Accent
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
+            currentY = doc.lastAutoTable.finalY + 12;
 
-            // Small clean spacing before Stay Details
-            currentY = guestBoxY + guestBoxHeight + 12;
+            // ========== STAY DETAILS ==========
+            checkNewPage(65);
 
-            // ---------- STAY DETAILS ----------
-            checkNewPage(60);
+            const stayCardHeight = 55; 
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.roundedRect(15, currentY, 180, stayCardHeight, 4, 4, "FD");
 
-            doc.setFillColor(
-                LIGHT_GRAY[0],
-                LIGHT_GRAY[1],
-                LIGHT_GRAY[2]
-            );
-
-            doc.setDrawColor(
-                BORDER_LIGHT[0],
-                BORDER_LIGHT[1],
-                BORDER_LIGHT[2]
-            );
-
-            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
-
-
-            // Accent Bar
-            doc.setFillColor(
-                ACCENT_COLOR[0],
-                ACCENT_COLOR[1],
-                ACCENT_COLOR[2]
-            );
-
-            doc.rect(15, currentY, 5, 55, "F");
+            // Accent Bar matching exact frame height
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(15, currentY, 5, stayCardHeight, "F");
 
             // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("STAY DETAILS", 24, currentY + 10);
 
-            doc.setTextColor(
-                PRIMARY_COLOR[0],
-                PRIMARY_COLOR[1],
-                PRIMARY_COLOR[2]
-            );
-
-            doc.text(
-                "STAY DETAILS",
-                24,
-                currentY + 10
-            );
-
-
-            // LEFT SIDE
+            // Left Columns
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
             doc.setTextColor(90, 90, 90);
-
             doc.text("Check-in Date", 24, currentY + 22);
             doc.text("Check-out Date", 24, currentY + 34);
             doc.text("Duration", 24, currentY + 46);
 
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
+            doc.text(`${data.StartDate || "-"}`, 60, currentY + 22);
+            doc.text(`${data.EndDate || "-"}`, 60, currentY + 34);
+            doc.text(`${data.Duration || "0"} ${data.DurationUnit || ""}`, 60, currentY + 46);
 
-            doc.text(`${data.StartDate || "-"}`, 60,
-                currentY + 22
-            );
-
-            doc.text(`${data.EndDate || "-"}`, 60,
-                currentY + 34
-            );
-
-            doc.text(`${data.Duration || "0"} ${data.DurationUnit || ""}`, 60,
-                currentY + 46
-            );
-
-            // RIGHT SIDE
+            // Right Columns
             doc.setFont("helvetica", "bold");
             doc.setTextColor(90, 90, 90);
-
             doc.text("Room Type", 115, currentY + 22);
             doc.text("No Of Guests", 115, currentY + 34);
             doc.text("Booking Status", 115, currentY + 46);
 
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
+            doc.text(`${data.BedType || "-"}`, 150, currentY + 22);
+            doc.text(`${data.NoOfPersons || "-"}`, 150, currentY + 34);
+            doc.text(`${data.Status || "-"}`, 150, currentY + 46);
 
-            doc.text(`${data.BedType || "-"}`, 150,
-                currentY + 22
-            );
-
-            doc.text(`${data.NoOfPersons || "-"}`, 150,
-                currentY + 34
-            );
-
-            doc.text(`${data.Status || "-"}`, 150,
-                currentY + 46
-            );
-
-
-            // Final position
-            currentY += 70;
+            currentY += stayCardHeight + 12;
 
             // ========== FACILITY DETAILS TABLE ==========
-
             const facilities = data.AllSelectedFacilities || [];
 
             if (facilities.length > 0) {
+                // Check if there is enough space just for the TITLE (approx 20mm)
+                // If not, move to the next page BEFORE drawing the title
+                if (currentY + 20 > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                }
 
-                checkNewPage(20);
-
+                // Draw Title
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(14);
                 doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
                 doc.text("FACILITY DETAILS", 15, currentY);
 
+                // Draw Accent Line under title
                 doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
                 doc.setLineWidth(0.8);
                 doc.line(15, currentY + 3, 70, currentY + 3);
 
+                // Adjust currentY to be exactly where the table should start
                 currentY += 8;
 
-                let tableBody = [];
-                if (facilities.length > 0) {
-                    tableBody = facilities.map((item, index) => [
-                        (index + 1).toString(),
-                        item.FacilityName || "-",
-                        item.StartDate || "-",
-                        item.EndDate || "-",
-                        `${Formatter.fromatNumber(parseFloat(item.Price) || 0)}`,
-                        item.UnitText || "-",
-                        `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
-                    ]);
-                } else {
-                    tableBody = [
-                        ["", "No facilities selected", "", "", "", "", ""]
-                    ];
-                }
+                let tableBody = facilities.map((item, index) => [
+                    (index + 1).toString(),
+                    item.FacilityName || "-",
+                    item.StartDate || "-",
+                    item.EndDate || "-",
+                    `${Formatter.fromatNumber(parseFloat(item.Price) || 0)}`,
+                    item.UnitText || "-",
+                    `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
+                ]);
 
-                // Calculate if table will fit on current page
-                const estimatedTableHeight = (tableBody.length + 1) * 8; // Approximate height in mm
-                if (currentY + estimatedTableHeight > 260) {
-                    doc.addPage();
-                    currentY = 20;
-                }
-
+                // Let autoTable handle its own page breaks naturally
                 doc.autoTable({
                     startY: currentY,
-                    margin: {
-                        left: 15,
-                        right: 10
-                    },
-                    head: [
-                        ['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
-                    ],
+                    margin: { left: 15, right: 15 },
+                    head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
                     body: tableBody,
                     theme: 'striped',
-
                     styles: {
                         font: "helvetica",
                         fontSize: 9,
@@ -7856,92 +7719,56 @@ sap.ui.define([
                         lineWidth: 0.1,
                         valign: "middle"
                     },
-
                     headStyles: {
                         fillColor: PRIMARY_COLOR,
                         textColor: [255, 255, 255],
                         fontStyle: "bold",
-                        fontSize: 10,
+                        fontSize: 9,      // Dropped slightly for safety
+                        cellPadding: 1.5,  // Snugger padding prevents forced layout wrapping
                         halign: "center"
                     },
-
                     alternateRowStyles: {
                         fillColor: [250, 250, 250]
                     },
-
                     columnStyles: {
-                        0: {
-                            cellWidth: 12,
-                            halign: "center"
-                        },
-                        1: {
-                            cellWidth: 48,
-                            halign: "left"
-                        },
-                        2: {
-                            cellWidth: 24,
-                            halign: "center"
-                        },
-                        3: {
-                            cellWidth: 24,
-                            halign: "center"
-                        },
-                        4: {
-                            cellWidth: 24,
-                            halign: "right"
-                        },
-                        5: {
-                            cellWidth: 18,
-                            halign: "center"
-                        },
-                        6: {
-                            cellWidth: 28,
-                            halign: "right"
-                        }
+                        0: { cellWidth: 12, halign: "center" },
+                        1: { cellWidth: 'auto', halign: "left" }, // Dynamic width prevents overflow
+                        2: { cellWidth: 24, halign: "center" },
+                        3: { cellWidth: 24, halign: "center" },
+                        4: { cellWidth: 24, halign: "right" },
+                        5: { cellWidth: 16, halign: "center" },
+                        6: { cellWidth: 24, halign: "right" }
                     }
                 });
 
-                currentY = doc.lastAutoTable.finalY + 15;
-
+                // CRITICAL: Update currentY based on where autoTable actually finished 
+                currentY = doc.lastAutoTable.finalY + 12;
             }
-
-            // Force page break before payment summary if there's not enough space
-            if (currentY > 200) {
+            
+            // ========== PAYMENT SUMMARY ==========
+            const summaryHeight = 85;
+            if (currentY + summaryHeight > 280) {
                 doc.addPage();
                 currentY = 20;
-            } else {
-                // Check if payment summary (85mm height) will fit
-                if (currentY + 95 > 280) {
-                    doc.addPage();
-                    currentY = 20;
-                }
             }
 
-            // ========== PAYMENT SUMMARY ==========
-            // Calculate totals
             const roomRent = parseFloat(data.RentPrice) || 0;
             const facilityTotal = parseFloat(data.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(data.Discount) || 0;
-            const deposit = parseFloat(data.Deposit) || 0;
             let grandTotal = subTotal - discount;
 
-            // Payment Summary Card
-            const summaryHeight = 90;
             doc.setFillColor(255, 255, 255);
-            doc.setDrawColor(245, 186, 66);
-            //  doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.setLineWidth(0.3);
             doc.roundedRect(15, currentY, 180, summaryHeight, 4, 4, "FD");
 
-            // Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(13);
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
             doc.text("PAYMENT SUMMARY", 20, currentY + 10);
 
-            // Content area
-            let summaryY = currentY + 22;
+            let summaryY = currentY + 20;
             const leftX = 20;
             const rightX = 185;
 
@@ -7955,51 +7782,41 @@ sap.ui.define([
                     doc.setFontSize(10);
                     doc.setTextColor(80, 80, 80);
                 }
-
                 doc.text(label, leftX, summaryY);
-                doc.text(value, rightX, summaryY, {
-                    align: "right"
-                });
-                summaryY += 7;
+                doc.text(value, rightX, summaryY, { align: "right" });
+                summaryY += 6.5;
             };
 
-            // Add all payment lines
             addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
             addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
-            // GST Section
             if (data.GSTType === "CGST/SGST") {
                 const cgst = parseFloat(data.CGST) || 0;
                 const sgst = parseFloat(data.SGST) || 0;
                 addLine(`CGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
                 addLine(`SGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
                 grandTotal += cgst + sgst;
-            }
-
-            if (data.GSTType === "IGST") {
+            } else if (data.GSTType === "IGST") {
                 const igst = parseFloat(data.IGST) || 0;
                 addLine(`IGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
                 grandTotal += igst;
             }
 
-            addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-            // addLine("Deposit", ` ${Formatter.fromatNumber(deposit)}`);
+            addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
 
-            // Add separator line
-            summaryY += 2;
+            summaryY += 1;
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
 
-            // Grand Total
             summaryY += 2;
             addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
             currentY += summaryHeight + 10;
 
             // ========== AMOUNT IN WORDS ==========
-            if (currentY + 30 > 280) {
+            if (currentY + 25 > 280) {
                 doc.addPage();
                 currentY = 20;
             }
@@ -8023,14 +7840,14 @@ sap.ui.define([
             currentY += 28;
 
             // ========== IMPORTANT INFORMATION ==========
-            if (currentY + 50 > 280) {
+            if (currentY + 45 > 280) {
                 doc.addPage();
                 currentY = 20;
             }
 
             doc.setFillColor(255, 250, 240);
             doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
+            doc.roundedRect(15, currentY, 180, 38, 4, 4, "FD");
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
@@ -8042,19 +7859,19 @@ sap.ui.define([
             doc.setTextColor(100, 100, 100);
 
             const infoItems = [
-                "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
+                "• Valid government ID required at check-in (Passport, Driver's License, etc.)",
                 "• GST invoice available at the property upon request",
                 `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
                 "• Early check-in/late check-out subject to availability"
             ];
 
-            let infoY = currentY + 16;
+            let infoY = currentY + 15;
             infoItems.forEach((item) => {
                 doc.text(item, 20, infoY);
                 infoY += 5;
             });
 
-            currentY += 48;
+            currentY += 45;
 
             // ========== FOOTER ==========
             if (currentY + 15 > 280) {
@@ -8072,11 +7889,8 @@ sap.ui.define([
             doc.text("Thank you for choosing us! We look forward to hosting you.", 15, currentY + 5);
 
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.text("Premium Hospitality Experience", 195, currentY + 5, {
-                align: "right"
-            });
+            doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
 
-            //    (IMPORTANT CHANGE)
             return doc.output("datauristring").split(",")[1];
         },
 
