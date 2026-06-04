@@ -10,6 +10,7 @@
         class="authDialog"
         contentWidth="28rem"
         contentHeight="auto"
+        afterClose="onDialogClose"
     >
         <customHeader>
             <Bar class="barheader">

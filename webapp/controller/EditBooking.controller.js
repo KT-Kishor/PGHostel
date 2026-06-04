@@ -146,6 +146,7 @@ sap.ui.define([
             if (!bLoggedIn) {
 
                 this._bPendingEditRoute = true;
+                this.getView().addStyleClass("blur-background");
 
                 MessageBox.information(
                     "Please log in to manage booking.",
@@ -4185,6 +4186,7 @@ sap.ui.define([
                     this ._onEditRouteMatched();
                 }
 
+                this.getView().removeStyleClass("blur-background");
                 if (oFragment) {
                     oFragment.close();
                 }
@@ -4865,6 +4867,7 @@ sap.ui.define([
             }
 
             // ✅ Close Dialog
+            this.getView().removeStyleClass("blur-background");
             if (this._oLoginAlertDialog) {
                 this._oLoginAlertDialog.close();
             }
