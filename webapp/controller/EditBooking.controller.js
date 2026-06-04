@@ -534,16 +534,12 @@ sap.ui.define([
          * Use DocumentUrl if available, otherwise fallback to parent
          */
         _previewDocument: function (oDoc) {
-            // Check if document has a URL property (backend should provide direct URLs)
             if (oDoc && (oDoc.DocumentUrl || oDoc.FileUrl || oDoc.Url)) {
                 const sUrl = oDoc.DocumentUrl || oDoc.FileUrl || oDoc.Url;
-                // Open URL in new tab or display in dialog
                 window.open(sUrl, '_blank');
                 return;
             }
-
-            // Fallback to parent implementation (which uses Base64 decoding)
-            BookingController.prototype._previewDocument.call(this, oDoc);
+            this._openDocumentPreview(oDoc);
         },
 
         _simplifyFacilityItemsForEdit: function (aRawFacilities, oBooking) {

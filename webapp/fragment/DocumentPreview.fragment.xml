@@ -34,13 +34,13 @@
             <Button
                 text="Download"
                 type="Transparent"
-                press=".onDownloadPreview"/>
+                press=".onDownloadPreview" class="myUnifiedBtn"/>
         </beginButton>
 
         <endButton>
             <Button
                 text="Close"
-                press=".onClosePreview"/>
+                press=".onClosePreview" class="myUnifiedBtn"/>
         </endButton>
 
     </Dialog>
