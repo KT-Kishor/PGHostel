@@ -1630,7 +1630,7 @@ sap.ui.define([
         onNewMemberSalutationChange: function(oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = this.byId("idSelect");
+            const oGender = sap.ui.getCore().byId("MemberGenderCombo");
             // Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
