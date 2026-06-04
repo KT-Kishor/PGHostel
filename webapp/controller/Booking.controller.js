@@ -6280,7 +6280,7 @@
             }
         },
 
-        onGeneratePDF: async function (data) {
+         onGeneratePDF: async function (data) {
             const booking = data.Booking?.[0] || {};
             const facilities = data.FacilityItems || [];
             const oHostelModel =
@@ -6384,10 +6384,7 @@
             // ================= GUEST & STAY =================
             checkNewPage(45); // Adjusted down to keep layouts together gracefully if needed
 
-            var Memberdata =
-            this.getView()
-                .getModel("BookingView")
-                .getProperty("/FamilyMembers") || [];
+            var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
             let guestBody = [];
             let guestBoxY = currentY;
 
@@ -6402,9 +6399,8 @@
             });
 
             // Guest Box Background
-            doc.setFillColor(...LIGHT_GRAY);
             doc.setDrawColor(...BORDER_LIGHT);
-            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
+            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "S");
 
             // Accent bar
             doc.setFillColor(...ACCENT_COLOR);

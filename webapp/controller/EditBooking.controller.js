@@ -3631,7 +3631,7 @@ sap.ui.define([
             // based on editModeEnabled property
         },
 
-       onGenerateeditedPDF: async function(data) {
+       onGeneratePDF: async function(data) {
                 const booking = data.Booking?.[0] || {};
                 const facilities = data.FacilityItems || [];
                 const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
@@ -3742,9 +3742,8 @@ sap.ui.define([
                 });
 
                 // Outer Background Box for title context
-                doc.setFillColor(...LIGHT_GRAY);
                 doc.setDrawColor(...BORDER_LIGHT);
-                doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "FD");
+                doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "S");
 
                 doc.setFillColor(...ACCENT_COLOR);
                 doc.rect(15, guestBoxY, 5, 25, "F");
