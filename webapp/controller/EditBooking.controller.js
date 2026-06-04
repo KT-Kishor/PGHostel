@@ -3282,7 +3282,7 @@ sap.ui.define([
                 var oMatchedCoupon = aCoupons.find(function (oCoupon) {
                     var sCouponBranchCode = String(oCoupon.BranchCode || "").trim();
                     return String(oCoupon.CouponCode || "").toUpperCase() === sCouponCode.toUpperCase()
-                        && (!sCouponBranchCode || sCouponBranchCode === sBranchCode);
+                        && sCouponBranchCode === sBranchCode;
                 }) || null;
 
                 oHostelModel.setProperty("/AppliedCouponData", oMatchedCoupon);

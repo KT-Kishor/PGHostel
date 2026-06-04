@@ -101,7 +101,7 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
-            this.getBusyDialog();
+            // this.getBusyDialog();
             await this.commonLoginFunction("Booking");
 
             // if (performance.navigation && performance.navigation.type === 1) {
@@ -5294,7 +5294,9 @@ return;
                 const aCoupons = oResponse?.data || [];
 
                 oMatchedCoupon = aCoupons.find(function (oCoupon) {
-                    return String(oCoupon.CouponCode || "").trim() === sEnteredCode;
+                    var sCouponBranchCode = String(oCoupon.BranchCode || "").trim();
+                    return String(oCoupon.CouponCode || "").trim() === sEnteredCode
+                        && sCouponBranchCode === sBranchCode;
                 });
 
                 if (!oMatchedCoupon) {
