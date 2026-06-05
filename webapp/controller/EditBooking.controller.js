@@ -137,8 +137,10 @@ sap.ui.define([
             this._processEditArgs = oArgs;
             this.BookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
 
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const bLoggedIn = oUIModel.getData().isLoggedIn;
+            // const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            // const bLoggedIn = oUIModel.getData().isLoggedIn;
+
+            var bLoggedIn = localStorage.getItem("isLoggedIn")
 
             // LOGIN CHECK
             if (!bLoggedIn) {
@@ -4152,28 +4154,25 @@ sap.ui.define([
                 const isValid = await this._verifyOTPWithBackend(sOTP);
 
                 if (!isValid) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+                    sap.m.MessageToast.show("Incorrect OTP");
                     return;
                 }
 
-                const result = await this.ajaxReadWithJQuery("HM_Customer", {
+                const result = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
                     BookingID: this.BookingID,
                     OTP: sOTP
                 });
 
-                const customer = result.Customers[0]
+                const customer = result.data[0]
 
                 this.CustomerEmail = sEmail;
 
                 localStorage.setItem("isLoggedIn", "true");
+                this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
                 localStorage.setItem("_aB39X",btoa(customer.UserID));
                 localStorage.setItem("_mN72P",btoa(customer.CustomerName));
                 localStorage.setItem("_x9A1p",customer._x9A1p);
                 localStorage.setItem("_k7LmQ",customer._k7LmQ);
-
-                // Update UIModel also
-                const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                oUIModel.setProperty("/isLoggedIn", true);
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
@@ -4404,13 +4403,11 @@ sap.ui.define([
         _verifyOTPWithBackend: async function(otp) {
             this.getBusyDialog()
             try {
-                const oPayload = {
+                // Call the BaseController Generic Read method
+                  const oResp = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
                     BookingID: this.BookingID,
                     OTP: otp.trim()
-                };
-
-                // Call the BaseController Generic Read method
-                const oResp = await this.ajaxReadWithJQuery("HM_Customer", oPayload);
+                });
 
                 return oResp?.success === true;
 

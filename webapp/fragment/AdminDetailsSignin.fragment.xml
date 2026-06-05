@@ -84,6 +84,7 @@
                     text="{LoginViewModel>/otpButtonText}"
                     class="myUnifiedBtn"
                     press="onPressOTP"
+                    enabled="{LoginViewModel>/canResendOTP}"
                 />
             </HBox>
 
