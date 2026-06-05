@@ -2826,12 +2826,22 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     padding-bottom: 3rem !important;
   }
 
-  .contact-map-box {
-    margin-bottom: 1rem !important;
+  .contact-flex {
+    flex-direction: column;
+    padding-bottom: 1.6rem !important;
   }
 
-  .contact-flex {
-    padding-bottom: 1.6rem !important;
+  .contact-address-box,
+  .contact-map-box {
+    width: 100% !important;
+  }
+
+  .contact-address-box {
+    margin-bottom: 1rem;
+  }
+
+  .contact-map-box {
+    margin-bottom: 1rem !important;
   }
 }
 
