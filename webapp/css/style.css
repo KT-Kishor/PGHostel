@@ -634,7 +634,7 @@
 }
 
 .vrIdentityRow {
-    min-width: 31rem;
+    min-width: 20rem;
     max-width: 32rem;
     align-items: flex-start !important;
 }
@@ -1959,8 +1959,8 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
 .amountText {
   text-align: end;
-  min-width: 100px;
-  margin-right: 20px;
+ min-width: 70px;
+  margin-right: 5px;
 }
 
 .boldBlackText {
@@ -2613,11 +2613,55 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   transform: scale(1.3);
 }
 
+.sapMVBox.sapMVBoxNone.sapUiVlt {
+  height: 100% !important;
+}
+
+.mainScrollWrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden;
+  gap: 0 !important;
+}
+
+#pageContainer {
+  flex: 1 1 auto !important;
+  width: 100%;
+  overflow-y: auto;
+  margin-bottom: 0 !important;
+}
+
+.sapMOTB.footer-shell {
+  position: relative;
+  width: calc(100% - 1.2rem) !important;
+  margin: 0 0.6rem 0 0.6rem !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #00b7c7, #007984) !important;
+  height: auto !important;
+  min-height: 2.75rem !important;
+  border: none !important;
+  border-radius: 0.6rem 0.6rem 0 0 !important;
+  overflow: hidden;
+}
+
+.footer-inner {
+  height: 100% !important;
+  padding: 5px 11px !important;
+}
+
+.footer-shell.sapMOTB {
+  min-height: 2.75rem !important;
+  height: auto !important;
+}
+
 /* Responsive Footer */
 @media (max-width: 768px) {
-  .footer-shell {
-    width: calc(100% - 1.2rem) !important;
-    margin: 0 0.6rem 0 0.6rem !important;
+  .footer-shell,
+  .sapMOTB.footer-shell {
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 1rem 1rem 0 0 !important;
   }
 
   .footer-inner {
@@ -2660,48 +2704,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   .contact-address-box {
     margin-bottom: 1rem;
   }
-}
-
-.sapMVBox.sapMVBoxNone.sapUiVlt {
-  height: 100% !important;
-}
-
-.mainScrollWrapper {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100% !important;
-  overflow: hidden;
-  gap: 0 !important;
-}
-
-#pageContainer {
-  flex: 1 1 auto !important;
-  width: 100%;
-  overflow-y: auto;
-  margin-bottom: 0 !important;
-}
-
-.footer-shell {
-  position: relative;
-  width: calc(100% - 1.2rem) !important;
-  margin: 0 0.6rem 0 0.6rem !important;
-  flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #00b7c7, #007984) !important;
-  height: auto !important;
-  min-height: 2.75rem !important;
-  border: none !important;
-  border-radius: 0.6rem 0.6rem 0 0 !important;
-  overflow: hidden;
-}
-
-.footer-inner {
-  height: 100% !important;
-  padding: 5px 11px !important;
-}
-
-.footer-shell.sapMOTB {
-  min-height: 2.75rem !important;
-  height: auto !important;
 }
 
 .sapMScrollCont {
@@ -6875,4 +6877,8 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
     .familyMembersTable .sapMListTbl {
         min-width: 250px;
     }
+}
+
+.hideVendorReg .fa-admin-btn {
+  display: none !important;
 }

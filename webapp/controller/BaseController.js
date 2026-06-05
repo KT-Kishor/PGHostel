@@ -545,7 +545,7 @@ sap.ui.define([
           }
         }
 
-        resolve(finalResult.trim());
+        resolve(`${finalResult.trim()} Only`);
       });
     },
 

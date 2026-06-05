@@ -939,6 +939,7 @@
                     class="myUnifiedBtn"
                     press="onSubmitPress"
                     enabled="{BookingView>/editModeEnabled}"
+                    visible="{= !${BookingView>/isAdminUpdatedYes} }"
                 />
                   </contentRight>
 			</Bar>
