@@ -318,6 +318,11 @@ sap.ui.define([
                         InvNo: this.decodedPath
                     })
                     await this.totalAmountCalculation();
+
+                     var oFooterBar = this.byId("invoicefooter");
+                    if (oFooterBar) {
+                        oFooterBar.invalidate();
+                    }
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
