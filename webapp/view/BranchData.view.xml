@@ -104,7 +104,7 @@
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="{i18n>MSbranchlogo}" tooltip="{i18n>MSbranchlogo}"/>
+						<Text text="{i18n>logoname}" tooltip="{i18n>logoname}"/>
 					</Column>
 					<Column demandPopin="true" width="10rem">
 						<Text text="{i18n>MSbranchCode}" tooltip="{i18n>MSbranchCode}"/>
@@ -143,7 +143,7 @@
                             tooltip="{i18n>logo}"
                         /></Column> -->
 					<Column demandPopin="true">
-						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
+						<Text text="{i18n>homeimage}" tooltip="{i18n>homeimage}"/>
 					</Column>
 				</columns>
 				<items>

@@ -1,6 +1,6 @@
 [
     { "key": "SINGLE", "text": "Per Room" },
     { "key": "QTY", "text": "Per Quantity" },
-    { "key": "PERSON", "text": "Per person" },
-    { "key": "PERSON_QTY", "text": "Per package" }
+    { "key": "PERSON", "text": "Per Person" },
+    { "key": "PERSON_QTY", "text": "Per Package" }
 ]
