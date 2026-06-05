@@ -2826,12 +2826,22 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     padding-bottom: 3rem !important;
   }
 
-  .contact-map-box {
-    margin-bottom: 1rem !important;
+  .contact-flex {
+    flex-direction: column;
+    padding-bottom: 1.6rem !important;
   }
 
-  .contact-flex {
-    padding-bottom: 1.6rem !important;
+  .contact-address-box,
+  .contact-map-box {
+    width: 100% !important;
+  }
+
+  .contact-address-box {
+    margin-bottom: 1rem;
+  }
+
+  .contact-map-box {
+    margin-bottom: 1rem !important;
   }
 }
 
@@ -6802,9 +6812,34 @@ html, body {
     }
 }
 
-/* .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
   width:250px !important;
-} */
+}
+
+.sapMPopover.facilityPopover .sapMPopoverCont,
+.sapMPopover.facilityPopover .sapMIBar.sapMFooter-CTX{
+  width:auto !important;
+}
+
+.sapMPopover.facilityPopoverQty .sapMPopoverCont,
+.sapMPopover.facilityPopoverQty .sapMIBar.sapMFooter-CTX{
+  width:18rem !important;
+}
+
+.sapMPopover.facilityPopoverPerson .sapMPopoverCont,
+.sapMPopover.facilityPopoverPerson .sapMIBar.sapMFooter-CTX{
+  width:20rem !important;
+}
+
+.sapMPopover.facilityPopoverPersonQty .sapMPopoverCont,
+.sapMPopover.facilityPopoverPersonQty .sapMIBar.sapMFooter-CTX{
+  width:26rem !important;
+}
+
+.sapMPopover.facilityPopoverSingle .sapMPopoverCont,
+.sapMPopover.facilityPopoverSingle .sapMIBar.sapMFooter-CTX{
+  width:18rem !important;
+} 
 .adminPreviewImage {
     width: 100% !important;
     height: 100% !important;
