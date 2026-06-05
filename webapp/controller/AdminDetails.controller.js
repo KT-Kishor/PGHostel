@@ -159,6 +159,11 @@ sap.ui.define([
                 minDate: new Date(2000, 0, 1)
             }), "LoginMode");
 
+            var oFooterBar = this.byId("idFooterBar");
+            if (oFooterBar) {
+                oFooterBar.invalidate();
+            }
+
         },
 
         valuestate: function () {
