@@ -9,7 +9,6 @@
     <Page
         showHeader="true"
         enableScrolling="false"
-        class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
     >
         <headerContent>
             <core:Fragment
