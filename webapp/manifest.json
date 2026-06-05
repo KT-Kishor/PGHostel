@@ -429,7 +429,7 @@
         },
            {
           "name": "RouteUploadDocs",
-          "pattern": "UploadDocs/{EncodedCustomerID}",
+          "pattern": "UploadDocs/{EncodedCustomerID}/{MemberID}",
           "target": [
             "targetUploadDocs"
           ]
