@@ -889,6 +889,63 @@ sap.ui.define([
             onCloseNewMemberDialog: function () {
                 this.MM_Dialog.close();
             },
+              onDownloadPreview: function () {
+
+            if (!this._sPreviewBase64) {
+
+                MessageToast.show(
+                    "No file available for download."
+                );
+
+                return;
+            }
+
+            let sDownloadUrl = "";
+
+            // PDF
+            if (this._sPreviewMimeType === "application/pdf") {
+                sDownloadUrl = this._pdfBlobUrl;
+            }
+
+            // IMAGE
+            else if (this._sPreviewMimeType.startsWith("image/")) {
+                sDownloadUrl = `data:${this._sPreviewMimeType};base64,${this._sPreviewBase64}`;
+            }
+
+            if (!sDownloadUrl) {
+                MessageToast.show("Download not supported.");
+                return;
+            }
+
+            const oLink = document.createElement("a");
+            oLink.href = sDownloadUrl;
+            oLink.download = this._sPreviewFileName || "Document";
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onClosePreview: function () {
+
+            if (this._pdfBlobUrl) {
+
+                URL.revokeObjectURL(
+                    this._pdfBlobUrl
+                );
+
+                this._pdfBlobUrl = null;
+            }
+
+            this._sPreviewBase64 = null;
+            this._sPreviewMimeType = null;
+            this._sPreviewFileName = null;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+        },
             onNewMemberSalutationChange: function (oEvent) {
                 const oSalutation = oEvent.getSource();
                 const sKey = oSalutation.getSelectedKey();

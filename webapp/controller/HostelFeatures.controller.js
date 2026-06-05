@@ -188,6 +188,8 @@ sap.ui.define([
         HF_onsavebuttonpress: async function () {
             const oView = this.getView();
             const oHostelFeaturesModel = oView.getModel("HostelFeaturesModel");
+            const oDescControl = sap.ui.getCore().byId(this.getView().createId("HFF_id_Description"));
+            oHostelFeaturesModel.setProperty("/Description", oDescControl.getValue().trim());
             const Payload = oHostelFeaturesModel.getData();
             const oUpload = oView.getModel("UploadModel").getData();
             const aHostelData = oView.getModel("HostelFeatures").getData();
@@ -226,16 +228,19 @@ sap.ui.define([
                 }
             }
 
+            const sDescription = sap.ui.getCore().byId(oView.createId("HFF_id_Description")).getValue();
+            Payload.Description = sDescription;
+
             this.getBusyDialog()
             try {
                 const oPayload = {
                     BranchCode: Payload.BranchCode,
                     FacilityName: Payload.FacilityName,
+                    Type: Payload.Type,
                     Description: Payload.Description,
                     Photo1: oUpload.Photo1,
                     Photo1Type: oUpload.Photo1Type,
                     Photo1Name: oUpload.Photo1Name,
-                    Type: Payload.Type
                 };
 
                 if (Payload.ID) {
