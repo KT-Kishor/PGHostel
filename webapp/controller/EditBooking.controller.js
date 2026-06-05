@@ -3867,15 +3867,15 @@ sap.ui.define([
 
                     currentY += 8;
 
-                    // Fix: Typo bugs resolved below (`Formatter.formatNumber`)
+                    // Fix: Typo bugs resolved below (`Formatter.fromatNumber`)
                     let tableBody = facilities.map((item, index) => [
                         (index + 1).toString(),
                         item.FacilityName || "-",
                         `${Formatter.formatDate(item.StartDate) || "-"}`,
                         `${Formatter.formatDate(item.EndDate) || "-"}`,
-                        `${Formatter.formatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
+                        `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
                         item.UnitText || "-",
-                        `${Formatter.formatNumber(parseFloat(item.FacilitiPrice) || 0)}`
+                        `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
                     ]);
 
                     const estimatedTableHeight = (tableBody.length + 1) * 8; 
@@ -3963,23 +3963,23 @@ sap.ui.define([
                 };
 
                 // Fix: Formatter typos handled here as well
-                addLine("Room Rent", ` ${Formatter.formatNumber(roomRent)}`);
-                addLine("Facilities", ` ${Formatter.formatNumber(facilityTotal)}`);
-                addLine("Sub Total", ` ${Formatter.formatNumber(subTotal)}`);
+                addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+                addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
                 if (booking.GSTType === "CGST/SGST") {
                     const cgst = parseFloat(oHostelModel.CGST) || 0;
                     const sgst = parseFloat(oHostelModel.SGST) || 0;
-                    addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.formatNumber(cgst)}`);
-                    addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.formatNumber(sgst)}`);
+                    addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
+                    addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
                 }
 
                 if (booking.GSTType === "IGST") {
                     const igst = parseFloat(oHostelModel.IGST) || 0;
-                    addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.formatNumber(igst)}`);
+                    addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
                 }
 
-                addLine("Discount", `- ${Formatter.formatNumber(discount)}`);
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
 
                 summaryY += 2;
                 doc.setDrawColor(200, 200, 200);
@@ -3987,7 +3987,7 @@ sap.ui.define([
                 doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
 
                 summaryY += 2;
-                addLine("GRAND TOTAL", ` ${Formatter.formatNumber(grandTotal)}`, true);
+                addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
                 currentY += summaryHeight + 10;
 
