@@ -10,7 +10,6 @@ sap.ui.define([
     return BookingController.extend("sap.ui.com.project1.controller.EditBooking", {
         Formatter: Formatter,
         onInit: function () {
-            this.getBusyDialog();
             this._bEditMode = true;
 
             this.getOwnerComponent()
@@ -145,7 +144,6 @@ sap.ui.define([
 
             // LOGIN CHECK
             if (!bLoggedIn) {
-                this.closeBusyDialog();
                 this._bPendingEditRoute = true;
                 this.getView().addStyleClass("blur-background");
 

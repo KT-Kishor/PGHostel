@@ -364,7 +364,7 @@ sap.ui.define([
                     return;
                 }
 
-                if (!Payload.MinimumPrice || Number(Payload.MinimumPrice) === 0) {
+                if (!Payload.MinimumPrice) {
                     MessageToast.show(this.i18nModel.getText("pleaseFillMinimumPrice"));
                     return;
                 }
