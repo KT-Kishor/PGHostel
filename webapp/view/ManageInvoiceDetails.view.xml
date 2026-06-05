@@ -851,8 +851,8 @@
 				</ObjectPageSection>
 			</sections>
 		</ObjectPageLayout>
-		<m:footer>
-			<m:Bar>
+		<m:footer >
+			<m:Bar id="invoicefooter">
 				<m:contentLeft>
 					<m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
 					<m:Link
@@ -924,7 +924,7 @@
                         class="sendMail myUnifiedBtn"
                     />
 					<!-- Multi Email -->
-					<m:Button
+					<!-- <m:Button
                         visible="{= ${visiablityPlay>/MultiEmail}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -937,7 +937,7 @@
                         tooltip="{i18n>sendInvoiceText}"
                         press="CID_onPressSendMultipalEmail"
                         class="myUnifiedBtn"
-                    />
+                    /> -->
 					<!-- Generate PDF -->
 					<m:MenuButton
                         visible="{= 

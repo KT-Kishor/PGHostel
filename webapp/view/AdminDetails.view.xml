@@ -10,7 +10,6 @@
 >
     <Page
         showHeader="true"
-        class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >
         <headerContent>

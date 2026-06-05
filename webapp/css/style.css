@@ -6882,3 +6882,28 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
 .hideVendorReg .fa-admin-btn {
   display: none !important;
 }
+.customPanelHeader .sapMPanelHdr {
+    background-color: #1bb2bf !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    white-space: normal !important;
+    height: auto !important;
+    min-height: 2rem; /* Ensures it looks good even on single line */
+    display: flex;
+    align-items: center;
+}
+
+/* 2. Target the inner text element to stop truncation and force wrapping */
+.customPanelHeader .sapMPanelHdr > * {
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+    word-break: break-word !important;
+    word-wrap: break-word !important;
+    display: inline-block;
+    width: 100%;
+}
+/* 1. Fix the container so it can grow vertically */

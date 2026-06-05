@@ -8,157 +8,19 @@
     displayBlock="true"
 >
     <Page
-        title="Upload Documents"
-        showHeader="true"
-        enableScrolling="false"
-        class="sapUiNoContentPadding"
-        navButtonPress="BI_onButtonPress"
-        showNavButton="true"
-    >
-        <content>
-            <VBox
-                width="100%"
-                alignItems="Center"
-                justifyContent="Center"
-                class="Tilehome centerFix"
-            >
-                <VBox
-                    width="80%"
-                    class=" formContainer sapUiContentPadding"
-                >
-                    <f:SimpleForm
-                        editable="true"
-                        layout="ResponsiveGridLayout"
-                        labelSpanXL="12"
-                        labelSpanL="12"
-                        labelSpanM="12"
-                        labelSpanS="12"
-                        columnsXL="1"
-                        columnsL="1"
-                        columnsM="1"
-                    >
-                        <f:content>
-                            <Label
-                                text="{i18n>iDProofType}"
-                                class="sapUiTinyMarginBottom"
-                                required="true"
-                            />
-                            <ComboBox
-                                id="id_ProofType"
-                                placeholder="{i18n>selectIDProof}"
-                                selectedKey="{Bookingmodel>/DocumentType}"
-                                visible="{VisibleModel>/visible}"
-                                valueStateText="{i18n>selectIDProof}"
-                                change="onidproofchange"
-                            >
-                                <core:ListItem
-                                    key="Aadhar Card"
-                                    text="Aadhar Card"
-                                />
-                                <core:ListItem
-                                    key="Pan Card"
-                                    text="Pan Card"
-                                />
-                                <core:ListItem
-                                    key="Driving License"
-                                    text="Driving License"
-                                />
-                                <core:ListItem
-                                    key="Passport"
-                                    text="Passport"
-                                />
-                            </ComboBox>
-                            <!-- <Label text="{i18n>uploadDocument}" required="true" />
-                <u:FileUploader id="UD_id_FileUploader1" fileType="jpg,jpeg,png,PDF" sameFilenameAllowed="false" change="onFacilityFileChange" visible="{VisibleModel>/visible}" class="myUnifiedBtn" width="100%" /> -->
-                            <Label text="{i18n>MVDattachments}" />
-                            <Table
-                                id="UD_id_AttachmentsTable"
-                                sticky="ColumnHeaders,HeaderToolbar"
-                                items="{UploaderData>/attachments}"
-                                inset="false"
-                                mode="Delete"
-                                delete="onAttachmentsTableDelete"
-                                popinLayout="Block"
-                                width="100%"
-                            >
-                                <headerToolbar>
-                                    <OverflowToolbar>
-                                        <ToolbarSpacer />
-                                        <u:FileUploader
-                                            id="UD_id_FileUploader"
-                                            fileType="pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt"
-                                            name="myFileUpload"
-                                            multiple="true"
-                                            uploadUrl=""
-                                            enabled="{=
-${Bookingmodel>/DocumentType} ? true : false}"
-                                            tooltip="{i18n>toolTipMsgSM}"
-                                            change="onFileSelected"
-                                            buttonOnly="true"
-                                            buttonText="Upload Attachment"
-                                            class="myUnifiedBtn"
-                                        />
-                                    </OverflowToolbar>
-                                </headerToolbar>
-                                <columns>
-                                    <Column
-                                        demandPopin="true"
-                                     
-                                    >
-                                        <Text text="{i18n>filename}" />
-                                    </Column>
-                                    <Column
-                                        minScreenWidth="Tablet"
-                                        demandPopin="true"
-                                   
-                                    >
-                                        <Text text="{i18n>FileType}" />
-                                    </Column>
-                                    <Column
-                                        demandPopin="true"
-                                        minScreenWidth="Tablet"
+    class="RoomsPage"
+>
+   <customHeader>
+        <Bar>
+            <contentLeft>
+                <HBox width="1rem" />
+            </contentLeft>
 
-                                    >
-                                        <Text text="Document Type" />
-                                    </Column>
-                                </columns>
-                                <items>
-                                    <ColumnListItem>
-                                        <cells>
-                                            <!-- <Text
-                                                text="{UploaderData>filename}"
-                                            /> -->
-                                             <Link
-                                                text="{UploaderData>filename}"
-                                                press="onFileLinkPress"
-                                            />
-                                            <Text
-                                                text="{path:'UploaderData>fileType'}"
-                                            />
-                                            <Text
-                                                text="{UploaderData>documentType}"
-                                            />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
-                            <Label text="" />
-
-                            <HBox
-                                justifyContent="End"
-                                width="100%"
-                                class="sapUiSmallMarginTop"
-                            >
-                                <Button
-                                    text="Submit"
-                                    class="myUnifiedBtn"
-                                    press="onpressSave"
-                                />
-                            </HBox>
-                        </f:content>
-                    </f:SimpleForm>
-                </VBox>
-            </VBox>
-        </content>
-    </Page>
+            <contentMiddle>
+                <Title text="Upload Documents" />
+            </contentMiddle>
+        </Bar>
+    </customHeader>
+    
+</Page>
 </mvc:View>

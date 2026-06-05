@@ -229,6 +229,9 @@ sap.ui.define([
             sap.ui.getCore().byId("Ck_id_editStartDate").setValue(data.StartDate)
             sap.ui.getCore().byId("Ck_id_editEndDate").setValue(data.EndDate)
 
+            this._FragmentDatePickersReadOnly(["Ck_id_editEndDate"]);
+
+
             this.CK_Dialog.open();
         },
 
@@ -1962,6 +1965,7 @@ sap.ui.define([
 
             if (data.CouponCode) {
                 this.Coupon();
+                this.getView().byId("couponInput").setShowValueHelp(true)
             } else {
                 this.getView().byId("couponInput").setShowValueHelp(false);
             }
@@ -5712,7 +5716,7 @@ sap.ui.define([
                 .setValue(CustData.GSTIN || "");
 
             sap.ui.getCore().byId("idGSTNumber")
-                .setValue(CustData.CustomerGSTIN || "");
+                .setValue(CustData.CustomerGSTIN || "").setValueState("None");
 
             sap.ui.getCore().byId("idGSTPercentage")
                 .setValue(CustData.GSTValue || "");
@@ -5725,10 +5729,10 @@ sap.ui.define([
                 );
 
             sap.ui.getCore().byId("idCompanyName")
-                .setValue(CustData.CustCompanyName || "");
+                .setValue(CustData.CustCompanyName || "").setValueState("None");
 
             sap.ui.getCore().byId("idCompanyAddress")
-                .setValue(CustData.CustCompanyAddress || "");
+                .setValue(CustData.CustCompanyAddress || "").setValueState("None");
 
             // Branch GST visibility
             var bHasBranchGST = !!(

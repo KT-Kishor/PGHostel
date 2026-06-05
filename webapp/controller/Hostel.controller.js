@@ -2855,6 +2855,11 @@ sap.ui.define([
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
+
+                var localdata=await this.Branch("")
+
+               this.getOwnerComponent().getModel("sBRModel").setData(localdata)
+
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
@@ -5528,6 +5533,12 @@ sap.ui.define([
         },
         onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
+        },
+        ondoc:function(){
+            this.getOwnerComponent().getRouter().navTo("RouteUploadDocs", {
+    EncodedCustomerID: "R09MS0s0XzIwMjYvMjctMDEx",
+    MemberID: "MDAwMDM="
+});
         }
     });
 });

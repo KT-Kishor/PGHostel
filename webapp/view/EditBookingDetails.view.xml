@@ -8,7 +8,6 @@
 >
     <Page
         showHeader="false"
-        class="sapUiResponsivePadding--footer sapUiResponsivePadding--floatingFooter"
         enableScrolling="true"
     >
         <ScrollContainer>
