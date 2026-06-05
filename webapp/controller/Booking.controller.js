@@ -1360,11 +1360,16 @@
 
             const oFacilityPopover = this._getFacilitySelectionDialog();
 
+            oFacilityPopover.removeStyleClass("facilityPopoverQty facilityPopoverPerson facilityPopoverPersonQty facilityPopoverSingle");
+
             var sPopoverWidth = "20rem";
+            var sModeClass = "facilityPopoverPerson";
             if (sSelectionMode === "QTY" || sSelectionMode === "SINGLE") {
                 sPopoverWidth = "18rem";
+                sModeClass = sSelectionMode === "SINGLE" ? "facilityPopoverSingle" : "facilityPopoverQty";
             } else if (sSelectionMode === "PERSON_QTY") {
                 sPopoverWidth = "26rem";
+                sModeClass = "facilityPopoverPersonQty";
             }
             if (sap.ui.Device.system.phone) {
                 sPopoverWidth = "95vw";
@@ -1372,6 +1377,7 @@
                 this._applyMobilePopoverDialogBehavior(oFacilityPopover, "mobileAutoHeightPopoverDialog");
             }
             oFacilityPopover.setContentWidth(sPopoverWidth);
+            oFacilityPopover.addStyleClass(sModeClass);
 
             oFacilityPopover.data("facilityRef", oFacility);
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
@@ -1758,7 +1764,7 @@
                         }).addStyleClass("myUnifiedBtn")
                     ]
                 })
-            });
+            }).addStyleClass("facilityPopover");
 
             if (sap.ui.Device.system.phone && oDialog._oControl && oDialog._oControl.setStretch) {
                 this._applyMobilePopoverDialogBehavior(oDialog, "mobileAutoHeightPopoverDialog");

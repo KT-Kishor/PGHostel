@@ -6812,9 +6812,34 @@ html, body {
     }
 }
 
-/* .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
   width:250px !important;
-} */
+}
+
+.sapMPopover.facilityPopover .sapMPopoverCont,
+.sapMPopover.facilityPopover .sapMIBar.sapMFooter-CTX{
+  width:auto !important;
+}
+
+.sapMPopover.facilityPopoverQty .sapMPopoverCont,
+.sapMPopover.facilityPopoverQty .sapMIBar.sapMFooter-CTX{
+  width:18rem !important;
+}
+
+.sapMPopover.facilityPopoverPerson .sapMPopoverCont,
+.sapMPopover.facilityPopoverPerson .sapMIBar.sapMFooter-CTX{
+  width:20rem !important;
+}
+
+.sapMPopover.facilityPopoverPersonQty .sapMPopoverCont,
+.sapMPopover.facilityPopoverPersonQty .sapMIBar.sapMFooter-CTX{
+  width:26rem !important;
+}
+
+.sapMPopover.facilityPopoverSingle .sapMPopoverCont,
+.sapMPopover.facilityPopoverSingle .sapMIBar.sapMFooter-CTX{
+  width:18rem !important;
+} 
 .adminPreviewImage {
     width: 100% !important;
     height: 100% !important;
