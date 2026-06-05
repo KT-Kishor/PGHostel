@@ -112,8 +112,6 @@ sap.ui.define([
             this._updateTableColumnWidths();
         },
         _onEditRouteMatched: async function (oEvent) {
-            var LoginFUnction = await this.commonLoginFunction("Booking");
-            if (!LoginFUnction) return;
             // if (performance.navigation && performance.navigation.type === 1) {
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             //     oRouter.navTo("RouteHostel", {}, true);
@@ -139,8 +137,10 @@ sap.ui.define([
             this._processEditArgs = oArgs;
             this.BookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
 
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const bLoggedIn = oUIModel.getData().isLoggedIn;
+            // const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            // const bLoggedIn = oUIModel.getData().isLoggedIn;
+
+            var bLoggedIn = localStorage.getItem("isLoggedIn")
 
             // LOGIN CHECK
             if (!bLoggedIn) {
@@ -184,6 +184,9 @@ sap.ui.define([
                 MessageBox.error("Booking ID is required for editing.");
                 return;
             }
+
+            var LoginFUnction = await this.commonLoginFunction("Booking");
+            if (!LoginFUnction) return;
 
             var oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
@@ -4151,23 +4154,25 @@ sap.ui.define([
                 const isValid = await this._verifyOTPWithBackend(sOTP);
 
                 if (!isValid) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("incorrectOTP"));
+                    sap.m.MessageToast.show("Incorrect OTP");
                     return;
                 }
 
-                // 2️⃣ Backend call
-                const payload = {
+                const result = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
                     BookingID: this.BookingID,
                     OTP: sOTP
-                };
+                });
 
-                await this.ajaxReadWithJQuery("HM_Customer", payload);
+                const customer = result.data[0]
 
                 this.CustomerEmail = sEmail;
 
-                // Update UIModel also
-                const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                oUIModel.setProperty("/isLoggedIn", true);
+                localStorage.setItem("isLoggedIn", "true");
+                this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
+                localStorage.setItem("_aB39X",btoa(customer.UserID));
+                localStorage.setItem("_mN72P",btoa(customer.CustomerName));
+                localStorage.setItem("_x9A1p",customer._x9A1p);
+                localStorage.setItem("_k7LmQ",customer._k7LmQ);
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
@@ -4287,30 +4292,28 @@ sap.ui.define([
             }
         },
 
-        _startOtpTimer: function() {
+        _startOtpTimer: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             this._clearOtpTimer();
 
             const START = 20;
 
-            vm.setProperty("/canResendOTP", false);
+            vm.setProperty("/canResendOTP", false); // Disable button
             vm.setProperty("/otpTimer", START);
-
-            // 🔥 UPDATE TEXT IMMEDIATELY (important)
             vm.setProperty("/otpButtonText", `Resend OTP (${START}s)`);
 
             this._otpInterval = setInterval(() => {
 
-                let remaining = vm.getProperty("/otpTimer");
-
-                remaining--;
+                let remaining = vm.getProperty("/otpTimer") - 1;
 
                 if (remaining <= 0) {
                     this._clearOtpTimer();
+
                     vm.setProperty("/otpTimer", 0);
                     vm.setProperty("/otpButtonText", "Resend OTP");
-                    vm.setProperty("/canResendOTP", true);
+                    vm.setProperty("/canResendOTP", true); // Enable button after 20 sec
+
                     return;
                 }
 
@@ -4400,13 +4403,11 @@ sap.ui.define([
         _verifyOTPWithBackend: async function(otp) {
             this.getBusyDialog()
             try {
-                const oPayload = {
+                // Call the BaseController Generic Read method
+                  const oResp = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
                     BookingID: this.BookingID,
                     OTP: otp.trim()
-                };
-
-                // Call the BaseController Generic Read method
-                const oResp = await this.ajaxReadWithJQuery("HM_Customer", oPayload);
+                });
 
                 return oResp?.success === true;
 

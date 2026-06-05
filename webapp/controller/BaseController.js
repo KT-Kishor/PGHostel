@@ -706,7 +706,7 @@ sap.ui.define([
       dialog.open();
     },
 
-    CommonLogoutFunction: function () {
+   LCommonLogoutFunction: function () {
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
       const oUIModel = this.getOwnerComponent().getModel("UIModel");
       oUIModel.setProperty("/isLoggedIn", false);

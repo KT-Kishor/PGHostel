@@ -1272,7 +1272,7 @@
         </footer> -->
 
         <footer>
-            <Bar>
+            <Bar id="idFooterBar">
                 <contentLeft>
                     <Image
                         src="../image/TransparentKTlogo.png"
