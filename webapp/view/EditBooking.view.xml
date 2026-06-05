@@ -188,6 +188,7 @@
                                 valueHelpOnly="true"
                                 valueHelpRequest="onMemberValueHelpRequest"
                                 enabled="{BookingView>/editModeEnabled}"
+                                visible="{BookingView>/editModeEnabled}"
                             />
                             <MessageStrip
                                 text="You can change any occupant as the primary occupant; they will be the contact person"

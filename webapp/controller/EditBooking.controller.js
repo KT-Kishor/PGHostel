@@ -3601,7 +3601,29 @@ sap.ui.define([
 
         // Override the nav back to always go to ManageProfile
         onNavBack: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+            var oBookingView = this.getView().getModel("BookingView");
+            var bEditModeEnabled = oBookingView && oBookingView.getProperty("/editModeEnabled");
+
+            if (bEditModeEnabled) {
+                MessageBox.warning(
+                    "Do you really want to go back? All saved changes will be lost",
+                    {
+                        actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
+                        emphasizedAction: MessageBox.Action.OK,
+                        styleClass: "myUnifiedBtn",
+                        onClose: function (sAction) {
+                            if (sAction !== MessageBox.Action.OK) {
+                                return;
+                            }
+                            this._resetBookingPageModels();
+                            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                        }.bind(this)
+                    }
+                );
+            } else {
+                this._resetBookingPageModels();
+                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+            }
         },
 
         _getDefaultFacilityData: function () {
