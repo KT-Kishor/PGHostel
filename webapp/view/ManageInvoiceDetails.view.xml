@@ -422,10 +422,11 @@
                                         items="{ManageInvoiceItemModel>/ManageInvoiceItem}"
                                         mode="MultiSelect">
 										<m:headerToolbar>
-											<m:Toolbar>
+											<m:OverflowToolbar>
 												<m:Title
-                                                    text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })"
+                                                    text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })" wrapping="true"
                                                 />
+												<m:ToolbarSeparator />
 												<m:ToolbarSpacer />
 												<m:Button
                                                     class="myUnifiedBtn"
@@ -453,100 +454,61 @@
 												<m:Button text="Refresh" press="onRefreshInvoice"
                                                 visible="{visiablityPlay>/refresh}" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
-											</m:Toolbar>
+											</m:OverflowToolbar>
 										</m:headerToolbar>
 										<m:columns>
-											<m:Column
-                                                width="3rem"
-                                                minScreenWidth="Tablet"
-                                            >
+											<m:Column width="3rem" demandPopin="true">
 												<m:Text
                                                     text="{i18n>itemID}"
                                                     tooltip="{i18n>itemID}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                width="12rem"
-                                            >
+											<m:Column demandPopin="true" minScreenWidth="Tablet" width="12rem">
 												<m:Text
                                                     text="{i18n>particulars}"
                                                     tooltip="{i18n>particulars}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                id="idSAC"
-                                                width="6rem"
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                            >
+											<m:Column id="idSAC"  width="6rem" demandPopin="true">
 												<m:Text
                                                     text="{i18n>SAC}"
                                                     tooltip="{i18n>SAC}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                id="idGSTCalculation"
-                                                width="6rem"
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                            >
+											<m:Column id="idGSTCalculation" width="6rem" demandPopin="true">
 												<m:Text
                                                     text="{i18n>GSTCalculation}"
                                                     tooltip="{i18n>GSTCalculation}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="7rem"
-                                            >
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
 												<m:Text
                                                     text="{i18n>startDate}"
                                                     tooltip="{i18n>startDate}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="7rem"
-                                            >
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
 												<m:Text
                                                     text="{i18n>endDate}"
                                                     tooltip="{i18n>endDate}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="7rem"
-                                            >
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
 												<m:Text
                                                     text="{i18n>grossPrice}"
                                                     tooltip="{i18n>grossPrice}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="7rem"
-                                            >
+											<m:Column minScreenWidth="Tablet" demandPopin="true"  width="7rem" >
 												<m:Text
                                                     text="{i18n>Unit}"
                                                     tooltip="{i18n>Unit}"
                                                 />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="8rem">
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="8rem">
 												<m:Text text="Duration" />
 											</m:Column>
-											<m:Column
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                                width="8rem"
-                                            >
+											<m:Column minScreenWidth="Tablet" demandPopin="true" width="8rem">
 												<m:Text
                                                     text="{i18n>total}"
                                                     tooltip="{i18n>total}"
