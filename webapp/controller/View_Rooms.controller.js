@@ -1079,40 +1079,52 @@ sap.ui.define([
                 return MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
             }
 
+            // ----------------------------- OTP MODE PRE-CHECKS -----------------------------
+            if (isOTP) {
+                const showOTPField = vm.getProperty("/showOTPField");
+                const isOtpEntered = vm.getProperty("/isOtpEntered");
+                const otpCtrl = $C("signInOTP");
+
+                if (!showOTPField) return MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
+                if (!isOtpEntered) {
+                    otpCtrl.setValueState("Error");
+                    otpCtrl.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
+                    return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                }
+                if (!/^\d{6}$/.test(sOTP)) {
+                    otpCtrl.setValueState("Error");
+                    otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                    return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                }
+                const expiryTs = vm.getProperty("/otpExpiryTs");
+                if (!expiryTs || Date.now() > expiryTs) return this._onOtpExpired();
+            } else {
+                // -------------------------- PASSWORD MODE PRE-CHECKS -------------------------
+                const passCtrl = $C("signinPassword");
+
+                if (!sPassword) {
+                    passCtrl.setValueState("Error");
+                    passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
+                    return MessageToast.show(this.i18nModel.getText("passwordRequired"));
+                }
+                if (!utils._LCvalidatePassword(passCtrl)) {
+                    passCtrl.setValueState("Error");
+                    passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
+                    return MessageToast.show(this.i18nModel.getText("enterValidPassword"));
+                }
+                passCtrl.setValueState("None");
+                if (!utils._LCvalidatePassword($C("signinPassword"))) return MessageToast.show(this.i18nModel.getText("entervalidpassword"));
+            }
+
             try {
                 this.getBusyDialog();
 
                 let payload, oResponse;
                 // ----------------------------- OTP MODE -----------------------------
                 if (isOTP) {
-                    const vm = this.oViewModel;
-                    const showOTPField = vm.getProperty("/showOTPField");
-                    const isOtpEntered = vm.getProperty("/isOtpEntered");
-
-                    const otpCtrl = $C("signInOTP");
-
-                    // 1️⃣ OTP has NOT been generated
-                    if (!showOTPField) return MessageToast.show(this.i18nModel.getText("pleaseGenerateOTPFirst"));
-                    // 2️⃣ OTP was generated but user has not typed anything
-                    if (!isOtpEntered) {
-                        otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
-                        return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                    }
-                    // 3️⃣ Validate OTP format strictly
-                    if (!/^\d{6}$/.test(sOTP)) {
-                        otpCtrl.setValueState("Error");
-                        otpCtrl.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
-                        return MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
-                    }
-                    const expiryTs = vm.getProperty("/otpExpiryTs");
-                    if (!expiryTs || Date.now() > expiryTs) return this._onOtpExpired();
-
-                    // 4️⃣ Backend verification
                     const isValid = await this._verifyOTPWithBackend(sOTP);
                     if (!isValid) return MessageToast.show(this.i18nModel.getText("incorrectOTP"));
 
-                    // 5️⃣ Construct payload and continue login
                     payload = {
                         EmailID: sEmail,
                         OTP: sOTP
@@ -1120,24 +1132,6 @@ sap.ui.define([
                     oResponse = await this.ajaxReadWithJQuery("HM_Login", payload);
                 } else {
                     // -------------------------- PASSWORD MODE -------------------------
-                    const passCtrl = $C("signinPassword");
-
-                    // Required
-                    if (!sPassword) {
-                        passCtrl.setValueState("Error");
-                        passCtrl.setValueStateText(this.i18nModel.getText("passwordRequired"));
-                        return MessageToast.show(this.i18nModel.getText("passwordRequired"));
-                    }
-                    // Format validation
-                    if (!utils._LCvalidatePassword(passCtrl)) {
-                        passCtrl.setValueState("Error");
-                        passCtrl.setValueStateText(this.i18nModel.getText("enterValidPassword"));
-                        return MessageToast.show(this.i18nModel.getText("enterValidPassword"));
-                    }
-                    // If valid
-                    passCtrl.setValueState("None");
-                    if (!utils._LCvalidatePassword($C("signinPassword"))) return MessageToast.show(this.i18nModel.getText("entervalidpassword"));
-
                     payload = {
                         EmailID: sEmail,
                         Password: btoa(sPassword)
