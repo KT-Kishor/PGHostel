@@ -2600,9 +2600,42 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 /* Social Icons */
-.footer-social {
+.footer-social,
+.footer-right-items {
   display: flex;
   gap: 10px;
+}
+
+.footer-scroll-text {
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.footer-marquee {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .footer-scroll-text {
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .footer-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee-scroll 8s linear infinite;
+  }
+
+  @keyframes marquee-scroll {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
 }
 
 .footer-social .social-icon {
@@ -2660,49 +2693,91 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   .footer-shell,
   .sapMOTB.footer-shell {
     width: 100% !important;
-    margin: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
     border-radius: 1rem 1rem 0 0 !important;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   .footer-inner {
-    flex-direction: column !important;
-    padding: 15px 10px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 5px 10px !important;
+    gap: 8px;
+    min-width: 0;
   }
 
-  .footer-text {
-    text-align: center;
-    width: 100%;
-    font-size: 14px;
+  .footer-scroll-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
   }
 
-  .footer-social {
-    justify-content: center !important;
-    width: 100%;
-    margin-top: 5px;
+  .footer-right-items {
+    flex-shrink: 0;
+    justify-content: flex-end !important;
   }
 
-  .footer-bar {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
+  .footer-marquee {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: translateX(0);
+    animation: none !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .footer-marquee {
+    width: max-content;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    animation: footer-marquee-left 8s linear infinite !important;
   }
 
-  .footer-column {
-    flex: 1 1 100%;
-    align-items: center;
+  @keyframes footer-marquee-left {
+    0% {
+      transform: translateX(0);
+    }
+
+    20% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+}
+
+/* Enable scrolling only on very small mobile widths where space is not enough.
+   Adjust 430px if your footer buttons take more/less space. */
+@media (max-width: 430px) {
+  .footer-marquee {
+    width: max-content;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+    animation: footer-marquee-left 8s linear infinite !important;
   }
 
-  .contact-flex {
-    flex-direction: column;
-  }
+  @keyframes footer-marquee-left {
+    0% {
+      transform: translateX(0);
+    }
 
-  .contact-address-box,
-  .contact-map-box {
-    width: 100% !important;
-  }
+    20% {
+      transform: translateX(0);
+    }
 
-  .contact-address-box {
-    margin-bottom: 1rem;
+    100% {
+      transform: translateX(-100%);
+    }
   }
 }
 
