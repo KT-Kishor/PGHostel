@@ -496,7 +496,8 @@ sap.ui.define([
         },
         onCloseRoomDetail: function () {
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
-            this._clearRoomDetailDialog(); // destroy AFTER
+            this._clearRoomDetailDialog();
+            this._pendingBookingNav = false;
         },
 
         onDialogAfterClose: function () {
@@ -665,6 +666,7 @@ sap.ui.define([
 
       onDialogClose: function () {
     this._resetOtpState();
+    this._pendingBookingNav = false;
 
     if (this._oSignDialog) {
         this._oSignDialog.close();
@@ -1187,6 +1189,10 @@ sap.ui.define([
                 // Close dialog
                 if (this._oSignDialog) this._oSignDialog.close(),this._oSignDialog.destroy();
         this._oSignDialog = null;
+                if (this._pendingBookingNav) {
+                    this._pendingBookingNav = false;
+                    this.onConfirmBooking();
+                }
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
@@ -2029,7 +2035,7 @@ sap.ui.define([
             // LOGIN CHECK
             // -------------------------
             if (!bLoggedIn) {
-
+                this._pendingBookingNav = true;
                 MessageBox.information(
                     "Please log in to continue booking.",
                     {
@@ -2039,7 +2045,6 @@ sap.ui.define([
                         emphasizedAction: MessageBox.Action.OK,
                         onClose: function () {
                             this.onpressLogin();
-                            // this.getOwnerComponent().getRouter().navTo("RouteHostel");
                         }.bind(this)
                     }
                 );
