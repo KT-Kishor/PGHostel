@@ -361,11 +361,11 @@ sap.ui.define([
           
 
             onSearch: async function (_decodedMemberID) {
-                const filter = {
-                    MemberIDs: [_decodedMemberID]
-                      }
                 this.getBusyDialog()
-                var item = await this.ajaxReadWithJQuery("HM_MemberDoc", filter);
+                debugger
+              var item =   await this.ajaxReadWithJQuery("HM_MemberDoc", {
+                    MemberIDs: [this._decodedMemberID].join(",").replace(/\s+/g, "")
+                });
 
                 var aMember = Array.isArray(item.data) ?
                     item.data : [item.data];
