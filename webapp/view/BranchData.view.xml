@@ -116,6 +116,9 @@
 						<Text text="GSTIN" tooltip="GSTIN"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>startingPrice}" tooltip="{i18n>startingPrice}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>penalty}" tooltip="{i18n>penalty}"/>
 					</Column>
 					<!-- <Column demandPopin="true"><Text
@@ -171,6 +174,9 @@
 							</VBox>
 							<Text
                                 text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
+                            />
+							<Text
+                                text="{parts: ['mainModel>StartingPrice','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"
                             />
 							<Text
                                 text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }"
