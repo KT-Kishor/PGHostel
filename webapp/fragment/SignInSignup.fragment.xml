@@ -175,166 +175,172 @@
                     />
                 </HBox>
             </Panel>
-            <!-- FORGOT FLOW IN ONE PANEL -->
-            <Panel
-                id="forgotFlowPanel"
-                expandable="false"
-                visible="{= ${LoginViewModel>/authFlow} === 'forgot' }"
+        <!-- FORGOT FLOW IN ONE PANEL -->
+<Panel
+    id="forgotFlowPanel"
+    expandable="false"
+    visible="{= ${LoginViewModel>/authFlow} === 'forgot' }"
+>
+    <!-- <HBox justifyContent="Center" class="switch-toggle-container" /> -->
+    <f:SimpleForm
+        id="forgotVBox"
+        editable="true"
+        layout="ResponsiveGridLayout"
+        labelSpanL="12"
+        labelSpanM="12"
+        emptySpanL="0"
+        emptySpanM="0"
+        columnsL="1"
+        columnsM="1"
+    >
+        <!-- STEP 1: SEND OTP -->
+        <VBox
+            id="fpStepUser"
+            visible="{= ${LoginViewModel>/forgotStep} >= 1 }"
+        >
+            <Label
+                text="{i18n>emailId}"
+                required="true"
+                visible="{= ${LoginViewModel>/forgotStep} === 1 }"
+            />
+            <Input
+                id="fpEmailId"
+                placeholder="{i18n>enteryourEmail}"
+                liveChange="onEmailliveChange"
+                valueStateText="{i18n>MSenterValidEmail}"
+                visible="{= ${LoginViewModel>/forgotStep} === 1 }"
+                maxLength="100"
+            />
+            <HBox justifyContent="End">
+                <Button
+                    id="btnFPNext"
+                    text="{LoginViewModel>/otpButtonText}"
+                    press="onValidateUser"
+                    visible="{= ${LoginViewModel>/forgotStep} &lt;= 2 &amp;&amp; ${LoginViewModel>/canResendOTP} }"
+                    class="myUnifiedBtn sapUiSmallMarginTop"
+                />
+                <!-- <Button id="btnFPNext" text="Send OTP" press="onValidateUser" visible="{= ${LoginViewModel>/forgotStep} &lt;= 2 }" class="myUnifiedBtn sapUiSmallMarginTop"/> -->
+            </HBox>
+        </VBox>
+        <!-- STEP 2: OTP -->
+        <VBox
+            id="fpStepOtp"
+            visible="{= ${LoginViewModel>/forgotStep} >= 2 }"
+        >
+            <Label
+                text="{i18n>enterOTP}"
+                required="true"
+                visible="{= ${LoginViewModel>/forgotStep} === 2 }"
+            />
+            <Input
+                id="fpOTP"
+                placeholder="{i18n>enterOTP}"
+                liveChange="onOtpLive"
+                maxLength="6"
+                type="Text"
+                valueStateText="{i18n>pleaseenteravalidOTP}"
+                visible="{= ${LoginViewModel>/forgotStep} === 2 }"
+            />
+            <HBox justifyContent="End">
+                <Button
+                    id="btnOtpVerify"
+                    text="{i18n>verifyOTP}"
+                    tooltip="{i18n>verifyOTP}"
+                    press="_onVerifyOTP"
+                    visible="{= ${LoginViewModel>/forgotStep} === 2 }"
+                    class="myUnifiedBtn sapUiSmallMarginTop"
+                />
+            </HBox>
+        </VBox>
+        <!-- STEP 3: RESET PASSWORD -->
+        <VBox
+            id="fpStepReset"
+            visible="{= ${LoginViewModel>/forgotStep} >= 3 }"
+        >
+            <Label
+                class="sapUiSmallMarginTop sapTinyMarginBottom"
+                text="{i18n>createnewpassword}"
+                design="Bold"
+                visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+            />
+            <MessageStrip
+                type="Information"
+                showIcon="false"
+                text="{i18n>msgStrip}"
+            />
+            <Label
+                text="{i18n>newPassword}"
+                required="true"
+                class="sapUiSmallMarginTop"
+                visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+            />
+            <Input
+                id="newPass"
+                showValueStateMessage="false"
+                type="Password"
+                showValueHelp="true"
+                valueHelpIconSrc="sap-icon://show"
+                liveChange="SM_onChnageSetAndConfirm"
+                maxLength="50"
+                valueHelpRequest=".SM_onTogglePasswordVisibility"
+                visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+            />
+            <HBox
+                width="100%"
+                justifyContent="SpaceBetween"
             >
-                <!-- <HBox justifyContent="Center" class="switch-toggle-container" /> -->
-                <f:SimpleForm
-                    id="forgotVBox"
-                    editable="true"
-                    layout="ResponsiveGridLayout"
-                    labelSpanL="12"
-                    labelSpanM="12"
-                    emptySpanL="0"
-                    emptySpanM="0"
-                    columnsL="1"
-                    columnsM="1"
-                >
-                    <!-- STEP 1: SEND OTP -->
-                    <VBox
-                        id="fpStepUser"
-                        visible="{= ${LoginViewModel>/forgotStep} >= 1 }"
-                    >
-                        <Label
-                            text="{i18n>emailId}"
-                            required="true"
-                        />
-                        <Input
-                            id="fpEmailId"
-                            placeholder="{i18n>enteryourEmail}"
-                            liveChange="onEmailliveChange"
-                            valueStateText="{i18n>MSenterValidEmail}"
-                            enabled="{= ${LoginViewModel>/forgotStep} === 1 }"
-                            maxLength="100"
-                        />
-                        <HBox justifyContent="End">
-                            <Button
-                                id="btnFPNext"
-                                text="{LoginViewModel>/otpButtonText}"
-                                press="onValidateUser"
-                                enabled="{= ${LoginViewModel>/forgotStep} &lt;= 2 &amp;&amp; ${LoginViewModel>/canResendOTP} }"
-                                class="myUnifiedBtn sapUiSmallMarginTop"
-                            />
-                            <!-- <Button id="btnFPNext" text="Send OTP" press="onValidateUser" enabled="{= ${LoginViewModel>/forgotStep} &lt;= 2 }" class="myUnifiedBtn sapUiSmallMarginTop"/> -->
-                        </HBox>
-                    </VBox>
-                    <!-- STEP 2: OTP -->
-                    <VBox
-                        id="fpStepOtp"
-                        visible="{= ${LoginViewModel>/forgotStep} >= 2 }"
-                    >
-                        <Label
-                            text="{i18n>enterOTP}"
-                            required="true"
-                        />
-                        <Input
-                            id="fpOTP"
-                            placeholder="{i18n>enterOTP}"
-                            liveChange="onOtpLive"
-                            maxLength="6"
-                            type="Text"
-                            valueStateText="{i18n>pleaseenteravalidOTP}"
-                            enabled="{= ${LoginViewModel>/forgotStep} === 2 }"
-                        />
-                        <HBox justifyContent="End">
-                            <Button
-                                id="btnOtpVerify"
-                                text="{i18n>verifyOTP}"
-                                tooltip="{i18n>verifyOTP}"
-                                press="_onVerifyOTP"
-                                enabled="{= ${LoginViewModel>/forgotStep} === 2 }"
-                                class="myUnifiedBtn sapUiSmallMarginTop"
-                            />
-                        </HBox>
-                    </VBox>
-                    <!-- STEP 3: RESET PASSWORD -->
-                    <VBox
-                        id="fpStepReset"
-                        visible="{= ${LoginViewModel>/forgotStep} >= 3 }"
-                    >
-                        <Label
-                            class="sapUiSmallMarginTop sapTinyMarginBottom"
-                            text="{i18n>createnewpassword}"
-                            design="Bold"
-                        />
-                        <MessageStrip
-                            type="Information"
-                            showIcon="false"
-                            text="{i18n>msgStrip}"
-                        />
-                        <Label
-                            text="{i18n>newPassword}"
-                            required="true"
-                            class="sapUiSmallMarginTop"
-                        />
-                        <Input
-                            id="newPass"
-                            showValueStateMessage="false"
-                            type="Password"
-                            showValueHelp="true"
-                            valueHelpIconSrc="sap-icon://show"
-                            liveChange="SM_onChnageSetAndConfirm"
-                            maxLength="50"
-                            valueHelpRequest=".SM_onTogglePasswordVisibility"
-                            enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
-                        />
-                        <HBox
-                            width="100%"
-                            justifyContent="SpaceBetween"
-                        >
-                            <Text
-                                id="fpPasswordStrengthText"
-                                class="pwdMinFail"
-                            />
-                            <Button
-                                text="{i18n>MSgeneratePassword}"
-                                tooltip="{i18n>MSgeneratePassword}"
-                                type="Transparent"
-                                icon="sap-icon://refresh"
-                                press="SM_onGenerateForgotPassword"
-                            />
-                        </HBox>
-                        <Label
-                            class="sapUiSmallMarginTop"
-                            text="{i18n>MSconfirmPassword}"
-                            required="true"
-                        />
-                        <Input
-                            id="confPass"
-                            type="Password"
-                            change="Forget_onConfirm"
-                            liveChange="Forget_onConfirm"
-                            showValueHelp="true"
-                            valueHelpIconSrc="sap-icon://show"
-                            valueHelpRequest="SM_onTogglePasswordVisibility"
-                            valueStateText="{i18n>MSenterConfirmPassword}"
-                            maxLength="50"
-                            enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
-                            submit="onSubmitNewPassword"
-                        />
-                        <HBox justifyContent="End">
-                            <Button
-                                id="btnUpdatePass"
-                                text="{i18n>updatePassword}"
-                                press="onSubmitNewPassword"
-                                enabled="{= ${LoginViewModel>/forgotStep} === 3 }"
-                                class="myUnifiedBtn sapUiSmallMarginTop"
-                            />
-                        </HBox>
-                    </VBox>
-                    <HBox alignContent="Start">
-                        <Button
-                            text="{i18n>backtoLogin}"
-                            tooltip="{i18n>backtoLogin}"
-                            type="Transparent"
-                            press="onBackToLogin"
-                        />
-                    </HBox>
-                </f:SimpleForm>
-            </Panel>
+                <Text
+                    id="fpPasswordStrengthText"
+                    class="pwdMinFail"
+                />
+                <Button
+                    text="{i18n>MSgeneratePassword}"
+                    tooltip="{i18n>MSgeneratePassword}"
+                    type="Transparent"
+                    icon="sap-icon://refresh"
+                    press="SM_onGenerateForgotPassword"
+                />
+            </HBox>
+            <Label
+                class="sapUiSmallMarginTop"
+                text="{i18n>MSconfirmPassword}"
+                required="true"
+                visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+            />
+            <Input
+                id="confPass"
+                type="Password"
+                change="Forget_onConfirm"
+                liveChange="Forget_onConfirm"
+                showValueHelp="true"
+                valueHelpIconSrc="sap-icon://show"
+                valueHelpRequest="SM_onTogglePasswordVisibility"
+                valueStateText="{i18n>MSenterConfirmPassword}"
+                maxLength="50"
+                visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+                submit="onSubmitNewPassword"
+            />
+            <HBox justifyContent="End">
+                <Button
+                    id="btnUpdatePass"
+                    text="{i18n>updatePassword}"
+                    press="onSubmitNewPassword"
+                    visible="{= ${LoginViewModel>/forgotStep} === 3 }"
+                    class="myUnifiedBtn sapUiSmallMarginTop"
+                />
+            </HBox>
+        </VBox>
+        <HBox alignContent="Start">
+            <Button
+                text="{i18n>backtoLogin}"
+                tooltip="{i18n>backtoLogin}"
+                type="Transparent"
+                press="onBackToLogin"
+            />
+        </HBox>
+    </f:SimpleForm>
+</Panel>
+
             <!-- SIGN UP PANEL -->
             <Panel
                 id="signUpPanel"

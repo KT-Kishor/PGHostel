@@ -1342,7 +1342,6 @@ sap.ui.define([
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
-                        c.setValueStateText("");
                     }
                 });
 
@@ -1357,7 +1356,6 @@ sap.ui.define([
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
-                        c.setValueStateText("");
                     }
                 });
 
@@ -3185,6 +3183,11 @@ sap.ui.define([
             this.oViewModel.setProperty("/forgotStep", 1); // safe, runtime only
             this.oViewModel.setProperty("/dialogTitle", "Set / Reset Password"); //
             this._addPasswordGenerateIcon();
+
+            ["fpEmailId", "fpOTP", "newPass", "confPass"].forEach(id => {
+                const c = $C(id);
+                if (c) c.setEnabled(true);
+            });
         },
 
         onSelectLoginMode: function (e) {

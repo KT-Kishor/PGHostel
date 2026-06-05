@@ -3849,11 +3849,11 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   }
 }
 
-.Popoverclass {
+/* .Popoverclass {
   position: absolute !important;
   left: 1rem !important;
   transform: none !important;
-}
+} */
 
 .customErrorPopover .sapMPopoverTitle {
   color: #ffffff !important;

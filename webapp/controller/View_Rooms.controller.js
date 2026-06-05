@@ -689,7 +689,6 @@ sap.ui.define([
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
-                        c.setValueStateText("");
                     }
                 });
 
@@ -704,7 +703,6 @@ sap.ui.define([
                     if (c) {
                         c.setValue("");
                         c.setValueState("None");
-                        c.setValueStateText("");
                     }
                 });
 
@@ -1920,9 +1918,14 @@ sap.ui.define([
         onForgotPassword: function () {
             this._resetOtpState();
             this.oViewModel.setProperty("/authFlow", "forgot");
-            this.oViewModel.setProperty("/forgotStep", 1); // safe, runtime only
-            this.oViewModel.setProperty("/dialogTitle", "Set / Reset Password"); //
+            this.oViewModel.setProperty("/forgotStep", 1);
+            this.oViewModel.setProperty("/dialogTitle", "Set / Reset Password");
             this._addPasswordGenerateIcon();
+
+            ["fpEmailId", "fpOTP", "newPass", "confPass"].forEach(id => {
+                const c = $C(id);
+                if (c) c.setEnabled(true);
+            });
         },
           _findBestMatch: function (sInput, aItems, sPropertyName) {
             if (!sInput || !aItems || aItems.length === 0) return null;
