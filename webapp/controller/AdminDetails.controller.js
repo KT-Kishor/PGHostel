@@ -32,6 +32,11 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
+             
+          
+
+
+
             if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
@@ -1282,6 +1287,7 @@ sap.ui.define([
             let sUnit = oModel.getProperty("/UnitText") || "Unit Price";
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
+            var Bookingstartdate=this.getView().getModel("Bookingmodel").getProperty("/StartDate").includes("/") ? this.getView().getModel("Bookingmodel").getProperty("/StartDate").split("/").reverse().join("-") : this.getView().getModel("Bookingmodel").getProperty("/StartDate");
 
             if (sUnit === "Package Price") {
                 sUnit = "Unit Price"
@@ -1311,6 +1317,12 @@ sap.ui.define([
             if (sEndDate.includes("/")) {
                 sEndDate = sEndDate.split("/").reverse().join("-");
             }
+            if(sStartDate!== ""){
+                sap.ui.getCore().byId("editEndDate").setMinDate(new Date(sStartDate))
+
+            }
+                sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
+
             if (sStartDate !== "" && sEndDate !== "") {
                 if (sEndDate <= sStartDate) {
                     sap.m.MessageToast.show("Please select a valid date");
@@ -1343,12 +1355,12 @@ sap.ui.define([
             if (sUnit === "Per Month" || sUnit === "monthly") {
                 oEnd = new Date(oStart);
                 oEnd.setMonth(oEnd.getMonth() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1)
+                oEnd.setDate(oEnd.getDate())
             } else if (sUnit === "Per Year" || sUnit === "yearly") {
 
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1)
+                oEnd.setDate(oEnd.getDate())
 
             } else if (sUnit === "Per Day" || sUnit === "daily" || sUnit === "Per Hour") {
                 if (!oEnd) {
@@ -1423,11 +1435,11 @@ sap.ui.define([
 
             if (sUnit === "Per Month") {
                 oEnd.setMonth(oEnd.getMonth() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1)
+                oEnd.setDate(oEnd.getDate())
 
             } else if (sUnit === "Per Year") {
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
-                oEnd.setDate(oEnd.getDate() - 1)
+                oEnd.setDate(oEnd.getDate())
             }
             if (oEnd && iDays === 0) {
                 iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
@@ -2185,7 +2197,7 @@ sap.ui.define([
 
                 // Add selected duration months
                 oEnd.setMonth(oEnd.getMonth() + duration);
-                oEnd.setDate(oEnd.getDate() - 1);
+                oEnd.setDate(oEnd.getDate());
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
 
@@ -2227,7 +2239,7 @@ sap.ui.define([
 
                 // Add selected duration years
                 oEnd.setFullYear(oEnd.getFullYear() + duration);
-                oEnd.setDate(oEnd.getDate() - 1);
+                oEnd.setDate(oEnd.getDate());
                 var diffDays = oBookingModel.getProperty("/DurationUnit");
                 oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
 
@@ -2251,7 +2263,6 @@ sap.ui.define([
                 } else {
                     oCustomerModel.setProperty("/SGST", CGST)
                     oCustomerModel.setProperty("/CGST", CGST)
-
                 }
 
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount);
@@ -2305,11 +2316,11 @@ sap.ui.define([
 
             if (sUnit === "monthly" || sUnit === "Per Month") {
                 oEnd.setMonth(oEnd.getMonth() + iCount); // add iCount months
-                oEnd.setDate(oEnd.getDate() - 1);
+                oEnd.setDate(oEnd.getDate());
                 oCustomerData.setProperty("/RentPrice", iCount * originalRent); // use originalRent
             } else if (sUnit === "yearly" || sUnit === "Per Year") {
                 oEnd.setFullYear(oEnd.getFullYear() + iCount); // add iCount years
-                oEnd.setDate(oEnd.getDate() - 1)
+                oEnd.setDate(oEnd.getDate())
                 oCustomerData.setProperty("/RentPrice", iCount * originalRent); // use originalRent
             }
 
@@ -3669,6 +3680,26 @@ sap.ui.define([
             var ID = this.getView().getModel("CustomerData").getData()
 
 
+             var RoomData=this.getOwnerComponent().getModel("RoomDetailsModel").getData()
+           var HostelData= this.getOwnerComponent().getModel("HostelModelcheckrooms").getData().filter((item)=>{
+             
+        return      (item.Status==="Assigned" || item.Status==="Confirmed")  &&
+                item.BedType===ID.BedType &&
+                item.BranchCode===ID.BranchCode
+                
+            })
+
+            var SelectedRoom = RoomData.filter((item)=>{
+                
+              return   item.BedTypeName===ID.BedType &&
+                       item.BranchCode===ID.BranchCode
+            })
+
+            if(SelectedRoom[0].NoofPerson <=HostelData.length){
+                sap.m.MessageBox.error("No rooms available for the selected bed type. Please assign a different bed type or check room availability.");
+                return;
+            }
+           
             this.getBusyDialog();
             const pdfBase64 = await this.onGeneratePDF();
             this.closeBusyDialog();
