@@ -29,17 +29,30 @@ sap.ui.define([
                 const sMemberID = oEvent.getParameter("arguments")?.MemberID;
 
 
-             
+
 
                 const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
-               
 
-                    this._decodedMemberID = atob(sMemberID);
 
-                this.onSearch(this._decodedMemberID)
-            
+                this._decodedMemberID = atob(sMemberID);
 
+                await this.onSearch(this._decodedMemberID)
+
+
+                const oData = this.getView().getModel("BookingView").getData();
+
+                const oDocument = oData.Members
+                    .flatMap(member => member.Documents)
+                    .find(doc => doc.Status === "Updated");
+
+                if (oDocument && oDocument.Status === "Updated") {
+                    this._goToNotFound()
+                }
+
+            },
+            _goToNotFound: function () {
+                this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
             },
 
             onFileUpload: function (oEvent) {
@@ -237,6 +250,7 @@ sap.ui.define([
                             Gender: oMember.Gender,
                             UserID: oMember.UserID,
                             DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
+                            Status: "Updated",
                             Documents: [{
                                 DocumentID: oMember.Documents?.[0]?.DocumentID || "",
                                 MemberID: oMember.MemberID || "",
@@ -358,12 +372,12 @@ sap.ui.define([
                     oFileUploader.clear();
                 }
             },
-          
+
 
             onSearch: async function (_decodedMemberID) {
                 this.getBusyDialog()
                 debugger
-              var item =   await this.ajaxReadWithJQuery("HM_MemberDoc", {
+                var item = await this.ajaxReadWithJQuery("HM_MemberDoc", {
                     MemberIDs: [this._decodedMemberID].join(",").replace(/\s+/g, "")
                 });
 
@@ -889,63 +903,63 @@ sap.ui.define([
             onCloseNewMemberDialog: function () {
                 this.MM_Dialog.close();
             },
-              onDownloadPreview: function () {
+            onDownloadPreview: function () {
 
-            if (!this._sPreviewBase64) {
+                if (!this._sPreviewBase64) {
 
-                MessageToast.show(
-                    "No file available for download."
-                );
+                    MessageToast.show(
+                        "No file available for download."
+                    );
 
-                return;
-            }
+                    return;
+                }
 
-            let sDownloadUrl = "";
+                let sDownloadUrl = "";
 
-            // PDF
-            if (this._sPreviewMimeType === "application/pdf") {
-                sDownloadUrl = this._pdfBlobUrl;
-            }
+                // PDF
+                if (this._sPreviewMimeType === "application/pdf") {
+                    sDownloadUrl = this._pdfBlobUrl;
+                }
 
-            // IMAGE
-            else if (this._sPreviewMimeType.startsWith("image/")) {
-                sDownloadUrl = `data:${this._sPreviewMimeType};base64,${this._sPreviewBase64}`;
-            }
+                // IMAGE
+                else if (this._sPreviewMimeType.startsWith("image/")) {
+                    sDownloadUrl = `data:${this._sPreviewMimeType};base64,${this._sPreviewBase64}`;
+                }
 
-            if (!sDownloadUrl) {
-                MessageToast.show("Download not supported.");
-                return;
-            }
+                if (!sDownloadUrl) {
+                    MessageToast.show("Download not supported.");
+                    return;
+                }
 
-            const oLink = document.createElement("a");
-            oLink.href = sDownloadUrl;
-            oLink.download = this._sPreviewFileName || "Document";
-            document.body.appendChild(oLink);
-            oLink.click();
-            document.body.removeChild(oLink);
-        },
+                const oLink = document.createElement("a");
+                oLink.href = sDownloadUrl;
+                oLink.download = this._sPreviewFileName || "Document";
+                document.body.appendChild(oLink);
+                oLink.click();
+                document.body.removeChild(oLink);
+            },
 
-        onClosePreview: function () {
+            onClosePreview: function () {
 
-            if (this._pdfBlobUrl) {
+                if (this._pdfBlobUrl) {
 
-                URL.revokeObjectURL(
-                    this._pdfBlobUrl
-                );
+                    URL.revokeObjectURL(
+                        this._pdfBlobUrl
+                    );
 
-                this._pdfBlobUrl = null;
-            }
+                    this._pdfBlobUrl = null;
+                }
 
-            this._sPreviewBase64 = null;
-            this._sPreviewMimeType = null;
-            this._sPreviewFileName = null;
+                this._sPreviewBase64 = null;
+                this._sPreviewMimeType = null;
+                this._sPreviewFileName = null;
 
-            if (this._oPreviewDialog) {
-                this._oPreviewDialog.close();
-                this._oPreviewDialog.destroy();
-                this._oPreviewDialog = null;
-            }
-        },
+                if (this._oPreviewDialog) {
+                    this._oPreviewDialog.close();
+                    this._oPreviewDialog.destroy();
+                    this._oPreviewDialog = null;
+                }
+            },
             onNewMemberSalutationChange: function (oEvent) {
                 const oSalutation = oEvent.getSource();
                 const sKey = oSalutation.getSelectedKey();
