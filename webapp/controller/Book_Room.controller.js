@@ -1341,8 +1341,8 @@ sap.ui.define([
                             selectedKey: "{HostelModel>/Persons/" + i + "/DocumentType}",
                             items: [
                                 new sap.ui.core.ListItem({
-                                    key: "Aadhar Card",
-                                    text: "Aadhar Card"
+                                    key: "Aadhaar Card",
+                                    text: "Aadhaar Card"
                                 }),
                                 new sap.ui.core.ListItem({
                                     key: "Pan Card",

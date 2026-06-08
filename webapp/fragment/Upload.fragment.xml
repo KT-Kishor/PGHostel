@@ -72,8 +72,8 @@
                     change="onidproofchange"
                 >
                     <core:ListItem
-                        key="Aadhar Card"
-                        text="Aadhar Card"
+                        key="Aadhaar Card"
+                        text="Aadhaar Card"
                     />
                     <core:ListItem
                         key="Pan Card"

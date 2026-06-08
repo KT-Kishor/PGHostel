@@ -193,7 +193,7 @@
                 maxPersons: 1,
                 originalPersonOptions: [],
                 DocumentTypeOptions: [
-                    { key: "Aadhaar", text: "Aadhaar" },
+                    { key: "Aadhaar Card", text: "Aadhaar Card" },
                     { key: "Passport", text: "Passport" },
                     { key: "Driving License", text: "Driving License" },
                     { key: "Voter ID", text: "Voter ID" }
