@@ -939,7 +939,7 @@ sap.ui.define([
         },
 
         onAddFacilityDetails: function () {
-            // this.edit=true
+            this.edit=true
             var data = this.getView().getModel("Bookingmodel").getData()
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
@@ -1751,115 +1751,115 @@ sap.ui.define([
                 }
             }
 
-            //         if(!oPayload.MemberName && this.edit===true){
-            //            const newStart = this._parseDate(oPayload.StartDate);
-            //             const newEnd = this._parseDate(oPayload.EndDate);
+                    if(!oPayload.MemberName && this.edit===true){
+                       const newStart = this._parseDate(oPayload.StartDate);
+                        const newEnd = this._parseDate(oPayload.EndDate);
 
-            //             const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+                        const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
 
 
 
-            //                 const oldStart = this._parseDate(item.StartDate);
-            //                 const oldEnd = this._parseDate(item.EndDate);
+                            const oldStart = this._parseDate(item.StartDate);
+                            const oldEnd = this._parseDate(item.EndDate);
 
-            //                 //  Block ONLY if dates overlap
-            //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
+                            //  Block ONLY if dates overlap
+                            const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
 
-            //                 return isOverlap;
-            //             });
+                            return isOverlap;
+                        });
 
-            //             if (oDuplicatedates) {
-            //                 sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-            //                 return;
-            //             }
-            //         }
+                        if (oDuplicatedates) {
+                            sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                            return;
+                        }
+                    }
 
-            //          if(!oPayload.MemberName && this.edit===false){
-            //            const newStart = this._parseDate(oPayload.StartDate);
-            // const newEnd = this._parseDate(oPayload.EndDate);
+                     if(!oPayload.MemberName && this.edit===false){
+                       const newStart = this._parseDate(oPayload.StartDate);
+            const newEnd = this._parseDate(oPayload.EndDate);
 
-            // const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+            const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
 
-            //     //  Skip same row while editing
-            //     if (this.edit === false && index === this._editIndex) {
-            //         return false;
-            //     }
+                //  Skip same row while editing
+                if (this.edit === false && index === this._editIndex) {
+                    return false;
+                }
 
-            //     const oldStart = this._parseDate(item.StartDate);
-            //     const oldEnd = this._parseDate(item.EndDate);
+                const oldStart = this._parseDate(item.StartDate);
+                const oldEnd = this._parseDate(item.EndDate);
 
-            //     return (
-            //         newStart <= oldEnd &&
-            //         newEnd >= oldStart &&
-            //         item.FacilityName === oPayload.FacilityName
-            //     );
-            // });
+                return (
+                    newStart <= oldEnd &&
+                    newEnd >= oldStart &&
+                    item.FacilityName === oPayload.FacilityName
+                );
+            });
 
-            // if (oDuplicatedates) {
-            //     sap.m.MessageToast.show(
-            //         this.i18nModel.getText("dateOverlapExists")
-            //     );
-            //     return;
-            // }
-            //         }
+            if (oDuplicatedates) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("dateOverlapExists")
+                );
+                return;
+            }
+                    }
 
-            //          if(oPayload.MemberName && this.edit===true){
-            //          const newStart = this._parseDate(oPayload.StartDate);
-            //             const newEnd = this._parseDate(oPayload.EndDate);
+                     if(oPayload.MemberName && this.edit===true){
+                     const newStart = this._parseDate(oPayload.StartDate);
+                        const newEnd = this._parseDate(oPayload.EndDate);
 
-            //             const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+                        const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
 
-            //                 //  Only check for SAME member
-            //                 if (item.MemberName !== oPayload.MemberName) {
-            //                     return false;
-            //                 }
+                            //  Only check for SAME member
+                            if (item.MemberName !== oPayload.MemberName) {
+                                return false;
+                            }
 
-            //                 const oldStart = this._parseDate(item.StartDate);
-            //                 const oldEnd = this._parseDate(item.EndDate);
+                            const oldStart = this._parseDate(item.StartDate);
+                            const oldEnd = this._parseDate(item.EndDate);
 
-            //                 //  Block ONLY if dates overlap
-            //                 const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+                            //  Block ONLY if dates overlap
+                            const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
 
-            //                 return isOverlap;
-            //             });
+                            return isOverlap;
+                        });
 
-            //             if (oDuplicatedates) {
-            //                 sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-            //                 return;
-            //             }
-            //         }
-            //           if (oPayload.MemberName && this.edit===false) {
-            //              const newStart = this._parseDate(oPayload.StartDate);
-            // const newEnd = this._parseDate(oPayload.EndDate);
+                        if (oDuplicatedates) {
+                            sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                            return;
+                        }
+                    }
+                      if (oPayload.MemberName && this.edit===false) {
+                         const newStart = this._parseDate(oPayload.StartDate);
+            const newEnd = this._parseDate(oPayload.EndDate);
 
-            // const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+            const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
 
-            //       if (item.MemberName !== oPayload.MemberName) {
-            //                     return false;
-            //                 }
+                  if (item.MemberName !== oPayload.MemberName) {
+                                return false;
+                            }
 
-            //     //  Skip same row while editing
-            //     if (this.edit === false && index === this._editIndex) {
-            //         return false;
-            //     }
+                //  Skip same row while editing
+                if (this.edit === false && index === this._editIndex) {
+                    return false;
+                }
 
-            //     const oldStart = this._parseDate(item.StartDate);
-            //     const oldEnd = this._parseDate(item.EndDate);
+                const oldStart = this._parseDate(item.StartDate);
+                const oldEnd = this._parseDate(item.EndDate);
 
-            //     return (
-            //         newStart <= oldEnd &&
-            //         newEnd >= oldStart &&
-            //         item.FacilityName === oPayload.FacilityName
-            //     );
-            // });
+                return (
+                    newStart <= oldEnd &&
+                    newEnd >= oldStart &&
+                    item.FacilityName === oPayload.FacilityName
+                );
+            });
 
-            // if (oDuplicatedates) {
-            //     sap.m.MessageToast.show(
-            //         this.i18nModel.getText("dateOverlapExists")
-            //     );
-            //     return;
-            // }
-            //         }
+            if (oDuplicatedates) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("dateOverlapExists")
+                );
+                return;
+            }
+                    }
             // UPDATE existing OR ADD new
             if (this._editIndex !== undefined) {
                 oCustomerData.AllSelectedFacilities[this._editIndex] =
@@ -2451,7 +2451,7 @@ sap.ui.define([
         },
 
         onEditFacilityDetails: function () {
-            // this.edit=false
+            this.edit=false
             var data = this.getView().getModel("Bookingmodel").getData()
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
@@ -8976,6 +8976,37 @@ sap.ui.define([
             }
         },
         onCloseMemberSelectionDialog: function () {
+
+            var oView = this.getView();
+            var oTable = sap.ui.getCore().byId("abmemberSelectTable");
+
+                var oCustomerModel = this.getView().getModel("BookingView");
+            var aDocs = oCustomerModel.getProperty("/Documents") || [];
+
+            var aSelectedItems = oTable.getSelectedItems();
+
+              aSelectedItems.forEach(function (oItem) {
+
+                var oContext = oItem.getBindingContext("BookingView");
+                var oData = oContext.getObject();
+
+                var doc = oData.Documents[0];
+
+                if (doc) {
+                    aDocs.push({
+                        DocumentID: doc.DocumentID,
+                        DocumentType: doc.DocumentType,
+                        MemberID: oData.MemberID,
+                        MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
+                        FileName: doc.FileName,
+                        FileType: doc.FileType,
+                        File: doc.File
+                    });
+                }
+            });
+
+            this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
+
             this.UD_Dialog.close();
         },
         onMemberSearch: function (oEvent) {
