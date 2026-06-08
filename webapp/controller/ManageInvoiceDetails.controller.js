@@ -209,7 +209,7 @@ sap.ui.define([
                 this.visiablityPlay.setProperty("/addInvBtn", false);
                 this.visiablityPlay.setProperty("/refresh", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
-                this.byId("CID_id_TableInvoiceItem").setMode("None");
+                // this.byId("CID_id_TableInvoiceItem").setMode("None");
                 this.byId("CID_id_CurrencySelect").setEditable(false);
                 this.visiablityPlay.setProperty("/merge", true);
                 this.visiablityPlay.setProperty("/MultiEmail", true);
@@ -1514,7 +1514,7 @@ sap.ui.define([
                 } else {
                     this.visiablityPlay.setProperty("/editable", true);
                     this.visiablityPlay.setProperty("/CInvoice", true);
-                    this.byId("CID_id_TableInvoiceItem").setMode(sap.m.ListMode.MultiSelect);
+                    // this.byId("CID_id_TableInvoiceItem").setMode(sap.m.ListMode.MultiSelect);
                     this.visiablityPlay.setProperty("/addInvBtn", true);
                     this.visiablityPlay.setProperty("/merge", false);
                     this.visiablityPlay.setProperty("/MultiEmail", false);
@@ -1660,7 +1660,7 @@ sap.ui.define([
                         });
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
-                        this.byId("CID_id_TableInvoiceItem").setMode("None");
+                        // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         this.visiablityPlay.setProperty("/addInvBtn", false);
                         this.visiablityPlay.setProperty("/refresh", false);
                         this.visiablityPlay.setProperty("/merge", true);
