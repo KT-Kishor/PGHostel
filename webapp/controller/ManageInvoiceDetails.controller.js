@@ -343,9 +343,28 @@ sap.ui.define([
                             var aData = Array.isArray(oData.commentData) ?
                                 oData.commentData : [oData.commentData];
 
-                            const aFilteredData = aData.filter(item =>
-                                item.Status === "Assigned" || item.Status === "Completed"
-                            );
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+
+                            const aFilteredData = aData.filter(item => {
+                                if (item.Status === "Assigned") {
+                                    return true;
+                                }
+
+                                if (item.Status === "Completed") {
+                                    const endDate = new Date(item.EndDate);
+                                    endDate.setHours(0, 0, 0, 0);
+
+                                    const diffDays = Math.floor(
+                                        (today - endDate) / (1000 * 60 * 60 * 24)
+                                    );
+
+                                    // Show Completed records only for 5 days after EndDate
+                                    return diffDays <= 5;
+                                }
+
+                                return false;
+                            });
 
                             this.getView().setModel(
                                 new sap.ui.model.json.JSONModel(aFilteredData),

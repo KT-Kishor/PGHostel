@@ -205,6 +205,7 @@ sap.ui.define([
             oBookingViewData.editModeEnabled = false; // Start in read-only mode
             oBookingViewData.isStatusNew = false; // Will be set after loading
             oBookingViewData.isAdminUpdatedYes = false; // Will be set after loading
+            oBookingViewData.isWithin48HoursOfCheckIn = false; // Will be set after loading
             oBookingViewData.showEditButton = false; // Will be set after loading
             
             this.getView().setModel(oHostelModel, "HostelModel");
@@ -381,12 +382,30 @@ sap.ui.define([
                 var bIsStatusConfirmed = sStatus === "Confirmed";
                 var bIsEditableStatus = bIsStatusNew || bIsStatusConfirmed;
                 var bIsAdminUpdatedYes = sAdminUpdated === "YES";
+                var sBookingStartDate = oBooking.StartDate || "";
+                var sCheckInTime = oHostelModel.getProperty("/CheckInTime") || "";
+                var bIsWithin48Hours = this._isWithin48HoursOfCheckIn(sBookingStartDate, sCheckInTime);
                 oBookingView.setProperty("/isStatusNew", bIsStatusNew);
                 oBookingView.setProperty("/isAdminUpdatedYes", bIsAdminUpdatedYes);
-                oBookingView.setProperty("/showEditButton", bIsEditableStatus && !bIsAdminUpdatedYes);
-                oBookingView.setProperty("/editModeEnabled", false); // Start in read-only mode
+                oBookingView.setProperty("/isWithin48HoursOfCheckIn", bIsWithin48Hours);
+                oBookingView.setProperty("/showEditButton", bIsEditableStatus && !bIsAdminUpdatedYes && !bIsWithin48Hours);
+                oBookingView.setProperty("/editModeEnabled", false);
 
-                // Show message when admin has updated the booking
+                if (bIsEditableStatus && !bIsAdminUpdatedYes && bIsWithin48Hours) {
+                    var sCheckInDisplay = sCheckInTime || "12:00 PM";
+                    MessageBox.warning(
+                        "Editing is no longer allowed as the check-in time is within 48 hours. " +
+                        "Check-in is at " + sCheckInDisplay + " on " + this._formatDateToDDMMYYYY(this._parseDate(sBookingStartDate)) + ".\n\n" +
+                        "For any changes, please contact " + (oHostelModel.getProperty("/Area") || "") + ".",
+                        {
+                            title: "Editing Not Available",
+                            styleClass: "myUnifiedBtn",
+                            contentWidth: "460px",
+                            actions: [MessageBox.Action.OK]
+                        }
+                    );
+                }
+
                 if (bIsEditableStatus && bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
@@ -2073,6 +2092,35 @@ sap.ui.define([
             }
         },
         
+        _parseTimeToHours: function (sTime) {
+            if (!sTime) return 0;
+            sTime = sTime.trim().toUpperCase();
+            var bIsPM = sTime.includes("PM");
+            var bIsAM = sTime.includes("AM");
+            sTime = sTime.replace(/AM|PM/gi, "").trim();
+            var aParts = sTime.split(":");
+            var iHours = parseInt(aParts[0], 10) || 0;
+            var iMinutes = parseInt(aParts[1], 10) || 0;
+            if (bIsPM && iHours < 12) {
+                iHours += 12;
+            } else if (bIsAM && iHours === 12) {
+                iHours = 0;
+            }
+            return iHours + (iMinutes / 60);
+        },
+
+        _isWithin48HoursOfCheckIn: function (sStartDate, sCheckInTime) {
+            var oStartDate = this._parseDate(sStartDate);
+            if (!oStartDate) {
+                return false;
+            }
+            var fCheckInHours = this._parseTimeToHours(sCheckInTime);
+            oStartDate.setHours(Math.floor(fCheckInHours), Math.round((fCheckInHours % 1) * 60), 0, 0);
+            var oCutoff = new Date(oStartDate.getTime() - 48 * 60 * 60 * 1000);
+            var oNow = new Date();
+            return oNow >= oCutoff;
+        },
+
         _formatDateToDDMMYYYY: function (oDate) {
             if (!oDate || !(oDate instanceof Date) || isNaN(oDate.getTime())) {
                 return "";
@@ -3158,6 +3206,7 @@ sap.ui.define([
                 editModeEnabled: false,
                 isStatusNew: false,
                 isAdminUpdatedYes: false,
+                isWithin48HoursOfCheckIn: false,
                 showEditButton: false,
                 DurationOptions: [
                     { key: "1", text: "1 Month" },

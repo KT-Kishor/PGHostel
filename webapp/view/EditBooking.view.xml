@@ -940,7 +940,7 @@
                     class="myUnifiedBtn"
                     press="onSubmitPress"
                     enabled="{BookingView>/editModeEnabled}"
-                    visible="{= !${BookingView>/isAdminUpdatedYes} }"
+                    visible="{= !${BookingView>/isAdminUpdatedYes} &amp;&amp; !${BookingView>/isWithin48HoursOfCheckIn} }"
                 />
                   </contentRight>
 			</Bar>

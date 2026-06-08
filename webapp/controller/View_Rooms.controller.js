@@ -166,17 +166,27 @@ sap.ui.define([
         _loadBranchData: async function () {
             const oView = this.getView();
             const sBranchID = this.sPath;
+            var filter = {
+                flag: "true",
+                BranchID: sBranchID
+            }
 
             try {
                 // Fetch branch data filtered by BranchID from HM_Branch backend endpoint
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", {
-                    BranchID: sBranchID
-                });
+                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", 
+                    filter
+                );
 
                 // Set the filtered branch data to BranchModel
                 const aBranchData = oResponse?.data || [];
                 const oBranchModel = new JSONModel(aBranchData[0] || {});
                 oView.setModel(oBranchModel, "BranchModel");
+
+                const oVisibilityModel = oView.getModel("VisibilityModel");
+                if (oVisibilityModel) {
+                    oVisibilityModel.setProperty("/AverageRating", aBranchData[0]?.AverageRating || 0);
+                    oVisibilityModel.setProperty("/TotalFeedbacks", aBranchData[0]?.TotalFeedbacks || 0);
+                }
             } catch (error) {
                 console.error("Error loading branch data:", error);
                 // Set empty model on error
