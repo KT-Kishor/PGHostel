@@ -190,7 +190,7 @@
                                             text="{path:'complaintTemp>size', formatter:'.Formatter.formatFileSize'}"
                                         />
 										<Button
-                                            icon="sap-icon://decline"
+                                            icon="sap-icon://delete"
                                             class="myUnifiedBtn"
                                             press="onComplaintDeleteDoc"
                                             tooltip="Remove"
