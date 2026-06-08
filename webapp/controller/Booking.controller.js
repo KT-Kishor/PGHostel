@@ -5035,10 +5035,10 @@
 
             if (sPlan === "Per Month") {
                 oEndDate.setMonth(oEndDate.getMonth() + iDuration);
-                oEndDate.setDate(oEndDate.getDate() - 1);
+                // oEndDate.setDate(oEndDate.getDate() - 1);
             } else if (sPlan === "Per Year") {
                 oEndDate.setFullYear(oEndDate.getFullYear() + iDuration);
-                oEndDate.setDate(oEndDate.getDate() - 1);
+                // oEndDate.setDate(oEndDate.getDate() - 1);
             } else {
                 return;
             }
