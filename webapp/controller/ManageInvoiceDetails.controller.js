@@ -1096,14 +1096,9 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
-                //  ROUND OFF 
-                const roundedAmount = Math.round(finalAmount);
-
-                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
-                oSOWModel.setProperty("/RoundOf", roundOffDiff);
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
-                oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
-                oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
+                oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+                oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
 
                 //  PAYMENT 
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
@@ -1119,11 +1114,11 @@ sap.ui.define([
                 let balanceAmount = 0;
                 let refundAmount = 0;
 
-                if (totalPaid > roundedAmount) {
-                    refundAmount = totalPaid - roundedAmount;
+                if (totalPaid > finalAmount) {
+                    refundAmount = totalPaid - finalAmount;
                     balanceAmount = 0;
                 } else {
-                    balanceAmount = roundedAmount - totalPaid;
+                    balanceAmount = finalAmount - totalPaid;
                     refundAmount = 0;
                 }
 
@@ -1918,7 +1913,8 @@ sap.ui.define([
                     CustomerName: paymentModel.CustomerName,
                     BookingID: paymentModel.BookingID,
                     BranchCode: paymentModel.BranchCode,
-                    PaymentType: "UPI"
+                    PaymentType: "UPI",
+                    EntryDate: new Date().toISOString().split("T")[0]
                 };
 
                 try {
@@ -2302,9 +2298,7 @@ sap.ui.define([
             CID_onPressGeneratePdf: async function() {
                 try {
                     this.getBusyDialog()
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF} = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
@@ -2312,15 +2306,11 @@ sap.ui.define([
                     var data = this.getView().getModel("FilteredSOWModel").getData();
 
                     // fetch company details
-                    let filter = {
-                        BranchID: [oModel.BranchCode]
-                    };
+                    let filter = {BranchID: [oModel.BranchCode]};
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let paymentTermsFilter = {
-                        InvNo: [oModel.InvNo]
-                    };
+                    let paymentTermsFilter = {InvNo: [oModel.InvNo]};
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
@@ -2566,10 +2556,10 @@ sap.ui.define([
                     //     ]);
                     // }
 
-                    const roundOff = Number(data.RoundOf);
-                    if (!isNaN(roundOff) && roundOff !== 0) {
-                        summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                    }
+                    // const roundOff = Number(data.RoundOf);
+                    // if (!isNaN(roundOff) && roundOff !== 0) {
+                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
+                    // }
 
                     // if (data.RoundOf && data.RoundOf !== "0") {
                     //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
@@ -2789,9 +2779,7 @@ sap.ui.define([
                 try {
                     this.getBusyDialog()
 
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
                     const oTable = this.byId("CID_id_TableInvoiceItem");
@@ -2822,9 +2810,7 @@ sap.ui.define([
                         currency === "INR";
 
                     //  COMPANY DETAILS 
-                    const filter = {
-                        BranchID: [oCustomerModel.BranchCode]
-                    };
+                    const filter = {BranchID: [oCustomerModel.BranchCode]};
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
 
@@ -2908,10 +2894,10 @@ sap.ui.define([
                         }
                     }
 
-                    //  ROUND OFF 
-                    const roundedAmount = Math.round(finalAmount);
+                    // //  ROUND OFF 
+                    // const roundedAmount = Math.round(finalAmount);
 
-                    const roundOff = (roundedAmount - finalAmount).toFixed(2);
+                    // const roundOff = (roundedAmount - finalAmount).toFixed(2);
 
                     //  ASSIGN VALUES FOR PDF 
                     oCustomerModel.SubTotal = subTotal.toFixed(2);
@@ -2922,8 +2908,8 @@ sap.ui.define([
                     oCustomerModel.SGST = sgst.toFixed(2);
                     oCustomerModel.IGST = igst.toFixed(2);
                     oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
-                    oCustomerModel.RoundOff = roundOff;
-                    oCustomerModel.TotalAmount = roundedAmount.toFixed(2);
+                    // oCustomerModel.RoundOff = roundOff;
+                    oCustomerModel.TotalAmount = finalAmount.toFixed(2);
 
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
                     const showSAC = isGSTEnabled;
@@ -3101,7 +3087,7 @@ sap.ui.define([
                     if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
 
                     const totalRowIndex = summary.length;
-                    summary.push(["Total :", Formatter.fromatNumber(roundedAmount)]);
+                    summary.push(["Total :", Formatter.fromatNumber(finalAmount)]);
 
                     doc.autoTable({
                         startY: currentY,
@@ -3172,9 +3158,7 @@ sap.ui.define([
             CID_onPressGenerateSummaryPDF: async function() {
                 try {
                     this.getBusyDialog()
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
                     //  FETCH OVERALL INVOICE DATA 
