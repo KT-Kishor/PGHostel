@@ -12,10 +12,7 @@ sap.ui.define([
         onInit: function () {
             this._bEditMode = true;
 
-            this.getOwnerComponent()
-                .getRouter()
-                .getRoute("RouteEditBooking")
-                .attachMatched(this._onEditRouteMatched, this);
+            this.getOwnerComponent().getRouter().getRoute("RouteEditBooking").attachMatched(this._onEditRouteMatched, this);
 
             this._iFacilityStartIndex = 0;  
             this._iFacilityPageSize = 3; // fallback; recalculated dynamically
@@ -116,7 +113,7 @@ sap.ui.define([
             //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             //     oRouter.navTo("RouteHostel", {}, true);
             // }
-
+             this.getBusyDialog();
             let oArgs;
 
             // Case 1: called from router
@@ -144,6 +141,7 @@ sap.ui.define([
 
             // LOGIN CHECK
             if (!bLoggedIn) {
+                await this.closeBusyDialog()
                 this._bPendingEditRoute = true;
                 this.getView().addStyleClass("blur-background");
 
@@ -217,8 +215,6 @@ sap.ui.define([
             this._resetBookingPageModels();
 
             try {
-                this.getBusyDialog();
-
                 // 1. Fetch booking data using HM_Customer
                 var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
                     BookingID: sBookingID,

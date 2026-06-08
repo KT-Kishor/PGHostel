@@ -101,7 +101,7 @@
             BaseController.prototype.onExit.call(this);
         },
         _onRouteMatched: async function () {
-            // this.getBusyDialog();
+            this.getBusyDialog();
             var LoginFUnction = await this.commonLoginFunction("Booking");
             if (!LoginFUnction) return;
 
@@ -138,6 +138,7 @@
 
             // Start background loading of member data
             this._loadMemberDataInBackground();
+            this.closeBusyDialog()
         },
 
         /**
