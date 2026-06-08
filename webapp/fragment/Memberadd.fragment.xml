@@ -209,8 +209,8 @@
                         class="sapUiSmallMarginEnd"
                     >
                         <core:Item
-                            key="Aadhar Card"
-                            text="Aadhar Card"
+                            key="Aadhaar Card"
+                            text="Aadhaar Card"
                         />
                         <core:Item
                             key="Pan Card"

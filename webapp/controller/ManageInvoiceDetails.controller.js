@@ -504,7 +504,12 @@ sap.ui.define([
                         oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
 
                     if (!bookingDetails && facilityArray.length === 0) {
-                        MessageBox.information("Booking is Fully Completed. No new Invoice can be Generated.");
+                        sap.m.MessageBox.information(
+                        "Booking is Fully Completed. No new Invoice can be Generated.",
+                        {
+                            styleClass: "myUnifiedBtn"
+                        }
+                    );
                         return;
                     }
 
@@ -1509,7 +1514,7 @@ sap.ui.define([
                 } else {
                     this.visiablityPlay.setProperty("/editable", true);
                     this.visiablityPlay.setProperty("/CInvoice", true);
-                    // this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+                    // this.byId("CID_id_TableInvoiceItem").setMode(sap.m.ListMode.MultiSelect);
                     this.visiablityPlay.setProperty("/addInvBtn", true);
                     this.visiablityPlay.setProperty("/merge", false);
                     this.visiablityPlay.setProperty("/MultiEmail", false);

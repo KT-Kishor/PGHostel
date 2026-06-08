@@ -193,7 +193,7 @@
                 maxPersons: 1,
                 originalPersonOptions: [],
                 DocumentTypeOptions: [
-                    { key: "Aadhaar", text: "Aadhaar" },
+                    { key: "Aadhaar Card", text: "Aadhaar Card" },
                     { key: "Passport", text: "Passport" },
                     { key: "Driving License", text: "Driving License" },
                     { key: "Voter ID", text: "Voter ID" }
@@ -5035,10 +5035,10 @@
 
             if (sPlan === "Per Month") {
                 oEndDate.setMonth(oEndDate.getMonth() + iDuration);
-                oEndDate.setDate(oEndDate.getDate() - 1);
+                // oEndDate.setDate(oEndDate.getDate() - 1);
             } else if (sPlan === "Per Year") {
                 oEndDate.setFullYear(oEndDate.getFullYear() + iDuration);
-                oEndDate.setDate(oEndDate.getDate() - 1);
+                // oEndDate.setDate(oEndDate.getDate() - 1);
             } else {
                 return;
             }
