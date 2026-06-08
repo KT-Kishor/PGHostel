@@ -919,28 +919,17 @@
             
             </contentLeft>
 				<contentRight>
-                <!-- Edit booking button - only visible when status is New and not in edit mode -->
                 <Button
-                    text="Edit Booking"
+                    text="{= ${BookingView>/editModeEnabled} ? 'Update Booking' : 'Edit Booking' }"
                     class="myUnifiedBtn"
-                    press="onEditBookingPress"
-                    visible="{BookingView>/showEditButton}"
-                    enabled="{= !${BookingView>/editModeEnabled} }"
+                    press="onToggleEditUpdate"
+                    visible="{= ${BookingView>/showEditButton} || ${BookingView>/editModeEnabled} }"
                 />
-                <!-- Cancel button - only visible when in edit mode -->
                 <Button
                     text="Cancel"
                     class="myUnifiedBtn"
                     press="onCancelEditPress"
                     visible="{BookingView>/editModeEnabled}"
-                />
-                <!-- Update booking button - only enabled when in edit mode -->
-                <Button
-                    text="Update Booking"
-                    class="myUnifiedBtn"
-                    press="onSubmitPress"
-                    enabled="{BookingView>/editModeEnabled}"
-                    visible="{= !${BookingView>/isAdminUpdatedYes} &amp;&amp; !${BookingView>/isWithin48HoursOfCheckIn} }"
                 />
                   </contentRight>
 			</Bar>
