@@ -2444,7 +2444,7 @@ sap.ui.define([
                 return Number((fSavedTotal / iPersonCount).toFixed(2));
             }
 
-            return this._toNumber(oFacility.BasicFacilityPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
+            return this._toNumber(oFacility.UnitPrice || oFacility.BasicFacilityPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
         },
 
         _applyEditFacilityPriceFilter: function () {
@@ -3039,7 +3039,8 @@ sap.ui.define([
                 BranchCode: oFacility.BranchCode,
                 Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
                 Image: this._getFacilityImageSource(oFacility),
-                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice),
+                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice || oFacility.UnitPrice),
+                UnitPrice: this._toNumber(oFacility.UnitPrice),
                 PricePerHour: this._toNumber(oFacility.PerHourPrice),
                 PricePerDay: this._toNumber(oFacility.PerDayPrice),
                 PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
