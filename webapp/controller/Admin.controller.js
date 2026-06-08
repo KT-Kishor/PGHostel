@@ -867,7 +867,7 @@ sap.ui.define([
                         title: "Confirm Navigation",
                         icon: sap.m.MessageBox.Icon.INFORMATION,
                         actions: [
-                            sap.m.MessageBox.Action.OK,
+                            // sap.m.MessageBox.Action.OK,
                             sap.m.MessageBox.Action.CANCEL,
                         ],
 
