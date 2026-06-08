@@ -13,7 +13,7 @@ sap.ui.define([
                 this.getOwnerComponent().getRouter().getRoute("RouteUploadDocs").attachMatched(this._onRouteMatched, this);
             },
 
-            _onRouteMatched: function (oEvent) {
+            _onRouteMatched: async function (oEvent) {
                 if (!this._oMemberDialog) {
                     this._oMemberDialog = sap.ui.xmlfragment(
                         this.getView().getId(),
@@ -42,12 +42,12 @@ sap.ui.define([
 
                 const oData = this.getView().getModel("BookingView").getData();
 
-                const oDocument = oData.Members
+                const bAllUpdated = oData.Members
                     .flatMap(member => member.Documents)
-                    .find(doc => doc.Status === "Updated");
+                    .every(doc => doc.Status === "Updated");
 
-                if (oDocument && oDocument.Status === "Updated") {
-                    this._goToNotFound()
+                if (bAllUpdated) {
+                    this._goToNotFound();
                 }
 
             },

@@ -3219,6 +3219,15 @@ sap.ui.define([
         },
 
         // Enable edit mode when "Edit booking" button is pressed
+        onToggleEditUpdate: function () {
+            var oBookingView = this.getView().getModel("BookingView");
+            if (oBookingView && oBookingView.getProperty("/editModeEnabled")) {
+                this.onSubmitPress();
+            } else {
+                this.onEditBookingPress();
+            }
+        },
+
         onEditBookingPress: function () {
             const oView = this.getView();
 
