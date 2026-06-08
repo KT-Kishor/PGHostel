@@ -6289,14 +6289,10 @@
          onGeneratePDF: async function (data) {
             const booking = data.Booking?.[0] || {};
             const facilities = data.FacilityItems || [];
-            const oHostelModel =
-            this.getView().getModel("HostelModel").getData() || {};
+            const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
             let filter = { BranchID: [booking.BranchCode] };
-            const oCompanyDetailsModel = await this.ajaxReadWithJQuery(
-            "HM_Branch",
-            filter,
-            );
+            const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter,);
             const company = oCompanyDetailsModel.data[0] || {};
             const checkinTime = company.CheckinTime || "11:00 AM";
             const checkoutTime = company.CheckoutTime || "10:00 PM";
@@ -6347,10 +6343,7 @@
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
             doc.text(
-            `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`,
-            148,
-            15,
-            );
+            `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15,);
 
             currentY = 40;
 
@@ -6388,29 +6381,21 @@
             currentY += 55;
 
             // ================= GUEST & STAY =================
-            checkNewPage(45); // Adjusted down to keep layouts together gracefully if needed
+            checkNewPage(45); 
 
             var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
             let guestBody = [];
             let guestBoxY = currentY;
 
             Memberdata.forEach((member, index) => {
-            guestBody.push([
-                (index + 1).toString(),
-                `${member.Salutation || ""} ${member.Name || "-"}`,
-                member.Gender || "-",
-                Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
-                member.Relation || "-",
-            ]);
+                guestBody.push([
+                    (index + 1).toString(),
+                    `${member.Salutation || ""} ${member.Name || "-"}`,
+                    member.Gender || "-",
+                    Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
+                    member.Relation || "-",
+                ]);
             });
-
-            // Guest Box Background
-            doc.setDrawColor(...BORDER_LIGHT);
-            doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "S");
-
-            // Accent bar
-            doc.setFillColor(...ACCENT_COLOR);
-            doc.rect(15, guestBoxY, 5, 25, "F");
 
             // Title
             doc.setFont("helvetica", "bold");
@@ -6419,178 +6404,164 @@
             doc.text("GUEST DETAILS", 24, guestBoxY + 8);
 
             doc.autoTable({
-            startY: guestBoxY + 12,
-            margin: { left: 20, right: 15 },
-            head: [["Sl.No", "Guest Name", "Gender", "Age", "Relation"]],
-            body: guestBody,
-            theme: "grid",
-            styles: {
-                font: "helvetica",
-                fontSize: 8,
-                cellPadding: 2,
-                lineColor: [220, 220, 220],
-                lineWidth: 0.1,
-            },
-            headStyles: {
-                fillColor: PRIMARY_COLOR,
-                textColor: [255, 255, 255],
-                fontStyle: "bold",
-                halign: "center",
-            },
-            columnStyles: {
-                0: { cellWidth: 15, halign: "center" },
-                1: { cellWidth: 58 },
-                2: { cellWidth: 26, halign: "center" },
-                3: { cellWidth: 38, halign: "center" },
-                4: { cellWidth: 30, halign: "center" },
-            },
+                startY: guestBoxY + 12,
+                margin: { left: 20, right: 15 },
+                head: [["Sl.No", "Guest Name", "Gender", "Age", "Relation"]],
+                body: guestBody,
+                theme: "grid",
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                    cellPadding: 2,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1,
+                },
+                headStyles: {
+                    fillColor: PRIMARY_COLOR,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    halign: "center",
+                },
+                columnStyles: {
+                    0: { cellWidth: 15, halign: "center" },
+                    1: { cellWidth: 'auto' },
+                    2: { cellWidth: 25, halign: "center" },
+                    3: { cellWidth: 25, halign: "center" },
+                    4: { cellWidth: 30, halign: "center" }
+                }
             });
 
             // Dynamic Guest Box Height
             let guestBoxHeight = doc.lastAutoTable.finalY - guestBoxY + 10;
 
-            // Redraw Box Border & Complete Accent Bar
-            doc.setDrawColor(...BORDER_LIGHT);
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
             doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-            doc.setFillColor(...ACCENT_COLOR);
+            
+            // Colored Side Bar Accent
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
-            currentY = guestBoxY + guestBoxHeight + 10;
+            currentY = guestBoxY + guestBoxHeight + 12;
 
-            // ---------- STAY DETAILS ----------
-            checkNewPage(50);
+            // ---------- STAY DETAILS (DYNAMICALLY CALCULATED) ----------
+            checkNewPage(45);
 
+            let stayStartY = currentY;
+
+            // Text offset placements relative to stayStartY
+            let titleOffset = 10;
+            let row1Offset = 22;
+            let row2Offset = 34;
+
+            // Calculate dynamic container boundary height based on the final row offset
+            let stayCardHeight = row2Offset + 8; 
+
+            // Render background structure with calculated dynamic heights
             doc.setFillColor(...LIGHT_GRAY);
             doc.setDrawColor(...BORDER_LIGHT);
-            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
+            doc.roundedRect(15, stayStartY, 180, stayCardHeight, 4, 4, "FD");
 
+            // Sidebar Accent matches exactly
             doc.setFillColor(...ACCENT_COLOR);
-            doc.rect(15, currentY, 5, 40, "F");
+            doc.rect(15, stayStartY, 5, stayCardHeight, "F");
 
+            // Component Title
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
             doc.setTextColor(...PRIMARY_COLOR);
-            doc.text("STAY DETAILS", 24, currentY + 7);
+            doc.text("STAY DETAILS", 24, stayStartY + titleOffset);
 
+            // Row 1 Metadata Fields
             doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
             doc.setTextColor(90, 90, 90);
-            doc.text("Check-in Date", 24, currentY + 16);
-            doc.text("Check-out Date", 24, currentY + 26);
+            doc.text("Check-in Date", 24, stayStartY + row1Offset);
+            doc.text("Room Type", 115, stayStartY + row1Offset);
 
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
-            doc.text(
-            booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-",
-            60,
-            currentY + 16,
-            );
-            doc.text(
-            booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-",
-            60,
-            currentY + 26,
-            );
+            doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60, stayStartY + row1Offset);
+            doc.text(booking.BedType || "-", 150, stayStartY + row1Offset);
 
+            // Row 2 Metadata Fields
             doc.setFont("helvetica", "bold");
             doc.setTextColor(90, 90, 90);
-            doc.text("Room Type", 115, currentY + 16);
-            doc.text("No Of Guests", 115, currentY + 26);
+            doc.text("Check-out Date", 24, stayStartY + row2Offset);
+            doc.text("No Of Guests", 115, stayStartY + row2Offset);
 
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
-            doc.text(booking.BedType || "-", 150, currentY + 16);
-            doc.text(String(booking.NoOfPersons || "-"), 150, currentY + 26);
+            doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, stayStartY + row2Offset);
+            doc.text(String(booking.NoOfPersons || "-"), 150, stayStartY + row2Offset);
 
-            currentY += 50;
+            // Baseline spacing derived purely dynamically from computed layout values
+            currentY = stayStartY + stayCardHeight + 12;
 
             // ---------- FACILITY DETAILS ----------
             if (facilities.length > 0) {
-            // Safeguard check: Move title section ONLY if there isn't even 15mm left on Page 1
-            if (currentY + 20 > 280) {
-                doc.addPage();
-                currentY = 20;
-            }
+                if (currentY + 20 > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                }
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(
-                PRIMARY_COLOR[0],
-                PRIMARY_COLOR[1],
-                PRIMARY_COLOR[2],
-            );
-            doc.text("FACILITY DETAILS", 15, currentY);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(14);
+                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+                doc.text("FACILITY DETAILS", 15, currentY);
 
-            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.setLineWidth(0.8);
-            doc.line(15, currentY + 3, 70, currentY + 3);
+                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.setLineWidth(0.8);
+                doc.line(15, currentY + 3, 70, currentY + 3);
 
-            currentY += 8;
+                currentY += 8;
 
-            let tableBody = facilities.map((item, index) => [
-                (index + 1).toString(),
-                item.FacilityName || "-",
-                `${Formatter.formatDate(item.StartDate) || "-"}`,
-                `${Formatter.formatDate(item.EndDate) || "-"}`,
-                `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
-                item.UnitText || "-",
-                `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`,
-            ]);
+                let tableBody = facilities.map((item, index) => [
+                    (index + 1).toString(),
+                    item.FacilityName || "-",
+                    `${Formatter.formatDate(item.StartDate) || "-"}`,
+                    `${Formatter.formatDate(item.EndDate) || "-"}`,
+                    `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
+                    item.UnitText || "-",
+                    `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`,
+                ]);
 
-            // BUG REMOVED: Deleted the block that manually triggered a hard break if the full table couldn't fit.
-            // AutoTable will now split dynamically between Page 1 and Page 2.
-            doc.autoTable({
-                startY: currentY,
-                margin: { left: 15, right: 15 },
-                head: [
-                [
-                    "Sl.No",
-                    "Particular",
-                    "Start Date",
-                    "End Date",
-                    "Gross Price",
-                    "Unit",
-                    "Total",
-                ],
-                ],
-                body: tableBody,
-                theme: "striped",
-                styles: {
-                font: "helvetica",
-                fontSize: 9,
-                cellPadding: 2,
-                lineColor: [220, 220, 220],
-                lineWidth: 0.1,
-                valign: "middle",
-                },
-                headStyles: {
-                fillColor: PRIMARY_COLOR,
-                textColor: [255, 255, 255],
-                fontStyle: "bold",
-                fontSize: 10,
-                halign: "center",
-                },
-                columnStyles: {
-                0: { cellWidth: 12, halign: "center" },
-                1: { cellWidth: "auto", halign: "left" },
-                2: { cellWidth: 24, halign: "center" },
-                3: { cellWidth: 24, halign: "center" },
-                4: { cellWidth: 24, halign: "right" },
-                5: { cellWidth: 18, halign: "center" },
-                6: { cellWidth: 28, halign: "right" },
-                },
-            });
+                doc.autoTable({
+                    startY: currentY,
+                    margin: { left: 15, right: 15 },
+                    head: [["Sl.No", "Particular", "Start Date", "End Date", "Gross Price", "Unit", "Total"]],
+                    body: tableBody,
+                    theme: "striped",
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 9,
+                        cellPadding: 2,
+                        lineColor: [220, 220, 220],
+                        lineWidth: 0.1,
+                        valign: "middle",
+                    },
+                    headStyles: {
+                        fillColor: PRIMARY_COLOR,
+                        textColor: [255, 255, 255],
+                        fontStyle: "bold",
+                        fontSize: 10,
+                        halign: "center",
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 12, halign: "center" },
+                        1: { cellWidth: "auto", halign: "left" },
+                        2: { cellWidth: 24, halign: "center" },
+                        3: { cellWidth: 24, halign: "center" },
+                        4: { cellWidth: 24, halign: "right" },
+                        5: { cellWidth: 18, halign: "center" },
+                        6: { cellWidth: 28, halign: "right" },
+                    },
+                });
 
-            // Always calculate the next baseline from where the table actually ends
-            currentY = doc.lastAutoTable.finalY + 12;
+                currentY = doc.lastAutoTable.finalY + 12;
             }
 
             // ========== PAYMENT SUMMARY ==========
-            // Check if the payment card (approx 90mm) fits on the page where the table stopped
-            if (currentY + 95 > 280) {
-            doc.addPage();
-            currentY = 20;
-            }
-
             const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
             const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
@@ -6598,65 +6569,74 @@
             const deposit = parseFloat(data.Deposit) || 0;
             let grandTotal = oHostelModel.GrandTotal;
 
-            const summaryHeight = 90;
+            const hasCGST = booking.GSTType === "CGST/SGST";
+            const hasIGST = booking.GSTType === "IGST";
+
+            // Calculate dynamic calculation box matrix properties
+            let lineCounter = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
+            let paymentBoxHeight = (lineCounter * 7) + 25;
+
+            if (currentY + paymentBoxHeight > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            let paymentStartY = currentY;
+
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(245, 186, 66);
             doc.setLineWidth(0.3);
-            doc.roundedRect(15, currentY, 180, summaryHeight, 4, 4, "FD");
+            doc.roundedRect(15, paymentStartY, 180, paymentBoxHeight, 4, 4, "FD");
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(13);
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("PAYMENT SUMMARY", 20, currentY + 10);
+            doc.text("PAYMENT SUMMARY", 20, paymentStartY + 10);
 
-            let summaryY = currentY + 22;
+            let summaryY = paymentStartY + 20;
             const leftX = 20;
             const rightX = 185;
 
             const addLine = (label, value, isGrandTotal = false) => {
-            if (isGrandTotal) {
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12);
-                doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            } else {
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(10);
-                doc.setTextColor(80, 80, 80);
-            }
+                if (isGrandTotal) {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                } else {
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(80, 80, 80);
+                }
 
-            doc.text(label, leftX, summaryY);
-            doc.text(value, rightX, summaryY, { align: "right" });
-            summaryY += 7;
+                doc.text(label, leftX, summaryY);
+                doc.text(value, rightX, summaryY, { align: "right" });
+                summaryY += 7;
             };
 
             addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
-            addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+
+             // Render Facility Total row line only if there's actual value or entries
+            if (facilityTotal > 0 || facilities.length > 0) {
+                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            }
+
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
-            if (booking.GSTType === "CGST/SGST") {
-            const cgst = parseFloat(oHostelModel.CGST) || 0;
-            const sgst = parseFloat(oHostelModel.SGST) || 0;
-            addLine(
-                `CGST (${oHostelModel.GSTValue}%)`,
-                ` ${Formatter.fromatNumber(cgst)}`,
-            );
-            addLine(
-                `SGST (${oHostelModel.GSTValue}%)`,
-                ` ${Formatter.fromatNumber(sgst)}`,
-            );
+            if (hasCGST) {
+                const cgst = parseFloat(oHostelModel.CGST) || 0;
+                const sgst = parseFloat(oHostelModel.SGST) || 0;
+                addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
+                addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
+            } else if (hasIGST) {
+                const igst = parseFloat(oHostelModel.IGST) || 0;
+                addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
             }
 
-            if (booking.GSTType === "IGST") {
-            const igst = parseFloat(oHostelModel.IGST) || 0;
-            addLine(
-                `IGST (${oHostelModel.GSTValue}%)`,
-                ` ${Formatter.fromatNumber(igst)}`,
-            );
+            if (discount > 0) {
+                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
             }
 
-            addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-
-            summaryY += 2;
+            summaryY += 1;
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
@@ -6664,7 +6644,7 @@
             summaryY += 2;
             addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
-            currentY += summaryHeight + 10;
+            currentY = paymentStartY + paymentBoxHeight + 12;
 
             // ========== AMOUNT IN WORDS ==========
             if (currentY + 25 > 280) {

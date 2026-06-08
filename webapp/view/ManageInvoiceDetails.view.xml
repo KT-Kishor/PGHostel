@@ -420,7 +420,8 @@
 									<m:Table id="CID_id_TableInvoiceItem"
                                         sticky="ColumnHeaders,HeaderToolbar"
                                         items="{ManageInvoiceItemModel>/ManageInvoiceItem}"
-                                        mode="MultiSelect">
+                                        mode="MultiSelect" autoPopinMode="true"
+                                        contextualWidth="Auto">
 										<m:headerToolbar>
 											<m:OverflowToolbar>
 												<m:Title
