@@ -30,7 +30,6 @@
 
                 <Table
                     id="abmemberSelectTable"
-                    mode="MultiSelect"
                     items="{BookingView>/Members}"
                     noDataText="No saved members available"
                     growing="true"

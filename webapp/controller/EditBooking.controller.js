@@ -2444,7 +2444,7 @@ sap.ui.define([
                 return Number((fSavedTotal / iPersonCount).toFixed(2));
             }
 
-            return this._toNumber(oFacility.BasicFacilityPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
+            return this._toNumber(oFacility.UnitPrice || oFacility.BasicFacilityPrice || oFacility.PerDayPrice || oFacility.PerMonthPrice || oFacility.PerYearPrice || 0);
         },
 
         _applyEditFacilityPriceFilter: function () {
@@ -3039,7 +3039,8 @@ sap.ui.define([
                 BranchCode: oFacility.BranchCode,
                 Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
                 Image: this._getFacilityImageSource(oFacility),
-                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice),
+                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice || oFacility.UnitPrice),
+                UnitPrice: this._toNumber(oFacility.UnitPrice),
                 PricePerHour: this._toNumber(oFacility.PerHourPrice),
                 PricePerDay: this._toNumber(oFacility.PerDayPrice),
                 PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
@@ -3748,8 +3749,8 @@ sap.ui.define([
 
                 currentY += 55;
 
-                // ================= GUEST & STAY =================
-                checkNewPage(100);
+               // ================= GUEST & STAY =================
+                checkNewPage(45); 
 
                 let guestBoxY = currentY;
                 var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
@@ -3764,13 +3765,6 @@ sap.ui.define([
                         member.Relation || "-"
                     ]);
                 });
-
-                // Outer Background Box for title context
-                doc.setDrawColor(...BORDER_LIGHT);
-                doc.roundedRect(15, guestBoxY, 180, 25, 4, 4, "S");
-
-                doc.setFillColor(...ACCENT_COLOR);
-                doc.rect(15, guestBoxY, 5, 25, "F");
 
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(12);
@@ -3792,69 +3786,88 @@ sap.ui.define([
                     },
                     headStyles: {
                         fillColor: PRIMARY_COLOR,
-                        textColor: [255,255,255],
+                        textColor: [255, 255, 255],
                         fontStyle: "bold",
                         halign: "center"
                     },
                     columnStyles: {
-                        0: { cellWidth: 15, halign: "center" },
-                        1: { cellWidth: 58 },
-                        2: { cellWidth: 26, halign: "center" },
-                        3: { cellWidth: 38, halign: "center" },
-                        4: { cellWidth: 30, halign: "center" }
-                    }
+                    0: { cellWidth: 15, halign: "center" },
+                    1: { cellWidth: 'auto' },
+                    2: { cellWidth: 25, halign: "center" },
+                    3: { cellWidth: 25, halign: "center" },
+                    4: { cellWidth: 30, halign: "center" }
+                }
                 });
 
-                // Fix: Dynamic Box Height over-render handling
-                let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 5;
-                doc.setDrawColor(...BORDER_LIGHT);
+                // Dynamic Box Height over-render handling
+                let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 10;
+                doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+                doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
                 doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-                doc.setFillColor(...ACCENT_COLOR);
+                
+                // Colored Side Bar Accent
+                doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
                 doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
-                currentY = guestBoxY + guestBoxHeight + 10;
+                currentY = guestBoxY + guestBoxHeight + 12;
 
-                // ---------- STAY DETAILS ----------
-                checkNewPage(55);
+                // ---------- STAY DETAILS (DYNAMICALLY CALCULATED) ----------
+                checkNewPage(45);
+
+                let stayStartY = currentY;
+
+                // Text offset placements relative to stayStartY
+                let titleOffset = 10;
+                let row1Offset = 22;
+                let row2Offset = 34;
+
+                // Calculate dynamic container boundary height based on the final row offset
+                let stayCardHeight = row2Offset + 8; 
 
                 doc.setFillColor(...LIGHT_GRAY);
                 doc.setDrawColor(...BORDER_LIGHT);
-                doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
+                doc.roundedRect(15, stayStartY, 180, stayCardHeight, 4, 4, "FD");
 
                 doc.setFillColor(...ACCENT_COLOR);
-                doc.rect(15, currentY, 5, 40, "F");
+                doc.rect(15, stayStartY, 5, stayCardHeight, "F");
 
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(12);
                 doc.setTextColor(...PRIMARY_COLOR);
-                doc.text("STAY DETAILS", 24, currentY + 7);
+                doc.text("STAY DETAILS", 24, stayStartY + titleOffset);
 
+                // Row 1 Fields
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(9);
                 doc.setTextColor(90, 90, 90);
-                doc.text("Check-in Date", 24, currentY + 16);
-                doc.text("Check-out Date", 24, currentY + 26);
+                doc.text("Check-in Date", 24, stayStartY + row1Offset);
+                doc.text("Room Type", 115, stayStartY + row1Offset);
 
                 doc.setFont("helvetica", "normal");
                 doc.setTextColor(50, 50, 50);
-                doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60, currentY + 16);
-                doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, currentY + 26);
+                doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60, stayStartY + row1Offset);
+                doc.text(booking.BedType || "-", 150, stayStartY + row1Offset);
 
+                // Row 2 Fields
                 doc.setFont("helvetica", "bold");
                 doc.setTextColor(90, 90, 90);
-                doc.text("Room Type", 115, currentY + 16);
-                doc.text("No Of Guests", 115, currentY + 26);
+                doc.text("Check-out Date", 24, stayStartY + row2Offset);
+                doc.text("No Of Guests", 115, stayStartY + row2Offset);
 
                 doc.setFont("helvetica", "normal");
                 doc.setTextColor(50, 50, 50);
-                doc.text(booking.BedType || "-", 150, currentY + 16);
-                doc.text(String(booking.NoOfPersons || "-"), 150, currentY + 26);
+                doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, stayStartY + row2Offset);
+                doc.text(String(booking.NoOfPersons || "-"), 150, stayStartY + row2Offset);
 
-                currentY += 50;
+                // Baseline spacing derived dynamically from computed layout card structure
+                currentY = stayStartY + stayCardHeight + 12;
 
                 // ================= FACILITY DETAILS =================
                 if (facilities.length > 0) {
-                    checkNewPage(20);
+                    if (currentY + 20 > 280) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
 
                     doc.setFont("helvetica", "bold");
                     doc.setFontSize(14);
@@ -3867,7 +3880,6 @@ sap.ui.define([
 
                     currentY += 8;
 
-                    // Fix: Typo bugs resolved below (`Formatter.fromatNumber`)
                     let tableBody = facilities.map((item, index) => [
                         (index + 1).toString(),
                         item.FacilityName || "-",
@@ -3878,15 +3890,9 @@ sap.ui.define([
                         `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
                     ]);
 
-                    const estimatedTableHeight = (tableBody.length + 1) * 8; 
-                    if (currentY + estimatedTableHeight > 260) {
-                        doc.addPage();
-                        currentY = 20;
-                    }
-
                     doc.autoTable({
                         startY: currentY,
-                        margin: { left: 15, right: 10 },
+                        margin: { left: 15, right: 15 },
                         head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
                         body: tableBody,
                         theme: 'striped',
@@ -3907,7 +3913,7 @@ sap.ui.define([
                         },
                         columnStyles: {
                             0: { cellWidth: 12, halign: "center" },
-                            1: { cellWidth: 48, halign: "left" },
+                            1: { cellWidth: 'auto', halign: "left" },
                             2: { cellWidth: 24, halign: "center" },
                             3: { cellWidth: 24, halign: "center" },
                             4: { cellWidth: 24, halign: "right" },
@@ -3916,33 +3922,41 @@ sap.ui.define([
                         }
                     });
 
-                    currentY = doc.lastAutoTable.finalY + 15;
+                    currentY = doc.lastAutoTable.finalY + 12;
                 }
 
-                // ========== PAYMENT SUMMARY ==========
-                if (currentY + 95 > 280) {
-                    doc.addPage();
-                    currentY = 20;
-                }
-
+                // ========== PAYMENT SUMMARY (DYNAMICALLY CALCULATED) ==========
                 const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
                 const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
                 const subTotal = roomRent + facilityTotal;
                 const discount = parseFloat(booking.Discount) || 0;
                 let grandTotal = oHostelModel.GrandTotal;
 
-                const summaryHeight = 90;
+                const hasCGST = booking.GSTType === "CGST/SGST";
+                const hasIGST = booking.GSTType === "IGST";
+
+                // Calculate unique lines to isolate precise box height requirements
+                let linesCount = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
+                let paymentBoxHeight = (linesCount * 7) + 25;
+
+                if (currentY + paymentBoxHeight > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                let paymentStartY = currentY;
+
                 doc.setFillColor(255, 255, 255);
                 doc.setDrawColor(244, 185, 66);
                 doc.setLineWidth(0.3);
-                doc.roundedRect(15, currentY, 180, summaryHeight, 4, 4, "FD");
+                doc.roundedRect(15, paymentStartY, 180, paymentBoxHeight, 4, 4, "FD");
 
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(13);
                 doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text("PAYMENT SUMMARY", 20, currentY + 10);
+                doc.text("PAYMENT SUMMARY", 20, paymentStartY + 10);
 
-                let summaryY = currentY + 22;
+                let summaryY = paymentStartY + 20;
                 const leftX = 20;
                 const rightX = 185;
 
@@ -3962,26 +3976,30 @@ sap.ui.define([
                     summaryY += 7;
                 };
 
-                // Fix: Formatter typos handled here as well
                 addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
-                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
-                addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
-                if (booking.GSTType === "CGST/SGST") {
+                // Render Facility Total row line only if there's actual value or entries
+                if (facilityTotal > 0 || facilities.length > 0) {
+                    addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+                }
+
+            addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
+
+                if (hasCGST) {
                     const cgst = parseFloat(oHostelModel.CGST) || 0;
                     const sgst = parseFloat(oHostelModel.SGST) || 0;
                     addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
                     addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
-                }
-
-                if (booking.GSTType === "IGST") {
+                } else if (hasIGST) {
                     const igst = parseFloat(oHostelModel.IGST) || 0;
                     addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
                 }
 
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+                if (discount > 0) {
+                    addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+                }
 
-                summaryY += 2;
+                summaryY += 1;
                 doc.setDrawColor(200, 200, 200);
                 doc.setLineWidth(0.3);
                 doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
@@ -3989,7 +4007,7 @@ sap.ui.define([
                 summaryY += 2;
                 addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
-                currentY += summaryHeight + 10;
+                currentY = paymentStartY + paymentBoxHeight + 12;
 
                 // ========== AMOUNT IN WORDS ==========
                 if (currentY + 30 > 280) {

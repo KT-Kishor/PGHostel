@@ -792,7 +792,13 @@
                     <Table
                         id="Ad_id_idFacilityRoomTableDetails"
                         class="sapUiSmallMarginTop"
-                        items="{path: 'CustomerData>/AllSelectedFacilities'}"
+                        items="{
+    path: 'CustomerData>/AllSelectedFacilities',
+    sorter: {
+        path: 'StartDate',
+        descending: false
+    }
+}"
                         mode="{= ${VisibleModel>/visible} === true ? 'SingleSelectLeft' : 'None' }"
                         busyIndicatorDelay="0"
                         inset="false"
@@ -1309,7 +1315,7 @@
                         id="idGST"
                         tooltip="GST Setup"
                         press="onGSTBooking"
-                        visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin') 
+                        visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin' || ${LoginModel>/Role} === 'Front Office Employee') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
                         class="myUnifiedBtn"
                     />
@@ -1330,6 +1336,7 @@
                                              &amp;&amp; (
                                            ${LoginModel>/Role} === 'Admin'
                                            || ${LoginModel>/Role} === 'SuperAdmin'
+                                           || ${LoginModel>/Role} === 'Front Office Employee'
                                               )
                                             )
                                                )
@@ -1354,7 +1361,7 @@
                         press="onChekout"
                         visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible} &amp;&amp; ${CustomerData>/Status} !== 'New'
-                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin') }"
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin' ||  ${LoginModel>/Role} === 'Front Office Employee') }"
                     />
 
                     <Button

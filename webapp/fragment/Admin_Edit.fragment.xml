@@ -230,8 +230,6 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onEditDateChange"
-                    minDate="{CustomerData>/minStartDate}"
-                    maxDate="{CustomerData>/minEndDate}"
                     valueStateText="{i18n>plaeseSelectDate}"
                 />
                 <!-- Days -->

@@ -163,6 +163,7 @@
                             tooltip="Unassign Room"
                             press="HM_UnassignRoom"
                             class="myUnifiedBtn"
+                            visible="false"
                         />
 						<Button
                             text="{i18n>download}"

@@ -1361,7 +1361,7 @@ sap.ui.define([
 
         const defaultStyle = {
             background: "#00b6c6",
-            textColor: "#000000"
+            textColor: "#f8f3f3"
         };
 
         const oHeader = new sap.m.GroupHeaderListItem({

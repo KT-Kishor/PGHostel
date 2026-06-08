@@ -614,6 +614,10 @@ sap.ui.define([
                             particulars = `${item.FacilityName} - Facility${memberSuffix}`;
                         }
 
+                        const unitPrice = parseFloat(item.UnitPrice ?? 0) || 0;
+                        const basicPrice = parseFloat(item.BasicFacilityPrice ?? 0) || 0;
+                        const price = basicPrice > 0 ? basicPrice : unitPrice;
+
                         finalInvoiceItems.push({
                             IndexNo: index + 2,
                             InvNo: this.newID,
@@ -623,7 +627,7 @@ sap.ui.define([
                             SAC: "996322",
                             GSTCalculation: "YES",
                             Discount: "0.00",
-                            GrossPrice: item.BasicFacilityPrice,
+                            GrossPrice: price,
                             Total: parseFloat(item.FacilityPrice),
                             StartDate: this.Formatter.DateFormat(item.StartDate),
                             EndDate: this.Formatter.DateFormat(item.EndDate),
@@ -1096,14 +1100,9 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGST", "0.00");
                 }
 
-                //  ROUND OFF 
-                const roundedAmount = Math.round(finalAmount);
-
-                const roundOffDiff = (roundedAmount - finalAmount).toFixed(2);
-                oSOWModel.setProperty("/RoundOf", roundOffDiff);
                 oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
-                oSOWModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
-                oCustomerModel.setProperty("/TotalAmount", roundedAmount.toFixed(2));
+                oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+                oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
 
                 //  PAYMENT 
                 let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
@@ -1119,11 +1118,11 @@ sap.ui.define([
                 let balanceAmount = 0;
                 let refundAmount = 0;
 
-                if (totalPaid > roundedAmount) {
-                    refundAmount = totalPaid - roundedAmount;
+                if (totalPaid > finalAmount) {
+                    refundAmount = totalPaid - finalAmount;
                     balanceAmount = 0;
                 } else {
-                    balanceAmount = roundedAmount - totalPaid;
+                    balanceAmount = finalAmount - totalPaid;
                     refundAmount = 0;
                 }
 
@@ -1918,7 +1917,8 @@ sap.ui.define([
                     CustomerName: paymentModel.CustomerName,
                     BookingID: paymentModel.BookingID,
                     BranchCode: paymentModel.BranchCode,
-                    PaymentType: "UPI"
+                    PaymentType: "UPI",
+                    EntryDate: new Date().toISOString().split("T")[0]
                 };
 
                 try {
@@ -2302,9 +2302,7 @@ sap.ui.define([
             CID_onPressGeneratePdf: async function() {
                 try {
                     this.getBusyDialog()
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF} = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
@@ -2312,15 +2310,11 @@ sap.ui.define([
                     var data = this.getView().getModel("FilteredSOWModel").getData();
 
                     // fetch company details
-                    let filter = {
-                        BranchID: [oModel.BranchCode]
-                    };
+                    let filter = {BranchID: [oModel.BranchCode]};
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0].Photo1;
 
-                    let paymentTermsFilter = {
-                        InvNo: [oModel.InvNo]
-                    };
+                    let paymentTermsFilter = {InvNo: [oModel.InvNo]};
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
@@ -2566,10 +2560,10 @@ sap.ui.define([
                     //     ]);
                     // }
 
-                    const roundOff = Number(data.RoundOf);
-                    if (!isNaN(roundOff) && roundOff !== 0) {
-                        summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                    }
+                    // const roundOff = Number(data.RoundOf);
+                    // if (!isNaN(roundOff) && roundOff !== 0) {
+                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
+                    // }
 
                     // if (data.RoundOf && data.RoundOf !== "0") {
                     //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
@@ -2789,9 +2783,7 @@ sap.ui.define([
                 try {
                     this.getBusyDialog()
 
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
                     const oTable = this.byId("CID_id_TableInvoiceItem");
@@ -2822,9 +2814,7 @@ sap.ui.define([
                         currency === "INR";
 
                     //  COMPANY DETAILS 
-                    const filter = {
-                        BranchID: [oCustomerModel.BranchCode]
-                    };
+                    const filter = {BranchID: [oCustomerModel.BranchCode]};
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
 
@@ -2908,10 +2898,10 @@ sap.ui.define([
                         }
                     }
 
-                    //  ROUND OFF 
-                    const roundedAmount = Math.round(finalAmount);
+                    // //  ROUND OFF 
+                    // const roundedAmount = Math.round(finalAmount);
 
-                    const roundOff = (roundedAmount - finalAmount).toFixed(2);
+                    // const roundOff = (roundedAmount - finalAmount).toFixed(2);
 
                     //  ASSIGN VALUES FOR PDF 
                     oCustomerModel.SubTotal = subTotal.toFixed(2);
@@ -2922,8 +2912,8 @@ sap.ui.define([
                     oCustomerModel.SGST = sgst.toFixed(2);
                     oCustomerModel.IGST = igst.toFixed(2);
                     oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
-                    oCustomerModel.RoundOff = roundOff;
-                    oCustomerModel.TotalAmount = roundedAmount.toFixed(2);
+                    // oCustomerModel.RoundOff = roundOff;
+                    oCustomerModel.TotalAmount = finalAmount.toFixed(2);
 
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
                     const showSAC = isGSTEnabled;
@@ -3101,7 +3091,7 @@ sap.ui.define([
                     if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
 
                     const totalRowIndex = summary.length;
-                    summary.push(["Total :", Formatter.fromatNumber(roundedAmount)]);
+                    summary.push(["Total :", Formatter.fromatNumber(finalAmount)]);
 
                     doc.autoTable({
                         startY: currentY,
@@ -3172,9 +3162,7 @@ sap.ui.define([
             CID_onPressGenerateSummaryPDF: async function() {
                 try {
                     this.getBusyDialog()
-                    const {
-                        jsPDF
-                    } = window.jspdf;
+                    const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
                     //  FETCH OVERALL INVOICE DATA 
@@ -3821,225 +3809,278 @@ sap.ui.define([
             },
 
             _calculateFacilityTotal: function(item, cycleStart, cycleEnd, invoiceIndex = 0) {
+
                 const sDate = new Date(item.StartDate);
                 const eDate = new Date(item.EndDate);
 
                 sDate.setHours(0, 0, 0, 0);
                 eDate.setHours(0, 0, 0, 0);
 
-                //  OVERLAP 
-                const overlaps = !(eDate < cycleStart || sDate > cycleEnd);
-                if (!overlaps) {
-                    return 0;
-                }
-
-                const effectiveStart = sDate > cycleStart ? sDate : cycleStart;
-                const effectiveEnd = eDate < cycleEnd ? eDate : cycleEnd;
-
-                const usedDays = this._calculateDays(effectiveStart, effectiveEnd);
-                const useddaysforday = this._calculateDaysForDay(effectiveStart, effectiveEnd);
-                const totalusedDays = this._calculateDaysForDay(sDate, eDate);
-
                 const unit = item.UnitText?.toLowerCase();
                 const selectionMode = item.SelectionMode?.toUpperCase();
                 const chargeType = item.FacilityChargeType?.toUpperCase();
                 const bookingUnit = item.PaymentType?.toLowerCase();
 
-                const qty = Number(item.Quantity) || 1;
-                const unitPrice = Number(item.UnitPrice) || 0;
-                const price = Number(item.BasicFacilityPrice) || unitPrice;
-                const totalprice = Number(item.FacilitiPrice) || price;
-                const totalHour = Number(item.TotalHour) || 1;
+                const qty = parseFloat(item.Quantity ?? 1) || 1;
+                const unitPrice = parseFloat(item.UnitPrice ?? 0) || 0;
+                const basicPrice = parseFloat(item.BasicFacilityPrice ?? 0) || 0;
 
+                const price = basicPrice > 0 ? basicPrice : unitPrice;
+
+                const totalPrice = parseFloat(item.FacilitiPrice ?? price) || price;
+                const totalHour = parseFloat(item.TotalHour ?? 1) || 1;
+
+                let effectiveStart = sDate;
+                let effectiveEnd = eDate;
                 let facilityAmount = 0;
+
+                if (bookingUnit !== "per day") {
+
+                    const overlaps =
+                        !(eDate < cycleStart || sDate > cycleEnd);
+
+                    if (!overlaps) {
+                        return 0;
+                    }
+
+                    effectiveStart =
+                        sDate > cycleStart ? sDate : cycleStart;
+
+                    effectiveEnd =
+                        eDate < cycleEnd ? eDate : cycleEnd;
+                }
+
+                const calcStart =
+                    bookingUnit === "per day"
+                        ? sDate
+                        : effectiveStart;
+
+                const calcEnd =
+                    bookingUnit === "per day"
+                        ? eDate
+                        : effectiveEnd;
+
+                const usedDays =
+                    this._calculateDays(calcStart, calcEnd);
+
+                const usedDaysForDay =
+                    this._calculateDaysForDay(calcStart, calcEnd);
+
+                const calculateYearAmount = (multiplier = 1) => {
+
+                    const years =
+                        Math.ceil(
+                            this._calculateTotalMonths(
+                                sDate,
+                                eDate
+                            ) / 12
+                        ) || 1;
+
+                    const yearlyPrice =
+                        totalPrice / years;
+
+                    const overlapDays =
+                        this._calculateDays(
+                            calcStart,
+                            calcEnd
+                        );
+
+                    if (overlapDays >= 364) {
+                        return this._round2(
+                            multiplier * yearlyPrice
+                        );
+                    }
+
+                    return this._round2(
+                        multiplier *
+                        (yearlyPrice / 365) *
+                        overlapDays
+                    );
+                };
 
                 // PERSON_QTY
                 if (selectionMode === "PERSON_QTY") {
+
                     if (chargeType === "DAILY") {
 
-                        // PER DAY
-                        if (bookingUnit === "per day") {
-                            facilityAmount = this._truncate2(price * useddaysforday);
-                            item.CalculatedUnits = qty;
+                        if (unit === "package price") {
+
+                            facilityAmount =
+                                this._truncate2(
+                                    price * usedDaysForDay
+                                );
+
+                        } else if (bookingUnit === "per year") {
+
+                            facilityAmount =
+                                calculateYearAmount();
+
+                        } else if (bookingUnit === "per day") {
+
+                            facilityAmount =
+                                this._truncate2(
+                                    price * usedDaysForDay
+                                );
+
+                        } else if (bookingUnit === "per month") {
+
+                            const daysInMonth =
+                                this._getDaysInMonth(calcStart);
+
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    daysInMonth *
+                                    this._calculateTotalMonths(
+                                        calcStart,
+                                        calcEnd
+                                    )
+                                );
                         }
 
-                        // PER MONTH
-                        else if (bookingUnit === "per month") {
-                            facilityAmount = this._truncate2(price * useddaysforday);
-                            item.CalculatedUnits = qty;
-                        }
-
-                        // PER YEAR
-                        else if (bookingUnit === "per year") {
-                            const years = Math.ceil(this._calculateTotalMonths(sDate, eDate) / 12) || 1;
-                            const yearlyPrice = totalprice / years;
-                            const overlapDays = this._calculateYearDays(effectiveStart, effectiveEnd);
-
-                            if (overlapDays >= 364) {
-                                facilityAmount = this._round2(yearlyPrice);
-                            } else {
-                                const dailyRate = yearlyPrice / 365;
-                                facilityAmount = this._round2(dailyRate * overlapDays);
-                            }
-
-                            item.CalculatedUnits = qty;
-                        }
-
-                        item.StartDate = this._formatDateLocal(effectiveStart);
-                        item.EndDate = this._formatDateLocal(effectiveEnd);
+                        item.CalculatedUnits = qty;
                     }
 
-                    //  ONCE PER BOOKING 
-                    else if (chargeType === "Entire Booking") {
+                    else if (chargeType === "ENTIRE BOOKING") {
 
                         if (invoiceIndex > 0) {
                             return 0;
                         }
 
-                        facilityAmount = this._truncate2(price);
-                        item.CalculatedUnits = qty;
-                        item.StartDate = this._formatDateLocal(sDate);
-                        item.EndDate = this._formatDateLocal(eDate);
-                    }
+                        facilityAmount =
+                            this._truncate2(price);
 
-                    item.UsedDays = usedDays;
-                    item.FacilityPrice = facilityAmount;
-                    return facilityAmount;
+                        item.CalculatedUnits = qty;
+
+                        item.StartDate =
+                            this._formatDateLocal(sDate);
+
+                        item.EndDate =
+                            this._formatDateLocal(eDate);
+                    }
                 }
 
-
                 // QTY
-                if (selectionMode === "QTY") {
+                else if (selectionMode === "QTY") {
 
-                    // ONLY FIRST INVOICE
                     if (invoiceIndex > 0) {
                         return 0;
                     }
 
-                    // UNIT PRICE
-                    if (unit === "unit price") {
-                        facilityAmount = this._truncate2(qty * price);
+                    switch (unit) {
+
+                        case "unit price":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty * price
+                                );
+                            break;
+
+                        case "per day":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per hour":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    totalHour *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per month":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    this._calculateTotalMonths(
+                                        calcStart,
+                                        calcEnd
+                                    )
+                                );
+                            break;
+
+                        case "per year":
+                            facilityAmount =
+                                calculateYearAmount(qty);
+                            break;
                     }
 
-                    // PER DAY
-                    else if (unit === "per day") {
-                        facilityAmount = this._truncate2(qty * price * totalusedDays);
-                    }
-
-                    // PER HOUR
-                    else if (unit === "per hour") {
-                        facilityAmount = this._truncate2(qty * price * totalHour * totalusedDays);
-                    }
-
-                    // PER MONTH
-                    else if (unit === "per month") {
-
-                        const usedMonths = this._calculateTotalMonths(sDate, eDate);
-                        facilityAmount = this._truncate2(qty * price * usedMonths);
-                    }
-
-                    // PER YEAR
-                    else if (unit === "per year") {
-                        const years = Math.ceil(this._calculateTotalMonths(sDate, eDate) / 12) || 1;
-
-                        const yearlyPrice = totalprice / years;
-
-                        const overlapDays = this._calculateYearDays(effectiveStart, effectiveEnd);
-
-                        if (overlapDays >= 364) {
-
-                            facilityAmount = this._round2(qty * yearlyPrice);
-                        } else {
-
-                            const dailyRate = yearlyPrice / 365;
-                            facilityAmount = this._round2(
-                                qty * dailyRate * overlapDays
-                            );
-                        }
-                    }
-
-                    item.StartDate = this._formatDateLocal(sDate);
-                    item.EndDate = this._formatDateLocal(eDate);
-                    item.UsedDays = usedDays;
-                    item.FacilityPrice = facilityAmount;
                     item.CalculatedQty = qty;
-
-                    return facilityAmount;
                 }
-
 
                 // SINGLE / PERSON
-                if (selectionMode === "SINGLE" || selectionMode === "PERSON") {
+                else if (
+                    selectionMode === "SINGLE" ||
+                    selectionMode === "PERSON"
+                ) {
 
-                    // PER DAY
-                    if (unit === "per day") {
-                        facilityAmount = this._truncate2(
-                            price * useddaysforday
-                        );
+                    switch (unit) {
+
+                        case "per day":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per hour":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    totalHour *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per month":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    this._calculateTotalMonths(
+                                        calcStart,
+                                        calcEnd
+                                    )
+                                );
+                            break;
+
+                        case "per year":
+                            facilityAmount =
+                                calculateYearAmount();
+                            break;
                     }
-
-                    // PER HOUR
-                    else if (unit === "per hour") {
-
-                        facilityAmount = this._truncate2(
-                            price * totalHour * useddaysforday
-                        );
-                    }
-
-                    // PER MONTH
-                    else if (unit === "per month") {
-
-                        const usedMonths = this._calculateTotalMonths(
-                            effectiveStart,
-                            effectiveEnd
-                        );
-
-                        facilityAmount = this._truncate2(
-                            price * usedMonths
-                        );
-                    }
-
-                    // PER YEAR
-                    else if (unit === "per year") {
-
-                        const years = Math.ceil(
-                            this._calculateTotalMonths(sDate, eDate) / 12
-                        ) || 1;
-
-                        const yearlyPrice = totalprice / years;
-
-                        const overlapDays = this._calculateYearDays(
-                            effectiveStart,
-                            effectiveEnd
-                        );
-
-                        if (overlapDays >= 364) {
-
-                            facilityAmount = this._round2(
-                                yearlyPrice
-                            );
-
-                        } else {
-
-                            const dailyRate = yearlyPrice / 365;
-
-                            facilityAmount = this._round2(
-                                dailyRate * overlapDays
-                            );
-                        }
-                    }
-
-                    item.StartDate = this._formatDateLocal(effectiveStart);
-                    item.EndDate = this._formatDateLocal(effectiveEnd);
-                    item.UsedDays = usedDays;
-                    item.FacilityPrice = facilityAmount;
-
-                    return facilityAmount;
                 }
 
-                return 0;
+                if (
+                    !(
+                        selectionMode === "PERSON_QTY" &&
+                        chargeType === "ENTIRE BOOKING"
+                    )
+                ) {
+                    item.StartDate =
+                        this._formatDateLocal(calcStart);
+
+                    item.EndDate =
+                        this._formatDateLocal(calcEnd);
+                }
+
+                item.UsedDays = usedDays;
+                item.FacilityPrice = facilityAmount;
+
+                return facilityAmount;
             },
 
+            _getDaysInMonth: function(date) {
+                return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            },
 
             // MONTHLY CYCLE
             _getMonthlyCycle: function(baseDate, index) {
@@ -4071,7 +4112,6 @@ sap.ui.define([
 
 
             // YEARLY CYCLE
-
             _getYearlyCycle: function(baseDate, index) {
 
                 const cycleStart = new Date(baseDate);

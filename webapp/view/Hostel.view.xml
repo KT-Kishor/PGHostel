@@ -355,13 +355,21 @@
                                                                         </CustomListItem>
                                                                     </List>
                                                                  
-                                                                          <Text
-                                                                              text="{
-                                                                                  parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
-                                                                                  formatter: '.Formatter.formatStartingPrice'
-                                                                                    }"
-                                                                                   class="branchCardPrice"
-                                                                                 />
+<Title
+                                                                               text="{
+                                                                                   parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
+                                                                                   formatter: '.Formatter.formatStartingPrice'
+                                                                                     }"
+                                                                                        visible="{= !(${VisibilityModel>TotalFeedbacks} ? Number(${VisibilityModel>TotalFeedbacks}) > 0 : false) }"
+                                                                                        class="branchCardPrice"
+                                                                                  />
+<Title
+                                                                               text="{
+                                                                                   parts: ['VisibilityModel>Currency','VisibilityModel>StartingPrice'],
+                                                                                   formatter: '.Formatter.formatStartingPrice'
+                                                                                     }"
+                                                                                        visible="{= ${VisibilityModel>TotalFeedbacks} ? Number(${VisibilityModel>TotalFeedbacks}) > 0 : false }"
+                                                                                  />
                                                                        </VBox>
                                                                     <HBox
                                                                         justifyContent="Center"

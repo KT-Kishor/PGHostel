@@ -55,8 +55,10 @@ sap.ui.define([
             this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
                 var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                 var model = new JSONModel(oFCIAerData);
-                this.getView().setModel(model, "RoomDetailsModel");
+                this.getOwnerComponent().setModel(model, "RoomDetailsModel");
             })
+
+            
 
             var model = new JSONModel({
                 BranchCode: "",
@@ -146,10 +148,10 @@ sap.ui.define([
 
 
             } else if (this.selectedIndex === 1) {
-                sap.ui.getCore().byId("id_ActualAmount").setEnabled(false);
-                sap.ui.getCore().byId("idPaymentMode").setEnabled(false);
+                sap.ui.getCore().byId("id_ActualAmount").setEnabled(false).setValue("");
+                sap.ui.getCore().byId("idPaymentMode").setEnabled(false).setValue("");
 
-                sap.ui.getCore().byId("id_TransactionID").setEnabled(false);
+                sap.ui.getCore().byId("id_TransactionID").setEnabled(false).setValue("");
 
                 sap.ui.getCore().byId("id_DepositTypeLabel").setRequired(false);
                 sap.ui.getCore().byId("id_PaymentModeLabel").setRequired(false);
@@ -276,6 +278,8 @@ sap.ui.define([
 
                     const oModel = new sap.ui.model.json.JSONModel(mappedData);
                     this.getView().setModel(oModel, "HostelModel");
+                    this.getOwnerComponent().setModel(oModel, "HostelModelcheckrooms");
+
                  
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
