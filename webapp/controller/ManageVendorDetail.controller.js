@@ -1091,30 +1091,54 @@ sap.ui.define([
 
             reader.onload = async function(e) {
                 try {
+
                     const sBase64 = e.target.result.split(",")[1];
+
+                    // Generate file name from Document Type
+                    const sExt = oFile.name.includes(".")
+                        ? oFile.name.split(".").pop().toLowerCase()
+                        : "";
+
+                    const sNewFileName = sDocType
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, "_") +
+                        (sExt ? "." + sExt : "");
+
                     const oPayload = {
                         data: {
                             UserID: oAdminModel.getProperty("/UserID"),
                             DocumentType: sDocType,
                             File: sBase64,
-                            FileName: oFile.name,
+                            FileName: sNewFileName, // <-- custom file name
                             FileType: oFile.type,
-                            MemberID: oAdminModel.getProperty("/UserID"),
+                            MemberID: oAdminModel.getProperty("/UserID")
                         }
                     };
-                    that.getBusyDialog()
-                    await that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
-                    // RELOAD DOCUMENTS → TABLE UPDATES
-                    await that._loadVendorDetails(oAdminModel.getProperty("/UserID"));
-                    // Reset
+
+                    that.getBusyDialog();
+
+                    await that.ajaxCreateWithJQuery(
+                        "HM_CustomerDocument",
+                        oPayload
+                    );
+
+                    await that._loadVendorDetails(
+                        oAdminModel.getProperty("/UserID")
+                    );
+
                     oAdminModel.setProperty("/CurrentDocType", "");
                     oFileUploader.clear();
+
                 } catch (err) {
-                    that.closeBusyDialog()
-                    MessageToast.show(that.i18nModel.getText("docUploadError"));
+                    that.closeBusyDialog();
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadError")
+                    );
                 } finally {
-                    that.closeBusyDialog()
-                    MessageToast.show(that.i18nModel.getText("docUploadSuccess"));
+                    that.closeBusyDialog();
+                    MessageToast.show(
+                        that.i18nModel.getText("docUploadSuccess")
+                    );
                 }
             };
             reader.readAsDataURL(oFile);
