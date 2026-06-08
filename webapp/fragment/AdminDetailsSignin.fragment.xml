@@ -93,7 +93,7 @@
 
             <!-- Sign In Button -->
             <Button
-                text="Sign In"
+                text="Continue"
                 class="myUnifiedBtn"
                 width="100px"
                 press="onSignIn"

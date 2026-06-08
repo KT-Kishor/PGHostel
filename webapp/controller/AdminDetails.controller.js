@@ -7611,7 +7611,7 @@ sap.ui.define([
                 },
                 columnStyles: {
                     0: { cellWidth: 15, halign: "center" },
-                    1: { cellWidth: 'auto' }, // Let name scale dynamically
+                    1: { cellWidth: 'auto' },
                     2: { cellWidth: 25, halign: "center" },
                     3: { cellWidth: 25, halign: "center" },
                     4: { cellWidth: 30, halign: "center" }
@@ -7676,14 +7676,13 @@ sap.ui.define([
             doc.text(`${data.NoOfPersons || "-"}`, 150, currentY + 34);
             doc.text(`${data.Status || "-"}`, 150, currentY + 46);
 
+            // CRITICAL FIX: Establish baseline spacing after the Stay Card
             currentY += stayCardHeight + 12;
 
             // ========== FACILITY DETAILS TABLE ==========
             const facilities = data.AllSelectedFacilities || [];
 
             if (facilities.length > 0) {
-                // Check if there is enough space just for the TITLE (approx 20mm)
-                // If not, move to the next page BEFORE drawing the title
                 if (currentY + 20 > 280) {
                     doc.addPage();
                     currentY = 20;
@@ -7700,7 +7699,6 @@ sap.ui.define([
                 doc.setLineWidth(0.8);
                 doc.line(15, currentY + 3, 70, currentY + 3);
 
-                // Adjust currentY to be exactly where the table should start
                 currentY += 8;
 
                 let tableBody = facilities.map((item, index) => [
@@ -7713,7 +7711,6 @@ sap.ui.define([
                     `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
                 ]);
 
-                // Let autoTable handle its own page breaks naturally
                 doc.autoTable({
                     startY: currentY,
                     margin: { left: 15, right: 15 },
@@ -7732,8 +7729,8 @@ sap.ui.define([
                         fillColor: PRIMARY_COLOR,
                         textColor: [255, 255, 255],
                         fontStyle: "bold",
-                        fontSize: 9,      // Dropped slightly for safety
-                        cellPadding: 1.5,  // Snugger padding prevents forced layout wrapping
+                        fontSize: 9,
+                        cellPadding: 1.5,
                         halign: "center"
                     },
                     alternateRowStyles: {
@@ -7741,7 +7738,7 @@ sap.ui.define([
                     },
                     columnStyles: {
                         0: { cellWidth: 12, halign: "center" },
-                        1: { cellWidth: 'auto', halign: "left" }, // Dynamic width prevents overflow
+                        1: { cellWidth: 'auto', halign: "left" },
                         2: { cellWidth: 24, halign: "center" },
                         3: { cellWidth: 24, halign: "center" },
                         4: { cellWidth: 24, halign: "right" },
@@ -7750,34 +7747,37 @@ sap.ui.define([
                     }
                 });
 
-                // CRITICAL: Update currentY based on where autoTable actually finished 
                 currentY = doc.lastAutoTable.finalY + 12;
             }
             
             // ========== PAYMENT SUMMARY ==========
-            const summaryHeight = 85;
-            if (currentY + summaryHeight > 280) {
-                doc.addPage();
-                currentY = 20;
-            }
-
             const roomRent = parseFloat(data.RentPrice) || 0;
             const facilityTotal = parseFloat(data.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(data.Discount) || 0;
             let grandTotal = subTotal - discount;
 
-            doc.setFillColor(255, 255, 255);
-            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.setLineWidth(0.3);
-            doc.roundedRect(15, currentY, 180, summaryHeight, 4, 4, "FD");
+            const hasCGST = data.GSTType === "CGST/SGST";
+            const hasIGST = data.GSTType === "IGST";
+
+            // Safely estimate dynamic lines based on setup
+            let estimatedLines = 6 + (hasCGST ? 2 : hasIGST ? 1 : 0);
+            const summaryHeight = (estimatedLines * 6.5) + 15; 
+
+            // Dynamic safe page-break execution 
+            if (currentY + summaryHeight > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            const startY = currentY;
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(13);
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text("PAYMENT SUMMARY", 20, currentY + 10);
+            doc.text("PAYMENT SUMMARY", 20, startY + 10);
 
-            let summaryY = currentY + 20;
+            let summaryY = startY + 18;
             const leftX = 20;
             const rightX = 185;
 
@@ -7797,22 +7797,29 @@ sap.ui.define([
             };
 
             addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
-            addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            
+            // Render Facility Total row line only if there's actual value or entries
+            if (facilityTotal > 0 || facilities.length > 0) {
+                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            }
+
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
-            if (data.GSTType === "CGST/SGST") {
+            if (hasCGST) {
                 const cgst = parseFloat(data.CGST) || 0;
                 const sgst = parseFloat(data.SGST) || 0;
                 addLine(`CGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
                 addLine(`SGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
                 grandTotal += cgst + sgst;
-            } else if (data.GSTType === "IGST") {
+            } else if (hasIGST) {
                 const igst = parseFloat(data.IGST) || 0;
                 addLine(`IGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
                 grandTotal += igst;
             }
 
-            addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+            if (discount > 0) {
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+            }
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
@@ -7822,7 +7829,14 @@ sap.ui.define([
             summaryY += 2;
             addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
-            currentY += summaryHeight + 10;
+            const finalHeight = summaryY - startY + 2;
+
+            // Draw clean background style layout safely
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(15, startY, 180, finalHeight, 4, 4, "D"); 
+
+            currentY = startY + finalHeight + 10;
 
             // ========== AMOUNT IN WORDS ==========
             if (currentY + 25 > 280) {
