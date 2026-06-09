@@ -122,7 +122,7 @@ sap.ui.define([
                 const oProfileModel = new JSONModel({
                     ...fullUserData,
                     isEditMode: false,
-                    photo: "data:image/png;base64," + oUser.FileContent || "",
+                    photo: oUser.FileContent ? "data:image/png;base64," + oUser.FileContent : "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
                     name: oUser.UserName || "",
                     UserID: oUser.UserID,
@@ -149,7 +149,7 @@ sap.ui.define([
                         BookingID: booking.BookingID,
                         customerName: booking.customerName
                     })),
-                    facility: [],                    
+                    facility: [],
                 });
                 this.getView().setModel(oProfileModel, "profileData");
                 oProfileModel.refresh(true);
@@ -165,7 +165,7 @@ sap.ui.define([
             } catch (err) {
                 const oProfileModel = new sap.ui.model.json.JSONModel({
                     ...fullUserData,
-                    photo: "data:image/png;base64," + oUser.FileContent || "",
+                    photo: oUser.FileContent ? "data:image/png;base64," + oUser.FileContent : "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
                     name: oUser.UserName || "",
                     email: oUser.EmailID || "",
@@ -625,6 +625,12 @@ sap.ui.define([
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 this._oLoggedInUser.FileContent = fileContent;
                 this._oLoggedInUser.Photo = "data:image/png;base64," + fileContent;
+
+                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+                if (oLoginModel) {
+                    oLoginModel.setProperty("/Photo", fileContent ? "data:image/png;base64," + fileContent : "");
+                    oLoginModel.setProperty("/FileContent", fileContent || "");
+                }
 
                 if (!fileContent) {
                     sap.m.MessageToast.show(this.i18nModel.getText("profilephotoremovedsuccessfully"));

@@ -3948,6 +3948,9 @@ sap.ui.define([
                 // Role Based Access
                 if (user.Role === "Customer") {
                     const oUserModel = new JSONModel(user);
+                    if (user.FileContent) {
+                        oUserModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
+                    }
                     sap.ui.getCore().setModel(oUserModel, "LoginModel");
                     this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
                 } else {

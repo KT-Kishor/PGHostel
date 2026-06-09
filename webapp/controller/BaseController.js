@@ -859,6 +859,8 @@ sap.ui.define([
         oLoginModel.setProperty("/City", user.City || "");
         oLoginModel.setProperty("/Address", user.Address || "");
         oLoginModel.setProperty("/DateofBirth", user.DateOfBirth ? this.Formatter.DateFormat(user.DateOfBirth) : "");
+        oLoginModel.setProperty("/FileContent", user.FileContent || "");
+        oLoginModel.setProperty("/Photo", user.FileContent ? "data:image/png;base64," + user.FileContent : "");
 
         this.getView().getModel("UIModel").setProperty("/isLoggedIn", true);
 
