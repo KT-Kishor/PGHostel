@@ -664,9 +664,9 @@ sap.ui.define([
                         let totalMonths = years * 12 + months;
 
                         // If end day >= start day, add 1 month
-                        if (end.getDate() >= start.getDate()) {
-                            totalMonths += 1;
-                        }
+                        // if (end.getDate() >= start.getDate()) {
+                        //     totalMonths += 1;
+                        // }
 
                         Duration = totalMonths;
                         DurationUnit = Duration === 1 ? "Month" : "Months";
@@ -675,12 +675,12 @@ sap.ui.define([
                         let years = end.getFullYear() - start.getFullYear();
 
                         // If end month > start month OR same month and end day >= start day, add 1
-                        if (
-                            end.getMonth() > start.getMonth() ||
-                            (end.getMonth() === start.getMonth() && end.getDate() >= start.getDate())
-                        ) {
-                            years += 1;
-                        }
+                        // if (
+                        //     end.getMonth() > start.getMonth() ||
+                        //     (end.getMonth() === start.getMonth() && end.getDate() >= start.getDate())
+                        // ) {
+                        //     years += 1;
+                        // }
 
                         Duration = years;
                         DurationUnit = Duration === 1 ? "Year" : "Years";
@@ -780,9 +780,9 @@ sap.ui.define([
                         (facEnd.getFullYear() - facStart.getFullYear()) * 12 +
                         (facEnd.getMonth() - facStart.getMonth());
 
-                    if (facEnd.getDate() >= facStart.getDate()) {
-                        months += 1;
-                    }
+                    // if (facEnd.getDate() >= facStart.getDate()) {
+                    //     months += 1;
+                    // }
 
                     const totalMonths = Math.max(months, 1);
 
