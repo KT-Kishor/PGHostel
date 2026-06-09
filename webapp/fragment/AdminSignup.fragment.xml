@@ -25,6 +25,7 @@
                         icon="sap-icon://decline"
                         tooltip="{i18n>close}"
                         press="onCloseAdminSignup"
+                        enabled="{= !${AdminSignupModel>/ProcessingActive} }"
                     />
                 </contentRight>
             </Bar>
@@ -392,28 +393,45 @@ filterSecondaryValues="true"
                     <Text text="Action" />
                 </Column>
             </columns>
-            <items>
-                <ColumnListItem>
-                    <cells>
-                        <!-- FILE NAME WITH ICON + PREVIEW LINK -->
-                        <Link
-                            wrapping="true"
-                            text="{AdminSignupModel>FileName}"
-                            press="onAdminPreviewDoc"
-                            tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
-                        />
-                        <!-- DOCUMENT TYPE (VdocType = Aadhaar/PAN/Resume) -->
-                        <Text text="{AdminSignupModel>VdocType}" />
+          <items>
+    <ColumnListItem>
+        <cells>
+            <!-- 🔄 Show BusyIndicator while processing, otherwise show Link -->
+            <HBox
+                justifyContent="Start"
+                alignItems="Center"
+            >
+                <BusyIndicator
+                    size="1.2rem"
+                    visible="{= ${AdminSignupModel>isProcessing} === true }"
+                />
+                <Link
+                    visible="{= !${AdminSignupModel>isProcessing} }"
+                    wrapping="true"
+                    text="{AdminSignupModel>FileName}"
+                    press="onAdminPreviewDoc"
+                    tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
+                />
+            </HBox>
 
-                        <Text
-                            text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
-                        />
-                        <Button
-                            icon="sap-icon://delete"
-                            press="onAdminDeleteDoc"/>
-                    </cells>
-                </ColumnListItem>
-            </items>
+            <!-- Document type -->
+            <Text text="{AdminSignupModel>VdocType}" />
+
+            <!-- File size (formatted) -->
+            <Text
+                text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
+            />
+
+            <!-- Delete button – optionally disabled during processing -->
+            <Button
+                icon="sap-icon://delete"
+                press="onAdminDeleteDoc"
+                enabled="{= !${AdminSignupModel>isProcessing} }"
+            />
+        </cells>
+    </ColumnListItem>
+</items>
+
         </Table>
         <!-- ACTIONS -->
         <beginButton>
@@ -423,6 +441,7 @@ filterSecondaryValues="true"
                 press="onSubmitAdminSignup"
                 class="myUnifiedBtn sapUiSmallMargin"
                 width="120px"
+                enabled="{= !${AdminSignupModel>/ProcessingActive} }"
             />
         </beginButton>
     </Dialog>

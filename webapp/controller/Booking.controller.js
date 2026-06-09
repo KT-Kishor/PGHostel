@@ -4447,7 +4447,7 @@
             if (iNewPageSize !== this._iFacilityPageSize) {
                 this._iFacilityPageSize = iNewPageSize;
                 var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
-                var iMaxStart = Math.max(aFacilities.length - iNewPageSize, 0);
+                var iMaxStart = Math.max(aFacilities.length - 1, 0);
                 this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
                 this._renderFacilityCards();
             }
@@ -4474,7 +4474,7 @@
             // Calculate visible card count dynamically from available viewport width
             this._iFacilityPageSize = this._getVisibleCardCount();
             var iPageSize = this._iFacilityPageSize;
-            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            var iMaxStart = Math.max(aFacilities.length - 1, 0);
             this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
 
             var iStart = this._iFacilityStartIndex;
@@ -4899,7 +4899,7 @@
             var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
             var iPageSize = this._getVisibleCardCount();
             this._iFacilityPageSize = iPageSize;
-            var iMaxStart = Math.max(aFacilities.length - iPageSize, 0);
+            var iMaxStart = Math.max(aFacilities.length - 1, 0);
 
             this._iFacilityStartIndex = Math.min((this._iFacilityStartIndex || 0) + iPageSize, iMaxStart);
             this._renderFacilityCards();

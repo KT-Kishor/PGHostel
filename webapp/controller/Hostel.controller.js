@@ -4676,83 +4676,239 @@ sap.ui.define([
         },
 
 
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const aDocs = oModel.getProperty("/Documents") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempDoc = {
+                FileName: "Compressing...",          // will be hidden because BusyIndicator shown
+                VdocType: "",
+                size: 0,
+                isProcessing: true,                  // triggers BusyIndicator
+                tempId: sTempId
+            };
+            aDocs.push(oTempDoc);
+            oModel.setProperty("/Documents", aDocs);
+            return sTempId;
+        },
 
-        onAdminFileSelect: function (oEvent) {
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            let aDocs = oModel.getProperty("/Documents") || [];
+            aDocs = aDocs.filter(doc => doc.tempId !== sTempId);
+            oModel.setProperty("/Documents", aDocs);
+        },
+        onAdminFileSelect: async function (oEvent) {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            // Disable register button immediately
+            oModel.setProperty("/ProcessingActive", true);
+
             const oUploader = $C("adminFileUploader");
             const oDocType = $C("adminDocType");
-            const oModel = this.getView().getModel("AdminSignupModel");
+            // const oModel = this.getView().getModel("AdminSignupModel");
 
             const file = oEvent.getParameter("files")?.[0];
             if (!file) return;
-            // ---- REJECT DOC / DOCX (defensive) ----
-            const forbiddenExt = ["doc", "docx"];
-            const ext = (file.name || "").split(".").pop().toLowerCase();
 
-            const forbiddenMimes = [
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ];
-
-            if (forbiddenExt.includes(ext) || forbiddenMimes.includes(file.type)) {
-                MessageToast.show(this.i18nModel.getText("filetypeNotAllowed") || "This file type is not allowed.");
-                oUploader.clear();
-                return;
-            }
-
-
-            const MAX_SIZE = 2 * 1024 * 1024; // 5 MB
-            if (file.size > MAX_SIZE) {
-                MessageToast.show(this.i18nModel.getText("filesizemustnotexceed5MB"));
-                oUploader.clear();
-                return;
-            }
-            const selectedDocType = oDocType.getSelectedKey();
-            // 🔒 Guard 1: Doc type mandatory
+            const selectedDocType = oDocType ? oDocType.getSelectedKey() : null;
             if (!selectedDocType) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
-                oUploader.clear();
+                MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst") || "Select document type first");
+                if (oUploader) oUploader.clear();
                 return;
             }
-            // 🔒 Guard 2: Duplicate file check
+
             if (this._isDuplicateFile(file.name)) {
-                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded"));
-                oUploader.clear();
+                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded") || "File already uploaded");
+                if (oUploader) oUploader.clear();
                 return;
             }
-            // 🔒 Lock controls during processing
+
+            // 🔥 Add temporary busy row
+            const sTempId = this._addBusyProcessingRow();
+
+            // Disable uploader & doc type during processing
             oModel.setProperty("/UploadEnabled", false);
             oModel.setProperty("/DocTypeEnabled", false);
-            const reader = new FileReader();
-            reader.onload = () => {
-                const base64 = reader.result.split(",")[1];
-                const docs = oModel.getProperty("/Documents") || [];
 
-                // 🔑 ADDITION: preview URL for images ONLY
-                const previewUrl = URL.createObjectURL(file);
-                docs.push({
-                    FileName: selectedDocType,
-                    DocumentType: file.type, // MIME
-                    VdocType: selectedDocType, // Aadhaar / PAN etc
-                    File: base64,
-                    Base64: base64,
-                    PreviewUrl: previewUrl, // 🔥 NEW (for preview)
-                    size: file.size
+            let processedFile = file;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = file.size / (1024 * 1024);
+            const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
+
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.85
+                    };
+                    processedFile = await imageCompression(file, options);
+                    MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    throw new Error("Only images can be compressed");
+                }
+
+                // Convert to Base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(",")[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
                 });
 
-                oModel.setProperty("/Documents", docs);
-                // ✅ CLEAR ERROR STATE HERE (this is what you asked)
+                const previewUrl = URL.createObjectURL(processedFile);
+                const newDoc = {
+                    FileName: selectedDocType,
+                    DocumentType: processedFile.type,
+                    VdocType: selectedDocType,
+                    File: base64,
+                    Base64: base64,
+                    PreviewUrl: previewUrl,
+                    size: processedFile.size,
+                    originalName: file.name
+                };
+
+                // Remove temporary row and add actual document
+                this._removeProcessingRow(sTempId);
+                const aDocs = oModel.getProperty("/Documents") || [];
+                aDocs.push(newDoc);
+                oModel.setProperty("/Documents", aDocs);
+
+                // Clear error highlight
                 const table = $C("adminAttachmentTable");
-                table?.removeStyleClass("fileErrorHighlight");
-                // 🔁 Reset doc type
+                if (table) table.removeStyleClass("fileErrorHighlight");
+
+            } catch (err) {
+                // On error, remove the busy row and show error
+                this._removeProcessingRow(sTempId);
+                console.error(err);
+                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                // Re-enable UI
                 oModel.setProperty("/CurrentDocType", "");
-                oUploader.clear();
-                // Keep document types available for repeated uploads.
+                if (oUploader) oUploader.clear();
                 oModel.setProperty("/DocTypeEnabled", true);
                 oModel.setProperty("/UploadEnabled", false);
-            };
-            reader.readAsDataURL(file);
+                oModel.setProperty("/ProcessingActive", false);
+            }
         },
+        // onAdminFileSelect: async function (oEvent) {
+        //     const oUploader = $C("adminFileUploader");
+        //     const oDocType = $C("adminDocType");
+        //     const oModel = this.getView().getModel("AdminSignupModel");
 
+        //     const file = oEvent.getParameter("files")?.[0];
+        //     if (!file) return;
+
+        //     // 1. Document type selected?
+        //     const selectedDocType = oDocType ? oDocType.getSelectedKey() : null;
+        //     if (!selectedDocType) {
+        //         MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst") || "Select document type first");
+        //         if (oUploader) oUploader.clear();
+        //         return;
+        //     }
+
+        //     // 2. Duplicate check
+        //     // 2. Duplicate check by original filename
+        //     if (this._isDuplicateFile(file.name)) {
+        //         MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded") || "File already uploaded");
+        //         if (oUploader) oUploader.clear();
+        //         return;
+        //     }
+
+        //     // 3. Compression logic
+        //     const MAX_SIZE_MB = 2;
+        //     const fileSizeMB = file.size / (1024 * 1024);
+        //     const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
+        //     let processedFile = file;
+
+        //     if (fileSizeMB > MAX_SIZE_MB) {
+        //         if (isImage) {
+        //             if (typeof imageCompression === "undefined") {
+        //                 MessageBox.error("Compression library missing. Refresh the page.");
+        //                 if (oUploader) oUploader.clear();
+        //                 return;
+        //             }
+        //             // Show global busy dialog during compression
+        //             this.getBusyDialog();
+        //             try {
+        //                 MessageToast.show("Compressing image, please wait...");
+        //                 const options = {
+        //                     maxSizeMB: 1.96,
+        //                     maxWidthOrHeight: 1920,
+        //                     useWebWorker: true,
+        //                     initialQuality: 0.95
+        //                 };
+        //                 processedFile = await imageCompression(file, options);
+        //                 MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
+        //             } catch (err) {
+        //                 console.error(err);
+        //                 MessageBox.error("Compression failed. Use a smaller image.");
+        //                 if (oUploader) oUploader.clear();
+        //                 return;
+        //             } finally {
+        //                 this.closeBusyDialog();   // always close busy dialog
+        //             }
+        //         } else {
+        //             MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
+        //             if (oUploader) oUploader.clear();
+        //             return;
+        //         }
+        //     }
+
+        //     // 4. Convert to Base64
+        //     let base64 = "";
+        //     try {
+        //         base64 = await new Promise((resolve, reject) => {
+        //             const reader = new FileReader();
+        //             reader.onload = () => resolve(reader.result.split(",")[1]);
+        //             reader.onerror = reject;
+        //             reader.readAsDataURL(processedFile);
+        //         });
+        //     } catch (err) {
+        //         MessageBox.error("Failed to read file.");
+        //         if (oUploader) oUploader.clear();
+        //         return;
+        //     }
+
+        //     // 5. Add to model
+        //     const previewUrl = URL.createObjectURL(processedFile);
+        //     const newDoc = {
+        //         FileName: selectedDocType,          // display name = doc type
+        //         DocumentType: processedFile.type,
+        //         VdocType: selectedDocType,
+        //         File: base64,
+        //         Base64: base64,
+        //         PreviewUrl: previewUrl,
+        //         size: processedFile.size,
+        //         originalName: file.name             // ✅ needed for duplicate check
+        //     };
+
+        //     const docs = oModel.getProperty("/Documents") || [];
+        //     docs.push(newDoc);
+        //     oModel.setProperty("/Documents", docs);
+
+        //     // 6. Clean up UI
+        //     const table = $C("adminAttachmentTable");
+        //     if (table) table.removeStyleClass("fileErrorHighlight");
+        //     oModel.setProperty("/CurrentDocType", "");
+        //     if (oUploader) oUploader.clear();
+        //     oModel.setProperty("/DocTypeEnabled", true);
+        //     oModel.setProperty("/UploadEnabled", false);
+
+        //     MessageToast.show("Document added successfully");
+        // },
+        // Helper to show/hide busy indicator on the uploader button (optional)
+        _showBusyOnUploader: function (bBusy) {
+            const oUploader = this.byId("adminFileUploader");
+            if (oUploader) {
+                oUploader.setBusy(bBusy);
+            }
+        },
         ADMIN_onChangeGender: function (oEvent) {
             const oSelect = oEvent.getSource();
             const key = oSelect.getSelectedKey();
@@ -4860,7 +5016,8 @@ sap.ui.define([
                 CurrentDocType: "",
                 Documents: [],
                 UploadEnabled: false,
-                DocTypeEnabled: true
+                DocTypeEnabled: true,
+                ProcessingActive: false,   // ← add this
             });
             this.getView().setModel(oModel, "AdminSignupModel");
         },
@@ -4875,7 +5032,8 @@ sap.ui.define([
             const docs = this.getView()
                 .getModel("AdminSignupModel")
                 .getProperty("/Documents") || [];
-            return docs.some(d => d.FileName === fileName);
+            // Compare against stored original filename
+            return docs.some(d => d.originalName === fileName);
         },
 
         _onCollectAdminSignupPayloadDocs: function () {
