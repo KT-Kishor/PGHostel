@@ -2152,11 +2152,13 @@ sap.ui.define([
 
             // Apply busy dialog while routing to booking page
             // this.getBusyDialog();
+            sap.ui.core.BusyIndicator.show(0);
 
             // Close the busy dialog once the booking route finishes matching
             const oBookingRoute = this.getOwnerComponent().getRouter().getRoute("RouteBooking");
             const fnCloseBusy = function () {
-                this.closeBusyDialog();
+                // this.closeBusyDialog();
+                sap.ui.core.BusyIndicator.hide(0);
                 oBookingRoute.detachMatched(fnCloseBusy, this);
             };
             oBookingRoute.attachMatched(fnCloseBusy, this);
