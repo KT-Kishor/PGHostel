@@ -153,7 +153,8 @@
 										<RatingIndicator
 											value="{= Number(${VisibilityModel>/AverageRating}) || 0 }"
 											maxValue="5"
-											enabled="false"
+										    editable="false"
+ 										    enabled="true"
 											iconSize="1.1rem"
 											class="vrRatingStars sapUiTinyMarginEnd" />
 										<Text
