@@ -4742,6 +4742,57 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   z-index: 5;
 }
 
+.profile-footer-scroll-text {
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-footer-marquee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.profile-footer-marquee .sapMLnk {
+  line-height: 30px;
+}
+
+.profile-footer-marquee .sapMImg {
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .defaultBGBlur > footer .sapMBarLeft {
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .profile-footer-scroll-text {
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .profile-footer-marquee {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    animation: profile-footer-marquee-scroll 8s linear infinite;
+  }
+
+  @keyframes profile-footer-marquee-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+}
+
 /* Page content */
 .defaultBGBlur .sapMPageEnableScrolling {
   padding-bottom: 70px;

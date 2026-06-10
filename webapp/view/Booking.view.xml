@@ -1088,6 +1088,10 @@
         <footer>
             	<Bar>
             <contentLeft>
+             <FlexBox class="profile-footer-scroll-text" alignItems="Center">
+                        <items>
+                            <FlexBox class="profile-footer-marquee" alignItems="Center">
+                    
              <Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
              <Link
                 text="{i18n>devlopby}"
@@ -1095,7 +1099,9 @@
                 target="_blank"
                 class="customLinkWhiteBg"
             />
-            
+                      </FlexBox>
+                        </items>
+                    </FlexBox>
             </contentLeft>
 				<contentRight>
                 <Button

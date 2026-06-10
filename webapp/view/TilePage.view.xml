@@ -352,6 +352,9 @@
 		</content>
         <footer>
     <OverflowToolbar>
+    <FlexBox class="profile-footer-scroll-text" alignItems="Center">
+  <items>
+    <FlexBox class="profile-footer-marquee" alignItems="Center"> 
 
         <Image
             src="../image/TransparentKTlogo.png"
@@ -366,6 +369,9 @@
             class="customLinkWhiteBg"
         />
 
+            </FlexBox>
+        </items>
+        </FlexBox>
         <ToolbarSpacer />
 
         <Button

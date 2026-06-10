@@ -855,6 +855,10 @@
 		<m:footer >
 			<m:Bar id="invoicefooter">
 				<m:contentLeft>
+                <m:FlexBox class="profile-footer-scroll-text" alignItems="Center">
+                <m:items>
+                    <m:FlexBox class="profile-footer-marquee" alignItems="Center"> 
+
 					<m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
 					<m:Link
                 text="{i18n>devlopby}"
@@ -862,6 +866,9 @@
                 target="_blank"
                 class="customLinkWhiteBg"
             />
+                </m:FlexBox>
+                </m:items>
+                </m:FlexBox>
 				</m:contentLeft>
 				<m:contentRight>
 					<!-- Refund Amount -->

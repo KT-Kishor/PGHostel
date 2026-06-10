@@ -335,6 +335,11 @@
 		<m:footer>
 			<m:Bar id="FD_id_FooterBar">
 				<m:contentLeft>
+                <m:FlexBox class="profile-footer-scroll-text" alignItems="Center">
+                <m:items>
+                    <m:FlexBox class="profile-footer-marquee" alignItems="Center"> 
+
+
                      <m:Image
                         src="../image/TransparentKTlogo.png"
                         width="30px"
@@ -346,6 +351,9 @@
                         target="_blank"
                         class="customLinkWhiteBg"
                     />
+                        </m:FlexBox>
+                    </m:items>
+                    </m:FlexBox>
 				</m:contentLeft>
 				<m:contentRight>
 					<m:Button
