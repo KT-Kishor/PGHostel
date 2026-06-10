@@ -7855,7 +7855,7 @@ sap.ui.define([
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
-            doc.line(leftX, summaryY - 2, rightX, summaryY - 2);
+            doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
 
             summaryY += 2;
             addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
