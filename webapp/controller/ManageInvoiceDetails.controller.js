@@ -2852,47 +2852,62 @@ sap.ui.define([
                     //  SUBTOTAL 
                     let subTotal = 0;
 
+                    // Fetch initial global coupon discount
+                    let couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
+
+                    // Calculate total available room rent first to cap coupon if needed
                     aInvoiceItems.forEach(item => {
                         const amount = parseFloat(item.Total) || 0;
-
-                        subTotal += amount;
-
-                        // Identify Room items
-                        const isRoomItem =
-                            item.Particulars &&
-                            item.Particulars.toLowerCase().includes("room");
-
+                        const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
                         if (isRoomItem) {
                             roomTotal += amount;
                         }
-
-                        const isGSTApplicable =
-                            isGSTEnabled &&
-                            item.GSTCalculation === "YES";
-
-                        item.SAC =
-                            isGSTApplicable ? "996322" : "-";
-
-                        if (isGSTApplicable) {
-                            totalWithGST += amount;
-                        } else {
-                            totalWithoutGST += amount;
-                        }
                     });
-
-                    //  COUPON 
-                    let couponDiscount =
-                        parseFloat(oCustomerModel.CouponDiscount) || 0;
 
                     // Coupon cannot exceed room total
                     if (couponDiscount > roomTotal) {
                         couponDiscount = roomTotal;
                     }
 
-                    //  DISCOUNTED TOTAL 
-                    let discountedTotal =
-                        subTotal - couponDiscount;
+                    let remainingCoupon = couponDiscount;
 
+                    // Process item calculations and inject item-level discount
+                    aInvoiceItems.forEach(item => {
+                        let amount = parseFloat(item.Total) || 0;
+                        let itemDiscount = 0;
+
+                        // Identify Room items and apply discount directly here
+                        const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
+
+                        if (isRoomItem && remainingCoupon > 0) {
+                            if (remainingCoupon >= amount) {
+                                itemDiscount = amount;
+                                remainingCoupon -= amount;
+                            } else {
+                                itemDiscount = remainingCoupon;
+                                remainingCoupon = 0;
+                            }
+                        }
+
+                        // Adjust amount and item totals based on discount
+                        item.itemDiscountValue = itemDiscount; 
+                        const finalItemTotal = amount - itemDiscount;
+                        item.adjustedTotal = finalItemTotal;
+
+                        subTotal += amount; // Keeps track of original subtotal before coupon if needed
+
+                        const isGSTApplicable = isGSTEnabled && item.GSTCalculation === "YES";
+                        item.SAC = isGSTApplicable ? "996322" : "-";
+
+                        if (isGSTApplicable) {
+                            totalWithGST += finalItemTotal;
+                        } else {
+                            totalWithoutGST += finalItemTotal;
+                        }
+                    });
+
+                    //  DISCOUNTED TOTAL 
+                    let discountedTotal = subTotal - couponDiscount;
                     if (discountedTotal < 0) {
                         discountedTotal = 0;
                     }
@@ -2908,24 +2923,19 @@ sap.ui.define([
 
                     if (isGSTEnabled) {
                         // Proportional taxable amount after discount
-                        let taxableAmount = discountedTotal;
+                        let taxableAmount = totalWithGST; // Using totalWithGST since it already has item discounts subtracted
 
                         if (taxType === "CGST/SGST") {
                             gstAmount = (taxableAmount * taxRate) / 100;
                             cgst = gstAmount;
                             sgst = gstAmount;
-                            finalAmount += cgst + sgst;
+                            finalAmount = discountedTotal + cgst + sgst;
                         } else if (taxType === "IGST") {
                             gstAmount = (taxableAmount * taxRate) / 100;
                             igst = gstAmount;
-                            finalAmount += igst;
+                            finalAmount = discountedTotal + igst;
                         }
                     }
-
-                    // //  ROUND OFF 
-                    // const roundedAmount = Math.round(finalAmount);
-
-                    // const roundOff = (roundedAmount - finalAmount).toFixed(2);
 
                     //  ASSIGN VALUES FOR PDF 
                     oCustomerModel.SubTotal = subTotal.toFixed(2);
@@ -2936,7 +2946,6 @@ sap.ui.define([
                     oCustomerModel.SGST = sgst.toFixed(2);
                     oCustomerModel.IGST = igst.toFixed(2);
                     oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
-                    // oCustomerModel.RoundOff = roundOff;
                     oCustomerModel.TotalAmount = finalAmount.toFixed(2);
 
                     const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
@@ -3008,11 +3017,11 @@ sap.ui.define([
 
                     currentY += 5;
 
-                    //  ITEMS TABLE 
+                    //  ITEMS TABLE WITH DISCOUNT COLUMN Included
                     const head = showSAC ? [
-                        ['Sl.No', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross', 'Unit', 'Total']
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ] : [
-                        ['Sl.No', 'Particulars', 'Start Date', 'End Date', 'Gross', 'Unit', 'Total']
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ];
 
                     const body = aInvoiceItems.map((item, i) => {
@@ -3023,7 +3032,8 @@ sap.ui.define([
                             item.EndDate || "",
                             Formatter.fromatNumber(item.GrossPrice),
                             item.UnitText,
-                            Formatter.fromatNumber(item.Total)
+                            Formatter.fromatNumber(item.itemDiscountValue), // Injected Discount column value
+                            Formatter.fromatNumber(item.adjustedTotal)      // Adjusted Total column value
                         ];
                         if (showSAC) row.splice(2, 0, item.SAC);
                         return row;
@@ -3046,54 +3056,30 @@ sap.ui.define([
                             halign: "center"
                         },
                         columnStyles: {
-                            0: {
-                                halign: 'center'
-                            },
-                            1: {
-                                halign: 'left'
-                            },
+                            0: { halign: 'center' },
+                            1: { halign: 'left' },
                             ...(showSAC ? {
-                                2: {
-                                    halign: 'center'
-                                },
-                                3: {
-                                    halign: 'right'
-                                },
-                                4: {
-                                    halign: 'right'
-                                },
-                                5: {
-                                    halign: 'right'
-                                },
-                                6: {
-                                    halign: 'right'
-                                },
-                                7: {
-                                    halign: 'right'
-                                }
+                                2: { halign: 'center' }, // SAC
+                                3: { halign: 'right' },  // Start Date
+                                4: { halign: 'right' },  // End Date
+                                5: { halign: 'right' },  // Gross Price
+                                6: { halign: 'right' },  // Unit Text
+                                7: { halign: 'right' },  // Discount
+                                8: { halign: 'right' }   // Total
                             } : {
-                                2: {
-                                    halign: 'center'
-                                },
-                                3: {
-                                    halign: 'right'
-                                },
-                                4: {
-                                    halign: 'right'
-                                },
-                                5: {
-                                    halign: 'right'
-                                },
-                                6: {
-                                    halign: 'right'
-                                }
+                                2: { halign: 'center' }, // Start Date
+                                3: { halign: 'right' },  // End Date
+                                4: { halign: 'right' },  // Gross Price
+                                5: { halign: 'right' },  // Unit Text
+                                6: { halign: 'right' },  // Discount
+                                7: { halign: 'right' }   // Total
                             })
                         },
                     });
 
                     currentY = doc.lastAutoTable.finalY + 6;
 
-                    //  SUMMARY 
+                    //  SUMMARY (Coupon discount removed from here) 
                     const summary = [];
 
                     if (totalWithoutGST > 0)
@@ -3101,12 +3087,6 @@ sap.ui.define([
 
                     if (totalWithGST > 0)
                         summary.push(["Sub-Total (Taxable) :", Formatter.fromatNumber(totalWithGST)]);
-
-                    if (couponDiscount > 0)
-                        summary.push([
-                            `Discount (${oCustomerModel.CouponCode}) :`,
-                            "- " + Formatter.fromatNumber(couponDiscount)
-                        ]);
 
                     const pct = taxRate ? `(${taxRate}%)` : "";
 
