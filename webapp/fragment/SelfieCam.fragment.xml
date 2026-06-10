@@ -14,18 +14,18 @@
         <VBox class="sapUiSmallMargin">
             <HBox class="sapUiTinyMarginTop">
              <core:HTML
-    content="
-    &lt;div style='position:relative;display:inline-block;'&gt;
-        &lt;video
-            id='video'
-            autoplay
-            playsinline
-            muted
-            class='squareVideo'
-            style='border:2px solid #fff;border-radius:10px;'&gt;
-        &lt;/video&gt;
-    &lt;/div&gt;"
-/>
+                    content="
+                    &lt;div style='position:relative;display:inline-block;'&gt;
+                        &lt;video
+                            id='video'
+                            autoplay
+                            playsinline
+                            muted
+                            class='squareVideo'
+                            style='border:2px solid #fff;border-radius:10px;'&gt;
+                        &lt;/video&gt;
+                    &lt;/div&gt;"
+                />
             </HBox>
             <FlexBox
                 class="sapUiTinyMarginTop"

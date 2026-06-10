@@ -3877,8 +3877,7 @@ sap.ui.define([
 
                 if (bookingUnit !== "per day") {
 
-                    const overlaps =
-                        !(eDate < cycleStart || sDate > cycleEnd);
+                     const overlaps = !(eDate <= cycleStart || sDate >= cycleEnd);
 
                     if (!overlaps) {
                         return 0;
@@ -3964,11 +3963,16 @@ sap.ui.define([
                                 );
 
                         } else if (bookingUnit === "per month") {
+                            if (invoiceIndex >= totalMonths) {
+                                return;
+                            }
                             facilityAmount = truncate2(
                                 price * calculateTotalMonths(calcStart, calcEnd)
                             );
+                             if (invoiceIndex >= totalMonths) {
+                                return;
+                            }
                         }
-                        
                         item.CalculatedUnits = qty;
                     }
 
