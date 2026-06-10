@@ -42,9 +42,10 @@ sap.ui.define([
 
                 const oData = this.getView().getModel("BookingView").getData();
 
-                const bAllUpdated = oData.Members
-                    .flatMap(member => member.Documents)
-                    .every(doc => doc.Status === "Updated");
+                const bAllUpdated = oData.Members.every(member =>
+                    member.Documents.length > 0 &&
+                    member.Documents.every(doc => doc.Status === "Updated")
+                );
 
                 if (bAllUpdated) {
                     this._goToNotFound();
@@ -286,26 +287,26 @@ sap.ui.define([
                     "/NewMemberDraft"
                 );
 
-              
 
 
-                    // ================= CREATE =================
 
-                  
-                        if (this._sEditPath) {
-
-                            oModel.setProperty(
-                                this._sEditPath,
-                                oDraft
-                            );
-                        }
-
-                    oModel.refresh(true);
+                // ================= CREATE =================
 
 
-                    this.MM_Dialog.close();
+                if (this._sEditPath) {
 
-                    sap.m.MessageToast.show("Document uploaded successfully");
+                    oModel.setProperty(
+                        this._sEditPath,
+                        oDraft
+                    );
+                }
+
+                oModel.refresh(true);
+
+
+                this.MM_Dialog.close();
+
+                sap.m.MessageToast.show("Document uploaded successfully");
             },
             onRemoveButtonPress: function () {
 
@@ -986,71 +987,71 @@ sap.ui.define([
 
             // },
             OnSubmit: function () {
-    var oController = this;
+                var oController = this;
 
-    // Get Members data from model
-    var aMembers = this.getView().getModel("BookingView").getProperty("/Members") || [];
+                // Get Members data from model
+                var aMembers = this.getView().getModel("BookingView").getProperty("/Members") || [];
 
-    // Create Payload
-   const oPayload = {
-    Members: aMembers.map(function (oMember) {
+                // Create Payload
+                const oPayload = {
+                    Members: aMembers.map(function (oMember) {
 
-        const oDoc = oMember.Documents?.[0];
+                        const oDoc = oMember.Documents?.[0];
 
-        return {
-            MemberID: oMember.MemberID || "",
-            Salutation: oMember.Salutation || "",
-            Name: oMember.Name || "",
-            Relation: oMember.Relation || "",
-            Gender: oMember.Gender || "",
-            UserID: oMember.UserID || "",
-            DateOfBirth: oMember.DateOfBirth
-                ? oMember.DateOfBirth.split("/").reverse().join("-")
-                : "",
+                        return {
+                            MemberID: oMember.MemberID || "",
+                            Salutation: oMember.Salutation || "",
+                            Name: oMember.Name || "",
+                            Relation: oMember.Relation || "",
+                            Gender: oMember.Gender || "",
+                            UserID: oMember.UserID || "",
+                            DateOfBirth: oMember.DateOfBirth
+                                ? oMember.DateOfBirth.split("/").reverse().join("-")
+                                : "",
 
-            Documents: oDoc ? [{
-                DocumentID: oDoc.DocumentID || "",
-                MemberID: oMember.MemberID || "",
-                UserID: oMember.UserID || "",
-                DocumentType: oDoc.DocumentType || "",
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || "",
-                File: oDoc.File || "",
-                Status: "Updated"
-            }] : []
-        };
-    })
-};
+                            Documents: oDoc ? [{
+                                DocumentID: oDoc.DocumentID || "",
+                                MemberID: oMember.MemberID || "",
+                                UserID: oMember.UserID || "",
+                                DocumentType: oDoc.DocumentType || "",
+                                FileName: oDoc.FileName || "",
+                                FileType: oDoc.FileType || "",
+                                File: oDoc.File || "",
+                                Status: "Updated"
+                            }] : []
+                        };
+                    })
+                };
 
 
-    // Call CAP/OData Service
- this.ajaxUpdateWithJQuery(
-                        "HM_Document", {
-                        data: [oPayload],
-                    
-                    }
-                    );
-            MessageBox.information("Documents submitted successfully", {
-                title: "Success",
-                actions: [MessageBox.Action.OK],
-                emphasizedAction: MessageBox.Action.OK,
-                styleClass: "myUnifiedBtn",
-                onClose: function (sAction) {
-                    if (sAction === MessageBox.Action.OK) {
+                // Call CAP/OData Service
+                this.ajaxUpdateWithJQuery(
+                    "HM_Document", {
+                    data: [oPayload],
 
-                        if (oController._oMemberDialog) {
-                            oController._oMemberDialog.destroy();
-                            oController._oMemberDialog = null;
-                        }
-
-                        oController.getOwnerComponent()
-                            .getRouter()
-                            .navTo("RouteHostel");
-                    }
                 }
-            });
-      
-},
+                );
+                MessageBox.information("Documents submitted successfully", {
+                    title: "Success",
+                    actions: [MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (sAction) {
+                        if (sAction === MessageBox.Action.OK) {
+
+                            if (oController._oMemberDialog) {
+                                oController._oMemberDialog.destroy();
+                                oController._oMemberDialog = null;
+                            }
+
+                            oController.getOwnerComponent()
+                                .getRouter()
+                                .navTo("RouteHostel");
+                        }
+                    }
+                });
+
+            },
             onMemberSearch: function (oEvent) {
                 const sValue = String(oEvent.getParameter("newValue") || oEvent.getParameter("query") || "").trim();
                 const oTable = sap.ui.getCore().byId("abmemberSelectTable");
