@@ -731,19 +731,31 @@ sap.ui.define([
                         (end.getFullYear() - start.getFullYear()) * 12 +
                         (end.getMonth() - start.getMonth());
 
-                    if (end.getDate() >= start.getDate()) {
+                    if (end.getDate() > start.getDate()) {
                         months += 1;
                     }
+
+                    months = Math.max(months, 1);
 
                     baseDuration = months + (months === 1 ? " Month" : " Months");
                 } else if (unit === "per year") {
 
-                    if (diffDays < 364) {
-                        baseDuration = diffDays + " Days";
-                    } else {
-                        const years = Math.round(diffDays / 365);
-                        baseDuration = years + (years === 1 ? " Year" : " Years");
+                    let years =
+                        end.getFullYear() - start.getFullYear();
+
+                    if (
+                        end.getMonth() > start.getMonth() ||
+                        (
+                            end.getMonth() === start.getMonth() &&
+                            end.getDate() > start.getDate()
+                        )
+                    ) {
+                        years += 1;
                     }
+
+                    years = Math.max(years, 1);
+
+                    baseDuration = years + (years === 1 ? " Year" : " Years");
                 } else if (unit === "per hour") {
 
                     const hoursPerDay = Number(totalHour) || 1;
@@ -768,20 +780,30 @@ sap.ui.define([
                             (end.getFullYear() - start.getFullYear()) * 12 +
                             (end.getMonth() - start.getMonth());
 
-                        if (end.getDate() >= start.getDate()) {
+                        if (end.getDate() > start.getDate()) {
                             months += 1;
                         }
+
+                        months = Math.max(months, 1);
 
                         return months + (months === 1 ? " Month" : " Months");
                     }
 
-                    if (unit === "per year") {
+                   if (unit === "per year") {
 
-                        if (diffDays < 364) {
-                            return diffDays + " Days";
+                        let years = end.getFullYear() - start.getFullYear();
+
+                        if (
+                            end.getMonth() > start.getMonth() ||
+                            (
+                                end.getMonth() === start.getMonth() &&
+                                end.getDate() > start.getDate()
+                            )
+                        ) {
+                            years += 1;
                         }
 
-                        const years = Math.round(diffDays / 365);
+                        years = Math.max(years, 1);
 
                         return years + (years === 1 ? " Year" : " Years");
                     }
@@ -962,17 +984,32 @@ sap.ui.define([
                         (end.getFullYear() - start.getFullYear()) * 12 +
                         (end.getMonth() - start.getMonth());
 
-                    if (end.getDate() >= start.getDate()) months += 1;
+                    if (end.getDate() > start.getDate()) {
+                        months += 1;
+                    }
+
+                    months = Math.max(months, 1);
 
                     return months + (months === 1 ? " Month" : " Months");
                 }
 
                 if (sUnit === "Per Year") {
-                    if (diffDays < 364) {
-                        return diffDays + " Days";
+
+                    let years =
+                        end.getFullYear() - start.getFullYear();
+
+                    if (
+                        end.getMonth() > start.getMonth() ||
+                        (
+                            end.getMonth() === start.getMonth() &&
+                            end.getDate() > start.getDate()
+                        )
+                    ) {
+                        years += 1;
                     }
 
-                    const years = Math.round(diffDays / 365);
+                    years = Math.max(years, 1);
+
                     return years + (years === 1 ? " Year" : " Years");
                 }
 
@@ -3927,21 +3964,11 @@ sap.ui.define([
                                 );
 
                         } else if (bookingUnit === "per month") {
-
-                            const daysInMonth =
-                                this._getDaysInMonth(calcStart);
-
-                            facilityAmount =
-                                this._truncate2(
-                                    price *
-                                    daysInMonth *
-                                    this._calculateTotalMonths(
-                                        calcStart,
-                                        calcEnd
-                                    )
-                                );
+                            facilityAmount = truncate2(
+                                price * calculateTotalMonths(calcStart, calcEnd)
+                            );
                         }
-
+                        
                         item.CalculatedUnits = qty;
                     }
 
@@ -4101,10 +4128,6 @@ sap.ui.define([
                     cycleEnd.getMonth() + 1
                 );
 
-                cycleEnd.setDate(
-                    cycleEnd.getDate() - 1
-                );
-
                 cycleStart.setHours(0, 0, 0, 0);
                 cycleEnd.setHours(0, 0, 0, 0);
 
@@ -4130,10 +4153,6 @@ sap.ui.define([
                     cycleEnd.getFullYear() + 1
                 );
 
-                cycleEnd.setDate(
-                    cycleEnd.getDate() - 1
-                );
-
                 cycleStart.setHours(0, 0, 0, 0);
                 cycleEnd.setHours(0, 0, 0, 0);
 
@@ -4145,9 +4164,7 @@ sap.ui.define([
 
 
             // TOTAL MONTHS
-
-            _calculateTotalMonths: function(startDate, endDate) {
-
+             calculateTotalMonths : function(startDate, endDate) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
 
@@ -4155,20 +4172,15 @@ sap.ui.define([
                     (end.getFullYear() - start.getFullYear()) * 12 +
                     (end.getMonth() - start.getMonth());
 
-                if (months === 0) {
-                    return 1;
-                }
-
-                if (end.getDate() >= start.getDate()) {
+                if (end.getDate() > start.getDate()) {
                     months += 1;
                 }
 
-                return months;
+                return Math.max(months, 1);
             },
 
 
             // DAYS
-
             _calculateDays: function(start, end) {
 
                 return Math.floor(
