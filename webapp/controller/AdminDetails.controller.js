@@ -8976,37 +8976,6 @@ sap.ui.define([
             }
         },
         onCloseMemberSelectionDialog: function () {
-
-            var oView = this.getView();
-            var oTable = sap.ui.getCore().byId("abmemberSelectTable");
-
-                var oCustomerModel = this.getView().getModel("BookingView");
-            var aDocs = oCustomerModel.getProperty("/Documents") || [];
-
-            var aSelectedItems = oTable.getSelectedItems();
-
-              aSelectedItems.forEach(function (oItem) {
-
-                var oContext = oItem.getBindingContext("BookingView");
-                var oData = oContext.getObject();
-
-                var doc = oData.Documents[0];
-
-                if (doc) {
-                    aDocs.push({
-                        DocumentID: doc.DocumentID,
-                        DocumentType: doc.DocumentType,
-                        MemberID: oData.MemberID,
-                        MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
-                        FileName: doc.FileName,
-                        FileType: doc.FileType,
-                        File: doc.File
-                    });
-                }
-            });
-
-            this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
-
             this.UD_Dialog.close();
         },
         onMemberSearch: function (oEvent) {

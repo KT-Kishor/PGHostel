@@ -276,7 +276,6 @@ sap.ui.define([
             },
             _uploadNewMemberDocument: function (oDoc) {
 
-                this.getBusyDialog();
 
                 const isCreate =
                     this._mode === "CREATE";
@@ -287,44 +286,12 @@ sap.ui.define([
                     "/NewMemberDraft"
                 );
 
-                const oPromise = isCreate ?
-                    this.ajaxCreateWithJQuery(
-                        "HM_MemberDocument", {
-                        data: [oDoc]
-                    }
-                    )
+              
 
-                    :
-                    this.ajaxUpdateWithJQuery(
-                        "HM_MemberDocument", {
-                        data: [oDoc],
-                        filters: {
-                            DocumentID: oDraft.Documents?.[0]?.DocumentID
-                        }
-                    }
-                    );
-
-                oPromise.then(() => {
 
                     // ================= CREATE =================
 
-                    if (isCreate) {
-
-                        var aMembers =
-                            oModel.getProperty("/Members") || [];
-
-                        var oNewMember =
-                            JSON.parse(JSON.stringify(oDraft));
-
-                        aMembers.push(oNewMember);
-
-                        oModel.setProperty(
-                            "/Members",
-                            aMembers
-                        );
-                    }
-                    // ================= UPDATE =================
-                    else {
+                  
                         if (this._sEditPath) {
 
                             oModel.setProperty(
@@ -332,30 +299,13 @@ sap.ui.define([
                                 oDraft
                             );
                         }
-                    }
 
                     oModel.refresh(true);
 
+
                     this.MM_Dialog.close();
 
-                    sap.m.MessageToast.show(
-                        this.i18nModel.getText(
-                            "docUploadSuccess"
-                        )
-                    );
-
-                }).catch(() => {
-
-                    sap.m.MessageToast.show(
-                        this.i18nModel.getText(
-                            "Error Uploading Documents"
-                        )
-                    );
-
-                }).finally(() => {
-
-                    this.closeBusyDialog();
-                });
+                    sap.m.MessageToast.show("Document uploaded successfully");
             },
             onRemoveButtonPress: function () {
 
@@ -1011,30 +961,96 @@ sap.ui.define([
                 return utils._LCstrictValidationComboBox(oComboBox, "ID");
             },
 
+            // OnSubmit: function () {
+
+            //     var oController = this;
+
+            //     MessageBox.information("Documents submitted successfully", {
+            //         title: "Success",
+            //         actions: [MessageBox.Action.OK],
+            //         emphasizedAction: MessageBox.Action.OK,
+            //         styleClass: "myUnifiedBtn",
+            //         onClose: function (sAction) {
+            //             if (sAction === MessageBox.Action.OK) {
+            //                 oController.getOwnerComponent()
+            //                     .getRouter()
+            //                     .navTo("RouteHostel");
+            //                 if (oController._oMemberDialog) {
+            //                     oController._oMemberDialog.destroy();
+            //                     oController._oMemberDialog = null;
+            //                 }
+            //             }
+            //         }
+            //     });
+
+
+            // },
             OnSubmit: function () {
+    var oController = this;
 
-                var oController = this;
+    // Get Members data from model
+    var aMembers = this.getView().getModel("BookingView").getProperty("/Members") || [];
 
-                MessageBox.information("Documents submitted successfully", {
-                    title: "Success",
-                    actions: [MessageBox.Action.OK],
-                    emphasizedAction: MessageBox.Action.OK,
-                    styleClass: "myUnifiedBtn",
-                    onClose: function (sAction) {
-                        if (sAction === MessageBox.Action.OK) {
-                            oController.getOwnerComponent()
-                                .getRouter()
-                                .navTo("RouteHostel");
-                            if (oController._oMemberDialog) {
-                                oController._oMemberDialog.destroy();
-                                oController._oMemberDialog = null;
-                            }
-                        }
+    // Create Payload
+   const oPayload = {
+    Members: aMembers.map(function (oMember) {
+
+        const oDoc = oMember.Documents?.[0];
+
+        return {
+            MemberID: oMember.MemberID || "",
+            Salutation: oMember.Salutation || "",
+            Name: oMember.Name || "",
+            Relation: oMember.Relation || "",
+            Gender: oMember.Gender || "",
+            UserID: oMember.UserID || "",
+            DateOfBirth: oMember.DateOfBirth
+                ? oMember.DateOfBirth.split("/").reverse().join("-")
+                : "",
+
+            Documents: oDoc ? [{
+                DocumentID: oDoc.DocumentID || "",
+                MemberID: oMember.MemberID || "",
+                UserID: oMember.UserID || "",
+                DocumentType: oDoc.DocumentType || "",
+                FileName: oDoc.FileName || "",
+                FileType: oDoc.FileType || "",
+                File: oDoc.File || "",
+                Status: "Updated"
+            }] : []
+        };
+    })
+};
+
+
+    // Call CAP/OData Service
+ this.ajaxUpdateWithJQuery(
+                        "HM_Document", {
+                        data: [oPayload],
+                    
                     }
-                });
+                    );
+            MessageBox.information("Documents submitted successfully", {
+                title: "Success",
+                actions: [MessageBox.Action.OK],
+                emphasizedAction: MessageBox.Action.OK,
+                styleClass: "myUnifiedBtn",
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
 
+                        if (oController._oMemberDialog) {
+                            oController._oMemberDialog.destroy();
+                            oController._oMemberDialog = null;
+                        }
 
-            },
+                        oController.getOwnerComponent()
+                            .getRouter()
+                            .navTo("RouteHostel");
+                    }
+                }
+            });
+      
+},
             onMemberSearch: function (oEvent) {
                 const sValue = String(oEvent.getParameter("newValue") || oEvent.getParameter("query") || "").trim();
                 const oTable = sap.ui.getCore().byId("abmemberSelectTable");
