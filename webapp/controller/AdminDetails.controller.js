@@ -4761,6 +4761,7 @@ sap.ui.define([
                     onClose: function (sAction) {
 
                         if (sAction === MessageBox.Action.YES) {
+                            that.getBusyDialog()
                             that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
                                 filters: {
                                     DocumentID: oDoc.DocumentID
@@ -4771,12 +4772,13 @@ sap.ui.define([
                                     aDocs.splice(iIndex, 1);
                                     oCustomerModel.setProperty("/Documents", aDocs);
                                     oCustomerModel.refresh(true)
+                                    that.closeBusyDialog()
 
-                                    sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
+                                    sap.m.MessageToast.show(that.i18nModel.getText("docdeletedSuccess"));
 
                                 })
                                 .catch(function () {
-                                    sap.m.MessageToast.show(this.i18nModel.getText("failedDeleteDocumentfromServer"));
+                                    sap.m.MessageToast.show(that.i18nModel.getText("failedDeleteDocumentfromServer"));
                                 });
                         }
                     }
@@ -4788,7 +4790,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Documents", aDocs);
                 oCustomerModel.refresh(true)
 
-                sap.m.MessageToast.show(this.i18nModel.getText("documentRemoved"));
+                sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
             }
         },
 

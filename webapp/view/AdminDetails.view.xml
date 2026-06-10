@@ -716,6 +716,7 @@
                                 id="Ad_id_idFacilityRoomTableDetails1"
                                 class="sapUiSmallMarginTop"
                                 items="{path: 'CustomerData>/Documents'}"
+                                mode="{= ${VisibleModel>/visible} ? 'Delete' : 'None' }"
                                 delete="onDocumentDelete"
                                 busyIndicatorDelay="0"
                                 inset="false"
