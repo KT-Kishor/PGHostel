@@ -3994,17 +3994,13 @@ sap.ui.define([
                 // QTY
                 else if (selectionMode === "QTY") {
 
-                    if (invoiceIndex > 0) {
-                        return 0;
-                    }
-
                     switch (unit) {
-
                         case "unit price":
-                            facilityAmount =
-                                this._truncate2(
-                                    qty * price
-                                );
+                            if (invoiceIndex > 0) {
+                                return 0;
+                            }
+
+                            facilityAmount = this._truncate2(  qty * price);
                             break;
 
                         case "per day":
