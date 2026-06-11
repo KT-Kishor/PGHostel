@@ -155,6 +155,43 @@ sap.ui.define([
       });
     },
 
+    showSyncBusyDialog: function () {
+      if (!this._oSyncBusyOverlay) {
+        var oOverlay = document.createElement("div");
+        oOverlay.setAttribute("data-sync-busy", "1");
+        oOverlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.01);";
+
+        var oDialog = document.createElement("div");
+        oDialog.style.cssText = "background:transparent;padding:2rem;text-align:center;";
+
+        var oImg = document.createElement("img");
+        oImg.src = "./image/image.png";
+        oImg.style.cssText = "width:100px;height:100px;";
+
+        var sKeyframes = "@keyframes syncBusySpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }";
+        if (!document.getElementById("_syncBusySpinStyle")) {
+          var oStyle = document.createElement("style");
+          oStyle.id = "_syncBusySpinStyle";
+          oStyle.textContent = sKeyframes;
+          document.head.appendChild(oStyle);
+        }
+        oImg.style.animation = "syncBusySpin 3s linear infinite";
+
+        oDialog.appendChild(oImg);
+        oOverlay.appendChild(oDialog);
+        document.body.appendChild(oOverlay);
+
+        this._oSyncBusyOverlay = oOverlay;
+      }
+      this._oSyncBusyOverlay.style.display = "flex";
+    },
+
+    closeSyncBusyDialog: function () {
+      if (this._oSyncBusyOverlay) {
+        this._oSyncBusyOverlay.style.display = "none";
+      }
+    },
+
     getBusyDialog: function () {
       if (!this._pBusyDialog) {
         this._pBusyDialog = sap.ui.core.Fragment.load({
