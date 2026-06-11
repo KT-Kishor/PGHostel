@@ -81,7 +81,7 @@ sap.ui.define([
                 String(today.getMonth() + 1).padStart(2, "0") + "-" +
                 String(today.getDate()).padStart(2, "0");
             aData.forEach((oBooking) => {
-                if (!["New", "Assigned", "Completed", "Cancelled"].includes(oBooking.Status)) return;
+                if (!["New", "Assigned", "Completed", "Cancelled", "Confirmed", "Rejected"].includes(oBooking.Status)) return;
                 if (!aAllowedBranches.includes("ALL") && !aAllowedBranches.includes(oBooking.BranchCode)
                 ) return;
                 const d = new Date(oBooking.BookingDate);
@@ -725,7 +725,9 @@ sap.ui.define([
                         { Status: "New", Count: 0 },
                         { Status: "Assigned", Count: 0 },
                         { Status: "Completed", Count: 0 },
-                        { Status: "Cancelled", Count: 0 }
+                        { Status: "Cancelled", Count: 0 },
+                        { Status: "Confirmed", Count: 0 },
+                        { Status: "Rejected", Count: 0 },
                     ];
                 case "PAYMENT":
                     return [
