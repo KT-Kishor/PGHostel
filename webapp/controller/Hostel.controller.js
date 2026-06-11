@@ -2706,6 +2706,8 @@ sap.ui.define([
             // 🔹 Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
             oView.setModel(oAreaModel, "AreaModel");
+            this._populateUniqueFilterValues(aFiltered)
+
             // 🔹 Enable the Area dropdown now that data is ready
             oAreaCombo.setEnabled(true);
             oRoomType.setEnabled(true);
@@ -2886,7 +2888,6 @@ sap.ui.define([
                 this.closeBusyDialog()
                 this.isInitialLoad = true;
                 this.isShowmore=false
-                this._populateUniqueFilterValues(data)
 
 
                 if (this.cityuse === false) {
@@ -2910,6 +2911,8 @@ sap.ui.define([
                     index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
+                this._populateUniqueFilterValues(aUnique)
+
 
                 // Default selections
                 this.byId("id_Branch").setSelectedKey(sCity);
@@ -2927,6 +2930,43 @@ sap.ui.define([
                 oFooterModel.setProperty("/showGlobalFooter", false);
 
             }
+        },
+          _populateUniqueFilterValues: function (data) {
+            let uniqueValues = {
+                id_Roomtype: new Set(),
+                id_Area: new Set(),
+                id_Branch: new Set()
+            
+            };
+
+            data.forEach(item => {
+                if (item.Name && item.Name.trim()) {
+                    uniqueValues.id_Roomtype.add(item.Name.trim());
+                }
+                if (item.LandMark && item.LandMark.trim()) {
+                    uniqueValues.id_Area.add(item.LandMark.trim());
+                }
+                if (item.City && item.City.trim()) {
+                    uniqueValues.id_Branch.add(item.City.trim());
+                }
+            });
+
+            let oView = this.getView();
+
+            ["id_Roomtype", "id_Area","id_Branch"].forEach(field => {
+                let oComboBox = oView.byId(field);
+                if (!oComboBox) return;
+
+                oComboBox.destroyItems();
+                Array.from(uniqueValues[field]).sort().forEach(value => {
+                    oComboBox.addItem(
+                        new sap.ui.core.Item({
+                            key: value,
+                            text: value
+                        })
+                    );
+                });
+            });
         },
         _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
             const oView = this.getView();
@@ -2984,6 +3024,8 @@ sap.ui.define([
                     let aUpdatedData = [...aExistingData, ...aFilteredData];
 
                     this.getView().getModel("AreaModel").setData(aUpdatedData);
+                    this._populateUniqueFilterValues(aUpdatedData)
+
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
                     aBranchesData = oBRModel?.getData() || [];
