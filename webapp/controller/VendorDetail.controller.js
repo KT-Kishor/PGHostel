@@ -968,7 +968,7 @@ sap.ui.define([
             this.UD_Dialog.close();
         },
 
-        onFacilityFileChange: function (oEvent) {
+        onFacilityFileChange: function(oEvent) {
             const oFileUploader = oEvent.getSource();
             const oFile = oEvent.getParameter("files")[0];
 
@@ -984,6 +984,17 @@ sap.ui.define([
             if (!oFile) {
                 return;
             }
+
+            const bIsPdf = oFile.type === "application/pdf" ||
+                oFile.name.toLowerCase().endsWith(".pdf");
+
+            if (bIsPdf && oFile.size > (2 * 1024 * 1024)) {
+                sap.m.MessageToast.show(
+                    "PDF file size should not exceed 2 MB."
+                );
+                oFileUploader.clear();
+                return;
+            }
             // DUPLICATE CHECK
             // const aDocs = oAdminModel.getProperty("/Documents") || [];
             // const bDuplicate = aDocs.some(
@@ -997,6 +1008,7 @@ sap.ui.define([
             //     oFileUploader.clear();
             //     return;
             // }
+
             // FILE READ
             const reader = new FileReader();
             const that = this;
@@ -1004,17 +1016,14 @@ sap.ui.define([
             reader.onload = async function(e) {
                 try {
 
-                    const sBase64 = e.target.result.split(",")[1];
+                    const sBase64 = await that._compressImageTo2MB(oFile);
 
-                    // Generate file name from Document Type
-                    const sExt = oFile.name.includes(".")
-                        ? oFile.name.split(".").pop().toLowerCase()
-                        : "";
+                    const sExt = "jpg"; // compressed output is jpeg
 
                     const sNewFileName = sDocType
                         .toLowerCase()
                         .replace(/[^a-z0-9]/g, "_") +
-                        (sExt ? "." + sExt : "");
+                        "." + sExt;
 
                     const oPayload = {
                         data: {
@@ -1055,6 +1064,74 @@ sap.ui.define([
             };
             reader.readAsDataURL(oFile);
             this.UD_Dialog.close();
+        },
+
+        _compressImageTo2MB: function (oFile) {
+            return new Promise((resolve, reject) => {
+
+                // Non-image files
+                if (!oFile.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        resolve(e.target.result.split(",")[1]);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(oFile);
+                    return;
+                }
+
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                };
+
+                img.onload = function () {
+
+                    let canvas = document.createElement("canvas");
+                    let ctx = canvas.getContext("2d");
+
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize large images
+                    const maxDimension = 1920;
+
+                    if (width > maxDimension || height > maxDimension) {
+                        const ratio = Math.min(
+                            maxDimension / width,
+                            maxDimension / height
+                        );
+                        width *= ratio;
+                        height *= ratio;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.9;
+                    let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+                    // Keep reducing quality until under 2MB
+                    while (
+                        dataUrl.length * 0.75 > 2 * 1024 * 1024 &&
+                        quality > 0.1
+                    ) {
+                        quality -= 0.1;
+                        dataUrl = canvas.toDataURL("image/jpeg", quality);
+                    }
+
+                    resolve(dataUrl.split(",")[1]);
+                };
+
+                img.onerror = reject;
+                reader.onerror = reject;
+
+                reader.readAsDataURL(oFile);
+            });
         }
     });
 });

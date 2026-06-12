@@ -211,28 +211,6 @@ sap.ui.define([
                         }));
                     });
             }
-
-            // // ===== Status Combo =====
-            // let oStatusCombo = oView.byId("MV_id_Status");
-
-            // if (oStatusCombo) {
-            //     oStatusCombo.destroyItems();
-
-            //     let uniqueCities = [...new Set(
-            //         data
-            //         .map(item => item.Status)
-            //         .filter(Boolean)
-            //     )];
-
-            //     uniqueCities
-            //         .sort()
-            //         .forEach(Status => {
-            //             oStatusCombo.addItem(new sap.ui.core.Item({
-            //                 key: Status,
-            //                 text: Status
-            //             }));
-            //         });
-            // }
         },
          getGroupHeader: function (oGroup) {
                     return this.getStyledGroupHeader(oGroup);
