@@ -240,8 +240,21 @@
                                                 width="120px"
                                                 height="120px"
                                                 press="onImagePress"
-                                                visible="{= ${DisplayImagesModel>isPlaceholder} === false }"
+                                                visible="{= ${DisplayImagesModel>isPlaceholder} === false &amp;&amp; ${DisplayImagesModel>isProcessing} !== true }"
                                             />
+                                            <!-- Processing / Compressing State -->
+                                            <m:VBox
+                                                visible="{= ${DisplayImagesModel>isProcessing} === true }"
+                                                width="120px"
+                                                height="120px"
+                                                alignItems="Center"
+                                                justifyContent="Center"
+                                                class="placeholderBox"
+                                            >
+                                                <m:BusyIndicator
+                                                    size="2rem"
+                                                />
+                                            </m:VBox>
                                             <!-- Placeholder Box (visible only when no image) -->
                                             <m:VBox
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"

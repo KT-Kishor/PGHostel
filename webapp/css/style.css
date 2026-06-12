@@ -146,6 +146,23 @@
 /* Active */
 .loginButton:active .sapMBtnInner {
   background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+  color: #ffffff !important;
+}
+
+/* Hover */
+.loginButton:hover .sapMBtnInner {
+  background: linear-gradient(135deg, #02d0ed, #007f89) !important;
+  color: #ffffff !important;
+}
+
+/* Focus */
+.loginButton.sapMBtnFocus .sapMBtnInner {
+  color: #ffffff !important;
+}
+
+.loginButton .sapMBtnContent,
+.loginButton .sapMBtnContent bdi {
+  color: #ffffff !important;
 }
 
 .custom-text {

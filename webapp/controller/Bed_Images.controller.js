@@ -419,35 +419,95 @@ sap.ui.define([
             oModel.setProperty("/DisplayImages", finalImages);
         },
 
-        onFileSelected: function(oEvent) {
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempImage = {
+                isPlaceholder: false,
+                isProcessing: true,
+                tempId: sTempId,
+                fileName: "Compressing..."
+            };
+            const iPlaceholderIndex = aImages.findIndex(img => img.isPlaceholder);
+            if (iPlaceholderIndex !== -1) {
+                aImages[iPlaceholderIndex] = oTempImage;
+            } else {
+                aImages.push(oTempImage);
+            }
+            oModel.setProperty("/DisplayImages", aImages);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const iIndex = aImages.findIndex(img => img.tempId === sTempId);
+            if (iIndex !== -1) {
+                aImages[iIndex] = { isPlaceholder: true };
+            }
+            oModel.setProperty("/DisplayImages", aImages);
+        },
+
+        _showBusyOnUploader: function (bBusy, oUploader) {
+            if (oUploader && oUploader.setBusy) {
+                oUploader.setBusy(bBusy);
+            }
+        },
+
+        onFileSelected: async function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
-            const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-            if (oFile.size > MAX_SIZE) {
-                sap.m.MessageToast.show(
-                    "File Size must be less than 2 MB.\nSelected File Size: " +
-                    (oFile.size / 1024 / 1024).toFixed(2) + " MB"
-                );
 
-                // reset uploader field
-                oEvent.getSource().clear();
+            const oSource = oEvent.getSource();
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const aRealImages = aImages.filter(img => !img.isPlaceholder);
+
+            const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
+            if (bFileNameDuplicate) {
+                sap.m.MessageToast.show(`"${oFile.name}" is already Added.`);
                 return;
             }
 
-            const oReader = new FileReader();
-            oReader.onload = (oLoadEvent) => {
-                const sBase64 = oLoadEvent.target.result;
-                const oModel = this.getView().getModel("DisplayImagesModel");
-                let aImages = oModel.getProperty("/DisplayImages") || [];
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-                const aRealImages = aImages.filter(img => !img.isPlaceholder);
-                const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
-                if (bFileNameDuplicate) {
-                    sap.m.MessageToast.show(`"${oFile.name}" is already Added.`);
+            try {
+                this.getBusyDialog();
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    const sTempId = this._addBusyProcessingRow();
+                    try {
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.85
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    } finally {
+                        this._removeProcessingRow(sTempId);
+                    }
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    sap.m.MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
                     return;
                 }
 
-                const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
+                const sBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
+
+                aImages = oModel.getProperty("/DisplayImages") || [];
+                const aCurrentReal = aImages.filter(img => !img.isPlaceholder);
+                const bContentDuplicate = aCurrentReal.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
                     sap.m.MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
                     return;
@@ -457,7 +517,7 @@ sap.ui.define([
                 const oNewImage = {
                     src: sBase64,
                     fileName: oFile.name,
-                    fileType: oFile.type,
+                    fileType: processedFile.type,
                     isPlaceholder: false
                 };
 
@@ -467,21 +527,26 @@ sap.ui.define([
                     aImages.push(oNewImage);
                 }
 
-                const realImagesCount = aImages.filter(img => !img.isPlaceholder).length;
+                const realImagesCount = aImages.filter(img => !img.isPlaceholder && !img.isProcessing).length;
                 if (realImagesCount < 5) {
                     if (!aImages.some(img => img.isPlaceholder)) {
-                        aImages.push({
-                            isPlaceholder: true
-                        });
+                        aImages.push({ isPlaceholder: true });
                     }
                 } else {
                     aImages = aImages.filter(img => !img.isPlaceholder);
                 }
 
                 oModel.setProperty("/DisplayImages", aImages);
-            };
 
-            oReader.readAsDataURL(oFile);
+            } catch (err) {
+                this.closeBusyDialog();
+                sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                this.closeBusyDialog();
+                if (oSource && oSource.clear) {
+                    oSource.clear();
+                }
+            }
         },
 
         onPriceInputLiveChange: function(oEvent) {
