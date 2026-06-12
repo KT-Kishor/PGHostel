@@ -239,9 +239,12 @@
                                     size="1.2rem"
                                     visible="{= ${UploaderData>isProcessing} === true }"
                                 />
-                                <Text
+                                <Link
                                     visible="{= !${UploaderData>isProcessing} }"
-                                    text="{UploaderData>filename}"
+                                    text="{UploaderData>displayName}"
+                                    tooltip="{UploaderData>displayName}"
+                                    press="onPreviewBedImage"
+                                    class="documentLink"
                                 />
                             </HBox>
                             <Text text="{UploaderData>fileType}" />

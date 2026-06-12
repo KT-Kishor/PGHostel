@@ -270,7 +270,7 @@ sap.ui.define([
                 attachments.slice(0, 5).forEach((file, index) => {
                     const num = index + 1;
                     oData.Attachment[`Photo${num}`] = file.content || "";
-                    oData.Attachment[`Photo${num}Name`] = file.filename || "";
+                    oData.Attachment[`Photo${num}Name`] = file.displayName || "";
                     oData.Attachment[`Photo${num}Type`] = file.fileType || "";
                 });
 
@@ -432,11 +432,13 @@ sap.ui.define([
                         continue;
                     }
 
+                    const sExt = oFile.name.split(".").pop();
                     aAttachments.push({
                         content: sBase64,
                         fileType: processedFile.type,
                         filename: oFile.name,
-                        size: this.formatFileSize(processedFile.size)
+                        size: this.formatFileSize(processedFile.size),
+                        displayName: "BedImage " + (aAttachments.length + 1) + "." + sExt
                     });
 
                     aTokens.push({
@@ -885,6 +887,132 @@ sap.ui.define([
             oSheet.build().finally(function() {
                 oSheet.destroy();
             });
+        },
+
+        onPreviewBedImage: async function(oEvent) {
+            const oCtx = oEvent.getSource().getBindingContext("UploaderData");
+            if (!oCtx) return;
+
+            const oAttachment = oCtx.getObject();
+            if (!oAttachment || !oAttachment.content) {
+                sap.m.MessageToast.show("No image found");
+                return;
+            }
+
+            function autoDecodeBase64(b64) {
+                if (!b64) return "";
+                b64 = b64.replace(/\s/g, "");
+                let last = b64;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (last.startsWith("iVB") || last.startsWith("/9j") || last.startsWith("JVBER")) {
+                            return last;
+                        }
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return last;
+            }
+
+            const sBase64 = autoDecodeBase64(oAttachment.content);
+            let sMimeType = oAttachment.fileType || "application/octet-stream";
+            if (sBase64.startsWith("iVB")) { sMimeType = "image/png"; }
+            else if (sBase64.startsWith("/9j")) { sMimeType = "image/jpeg"; }
+
+            const sFileName = oAttachment.displayName || oAttachment.filename || "Bed Image";
+
+            this._sPreviewFileName = sFileName;
+            this._sPreviewMimeType = sMimeType;
+            this._sPreviewBase64 = sBase64;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+
+            this._oPreviewDialog = await sap.ui.core.Fragment.load({
+                id: this.getView().getId(),
+                name: "sap.ui.com.project1.fragment.DocumentPreview",
+                controller: this
+            });
+
+            this.getView().addDependent(this._oPreviewDialog);
+
+            const oDialog = sap.ui.core.Fragment.byId(this.getView().getId(), "previewDialog");
+            const oImage = sap.ui.core.Fragment.byId(this.getView().getId(), "previewImage");
+            const oHtml = sap.ui.core.Fragment.byId(this.getView().getId(), "previewHtml");
+
+            oDialog.setTitle(sFileName);
+            oImage.setVisible(false);
+            oHtml.setVisible(false);
+            oHtml.setContent("");
+
+            if (sMimeType.startsWith("image/")) {
+                const sImageSrc = "data:" + sMimeType + ";base64," + sBase64;
+                const oImg = new Image();
+                oImg.onload = function() {
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+                    const imgRatio = oImg.width / oImg.height;
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
+                    }
+                    oDialog.setContentWidth(finalWidth + "px");
+                    oDialog.setContentHeight(finalHeight + "px");
+                    oImage.setSrc(sImageSrc);
+                    oImage.setVisible(true);
+                    oDialog.open();
+                }.bind(this);
+                oImg.onerror = function() {
+                    sap.m.MessageToast.show("Unable to preview image.");
+                };
+                oImg.src = sImageSrc;
+                return;
+            }
+
+            this.onDownloadPreview();
+            sap.m.MessageToast.show("Preview not supported.");
+        },
+
+        onDownloadPreview: function() {
+            if (!this._sPreviewBase64) {
+                sap.m.MessageToast.show("No file available for download.");
+                return;
+            }
+            let sDownloadUrl = "";
+            if (this._sPreviewMimeType.startsWith("image/")) {
+                sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
+            }
+            if (!sDownloadUrl) {
+                sap.m.MessageToast.show("Download not supported.");
+                return;
+            }
+            const oLink = document.createElement("a");
+            oLink.href = sDownloadUrl;
+            oLink.download = this._sPreviewFileName || "BedImage";
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onClosePreview: function() {
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+            this._sPreviewBase64 = null;
+            this._sPreviewMimeType = null;
+            this._sPreviewFileName = null;
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
         },
 
         createTableSheet: function() {

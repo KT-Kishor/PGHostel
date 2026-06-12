@@ -132,9 +132,10 @@ sap.ui.define([
                     const sType = oBedData[`Photo${i}Type`];
 
                     if (sPhoto) {
+                        const sExt = (sType || "image/jpeg").split("/")[1] || "jpg";
                         aDisplayImages.push({
                             src: `data:${sType || "image/jpeg"};base64,${sPhoto}`,
-                            fileName: sName || `Photo${i}`,
+                            fileName: "BedImage " + i + "." + sExt,
                             fileType: sType || "image/jpeg",
                             isPlaceholder: false
                         });
@@ -517,10 +518,11 @@ sap.ui.define([
                     return;
                 }
 
+                const sExt = oFile.name.split(".").pop();
                 const iPlaceholderIndex = aImages.findIndex(img => img.isPlaceholder);
                 const oNewImage = {
                     src: sBase64,
-                    fileName: oFile.name,
+                    fileName: "BedImage " + (aCurrentReal.length + 1) + "." + sExt,
                     fileType: processedFile.type,
                     isPlaceholder: false
                 };
