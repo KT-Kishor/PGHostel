@@ -4789,7 +4789,7 @@ sap.ui.define([
                         maxSizeMB: 1.9,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
-                        initialQuality: 0.85
+                        initialQuality: 0.95
                     };
                     processedFile = await imageCompression(file, options);
                     MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
