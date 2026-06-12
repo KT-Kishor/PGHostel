@@ -8087,88 +8087,118 @@ sap.ui.define([
             return utils._LCstrictValidationComboBox(oComboBox, "ID");
         },
 
-        onFileUpload: function (oEvent) {
-
-            const oFileUploader = oEvent.getSource();
-
+        onFileUpload: async function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
+            const oUploader = sap.ui.getCore().byId("AD_id_FileUploader");
 
-            const oFile = oEvent.getParameter("files") &&
-                oEvent.getParameter("files")[0];
+            const file = oEvent.getParameter("files")?.[0];
+            if (!file) return;
 
-            if (!oFile) {
-                return;
-            }
-
-            const iMaxSize = 2 * 1024 * 1024;
-
-            const sDocType = oModel.getProperty(
-                "/NewMemberDraft/Documents/0/DocumentType"
-            );
-
+            const sDocType = oModel.getProperty("/NewMemberDraft/Documents/0/DocumentType");
             if (!sDocType) {
                 sap.m.MessageToast.show("Please select document type first");
-                oFileUploader.clear();
+                if (oUploader) oUploader.clear();
                 return;
             }
 
-            // Size validation
-            if (oFile.size > iMaxSize) {
-                sap.m.MessageToast.show(oFile.name + " exceeds the 2 MB size limit.");
-                oFileUploader.clear();
-                return;
-            }
-
-            const sFileName = oFile.name || "";
-
+            const sFileName = file.name || "";
             const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
-
-            const bAllowedExt = [
-                "jpg",
-                "jpeg",
-                "png",
-                "webp",
-                "pdf"
-            ].includes(sExt);
-
+            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
             if (!bAllowedExt) {
-
-                sap.m.MessageToast.show(
-                    "Only PDF, JPG, JPEG, PNG, WEBP allowed"
-                );
-
-                oFileUploader.clear();
+                sap.m.MessageToast.show("Only PDF, JPG, JPEG, PNG, WEBP allowed");
+                if (oUploader) oUploader.clear();
                 return;
             }
 
-            const oReader = new FileReader();
+            const sTempId = this._addBusyProcessingRow();
+            this._showBusyOnUploader(true);
 
-            oReader.onload = function (oLoadEvent) {
+            let processedFile = file;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = file.size / (1024 * 1024);
+            const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
 
-                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    this.getBusyDialog();
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(file, options);
+                    this.closeBusyDialog();
+                    // sap.m.MessageToast.show("Compressed to " + (processedFile.size / 1024).toFixed(2) + " KB");
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    sap.m.MessageToast.show(file.name + " exceeds the 2 MB size limit.");
+                    if (oUploader) oUploader.clear();
+                    this._removeProcessingRow(sTempId);
+                    this._showBusyOnUploader(false);
+                    oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
+                    return;
+                }
+
+                const base64 = await new Promise(function (resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function () { resolve(reader.result.split(",")[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
 
                 let sNewName = sDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
-
                 sNewName += "." + sExt;
 
-                oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
-                oModel.setProperty("/NewMemberDraft/Documents/0/FileType", oFile.type || "");
-                oModel.setProperty("/NewMemberDraft/Documents/0/File", sBase64);
-                oModel.refresh(true);
-            };
+                this._removeProcessingRow(sTempId);
 
-            oReader.readAsDataURL(oFile);
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileType", processedFile.type || "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/File", base64);
+                oModel.refresh(true);
+
+            } catch (err) {
+                this.closeBusyDialog();
+                this._removeProcessingRow(sTempId);
+                console.error(err);
+                sap.m.MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                if (oUploader) oUploader.clear();
+                this._showBusyOnUploader(false);
+                oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
+            }
         },
 
-        onMemberFileSizeExceed: function (oEvent) {
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("BookingView");
+            const sTempId = "__processing__" + Date.now();
+            oModel.setProperty("/NewMemberDraft/Documents/0/FileName", "Compressing...");
+            oModel.setProperty("/NewMemberDraft/Documents/0/FileType", "");
+            oModel.setProperty("/NewMemberDraft/Documents/0/File", "");
+            oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", true);
+            oModel.setProperty("/NewMemberDraft/Documents/0/tempId", sTempId);
+            oModel.refresh(true);
+            return sTempId;
+        },
 
-            const sFileName = oEvent.getParameter("fileName") || "File";
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("BookingView");
+            const sCurrentTempId = oModel.getProperty("/NewMemberDraft/Documents/0/tempId");
+            if (sCurrentTempId === sTempId) {
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileName", "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileType", "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/File", "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/tempId", "");
+            }
+        },
 
-            sap.m.MessageToast.show(
-                sFileName + " exceeds the 2 MB size limit."
-            );
-
-            oEvent.getSource().clear();
+        _showBusyOnUploader: function (bBusy) {
+            const oUploader = sap.ui.getCore().byId("AD_id_FileUploader");
+            if (oUploader) {
+                oUploader.setBusy(bBusy);
+            }
         },
 
         onRemoveButtonPress: function () {
@@ -8178,6 +8208,8 @@ sap.ui.define([
             oModel.setProperty("/NewMemberDraft/Documents/0/FileType", "");
             oModel.setProperty("/NewMemberDraft/Documents/0/File", "");
             oModel.setProperty("/NewMemberDraft/Documents/0/DocumentType", "");
+            oModel.setProperty("/NewMemberDraft/Documents/0/tempId", "");
+            oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
             oModel.refresh(true);
 
             const oFileUploader = sap.ui.getCore().byId("AD_id_FileUploader");
