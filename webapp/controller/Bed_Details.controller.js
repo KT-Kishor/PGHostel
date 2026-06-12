@@ -347,7 +347,7 @@ sap.ui.define([
             this.byId("BT_id_FileUploader1").clear();
         },
 
-        onFacilityFileChange: function(oEvent) {
+        onFacilityFileChange: async function (oEvent) {
             var oUploader = oEvent.getSource();
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
@@ -359,63 +359,86 @@ sap.ui.define([
             let aAttachments = oUploaderData.getProperty("/attachments") || [];
             let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-            // Block if already 5 files uploaded
             if (aAttachments.length >= 5) {
                 sap.m.MessageToast.show(this.i18nModel.getText("youcanUploadMaximumof5ImagesOnly"));
                 return;
             }
 
-            // Only allow remaining slots
             const iAvailableSlots = 5 - aAttachments.length;
             const aSelectedFiles = Array.from(oFiles).slice(0, iAvailableSlots);
 
-            aSelectedFiles.forEach((oFile) => {
-                const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-                if (oFile.size > MAX_SIZE) {
-                    sap.m.MessageToast.show(
-                        "File size must be Less than 2 MB.\nSelected file size: " +
-                        (oFile.size / 1024 / 1024).toFixed(2) + " MB"
-                    );
+            for (const oFile of aSelectedFiles) {
+                // Skip non-uploader-model entries like processing rows
+                const aCurrentAttachments = oUploaderData.getProperty("/attachments") || [];
+                const aRealAttachments = aCurrentAttachments.filter(att => !att.isProcessing);
 
-                    //  Reset the FileUploader input
-                    oEvent.getSource().clear();
-                    return;
-                }
-                const bIsDuplicate = aAttachments.some(att =>
-                    att.filename === oFile.name // filename duplicate
+                const bIsDuplicate = aRealAttachments.some(att =>
+                    att.filename === oFile.name
                 );
 
                 if (bIsDuplicate) {
                     sap.m.MessageToast.show(`"${oFile.name}" is Already Uploaded.`);
-                    return;
+                    continue;
                 }
 
-                // Validate file type
                 if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
                     sap.m.MessageToast.show(this.i18nModel.getText("onlyimagefilesareallowed"));
-                    return;
+                    continue;
                 }
 
-                const oReader = new FileReader();
-                oReader.onload = (e) => {
-                    const sBase64 = e.target.result.split(",")[1];
+                let processedFile = oFile;
+                const MAX_SIZE_MB = 2;
+                const fileSizeMB = oFile.size / (1024 * 1024);
+                const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-                    // Final Duplicate Check using file content
-                    const bContentDuplicate = aAttachments.some(att => att.content === sBase64);
-                    if (bContentDuplicate) {
-                        sap.m.MessageToast.show(this.i18nModel.getText("thisimageisalreadyuploaded"));
-                        return;
+                const sTempId = this._addBusyProcessingRow();
+
+                try {
+                    if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        this.getBusyDialog();
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                        throw new Error("Only images can be compressed");
                     }
 
-                    // Add attachment
-                    aAttachments.push({
-                        content: sBase64,
-                        fileType: oFile.type,
-                        filename: oFile.name,
-                        size: this.formatFileSize(oFile.size)
+                    this.closeBusyDialog();
+
+                    const sBase64 = await new Promise((resolve, reject) => {
+                        const oReader = new FileReader();
+                        oReader.onload = (e) => resolve(e.target.result.split(",")[1]);
+                        oReader.onerror = reject;
+                        oReader.readAsDataURL(processedFile);
                     });
 
-                    // Add token
+                    this._removeProcessingRow(sTempId);
+
+                    aAttachments = oUploaderData.getProperty("/attachments") || [];
+                    aTokens = oTokenModel.getProperty("/tokens") || [];
+
+                    const bContentDuplicate = aAttachments.some(att =>
+                        att.content === sBase64 && !att.isProcessing
+                    );
+                    if (bContentDuplicate) {
+                        sap.m.MessageToast.show(this.i18nModel.getText("thisimageisalreadyuploaded"));
+                        continue;
+                    }
+
+                    aAttachments.push({
+                        content: sBase64,
+                        fileType: processedFile.type,
+                        filename: oFile.name,
+                        size: this.formatFileSize(processedFile.size)
+                    });
+
                     aTokens.push({
                         key: oFile.name,
                         text: oFile.name
@@ -423,11 +446,36 @@ sap.ui.define([
 
                     oUploaderData.setProperty("/attachments", aAttachments);
                     oTokenModel.setProperty("/tokens", aTokens);
-                };
-
-                oReader.readAsDataURL(oFile);
-            });
+                } catch (err) {
+                    this.closeBusyDialog();
+                    this._removeProcessingRow(sTempId);
+                    sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+                }
+            }
             oUploader.clear();
+        },
+
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("UploaderData");
+            const aAttachments = oModel.getProperty("/attachments") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempDoc = {
+                filename: "Compressing...",
+                fileType: "",
+                size: 0,
+                isProcessing: true,
+                tempId: sTempId
+            };
+            aAttachments.push(oTempDoc);
+            oModel.setProperty("/attachments", aAttachments);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("UploaderData");
+            let aAttachments = oModel.getProperty("/attachments") || [];
+            aAttachments = aAttachments.filter(att => att.tempId !== sTempId);
+            oModel.setProperty("/attachments", aAttachments);
         },
 
         formatFileSize: function(bytes) {

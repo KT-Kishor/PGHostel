@@ -231,7 +231,19 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{UploaderData>filename}" />
+                            <HBox
+                                justifyContent="Start"
+                                alignItems="Center"
+                            >
+                                <BusyIndicator
+                                    size="1.2rem"
+                                    visible="{= ${UploaderData>isProcessing} === true }"
+                                />
+                                <Text
+                                    visible="{= !${UploaderData>isProcessing} }"
+                                    text="{UploaderData>filename}"
+                                />
+                            </HBox>
                             <Text text="{UploaderData>fileType}" />
                             <Text text="{UploaderData>size}" />
                              <Button
@@ -239,6 +251,7 @@
                     type="Transparent"
                     tooltip="Delete"
                     press="onTokenDelete"
+                    enabled="{= !${UploaderData>isProcessing} }"
                 />
                         </cells>
                     </ColumnListItem>
