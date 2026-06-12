@@ -6,17 +6,14 @@
 	xmlns:u="sap.ui.unified"
 	xmlns:mvc="sap.ui.core.mvc">
 	<Dialog id="HF_id_HostelFeaturesDialog"  type="Message" class="sapUiContentPadding"    contentWidth="28rem"
-        contentHeight="auto"
-    resizable="true" draggable="true">
-	    <customHeader>
-            <Bar class="barheader">
-                    <contentMiddle>
-                <Title text="{i18n>hostelFeatures}" />
-            </contentMiddle>
-              
-            </Bar>
-        </customHeader>
-		  
+    contentHeight="auto" resizable="true" draggable="true">
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="{i18n>hostelFeatures}" />
+				</contentMiddle>
+			</Bar>
+		</customHeader>
 		<f:SimpleForm
             editable="true"
             layout="ResponsiveGridLayout"
@@ -30,32 +27,20 @@
 			<f:content>
 				<!-- Branch Code -->
 				<Label text="{i18n>MSbranchCode}" required="true"/>
-				<ComboBox id="HFF_id_BranchCode" placeholder="Select property name" selectedKey="{HostelFeaturesModel>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
+				<ComboBox id="HFF_id_BranchCode" placeholder="Select property name" selectedKey="{HostelFeaturesModel>/BranchCode" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
                 valueStateText="Select property name">
-					<core:ListItem    key="{BranchModel>BranchID}"
-                        text="{BranchModel>BranchID} - {BranchModel>Name}"
-                        additionalText="{BranchModel>City}"/>
+					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
+                    additionalText="{BranchModel>City}"/>
 				</ComboBox>
-				<!-- Facility Name -->
+				<!-- Amenity Name -->
 				<Label text="{i18n>amenitiesName}" required="true"/>
 				<Input id="HFF_id_FacilityName" value="{HostelFeaturesModel>/FacilityName}"
                 placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterAmenitiesName}"/>
-				<Label
-                    text="{i18n>type}"
-                    required="true"
-                />
-				<ComboBox
-                    id="HFF_id_Amenities"
-                    items="{AmenityNameModel>/}"
-                    value="{HostelFeaturesModel>/Type}"
-                    placeholder="{i18n>enterType}"
-                    valueStateText="{i18n>enterType}"
-                    change="onAmenitieTypeChange"
-                >
-				<core:Item
-                        key="{AmenityNameModel>ID}"
-                        text="{AmenityNameModel>AmenitiName}"
-                    />
+                <!-- Amenity TYpe -->
+				<Label text="{i18n>type}" required="true"/>
+				<ComboBox id="HFF_id_Amenities" items="{AmenityNameModel>/}" value="{HostelFeaturesModel>/Type}"
+                placeholder="{i18n>enterType}" valueStateText="{i18n>enterType}" change="onAmenitieTypeChange">
+					<core:Item key="{AmenityNameModel>ID}" text="{AmenityNameModel>AmenitiName}"/>
 				</ComboBox>
 				<!-- Description -->
 				<Label text="{i18n>description}" required="true"/>
@@ -69,9 +54,6 @@
 					<HBox width="25%">
 						<u:FileUploader
                             id="HFF_id_FileUploader"
-                            fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="5MB"
-                            typeMissmatch="onFileTypeMissmatch"
                             fileType="jpg,jpeg,png"
                             change="onFacilityFileChange"
                             buttonOnly="true"
@@ -94,7 +76,6 @@
 				</VBox>
 			</f:content>
 		</f:SimpleForm>
-		
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer />

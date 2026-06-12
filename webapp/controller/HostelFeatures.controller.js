@@ -4,14 +4,14 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast"
-], function (BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
+], function(BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.HostelFeatures", {
-        onInit: function () {
+        onInit: function() {
             this.getOwnerComponent().getRouter().getRoute("RouteHostelFeatures").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function() {
             try {
                 this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
@@ -44,16 +44,16 @@ sap.ui.define([
                 this.closeBusyDialog()
                 sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
-               
+
                 this.closeBusyDialog()
             }
         },
 
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
 
-        _loadBranchCode: async function () {
+        _loadBranchCode: async function() {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -85,7 +85,7 @@ sap.ui.define([
             }
         },
 
-        HM_AddHostelFeature: function () {
+        HM_AddHostelFeature: function() {
             const oView = this.getView();
 
             if (!this.ARD_Dialog) {
@@ -116,7 +116,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HM_EditHostelFeature: function () {
+        HM_EditHostelFeature: function() {
             const oTable = this.byId("HF_HostelFeatureTable");
             const oSelected = oTable.getSelectedItems();
 
@@ -161,31 +161,31 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HF_onCancelButtonPress: function () {
+        HF_onCancelButtonPress: function() {
             this.ARD_Dialog.close();
             this.byId("HFF_id_BranchCode").setValueState("None");
             this.byId("HF_HostelFeatureTable").removeSelections(true);
         },
 
-        onNameInputLiveChange: function (oEvent) {
+        onNameInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function (oEvent) {
+        onFacilityNameChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onHostelbranchChange: function (oEvent) {
+        onHostelbranchChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        HF_onsavebuttonpress: async function () {
+        HF_onsavebuttonpress: async function() {
             const oView = this.getView();
             const oHostelFeaturesModel = oView.getModel("HostelFeaturesModel");
             const oDescControl = sap.ui.getCore().byId(this.getView().createId("HFF_id_Description"));
@@ -208,7 +208,7 @@ sap.ui.define([
             }
 
             //  Duplicate check
-            var bDuplicate = aHostelData.some(function (facility) {
+            var bDuplicate = aHostelData.some(function(facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false; // Skip comparing the same record during update
                 return (
                     facility.BranchCode === Payload.BranchCode &&
@@ -274,16 +274,19 @@ sap.ui.define([
             }
         },
 
-        onFacilityFileChange: function (oEvent) {
+        onFacilityFileChange: async function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
-            if (!oFile) return;
-            const oReader = new FileReader();
-            oReader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
+
+            if (!oFile) {
+                return;
+            }
+
+            try {
+                const oCompressed = await this._compressImage(oFile);
 
                 this.getView().getModel("UploadModel").setData({
-                    Photo1: base64,
-                    Photo1Type: oFile.type,
+                    Photo1: oCompressed.base64,
+                    Photo1Type: "image/jpeg",
                     Photo1Name: oFile.name
                 });
 
@@ -293,11 +296,72 @@ sap.ui.define([
                         text: oFile.name
                     }]
                 });
-            };
-            oReader.readAsDataURL(oFile);
+
+            } catch (err) {
+                sap.m.MessageToast.show("Failed to process image.");
+            }
         },
 
-        onTokenDelete: function (oEvent) {
+        _compressImage: function(oFile) {
+            return new Promise((resolve, reject) => {
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+
+                    const img = new Image();
+
+                    img.onload = function() {
+
+                        let width = img.width;
+                        let height = img.height;
+
+                        const maxDimension = 1920;
+
+                        if (width > maxDimension || height > maxDimension) {
+                            const ratio = Math.min(
+                                maxDimension / width,
+                                maxDimension / height
+                            );
+
+                            width *= ratio;
+                            height *= ratio;
+                        }
+
+                        const canvas = document.createElement("canvas");
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        let quality = 0.9;
+                        let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+                        // Compress until below 2MB
+                        while (
+                            dataUrl.length * 0.75 > (2 * 1024 * 1024) &&
+                            quality > 0.1
+                        ) {
+                            quality -= 0.1;
+                            dataUrl = canvas.toDataURL("image/jpeg", quality);
+                        }
+
+                        resolve({
+                            base64: dataUrl.split(",")[1]
+                        });
+                    };
+
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = reject;
+                reader.readAsDataURL(oFile);
+            });
+        },
+
+        onTokenDelete: function(oEvent) {
             this.getView().getModel("UploadModel").setData({
                 Photo1: "",
                 Photo1Type: "",
@@ -308,136 +372,135 @@ sap.ui.define([
             });
         },
 
- Onsearch: function(flag, bBusyAlreadyOpen) {
+        Onsearch: function(flag, bBusyAlreadyOpen) {
+            const oExistingModel = this.getOwnerComponent()
+                .getModel("LoginModel")
+                .getData();
 
-    const oExistingModel = this.getOwnerComponent()
-        .getModel("LoginModel")
-        .getData();
+            const omainModel = this.getOwnerComponent()
+                .getModel("mainModel")
+                ?.getData() || [];
 
-    const omainModel = this.getOwnerComponent()
-        .getModel("mainModel")
-        ?.getData() || [];
+            var oView = this.getView();
 
-    var oView = this.getView();
+            var oTable = oView.byId("HF_HostelFeatureTable");
 
-    var oTable = oView.byId("HF_HostelFeatureTable");
+            var oBinding = oTable.getBinding("items");
 
-    var oBinding = oTable.getBinding("items");
+            // Facility Name
+            var sFacilityName = oView.byId("HF_id_FacilityName")
+                .getSelectedKey() ||
+                oView.byId("HF_id_FacilityName").getValue();
 
-    // Facility Name
-    var sFacilityName = oView.byId("HF_id_FacilityName")
-        .getSelectedKey() ||
-        oView.byId("HF_id_FacilityName").getValue();
+            // Branch Code
+            var sBranchCode = oView.byId("HF_id_BranchCode")
+                .getSelectedKey() ||
+                oView.byId("HF_id_BranchCode").getValue();
 
-    // Branch Code
-    var sBranchCode = oView.byId("HF_id_BranchCode")
-        .getSelectedKey() ||
-        oView.byId("HF_id_BranchCode").getValue();
+            let aBranchCodes = [];
 
-    let aBranchCodes = [];
+            if (Array.isArray(omainModel) && omainModel.length) {
 
-    if (Array.isArray(omainModel) && omainModel.length) {
+                aBranchCodes = omainModel
+                    .map(item => item.BranchID)
+                    .flat()
+                    .filter(Boolean)
+                    .join(",");
 
-        aBranchCodes = omainModel
-            .map(item => item.BranchID)
-            .flat()
-            .filter(Boolean)
-            .join(",");
+            } else if (oExistingModel.BranchCode) {
 
-    } else if (oExistingModel.BranchCode) {
-
-        aBranchCodes = oExistingModel.BranchCode
-            .split(",")
-            .map(code => code.trim());
-    }
-
-    let filters = {};
-
-    // Role Based Filter
-    if (oExistingModel.Role === "Admin") {
-
-        filters = {
-            BranchCode: aBranchCodes
-        };
-
-        filters.Role = "Admin";
-
-    } else if (oExistingModel.Role === "SuperAdmin") {
-
-        filters.BranchCode = "";
-
-    } else {
-
-        filters.BranchCode = oExistingModel.BranchCode;
-    }
-
-    // Facility Filter
-    if (sFacilityName) {
-        filters.FacilityName = sFacilityName;
-    }
-
-    // Branch Filter from FilterBar
-    if (sBranchCode) {
-        filters.BranchCode = sBranchCode;
-    }
-
-     if (!bBusyAlreadyOpen) {
-                this.getBusyDialog();
+                aBranchCodes = oExistingModel.BranchCode
+                    .split(",")
+                    .map(code => code.trim());
             }
 
-    return this.ajaxReadWithJQuery(
-        "HM_HostelFeatures",
-        filters
-    ).then((oData) => {
+            let filters = {};
 
-        let response = Array.isArray(oData.data)
-            ? oData.data
-            : [oData.data];
+            // Role Based Filter
+            if (oExistingModel.Role === "Admin") {
 
-        const branchData = this.getView()
-            .getModel("BranchModel")
-            ?.getData() || [];
+                filters = {
+                    BranchCode: aBranchCodes
+                };
 
-        response = response.map(bed => {
+                filters.Role = "Admin";
 
-            const branch = branchData.find(
-                br => br.BranchID === bed.BranchCode
-            );
+            } else if (oExistingModel.Role === "SuperAdmin") {
 
-            return {
-                ...bed,
-                BranchName: branch
-                    ? branch.Name
-                    : bed.BranchCode
-            };
+                filters.BranchCode = "";
 
-        });
+            } else {
 
-        if (!this._originalBedData || flag === "true") {
-            this._originalBedData = response;
-        }
+                filters.BranchCode = oExistingModel.BranchCode;
+            }
 
-        const model = new sap.ui.model.json.JSONModel(response);
+            // Facility Filter
+            if (sFacilityName) {
+                filters.FacilityName = sFacilityName;
+            }
 
-        this.getView().setModel(model, "HostelFeatures");
+            // Branch Filter from FilterBar
+            if (sBranchCode) {
+                filters.BranchCode = sBranchCode;
+            }
 
-        this._populateUniqueFilterValues(this._originalBedData);
+            if (!bBusyAlreadyOpen) {
+                        this.getBusyDialog();
+                    }
 
-    }).catch((err) => {
+            return this.ajaxReadWithJQuery(
+                "HM_HostelFeatures",
+                filters
+            ).then((oData) => {
 
-        sap.m.MessageToast.show(
-            err.message || err.responseText
-        );
+                let response = Array.isArray(oData.data)
+                    ? oData.data
+                    : [oData.data];
 
-    }).finally(() => {
+                const branchData = this.getView()
+                    .getModel("BranchModel")
+                    ?.getData() || [];
 
-        this.closeBusyDialog();
+                response = response.map(bed => {
 
-    });
+                    const branch = branchData.find(
+                        br => br.BranchID === bed.BranchCode
+                    );
 
-},
+                    return {
+                        ...bed,
+                        BranchName: branch
+                            ? branch.Name
+                            : bed.BranchCode
+                    };
 
-        _populateUniqueFilterValues: function (data) {
+                });
+
+                if (!this._originalBedData || flag === "true") {
+                    this._originalBedData = response;
+                }
+
+                const model = new sap.ui.model.json.JSONModel(response);
+
+                this.getView().setModel(model, "HostelFeatures");
+
+                this._populateUniqueFilterValues(this._originalBedData);
+
+            }).catch((err) => {
+
+                sap.m.MessageToast.show(
+                    err.message || err.responseText
+                );
+
+            }).finally(() => {
+
+                this.closeBusyDialog();
+
+            });
+
+        },
+
+        _populateUniqueFilterValues: function(data) {
             let uniqueValues = {
                 HF_id_FacilityName: new Set(),
             };
@@ -459,7 +522,7 @@ sap.ui.define([
             });
         },
 
-        HM_DeleteHostelFeature: async function () {
+        HM_DeleteHostelFeature: async function() {
             var oTable = this.byId("HF_HostelFeatureTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -478,75 +541,74 @@ sap.ui.define([
 
             MessageBox.confirm(
                 `Are you sure you want to Delete the Selected Amenities: ${sNames}?`, {
-                icon: MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                emphasizedAction: MessageBox.Action.NO,
-                styleClass: "myUnifiedBtn",
-                onClose: async function (sAction) {
-                    if (sAction === MessageBox.Action.YES) {
-                        try {
-                            that.getBusyDialog()
+                    icon: MessageBox.Icon.WARNING,
+                    title: "Confirm Deletion",
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
+                    onClose: async function(sAction) {
+                        if (sAction === MessageBox.Action.YES) {
+                            try {
+                                that.getBusyDialog()
 
-                            // Collect all delete promises
-                            const aDeletePromises = aSelectedItems.map(async (item) => {
-                                var oData = item.getBindingContext("HostelFeatures").getObject();
-                                await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
-                                    filters: {
-                                        ID: oData.ID
-                                    }
+                                // Collect all delete promises
+                                const aDeletePromises = aSelectedItems.map(async (item) => {
+                                    var oData = item.getBindingContext("HostelFeatures").getObject();
+                                    await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
+                                        filters: {
+                                            ID: oData.ID
+                                        }
+                                    });
                                 });
-                            });
 
-                            // Wait for all deletions to complete
-                            await Promise.all(aDeletePromises);
-                            await that.Onsearch("true"); // refresh table
-                        } catch (err) {
-                            that.closeBusyDialog()
-                            sap.m.MessageToast.show(err.message || err.responseText);
-                        } finally {
-                            that.closeBusyDialog()
-                            sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
+                                // Wait for all deletions to complete
+                                await Promise.all(aDeletePromises);
+                                await that.Onsearch("true"); // refresh table
+                            } catch (err) {
+                                that.closeBusyDialog()
+                                sap.m.MessageToast.show(err.message || err.responseText);
+                            } finally {
+                                that.closeBusyDialog()
+                                sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
+                                oTable.removeSelections(true);
+                            }
+                        } else {
                             oTable.removeSelections(true);
                         }
-                    } else {
-                        oTable.removeSelections(true);
                     }
                 }
-            }
             );
         },
 
-        _resetFacilityValueStates: function () {
+        _resetFacilityValueStates: function() {
             ["HFF_id_FacilityName", "HFF_id_Description"].forEach(id => {
                 const oField = this.byId(id);
                 if (oField) oField.setValueState("None");
             });
         },
 
-        FC_onPressClear: function () {
+        FC_onPressClear: function() {
             this.getView().byId("HF_id_FacilityName").setSelectedKey("")
             this.getView().byId("HF_id_BranchCode").setSelectedKey("")
         },
 
-        onNavBack: function () {
+        onNavBack: function() {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("HostelFeatures").setData({});
         },
 
-        onHome: function () {
+        onHome: function() {
             this.CommonLogoutFunction();
         },
 
-        HF_viewroom: function (oEvent) {
+        HF_viewroom: function(oEvent) {
             var oContext = oEvent.getSource().getBindingContext("HostelFeatures");
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
                 sap.m.MessageBox.information(
-                    "No image is uploaded.",
-                    {
+                    "No image is uploaded.", {
                         title: "Information",
                         styleClass: "myUnifiedBtn"
                     }
@@ -561,94 +623,94 @@ sap.ui.define([
             const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${oData.Photo1Type || "image/jpeg"};base64,${sBase64}`;
 
 
-                // Create a temporary image to detect orientation and dimensions
-                const oImg = new Image();
+            // Create a temporary image to detect orientation and dimensions
+            const oImg = new Image();
 
-                oImg.onload = function () {
+            oImg.onload = function() {
 
-                    const viewportW = window.innerWidth * 0.8;
-                    const viewportH = window.innerHeight * 0.8;
+                const viewportW = window.innerWidth * 0.8;
+                const viewportH = window.innerHeight * 0.8;
 
-                    const imgRatio = oImg.width / oImg.height;
+                const imgRatio = oImg.width / oImg.height;
 
-                    let finalWidth = viewportW;
-                    let finalHeight = viewportW / imgRatio;
+                let finalWidth = viewportW;
+                let finalHeight = viewportW / imgRatio;
 
-                    if (finalHeight > viewportH) {
-                        finalHeight = viewportH;
-                        finalWidth = viewportH * imgRatio;
-                    }
+                if (finalHeight > viewportH) {
+                    finalHeight = viewportH;
+                    finalWidth = viewportH * imgRatio;
+                }
 
-                    const oHtml = new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
+                const oHtml = new sap.ui.core.HTML({
+                    sanitizeContent: false,
+                    content: `
             <div class="preview-image-container">
                 <img src="${sImageSrc}" />
             </div>
         `
-                    });
+                });
 
-                    this._oComplaintPreviewDialog = new sap.m.Dialog({
-                        title: oData.Photo1Name || "Document Preview",
-                        contentWidth: finalWidth + "px",
-                        contentHeight: finalHeight + "px",
-                        draggable: true,
-                        resizable: true,
-                        contentPadding: "0rem",
-                        horizontalScrolling: false,
-                        verticalScrolling: false,
-                        content: [oHtml],
-                        beginButton: new sap.m.Button({
-                            text: "Close",
-                            addstyleClass: "myUnifiedBtn",
-                            press: () => this._oComplaintPreviewDialog.close()
-                        }),
-                        afterClose: () => {
-                            this._oComplaintPreviewDialog.destroy();
-                            this._oComplaintPreviewDialog = null;
-                        }
-                    });
+                this._oComplaintPreviewDialog = new sap.m.Dialog({
+                    title: oData.Photo1Name || "Document Preview",
+                    contentWidth: finalWidth + "px",
+                    contentHeight: finalHeight + "px",
+                    draggable: true,
+                    resizable: true,
+                    contentPadding: "0rem",
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    content: [oHtml],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        addstyleClass: "myUnifiedBtn",
+                        press: () => this._oComplaintPreviewDialog.close()
+                    }),
+                    afterClose: () => {
+                        this._oComplaintPreviewDialog.destroy();
+                        this._oComplaintPreviewDialog = null;
+                    }
+                });
 
-                    this.getView().addDependent(this._oComplaintPreviewDialog);
-                    this._oComplaintPreviewDialog.open();
+                this.getView().addDependent(this._oComplaintPreviewDialog);
+                this._oComplaintPreviewDialog.open();
 
-                }.bind(this);
+            }.bind(this);
 
-                oImg.src = sImageSrc;
-                return;
+            oImg.src = sImageSrc;
+            return;
         },
 
-        onAmenitieTypeChange: function (oEvent) {
+        onAmenitieTypeChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        createTableSheet: function () {
+        createTableSheet: function() {
             return [{
-                label: "Property Name",
-                property: "BranchName",
-                type: "string"
-            },
-            {
-                label: "Amenities Name",
-                property: "FacilityName",
-                type: "string"
-            },
-            {
-                label: "Type",
-                property: "Type",
-                type: "string"
-            },
-            {
-                label: "Description",
-                property: "Description",
-                type: "string"
-            }
+                    label: "Property Name",
+                    property: "BranchName",
+                    type: "string"
+                },
+                {
+                    label: "Amenities Name",
+                    property: "FacilityName",
+                    type: "string"
+                },
+                {
+                    label: "Type",
+                    property: "Type",
+                    type: "string"
+                },
+                {
+                    label: "Description",
+                    property: "Description",
+                    type: "string"
+                }
             ]
         },
 
-        HF_onDownload: function () {
+        HF_onDownload: function() {
             const oModel = this.byId("HF_HostelFeatureTable").getModel("HostelFeatures").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));

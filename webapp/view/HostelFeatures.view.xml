@@ -1,167 +1,92 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.HostelFeatures"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:m="sap.m"
-    xmlns:c="sap.ui.core"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
+<mvc:View controllerName="sap.ui.com.project1.controller.HostelFeatures"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:m="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core"
     displayBlock="true"
     height="100%"
-    busyIndicatorDelay="0"
->
-    <Page showHeader="true">
-        <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent>
-        <content>
-            <fb:FilterBar
-                id="HF_id_FilterbarEmployee"
-                persistencyKey="myPersKey"
-                useToolbar="false"
-                clear="FC_onPressClear"
-                showClearOnFB="true"
-                search="Onsearch"
-                filterChange="IA_.onFilterChange"
-                afterVariantLoad="IA_.onAfterVariantLoad"
-                showFilterConfiguration="false"
-                filterContainerWidth="auto"
-                class="filterBarTheme"
-                
-            >
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="FacilityName"
-                        label="{i18n>hostelFeatures}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="HF_id_FacilityName"
-                                items="{HostelFeatures>/}"
-                                showClearIcon="true"
-                            >
-                                <core:Item
-                                    key="{HostelFeatures>FacilityName}"
-                                    text="{HostelFeatures>FacilityName}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                </fb:filterGroupItems>
-                <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="BranchCode"
-                        label="{i18n>MSbranchCode}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="HF_id_BranchCode"
-                                items="{BranchModel>/}"
-                                showClearIcon="true"
-                                showSecondaryValues="true"
-                            >
-                                <core:ListItem
-                                    key="{BranchModel>BranchID}"
-                                    text="{BranchModel>BranchID} - {BranchModel>Name}"
-                                    additionalText="{BranchModel>City}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    </fb:filterGroupItems>
-            </fb:FilterBar>
-            <Table
-                id="HF_HostelFeatureTable"
-                sticky="ColumnHeaders,HeaderToolbar"
-                mode="MultiSelect"
-                width="auto"
-                busyIndicatorDelay="0"
-                items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
-            >
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <Title
-                            text="{i18n>hostelFeatures} ({= ${HostelFeatures>/}.length})"
-                        />
-                        <ToolbarSpacer />
-                        <Button
-                            text="{i18n>addHostelFeatures}"
-                            tooltip="{i18n>addHostelFeatures}"
-                            press="HM_AddHostelFeature"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
-                            text="{i18n>MSedit}"
-                            tooltip="{i18n>MSedit}"
-                            press="HM_EditHostelFeature"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
-                            text="{i18n>MSdelete}"
-                            tooltip="{i18n>MSdelete}"
-                            press="HM_DeleteHostelFeature"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
-                        />
-                        <Button
-                            text="{i18n>download}"
-                            icon="sap-icon://excel-attachment"
-                            tooltip="{i18n>downloadBranchData}"
-                            press="HF_onDownload"
-                            class="myUnifiedBtn"
-                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"
-                        />
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>amenitiesName}"
-                            tooltip="{i18n>amenitiesName}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>type}"
-                            tooltip="{i18n>type}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>description}"
-                            tooltip="{i18n>description}"
-                        />
-                    </Column>
-                    <Column demandPopin="true">
-                        <Text
-                            text="{i18n>image}"
-                            tooltip="{i18n>image}"
-                        />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem>
-                        <cells>
-                            <Text text="{HostelFeatures>FacilityName}" />
-                            <Text text="{HostelFeatures>Type}" />
-                            <ExpandableText text="{HostelFeatures>Description}" maxCharacters="20"/>
-                            <Button text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-         <core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
-        </footer>
-    </Page>
+    busyIndicatorDelay="0">
+	<Page showHeader="true">
+		<headerContent>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar id="HF_id_FilterbarEmployee" persistencyKey="myPersKey" useToolbar="false"
+            clear="FC_onPressClear" showClearOnFB="true" search="Onsearch" filterChange="IA_.onFilterChange"
+            afterVariantLoad="IA_.onAfterVariantLoad" showFilterConfiguration="false" filterContainerWidth="auto"
+            class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="FacilityName" label="{i18n>hostelFeatures}" groupName="Group"
+                    visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="HF_id_FacilityName" items="{HostelFeatures>/}" showClearIcon="true">
+								<core:Item key="{HostelFeatures>FacilityName}" text="{HostelFeatures>FacilityName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="BranchCode" label="{i18n>MSbranchCode}" groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="HF_id_BranchCode" items="{BranchModel>/}" showClearIcon="true"
+                            showSecondaryValues="true">
+								<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
+                                    additionalText="{BranchModel>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="HF_HostelFeatureTable" sticky="ColumnHeaders,HeaderToolbar" mode="MultiSelect" width="auto" busyIndicatorDelay="0" items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>hostelFeatures} ({= ${HostelFeatures>/}.length})"/>
+						<ToolbarSpacer />
+						<Button text="{i18n>addHostelFeatures}" tooltip="{i18n>addHostelFeatures}"
+                        press="HM_AddHostelFeature" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button text="{i18n>MSedit}" tooltip="{i18n>MSedit}"
+                        press="HM_EditHostelFeature" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button text="{i18n>MSdelete}" tooltip="{i18n>MSdelete}"
+                        press="HM_DeleteHostelFeature" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
+						<Button text="{i18n>download}" icon="sap-icon://excel-attachment"
+                        tooltip="{i18n>downloadBranchData}" press="HF_onDownload" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'Branch Manager' }"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column demandPopin="true">
+						<Text text="{i18n>amenitiesName}" tooltip="{i18n>amenitiesName}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>type}" tooltip="{i18n>type}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>description}" tooltip="{i18n>description}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text text="{HostelFeatures>FacilityName}" />
+							<Text text="{HostelFeatures>Type}" />
+							<ExpandableText text="{HostelFeatures>Description}" maxCharacters="20"/>
+							<Button text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
 </mvc:View>
