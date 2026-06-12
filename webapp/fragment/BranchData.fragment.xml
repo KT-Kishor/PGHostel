@@ -340,8 +340,6 @@
 				<HBox justifyContent="End" class="sapUiSmallMarginBottom responsiveUploadBtn" >
 					<u:FileUploader
                         id="BD_id_FileUploader"
-                        fileSizeExceed="onFileSizeExceeds"
-                        maximumFileSize="2"
                         typeMissmatch="onFileTypeMissmatch"
                         fileType="jpg,jpeg,png"
                         change="onFacilityFileChange"
@@ -380,7 +378,20 @@
     <items>
         <ColumnListItem>
             <cells>
-                <Text text="{UploaderData>filename}" />
+                <HBox
+                    justifyContent="Start"
+                    alignItems="Center"
+                >
+                    <BusyIndicator
+                        size="1.2rem"
+                        visible="{= ${UploaderData>isProcessing} === true }"
+                    />
+                    <Link
+                        visible="{= !${UploaderData>isProcessing} }"
+                        text="{UploaderData>filename}"
+                        press="onPreviewLogoFile"
+                    />
+                </HBox>
 
                 <Text text="{UploaderData>fileType}" />
 
@@ -396,6 +407,7 @@
                     type="Transparent"
                     tooltip="Delete"
                     press="onTokenDelete"
+                    enabled="{= !${UploaderData>isProcessing} }"
                 />
             </cells>
         </ColumnListItem>
@@ -407,8 +419,6 @@
 				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
 					<u:FileUploader
                         id="BD_id_FileUploader1"
-                        fileSizeExceed="onFileSizeExceeds"
-                        maximumFileSize="2"
                         typeMissmatch="onFileTypeMissmatch"
                         fileType="jpg,jpeg,png"
                         change="onImageChange"
@@ -448,7 +458,20 @@
     <items>
         <ColumnListItem>
             <cells>
-                <Text text="{UploaderData>filename}" />
+                <HBox
+                    justifyContent="Start"
+                    alignItems="Center"
+                >
+                    <BusyIndicator
+                        size="1.2rem"
+                        visible="{= ${UploaderData>isProcessing} === true }"
+                    />
+                    <Link
+                        visible="{= !${UploaderData>isProcessing} }"
+                        text="{UploaderData>filename}"
+                        press="onPreviewImageFile"
+                    />
+                </HBox>
 
                 <Text text="{UploaderData>fileType}" />
 
@@ -464,6 +487,7 @@
                     type="Transparent"
                     tooltip="Delete"
                     press="onTokenImageDelete"
+                    enabled="{= !${UploaderData>isProcessing} }"
                 />
             </cells>
         </ColumnListItem>

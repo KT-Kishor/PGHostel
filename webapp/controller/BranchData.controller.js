@@ -1082,12 +1082,14 @@ sap.ui.define([
                 filename: oData.Photo1Name,
                 fileType: oData.Photo1Type || "",
                 size: oData.Photo1 ? atob(oData.Photo1).length : 0,
+                base64: oData.Photo1 || ""
             }] : [];
 
             const aImageData = oData.AttachmentName ? [{
                 filename: oData.AttachmentName,
                 fileType: oData.AttachmentType || "",
                 size: oData.Attachment ? atob(oData.Attachment).length : 0,
+                base64: oData.Attachment || ""
             }] : [];
 
             this.getView().setModel(new sap.ui.model.json.JSONModel({
@@ -1464,104 +1466,388 @@ sap.ui.define([
             }
         },
 
-        onFacilityFileChange: function(oEvent) {
+        _addLogoProcessingRow: function () {
+            const oModel = this.getView().getModel("UploaderData");
+            const aDocs = oModel.getProperty("/attachmentslogo") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempDoc = {
+                filename: "Compressing...",
+                fileType: "",
+                size: 0,
+                isProcessing: true,
+                tempId: sTempId
+            };
+            aDocs.push(oTempDoc);
+            oModel.setProperty("/attachmentslogo", aDocs);
+            return sTempId;
+        },
+
+        _removeLogoProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("UploaderData");
+            let aDocs = oModel.getProperty("/attachmentslogo") || [];
+            aDocs = aDocs.filter(doc => doc.tempId !== sTempId);
+            oModel.setProperty("/attachmentslogo", aDocs);
+        },
+
+        _addImageProcessingRow: function () {
+            const oModel = this.getView().getModel("UploaderData");
+            const aDocs = oModel.getProperty("/attachmentimage") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempDoc = {
+                filename: "Compressing...",
+                fileType: "",
+                size: 0,
+                isProcessing: true,
+                tempId: sTempId
+            };
+            aDocs.push(oTempDoc);
+            oModel.setProperty("/attachmentimage", aDocs);
+            return sTempId;
+        },
+
+        _removeImageProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("UploaderData");
+            let aDocs = oModel.getProperty("/attachmentimage") || [];
+            aDocs = aDocs.filter(doc => doc.tempId !== sTempId);
+            oModel.setProperty("/attachmentimage", aDocs);
+        },
+
+        onFacilityFileChange: async function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
-            const MaxSize = 2 * 1024 * 1024;
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-            if (oFile.size > MaxSize) {
-                sap.m.MessageToast.show("Image must be under 2 MB");
-                oEvent.getSource().clear();
-                return;
-            }
+            const sTempId = this._addLogoProcessingRow();
+            this.getBusyDialog();
 
-            const oReader = new FileReader();
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(oFile, options);
+                }
 
-            oReader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
-
-                // Save in UploadModel
-                this.getView().getModel("UploadModel").setData({
-                    Photo1: base64,
-                    Photo1Type: oFile.type,
-                    Photo1Name: oFile.name
+                const base64 = await new Promise((resolve, reject) => {
+                    const oReader = new FileReader();
+                    oReader.onload = (e) => resolve(e.target.result.split(",")[1]);
+                    oReader.onerror = reject;
+                    oReader.readAsDataURL(processedFile);
                 });
 
-                // ONLY ONE FILE → REPLACE ARRAY
-                const oUploaderModel = this.getView().getModel("UploaderData");
+                const sExtension = processedFile.type.split("/")[1] === "jpeg" ? "jpg" : processedFile.type.split("/")[1];
+                const sFileName = "Logo." + (sExtension || "png");
 
+                this.getView().getModel("UploadModel").setData({
+                    Photo1: base64,
+                    Photo1Type: processedFile.type,
+                    Photo1Name: sFileName
+                });
+
+                this._removeLogoProcessingRow(sTempId);
+
+                const oUploaderModel = this.getView().getModel("UploaderData");
                 oUploaderModel.setProperty("/attachmentslogo", [{
-                    filename: oFile.name,
-                    fileType: oFile.type,
-                    size: oFile.size,
-                    base64: base64
+                    filename: sFileName,
+                    fileType: processedFile.type,
+                    size: processedFile.size,
+                    base64: base64,
+                    isProcessing: false
                 }]);
 
-                // Optional visibility
                 const oVisModel = this.getView().getModel("VisibilityModel");
                 if (oVisModel) {
                     oVisModel.setProperty("/Logo", base64);
                 }
 
                 sap.m.MessageToast.show("File uploaded successfully");
-            };
-
-            oReader.readAsDataURL(oFile);
+            } catch (err) {
+                this._removeLogoProcessingRow(sTempId);
+                sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+                oEvent.getSource().clear();
+            } finally {
+                this.closeBusyDialog();
+            }
         },
 
-        onImageChange: function(oEvent) {
+        onImageChange: async function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
-            const MaxSize = 2 * 1024 * 1024;
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-            if (oFile.size > MaxSize) {
-                sap.m.MessageToast.show("Image must be under 2 MB");
-                oEvent.getSource().clear();
-                return;
-            }
+            const sTempId = this._addImageProcessingRow();
+            this.getBusyDialog();
 
-            const oReader = new FileReader();
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(oFile, options);
+                }
 
-            oReader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
+                const base64 = await new Promise((resolve, reject) => {
+                    const oReader = new FileReader();
+                    oReader.onload = (e) => resolve(e.target.result.split(",")[1]);
+                    oReader.onerror = reject;
+                    oReader.readAsDataURL(processedFile);
+                });
 
-                //  Existing logic
+                const sExtension = processedFile.type.split("/")[1] === "jpeg" ? "jpg" : processedFile.type.split("/")[1];
+                const sFileName = "HomePage." + (sExtension || "png");
+
                 this.getView().getModel("imageModel").setData({
                     Attachment: base64,
-                    AttachmentType: oFile.type,
-                    AttachmentName: oFile.name
+                    AttachmentType: processedFile.type,
+                    AttachmentName: sFileName
                 });
 
                 this.getView().getModel("tokenImageModel").setData({
                     imageTokens: [{
-                        key: oFile.name,
-                        text: oFile.name
+                        key: sFileName,
+                        text: sFileName
                     }]
                 });
 
-                // ONLY ONE IMAGE → REPLACE ARRAY
-                const oUploaderModel = this.getView().getModel("UploaderData");
+                this._removeImageProcessingRow(sTempId);
 
+                const oUploaderModel = this.getView().getModel("UploaderData");
                 oUploaderModel.setProperty("/attachmentimage", [{
-                    filename: oFile.name,
-                    fileType: oFile.type,
-                    size: oFile.size,
+                    filename: sFileName,
+                    fileType: processedFile.type,
+                    size: processedFile.size,
                     base64: base64,
-                    category: "Image"
+                    category: "Image",
+                    isProcessing: false
                 }]);
 
                 sap.m.MessageToast.show("Image uploaded successfully");
-            };
-
-            oReader.readAsDataURL(oFile);
+            } catch (err) {
+                this._removeImageProcessingRow(sTempId);
+                sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+                oEvent.getSource().clear();
+            } finally {
+                this.closeBusyDialog();
+            }
         },
 
-        onFileSizeExceeds: function() {
-            sap.m.MessageToast.show(
-                "This file is more than 2 MB and cannot be uploaded"
-            );
+        onPreviewLogoFile: async function (oEvent) {
+            const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
+            if (!oData || !oData.base64) {
+                sap.m.MessageToast.show("No file available");
+                return;
+            }
+            this._openFilePreview(oData.base64, oData.filename, oData.fileType);
+        },
+
+        onPreviewImageFile: async function (oEvent) {
+            const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
+            if (!oData || !oData.base64) {
+                sap.m.MessageToast.show("No file available");
+                return;
+            }
+            this._openFilePreview(oData.base64, oData.filename, oData.fileType);
+        },
+
+        _autoDecodeBase64: function (b64) {
+            if (!b64) return "";
+            b64 = b64.replace(/\s/g, "");
+            let last = b64;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    if (last.startsWith("iVB") || last.startsWith("/9j") || last.startsWith("JVBER")) {
+                        return last;
+                    }
+                    last = atob(last);
+                } catch (e) {
+                    break;
+                }
+            }
+            return last;
+        },
+
+        _openFilePreview: async function (sBase64, sFileName, sFileType) {
+            const sDecoded = this._autoDecodeBase64(sBase64);
+
+            let sMimeType = "application/octet-stream";
+            if (sDecoded.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sDecoded.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sDecoded.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            }
+
+            this._sPreviewFileName = sFileName;
+            this._sPreviewMimeType = sMimeType;
+            this._sPreviewBase64 = sDecoded;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+
+            this._oPreviewDialog = await sap.ui.core.Fragment.load({
+                id: this.getView().getId(),
+                name: "sap.ui.com.project1.fragment.DocumentPreview",
+                controller: this
+            });
+
+            this.getView().addDependent(this._oPreviewDialog);
+
+            const oDialog = sap.ui.core.Fragment.byId(this.getView().getId(), "previewDialog");
+            const oImage = sap.ui.core.Fragment.byId(this.getView().getId(), "previewImage");
+            const oHtml = sap.ui.core.Fragment.byId(this.getView().getId(), "previewHtml");
+
+            oDialog.setTitle(sFileName);
+            oImage.setVisible(false);
+            oImage.setSrc("");
+            oHtml.setVisible(false);
+            oHtml.setContent("");
+
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            if (sMimeType.startsWith("image/")) {
+                const sImageSrc = "data:" + sMimeType + ";base64," + sDecoded;
+                const oImg = new Image();
+
+                oImg.onload = function () {
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+                    const imgRatio = oImg.width / oImg.height;
+
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
+                    }
+
+                    oDialog.setContentWidth(finalWidth + "px");
+                    oDialog.setContentHeight(finalHeight + "px");
+                    oImage.setSrc(sImageSrc);
+                    oImage.setVisible(true);
+                    oDialog.open();
+                }.bind(this);
+
+                oImg.onerror = function () {
+                    sap.m.MessageToast.show("Unable to preview image.");
+                };
+
+                oImg.src = sImageSrc;
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                const byteCharacters = atob(sDecoded);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: "application/pdf" });
+                this._pdfBlobUrl = URL.createObjectURL(blob);
+
+                oHtml.setContent(
+                    '<iframe src="' + this._pdfBlobUrl +
+                    '" width="100%" height="100%" ' +
+                    'style="border:none;" ' +
+                    'title="PDF Preview"></iframe>'
+                );
+                oHtml.setVisible(true);
+
+                oDialog.setContentWidth("80%");
+                oDialog.setContentHeight("85%");
+                oDialog.open();
+                return;
+            }
+
+            sap.m.MessageToast.show("Preview not supported.");
+        },
+
+        onDownloadPreview: function () {
+            if (!this._sPreviewBase64) {
+                sap.m.MessageToast.show("No file available for download.");
+                return;
+            }
+
+            let sDownloadUrl = "";
+
+            if (this._sPreviewMimeType === "application/pdf") {
+                if (!this._pdfBlobUrl) {
+                    const byteCharacters = atob(this._sPreviewBase64);
+                    const byteArrays = [];
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                            byteNumbers[i] = slice.charCodeAt(i);
+                        }
+                        byteArrays.push(new Uint8Array(byteNumbers));
+                    }
+                    const blob = new Blob(byteArrays, { type: "application/pdf" });
+                    this._pdfBlobUrl = URL.createObjectURL(blob);
+                }
+                sDownloadUrl = this._pdfBlobUrl;
+            } else if (this._sPreviewMimeType && this._sPreviewMimeType.startsWith("image/")) {
+                sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
+            } else {
+                sDownloadUrl = "data:application/octet-stream;base64," + this._sPreviewBase64;
+            }
+
+            const oLink = document.createElement("a");
+            oLink.href = sDownloadUrl;
+            oLink.download = this._sPreviewFileName || "Document";
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onClosePreview: function () {
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            this._sPreviewBase64 = null;
+            this._sPreviewMimeType = null;
+            this._sPreviewFileName = null;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
         },
 
         onTokenDelete: function(oEvent) {
