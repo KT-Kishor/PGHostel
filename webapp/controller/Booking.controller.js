@@ -3119,63 +3119,121 @@
             }
         },
 
-        onNewMemberDocumentChange: function (oEvent) {
-            const oFileUploader = oEvent.getSource();
+        onNewMemberDocumentChange: async function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
+            const oFileUploader = this.byId("newMemberFileUploader");
+
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
-            const oReader = new FileReader();
-            const iMaxSize = 2 * 1024 * 1024;
-            const sFileName = String(oFile && oFile.name || "");
-            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
-            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
-            const sMimeType = String(oFile && oFile.type || "").toLowerCase();
-            const bAllowedMime = sMimeType === "application/pdf" || sMimeType.indexOf("image/") === 0;
+            if (!oFile) return;
 
-            if (!oFile) {
-                return;
-            }
-
-            // Check if document type is selected
             const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType");
             if (!sDocType) {
-                sap.m.MessageToast.show("Please select document type first");
-                oFileUploader.clear();
+                MessageToast.show("Please select document type first");
+                if (oFileUploader) oFileUploader.clear();
                 return;
             }
 
-            if (oFile.size > iMaxSize) {
-                this._showDocumentUploadSizeError();
-                oFileUploader.clear();
-                return;
-            }
-
-            if (!bAllowedMime && !bAllowedExt) {
+            const sFileName = oFile.name || "";
+            const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
+            const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
+            if (!bAllowedExt) {
                 this._showDocumentUploadTypeError();
-                oFileUploader.clear();
+                if (oFileUploader) oFileUploader.clear();
                 return;
             }
 
-            oReader.onload = function (oLoadEvent) {
-                const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+            const sTempId = this._addBusyProcessingRow();
+            this._showBusyOnUploader(true);
 
-                // Determine new filename based on selected document type
-                const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType") || "document";
-                let sNewName = sDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
-                if (sExt) {
-                    sNewName += "." + sExt;
-                } else {
-                    sNewName += ".pdf"; // fallback
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    this.getBusyDialog();
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(oFile, options);
+                    this.closeBusyDialog();
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    this._showDocumentUploadSizeError();
+                    if (oFileUploader) oFileUploader.clear();
+                    this._removeProcessingRow(sTempId);
+                    this._showBusyOnUploader(false);
+                    oModel.setProperty("/NewMemberDraft/ProcessingActive", false);
+                    return;
                 }
 
-                oModel.setProperty("/NewMemberDraft/DocumentName", sNewName);
-                oModel.setProperty("/NewMemberDraft/DocumentFile", oFile);
-                oModel.setProperty("/NewMemberDraft/Document", sBase64);
-                oModel.setProperty("/NewMemberDraft/File", sBase64);
-                oModel.setProperty("/NewMemberDraft/FileType", oFile.type || "");
-                oModel.refresh(true);
-            };
+                const base64 = await new Promise(function (resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function () { resolve(reader.result.split(",")[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
 
-            oReader.readAsDataURL(oFile);
+                let sNewName = sDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                sNewName += "." + sExt;
+
+                this._removeProcessingRow(sTempId);
+
+                oModel.setProperty("/NewMemberDraft/DocumentName", sNewName);
+                oModel.setProperty("/NewMemberDraft/DocumentFile", processedFile);
+                oModel.setProperty("/NewMemberDraft/Document", base64);
+                oModel.setProperty("/NewMemberDraft/File", base64);
+                oModel.setProperty("/NewMemberDraft/FileType", processedFile.type || "");
+                oModel.refresh(true);
+
+            } catch (err) {
+                this.closeBusyDialog();
+                this._removeProcessingRow(sTempId);
+                console.error(err);
+                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                if (oFileUploader) oFileUploader.clear();
+                this._showBusyOnUploader(false);
+                oModel.setProperty("/NewMemberDraft/ProcessingActive", false);
+            }
+        },
+
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("BookingView");
+            const sTempId = "__processing__" + Date.now();
+            oModel.setProperty("/NewMemberDraft/DocumentName", "Compressing...");
+            oModel.setProperty("/NewMemberDraft/FileType", "");
+            oModel.setProperty("/NewMemberDraft/Document", "");
+            oModel.setProperty("/NewMemberDraft/File", "");
+            oModel.setProperty("/NewMemberDraft/ProcessingActive", true);
+            oModel.setProperty("/NewMemberDraft/tempId", sTempId);
+            oModel.refresh(true);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("BookingView");
+            const sCurrentTempId = oModel.getProperty("/NewMemberDraft/tempId");
+            if (sCurrentTempId === sTempId) {
+                oModel.setProperty("/NewMemberDraft/DocumentName", "");
+                oModel.setProperty("/NewMemberDraft/FileType", "");
+                oModel.setProperty("/NewMemberDraft/Document", "");
+                oModel.setProperty("/NewMemberDraft/File", "");
+                oModel.setProperty("/NewMemberDraft/tempId", "");
+            }
+        },
+
+        _showBusyOnUploader: function (bBusy) {
+            const oUploader = this.byId("newMemberFileUploader");
+            if (oUploader) {
+                oUploader.setBusy(bBusy);
+            }
         },
 
         onNewMemberFileSizeExceed: function (oEvent) {
