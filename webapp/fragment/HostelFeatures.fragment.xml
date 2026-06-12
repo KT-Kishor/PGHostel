@@ -27,7 +27,8 @@
 			<f:content>
 				<!-- Branch Code -->
 				<Label text="{i18n>MSbranchCode}" required="true"/>
-				<ComboBox id="HFF_id_BranchCode" placeholder="Select property name" selectedKey="{HostelFeaturesModel>/BranchCode" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
+				<ComboBox id="HFF_id_BranchCode" placeholder="Select property name" 
+				selectedKey="{HostelFeaturesModel>/BranchCode}" items="{BranchModel>/}" showSecondaryValues="true" change=".onHostelbranchChange"
                 valueStateText="Select property name">
 					<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
                     additionalText="{BranchModel>City}"/>
