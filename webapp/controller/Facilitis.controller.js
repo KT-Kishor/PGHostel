@@ -631,10 +631,6 @@ sap.ui.define([
             }
         },
 
-        onFileSizeExceeds: function() {
-            MessageToast.show(this.i18nModel.getText("fileSizeExceeds"));
-        },
-
         onTokenDelete: function(oEvent) {
             const oView = this.getView();
 
@@ -663,7 +659,30 @@ sap.ui.define([
             this.byId("id_fileUploader").clear();
         },
 
-        onFacilityFileChange: function(oEvent) {
+        _addProcessingRow: function () {
+            const oModel = this.getView().getModel("UploaderData");
+            const aDocs = oModel.getProperty("/attachments") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempDoc = {
+                filename: "Compressing...",
+                fileType: "",
+                size: "",
+                isProcessing: true,
+                tempId: sTempId
+            };
+            aDocs.push(oTempDoc);
+            oModel.setProperty("/attachments", aDocs);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("UploaderData");
+            let aDocs = oModel.getProperty("/attachments") || [];
+            aDocs = aDocs.filter(doc => doc.tempId !== sTempId);
+            oModel.setProperty("/attachments", aDocs);
+        },
+
+        onFacilityFileChange: async function(oEvent) {
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
 
@@ -674,43 +693,91 @@ sap.ui.define([
             let aAttachments = oUploaderData.getProperty("/attachments") || [];
             let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-            // Block if already 3 files uploaded
-            if (aAttachments.length >= 3) return MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+            if (aAttachments.length >= 3) {
+                oEvent.getSource().clear();
+                return MessageToast.show(this.i18nModel.getText("youcanuploadamaximumof3imagesonly"));
+            }
 
-            // Only allow remaining slots
             const iAvailableSlots = 3 - aAttachments.length;
             const aSelectedFiles = Array.from(oFiles).slice(0, iAvailableSlots);
 
-            aSelectedFiles.forEach((oFile) => {
-                if (oFile.size > 2 * 1024 * 1024) return MessageToast.show(`"${oFile.name}" exceeds 2 MB size limit.`);
-                const bIsDuplicate = aAttachments.some(att => att.filename === oFile.name);
-                if (bIsDuplicate) return MessageToast.show(`"${oFile.name}" is already uploaded.`);
-                if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) return MessageToast.show(this.i18nModel.getText("onlyimagefilesareallowed"));
+            this.getBusyDialog();
 
-                const oReader = new FileReader();
-                oReader.onload = (e) => {
-                    const sBase64 = e.target.result.split(",")[1];
-                    // Final Duplicate Check using file content
+            try {
+                for (const oFile of aSelectedFiles) {
+                    const bIsDuplicate = aAttachments.some(att => att.filename === oFile.name);
+                    if (bIsDuplicate) {
+                        MessageToast.show("\"" + oFile.name + "\" is already uploaded.");
+                        continue;
+                    }
+
+                    if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                        MessageToast.show(this.i18nModel.getText("onlyimagefilesareallowed"));
+                        continue;
+                    }
+
+                    const sTempId = this._addProcessingRow();
+                    aAttachments = oUploaderData.getProperty("/attachments") || [];
+
+                    let processedFile = oFile;
+                    const MAX_SIZE_MB = 2;
+                    const fileSizeMB = oFile.size / (1024 * 1024);
+
+                    if (fileSizeMB > MAX_SIZE_MB) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    }
+
+                    const sBase64 = await new Promise((resolve, reject) => {
+                        const oReader = new FileReader();
+                        oReader.onload = (e) => resolve(e.target.result.split(",")[1]);
+                        oReader.onerror = reject;
+                        oReader.readAsDataURL(processedFile);
+                    });
+
                     const bContentDuplicate = aAttachments.some(att => att.content === sBase64);
-                    if (bContentDuplicate) return MessageToast.show(this.i18nModel.getText("thisimageisalreadyuploaded"));
-                    // Add attachment
+                    if (bContentDuplicate) {
+                        this._removeProcessingRow(sTempId);
+                        MessageToast.show(this.i18nModel.getText("thisimageisalreadyuploaded"));
+                        continue;
+                    }
+
+                    this._removeProcessingRow(sTempId);
+
+                    aAttachments = oUploaderData.getProperty("/attachments") || [];
+                    const sFileName = "FacilityImage " + (aAttachments.length + 1);
+                    aTokens = oTokenModel.getProperty("/tokens") || [];
+
                     aAttachments.push({
                         content: sBase64,
-                        fileType: oFile.type,
-                        filename: oFile.name,
-                        size: this._formatFileSize(oFile.size)
+                        fileType: processedFile.type,
+                        filename: sFileName,
+                        size: this._formatFileSize(processedFile.size),
+                        isProcessing: false
                     });
-                    // Add token
+
                     aTokens.push({
-                        key: oFile.name,
-                        text: oFile.name
+                        key: sFileName,
+                        text: sFileName
                     });
+
                     oUploaderData.setProperty("/attachments", aAttachments);
                     oTokenModel.setProperty("/tokens", aTokens);
-                };
-                oReader.readAsDataURL(oFile);
-            });
-            oEvent.getSource().clear();
+                }
+            } catch (err) {
+                MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                this.closeBusyDialog();
+                oEvent.getSource().clear();
+            }
         },
 
         _formatFileSize: function(bytes) {
@@ -718,6 +785,196 @@ sap.ui.define([
             const sizes = ["Bytes", "KB", "MB", "GB"];
             let i = Math.floor(Math.log(bytes) / Math.log(1024));
             return (bytes / Math.pow(1024, i)).toFixed(1) + " " + sizes[i];
+        },
+
+        onPreviewFacilityFile: async function (oEvent) {
+            const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
+            if (!oData || !oData.content) {
+                MessageToast.show("No file available");
+                return;
+            }
+            this._openFilePreview(oData.content, oData.filename, oData.fileType);
+        },
+
+        _autoDecodeBase64: function (b64) {
+            if (!b64) return "";
+            b64 = b64.replace(/\s/g, "");
+            let last = b64;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    if (last.startsWith("iVB") || last.startsWith("/9j") || last.startsWith("JVBER")) {
+                        return last;
+                    }
+                    last = atob(last);
+                } catch (e) {
+                    break;
+                }
+            }
+            return last;
+        },
+
+        _openFilePreview: async function (sBase64, sFileName, sFileType) {
+            const sDecoded = this._autoDecodeBase64(sBase64);
+
+            let sMimeType = "application/octet-stream";
+            if (sDecoded.startsWith("iVB")) {
+                sMimeType = "image/png";
+            } else if (sDecoded.startsWith("/9j")) {
+                sMimeType = "image/jpeg";
+            } else if (sDecoded.startsWith("JVBER")) {
+                sMimeType = "application/pdf";
+            }
+
+            this._sPreviewFileName = sFileName;
+            this._sPreviewMimeType = sMimeType;
+            this._sPreviewBase64 = sDecoded;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+
+            this._oPreviewDialog = await sap.ui.core.Fragment.load({
+                id: this.getView().getId(),
+                name: "sap.ui.com.project1.fragment.DocumentPreview",
+                controller: this
+            });
+
+            this.getView().addDependent(this._oPreviewDialog);
+
+            const oDialog = sap.ui.core.Fragment.byId(this.getView().getId(), "previewDialog");
+            const oImage = sap.ui.core.Fragment.byId(this.getView().getId(), "previewImage");
+            const oHtml = sap.ui.core.Fragment.byId(this.getView().getId(), "previewHtml");
+
+            oDialog.setTitle(sFileName);
+            oImage.setVisible(false);
+            oImage.setSrc("");
+            oHtml.setVisible(false);
+            oHtml.setContent("");
+
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            if (sMimeType.startsWith("image/")) {
+                const sImageSrc = "data:" + sMimeType + ";base64," + sDecoded;
+                const oImg = new Image();
+
+                oImg.onload = function () {
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+                    const imgRatio = oImg.width / oImg.height;
+
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
+
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
+                    }
+
+                    oDialog.setContentWidth(finalWidth + "px");
+                    oDialog.setContentHeight(finalHeight + "px");
+                    oImage.setSrc(sImageSrc);
+                    oImage.setVisible(true);
+                    oDialog.open();
+                }.bind(this);
+
+                oImg.onerror = function () {
+                    MessageToast.show("Unable to preview image.");
+                };
+
+                oImg.src = sImageSrc;
+                return;
+            }
+
+            if (sMimeType === "application/pdf") {
+                const byteCharacters = atob(sDecoded);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, { type: "application/pdf" });
+                this._pdfBlobUrl = URL.createObjectURL(blob);
+
+                oHtml.setContent(
+                    '<iframe src="' + this._pdfBlobUrl +
+                    '" width="100%" height="100%" ' +
+                    'style="border:none;" ' +
+                    'title="PDF Preview"></iframe>'
+                );
+                oHtml.setVisible(true);
+
+                oDialog.setContentWidth("80%");
+                oDialog.setContentHeight("85%");
+                oDialog.open();
+                return;
+            }
+
+            MessageToast.show("Preview not supported.");
+        },
+
+        onDownloadPreview: function () {
+            if (!this._sPreviewBase64) {
+                MessageToast.show("No file available for download.");
+                return;
+            }
+
+            let sDownloadUrl = "";
+
+            if (this._sPreviewMimeType === "application/pdf") {
+                if (!this._pdfBlobUrl) {
+                    const byteCharacters = atob(this._sPreviewBase64);
+                    const byteArrays = [];
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                            byteNumbers[i] = slice.charCodeAt(i);
+                        }
+                        byteArrays.push(new Uint8Array(byteNumbers));
+                    }
+                    const blob = new Blob(byteArrays, { type: "application/pdf" });
+                    this._pdfBlobUrl = URL.createObjectURL(blob);
+                }
+                sDownloadUrl = this._pdfBlobUrl;
+            } else if (this._sPreviewMimeType && this._sPreviewMimeType.startsWith("image/")) {
+                sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
+            } else {
+                sDownloadUrl = "data:application/octet-stream;base64," + this._sPreviewBase64;
+            }
+
+            const oLink = document.createElement("a");
+            oLink.href = sDownloadUrl;
+            oLink.download = this._sPreviewFileName || "Document";
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onClosePreview: function () {
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            this._sPreviewBase64 = null;
+            this._sPreviewMimeType = null;
+            this._sPreviewFileName = null;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
         },
 
         FC_onPressClear: function() {

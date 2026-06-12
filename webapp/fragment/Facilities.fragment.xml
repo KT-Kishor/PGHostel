@@ -273,12 +273,26 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<Text text="{UploaderData>filename}" />
+							<HBox
+								justifyContent="Start"
+								alignItems="Center"
+							>
+								<BusyIndicator
+									size="1.2rem"
+									visible="{= ${UploaderData>isProcessing} === true }"
+								/>
+								<Link
+									visible="{= !${UploaderData>isProcessing} }"
+									text="{UploaderData>filename}"
+									press="onPreviewFacilityFile"
+								/>
+							</HBox>
 							<Text text="{UploaderData>fileType}" />
 							<Text text="{UploaderData>size}" />
 							<Button
                                 icon="sap-icon://delete"
                                 press="onTokenDelete"
+                                enabled="{= !${UploaderData>isProcessing} }"
                             />
 						</cells>
 					</ColumnListItem>
