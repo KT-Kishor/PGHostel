@@ -259,22 +259,20 @@ sap.ui.define([
                     sap.m.MessageBox.information("No images uploaded.");
                     return;
                 }
-                // Convert Base64 images
+
                 const aCarouselImages = aImages.map(function (img) {
                     let base64 = img.src.replace(/\s/g, "");
-
                     if (!base64.startsWith("data:image")) {
                         base64 = "data:" + img.type + ";base64," + base64;
                     }
-                    return new sap.m.Image({
-                        src: base64,
-                        width: "100%",
-                        height: "100%",
-                        style: "object-fit: cover; display:block; margin:0; padding:0;",
-                        densityAware: false,
-                        decorative: false,
+                    return new sap.ui.core.HTML({
+                        content:
+                            '<div class="preview-image-container">' +
+                                '<img src="' + base64 + '" />' +
+                            '</div>'
                     });
                 });
+
                 this._openImageDialog(aCarouselImages);
             })
                 .catch((err) => {
@@ -284,19 +282,22 @@ sap.ui.define([
         },
 
         _openImageDialog: function (aImages) {
-            // Create Carousel
-            var oCarousel = new sap.m.Carousel({
+            const oCarousel = new sap.m.Carousel({
                 pages: aImages,
                 width: "100%",
-                height: "400px",
+                height: "100%",
                 showPageIndicator: false
             });
+
             this._oDialog = new sap.m.Dialog({
                 title: "Support Images",
-                contentWidth: "60%",
-                contentHeight: "60%",
+                contentWidth: "80%",
+                contentHeight: "80%",
                 resizable: true,
                 draggable: true,
+                verticalScrolling: false,
+                horizontalScrolling: false,
+                contentPadding: "0rem",
                 content: [oCarousel],
                 endButton: new sap.m.Button({
                     text: "Close",
@@ -306,6 +307,7 @@ sap.ui.define([
                 }).addStyleClass("myUnifiedBtn"),
                 afterClose: () => {
                     this._oDialog.destroy();
+                    this._oDialog = null;
                 }
             });
             this._oDialog.open();
