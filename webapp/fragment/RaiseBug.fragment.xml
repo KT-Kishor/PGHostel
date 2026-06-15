@@ -87,14 +87,7 @@
 					value="{RaiseBugModel>/Email}"
 					placeholder="Enter email"/>
 
-				 <MessageStrip
-                    text=" Image files larger than 2 MB are not allowed."
-                    type="Warning"
-                    showIcon="true"
-                    enableFormattedText="true"
-                    class="sapUiSmallMarginBottom"
-                />
-				<!-- Upload Image (UNCHANGED) -->
+				 <!-- Upload Image -->
 				<Label text="{i18n>addImage}" required="true"/>
 
 			<VBox alignItems="Start" width="100%" renderType="Bare">
@@ -103,32 +96,27 @@
     <HBox width="100%">
         <u:FileUploader
             id="RB_id_FileUploader1"
-            fileSizeExceed="onFileSizeExceed"
-            maximumFileSize="2"
-            typeMissmatch="onFileTypeMissmatch"
             fileType="jpg,jpeg,png"
             change="onSupportrequestChange"
             buttonOnly="true"
-            sameFilenameAllowed="true"
             iconFirst="true"
             buttonText="Upload Images"
             multiple="true"
             uploadOnChange="false"/>
     </HBox>
 
-    <!-- Tokens -->
-    <Tokenizer
+    <!-- Tokens (stacked vertically) -->
+    <List
         id="RB_id_TokenList1"
         width="100%"
         class="sapUiSmallMarginTop"
-        tokens="{tokenModel>/tokens}"
-        tokenDelete="onTokenDelete">
-
-        <Token
-            key="{tokenModel>key}"
-            text="{tokenModel>text}" />
-
-    </Tokenizer>
+        items="{tokenModel>/tokens}"
+        mode="Delete"
+        delete="onTokenDelete">
+        <StandardListItem
+            title="{tokenModel>text}"
+            type="Active"/>
+    </List>
 
 </VBox>
 

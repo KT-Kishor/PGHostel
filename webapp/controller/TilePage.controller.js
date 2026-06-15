@@ -683,85 +683,10 @@ sap.ui.define([
 
         // Raise Bug
 
-           onFileSizeExceed: function (oEvent) {
-    const oFileUploader = oEvent.getSource();
-    const sFileName = oEvent.getParameter("fileName");
+           onSupportrequestChange: async function (oEvent) {
 
-    sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
-},
- onSupportrequestChange: function (oEvent) {
-
-    const oFiles = oEvent.getParameter("files");
-    if (!oFiles || oFiles.length === 0) return;
-
-    const oView = this.getView();
-    const oUploaderData = oView.getModel("UploaderData");
-    const oTokenModel = oView.getModel("tokenModel");
-
-    let aAttachments = oUploaderData.getProperty("/attachments") || [];
-    let aTokens = oTokenModel.getProperty("/tokens") || [];
-
-    // ✅ Restrict total files to 3
-    if (aAttachments.length + oFiles.length > 3) {
-        sap.m.MessageToast.show("You can upload a maximum of 3 files only");
-        oEvent.getSource().clear();
-        return;
-    }
-
-    Array.from(oFiles).forEach((oFile) => {
-
-        // ✅ Check if adding this file exceeds limit
-        if (aAttachments.length + oFiles.length > 3) {
-            sap.m.MessageToast.show("Maximum 3 files allowed");
-            return;
-        }
-
-        // Check duplicate file name
-        const bDuplicate = aAttachments.some(file => file.filename === oFile.name);
-        if (bDuplicate) {
-            sap.m.MessageToast.show("File already uploaded");
-            return;
-        }
-
-        // File type validation
-        if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-            sap.m.MessageToast.show("Only JPG, JPEG, PNG allowed");
-            return;
-        }
-
-        const oReader = new FileReader();
-
-        oReader.onload = (e) => {
-
-            const sBase64 = e.target.result.split(",")[1];
-
-            aAttachments.push({
-                filename: oFile.name,
-                fileType: oFile.type,
-                content: sBase64
-            });
-
-            aTokens.push({
-                key: oFile.name,
-                text: oFile.name
-            });
-
-            oUploaderData.setProperty("/attachments", aAttachments);
-            oTokenModel.setProperty("/tokens", aTokens);
-
-        };
-
-        oReader.readAsDataURL(oFile);
-
-    });
-
-    oEvent.getSource().clear();
-},
-        onTokenDelete: function (oEvent) {
-
-            const aDeletedTokens = oEvent.getParameter("tokens");
-
-            if (!aDeletedTokens || aDeletedTokens.length === 0) return;
+            const oFiles = oEvent.getParameter("files");
+            if (!oFiles || oFiles.length === 0) return;
 
             const oView = this.getView();
             const oUploaderData = oView.getModel("UploaderData");
@@ -770,18 +695,123 @@ sap.ui.define([
             let aAttachments = oUploaderData.getProperty("/attachments") || [];
             let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-            aDeletedTokens.forEach((oToken) => {
+            const totalAfterAdd = aAttachments.length + oFiles.length;
+            if (totalAfterAdd > 3) {
+                sap.m.MessageToast.show("You can upload a maximum of 3 files only");
+                oEvent.getSource().clear();
+                return;
+            }
 
-                const sKey = oToken.getKey();
+            for (let i = 0; i < oFiles.length; i++) {
+                const oFile = oFiles[i];
 
-                aAttachments = aAttachments.filter(file => file.filename !== sKey);
-                aTokens = aTokens.filter(token => token.key !== sKey);
+                const bDuplicate = aAttachments.some(file => file.originalFilename === oFile.name);
+                if (bDuplicate) {
+                    sap.m.MessageToast.show("File already uploaded");
+                    oEvent.getSource().clear();
+                    return;
+                }
 
+                if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                    sap.m.MessageToast.show("Only JPG, JPEG, PNG allowed");
+                    oEvent.getSource().clear();
+                    return;
+                }
+            }
+
+            const sAppName = oView.getModel("RaiseBugModel").getProperty("/AppName") || "";
+            const sBaseName = sAppName || "bug";
+            const iExistingCount = aAttachments.filter(f =>
+                new RegExp(`^${sBaseName} \\d+$`).test(f.filename)
+            ).length;
+
+            this.getBusyDialog();
+            this._addSupportBusyProcessingRow();
+
+            try {
+                for (let i = 0; i < oFiles.length; i++) {
+                    const oFile = oFiles[i];
+
+                    let processedFile = oFile;
+                    const fileSizeMB = oFile.size / (1024 * 1024);
+                    const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+
+                    if (fileSizeMB > 2 && isImage) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    }
+
+                    const base64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(",")[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(processedFile);
+                    });
+
+                    const sFileName = `${sBaseName} ${iExistingCount + i + 1}`;
+
+                    aAttachments.push({
+                        originalFilename: oFile.name,
+                        filename: sFileName,
+                        fileType: oFile.type,
+                        content: base64
+                    });
+
+                    aTokens.push({
+                        key: sFileName,
+                        text: sFileName
+                    });
+                }
+
+                oUploaderData.setProperty("/attachments", aAttachments);
+                oTokenModel.setProperty("/tokens", aTokens);
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || "Failed to process image.");
+            } finally {
+                this.closeBusyDialog();
+                oEvent.getSource().clear();
+            }
+        },
+
+        _addSupportBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("tokenModel");
+            oModel.setData({
+                tokens: [{
+                    key: "processing",
+                    text: "Compressing..."
+                }]
             });
+        },
+
+        onTokenDelete: function (oEvent) {
+            const oItem = oEvent.getParameter("listItem");
+            if (!oItem) return;
+
+            const oCtx = oItem.getBindingContext("tokenModel");
+            if (!oCtx) return;
+
+            const sKey = oCtx.getProperty("key");
+            if (!sKey) return;
+
+            const oUploaderData = this.getView().getModel("UploaderData");
+            const oTokenModel = this.getView().getModel("tokenModel");
+
+            let aAttachments = oUploaderData.getProperty("/attachments") || [];
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+
+            aAttachments = aAttachments.filter(file => file.filename !== sKey);
+            aTokens = aTokens.filter(token => token.key !== sKey);
 
             oUploaderData.setProperty("/attachments", aAttachments);
             oTokenModel.setProperty("/tokens", aTokens);
-
         },
 
            onAppnamechanges:function(oEvent){
