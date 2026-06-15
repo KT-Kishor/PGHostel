@@ -298,7 +298,7 @@ sap.ui.define([
                         throw new Error("Compression library missing");
                     }
                     this.getBusyDialog();
-                    const sTempId = this._addBusyProcessingRow();
+                    this._addBusyProcessingRow();
                     try {
                         const options = {
                             maxSizeMB: 1.9,
@@ -308,7 +308,6 @@ sap.ui.define([
                         };
                         processedFile = await imageCompression(oFile, options);
                     } finally {
-                        this._removeProcessingRow(sTempId);
                         this.closeBusyDialog();
                     }
                 } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
@@ -350,27 +349,12 @@ sap.ui.define([
 
         _addBusyProcessingRow: function() {
             const oModel = this.getView().getModel("tokenModel");
-            const sTempId = "__processing__" + Date.now();
             oModel.setData({
                 tokens: [{
-                    key: sTempId,
+                    key: "processing",
                     text: "Compressing..."
                 }]
             });
-            return sTempId;
-        },
-
-        _removeProcessingRow: function(sTempId) {
-            const oModel = this.getView().getModel("tokenModel");
-            const aTokens = oModel.getProperty("/tokens") || [];
-            const iIndex = aTokens.findIndex(function(token) {
-                return token.key === sTempId;
-            });
-            if (iIndex !== -1) {
-                oModel.setData({
-                    tokens: []
-                });
-            }
         },
 
         onTokenDelete: function(oEvent) {

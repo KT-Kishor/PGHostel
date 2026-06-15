@@ -4077,6 +4077,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   white-space: normal;
 }
 
+.noEllipsisToken .sapMTokenText {
+  max-width: none !important;
+}
+
 .sapMDialog>header .sapMDialogTitleGroup .sapMDialogIcon.sapUiIcon {
   font-size: 0;
 }

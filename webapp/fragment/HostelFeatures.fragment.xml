@@ -69,7 +69,7 @@
 					<HBox width="75%">
 						<ScrollContainer height="60px" width="100%" horizontal="false" vertical="true">
 							<Tokenizer id="HFF_id_TokenList" width="100%" tokenDelete="onTokenDelete"
-                            tokens="{tokenModel>/tokens}">
+                            tokens="{tokenModel>/tokens}" class="noEllipsisToken">
 								<Token key="{tokenModel>key}" text="{tokenModel>text}"/>
 							</Tokenizer>
 						</ScrollContainer>
