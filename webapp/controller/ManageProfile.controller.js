@@ -449,36 +449,67 @@ if (!this._oPreviewDialog) {
             }, 200);
         },
 
-        onAvatarFileSelected: function(oEvent) {
+        onAvatarFileSelected: async function(oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
-            const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-            if (file.size > MAX_SIZE) {
-                sap.m.MessageToast.show(
-                    "File size must be less than 2 MB.\nSelected file size: " +
-                    (file.size / 1024 / 1024).toFixed(2) + " MB"
-                );
 
-                // reset uploader field
-                oEvent.getSource().clear();
-                return;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = file.size / 1024 / 1024;
+            const isImage = file.type.startsWith("image/");
+            let processedFile = file;
+
+            if (fileSizeMB >= MAX_SIZE_MB) {
+                if (!isImage) {
+                    sap.m.MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
+                    oEvent.getSource().clear();
+                    return;
+                }
+
+                if (typeof imageCompression === "undefined") {
+                    sap.m.MessageToast.show("Compression library not available.");
+                    oEvent.getSource().clear();
+                    return;
+                }
+
+                const oAvatar = this.byId("id_profileAvatar");
+                if (oAvatar) {
+                    oAvatar.setBusy(true);
+                }
+
+                this.getBusyDialog();
+
+                try {
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(file, options);
+                } finally {
+                    this.closeBusyDialog();
+                    if (oAvatar) {
+                        oAvatar.setBusy(false);
+                    }
+                }
             }
+
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const fullDataURL = e.target.result;
-                const base64 = fullDataURL.split(",")[1]; // remove prefix
+                const base64 = fullDataURL.split(",")[1];
 
                 const oModel = this.getView().getModel("profileData");
                 const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
                 oModel.setProperty("/photo", fullDataURL);
                 oLoginModel.setProperty("/Photo", fullDataURL);
                 await this.updateUserPhoto({
-                    fileName: file.name,
-                    fileType: file.type,
+                    fileName: processedFile.name || file.name,
+                    fileType: processedFile.type || file.type,
                     fileContent: base64
                 });
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(processedFile);
         },
 
         onRemovePhoto: async function() {

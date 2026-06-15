@@ -57,6 +57,7 @@
         >
             <VBox class="avatarContainer sapUiSmallMarginEnd">
                 <Avatar
+                    id="id_profileAvatar"
                     src="{profileData>/photo}"
                     initials="{profileData>/initials}"
                     displayShape="Square"
