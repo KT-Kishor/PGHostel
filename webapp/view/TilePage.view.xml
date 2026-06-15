@@ -377,7 +377,7 @@
         <Button
             text="{i18n>raisebug}"
             tooltip="{i18n>proceedToPay}"
-            visible="true"
+            visible="false"
             class="myUnifiedBtn sapUiMediumMarginEnd"
             press="onPressbugs"
         />
