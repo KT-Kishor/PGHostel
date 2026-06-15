@@ -3121,66 +3121,99 @@ oProfileModel.setProperty("/photo", sPhoto);
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onComplaintFileChange: function(oEvent) {
+        onComplaintFileChange: async function(oEvent) {
             const oUploader = oEvent.getSource();
             const file = oEvent.getParameter("files")[0];
-            if (!file) {
-                return;
-            }
+            if (!file) return;
 
             const aAllowedMimeTypes = [
                 "image/jpeg",
                 "image/jpg",
-                "image/png"
+                "image/png",
+                "image/webp"
             ];
             if (file.type && !aAllowedMimeTypes.includes(file.type)) {
-                MessageToast.show("Only JPG & PNG files are allowed.");
+                MessageToast.show("Only JPG, PNG & WEBP files are allowed.");
                 oUploader.clear();
                 return;
             }
 
-            const MAX_SIZE = 2 * 1024 * 1024;
-            if (file.size > MAX_SIZE) {
-                MessageToast.show("File size must be less than 2 MB.");
-                oUploader.clear();
-                return;
-            }
+            const oComplaintType = this._getComplaintControl("idComplaintType");
+            const sComplaintType = oComplaintType ? oComplaintType.getValue() : "";
+            const oSelectedItem = oComplaintType ? oComplaintType.getSelectedItem() : null;
+            const sComplaintTypeText = oSelectedItem ? oSelectedItem.getText() : (sComplaintType || "Complaint");
 
             const oTempModel = this.getView().getModel("complaintTemp");
-            const aDocuments = oTempModel.getProperty("/Documents") || [];
-            const oExistingDoc = aDocuments[0];
-            if (
-                oExistingDoc &&
-                oExistingDoc.FileName === file.name &&
-                Number(oExistingDoc.size || 0) === Number(file.size || 0)
-            ) {
-                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded"));
-                oUploader.clear();
-                return;
-            }
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const sResult = e.target.result || "";
-                const base64 = sResult.includes(",") ? sResult.split(",")[1] : sResult;
+            // Add temporary processing row with busy indicator
+            oTempModel.setProperty("/Documents", [{
+                FileName: "",
+                size: 0,
+                ProcessingActive: true
+            }]);
+
+            let processedFile = file;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = file.size / (1024 * 1024);
+            const isImage = file.type.startsWith("image/");
+
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    this.getBusyDialog();
+                    try {
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(file, options);
+                    } finally {
+                        this.closeBusyDialog();
+                    }
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    throw new Error("Only images can be compressed");
+                }
+
+                const base64 = await new Promise(function(resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function() { resolve(reader.result.split(",")[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
+
+                const sExt = file.name.includes(".") ? file.name.split(".").pop().toLowerCase() : "";
+                const sGeneratedFileName = sComplaintTypeText + "." + sExt;
 
                 const oDoc = {
-                    FileName: file.name,
-                    DocumentType: file.type,
-                    FileType: file.type,
+                    FileName: sGeneratedFileName,
+                    DocumentType: processedFile.type,
+                    FileType: processedFile.type,
                     File: base64,
                     Base64: base64,
-                    size: file.size,
-                    // DocType: "Attachment"
+                    size: processedFile.size,
+                    originalName: file.name,
+                    ProcessingActive: false
                 };
 
                 oTempModel.setProperty("/Documents", [oDoc]);
-                oTempModel.setProperty("/FileName", file.name);
-                oTempModel.setProperty("/FileType", file.type);
+                oTempModel.setProperty("/FileName", sGeneratedFileName);
+                oTempModel.setProperty("/FileType", processedFile.type);
                 oTempModel.setProperty("/FileContent", base64);
+                oTempModel.refresh(true);
+
+            } catch (err) {
+                oTempModel.setProperty("/Documents", []);
+                oTempModel.setProperty("/FileName", "");
+                oTempModel.setProperty("/FileType", "");
+                oTempModel.setProperty("/FileContent", "");
+                console.error(err);
+                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
                 oUploader.clear();
-            };
-            reader.readAsDataURL(file);
+            }
         },
         onComplaintDeleteDoc: function() {
             const oTempModel = this.getView().getModel("complaintTemp");

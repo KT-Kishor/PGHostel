@@ -179,17 +179,24 @@
 							<items>
 								<ColumnListItem>
 									<cells>
-										<Link
-                                            text="{complaintTemp>FileName}"
-                                            press="onComplaintPreviewDoc"
-                                            tooltip="{path:'complaintTemp>', formatter:'.Formatter.fileTooltip'}"
-                                            wrapping="true"
-                                        />
-										<!-- <Text text="{complaintTemp>DocType}" /> -->
+										<HBox>
+											<BusyIndicator
+                                                visible="{= ${complaintTemp>ProcessingActive} === true }"
+                                            />
+											<Link
+                                                visible="{= ${complaintTemp>ProcessingActive} !== true }"
+                                                text="{complaintTemp>FileName}"
+                                                press="onComplaintPreviewDoc"
+                                                tooltip="{path:'complaintTemp>', formatter:'.Formatter.fileTooltip'}"
+                                                wrapping="true"
+                                            />
+										</HBox>
 										<Text
+                                            visible="{= ${complaintTemp>ProcessingActive} !== true }"
                                             text="{path:'complaintTemp>size', formatter:'.Formatter.formatFileSize'}"
                                         />
 										<Button
+                                            visible="{= ${complaintTemp>ProcessingActive} !== true }"
                                             icon="sap-icon://delete"
                                             class="myUnifiedBtn"
                                             press="onComplaintDeleteDoc"
