@@ -51,9 +51,6 @@
 					<HBox width="25%">
 						<u:FileUploader
                             id="MA_id_FileUploader"
-                            fileSizeExceed="onFileSizeExceeds"
-                            maximumFileSize="5MB"
-                            typeMissmatch="onFileTypeMissmatch"
                             fileType="jpg,jpeg,png"
                             change="onFacilityFileChange"
                             buttonOnly="true"
@@ -68,7 +65,7 @@
 					<HBox width="75%">
 						<ScrollContainer height="60px" width="100%" horizontal="false" vertical="true">
 							<Tokenizer id="MA_id_TokenList" width="100%" tokenDelete="onTokenDelete"
-                            tokens="{tokenModel>/tokens}">
+                            tokens="{tokenModel>/tokens}" class="noEllipsisToken">
 								<Token key="{tokenModel>key}" text="{tokenModel>text}"/>
 							</Tokenizer>
 						</ScrollContainer>

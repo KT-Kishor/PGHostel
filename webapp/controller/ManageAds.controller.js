@@ -243,7 +243,7 @@ sap.ui.define([
                 await this._loadAds();
 
             } catch (err) {
-                MessageToast.show(err.message);
+                MessageToast.show(err.message || err.responseText || "An error occurred.");
                 this.closeBusyDialog()
             } finally {
                 this.closeBusyDialog();
@@ -265,9 +265,8 @@ sap.ui.define([
             });
         },
 
-        onFacilityFileChange: function(oEvent) {
+        onFacilityFileChange: async function(oEvent) {
             let aFiles = oEvent.getParameter("files");
-
             if (!aFiles) return;
 
             if (aFiles instanceof FileList) {
@@ -276,49 +275,129 @@ sap.ui.define([
                 aFiles = [aFiles];
             }
 
+            const oFileUploader = this.byId("MA_id_FileUploader");
+
+            for (const oFile of aFiles) {
+                const sExt = oFile.name.includes(".") ? oFile.name.split(".").pop().toLowerCase() : "";
+                if (!["jpg", "jpeg", "png"].includes(sExt)) {
+                    sap.m.MessageToast.show("Only JPG, JPEG, and PNG files are allowed.");
+                    if (oFileUploader) oFileUploader.clear();
+                    return;
+                }
+            }
+
             const oUploadModel = this.getView().getModel("UploadModel");
             const oTokenModel = this.getView().getModel("tokenModel");
-
             let aExistingPhotos = oUploadModel.getProperty("/Photos") || [];
             let aTokens = oTokenModel.getProperty("/tokens") || [];
 
-            //  GLOBAL LIMIT CHECK
             if (aExistingPhotos.length + aFiles.length > 2) {
                 sap.m.MessageToast.show("You can upload maximum 2 photos only");
+                if (oFileUploader) oFileUploader.clear();
                 return;
             }
 
-            aFiles.forEach((oFile) => {
-
-                //  Duplicate check
-                const bDuplicate = aExistingPhotos.some(photo => photo.name === oFile.name);
-                if (bDuplicate) {
+            for (const oFile of aFiles) {
+                if (aExistingPhotos.some(photo => photo.originalName === oFile.name)) {
                     sap.m.MessageToast.show("File already uploaded: " + oFile.name);
+                    if (oFileUploader) oFileUploader.clear();
                     return;
                 }
+            }
 
-                const oReader = new FileReader();
+            const MAX_SIZE_MB = 2;
+            let bNeedsCompression = false;
 
-                oReader.onload = (e) => {
-                    const base64 = e.target.result.split(",")[1];
+            for (const oFile of aFiles) {
+                const fileSizeMB = oFile.size / (1024 * 1024);
+                const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    bNeedsCompression = true;
+                    break;
+                }
+            }
 
-                    aExistingPhotos.push({
+            if (bNeedsCompression) {
+                this.getBusyDialog();
+                this._addBusyProcessingRow(aFiles.length);
+            }
+
+            const iBaseIndex = aExistingPhotos.length;
+
+            try {
+                const aProcessedPhotos = await Promise.all(aFiles.map(async function(oFile, i) {
+                    let processedFile = oFile;
+                    const fileSizeMB = oFile.size / (1024 * 1024);
+                    const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+
+                    if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                        throw new Error("File exceeds 2 MB. Please choose a smaller file.");
+                    }
+
+                    const base64 = await new Promise(function(resolve, reject) {
+                        const reader = new FileReader();
+                        reader.onload = function() { resolve(reader.result.split(",")[1]); };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(processedFile);
+                    });
+
+                    const sExt = oFile.name.includes(".") ? oFile.name.split(".").pop().toLowerCase() : "jpg";
+                    const sAdName = "Advertisement " + (iBaseIndex + i + 1) + "." + sExt;
+
+                    return {
                         content: base64,
-                        type: oFile.type,
-                        name: oFile.name
-                    });
+                        type: "image/jpeg",
+                        name: sAdName,
+                        originalName: oFile.name
+                    };
+                }));
 
+                aTokens = oTokenModel.getProperty("/tokens") || [];
+                aTokens = aTokens.filter(function(token) {
+                    return token.text !== "Compressing...";
+                });
+
+                aProcessedPhotos.forEach(function(oPhoto) {
+                    aExistingPhotos.push(oPhoto);
                     aTokens.push({
-                        key: oFile.name,
-                        text: oFile.name
+                        key: oPhoto.name,
+                        text: oPhoto.name
                     });
+                });
 
-                    oUploadModel.setProperty("/Photos", aExistingPhotos);
-                    oTokenModel.setProperty("/tokens", aTokens);
-                };
+                oUploadModel.setProperty("/Photos", aExistingPhotos);
+                oTokenModel.setProperty("/tokens", aTokens);
 
-                oReader.readAsDataURL(oFile);
-            });
+            } catch (err) {
+                this.closeBusyDialog();
+                sap.m.MessageToast.show(err.message || "Failed to process image.");
+            } finally {
+                this.closeBusyDialog();
+                if (oFileUploader) oFileUploader.clear();
+            }
+        },
+
+        _addBusyProcessingRow: function(iCount) {
+            const oTokenModel = this.getView().getModel("tokenModel");
+            let aTokens = oTokenModel.getProperty("/tokens") || [];
+            for (let i = 0; i < iCount; i++) {
+                aTokens.push({
+                    key: "__processing__" + Date.now() + "_" + i,
+                    text: "Compressing..."
+                });
+            }
+            oTokenModel.setProperty("/tokens", aTokens);
         },
 
         onTokenDelete: function(oEvent) {
