@@ -320,39 +320,71 @@ sap.ui.define([
             oModel.setProperty("/CanAddMore", aRealImages.length < maxImages);
         },
 
-        onFileSelected: function(oEvent) {
+        onFileSelected: async function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
-            if (oFile.size > 2 * 1024 * 1024) {
-                MessageToast.show(`"${oFile.name}" Exceeds the 2 MB File Size Limit.`);
+            const oSource = oEvent.getSource();
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const aRealImages = aImages.filter(img => !img.isPlaceholder);
+
+            const bFileNameDuplicate = aRealImages.some(img => img.originalName === oFile.name);
+            if (bFileNameDuplicate) {
+                MessageToast.show(`"${oFile.name}" is already Added.`);
                 return;
             }
 
-            const oReader = new FileReader();
-            oReader.onload = (oLoadEvent) => {
-                const sBase64 = oLoadEvent.target.result;
-                const oModel = this.getView().getModel("DisplayImagesModel");
-                let aImages = oModel.getProperty("/DisplayImages") || [];
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-                const aRealImages = aImages.filter(img => !img.isPlaceholder);
-                const bFileNameDuplicate = aRealImages.some(img => img.fileName === oFile.name);
-                if (bFileNameDuplicate) {
-                    MessageToast.show(`"${oFile.name}" is already Added.`);
+            try {
+                this.getBusyDialog();
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    const sTempId = this._addBusyProcessingRow();
+                    try {
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    } finally {
+                        this._removeProcessingRow(sTempId);
+                    }
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
                     return;
                 }
 
-                const bContentDuplicate = aRealImages.some(img => img.src === sBase64);
+                const sBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
+
+                aImages = oModel.getProperty("/DisplayImages") || [];
+                const aCurrentReal = aImages.filter(img => !img.isPlaceholder && !img.isProcessing);
+                const bContentDuplicate = aCurrentReal.some(img => img.src === sBase64);
                 if (bContentDuplicate) {
                     MessageToast.show(this.i18nModel.getText("thisImageisalreadyAdded"));
                     return;
                 }
 
+                const sExt = oFile.name.split(".").pop();
                 const iPlaceholderIndex = aImages.findIndex(img => img.isPlaceholder);
                 const oNewImage = {
                     src: sBase64,
-                    fileName: oFile.name,
-                    fileType: oFile.type,
+                    fileName: "Facility " + (aCurrentReal.length + 1) + "." + sExt,
+                    originalName: oFile.name,
+                    fileType: processedFile.type,
                     isPlaceholder: false
                 };
 
@@ -362,21 +394,63 @@ sap.ui.define([
                     aImages.push(oNewImage);
                 }
 
-                const realImagesCount = aImages.filter(img => !img.isPlaceholder).length;
+                const realImagesCount = aImages.filter(img => !img.isPlaceholder && !img.isProcessing).length;
                 if (realImagesCount < 3) {
                     if (!aImages.some(img => img.isPlaceholder)) {
-                        aImages.push({
-                            isPlaceholder: true
-                        });
+                        aImages.push({ isPlaceholder: true });
                     }
                 } else {
                     aImages = aImages.filter(img => !img.isPlaceholder);
                 }
 
                 oModel.setProperty("/DisplayImages", aImages);
-            };
+                oModel.setProperty("/CanAddMore", realImagesCount < 3);
 
-            oReader.readAsDataURL(oFile);
+            } catch (err) {
+                this.closeBusyDialog();
+                MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                this.closeBusyDialog();
+                if (oSource && oSource.clear) {
+                    oSource.clear();
+                }
+            }
+        },
+
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const sTempId = "__processing__" + Date.now();
+            const oTempImage = {
+                isPlaceholder: false,
+                isProcessing: true,
+                tempId: sTempId,
+                fileName: "Compressing..."
+            };
+            const iPlaceholderIndex = aImages.findIndex(img => img.isPlaceholder);
+            if (iPlaceholderIndex !== -1) {
+                aImages[iPlaceholderIndex] = oTempImage;
+            } else {
+                aImages.push(oTempImage);
+            }
+            oModel.setProperty("/DisplayImages", aImages);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("DisplayImagesModel");
+            let aImages = oModel.getProperty("/DisplayImages") || [];
+            const iIndex = aImages.findIndex(img => img.tempId === sTempId);
+            if (iIndex !== -1) {
+                aImages[iIndex] = { isPlaceholder: true };
+            }
+            oModel.setProperty("/DisplayImages", aImages);
+        },
+
+        _showBusyOnUploader: function (bBusy, oUploader) {
+            if (oUploader && oUploader.setBusy) {
+                oUploader.setBusy(bBusy);
+            }
         },
 
         Onsearch: function() {
@@ -609,9 +683,10 @@ sap.ui.define([
                     const sName = oImageDetails[`Photo${i}Name`];
                     const sType = oImageDetails[`Photo${i}Type`];
                     if (sPhoto) {
+                        const sExt = (sType || "image/jpeg").split("/")[1] || "jpg";
                         aDisplayImages.push({
                             src: `data:${sType || "image/jpeg"};base64,${sPhoto}`,
-                            fileName: sName || `Photo${i}`,
+                            fileName: "Facility " + i + "." + sExt,
                             fileType: sType || "image/jpeg",
                             isPlaceholder: false
                         });
