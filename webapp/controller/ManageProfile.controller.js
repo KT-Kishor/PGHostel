@@ -362,26 +362,28 @@ sap.ui.define([
             oLoginModel.setProperty("/Photo", sPhoto);
 
             oProfileModel.setProperty("/photo", sPhoto);
-            if (!this._oPreviewDialog) {
-                this._oPreviewDialog = new sap.m.Dialog({
-                    title: "Profile Photo",
-                    contentWidth: "300px",
-                    contentHeight: "220px",
-                    verticalScrolling: false,
-                    content: new sap.m.Image({
-                        id: "previewProfileImage",
-                        width: "320px",
-                        height: "220px",
-                        src: ""
-                    }).addStyleClass("previewPhotoContain"),
-                    beginButton: new sap.m.Button({
-                        text: "Close",
-                        press: () => this._oPreviewDialog.close()
-                    }).addStyleClass("myUnifiedBtn")
-                })
-                this.getView().addDependent(this._oPreviewDialog);
-            }
-            sap.ui.getCore().byId("previewProfileImage").setSrc(sPhoto);
+if (!this._oPreviewDialog) {
+            this._oPreviewProfileImage = new sap.m.Image({
+                id: this.getView().createId("previewProfileImage"),
+                width: "320px",
+                height: "220px",
+                src: ""
+            }).addStyleClass("previewPhotoContain");
+
+            this._oPreviewDialog = new sap.m.Dialog({
+                title: "Profile Photo",
+                contentWidth: "300px",
+                contentHeight: "220px",
+                verticalScrolling: false,
+                content: this._oPreviewProfileImage,
+                beginButton: new sap.m.Button({
+                    text: "Close",
+                    press: () => this._oPreviewDialog.close()
+                }).addStyleClass("myUnifiedBtn")
+            })
+            this.getView().addDependent(this._oPreviewDialog);
+        }
+        this._oPreviewProfileImage.setSrc(sPhoto);
             this._oPreviewDialog.open();
         },
 
