@@ -361,30 +361,30 @@ sap.ui.define([
             // 1) Update global model (this is the key line)
             oLoginModel.setProperty("/Photo", sPhoto);
 
-            oProfileModel.setProperty("/photo", sPhoto);
-if (!this._oPreviewDialog) {
-            this._oPreviewProfileImage = new sap.m.Image({
-                id: this.getView().createId("previewProfileImage"),
-                width: "320px",
-                height: "220px",
-                src: ""
-            }).addStyleClass("previewPhotoContain");
+oProfileModel.setProperty("/photo", sPhoto);
+            if (!this._oProfilePreviewDialog) {
+                this._oProfilePreviewImage = new sap.m.Image({
+                    id: this.getView().createId("previewProfileImage"),
+                    width: "320px",
+                    height: "220px",
+                    src: ""
+                }).addStyleClass("previewPhotoContain");
 
-            this._oPreviewDialog = new sap.m.Dialog({
-                title: "Profile Photo",
-                contentWidth: "300px",
-                contentHeight: "220px",
-                verticalScrolling: false,
-                content: this._oPreviewProfileImage,
-                beginButton: new sap.m.Button({
-                    text: "Close",
-                    press: () => this._oPreviewDialog.close()
-                }).addStyleClass("myUnifiedBtn")
-            })
-            this.getView().addDependent(this._oPreviewDialog);
-        }
-        this._oPreviewProfileImage.setSrc(sPhoto);
-            this._oPreviewDialog.open();
+                this._oProfilePreviewDialog = new sap.m.Dialog({
+                    title: "Profile Photo",
+                    contentWidth: "300px",
+                    contentHeight: "220px",
+                    verticalScrolling: false,
+                    content: this._oProfilePreviewImage,
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: () => this._oProfilePreviewDialog.close()
+                    }).addStyleClass("myUnifiedBtn")
+                })
+                this.getView().addDependent(this._oProfilePreviewDialog);
+            }
+            this._oProfilePreviewImage.setSrc(sPhoto);
+            this._oProfilePreviewDialog.open();
         },
 
         onPressAvatarEdit: function(oEvent) {
@@ -460,7 +460,7 @@ if (!this._oPreviewDialog) {
 
             if (fileSizeMB >= MAX_SIZE_MB) {
                 if (!isImage) {
-                    sap.m.MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
+                    sap.m.MessageToast.show("Please upload a file under 2 MB.");
                     oEvent.getSource().clear();
                     return;
                 }
@@ -924,7 +924,39 @@ if (!this._oPreviewDialog) {
             return utils._LCstrictValidationComboBox(oComboBox, "ID");
         },
 
-        onFacilityFileChange: function(oEvent) {
+        _addBusyProcessingRow: function () {
+            const oModel = this.getView().getModel("Member");
+            const sTempId = "__processing__" + Date.now();
+            oModel.setProperty("/DocumentName", "Compressing...");
+            oModel.setProperty("/FileType", "");
+            oModel.setProperty("/Document", "");
+            oModel.setProperty("/File", "");
+            oModel.setProperty("/ProcessingActive", true);
+            oModel.setProperty("/tempId", sTempId);
+            oModel.refresh(true);
+            return sTempId;
+        },
+
+        _removeProcessingRow: function (sTempId) {
+            const oModel = this.getView().getModel("Member");
+            const sCurrentTempId = oModel.getProperty("/tempId");
+            if (sCurrentTempId === sTempId) {
+                oModel.setProperty("/DocumentName", "");
+                oModel.setProperty("/FileType", "");
+                oModel.setProperty("/Document", "");
+                oModel.setProperty("/File", "");
+                oModel.setProperty("/tempId", "");
+            }
+        },
+
+        _showBusyOnUploader: function (bBusy) {
+            const oUploader = sap.ui.getCore().byId("MM_id_FileUploader");
+            if (oUploader && oUploader.setBusy) {
+                oUploader.setBusy(bBusy);
+            }
+        },
+
+        onFacilityFileChange: async function(oEvent) {
 
             const oFileUploader = oEvent.getSource();
             const oModel = this.getView().getModel("Member");
@@ -936,23 +968,11 @@ if (!this._oPreviewDialog) {
                 return;
             }
 
-            const iMaxSize = 2 * 1024 * 1024;
-
             const sDocType = oModel.getProperty("/DocumentType");
 
             if (!sDocType) {
                 sap.m.MessageToast.show(
                     "Please select document type first"
-                );
-
-                oFileUploader.clear();
-                return;
-            }
-
-            if (oFile.size > iMaxSize) {
-
-                sap.m.MessageToast.show(
-                    oFile.name + " exceeds the 2 MB size limit."
                 );
 
                 oFileUploader.clear();
@@ -985,13 +1005,43 @@ if (!this._oPreviewDialog) {
 
             this._selectedFile = oFile;
 
-            const oReader = new FileReader();
+            const sTempId = this._addBusyProcessingRow();
+            this._showBusyOnUploader(true);
 
-            oReader.onload = function(oLoadEvent) {
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type.startsWith("image/");
 
-                const sBase64 = String(
-                    oLoadEvent.target.result || ""
-                ).split(",")[1] || "";
+            try {
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    this.getBusyDialog();
+                    const options = {
+                        maxSizeMB: 1.9,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    };
+                    processedFile = await imageCompression(oFile, options);
+                    this.closeBusyDialog();
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    sap.m.MessageToast.show("Please upload a file under 2 MB.");
+                    oFileUploader.clear();
+                    this._removeProcessingRow(sTempId);
+                    this._showBusyOnUploader(false);
+                    oModel.setProperty("/ProcessingActive", false);
+                    return;
+                }
+
+                const base64 = await new Promise(function (resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function () { resolve(reader.result.split(",")[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
 
                 let sNewName = sDocType
                     .toLowerCase()
@@ -999,16 +1049,25 @@ if (!this._oPreviewDialog) {
 
                 sNewName += "." + sExt;
 
+                this._removeProcessingRow(sTempId);
+
                 oModel.setProperty("/DocumentName", sNewName);
-                oModel.setProperty("/DocumentFile", oFile);
-                oModel.setProperty("/Document", sBase64);
-                oModel.setProperty("/File", sBase64);
-                oModel.setProperty("/FileType", oFile.type || "");
-
+                oModel.setProperty("/DocumentFile", processedFile);
+                oModel.setProperty("/Document", base64);
+                oModel.setProperty("/File", base64);
+                oModel.setProperty("/FileType", processedFile.type || "");
                 oModel.refresh(true);
-            };
 
-            oReader.readAsDataURL(oFile);
+            } catch (err) {
+                this.closeBusyDialog();
+                this._removeProcessingRow(sTempId);
+                console.error(err);
+                sap.m.MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                oFileUploader.clear();
+                this._showBusyOnUploader(false);
+                oModel.setProperty("/ProcessingActive", false);
+            }
         },
 
         onMemberFileSizeExceed: function(oEvent) {
