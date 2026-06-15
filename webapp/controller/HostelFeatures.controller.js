@@ -276,89 +276,101 @@ sap.ui.define([
 
         onFacilityFileChange: async function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
+            if (!oFile) return;
 
-            if (!oFile) {
+            const oFileUploader = this.byId("HFF_id_FileUploader");
+            const sExt = oFile.name.includes(".") ? oFile.name.split(".").pop().toLowerCase() : "";
+            const bAllowedExt = ["jpg", "jpeg", "png"].includes(sExt);
+            if (!bAllowedExt) {
+                sap.m.MessageToast.show("Only JPG, JPEG, and PNG files are allowed.");
+                if (oFileUploader) oFileUploader.clear();
                 return;
             }
 
+            let processedFile = oFile;
+            const MAX_SIZE_MB = 2;
+            const fileSizeMB = oFile.size / (1024 * 1024);
+            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+
             try {
-                const oCompressed = await this._compressImage(oFile);
+                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    this.getBusyDialog();
+                    const sTempId = this._addBusyProcessingRow();
+                    try {
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+                    } finally {
+                        this._removeProcessingRow(sTempId);
+                        this.closeBusyDialog();
+                    }
+                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                    sap.m.MessageToast.show("File exceeds 2 MB. Please choose a smaller file.");
+                    if (oFileUploader) oFileUploader.clear();
+                    return;
+                }
+
+                const base64 = await new Promise(function(resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onload = function() { resolve(reader.result.split(",")[1]); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(processedFile);
+                });
+
+                const sAmenityName = "Amenity Image." + sExt;
 
                 this.getView().getModel("UploadModel").setData({
-                    Photo1: oCompressed.base64,
+                    Photo1: base64,
                     Photo1Type: "image/jpeg",
-                    Photo1Name: oFile.name
+                    Photo1Name: sAmenityName
                 });
 
                 this.getView().getModel("tokenModel").setData({
                     tokens: [{
-                        key: oFile.name,
-                        text: oFile.name
+                        key: sAmenityName,
+                        text: sAmenityName
                     }]
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show("Failed to process image.");
+                this.closeBusyDialog();
+                sap.m.MessageToast.show(err.message || "Failed to process image.");
+            } finally {
+                this.closeBusyDialog();
+                if (oFileUploader) oFileUploader.clear();
             }
         },
 
-        _compressImage: function(oFile) {
-            return new Promise((resolve, reject) => {
-
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-
-                    const img = new Image();
-
-                    img.onload = function() {
-
-                        let width = img.width;
-                        let height = img.height;
-
-                        const maxDimension = 1920;
-
-                        if (width > maxDimension || height > maxDimension) {
-                            const ratio = Math.min(
-                                maxDimension / width,
-                                maxDimension / height
-                            );
-
-                            width *= ratio;
-                            height *= ratio;
-                        }
-
-                        const canvas = document.createElement("canvas");
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        let quality = 0.9;
-                        let dataUrl = canvas.toDataURL("image/jpeg", quality);
-
-                        // Compress until below 2MB
-                        while (
-                            dataUrl.length * 0.75 > (2 * 1024 * 1024) &&
-                            quality > 0.1
-                        ) {
-                            quality -= 0.1;
-                            dataUrl = canvas.toDataURL("image/jpeg", quality);
-                        }
-
-                        resolve({
-                            base64: dataUrl.split(",")[1]
-                        });
-                    };
-
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-
-                reader.onerror = reject;
-                reader.readAsDataURL(oFile);
+        _addBusyProcessingRow: function() {
+            const oModel = this.getView().getModel("tokenModel");
+            const sTempId = "__processing__" + Date.now();
+            oModel.setData({
+                tokens: [{
+                    key: sTempId,
+                    text: "Compressing..."
+                }]
             });
+            return sTempId;
+        },
+
+        _removeProcessingRow: function(sTempId) {
+            const oModel = this.getView().getModel("tokenModel");
+            const aTokens = oModel.getProperty("/tokens") || [];
+            const iIndex = aTokens.findIndex(function(token) {
+                return token.key === sTempId;
+            });
+            if (iIndex !== -1) {
+                oModel.setData({
+                    tokens: []
+                });
+            }
         },
 
         onTokenDelete: function(oEvent) {
