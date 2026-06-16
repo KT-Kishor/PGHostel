@@ -4792,7 +4792,7 @@ sap.ui.define([
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(file, options);
-                    MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
+                    // MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
                 } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
                     throw new Error("Only images can be compressed");
                 }

@@ -4718,11 +4718,10 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
 .defaultBGBlur {
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh; /* better for iPhone */
+  height: 100dvh; /* better for iPhone */
   -webkit-overflow-scrolling: touch; /* smooth iOS scrolling */
 }
 
@@ -4754,11 +4753,26 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   z-index: 1;
 }
 
+/* Lay the Page out as a flex column: fixed header, scrollable content,
+   fixed footer. This keeps content from sliding under the header while
+   the scrollbar stays between the header and footer (not behind them). */
+.defaultBGBlur > header.sapMPageHeader {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.defaultBGBlur > section.sapMPageEnableScrolling {
+  position: relative;
+  flex: 1 1 auto;
+  top: 0;
+  min-height: 0; /* allow the flex child to shrink so it can scroll */
+  overflow-y: auto;
+}
+
 /* Footer */
 .defaultBGBlur > footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  flex: 0 0 auto;
   width: 100%;
   z-index: 5;
 }
@@ -4816,7 +4830,6 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 
 /* Page content */
 .defaultBGBlur .sapMPageEnableScrolling {
-  padding-bottom: 70px;
   box-sizing: border-box;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
