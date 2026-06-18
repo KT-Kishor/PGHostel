@@ -1,0 +1,327 @@
+<c:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:f="sap.ui.layout.form">
+
+	<Dialog id="AB_id_Dialog"
+		type="Message"
+		class="sapUiContentPadding"
+		contentWidth="30rem"
+		resizable="true"
+		draggable="true">
+
+		<customHeader>
+			<Bar class="barheader">
+				<contentMiddle>
+					<Title text="{i18n>adminBookingTitle}"/>
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+
+		<f:SimpleForm
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="4"
+			labelSpanM="4"
+			labelSpanS="12"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1">
+
+			<f:content>
+
+				<!-- Branch Name/ID (only branches assigned to current user) -->
+				<Label text="{i18n>adminBookingBranch}" required="true"/>
+				<ComboBox
+					id="AB_id_Branch"
+					showSecondaryValues="true"
+					placeholder="{i18n>adminBookingBranchPlaceholder}"
+					selectedKey="{AdminBookingModel>/BranchCode}"
+					filterSecondaryValues="true"
+					items="{AdminBookingModel>/Branches}"
+					selectionChange="onAdminBookingBranchChange">
+					<c:ListItem key="{AdminBookingModel>BranchID}" text="{AdminBookingModel>BranchID} - {AdminBookingModel>Name}" additionalText="{AdminBookingModel>City}"/>
+				</ComboBox>
+
+				<!-- Room (dependent on selected branch) -->
+				<Label text="{i18n>adminBookingRoom}" required="true"/>
+				<ComboBox
+					id="AB_id_Room"
+					showSecondaryValues="true"
+					enabled="{= ${AdminBookingModel>/BranchCode} ? true : false }"
+					placeholder="{i18n>adminBookingRoomPlaceholder}"
+					selectedKey="{AdminBookingModel>/RoomKey}"
+					items="{AdminBookingModel>/Rooms}"
+					selectionChange="onAdminBookingRoomChange">
+					<c:ListItem key="{AdminBookingModel>RoomKey}" text="{AdminBookingModel>RoomText}"/>
+				</ComboBox>
+
+				<!-- Room Plan (per day / per month / per year) -->
+				<Label text="{i18n>adminBookingPlan}" required="true"/>
+				<ComboBox
+					id="AB_id_Plan"
+					enabled="{= ${AdminBookingModel>/RoomKey} ? true : false }"
+					placeholder="{i18n>adminBookingPlanPlaceholder}"
+					selectedKey="{AdminBookingModel>/SelectedPlan}"
+					items="{AdminBookingModel>/Plans}"
+					selectionChange="onAdminBookingPlanChange">
+					<c:Item key="{AdminBookingModel>key}" text="{AdminBookingModel>text}"/>
+				</ComboBox>
+
+				<!-- Rent (dynamic based on selected plan) -->
+				<Label text="{i18n>adminBookingRent}"/>
+				<Text
+					id="AB_id_Rent"
+					text="{AdminBookingModel>/RentDisplay}"
+					class="boldBlueText"/>
+
+				<!-- Booking For (Self / New Customer / Existing Customer) -->
+				<Label text="{i18n>adminBookingCustomerType}"/>
+				<RadioButtonGroup
+					id="AB_id_CustomerType"
+					columns="3"
+					selectedIndex="{AdminBookingModel>/CustomerTypeIndex}"
+					select="onAdminBookingCustomerTypeChange">
+					<RadioButton text="{i18n>adminBookingNewCustomer}"/>
+					<RadioButton text="{i18n>adminBookingExistingCustomer}"/>
+					<RadioButton text="{i18n>adminBookingSelfBooking}"/>
+				</RadioButtonGroup>
+
+			</f:content>
+		</f:SimpleForm>
+
+		<!-- ===== OPTION A: NEW CUSTOMER ===== -->
+		<f:SimpleForm
+			id="AB_id_NewCustomerForm"
+			visible="{= ${AdminBookingModel>/CustomerType} === 'New' }"
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="4"
+			labelSpanM="4"
+			labelSpanS="12"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1">
+			<f:content>
+
+				<c:Title text="{i18n>adminBookingNCPersonalDetails}"/>
+
+				<!-- Full Name (Salutation + Name) -->
+				<Label text="{i18n>adminBookingNCFullName}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="35%">
+						<ComboBox
+							id="AB_id_NC_Salutation"
+							selectedKey="{AdminBookingModel>/NC/Salutation}"
+							placeholder="Mr.">
+							<c:ListItem key="Mr." text="Mr."/>
+							<c:ListItem key="Ms." text="Ms."/>
+							<c:ListItem key="Mrs." text="Mrs."/>
+							<c:ListItem key="Dr." text="Dr."/>
+						</ComboBox>
+					</VBox>
+					<VBox width="65%" class="sapUiTinyMarginBegin">
+						<Input
+							id="AB_id_NC_Name"
+							value="{AdminBookingModel>/NC/UserName}"
+							placeholder="{i18n>enterFullName}"
+							liveChange="onAdminBookingNCNameLive"
+							valueStateText="{i18n>MSenterValidName}"
+							maxLength="50"/>
+					</VBox>
+				</HBox>
+
+				<!-- DOB -->
+				<Label text="{i18n>adminBookingNCDOB}" required="true"/>
+				<DatePicker
+					id="AB_id_NC_DOB"
+					value="{AdminBookingModel>/NC/DateOfBirth}"
+					displayFormat="dd/MM/yyyy"
+					valueFormat="yyyy-MM-dd"
+					change="onAdminBookingNCDOBChange"
+					valueStateText="{i18n>agediff}"/>
+
+				<!-- Gender -->
+				<Label text="{i18n>adminBookingNCGender}" required="true"/>
+				<Select
+					id="AB_id_NC_Gender"
+					selectedKey="{AdminBookingModel>/NC/Gender}"
+					forceSelection="false"
+					valueStateText="{i18n>pleaseselectGender}">
+					<c:Item key="Male" text="Male"/>
+					<c:Item key="Female" text="Female"/>
+					<c:Item key="Other" text="Other"/>
+				</Select>
+
+				<c:Title text="{i18n>adminBookingNCContactDetails}"/>
+
+				<!-- Email -->
+				<Label text="{i18n>adminBookingNCEmail}" required="true"/>
+				<Input
+					id="AB_id_NC_Email"
+					value="{AdminBookingModel>/NC/EmailID}"
+					placeholder="{i18n>enterEmailId}"
+					type="Email"
+					liveChange="onAdminBookingNCEmailLive"
+					valueStateText="{i18n>MSenterValidEmail}"
+					maxLength="50"/>
+
+				<!-- Country -->
+				<Label text="{i18n>adminBookingNCCountry}" required="true"/>
+				<ComboBox
+					id="AB_id_NC_Country"
+					selectedKey="{AdminBookingModel>/NC/Country}"
+					value="{AdminBookingModel>/NC/Country}"
+					selectionChange="onAdminBookingNCCountryChange"
+					placeholder="{i18n>selectCountry}"
+					valueStateText="{i18n>MVDselectcountry}"
+					items="{path:'CountryModel>/', length:1000}"
+					showSecondaryValues="true">
+					<c:ListItem
+						key="{CountryModel>countryName}"
+						text="{CountryModel>countryName}"
+						additionalText="{CountryModel>code}"/>
+				</ComboBox>
+
+				<!-- State -->
+				<Label text="{i18n>adminBookingNCState}" required="true"/>
+				<ComboBox
+					id="AB_id_NC_State"
+					selectedKey="{AdminBookingModel>/NC/State}"
+					value="{AdminBookingModel>/NC/State}"
+					change="onAdminBookingNCStateChange"
+					selectionChange="onAdminBookingNCStateChange"
+					placeholder="{i18n>selectState}"
+					valueStateText="{i18n>MSselectState}"
+					items="{path:'AdminBookingModel>/NCStates', length:1000}"
+					showSecondaryValues="true">
+					<c:ListItem key="{AdminBookingModel>stateName}" text="{AdminBookingModel>stateName}"/>
+				</ComboBox>
+
+				<!-- City -->
+				<Label text="{i18n>adminBookingNCCity}" required="true"/>
+				<ComboBox
+					id="AB_id_NC_City"
+					selectedKey="{AdminBookingModel>/NC/City}"
+					value="{AdminBookingModel>/NC/City}"
+					change="onAdminBookingNCCityChange"
+					selectionChange="onAdminBookingNCCityChange"
+					placeholder="{i18n>cityValueText}"
+					valueStateText="{i18n>MSselectCity}"
+					items="{path:'AdminBookingModel>/NCCities', length:1000}"
+					showSecondaryValues="true">
+					<c:ListItem key="{AdminBookingModel>cityName}" text="{AdminBookingModel>cityName}" additionalText="{AdminBookingModel>branchCode}"/>
+				</ComboBox>
+
+				<!-- Mobile No (ISD + number) -->
+				<Label text="{i18n>adminBookingNCMobile}" required="true"/>
+				<HBox width="100%" justifyContent="Start" alignItems="Center">
+					<VBox width="35%">
+						<ComboBox
+							id="AB_id_NC_STD"
+							value="{AdminBookingModel>/NC/STDCode}"
+							change="onAdminBookingNCSTDChange"
+							placeholder="ISD"
+							showSecondaryValues="true"
+							width="100%"
+							items="{path:'CountryModel>/', length:1000}"
+							filterSecondaryValues="true">
+							<c:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}" additionalText="{CountryModel>code}"/>
+						</ComboBox>
+					</VBox>
+					<VBox width="65%" class="sapUiTinyMarginBegin">
+						<Input
+							id="AB_id_NC_Mobile"
+							value="{AdminBookingModel>/NC/MobileNo}"
+							type="Tel"
+							placeholder="{i18n>enterMobileNumber}"
+							maxLength="18"
+							liveChange="onAdminBookingNCMobileLive"
+							valueStateText="{i18n>MSmobileNoValueState}"/>
+					</VBox>
+				</HBox>
+
+				<!-- Address -->
+				<Label text="{i18n>adminBookingNCAddress}" required="true"/>
+				<TextArea
+					id="AB_id_NC_Address"
+					rows="3"
+					value="{AdminBookingModel>/NC/Address}"
+					liveChange="onAdminBookingNCAddressChange"
+					placeholder="{i18n>placeHolderAddress}"
+					maxLength="120"/>
+
+			</f:content>
+		</f:SimpleForm>
+
+		<!-- ===== OPTION B: EXISTING CUSTOMER ===== -->
+		<f:SimpleForm
+			id="AB_id_ExistingCustomerForm"
+			visible="{= ${AdminBookingModel>/CustomerType} === 'Existing' }"
+			editable="true"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="4"
+			labelSpanL="4"
+			labelSpanM="4"
+			labelSpanS="12"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1">
+			<f:content>
+
+				<!-- Email (tokenized autocomplete against HM_Login) -->
+				<Label text="{i18n>adminBookingECEmail}" required="true"/>
+				<MultiInput
+					id="AB_id_EC_Email"
+					maxTokens="1"
+					editable="true"
+					placeholder="{i18n>adminBookingECEmailPlaceholder}"
+					showSuggestion="true"
+					suggestionItems="{AdminBookingModel>/ECSuggestions}"
+					suggest="onAdminBookingECEmailSuggest"
+					suggestionItemSelected="onAdminBookingECEmailSelected"
+					tokenUpdate="onAdminBookingECTokenUpdate"
+					valueStateText="{i18n>MSenterValidEmail}">
+					<suggestionItems>
+						<c:Item key="{AdminBookingModel>EmailID}" text="{AdminBookingModel>EmailID}"/>
+					</suggestionItems>
+				</MultiInput>
+
+				<!-- Read-only details of the selected existing customer -->
+				<Label text="{i18n>adminBookingECName}"/>
+				<Text id="AB_id_EC_Name" text="{AdminBookingModel>/EC/UserName}"/>
+
+				<Label text="{i18n>adminBookingECMobile}"/>
+				<Text id="AB_id_EC_Mobile" text="{= ${AdminBookingModel>/EC/STDCode} ? (${AdminBookingModel>/EC/STDCode} + ' ' + ${AdminBookingModel>/EC/MobileNo}) : ${AdminBookingModel>/EC/MobileNo} }"/>
+
+				<Label text="{i18n>adminBookingECDOB}"/>
+				<Text id="AB_id_EC_DOB" text="{AdminBookingModel>/EC/DateOfBirth}"/>
+
+				<Label text="{i18n>adminBookingECGender}"/>
+				<Text id="AB_id_EC_Gender" text="{AdminBookingModel>/EC/Gender}"/>
+
+				<Label text="{i18n>adminBookingECAddress}"/>
+				<Text id="AB_id_EC_Address" text="{AdminBookingModel>/EC/Address}"/>
+
+			</f:content>
+		</f:SimpleForm>
+
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button
+					text="{i18n>adminBookingBookNow}"
+					press="onAdminBookingBookNow"
+					class="marginRight myUnifiedBtn"/>
+				<Button
+					text="{i18n>adminBookingCancel}"
+					press="onAdminBookingCancel"
+					class="marginRight myUnifiedBtn"/>
+			</Toolbar>
+		</footer>
+
+	</Dialog>
+
+</c:FragmentDefinition>

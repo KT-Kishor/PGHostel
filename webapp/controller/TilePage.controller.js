@@ -1,9 +1,11 @@
 sap.ui.define([
-    "./BaseController", //call base controller 
+    "./BaseController", //call base controller
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
+    "sap/m/MessageBox",
+    "sap/m/Token",
      "../utils/validation",
-], function (BaseController, JSONModel, MessageToast,utils) {
+], function (BaseController, JSONModel, MessageToast, MessageBox, Token, utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.TilePage", {
         onInit: function () {
@@ -904,6 +906,972 @@ utils._LCvalidateMandatoryField(oEvent)
           this.RB_onCancelButtonPress()
         },
 
+
+        // ─── Admin Booking ("Book for Yourself") ──────────────────────────────────
+
+        TileV_onpressBookForYourself: function () {
+            if (!this.getView().getModel("AdminBookingModel")) {
+                this.getView().setModel(new JSONModel(this._getAdminBookingInitialData()), "AdminBookingModel");
+            }
+
+            if (!this._AdminBookingDialog) {
+                sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.AdminBooking",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._AdminBookingDialog = oDialog;
+                    this.getView().addDependent(oDialog);
+                    this._resetAdminBookingModel();
+                    this._loadAdminBookingBranches();
+                    oDialog.open();
+                }.bind(this));
+            } else {
+                this._resetAdminBookingModel();
+                this._loadAdminBookingBranches();
+                this._AdminBookingDialog.open();
+            }
+        },
+
+        _getAdminBookingInitialData: function () {
+            return {
+                Branches: [],
+                Rooms: [],
+                AllRooms: [],
+                Plans: [],
+                BranchCode: "",
+                RoomKey: "",
+                SelectedPlan: "",
+                RentDisplay: "",
+                // None selected initially. New (0) | Existing (1) | Self (2)
+                CustomerType: "",
+                CustomerTypeIndex: -1,
+                // New Customer form data + cascade lists
+                NC: this._getEmptyNewCustomer(),
+                NCStates: [],
+                NCCities: [],
+                // Existing Customer suggestions + selected record
+                EC: this._getEmptyExistingCustomer(),
+                ECSuggestions: [],
+                ECAllCustomers: []
+            };
+        },
+
+        _getEmptyNewCustomer: function () {
+            return {
+                Salutation: "",
+                UserName: "",
+                DateOfBirth: "",
+                Gender: "",
+                EmailID: "",
+                Country: "",
+                State: "",
+                City: "",
+                STDCode: "",
+                MobileNo: "",
+                Address: ""
+            };
+        },
+
+        _getEmptyExistingCustomer: function () {
+            return {
+                UserID: "",
+                Salutation: "",
+                UserName: "",
+                EmailID: "",
+                STDCode: "",
+                MobileNo: "",
+                DateOfBirth: "",
+                Gender: "",
+                Country: "",
+                State: "",
+                City: "",
+                Address: ""
+            };
+        },
+
+        _resetAdminBookingModel: function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            if (!oModel) return;
+            // Re-resolve assigned branches on each open (handles re-login).
+            this._sAdminBookingAssignedBranches = undefined;
+            oModel.setData({
+                Branches: oModel.getProperty("/Branches") || [],
+                Rooms: [],
+                AllRooms: [],
+                Plans: [],
+                BranchCode: "",
+                RoomKey: "",
+                SelectedPlan: "",
+                RentDisplay: "",
+                CustomerType: "",
+                CustomerTypeIndex: -1,
+                NC: this._getEmptyNewCustomer(),
+                NCStates: [],
+                NCCities: [],
+                EC: this._getEmptyExistingCustomer(),
+                ECSuggestions: [],
+                ECAllCustomers: []
+            });
+        },
+
+        // Resolve the logged-in user's own assigned branch codes from their
+        // HM_CustomerContact record (by UserID), the same authoritative source
+        // the BranchData "Property Name" filter uses. Returns "" for SuperAdmin
+        // (meaning "all branches"). Cached for the dialog's lifetime.
+        _getAdminBookingAssignedBranches: async function () {
+            var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            if (oLoginModel.Role === "SuperAdmin") {
+                return "";
+            }
+            if (this._sAdminBookingAssignedBranches !== undefined) {
+                return this._sAdminBookingAssignedBranches;
+            }
+            var sAssigned = oLoginModel.BranchCode || "";
+            try {
+                var oSelf = await this.ajaxReadWithJQuery("HM_CustomerContact", {
+                    UserID: oLoginModel.EmployeeID
+                });
+                var aSelf = Array.isArray(oSelf.data) ? oSelf.data : [oSelf.data].filter(Boolean);
+                if (aSelf.length && aSelf[0].BranchCode) {
+                    sAssigned = aSelf[0].BranchCode;
+                }
+            } catch (e) {
+                // Fall back to LoginModel.BranchCode on read failure.
+            }
+            this._sAdminBookingAssignedBranches = sAssigned;
+            return sAssigned;
+        },
+
+        // Load only the branches assigned to the current user. Mirrors the
+        // BranchData "Property Name" filter: the logged-in user's assigned
+        // branch codes come from their own HM_CustomerContact record (by
+        // UserID), not from mainModel — which isn't populated in this page's
+        // context, so relying on it showed every branch to every admin.
+        _loadAdminBookingBranches: async function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+            try {
+                this.getBusyDialog();
+
+                var sAssignedBranches = await this._getAdminBookingAssignedBranches();
+
+                var filters = {};
+                if (oLoginModel.Role === "SuperAdmin") {
+                    filters.BranchID = "";
+                } else if (oLoginModel.Role === "Admin") {
+                    filters.BranchID = sAssignedBranches;
+                    filters.Role = "Admin";
+                } else {
+                    filters.BranchID = sAssignedBranches;
+                }
+
+                var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
+                var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data].filter(Boolean);
+
+                // De-duplicate by BranchID
+                var oUnique = {};
+                aBranchData.forEach(function (b) {
+                    if (b && b.BranchID && !oUnique[b.BranchID]) {
+                        oUnique[b.BranchID] = {
+                            BranchID: b.BranchID,
+                            Name: b.Name,
+                            City: b.City,
+                            PropertyType: b.PropertyType || "",
+                            GSTIN: b.GSTIN || "",
+                            GSTType: b.Type || "",
+                            GSTValue: b.Value || "",
+                            Country: b.Country || "",
+                            State: b.State || "",
+                            CheckInTime: b.CheckinTime || "",
+                            CheckOutTime: b.CheckoutTime || ""
+                        };
+                    }
+                });
+                var aBranches = Object.values(oUnique).sort((a, b) => a.BranchID.localeCompare(b.BranchID));
+                oModel.setProperty("/Branches", aBranches);
+
+                if (!aBranches.length) {
+                    MessageToast.show(this.i18nModel.getText("adminBookingNoBranches"));
+                }
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        // Branch changed → load rooms belonging to that branch
+        onAdminBookingBranchChange: async function (oEvent) {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var sBranchCode = oEvent.getParameter("selectedItem") ?
+                oEvent.getParameter("selectedItem").getKey() : "";
+
+            // Reset dependent fields
+            oModel.setProperty("/BranchCode", sBranchCode);
+            oModel.setProperty("/Rooms", []);
+            oModel.setProperty("/AllRooms", []);
+            oModel.setProperty("/RoomKey", "");
+            oModel.setProperty("/Plans", []);
+            oModel.setProperty("/SelectedPlan", "");
+            oModel.setProperty("/RentDisplay", "");
+
+            if (!sBranchCode) return;
+
+            try {
+                this.getBusyDialog();
+                var oData = await this.ajaxReadWithJQuery("HM_Rooms", {});
+                var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData].filter(Boolean);
+
+                var normalize = v => (v ? String(v).trim().toLowerCase() : "");
+                var aBranchRooms = aRooms.filter(r => normalize(r.BranchCode) === normalize(sBranchCode));
+
+                // De-duplicate rooms by BedTypeName (booking is done at bed-type level)
+                var oUnique = {};
+                aBranchRooms.forEach(function (r) {
+                    var sKey = r.BedTypeName || r.RoomNo;
+                    if (sKey && !oUnique[sKey]) {
+                        // HM_Rooms stores the combined "BedType - ACType" in BedTypeName
+                        // (there is no separate ACType field). Split it so the booking
+                        // payload can rebuild the exact "BedType - ACType" the backend expects.
+                        var sBedTypeName = r.BedTypeName || "";
+                        var iSep = sBedTypeName.lastIndexOf(" - ");
+                        var sBedType = iSep > -1 ? sBedTypeName.slice(0, iSep).trim() : sBedTypeName.trim();
+                        var sACType = iSep > -1 ? sBedTypeName.slice(iSep + 3).trim() : "";
+                        oUnique[sKey] = {
+                            RoomKey: sKey,
+                            RoomText: r.BedTypeName || r.RoomNo,
+                            BedTypeName: sBedTypeName,
+                            BedType: sBedType,
+                            ACType: sACType,
+                            BranchCode: r.BranchCode || sBranchCode,
+                            Price: r.Price || "",
+                            MonthPrice: r.MonthPrice || "",
+                            YearPrice: r.YearPrice || "",
+                            Currency: r.Currency || "",
+                            Deposit: r.Deposit || "",
+                            DepositCurrency: r.DepositCurrency || "",
+                            NoOfPerson: r.NoofPerson || r.NoOfPerson || ""
+                        };
+                    }
+                });
+                oModel.setProperty("/AllRooms", Object.values(oUnique));
+                oModel.setProperty("/Rooms", Object.values(oUnique));
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        // Room changed → build the available plan options from the room's prices
+        onAdminBookingRoomChange: function (oEvent) {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var sRoomKey = oEvent.getParameter("selectedItem") ?
+                oEvent.getParameter("selectedItem").getKey() : "";
+
+            oModel.setProperty("/RoomKey", sRoomKey);
+            oModel.setProperty("/SelectedPlan", "");
+            oModel.setProperty("/RentDisplay", "");
+
+            var oRoom = (oModel.getProperty("/AllRooms") || []).find(r => r.RoomKey === sRoomKey);
+            if (!oRoom) {
+                oModel.setProperty("/Plans", []);
+                return;
+            }
+
+            var aPlans = [];
+            if (Number(oRoom.Price) > 0) { aPlans.push({ key: "Per Day", text: "Per Day" }); }
+            if (Number(oRoom.MonthPrice) > 0) { aPlans.push({ key: "Per Month", text: "Per Month" }); }
+            if (Number(oRoom.YearPrice) > 0) { aPlans.push({ key: "Per Year", text: "Per Year" }); }
+            oModel.setProperty("/Plans", aPlans);
+        },
+
+        // Plan changed → show the rent for that plan
+        onAdminBookingPlanChange: function (oEvent) {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var sPlan = oEvent.getParameter("selectedItem") ?
+                oEvent.getParameter("selectedItem").getKey() : "";
+
+            oModel.setProperty("/SelectedPlan", sPlan);
+
+            var oRoom = (oModel.getProperty("/AllRooms") || []).find(r => r.RoomKey === oModel.getProperty("/RoomKey"));
+            if (!oRoom || !sPlan) {
+                oModel.setProperty("/RentDisplay", "");
+                return;
+            }
+
+            var sRent = "";
+            if (sPlan === "Per Day") { sRent = oRoom.Price; }
+            else if (sPlan === "Per Month") { sRent = oRoom.MonthPrice; }
+            else if (sPlan === "Per Year") { sRent = oRoom.YearPrice; }
+
+            var sCurrency = (oRoom.Currency || "").trim();
+            oModel.setProperty("/RentDisplay", sRent ? (sCurrency + " " + sRent + " / " + sPlan).trim() : "");
+        },
+
+        // ─── Customer type (Self / New / Existing) ─────────────────────────────
+
+        onAdminBookingCustomerTypeChange: function (oEvent) {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var iIndex = oEvent.getParameter("selectedIndex");
+            var sType = iIndex === 0 ? "New" : (iIndex === 1 ? "Existing" : "Self");
+            oModel.setProperty("/CustomerTypeIndex", iIndex);
+            oModel.setProperty("/CustomerType", sType);
+
+            // Reset the customer sub-forms when switching modes so stale data
+            // from a previous selection never leaks into the booking.
+            oModel.setProperty("/NC", this._getEmptyNewCustomer());
+            oModel.setProperty("/NCStates", []);
+            oModel.setProperty("/NCCities", []);
+            oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+            oModel.setProperty("/ECSuggestions", []);
+            oModel.setProperty("/ECAllCustomers", []);
+            this._clearAdminBookingCustomerEmailToken();
+            this._clearAdminBookingCustomerValueStates();
+
+            // Selecting "Existing Customer" loads the bookable users once (by
+            // role) and caches them, so typing filters locally for instant
+            // partial-match suggestions.
+            if (sType === "Existing") {
+                this._loadAdminBookingExistingCustomers();
+            }
+        },
+
+        // Remove the email token (if any) from the Existing Customer MultiInput
+        // and re-enable typing.
+        _clearAdminBookingCustomerEmailToken: function () {
+            var oMultiInput = this.byId("AB_id_EC_Email");
+            if (!oMultiInput) return;
+            if (oMultiInput.removeAllTokens) {
+                oMultiInput.removeAllTokens();
+            }
+            if (oMultiInput.setValueHelpOnly) {
+                oMultiInput.setValueHelpOnly(false);
+            }
+            oMultiInput.setValue("");
+        },
+
+        _clearAdminBookingCustomerValueStates: function () {
+            ["AB_id_NC_Salutation", "AB_id_NC_Name", "AB_id_NC_DOB", "AB_id_NC_Gender",
+                "AB_id_NC_Email", "AB_id_NC_Country", "AB_id_NC_State", "AB_id_NC_City",
+                "AB_id_NC_STD", "AB_id_NC_Mobile", "AB_id_NC_Address", "AB_id_EC_Email"
+            ].forEach(function (sId) {
+                var oCtrl = this.byId(sId);
+                if (oCtrl && oCtrl.setValueState) {
+                    oCtrl.setValueState("None");
+                }
+            }.bind(this));
+        },
+
+        // ─── Option A: New Customer (mirrors Hostel onSignUp rules) ────────────
+
+        onAdminBookingNCNameLive: function (oEvent) {
+            utils._LCvalidateName(oEvent);
+        },
+
+        onAdminBookingNCEmailLive: function (oEvent) {
+            utils._LCvalidateEmail(oEvent);
+        },
+
+        onAdminBookingNCAddressChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        // DOB change → validate 0–100 age and store yyyy-MM-dd, returns boolean
+        // (used both as a change handler and as a validation gate in Book Now).
+        onAdminBookingNCDOBChange: function (oEventOrControl) {
+            var oDatePicker = (oEventOrControl && typeof oEventOrControl.getSource === "function")
+                ? oEventOrControl.getSource() : oEventOrControl;
+            var oModel = this.getView().getModel("AdminBookingModel");
+            if (!oDatePicker) return false;
+
+            var raw = oDatePicker.getDateValue();
+            if (!raw) {
+                oDatePicker.setValueState("Error");
+                oDatePicker.setValueStateText("Date of birth is required");
+                oModel.setProperty("/NC/DateOfBirth", "");
+                return false;
+            }
+            var today = new Date();
+            var age = today.getFullYear() - raw.getFullYear();
+            var m = today.getMonth() - raw.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < raw.getDate())) {
+                age--;
+            }
+            if (age < 0 || age > 100) {
+                oDatePicker.setValueState("Error");
+                oDatePicker.setValueStateText("Age must be between 0 and 100");
+                oModel.setProperty("/NC/DateOfBirth", "");
+                return false;
+            }
+            oDatePicker.setValueState("None");
+            var yyyy = raw.getFullYear();
+            var mm = String(raw.getMonth() + 1).padStart(2, "0");
+            var dd = String(raw.getDate()).padStart(2, "0");
+            oModel.setProperty("/NC/DateOfBirth", yyyy + "-" + mm + "-" + dd);
+            return true;
+        },
+
+        // Country → filter states + auto STD (uses component State/City models)
+        onAdminBookingNCCountryChange: function (oEvent) {
+            var oCountry = oEvent ? oEvent.getSource() : this.byId("AB_id_NC_Country");
+            if (!oCountry) return;
+
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oCountryModel = this.getOwnerComponent().getModel("CountryModel");
+            var oStateModel = this.getOwnerComponent().getModel("StateModel");
+
+            if (!oCountryModel) return;
+
+            if (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+                oModel.setProperty("/NC/State", "");
+                oModel.setProperty("/NC/City", "");
+                oModel.setProperty("/NCStates", []);
+                oModel.setProperty("/NCCities", []);
+            }
+
+            var aCountries = oCountryModel.getData() || [];
+            var oMatch = this._findBestMatch(oModel.getProperty("/NC/Country"), aCountries, "countryName");
+            if (oMatch) {
+                oCountry.setSelectedKey(oMatch.countryName);
+                var sCountryCode = oMatch.code;
+                var allStates = oStateModel ? (oStateModel.getData() || []) : [];
+                oModel.setProperty("/NCStates", allStates.filter(function (s) {
+                    return s.countryCode === sCountryCode;
+                }));
+                var oMobile = this.byId("AB_id_NC_Mobile");
+                if (oMobile) oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
+                this._autoSelectNCSTD(sCountryCode);
+            }
+        },
+
+        // State → filter cities
+        onAdminBookingNCStateChange: function (oEvent) {
+            var oState = oEvent ? oEvent.getSource() : this.byId("AB_id_NC_State");
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oCityModel = this.getOwnerComponent().getModel("CityModel");
+
+            if (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+                oModel.setProperty("/NC/City", "");
+                oModel.setProperty("/NCCities", []);
+            }
+
+            var aFilteredStates = oModel.getProperty("/NCStates") || [];
+            var oMatch = this._findBestMatch(oModel.getProperty("/NC/State"), aFilteredStates, "stateName");
+            if (oMatch) {
+                oState.setSelectedKey(oMatch.stateName);
+                var sStateName = oMatch.stateName;
+                var oCountry = this.byId("AB_id_NC_Country");
+                var sCountryCode = (oCountry.getSelectedItem() && oCountry.getSelectedItem().getAdditionalText()
+                    ? oCountry.getSelectedItem().getAdditionalText().trim() : "IN");
+                var allCities = oCityModel ? (oCityModel.getData() || []) : [];
+                oModel.setProperty("/NCCities", allCities.filter(function (c) {
+                    return c.countryCode === sCountryCode && c.stateName === sStateName;
+                }));
+            }
+        },
+
+        // City → fuzzy match selection
+        onAdminBookingNCCityChange: function (oEvent) {
+            var oCityCtrl = oEvent ? oEvent.getSource() : this.byId("AB_id_NC_City");
+            var oModel = this.getView().getModel("AdminBookingModel");
+
+            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
+
+            var aFilteredCities = oModel.getProperty("/NCCities") || [];
+            var sSearch = oModel.getProperty("/NC/City");
+            var oMatch = this._findBestMatch(sSearch, aFilteredCities, "cityName");
+            if (oMatch) {
+                oCityCtrl.setSelectedKey(oMatch.cityName);
+                oModel.setProperty("/NC/City", oMatch.cityName);
+                oCityCtrl.setValueState("None");
+            } else {
+                oModel.setProperty("/NC/City", sSearch);
+            }
+        },
+
+        _autoSelectNCSTD: function (sCode) {
+            var oSTD = this.byId("AB_id_NC_STD");
+            var oModel = this.getView().getModel("AdminBookingModel");
+            if (!oSTD) return;
+            var oItem = oSTD.getItems().find(function (i) {
+                return i.getAdditionalText() === sCode;
+            });
+            if (oItem) {
+                oSTD.setSelectedKey(oItem.getKey());
+                oModel.setProperty("/NC/STDCode", oItem.getKey());
+            }
+        },
+
+        // Fuzzy match a typed value against a list (mirrors Hostel _findBestMatch).
+        _findBestMatch: function (sInput, aItems, sPropertyName) {
+            if (!sInput || !aItems || aItems.length === 0) return null;
+            var sNormInput = sInput.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+            var oMatch = aItems.find(function (item) {
+                return item[sPropertyName].toLowerCase().trim() === sInput.toLowerCase().trim();
+            });
+            if (!oMatch) {
+                oMatch = aItems.find(function (item) {
+                    var sNormItem = item[sPropertyName].toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+                    return sNormItem.includes(sNormInput) || sNormInput.includes(sNormItem);
+                });
+            }
+            return oMatch;
+        },
+
+        onAdminBookingNCSTDChange: function (oEvent) {
+            var oSTD = oEvent.getSource();
+            var sValue = (oSTD.getValue() || "").trim();
+            var oMobile = this.byId("AB_id_NC_Mobile");
+            var oModel = this.getView().getModel("AdminBookingModel");
+            if (!sValue) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("STD Code is required");
+                oModel.setProperty("/NC/STDCode", "");
+                return;
+            }
+            var STD_REGEX = /^\+[1-9][0-9]*$/;
+            if (!STD_REGEX.test(sValue)) {
+                oSTD.setValueState("Error");
+                oSTD.setValueStateText("Must start with + and have no leading zero (e.g., +91)");
+                oModel.setProperty("/NC/STDCode", "");
+            } else {
+                oSTD.setValueState("None");
+                if (oMobile) oMobile.setMaxLength(sValue === "+91" ? 10 : 18);
+                oModel.setProperty("/NC/STDCode", sValue);
+            }
+        },
+
+        onAdminBookingNCMobileLive: function (oEvent) {
+            var isValid = utils._LCvalidateMandatoryField(oEvent);
+            if (!isValid) return;
+            var oInput = oEvent.getSource();
+            var val = oInput.getValue().replace(/\D/g, "");
+            oInput.setValue(val);
+
+            var oSTD = this.byId("AB_id_NC_STD");
+            var stdRaw = (oSTD && oSTD.getValue()) || "";
+            var std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
+
+            if (!val) return oInput.setValueState("None");
+            if (!std || std === "+") {
+                oInput.setValueState("Error");
+                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
+                return;
+            }
+            var valid = utils._LCvalidateISDmobile(oInput, std);
+            oInput.setValueState(valid ? "None" : "Error");
+            if (!valid) {
+                oInput.setValueStateText(std === "+91"
+                    ? this.i18nModel.getText("MSmobileNoValueStateIN")
+                    : this.i18nModel.getText("MSmobileNoValueStateINT"));
+            }
+        },
+
+        // Validate the New Customer form using the exact same rules as onSignUp.
+        _validateAdminBookingNewCustomer: function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var sSTD = this.byId("AB_id_NC_STD").getValue() || oModel.getProperty("/NC/STDCode");
+            return (
+                utils._LCstrictValidationSelect(this.byId("AB_id_NC_Salutation")) &&
+                utils._LCvalidateName(this.byId("AB_id_NC_Name"), "ID") &&
+                this.onAdminBookingNCDOBChange(this.byId("AB_id_NC_DOB")) &&
+                utils._LCstrictValidationSelect(this.byId("AB_id_NC_Gender")) &&
+                utils._LCvalidateEmail(this.byId("AB_id_NC_Email"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("AB_id_NC_Country"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("AB_id_NC_State"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("AB_id_NC_City"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("AB_id_NC_STD"), "ID") &&
+                utils._LCvalidateISDmobile(this.byId("AB_id_NC_Mobile"), sSTD) &&
+                utils._LCvalidateAddress(this.byId("AB_id_NC_Address"))
+            );
+        },
+
+        // ─── Option B: Existing Customer (autocomplete via MultiInput) ─────────
+
+        // Only these roles may be booked for. Vendor/admin roles
+        // (ManageVendor, SuperAdmin, Admin, Branch Manager) are filtered out.
+        _isAdminBookingAllowedRole: function (sRole) {
+            var aAllowed = ["Customer", "Front Office Employee", "Housekeeping"];
+            return aAllowed.indexOf(String(sRole || "").trim()) !== -1;
+        },
+
+        // Triggered when "Existing Customer" is selected. Reads the user
+        // directory once and caches it, so the MultiInput can filter locally as
+        // the user types — giving real partial-match autocomplete instead of
+        // needing the full email.
+        //
+        // HM_Login is the session endpoint: it ignores a Role filter and only
+        // ever returns the logged-in user. The directory endpoint is
+        // HM_CustomerContact, scoped by BranchCode (empty for SuperAdmin), the
+        // same source the Coupon "Email to Customers" share uses. Only customers
+        // associated with the logged-in user's allotted branches are listed, and
+        // roles are further restricted client-side to the bookable set.
+        _loadAdminBookingExistingCustomers: async function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
+
+            try {
+                this.getBusyDialog();
+
+                var sAssignedBranches = await this._getAdminBookingAssignedBranches();
+                var oFilter = oLoginModel.Role === "SuperAdmin" ? {} : { BranchCode: sAssignedBranches };
+
+                var oData = await this.ajaxReadWithJQuery("HM_CustomerContact", oFilter);
+                var aRows = Array.isArray(oData.data) ? oData.data : [oData.data].filter(Boolean);
+
+                var oSeen = {};
+                var aCustomers = [];
+                aRows.forEach(function (oRow) {
+                    var sEmail = oRow && oRow.EmailID;
+                    if (sEmail && !oSeen[sEmail] && this._isAdminBookingAllowedRole(oRow.Role)) {
+                        oSeen[sEmail] = true;
+                        aCustomers.push(oRow);
+                    }
+                }.bind(this));
+
+                oModel.setProperty("/ECAllCustomers", aCustomers);
+                oModel.setProperty("/ECSuggestions", aCustomers.map(function (oRow) {
+                    return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
+                }));
+            } catch (err) {
+                oModel.setProperty("/ECAllCustomers", []);
+                oModel.setProperty("/ECSuggestions", []);
+                MessageToast.show(this.i18nModel.getText("adminBookingCustomerReadFailed"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        // Typing → filter the cached customer list locally (partial match on
+        // email), so suggestions appear as soon as a few characters are typed.
+        onAdminBookingECEmailSuggest: function (oEvent) {
+            var sTerm = (oEvent.getParameter("suggestValue") || "").trim().toLowerCase();
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var aCustomers = oModel.getProperty("/ECAllCustomers") || [];
+
+            var aFiltered = !sTerm ? aCustomers : aCustomers.filter(function (oRow) {
+                return String(oRow.EmailID || "").toLowerCase().indexOf(sTerm) !== -1;
+            });
+
+            oModel.setProperty("/ECSuggestions", aFiltered.map(function (oRow) {
+                return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
+            }));
+
+            // Tell the user when their typed term matches no customer — but only
+            // once per distinct term, so the toast doesn't repeat on every
+            // keystroke while they keep typing the same unmatched value.
+            if (sTerm && !aFiltered.length) {
+                if (this._sLastNoMatchTerm !== sTerm) {
+                    this._sLastNoMatchTerm = sTerm;
+                    MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
+                }
+            } else {
+                this._sLastNoMatchTerm = "";
+            }
+        },
+
+        // Selection → wrap the email in a single token, lock typing, then read
+        // the customer's authoritative full record. HM_CustomerContact only
+        // carries summary fields (UserName, Role, EmailID, BranchCode) and no
+        // UserID, so the read-only details + booking identity come from an
+        // HM_Login read by email + role (same read the New Customer flow uses).
+        onAdminBookingECEmailSelected: async function (oEvent) {
+            var oItem = oEvent.getParameter("selectedItem") || oEvent.getParameter("selectedRow");
+            if (!oItem) return;
+            var sEmail = oItem.getText ? oItem.getText() : "";
+            if (!sEmail) return;
+
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oMultiInput = this.byId("AB_id_EC_Email");
+
+            // Build exactly one token for the chosen email.
+            oMultiInput.removeAllTokens();
+            oMultiInput.addToken(new Token({ key: sEmail, text: sEmail }));
+            oMultiInput.setValue("");
+            // Lock typing but keep the token's "X" interactive.
+            oMultiInput.setValueHelpOnly(true);
+            oMultiInput.setValueState("None");
+
+            var oContact = (oModel.getProperty("/ECAllCustomers") || []).find(function (oRow) {
+                return oRow.EmailID === sEmail;
+            });
+            if (!oContact) {
+                MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
+                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                return;
+            }
+
+            try {
+                this.getBusyDialog();
+                // HM_CustomerContact rows carry only summary fields (no UserID),
+                // so read the authoritative full record by email + role — the
+                // same HM_Login read the New Customer flow uses to obtain UserID.
+                var oRead = await this.ajaxReadWithJQuery("HM_Login", {
+                    EmailID: sEmail,
+                    Role: oContact.Role || ""
+                });
+                var oUser = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
+                if (!oUser) {
+                    MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
+                    oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                    return;
+                }
+
+                oModel.setProperty("/EC", {
+                    UserID: oUser.UserID || "",
+                    Salutation: oUser.Salutation || "",
+                    UserName: oUser.UserName || oContact.UserName || "",
+                    EmailID: oUser.EmailID || sEmail,
+                    STDCode: oUser.STDCode || "",
+                    MobileNo: oUser.MobileNo || "",
+                    DateOfBirth: oUser.DateOfBirth ? this.Formatter.DateFormat(oUser.DateOfBirth) : "",
+                    Gender: oUser.Gender || "",
+                    Country: oUser.Country || "",
+                    State: oUser.State || "",
+                    City: oUser.City || "",
+                    Address: oUser.Address || ""
+                });
+            } catch (err) {
+                MessageToast.show(this.i18nModel.getText("adminBookingCustomerReadFailed"));
+                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        // Removing the token (its "X") clears the selection and all the
+        // loaded read-only details, and re-enables typing.
+        onAdminBookingECTokenUpdate: function (oEvent) {
+            if (oEvent.getParameter("type") !== "removed") return;
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oMultiInput = this.byId("AB_id_EC_Email");
+
+            oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+            if (oMultiInput) {
+                oMultiInput.setValueHelpOnly(false);
+                oMultiInput.setValue("");
+                oMultiInput.setValueState("None");
+            }
+        },
+
+        // Seed the room/branch part of HostelModel that is common to every mode.
+        // Returns the seeded core HostelModel, or null if branch/room/plan invalid.
+        _seedAdminBookingHostelModel: function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var sBranchCode = oModel.getProperty("/BranchCode");
+            var sRoomKey = oModel.getProperty("/RoomKey");
+            var sPlan = oModel.getProperty("/SelectedPlan");
+
+            if (!sBranchCode || !sRoomKey || !sPlan) {
+                MessageToast.show(this.i18nModel.getText("adminBookingSelectBranchRoomPlan"));
+                return null;
+            }
+
+            var oRoom = (oModel.getProperty("/AllRooms") || []).find(function (r) {
+                return r.RoomKey === sRoomKey;
+            });
+            if (!oRoom) {
+                MessageToast.show(this.i18nModel.getText("adminBookingSelectBranchRoomPlan"));
+                return null;
+            }
+
+            var oBranch = (oModel.getProperty("/Branches") || []).find(function (b) {
+                return b.BranchID === sBranchCode;
+            }) || {};
+
+            var sRent = "";
+            if (sPlan === "Per Day") { sRent = oRoom.Price; }
+            else if (sPlan === "Per Month") { sRent = oRoom.MonthPrice; }
+            else if (sPlan === "Per Year") { sRent = oRoom.YearPrice; }
+
+            var oHostelModel = sap.ui.getCore().getModel("HostelModel");
+            if (!oHostelModel) {
+                oHostelModel = new JSONModel({});
+                sap.ui.getCore().setModel(oHostelModel, "HostelModel");
+            }
+            // Seed a fresh booking context (avoid stale data from a prior booking)
+            oHostelModel.setData({
+                BranchCode: sBranchCode,
+                Area: oBranch.Name || "",
+                BranchName: oBranch.Name || "",
+                RoomType: oRoom.BedTypeName,
+                BedType: oRoom.BedType,
+                ACType: oRoom.ACType,
+                Price: oRoom.Price || 0,
+                MonthPrice: oRoom.MonthPrice || 0,
+                YearPrice: oRoom.YearPrice || 0,
+                Currency: oRoom.Currency,
+                Deposit: oRoom.Deposit || "",
+                DepositCurrency: oRoom.DepositCurrency || "",
+                Capacity: oRoom.NoOfPerson || "",
+                PropertyType: oBranch.PropertyType || "",
+                GSTIN: oBranch.GSTIN || "",
+                PropertyGSTIN: oBranch.GSTIN || "",
+                GSTType: oBranch.GSTType || "",
+                GSTValue: oBranch.GSTValue || "",
+                Country: oBranch.Country || "",
+                State: oBranch.State || "",
+                CheckInTime: oBranch.CheckInTime || "",
+                CheckOutTime: oBranch.CheckOutTime || "",
+                SelectedPriceType: sPlan,
+                SelectedPriceValue: sRent,
+                FinalPrice: sRent,
+                AppliedCoupons: [],
+                // Tells the booking flow to come back here once finished/cancelled
+                ReturnRoute: "TilePage"
+            });
+
+            return oHostelModel;
+        },
+
+        // Overlay a customer's identity onto HostelModel so the booking is made
+        // on their behalf (not the logged-in admin). BookingOnBehalf tells the
+        // Booking page not to overwrite these with the admin's LoginModel.
+        _applyAdminBookingCustomerIdentity: function (oHostelModel, oCustomer) {
+            oHostelModel.setProperty("/BookingOnBehalf", true);
+            oHostelModel.setProperty("/UserID", oCustomer.UserID || "");
+            oHostelModel.setProperty("/Salutation", oCustomer.Salutation || "Mr.");
+            oHostelModel.setProperty("/FullName", oCustomer.UserName || "");
+            oHostelModel.setProperty("/CustomerEmail", oCustomer.EmailID || "");
+            oHostelModel.setProperty("/STDCode", oCustomer.STDCode || "+91");
+            oHostelModel.setProperty("/MobileNo", oCustomer.MobileNo || "");
+            oHostelModel.setProperty("/Gender", oCustomer.Gender || "");
+            oHostelModel.setProperty("/DateOfBirth", oCustomer.DateOfBirth || "");
+            oHostelModel.setProperty("/Country", oCustomer.Country || "");
+            oHostelModel.setProperty("/State", oCustomer.State || "");
+            oHostelModel.setProperty("/City", oCustomer.City || "");
+            oHostelModel.setProperty("/Address", oCustomer.Address || "");
+        },
+
+        // Book Now → dispatch on the selected customer type.
+        onAdminBookingBookNow: function () {
+            var sType = this.getView().getModel("AdminBookingModel").getProperty("/CustomerType");
+            if (!sType) {
+                MessageToast.show(this.i18nModel.getText("adminBookingSelectCustomerType"));
+                return;
+            }
+            if (sType === "New") {
+                this._adminBookingBookNowNewCustomer();
+            } else if (sType === "Existing") {
+                this._adminBookingBookNowExistingCustomer();
+            } else {
+                this._adminBookingBookNowSelf();
+            }
+        },
+
+        // Option C: Self Booking — unchanged baseline behavior.
+        _adminBookingBookNowSelf: function () {
+            var oHostelModel = this._seedAdminBookingHostelModel();
+            if (!oHostelModel) return;
+            oHostelModel.setProperty("/BookingOnBehalf", false);
+            this.onAdminBookingCancel();
+            this.getOwnerComponent().getRouter().navTo("RouteBooking");
+        },
+
+        // Option A: New Customer — register in HM_Login, read it back, then
+        // route into booking on behalf of the newly created customer.
+        _adminBookingBookNowNewCustomer: async function () {
+            if (!this._seedAdminBookingHostelModel()) return;
+            if (!this._validateAdminBookingNewCustomer()) {
+                MessageToast.show(this.i18nModel.getText("adminBookingNCFillAllFields"));
+                return;
+            }
+
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oNC = oModel.getProperty("/NC");
+            var sEmail = (oNC.EmailID || "").trim();
+            var TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+            // Same registration payload shape as onSignUp (password omitted —
+            // admin is booking on the customer's behalf).
+            var payload = {
+                data: {
+                    Salutation: oNC.Salutation,
+                    UserName: (oNC.UserName || "").trim(),
+                    Role: "Customer",
+                    Type: "Customer",
+                    EmailID: sEmail,
+                    STDCode: oNC.STDCode,
+                    MobileNo: oNC.MobileNo,
+                    Status: "Active",
+                    TimeDate: TimeDate,
+                    DateOfBirth: oNC.DateOfBirth || "",
+                    Gender: oNC.Gender,
+                    Country: oNC.Country,
+                    State: oNC.State,
+                    City: oNC.City,
+                    Address: (oNC.Address || "").trim()
+                }
+            };
+
+            try {
+                this.getBusyDialog();
+                var oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
+                if (oResp && oResp.success === false) {
+                    MessageBox.error(oResp.message || this.i18nModel.getText("adminBookingRegisterFailed"), {
+                        title: "Registration Failed",
+                        styleClass: "myUnifiedBtn"
+                    });
+                    return;
+                }
+
+                // Read back the newly created customer so the booking carries
+                // their authoritative HM_Login record (UserID, etc.).
+                var oRead = await this.ajaxReadWithJQuery("HM_Login", {
+                    EmailID: sEmail,
+                    Role: "Customer"
+                });
+                var oUser = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
+                if (!oUser || !oUser.UserID) {
+                    MessageBox.error(this.i18nModel.getText("adminBookingCustomerReadFailed"), {
+                        title: "Registration Failed",
+                        styleClass: "myUnifiedBtn"
+                    });
+                    return;
+                }
+
+                var oHostelModel = sap.ui.getCore().getModel("HostelModel");
+                this._applyAdminBookingCustomerIdentity(oHostelModel, oUser);
+
+                this.closeBusyDialog();
+                this.onAdminBookingCancel();
+                this.getOwnerComponent().getRouter().navTo("RouteBooking");
+            } catch (err) {
+                var sMsg = (err && err.responseJSON && err.responseJSON.message) ||
+                    this.i18nModel.getText("adminBookingRegisterFailed");
+                MessageBox.error(sMsg, { title: "Registration Failed", styleClass: "myUnifiedBtn" });
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        // Option B: Existing Customer — carry the selected HM_Login record
+        // into booking on their behalf.
+        _adminBookingBookNowExistingCustomer: function () {
+            var oModel = this.getView().getModel("AdminBookingModel");
+            var oEC = oModel.getProperty("/EC");
+            if (!oEC || !oEC.UserID || !oEC.EmailID) {
+                this.byId("AB_id_EC_Email").setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("adminBookingSelectCustomerEmail"));
+                return;
+            }
+            var oHostelModel = this._seedAdminBookingHostelModel();
+            if (!oHostelModel) return;
+            this._applyAdminBookingCustomerIdentity(oHostelModel, oEC);
+            this.onAdminBookingCancel();
+            this.getOwnerComponent().getRouter().navTo("RouteBooking");
+        },
+
+        onAdminBookingCancel: function () {
+            if (this._AdminBookingDialog) {
+                this._AdminBookingDialog.close();
+            }
+        },
 
         onPressbugs:function(){
              if (!this._RaiseBugDialog) {

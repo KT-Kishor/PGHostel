@@ -2494,7 +2494,7 @@ sap.ui.define([
                         (oEnd.getMonth() - oStart.getMonth());
 
                     // Optional: include partial month logic
-                    if (oEnd.getDate() >= oStart.getDate()) {
+                    if (oEnd.getDate() > oStart.getDate()) {
                         iMonths += 1;
                     }
                 } else if (oSelectedData.UnitText === "Per Year") {

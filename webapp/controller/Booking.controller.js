@@ -323,8 +323,7 @@
         },
 
         onHome: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHostel");
+            this.navBackFromBooking();
         },
 
         _loadAdvertisements: async function () {
@@ -4825,6 +4824,14 @@
                 return;
             }
 
+            // Admin "Book for Yourself" → New/Existing customer: the booking is
+            // made on behalf of that customer, whose identity was already seeded
+            // into HostelModel. Do NOT overwrite it with the logged-in admin.
+            if (oHostelModel.getProperty("/BookingOnBehalf")) {
+                this._syncPrimaryMemberInFamilyMembers();
+                return;
+            }
+
             const oUser = oLoginModel.getData() || {};
 
             oHostelModel.setProperty("/UserID", oUser.UserID || oUser.EmployeeID || oHostelModel.getProperty("/UserID") || "");
@@ -6314,6 +6321,17 @@
                     contentWidth: "500px",
                     onClose: function () {
                         const sUserID = oHostelModel.getProperty("/UserID");
+                        // ReturnRoute is authoritatively written on the core model
+                        // (see TilePage.onAdminBookingBookNow), so read it from there.
+                        const oCoreHostelModel = sap.ui.getCore().getModel("HostelModel");
+                        const sReturnRoute = oCoreHostelModel ? oCoreHostelModel.getProperty("/ReturnRoute") : "";
+
+                        // Admin "Book for Yourself" flow → return to the requested route
+                        if (sReturnRoute) {
+                            oCoreHostelModel.setProperty("/ReturnRoute", "");
+                            this.getOwnerComponent().getRouter().navTo(sReturnRoute);
+                            return;
+                        }
 
                         if (sUserID) {
                             this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
@@ -6795,7 +6813,12 @@
         },
 
         onNavBack: function () {
-            const sBranchCode = this.getView().getModel("HostelModel").getProperty("/BranchCode");
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sBranchCode = oHostelModel.getProperty("/BranchCode");
+            // ReturnRoute is authoritatively written on the core model
+            // (see TilePage.onAdminBookingBookNow), so read it from there.
+            const oCoreHostelModel = sap.ui.getCore().getModel("HostelModel");
+            const sReturnRoute = oCoreHostelModel ? oCoreHostelModel.getProperty("/ReturnRoute") : "";
             const oRouter = this.getOwnerComponent().getRouter();
 
             MessageBox.warning(
@@ -6810,6 +6833,13 @@
                         }
 
                         this._resetBookingPageModels();
+
+                        // Admin "Book for Yourself" flow → return to the requested route
+                        if (sReturnRoute) {
+                            oCoreHostelModel.setProperty("/ReturnRoute", "");
+                            oRouter.navTo(sReturnRoute);
+                            return;
+                        }
 
                         if (sBranchCode) {
                             oRouter.navTo("RouteViewRooms", {

@@ -40,6 +40,18 @@ sap.ui.define([
       this.getRouter().navTo(routeName, parameters, bReplace);
     },
 
+    // Exit the booking flow. If a caller (e.g. the Admin "Book for Yourself"
+    // dialog) seeded HostelModel>/ReturnRoute, navigate there and clear it;
+    // otherwise fall back to the public hostel page.
+    navBackFromBooking: function () {
+      var oHostelModel = sap.ui.getCore().getModel("HostelModel");
+      var sReturnRoute = oHostelModel ? oHostelModel.getProperty("/ReturnRoute") : "";
+      if (oHostelModel && sReturnRoute) {
+        oHostelModel.setProperty("/ReturnRoute", "");
+      }
+      this.getOwnerComponent().getRouter().navTo(sReturnRoute || "RouteHostel");
+    },
+
     // 4. Check if model exists helper (optional)
     getModel: function (sName) {
       return this.getView().getModel(sName);

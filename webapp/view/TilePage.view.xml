@@ -201,6 +201,17 @@
                 class="tileContainer1"
             >
 					<GenericTile
+                    id="idBookForYourself"
+                    visible="{= ${TileVisibility>/ManageComplainTracking} !== 0 || ${TileVisibility>/ManageCustomer} !== 0 || ${TileVisibility>/ManageInvoice} !== 0 }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>bookForYourself}"
+                    press="TileV_onpressBookForYourself"
+                >
+						<TileContent unit="{i18n>bookForYourselfSub}">
+							<ImageContent src="sap-icon://add-activity"/>
+						</TileContent>
+					</GenericTile>
+					<GenericTile
                     id="id3roomTile"
                     visible="{= ${TileVisibility>/ManageCustomer}!== 0?true:false }"
                     class="sapUiTinyMargin glassTile"

@@ -763,7 +763,7 @@ sap.ui.define([
             var oEnd = this._parseDate(oEndDate);
             if (!oStart || !oEnd || oEnd <= oStart) { return 0; }
             var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
-            if (oEnd.getDate() >= oStart.getDate()) { iMonths += 1; }
+            if (oEnd.getDate() > oStart.getDate()) { iMonths += 1; }
             return Math.max(iMonths, 0);
         },
 
@@ -777,7 +777,7 @@ sap.ui.define([
             var iYears = oEnd.getFullYear() - oStart.getFullYear();
             var iStartMonth = oStart.getMonth();
             var iEndMonth = oEnd.getMonth();
-            if (iEndMonth > iStartMonth || (iEndMonth === iStartMonth && oEnd.getDate() >= oStart.getDate())) {
+            if (iEndMonth > iStartMonth || (iEndMonth === iStartMonth && oEnd.getDate() > oStart.getDate())) {
                 iYears += 1;
             }
             return Math.max(iYears, 0);
@@ -1167,7 +1167,7 @@ sap.ui.define([
             if (oStart && oEnd) {
                 var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
 
-                if (oEnd.getDate() >= oStart.getDate()) {
+                if (oEnd.getDate() > oStart.getDate()) {
                     iMonths += 1;
                 }
 
