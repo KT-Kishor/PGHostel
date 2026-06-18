@@ -1158,6 +1158,15 @@ utils._LCvalidateMandatoryField(oEvent)
                 });
                 oModel.setProperty("/AllRooms", Object.values(oUnique));
                 oModel.setProperty("/Rooms", Object.values(oUnique));
+
+                // If the admin is in "Existing Customer" mode, the customer list
+                // is keyed by the selected branch — reload it for the new branch
+                // and clear any previously selected customer.
+                if (oModel.getProperty("/CustomerType") === "Existing") {
+                    oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                    this._clearAdminBookingCustomerEmailToken();
+                    await this._loadAdminBookingExistingCustomers();
+                }
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
             } finally {
@@ -1231,9 +1240,11 @@ utils._LCvalidateMandatoryField(oEvent)
             this._clearAdminBookingCustomerEmailToken();
             this._clearAdminBookingCustomerValueStates();
 
-            // Selecting "Existing Customer" loads the bookable users once (by
-            // role) and caches them, so typing filters locally for instant
-            // partial-match suggestions.
+            // Selecting "Existing Customer" loads the bookable users for the
+            // currently selected branch and caches them, so typing filters
+            // locally for instant partial-match suggestions. If no branch is
+            // selected yet, the loader no-ops and the list fills once a branch
+            // is chosen (onAdminBookingBranchChange reloads it).
             if (sType === "Existing") {
                 this._loadAdminBookingExistingCustomers();
             }
@@ -1273,6 +1284,39 @@ utils._LCvalidateMandatoryField(oEvent)
 
         onAdminBookingNCEmailLive: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
+        },
+
+        // Email is the FIRST field in the New Customer form. When the admin
+        // leaves it (change event), check globally whether this email already
+        // exists in HM_Login. If it does, offer to reuse that record instead of
+        // making the admin fill the whole form only to fail on a duplicate at
+        // Book Now. Identity is global (keyed by email); the booking associates
+        // them with the selected branch.
+        onAdminBookingNCEmailExistsCheck: async function (oEvent) {
+            // Only proceed once the email is well-formed.
+            if (!utils._LCvalidateEmail(oEvent)) return;
+
+            var sEmail = (oEvent.getSource().getValue() || "").trim();
+            if (!sEmail) return;
+
+            try {
+                this.getBusyDialog();
+                var oRead = await this.ajaxReadWithJQuery("HM_Login", { EmailID: sEmail });
+                var oExisting = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
+                this.closeBusyDialog();
+
+                if (!oExisting || !oExisting.UserID) return; // genuinely new → keep filling the form
+
+                // Booking needs branch/room/plan before we can route. Seed first;
+                // if incomplete, _seedAdminBookingHostelModel already toasts.
+                if (!this._seedAdminBookingHostelModel()) return;
+
+                this._confirmAdminBookingReuseExisting(oExisting);
+            } catch (err) {
+                this.closeBusyDialog();
+                // A failed pre-check shouldn't block creating a new customer;
+                // the Book Now path still guards against duplicates.
+            }
         },
 
         onAdminBookingNCAddressChange: function (oEvent) {
@@ -1500,28 +1544,30 @@ utils._LCvalidateMandatoryField(oEvent)
             return aAllowed.indexOf(String(sRole || "").trim()) !== -1;
         },
 
-        // Triggered when "Existing Customer" is selected. Reads the user
-        // directory once and caches it, so the MultiInput can filter locally as
-        // the user types — giving real partial-match autocomplete instead of
-        // needing the full email.
+        // Triggered when "Existing Customer" is selected (or the branch changes
+        // while in that mode). Reads the customer directory once for the
+        // currently selected branch and caches it, so the MultiInput can filter
+        // locally as the user types — giving real partial-match autocomplete
+        // instead of needing the full email.
         //
-        // HM_Login is the session endpoint: it ignores a Role filter and only
-        // ever returns the logged-in user. The directory endpoint is
-        // HM_CustomerContact, scoped by BranchCode (empty for SuperAdmin), the
-        // same source the Coupon "Email to Customers" share uses. Only customers
-        // associated with the logged-in user's allotted branches are listed, and
-        // roles are further restricted client-side to the bookable set.
+        // Uses the dedicated HM_Logindata service: passing { BranchCode } returns
+        // the full HM_Login rows (UserID, Salutation, DOB, etc.) for that branch
+        // only. Rows are role-filtered client-side to the bookable set.
         _loadAdminBookingExistingCustomers: async function () {
             var oModel = this.getView().getModel("AdminBookingModel");
-            var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            var sBranchCode = oModel.getProperty("/BranchCode");
+
+            // No branch chosen yet → nothing to list (the service is branch-keyed).
+            if (!sBranchCode) {
+                oModel.setProperty("/ECAllCustomers", []);
+                oModel.setProperty("/ECSuggestions", []);
+                return;
+            }
 
             try {
                 this.getBusyDialog();
 
-                var sAssignedBranches = await this._getAdminBookingAssignedBranches();
-                var oFilter = oLoginModel.Role === "SuperAdmin" ? {} : { BranchCode: sAssignedBranches };
-
-                var oData = await this.ajaxReadWithJQuery("HM_CustomerContact", oFilter);
+                var oData = await this.ajaxReadWithJQuery("HM_Logindata", { BranchCode: sBranchCode });
                 var aRows = Array.isArray(oData.data) ? oData.data : [oData.data].filter(Boolean);
 
                 var oSeen = {};
@@ -1575,12 +1621,11 @@ utils._LCvalidateMandatoryField(oEvent)
             }
         },
 
-        // Selection → wrap the email in a single token, lock typing, then read
-        // the customer's authoritative full record. HM_CustomerContact only
-        // carries summary fields (UserName, Role, EmailID, BranchCode) and no
-        // UserID, so the read-only details + booking identity come from an
-        // HM_Login read by email + role (same read the New Customer flow uses).
-        onAdminBookingECEmailSelected: async function (oEvent) {
+        // Selection → wrap the email in a single token, lock typing, and
+        // populate the read-only details + booking identity from the cached
+        // HM_Logindata row (which already carries the full HM_Login record:
+        // UserID, Salutation, DOB, etc.). No extra backend call needed.
+        onAdminBookingECEmailSelected: function (oEvent) {
             var oItem = oEvent.getParameter("selectedItem") || oEvent.getParameter("selectedRow");
             if (!oItem) return;
             var sEmail = oItem.getText ? oItem.getText() : "";
@@ -1597,51 +1642,29 @@ utils._LCvalidateMandatoryField(oEvent)
             oMultiInput.setValueHelpOnly(true);
             oMultiInput.setValueState("None");
 
-            var oContact = (oModel.getProperty("/ECAllCustomers") || []).find(function (oRow) {
+            var oUser = (oModel.getProperty("/ECAllCustomers") || []).find(function (oRow) {
                 return oRow.EmailID === sEmail;
             });
-            if (!oContact) {
+            if (!oUser) {
                 MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
                 oModel.setProperty("/EC", this._getEmptyExistingCustomer());
                 return;
             }
 
-            try {
-                this.getBusyDialog();
-                // HM_CustomerContact rows carry only summary fields (no UserID),
-                // so read the authoritative full record by email + role — the
-                // same HM_Login read the New Customer flow uses to obtain UserID.
-                var oRead = await this.ajaxReadWithJQuery("HM_Login", {
-                    EmailID: sEmail,
-                    Role: oContact.Role || ""
-                });
-                var oUser = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
-                if (!oUser) {
-                    MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
-                    oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-                    return;
-                }
-
-                oModel.setProperty("/EC", {
-                    UserID: oUser.UserID || "",
-                    Salutation: oUser.Salutation || "",
-                    UserName: oUser.UserName || oContact.UserName || "",
-                    EmailID: oUser.EmailID || sEmail,
-                    STDCode: oUser.STDCode || "",
-                    MobileNo: oUser.MobileNo || "",
-                    DateOfBirth: oUser.DateOfBirth ? this.Formatter.DateFormat(oUser.DateOfBirth) : "",
-                    Gender: oUser.Gender || "",
-                    Country: oUser.Country || "",
-                    State: oUser.State || "",
-                    City: oUser.City || "",
-                    Address: oUser.Address || ""
-                });
-            } catch (err) {
-                MessageToast.show(this.i18nModel.getText("adminBookingCustomerReadFailed"));
-                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-            } finally {
-                this.closeBusyDialog();
-            }
+            oModel.setProperty("/EC", {
+                UserID: oUser.UserID || "",
+                Salutation: oUser.Salutation || "",
+                UserName: oUser.UserName || "",
+                EmailID: oUser.EmailID || sEmail,
+                STDCode: oUser.STDCode || "",
+                MobileNo: oUser.MobileNo || "",
+                DateOfBirth: oUser.DateOfBirth ? this.Formatter.DateFormat(oUser.DateOfBirth) : "",
+                Gender: oUser.Gender || "",
+                Country: oUser.Country || "",
+                State: oUser.State || "",
+                City: oUser.City || "",
+                Address: oUser.Address || ""
+            });
         },
 
         // Removing the token (its "X") clears the selection and all the
@@ -1775,6 +1798,14 @@ utils._LCvalidateMandatoryField(oEvent)
 
         // Option A: New Customer — register in HM_Login, read it back, then
         // route into booking on behalf of the newly created customer.
+        //
+        // Identity in HM_Login is GLOBAL and keyed by email, while the
+        // Existing-Customer list is scoped to the selected branch. So a person
+        // can be "new to this branch" yet already exist in the system (e.g. they
+        // booked at another branch). A blind insert would fail on the duplicate
+        // email. Instead we look the email up globally first and, if it already
+        // exists, offer to reuse that record (the booking itself associates them
+        // with this branch).
         _adminBookingBookNowNewCustomer: async function () {
             if (!this._seedAdminBookingHostelModel()) return;
             if (!this._validateAdminBookingNewCustomer()) {
@@ -1785,6 +1816,67 @@ utils._LCvalidateMandatoryField(oEvent)
             var oModel = this.getView().getModel("AdminBookingModel");
             var oNC = oModel.getProperty("/NC");
             var sEmail = (oNC.EmailID || "").trim();
+
+            try {
+                this.getBusyDialog();
+                // Global lookup by email only (NO branch filter) — decides
+                // create-vs-reuse across the whole system.
+                var oRead = await this.ajaxReadWithJQuery("HM_Login", { EmailID: sEmail });
+                var oExisting = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
+                this.closeBusyDialog();
+
+                if (oExisting && oExisting.UserID) {
+                    // Already in the system → ask the admin to reuse it instead
+                    // of erroring on a duplicate email.
+                    this._confirmAdminBookingReuseExisting(oExisting);
+                    return;
+                }
+
+                // Genuinely new → create the record, then book.
+                await this._adminBookingCreateAndBookNewCustomer(oNC, sEmail);
+            } catch (err) {
+                this.closeBusyDialog();
+                var sMsg = (err && err.responseJSON && err.responseJSON.message) ||
+                    this.i18nModel.getText("adminBookingRegisterFailed");
+                MessageBox.error(sMsg, { title: "Registration Failed", styleClass: "myUnifiedBtn" });
+            }
+        },
+
+        // The email already exists globally. Confirm with the admin, and on OK
+        // reuse that record for this branch's booking (no new HM_Login row). On
+        // Cancel, clear the email field so a different one can be entered.
+        _confirmAdminBookingReuseExisting: function (oExisting) {
+            var sName = oExisting.UserName || oExisting.EmailID;
+            var sMobile = ((oExisting.STDCode || "") + " " + (oExisting.MobileNo || "")).trim();
+            var sMsg = this.i18nModel.getText("adminBookingEmailExistsReuse", [sName, sMobile]);
+            MessageBox.confirm(sMsg, {
+                title: this.i18nModel.getText("adminBookingEmailExistsTitle"),
+                styleClass: "myUnifiedBtn",
+                contentWidth: "500px",                
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
+                        var oHostelModel = sap.ui.getCore().getModel("HostelModel");
+                        this._applyAdminBookingCustomerIdentity(oHostelModel, oExisting);
+                        this.onAdminBookingCancel();
+                        this.getOwnerComponent().getRouter().navTo("RouteBooking");
+                    } else {
+                        // Declined reuse → clear the email so they can enter another.
+                        var oModel = this.getView().getModel("AdminBookingModel");
+                        oModel.setProperty("/NC/EmailID", "");
+                        var oEmail = this.byId("AB_id_NC_Email");
+                        if (oEmail) {
+                            oEmail.setValue("");
+                            oEmail.setValueState("None");
+                            oEmail.focus();
+                        }
+                    }
+                }.bind(this)
+            });
+        },
+
+        // Create a brand-new HM_Login customer, read it back for the
+        // authoritative record (UserID, etc.), then route into booking.
+        _adminBookingCreateAndBookNewCustomer: async function (oNC, sEmail) {
             var TimeDate = new Date().toISOString().replace("T", " ").slice(0, 19);
 
             // Same registration payload shape as onSignUp (password omitted —

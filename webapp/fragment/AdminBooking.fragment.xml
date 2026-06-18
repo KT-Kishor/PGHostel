@@ -108,6 +108,19 @@
 
 				<c:Title text="{i18n>adminBookingNCPersonalDetails}"/>
 
+				<!-- Email FIRST: on change we check globally whether this customer
+				     already exists, to offer reuse instead of a duplicate create. -->
+				<Label text="{i18n>adminBookingNCEmail}" required="true"/>
+				<Input
+					id="AB_id_NC_Email"
+					value="{AdminBookingModel>/NC/EmailID}"
+					placeholder="{i18n>enterEmailId}"
+					type="Email"
+					liveChange="onAdminBookingNCEmailLive"
+					change="onAdminBookingNCEmailExistsCheck"
+					valueStateText="{i18n>MSenterValidEmail}"
+					maxLength="50"/>
+
 				<!-- Full Name (Salutation + Name) -->
 				<Label text="{i18n>adminBookingNCFullName}" required="true"/>
 				<HBox width="100%" justifyContent="Start" alignItems="Center">
@@ -156,17 +169,6 @@
 				</Select>
 
 				<c:Title text="{i18n>adminBookingNCContactDetails}"/>
-
-				<!-- Email -->
-				<Label text="{i18n>adminBookingNCEmail}" required="true"/>
-				<Input
-					id="AB_id_NC_Email"
-					value="{AdminBookingModel>/NC/EmailID}"
-					placeholder="{i18n>enterEmailId}"
-					type="Email"
-					liveChange="onAdminBookingNCEmailLive"
-					valueStateText="{i18n>MSenterValidEmail}"
-					maxLength="50"/>
 
 				<!-- Country -->
 				<Label text="{i18n>adminBookingNCCountry}" required="true"/>
@@ -277,8 +279,10 @@
 					id="AB_id_EC_Email"
 					maxTokens="1"
 					editable="true"
+					width="100%"
 					placeholder="{i18n>adminBookingECEmailPlaceholder}"
 					showSuggestion="true"
+					startSuggestion="0"
 					suggestionItems="{AdminBookingModel>/ECSuggestions}"
 					suggest="onAdminBookingECEmailSuggest"
 					suggestionItemSelected="onAdminBookingECEmailSelected"
