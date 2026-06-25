@@ -1,0 +1,218 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.MyBookings"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Page
+        id="idMyBookingsPage"
+        title="My Booking"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        class="defaultBGBlur"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentLeft>
+                    <Button
+                        icon="sap-icon://nav-back"
+                        class="btnGradientHoverOnly"
+                        tooltip="{i18n>back}"
+                        press="onNavBack"
+                    />
+                </contentLeft>
+                <contentMiddle>
+                    <Title
+                        text="My Booking"
+                        level="H4"
+                    />
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        press="onLogPress"
+                        tooltip="{i18n>logoutTooltip}"
+                        icon="sap-icon://log"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <FlexBox
+            direction="Row"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            wrap="Wrap"
+            class="responsiveFlex sapUiSmallMargin customRoundedFlex"
+        >
+            <IconTabHeader
+                id="idMyBookingsTabHeader"
+                mode="Standard"
+                select="onTableSelect"
+                class="sapUiSmallMarginBottom"
+            >
+                <layoutData>
+                    <FlexItemData maxWidth="100%" />
+                </layoutData>
+                <items>
+                    <IconTabFilter
+                        key="Booking History"
+                        text="{= ${myBookings>/bookingCount} > 0 ? 'Booking History (' + ${myBookings>/bookingCount} + ')' : 'Booking History' }"
+                    />
+                    <IconTabFilter
+                        key="Members"
+                        text="{= ${myBookings>/memberCount} > 0 ? 'Members (' + ${myBookings>/memberCount} + ')' : 'Members' }"
+                    />
+                </items>
+            </IconTabHeader>
+
+            <ToolbarSpacer />
+            <HBox
+                alignItems="Center"
+                justifyContent="Start"
+                class="customActionBox"
+            >
+                <Button
+                    text="Add Members"
+                    press="onPressAddMember"
+                    class="myUnifiedBtn sapUiSmallMarginEnd"
+                    visible="{= ${myBookings>/selectedTab} === 'Members' }"
+                />
+                <SearchField
+                    id="idMyBookingsSearch"
+                    width="auto"
+                    liveChange="onGlobalSearch"
+                    placeholder="{i18n>search}"
+                />
+            </HBox>
+        </FlexBox>
+
+        <Table
+            id="Id_MyBookingTable"
+            visible="{= ${myBookings>/selectedTab} === 'Booking History' }"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No booking history found"
+            items="{
+                path: 'myBookings>/bookings',
+                sorter: [
+                    { path: 'bookingGroup', descending: false, group: true },
+                    { path: 'BookingDateSort', descending: true }
+                ]
+            }"
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
+        >
+            <columns>
+                <Column demandPopin="true">
+                    <Text text="{i18n>bookingID}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>customerName}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>bookingDate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>room}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>amount}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>status}" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem
+                    type="Navigation"
+                    press="onPressBookingRow"
+                >
+                    <cells>
+                        <Text text="{myBookings>BookingID}" />
+                        <Text text="{myBookings>customerName}" />
+                        <Text text="{myBookings>BookingDate}" />
+                        <Text text="{myBookings>room}" />
+                        <Text text="{
+                            parts: ['myBookings>amount', 'myBookings>currency'],
+                            formatter: '.Formatter.formatCurrency'
+                        }" />
+                        <ObjectStatus
+                            text="{myBookings>status}"
+                            state="{path: 'myBookings>status', formatter: '.Formatter.formatObjectStatus'}"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <Table
+            id="Id_MyBookingMemberTable"
+            visible="{= ${myBookings>/selectedTab} === 'Members' }"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No members found"
+            items="{path: 'myBookings>/Members'}"
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
+        >
+            <columns>
+                <Column demandPopin="true">
+                    <Text text="{i18n>fullname}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>age}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>relation}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>document}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                />
+            </columns>
+            <items>
+                <ColumnListItem type="Inactive">
+                    <cells>
+                        <Text text="{= ${myBookings>Salutation} + ' ' + ${myBookings>Name}}" />
+                        <Text text="{path: 'myBookings>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
+                        <Text text="{myBookings>Relation}" />
+                        <Link
+                            text="{= ${myBookings>Attachment} ? 'View' : 'No Document' }"
+                            enabled="{= !!${myBookings>Attachment} }"
+                            press="onViewMemberDocument"
+                        />
+                        <Button
+                            icon="sap-icon://edit"
+                            type="Transparent"
+                            tooltip="Upload Document"
+                            press="onEditMemberFromDialog"
+                            class="myUnifiedBtn"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <footer>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.AppFooter"
+                type="XML"
+            />
+        </footer>
+    </Page>
+</mvc:View>

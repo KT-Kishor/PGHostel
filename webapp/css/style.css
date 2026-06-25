@@ -6900,6 +6900,9 @@ html, body {
 .sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
   width:250px !important;
 }
+.sapMPopover .sapMIBar.sapMFooter-CTX.tourGuideFooter{
+  width:auto !important;
+}
 
 .sapMPopover.facilityPopover .sapMPopoverCont,
 .sapMPopover.facilityPopover .sapMIBar.sapMFooter-CTX{

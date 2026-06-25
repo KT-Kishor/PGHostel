@@ -38,6 +38,7 @@
 					showSecondaryValues="true"
 					placeholder="{i18n>adminBookingBranchPlaceholder}"
 					selectedKey="{AdminBookingModel>/BranchCode}"
+					valueStateText="{i18n>adminBookingBranchValueStateText}"
 					filterSecondaryValues="true"
 					items="{AdminBookingModel>/Branches}"
 					selectionChange="onAdminBookingBranchChange">
@@ -52,6 +53,7 @@
 					enabled="{= ${AdminBookingModel>/BranchCode} ? true : false }"
 					placeholder="{i18n>adminBookingRoomPlaceholder}"
 					selectedKey="{AdminBookingModel>/RoomKey}"
+					valueStateText="{i18n>adminBookingRoomValueStateText}"
 					items="{AdminBookingModel>/Rooms}"
 					selectionChange="onAdminBookingRoomChange">
 					<c:ListItem key="{AdminBookingModel>RoomKey}" text="{AdminBookingModel>RoomText}"/>
@@ -64,6 +66,7 @@
 					enabled="{= ${AdminBookingModel>/RoomKey} ? true : false }"
 					placeholder="{i18n>adminBookingPlanPlaceholder}"
 					selectedKey="{AdminBookingModel>/SelectedPlan}"
+					valueStateText="{i18n>adminBookingPlanValueStateText}"
 					items="{AdminBookingModel>/Plans}"
 					selectionChange="onAdminBookingPlanChange">
 					<c:Item key="{AdminBookingModel>key}" text="{AdminBookingModel>text}"/>
@@ -80,11 +83,13 @@
 				<Label text="{i18n>adminBookingCustomerType}"/>
 				<RadioButtonGroup
 					id="AB_id_CustomerType"
-					columns="3"
+					columns="{= ${LoginModel>/Role} === 'Housekeeping' ? 1 : 3 }"
+					enabled="{= !!${AdminBookingModel>/BranchCode} &amp;&amp; !!${AdminBookingModel>/RoomKey} &amp;&amp; !!${AdminBookingModel>/SelectedPlan} }"
+					valueStateText="{i18n>adminBookingCustomerTypeValueStateText}"
 					selectedIndex="{AdminBookingModel>/CustomerTypeIndex}"
 					select="onAdminBookingCustomerTypeChange">
-					<RadioButton text="{i18n>adminBookingNewCustomer}"/>
-					<RadioButton text="{i18n>adminBookingExistingCustomer}"/>
+					<RadioButton text="{i18n>adminBookingNewCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
+					<RadioButton text="{i18n>adminBookingExistingCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
 					<RadioButton text="{i18n>adminBookingSelfBooking}"/>
 				</RadioButtonGroup>
 
@@ -128,6 +133,7 @@
 						<ComboBox
 							id="AB_id_NC_Salutation"
 							selectedKey="{AdminBookingModel>/NC/Salutation}"
+							change="onAdminBookingNCSalutationChange"
 							placeholder="Mr.">
 							<c:ListItem key="Mr." text="Mr."/>
 							<c:ListItem key="Ms." text="Ms."/>
@@ -153,6 +159,9 @@
 					value="{AdminBookingModel>/NC/DateOfBirth}"
 					displayFormat="dd/MM/yyyy"
 					valueFormat="yyyy-MM-dd"
+					initialFocusedDateValue="{AdminBookingModel>/DOBFocusedDate}"
+					minDate="{AdminBookingModel>/DOBMinDate}"
+					maxDate="{AdminBookingModel>/DOBMaxDate}"
 					change="onAdminBookingNCDOBChange"
 					valueStateText="{i18n>agediff}"/>
 
@@ -161,8 +170,8 @@
 				<Select
 					id="AB_id_NC_Gender"
 					selectedKey="{AdminBookingModel>/NC/Gender}"
-					forceSelection="false"
 					valueStateText="{i18n>pleaseselectGender}">
+					<c:Item key="" text="Select Gender"/>
 					<c:Item key="Male" text="Male"/>
 					<c:Item key="Female" text="Female"/>
 					<c:Item key="Other" text="Other"/>
@@ -273,7 +282,7 @@
 			columnsM="1">
 			<f:content>
 
-				<!-- Email (tokenized autocomplete against HM_Login) -->
+				<!-- Email (tokenized autocomplete against unfiltered HM_Login data) -->
 				<Label text="{i18n>adminBookingECEmail}" required="true"/>
 				<MultiInput
 					id="AB_id_EC_Email"
@@ -285,6 +294,7 @@
 					startSuggestion="0"
 					suggestionItems="{AdminBookingModel>/ECSuggestions}"
 					suggest="onAdminBookingECEmailSuggest"
+					change="onAdminBookingECEmailChange"
 					suggestionItemSelected="onAdminBookingECEmailSelected"
 					tokenUpdate="onAdminBookingECTokenUpdate"
 					valueStateText="{i18n>MSenterValidEmail}">
