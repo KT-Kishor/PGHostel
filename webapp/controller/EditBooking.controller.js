@@ -132,6 +132,8 @@ sap.ui.define([
             // now safely use oArgs
             this._processEditArgs = oArgs;
             this.BookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
+            var oRouteQuery = oArgs["?query"] || oArgs.query || {};
+            this._sReturnRouteAfterEdit = oRouteQuery.FromMyBookings === "true" || oRouteQuery.FromMyBookings === true ? "RouteMyBookings" : "RouteManageProfile";
 
             // const oUIModel = this.getOwnerComponent().getModel("UIModel");
             // const bLoggedIn = oUIModel.getData().isLoggedIn;
@@ -1640,11 +1642,15 @@ sap.ui.define([
 
                     this._clearEditBookingTransientState();
 
-                    if (mOptions.navigateToManageProfile !== false) {
-                        this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                    if (this._sReturnRouteAfterEdit === "RouteMyBookings" || mOptions.navigateToManageProfile !== false) {
+                        this._navAfterEditBooking();
                     }
                 }.bind(this)
             });
+        },
+
+        _navAfterEditBooking: function () {
+            this.getOwnerComponent().getRouter().navTo(this._sReturnRouteAfterEdit || "RouteManageProfile");
         },
 
         _getPaymentDialogField: function (sFieldId) {
@@ -3317,6 +3323,11 @@ sap.ui.define([
             
             // Ensure edit mode is disabled
             oBookingView.setProperty("/editModeEnabled", false);
+
+            if (this._sReturnRouteAfterEdit === "RouteMyBookings") {
+                this._resetBookingPageModels();
+                this._navAfterEditBooking();
+            }
         },
 
         _hydrateAppliedCouponData: async function () {
@@ -3652,7 +3663,7 @@ sap.ui.define([
             return oDialog;
         },
 
-        // Override the nav back to always go to ManageProfile
+        // Override the nav back to return to the source page
         onNavBack: function () {
             var oBookingView = this.getView().getModel("BookingView");
             var bEditModeEnabled = oBookingView && oBookingView.getProperty("/editModeEnabled");
@@ -3669,13 +3680,13 @@ sap.ui.define([
                                 return;
                             }
                             this._resetBookingPageModels();
-                            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                            this._navAfterEditBooking();
                         }.bind(this)
                     }
                 );
             } else {
                 this._resetBookingPageModels();
-                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                this._navAfterEditBooking();
             }
         },
 

@@ -39,7 +39,7 @@
         </VBox>
 
         <footer  >
-            <Bar>
+            <Bar class="tourGuideFooter">
                 <contentLeft>
                     <Button
                         text="Skip Tour"

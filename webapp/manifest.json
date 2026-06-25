@@ -164,6 +164,13 @@
           ]
         },
         {
+          "name": "RouteMyBookings",
+          "pattern": "MyBookings",
+          "target": [
+            "TargetMyBookings"
+          ]
+        },
+        {
           "name": "RouteAdmin",
           "pattern": "Admin/{sPath}",
           "target": [
@@ -228,7 +235,7 @@
         },
         {
           "name": "RouteEditBooking",
-          "pattern": "editBooking/{BookingID}/{MemberID}",
+          "pattern": "editBooking/{BookingID}/{MemberID}:?query:",
           "target": [
             "TargetEditBookingView"
           ]
@@ -470,6 +477,13 @@
           "clearControlAggregation": false,
           "viewId": "TilePage",
           "viewName": "TilePage"
+        },
+        "TargetMyBookings": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "MyBookings",
+          "viewName": "MyBookings"
         },
         "targetComplaintDetails": {
           "viewType": "XML",

@@ -21,6 +21,12 @@
                 icon="sap-icon://home"
             /> -->
 			<Button
+                id="idMyBookingBtn"
+                text="My Booking"
+                press="onMyBookingsPress"
+                class="myUnifiedBtn sapUiTinyMarginEnd"
+            />
+			<Button
                 press="Tile_onLogPress"
                 tooltip="{i18n>logoutTooltip}"
                 icon="sap-icon://log"

@@ -77,6 +77,10 @@ sap.ui.define([
             }
         },
 
+        onMyBookingsPress: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
+        },
+
         TileV_onpressInbox: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteAdmin",{
