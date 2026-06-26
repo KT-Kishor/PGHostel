@@ -383,6 +383,26 @@ onNumber: function (oEvent, type) {
             }
         },
 
+        // Edit Before Hours Validation (digits only, max 3, no decimals/e, non-empty)
+        _LCvalidateEditBeforeHours: function(oEvent, type) {
+            var oField = type === "ID" ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+            var oValue = oField.getValue().replace(/[^0-9]/g, "").slice(0, 3);
+            // Normalize leading zeros only when there is input: "00"/"000" -> "0", "048" -> "48"
+            if (oValue) {
+                oValue = String(parseInt(oValue, 10) || 0);
+                if (oField.getValue() !== oValue) {
+                    oField.setValue(oValue);
+                }
+            }
+            if (!oValue) {
+                oField.setValueState("Error").focus();
+                return false;
+            }
+            oField.setValueState("None");
+            return true;
+        },
+
         // _LCvalidatePassword: function(oEvent, type) {
         //     var oField = type === "ID" ? oEvent : oEvent.getSource();
         //     if (!oField) return false;

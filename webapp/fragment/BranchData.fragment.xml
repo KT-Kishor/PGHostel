@@ -11,6 +11,7 @@
         resizable="true"
         draggable="true"
         contentWidth="80%"
+        afterClose="_onBranchDialogAfterClose"
     >
 		<f:SimpleForm
             editable="true"
@@ -322,10 +323,22 @@
                     liveChange="onPriceInputLiveChange"
                     valueStateText="{i18n>enterStartingPrice}"
                 />
+                <Label
+                    text="{i18n>editBeforeHours}"
+                    required="true"
+                />
+				<Input
+                    id="BD_id_EditBefore"
+                    value="{MDmodel>/EditBefore}"
+                    maxLength="3"
+                    placeholder="{i18n>enterEditBefore}"
+                    liveChange="onEditBeforeLiveChange"
+                    valueStateText="{i18n>enterEditBefore}"
+                />
 			</f:content>
 		</f:SimpleForm>
-		<MessageStrip
-                    text="For Logo and Image, files larger than 2 MB are not allowed."
+		<MessageStrip 
+                    text="For LOGO and Homepage Only JPEG, JPG and PNG images are allowed"
                     type="Warning"
                     showIcon="true"
                     visible="{= !${editableModel>/isEdit}}"

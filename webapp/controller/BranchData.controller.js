@@ -32,6 +32,7 @@ sap.ui.define([
                 CheckoutTime: "",
                 Penalty: "",
                 StartingPrice: "",
+                EditBefore: "",
             });
             this.getView().setModel(oMDmodel, "MDmodel");
             var oeditable = new sap.ui.model.json.JSONModel({
@@ -476,7 +477,8 @@ sap.ui.define([
                 Penalty: "",
                 StartingPrice: "",
                 CheckinTime: "",
-                CheckoutTime: ""
+                CheckoutTime: "",
+                EditBefore: ""
             });
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
             this.getView().getModel("visiblePlay").setProperty("/CC_id_CustInput", false);
@@ -623,6 +625,12 @@ sap.ui.define([
             // Clear error if valid
             oStartingPrice.setValueState("None");
 
+            const oEditBefore = sap.ui.getCore().byId(oView.createId("BD_id_EditBefore"));
+            if (!utils._LCvalidateEditBeforeHours(oEditBefore, "ID")) {
+                sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
             if (!oImage.Attachment) {
                 const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
                 sap.m.MessageToast.show("Please upload Home image");
@@ -645,6 +653,7 @@ sap.ui.define([
                 City: Payload.baseLocation,
                 Penalty: Payload.Penalty,
                 StartingPrice: Payload.StartingPrice,
+                EditBefore: String(Payload.EditBefore ?? ""),
                 Currency: Payload.Currency,
                 Photo1: oUpload.Photo1,
                 Attachment: oImage.Attachment,
@@ -789,6 +798,10 @@ sap.ui.define([
             var oInput = oEvent.getSource();
             utils._LCvalidatePinCode(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None");
+        },
+
+        onEditBeforeLiveChange: function(oEvent) {
+            utils._LCvalidateEditBeforeHours(oEvent);
         },
 
         onPenaltyInputLiveChange: function(oEvent) {
@@ -1133,7 +1146,8 @@ sap.ui.define([
                 CheckinTime: this.convert24ToAmPm(oData.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
                 Penalty: oData.Penalty,
-                StartingPrice: oData.StartingPrice
+                StartingPrice: oData.StartingPrice,
+                EditBefore: oData.EditBefore
             });
 
             this.isEdit = true;
@@ -1188,7 +1202,8 @@ sap.ui.define([
                 BD_id_CheckInTime: "enterCheckInTime",
                 BD_id_CheckOutTime: "enterCheckOutTime",
                 BD_idPenalty: "enterPenalty",
-                BD_id_StartingPrice: "enterStartingPrice"
+                BD_id_StartingPrice: "enterStartingPrice",
+                BD_id_EditBefore: "enterEditBefore"
 
             };
 
@@ -1204,6 +1219,11 @@ sap.ui.define([
                     }
                 }
             });
+        },
+
+        _onBranchDialogAfterClose: function() {
+            this._resetBranchValueStates();
+            this._resetFacilityValueStates();
         },
 
         _applyCountryStateCityFilters: function() {
