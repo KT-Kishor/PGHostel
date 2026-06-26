@@ -1648,6 +1648,7 @@ utils._LCvalidateMandatoryField(oEvent)
 
             if (Array.isArray(this._aAdminBookingExistingCustomersCache)) {
                 oModel.setProperty("/ECAllCustomers", this._aAdminBookingExistingCustomersCache);
+                this._prefillAdminBookingECSuggestions();
                 return;
             }
 
@@ -1669,6 +1670,7 @@ utils._LCvalidateMandatoryField(oEvent)
 
                 this._aAdminBookingExistingCustomersCache = aCustomers;
                 oModel.setProperty("/ECAllCustomers", aCustomers);
+                this._prefillAdminBookingECSuggestions();
             } catch (err) {
                 oModel.setProperty("/ECAllCustomers", []);
                 oModel.setProperty("/ECSuggestions", []);
@@ -1678,7 +1680,47 @@ utils._LCvalidateMandatoryField(oEvent)
             }
         },
 
-        // Typing → filter the cached global HM_LoginUser list locally in real time.
+        // Build the Existing Customer email suggestion list. An empty term
+        // auto-loads the first 20 email IDs (no filter) so the value help is
+        // populated the moment it opens — without typing. A typed term filters
+        // the cached list with a partial "contains" match. The result is always
+        // capped at 20 so the dropdown never exceeds a single screen.
+        _buildAdminBookingECSuggestions: function (sTerm) {
+            var aCustomers = this.getView().getModel("AdminBookingModel").getProperty("/ECAllCustomers") || [];
+            var aResult;
+
+            if (!sTerm) {
+                aResult = aCustomers;
+            } else {
+                var sNormalizedTerm = String(sTerm).toLowerCase();
+                aResult = aCustomers.filter(function (oRow) {
+                    return String(oRow.EmailID || "").toLowerCase().indexOf(sNormalizedTerm) !== -1;
+                });
+            }
+
+            return aResult.slice(0, 20).map(function (oRow) {
+                return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
+            });
+        },
+
+        // Pre-fill the suggestion dropdown with the first 20 email IDs (no
+        // filter) as soon as the Existing Customer list is ready, so the value
+        // help is already populated before the user types or focuses the field.
+        _prefillAdminBookingECSuggestions: function () {
+            if (this._hasAdminBookingExistingCustomerToken()) {
+                return;
+            }
+            var oMultiInput = this.byId("AB_id_EC_Email");
+            if (oMultiInput && oMultiInput.getValue && oMultiInput.getValue()) {
+                return;
+            }
+            this.getView().getModel("AdminBookingModel").setProperty(
+                "/ECSuggestions",
+                this._buildAdminBookingECSuggestions("")
+            );
+        },
+
+        // Focus/typing → build the suggestion list (auto-load 20 on open, filter while typing).
         onAdminBookingECEmailSuggest: function (oEvent) {
             var sTerm = (oEvent.getParameter("suggestValue") || "").trim();
             var oModel = this.getView().getModel("AdminBookingModel");
@@ -1692,26 +1734,15 @@ utils._LCvalidateMandatoryField(oEvent)
             oModel.setProperty("/EC/EmailID", sTerm);
             oModel.setProperty("/EC", Object.assign(this._getEmptyExistingCustomer(), { EmailID: sTerm }));
 
-            if (!sTerm) {
-                oModel.setProperty("/ECSuggestions", []);
-                this._sLastNoMatchTerm = "";
-                return;
-            }
-
-            var aCustomers = oModel.getProperty("/ECAllCustomers") || [];
             var sNormalizedTerm = sTerm.toLowerCase();
-            var aFiltered = aCustomers.filter(function (oRow) {
-                return String(oRow.EmailID || "").toLowerCase().indexOf(sNormalizedTerm) !== -1;
-            });
-
-            oModel.setProperty("/ECSuggestions", aFiltered.map(function (oRow) {
-                return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
-            }));
+            var aItems = this._buildAdminBookingECSuggestions(sTerm);
+            oModel.setProperty("/ECSuggestions", aItems);
 
             // Tell the user when their typed term matches no customer — but only
             // once per distinct term, so the toast doesn't repeat on every
-            // keystroke while they keep typing the same unmatched value.
-            if (!aFiltered.length) {
+            // keystroke while they keep typing the same unmatched value. An empty
+            // term auto-loads the first 20 emails, so it is never a "no match".
+            if (sTerm && !aItems.length) {
                 if (this._sLastNoMatchTerm !== sNormalizedTerm) {
                     this._sLastNoMatchTerm = sNormalizedTerm;
                     MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
@@ -1729,6 +1760,42 @@ utils._LCvalidateMandatoryField(oEvent)
             // Selecting a suggestion creates a token and clears the input value.
             // The subsequent change/focus-out event should keep the selected data.
             if (this._hasAdminBookingExistingCustomerToken()) {
+                oSource.setValueState("None");
+                return;
+            }
+
+            // Token-removal echo guard. Removing a token makes UI5 fire a trailing
+            // `change` event that can still carry the removed email — and the order
+            // is NOT guaranteed: `change` may fire BEFORE `tokenUpdate`. A flag set
+            // in `tokenUpdate` would therefore be too late. The ordering-independent
+            // signal is the last-selected email: if this `change` carries the same
+            // email we just had selected and there is no token anymore, it is the
+            // removal echo — never re-select / re-add it. (Re-selecting the same
+            // email intentionally is still possible via the suggestion list, which
+            // goes through `onAdminBookingECEmailSelected`, not blocked here.)
+            var sLastSelected = this._sAdminBookingECLastSelectedEmail || "";
+            if (sEmail && sLastSelected &&
+                sEmail.toLowerCase() === sLastSelected.toLowerCase()) {
+                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                oSource.setValue("");
+                oSource.setValueState("None");
+                return;
+            }
+
+            // Secondary guard for the `tokenUpdate`-before-`change`(s) ordering.
+            // A one-shot flag is not enough here: UI5 can fire MORE THAN ONE
+            // trailing `change` after a token removal (e.g. value change + focus
+            // out), and a flag consumed by the first one would leave the second
+            // unguarded → the exact-match path re-adds the token. A timestamp
+            // window survives every trailing event within it, so all echoes are
+            // ignored. Cleared only by time, never by an event, so it can't be
+            // exhausted.
+            if (this._tAdminBookingECRemovedAt &&
+                (Date.now() - this._tAdminBookingECRemovedAt) < 700) {
+                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                if (sEmail) {
+                    oSource.setValue("");
+                }
                 oSource.setValueState("None");
                 return;
             }
@@ -1785,6 +1852,11 @@ utils._LCvalidateMandatoryField(oEvent)
             oMultiInput.setValueHelpOnly(true);
             oMultiInput.setValueState("None");
 
+            // Remember the selected email so a trailing `change` fired on token
+            // removal (which can carry this same email) is recognized as an echo
+            // and ignored instead of re-adding the token. Cleared on removal.
+            this._sAdminBookingECLastSelectedEmail = sEmail;
+
             oModel.setProperty("/EC", {
                 UserID: oUser.UserID || "",
                 Salutation: oUser.Salutation || "",
@@ -1822,8 +1894,19 @@ utils._LCvalidateMandatoryField(oEvent)
             var oModel = this.getView().getModel("AdminBookingModel");
             var oMultiInput = this.byId("AB_id_EC_Email");
 
+            // Record the removal time. onAdminBookingECEmailChange uses a window
+            // (not a one-shot flag) so EVERY trailing `change` fired after a
+            // removal is ignored — UI5 can fire several. Survives multiple echoes
+            // and is ordering-independent when combined with the email-match
+            // guard above (which covers the change-before-tokenUpdate ordering).
+            this._tAdminBookingECRemovedAt = Date.now();
+
             oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+            this._sAdminBookingECLastSelectedEmail = "";
             if (oMultiInput) {
+                if (oMultiInput.removeAllTokens) {
+                    oMultiInput.removeAllTokens();
+                }
                 oMultiInput.setValueHelpOnly(false);
                 oMultiInput.setValue("");
                 oMultiInput.setValueState("None");

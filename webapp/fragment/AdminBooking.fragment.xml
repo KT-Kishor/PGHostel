@@ -286,6 +286,7 @@
 				<Label text="{i18n>adminBookingECEmail}" required="true"/>
 				<MultiInput
 					id="AB_id_EC_Email"
+					class="adminBookingEmailMultiInput"
 					maxTokens="1"
 					editable="true"
 					width="100%"

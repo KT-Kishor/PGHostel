@@ -7105,3 +7105,37 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
     width: 100%;
 }
 /* 1. Fix the container so it can grow vertically */
+
+/* Admin booking existing-customer email suggestions */
+.adminBookingEmailMultiInput {
+    width: 100% !important;
+}
+
+.sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"],
+.sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"],
+.sapMPopover[id*="AB_id_EC_Email"] {
+    width: 100% !important;
+    max-width: 26rem !important;
+}
+
+.sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"] .sapMPopoverCont,
+.sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"] .sapMPopoverCont,
+.sapMPopover[id*="AB_id_EC_Email"] .sapMPopoverCont {
+    width: 100% !important;
+    max-height: 20rem !important;
+    overflow-y: auto !important;
+    box-sizing: border-box;
+}
+
+.sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"] .sapMList,
+.sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"] .sapMList,
+.sapMPopover[id*="AB_id_EC_Email"] .sapMList,
+.sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"] .sapMListItems,
+.sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"] .sapMListItems,
+.sapMPopover[id*="AB_id_EC_Email"] .sapMListItems,
+.sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"] .sapMLIB,
+.sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"] .sapMLIB,
+.sapMPopover[id*="AB_id_EC_Email"] .sapMLIB {
+    width: 100% !important;
+    box-sizing: border-box;
+}
