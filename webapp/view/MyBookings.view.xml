@@ -6,7 +6,7 @@
 >
     <Page
         id="idMyBookingsPage"
-        title="My Booking"
+        title="My Bookings"
         showNavButton="true"
         navButtonPress="onNavBack"
         class="defaultBGBlur"
@@ -23,7 +23,7 @@
                 </contentLeft>
                 <contentMiddle>
                     <Title
-                        text="My Booking"
+                        text="My Bookings"
                         level="H4"
                     />
                 </contentMiddle>

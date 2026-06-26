@@ -22,7 +22,7 @@
             /> -->
 			<Button
                 id="idMyBookingBtn"
-                text="My Booking"
+                text="My Bookings"
                 press="onMyBookingsPress"
                 class="myUnifiedBtn sapUiTinyMarginEnd"
             />
