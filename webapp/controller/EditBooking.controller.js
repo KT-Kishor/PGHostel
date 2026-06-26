@@ -381,7 +381,8 @@ sap.ui.define([
                 var bIsAdminUpdatedYes = sAdminUpdated === "YES";
                 var sBookingStartDate = oBooking.StartDate || "";
                 var sCheckInTime = oHostelModel.getProperty("/CheckInTime") || "";
-                var bIsWithin48Hours = this._isWithin48HoursOfCheckIn(sBookingStartDate, sCheckInTime);
+                var sEditBeforeValue = (oBranchData && oBranchData.EditBefore != null) ? oBranchData.EditBefore : "";
+                var bIsWithin48Hours = this._isWithin48HoursOfCheckIn(sBookingStartDate, sCheckInTime, sEditBeforeValue);
                 oBookingView.setProperty("/isStatusNew", bIsStatusNew);
                 oBookingView.setProperty("/isAdminUpdatedYes", bIsAdminUpdatedYes);
                 oBookingView.setProperty("/isWithin48HoursOfCheckIn", bIsWithin48Hours);
@@ -390,8 +391,9 @@ sap.ui.define([
 
                 if (bIsEditableStatus && !bIsAdminUpdatedYes && bIsWithin48Hours) {
                     var sCheckInDisplay = sCheckInTime || "12:00 PM";
+                    var iHoursWindow = this._iEditHoursWindow || 0;
                     MessageBox.warning(
-                        "Editing is no longer allowed as the check-in time is within 48 hours. " +
+                        "Editing is no longer allowed as the check-in time is within " + iHoursWindow + " hours. " +
                         "Check-in is at " + sCheckInDisplay + " on " + this._formatDateToDDMMYYYY(this._parseDate(sBookingStartDate)) + ".\n\n" +
                         "For any changes, please contact " + (oHostelModel.getProperty("/Area") || "") + ".",
                         {
@@ -2110,14 +2112,26 @@ sap.ui.define([
             return iHours + (iMinutes / 60);
         },
 
-        _isWithin48HoursOfCheckIn: function (sStartDate, sCheckInTime) {
+        _isWithin48HoursOfCheckIn: function (sStartDate, sCheckInTime, vEditBefore) {
+            // Resolve the configured edit window (in hours) from the branch data.
+            // CRITICAL RULE: empty/0/null/undefined => NO time restriction, editing allowed.
+            var sEditBeforeValue = vEditBefore == null ? "" : String(vEditBefore).trim();
+            if (sEditBeforeValue === "" || sEditBeforeValue === "0") {
+                this._iEditHoursWindow = 0;
+                return false;
+            }
+            var iHoursWindow = parseInt(sEditBeforeValue, 10);
+            this._iEditHoursWindow = iHoursWindow;
+            if (isNaN(iHoursWindow) || iHoursWindow <= 0) {
+                return false;
+            }
             var oStartDate = this._parseDate(sStartDate);
             if (!oStartDate) {
                 return false;
             }
             var fCheckInHours = this._parseTimeToHours(sCheckInTime);
             oStartDate.setHours(Math.floor(fCheckInHours), Math.round((fCheckInHours % 1) * 60), 0, 0);
-            var oCutoff = new Date(oStartDate.getTime() - 48 * 60 * 60 * 1000);
+            var oCutoff = new Date(oStartDate.getTime() - iHoursWindow * 60 * 60 * 1000);
             var oNow = new Date();
             return oNow >= oCutoff;
         },
