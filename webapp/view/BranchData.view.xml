@@ -54,36 +54,37 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column demandPopin="true">
+					<Column demandPopin="true" width="7rem"> 
 						<Text text="{i18n>logoname}" tooltip="{i18n>logoname}"/>
 					</Column>
 					<Column demandPopin="true" width="10rem">
 						<Text text="{i18n>MSbranchCode}" tooltip="{i18n>MSbranchCode}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="Property Type"  tooltip="Property Type"/>
-					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="GSTIN" tooltip="GSTIN"/>
+						<Text text="Property Type / GSTIN" tooltip="Property Type / GSTIN"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>startingPrice}" tooltip="{i18n>startingPrice}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>penalty}" tooltip="{i18n>penalty}"/>
+					</Column> -->
+					<Column demandPopin="true" minScreenWidth="Tablet">
+    					<Text text="Edit Before" tooltip="Edit Before"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
 						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>pinCode}" tooltip="{i18n>pinCode}"/>
-					</Column>
+					</Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>contactNumber}" tooltip="{i18n>contactNumber}" />
 					</Column>
 					<Column demandPopin="true">
 						<Text text="{i18n>homeimage}" tooltip="{i18n>homeimage}"/>
 					</Column>
+				
 				</columns>
 				<items>
 					<ColumnListItem>
@@ -91,24 +92,28 @@
 							<HBox alignItems="Center">
 								<Avatar
                                     src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
-                                    displayShape="Circle" displaySize="L"
+                                    displayShape="Square" displaySize="L"
                                     press="onpressbranchlogo" fallbackIcon="sap-icon://attachment-photo"
-                                    class="sapUiTinyMarginEnd" />
+                                    class="sapUiTinyMarginEnd sapUiAvatarImageContain" />
 							</HBox>
-							<Text text="{= ${mainModel>Name} + '(' + ${mainModel>BranchID} + ')' }"/>
-							<Text text="{mainModel>PropertyType}" />
 							<VBox>
+								<Text text="{mainModel>Name}" />
+								<Text text="{= '(' + ${mainModel>BranchID} + ')' }" />
+							</VBox>
+							<VBox>
+								<Text text="{mainModel>PropertyType}" />
 								<Text text="{mainModel>GSTIN}" />
-								<Text text="{= ${mainModel>Type} + ' : ' + ${mainModel>Value} }" 
+								<Text text="{= ${mainModel>Type} + ' : ' + ${mainModel>Value} }"
 								 visible="{= !!${mainModel>Value} }"/>
 							</VBox>
 							<Text text="{parts: ['mainModel>StartingPrice','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"/>
-							<Text text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"/>
-							<Text text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }" wrapping="true"/>
-							<Text text="{mainModel>Pincode}" />
+							<Text text="{mainModel>EditBefore} Hrs" />
+							<!-- <Text text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"/> -->
+							<Text text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>Pincode} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }" wrapping="true"/>
+							<!-- <Text text="{mainModel>Pincode}" /> -->
 							<Text text="{mainModel>STD} {mainModel>Contact}" />
 							<Link text="{i18n>view}" press="HF_viewimage"/>
-						</cells>
+							</cells>
 					</ColumnListItem>
 				</items>
 			</Table>
