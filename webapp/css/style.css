@@ -7113,6 +7113,7 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
 
 .sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"],
 .sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"],
+.sapMComboBoxBasePicker[id*="AB_id_EC_Email"],
 .sapMPopover[id*="AB_id_EC_Email"] {
     width: 100% !important;
     max-width: 26rem !important;
@@ -7120,6 +7121,7 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
 
 .sapMInputBaseSuggestPopup[id*="AB_id_EC_Email"] .sapMPopoverCont,
 .sapMInputBaseSuggestPopover[id*="AB_id_EC_Email"] .sapMPopoverCont,
+.sapMComboBoxBasePicker[id*="AB_id_EC_Email"] .sapMPopoverCont,
 .sapMPopover[id*="AB_id_EC_Email"] .sapMPopoverCont {
     width: 100% !important;
     max-height: 20rem !important;

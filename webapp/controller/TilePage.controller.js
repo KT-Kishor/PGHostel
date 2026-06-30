@@ -3,9 +3,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "sap/m/Token",
      "../utils/validation",
-], function (BaseController, JSONModel, MessageToast, MessageBox, Token, utils) {
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.TilePage", {
         onInit: function () {
@@ -922,6 +921,7 @@ sap.ui.define([
                 }).then(function (oDialog) {
                     this._AdminBookingDialog = oDialog;
                     this.getView().addDependent(oDialog);
+                    this._applyAdminBookingECContainsFilter();
                     this._FragmentDatePickersReadOnly([this.getView().createId("AB_id_NC_DOB")]);
                     this._resetAdminBookingModel();
                     this._loadAdminBookingBranches();
@@ -1202,8 +1202,8 @@ sap.ui.define([
             // clear only the selected customer. Existing customer lookup is global.
             if (oModel.getProperty("/CustomerType") === "Existing") {
                 oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-                oModel.setProperty("/ECSuggestions", []);
                 this._clearAdminBookingCustomerEmailToken();
+                this._prefillAdminBookingECSuggestions();
             }
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
@@ -1297,23 +1297,25 @@ sap.ui.define([
             }
         },
 
-        // Remove the email token (if any) from the Existing Customer MultiInput
-        // and re-enable typing.
+        // Clear the Existing Customer selection (ComboBox) so a stale
+        // customer never leaks into the booking when switching modes/branches.
         _clearAdminBookingCustomerEmailToken: function () {
-            var oMultiInput = this.byId("AB_id_EC_Email");
-            if (!oMultiInput) return;
-            if (oMultiInput.removeAllTokens) {
-                oMultiInput.removeAllTokens();
+            var oCb = this.byId("AB_id_EC_Email");
+            if (!oCb) return;
+            if (oCb.setSelectedKey) {
+                oCb.setSelectedKey("");
             }
-            if (oMultiInput.setValueHelpOnly) {
-                oMultiInput.setValueHelpOnly(false);
+            if (oCb.setValue) {
+                oCb.setValue("");
             }
-            oMultiInput.setValue("");
+            if (oCb.setValueState) {
+                oCb.setValueState("None");
+            }
         },
 
         _hasAdminBookingExistingCustomerToken: function () {
-            var oMultiInput = this.byId("AB_id_EC_Email");
-            return !!(oMultiInput && oMultiInput.getTokens && oMultiInput.getTokens().length);
+            var oCb = this.byId("AB_id_EC_Email");
+            return !!(oCb && oCb.getSelectedKey && oCb.getSelectedKey());
         },
 
         _clearAdminBookingCustomerValueStates: function () {
@@ -1635,7 +1637,7 @@ sap.ui.define([
             );
         },
 
-        // ─── Option B: Existing Customer (autocomplete via MultiInput) ─────────
+        // ─── Option B: Existing Customer (autocomplete via ComboBox) ─────────
 
         // Load HM_LoginUser globally without branch/role/email filters. This runs once
         // per dialog open and the cached list is filtered locally while typing.
@@ -1676,188 +1678,65 @@ sap.ui.define([
             }
         },
 
-        // Build the Existing Customer email suggestion list. An empty term
-        // auto-loads the first 20 email IDs (no filter) so the value help is
-        // populated the moment it opens — without typing. A typed term filters
-        // the cached list with a partial "contains" match. The result is always
-        // capped at 20 so the dropdown never exceeds a single screen.
-        _buildAdminBookingECSuggestions: function (sTerm) {
+        // Bind the FULL existing-customer list to the ComboBox and let the
+        // control filter it natively as the user types (see the "contains"
+        // filter installed by _applyAdminBookingECContainsFilter). Rebuilding
+        // the bound list per keystroke is what previously broke live filtering
+        // — replacing items mid-type resets the control's own type-ahead — so we
+        // no longer touch /ECSuggestions on each keystroke.
+        _buildAdminBookingECSuggestions: function () {
             var aCustomers = this.getView().getModel("AdminBookingModel").getProperty("/ECAllCustomers") || [];
-            var aResult;
-
-            if (!sTerm) {
-                aResult = aCustomers;
-            } else {
-                var sNormalizedTerm = String(sTerm).toLowerCase();
-                aResult = aCustomers.filter(function (oRow) {
-                    return String(oRow.EmailID || "").toLowerCase().indexOf(sNormalizedTerm) !== -1;
-                });
-            }
-
-            return aResult.slice(0, 20).map(function (oRow) {
+            return aCustomers.map(function (oRow) {
                 return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
             });
         },
 
-        // Pre-fill the suggestion dropdown with the first 20 email IDs (no
-        // filter) as soon as the Existing Customer list is ready, so the value
-        // help is already populated before the user types or focuses the field.
+        // Install a case-insensitive "contains" filter on the EC ComboBox so a
+        // partial term (e.g. "232") matches "test232@test.tt", not only a
+        // prefix. Default ComboBox filtering is "starts-with". Set once.
+        _applyAdminBookingECContainsFilter: function () {
+            var oCb = this.byId("AB_id_EC_Email");
+            if (!oCb || !oCb.setFilterFunction) return;
+            oCb.setFilterFunction(function (sTerm, oItem) {
+                return String(oItem.getText() || "").toLowerCase()
+                    .indexOf(String(sTerm || "").toLowerCase()) !== -1;
+            });
+        },
+
         _prefillAdminBookingECSuggestions: function () {
             if (this._hasAdminBookingExistingCustomerToken()) {
                 return;
             }
-            var oMultiInput = this.byId("AB_id_EC_Email");
-            if (oMultiInput && oMultiInput.getValue && oMultiInput.getValue()) {
-                return;
-            }
             this.getView().getModel("AdminBookingModel").setProperty(
                 "/ECSuggestions",
-                this._buildAdminBookingECSuggestions("")
+                this._buildAdminBookingECSuggestions()
             );
         },
 
-        // Focus/typing → build the suggestion list (auto-load 20 on open, filter while typing).
-        onAdminBookingECEmailSuggest: function (oEvent) {
-            var sTerm = (oEvent.getParameter("suggestValue") || "").trim();
-            var oModel = this.getView().getModel("AdminBookingModel");
-
-            // After selection the email is held as a token and the input value is
-            // empty. Focus/change events must not clear the selected customer.
-            if (this._hasAdminBookingExistingCustomerToken()) {
-                return;
-            }
-
-            oModel.setProperty("/EC/EmailID", sTerm);
-            oModel.setProperty("/EC", Object.assign(this._getEmptyExistingCustomer(), { EmailID: sTerm }));
-
-            var sNormalizedTerm = sTerm.toLowerCase();
-            var aItems = this._buildAdminBookingECSuggestions(sTerm);
-            oModel.setProperty("/ECSuggestions", aItems);
-
-            // Tell the user when their typed term matches no customer — but only
-            // once per distinct term, so the toast doesn't repeat on every
-            // keystroke while they keep typing the same unmatched value. An empty
-            // term auto-loads the first 20 emails, so it is never a "no match".
-            if (sTerm && !aItems.length) {
-                if (this._sLastNoMatchTerm !== sNormalizedTerm) {
-                    this._sLastNoMatchTerm = sNormalizedTerm;
-                    MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
-                }
-            } else {
-                this._sLastNoMatchTerm = "";
-            }
+        // Case-insensitive exact lookup of an email in the master customer
+        // list (/ECAllCustomers). Used by both dropdown selection and free-text
+        // change validation to resolve a typed/picked email to its full record.
+        _findAdminBookingECUser: function (sEmail) {
+            var sNeedle = String(sEmail || "").toLowerCase();
+            if (!sNeedle) return null;
+            var aCustomers = this.getView().getModel("AdminBookingModel").getProperty("/ECAllCustomers") || [];
+            return aCustomers.find(function (oRow) {
+                return String(oRow.EmailID || "").toLowerCase() === sNeedle;
+            }) || null;
         },
 
-        onAdminBookingECEmailChange: function (oEvent) {
-            var oSource = oEvent.getSource();
-            var sEmail = String(oSource.getValue() || "").trim();
-            var oModel = this.getView().getModel("AdminBookingModel");
-
-            // Selecting a suggestion creates a token and clears the input value.
-            // The subsequent change/focus-out event should keep the selected data.
-            if (this._hasAdminBookingExistingCustomerToken()) {
-                oSource.setValueState("None");
-                return;
-            }
-
-            // Token-removal echo guard. Removing a token makes UI5 fire a trailing
-            // `change` event that can still carry the removed email — and the order
-            // is NOT guaranteed: `change` may fire BEFORE `tokenUpdate`. A flag set
-            // in `tokenUpdate` would therefore be too late. The ordering-independent
-            // signal is the last-selected email: if this `change` carries the same
-            // email we just had selected and there is no token anymore, it is the
-            // removal echo — never re-select / re-add it. (Re-selecting the same
-            // email intentionally is still possible via the suggestion list, which
-            // goes through `onAdminBookingECEmailSelected`, not blocked here.)
-            var sLastSelected = this._sAdminBookingECLastSelectedEmail || "";
-            if (sEmail && sLastSelected &&
-                sEmail.toLowerCase() === sLastSelected.toLowerCase()) {
-                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-                oSource.setValue("");
-                oSource.setValueState("None");
-                return;
-            }
-
-            // Secondary guard for the `tokenUpdate`-before-`change`(s) ordering.
-            // A one-shot flag is not enough here: UI5 can fire MORE THAN ONE
-            // trailing `change` after a token removal (e.g. value change + focus
-            // out), and a flag consumed by the first one would leave the second
-            // unguarded → the exact-match path re-adds the token. A timestamp
-            // window survives every trailing event within it, so all echoes are
-            // ignored. Cleared only by time, never by an event, so it can't be
-            // exhausted.
-            if (this._tAdminBookingECRemovedAt &&
-                (Date.now() - this._tAdminBookingECRemovedAt) < 700) {
-                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-                if (sEmail) {
-                    oSource.setValue("");
-                }
-                oSource.setValueState("None");
-                return;
-            }
-
-            oModel.setProperty("/EC", Object.assign(this._getEmptyExistingCustomer(), { EmailID: sEmail }));
-
-            if (!sEmail) {
-                oModel.setProperty("/ECSuggestions", []);
-                return;
-            }
-
-            var oExact = (oModel.getProperty("/ECAllCustomers") || []).find(function (oRow) {
-                return String(oRow.EmailID || "").toLowerCase() === sEmail.toLowerCase();
-            });
-
-            if (oExact) {
-                this._selectAdminBookingExistingCustomer(oExact);
-                return;
-            }
-
-            oSource.setValueState("Error");
-            MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
-        },
-
-        // Selection → wrap the email in a single token, lock typing, and populate
-        // the read-only details + booking identity from the cached HM_LoginUser row.
-        onAdminBookingECEmailSelected: function (oEvent) {
-            var oItem = oEvent.getParameter("selectedItem") || oEvent.getParameter("selectedRow");
-            if (!oItem) return;
-            var sEmail = oItem.getText ? oItem.getText() : "";
-            if (!sEmail) return;
-
-            var oUser = (this.getView().getModel("AdminBookingModel").getProperty("/ECAllCustomers") || []).find(function (oRow) {
-                return oRow.EmailID === sEmail;
-            });
-            if (!oUser) {
-                MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
-                return;
-            }
-
-            this._selectAdminBookingExistingCustomer(oUser);
-        },
-
+        // Populate /EC read-only details + booking identity from a cached
+        // HM_LoginUser row. selectedKey is two-way bound to /EC/EmailID, so
+        // setting it here reflects the pick in the ComboBox. The full customer
+        // list is bound to items, so the selected key always resolves.
         _selectAdminBookingExistingCustomer: function (oUser) {
             var oModel = this.getView().getModel("AdminBookingModel");
-            var oMultiInput = this.byId("AB_id_EC_Email");
             var sEmail = oUser.EmailID || "";
-
-            // Build exactly one token for the chosen email.
-            oMultiInput.removeAllTokens();
-            oMultiInput.addToken(new Token({ key: sEmail, text: sEmail }));
-            oMultiInput.setValue("");
-            // Lock typing but keep the token's "X" interactive.
-            oMultiInput.setValueHelpOnly(true);
-            oMultiInput.setValueState("None");
-
-            // Remember the selected email so a trailing `change` fired on token
-            // removal (which can carry this same email) is recognized as an echo
-            // and ignored instead of re-adding the token. Cleared on removal.
-            this._sAdminBookingECLastSelectedEmail = sEmail;
-
             oModel.setProperty("/EC", {
                 UserID: oUser.UserID || "",
                 Salutation: oUser.Salutation || "",
                 UserName: oUser.UserName || "",
-                EmailID: oUser.EmailID || sEmail,
+                EmailID: sEmail,
                 STDCode: oUser.STDCode || "",
                 MobileNo: oUser.MobileNo || "",
                 DateOfBirth: this._formatAdminBookingDOB(oUser.DateOfBirth),
@@ -1867,6 +1746,70 @@ sap.ui.define([
                 City: oUser.City || "",
                 Address: oUser.Address || ""
             });
+        },
+
+        _resetAdminBookingECSelection: function () {
+            this.getView().getModel("AdminBookingModel").setProperty("/EC", this._getEmptyExistingCustomer());
+        },
+
+        // Picking an item from the dropdown → populate the read-only details
+        // and booking identity. Validation uses the full master list, not the
+        // capped dropdown slice.
+        onAdminBookingECSelectionChange: function (oEvent) {
+            var oCb = oEvent.getSource();
+            var oItem = oEvent.getParameter("selectedItem");
+            var sEmail = oItem ? oItem.getKey() : "";
+
+            if (!sEmail) {
+                this._resetAdminBookingECSelection();
+                oCb.setValueState("None");
+                return;
+            }
+
+            var oUser = this._findAdminBookingECUser(sEmail);
+            if (oUser) {
+                this._selectAdminBookingExistingCustomer(oUser);
+                oCb.setValueState("None");
+            } else {
+                this._resetAdminBookingECSelection();
+                oCb.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
+            }
+        },
+
+        // Free-text validation: a plain ComboBox allows typing arbitrary text.
+        // When the user leaves the field, the typed value is matched against the
+        // FULL master list (/ECAllCustomers) — NOT the capped /ECSuggestions
+        // slice — so a valid email that fell outside the top-50 dropdown page is
+        // still accepted (auto-selected) instead of falsely rejected. Only a
+        // value that matches no known customer is rejected.
+        onAdminBookingECEmailChange: function (oEvent) {
+            var oCb = oEvent.getSource();
+            var sValue = String(oCb.getValue() || "").trim();
+            var sSelectedKey = oCb.getSelectedKey();
+
+            // Picked from the dropdown → selectionChange already populated /EC.
+            if (sSelectedKey) {
+                oCb.setValueState("None");
+                return;
+            }
+            // Empty field → nothing to validate.
+            if (!sValue) {
+                this._resetAdminBookingECSelection();
+                oCb.setValueState("None");
+                return;
+            }
+            // Free text with no dropdown pick: exact-match against the full
+            // master list. Found → select it; not found → reject.
+            var oUser = this._findAdminBookingECUser(sValue);
+            if (oUser) {
+                this._selectAdminBookingExistingCustomer(oUser);
+                oCb.setValueState("None");
+            } else {
+                this._resetAdminBookingECSelection();
+                oCb.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("adminBookingECNoResults"));
+            }
         },
 
         _formatAdminBookingDOB: function (vDate) {
@@ -1881,32 +1824,6 @@ sap.ui.define([
                 String(oDate.getMonth() + 1).padStart(2, "0"),
                 oDate.getFullYear()
             ].join("/");
-        },
-
-        // Removing the token (its "X") clears the selection and all the
-        // loaded read-only details, and re-enables typing.
-        onAdminBookingECTokenUpdate: function (oEvent) {
-            if (oEvent.getParameter("type") !== "removed") return;
-            var oModel = this.getView().getModel("AdminBookingModel");
-            var oMultiInput = this.byId("AB_id_EC_Email");
-
-            // Record the removal time. onAdminBookingECEmailChange uses a window
-            // (not a one-shot flag) so EVERY trailing `change` fired after a
-            // removal is ignored — UI5 can fire several. Survives multiple echoes
-            // and is ordering-independent when combined with the email-match
-            // guard above (which covers the change-before-tokenUpdate ordering).
-            this._tAdminBookingECRemovedAt = Date.now();
-
-            oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-            this._sAdminBookingECLastSelectedEmail = "";
-            if (oMultiInput) {
-                if (oMultiInput.removeAllTokens) {
-                    oMultiInput.removeAllTokens();
-                }
-                oMultiInput.setValueHelpOnly(false);
-                oMultiInput.setValue("");
-                oMultiInput.setValueState("None");
-            }
         },
 
         // Seed the room/branch part of HostelModel that is common to every mode.

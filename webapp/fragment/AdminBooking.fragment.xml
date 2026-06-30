@@ -282,27 +282,18 @@
 			columnsM="1">
 			<f:content>
 
-				<!-- Email (tokenized autocomplete against unfiltered HM_Login data) -->
+				<!-- Email (single-select dropdown of existing customers) -->
 				<Label text="{i18n>adminBookingECEmail}" required="true"/>
-				<MultiInput
+				<ComboBox
 					id="AB_id_EC_Email"
-					class="adminBookingEmailMultiInput"
-					maxTokens="1"
-					editable="true"
-					width="100%"
 					placeholder="{i18n>adminBookingECEmailPlaceholder}"
-					showSuggestion="true"
-					startSuggestion="0"
-					suggestionItems="{AdminBookingModel>/ECSuggestions}"
-					suggest="onAdminBookingECEmailSuggest"
+					items="{AdminBookingModel>/ECSuggestions}"
+					selectedKey="{AdminBookingModel>/EC/EmailID}"
+					selectionChange="onAdminBookingECSelectionChange"
 					change="onAdminBookingECEmailChange"
-					suggestionItemSelected="onAdminBookingECEmailSelected"
-					tokenUpdate="onAdminBookingECTokenUpdate"
 					valueStateText="{i18n>MSenterValidEmail}">
-					<suggestionItems>
-						<c:Item key="{AdminBookingModel>EmailID}" text="{AdminBookingModel>EmailID}"/>
-					</suggestionItems>
-				</MultiInput>
+					<c:ListItem key="{AdminBookingModel>EmailID}" text="{AdminBookingModel>EmailID}"/>
+				</ComboBox>
 
 				<!-- Read-only details of the selected existing customer -->
 				<Label text="{i18n>adminBookingECName}"/>

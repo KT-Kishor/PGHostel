@@ -74,7 +74,7 @@
     id="newMemberSalutationCombo"
     selectedKey="{BookingView>/NewMemberDraft/Salutation}"
     items="{BookingView>/SalutationOptions}"
-    placeholder="Mr."
+        ="e.g. Mr."
     valueStateText="Please select salutation"
     selectionChange="onNewMemberSalutationChange"
     change="onNewMemberSalutationChange"

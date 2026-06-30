@@ -1152,7 +1152,6 @@ sap.ui.define([
                 }
                 // ---------------------------- HANDLE RESPONSE ----------------------------
                 const user = oResponse?.data?.[0];
-                // if (!user?.UserID) {
                 oLoginModel.setProperty("/isLoggedIn", true);
                 this.getOwnerComponent().getRootControl().getController()._startSessionTracking();
                 if (!user?.UserID) return MessageToast.show(this.i18nModel.getText("invalidCredentials"));
@@ -1181,15 +1180,13 @@ sap.ui.define([
 
                 localStorage.setItem("_aB39X", btoa(user.UserID));
                 localStorage.setItem("_mN72P", btoa(user.UserName));
-                  
-                // Role Based Access
-                if (user.Role === "Customer") {
-                    const oUserModel = new JSONModel(user);
-                    sap.ui.getCore().setModel(oUserModel, "LoginModel");
-                    this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
-                } else {
-                    this.getOwnerComponent().getRouter().navTo("TilePage");
-                }
+
+                // ✅ UPDATED: Allow booking for ALL roles
+                // Set user model globally
+                const oUserModel = new JSONModel(user);
+                sap.ui.getCore().setModel(oUserModel, "LoginModel");
+                this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
+
                 MessageToast.show(this.i18nModel.getText("Login Successful"));
 
                 // Reset login fields
@@ -1197,19 +1194,22 @@ sap.ui.define([
                 $C("signinPassword").setValue("");
                 $C("signInOTP").setValue("");
                 // Close dialog
-                if (this._oSignDialog) this._oSignDialog.close(),this._oSignDialog.destroy();
-        this._oSignDialog = null;
+                if (this._oSignDialog) this._oSignDialog.close(), this._oSignDialog.destroy();
+                this._oSignDialog = null;
+
+                // ✅ Check if user was trying to book before login
                 if (this._pendingBookingNav) {
                     this._pendingBookingNav = false;
                     this.onConfirmBooking();
                 }
+                // If no pending booking, stay on current view (View_Rooms)
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
             } finally {
                 this.closeBusyDialog();
             }
         },
-            _setLoggedInUser: function (user) {
+        _setLoggedInUser: function (user) {
             const oLoginModel = this.getView().getModel("LoginModel");
 
             oLoginModel.setProperty("/EmployeeID", user.UserID);
@@ -1229,9 +1229,8 @@ sap.ui.define([
 
             this._oLoggedInUser = user;
 
-            if (user.Role === "Customer") { } else {
-                this.getOwnerComponent().getRouter().navTo("TilePage");
-            }
+            // ✅ No role-based redirect here - allow booking for all roles
+            // The booking flow will check _pendingBookingNav flag
         },
         onLoginOtpLive: function (e) {
             const input = e.getSource();
