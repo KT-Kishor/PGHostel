@@ -87,7 +87,7 @@
 					placeholder="Enter email"/>
 
 				<!-- Upload Image -->
-				<Label text="{i18n>addImage}" required="true"/>
+				<Label text="{i18n>addImage}" />
 
 			<VBox alignItems="Start" width="100%" renderType="Bare">
 

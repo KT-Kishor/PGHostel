@@ -5732,10 +5732,7 @@ sap.ui.define([
             }
 
             // IMAGE VALIDATION
-            if (!aAttachments || aAttachments.length === 0) {
-                MessageToast.show("Please upload at least one image.");
-                return;
-            }
+           
 
             // if (aAttachments.length > 3) {
             //     MessageToast.show("You can upload maximum 3 images only.");

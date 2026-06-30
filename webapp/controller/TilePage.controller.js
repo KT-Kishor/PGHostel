@@ -826,12 +826,8 @@ sap.ui.define([
         onBugdescriptionchnages:function(oEvent){
               utils._LCvalidateMandatoryField(oEvent)
         },
-        onBugRaisedby:function(oEvent){
-utils._LCvalidateMandatoryField(oEvent)
-        },
-        onBugEmailchange: function (oEvent) {
-            utils._LCvalidateEmail(oEvent)
-        },
+      
+      
 
         onBugSubmit: async function(){
             const oView = this.getView();
@@ -878,10 +874,10 @@ utils._LCvalidateMandatoryField(oEvent)
             }
 
             // IMAGE VALIDATION
-            if (!aAttachments || aAttachments.length === 0) {
-                MessageToast.show("Please upload at least one image.");
-                return;
-            }
+            // if (!aAttachments || aAttachments.length === 0) {
+            //     MessageToast.show("Please upload at least one image.");
+            //     return;
+            // }
 
             if (aAttachments.length > 3) {
                 MessageToast.show("You can upload maximum 3 images only.");
@@ -2201,6 +2197,13 @@ utils._LCvalidateMandatoryField(oEvent)
         },
 
         onPressbugs:function(){
+
+              var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+    var oRaiseBugModel = this.getView().getModel("RaiseBugModel");
+
+    // Set logged-in user details
+    oRaiseBugModel.setProperty("/RaisedBy", oLoginData.UserName || "");
+    oRaiseBugModel.setProperty("/Email", oLoginData.EmailID || "");
              if (!this._RaiseBugDialog) {
 
                 sap.ui.core.Fragment.load({

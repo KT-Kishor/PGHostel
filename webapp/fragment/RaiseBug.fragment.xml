@@ -68,27 +68,26 @@
 					maxLength="500"/>
 
 				<!-- Raised By -->
-				<Label text="{i18n>raisedby}" required="true"/>
+				<Label text="{i18n>raisedby}"/>
 				<Input
 					id="RB_id_RaisedBy"
                     liveChange="onBugRaisedby"
-                    valueStateText="{i18n>enteryourname}"
 					value="{RaiseBugModel>/RaisedBy}"
+					editable="false"
 					placeholder="Enter name"/>
 
 				<!-- Email -->
-				<Label text="{i18n>contactemail}" required="true"/>
+				<Label text="{i18n>contactemail}" />
 				<Input
 					id="RB_id_Email"
-                    liveChange="onBugEmailchange"
 					type="Email"
 					class="sapUiSmallMarginBottom"
-                    valueStateText="{i18n>enteremailis}"
+					editable="false"
 					value="{RaiseBugModel>/Email}"
 					placeholder="Enter email"/>
 
 				 <!-- Upload Image -->
-				<Label text="{i18n>addImage}" required="true"/>
+				<Label text="{i18n>addImage}" />
 
 			<VBox alignItems="Start" width="100%" renderType="Bare">
 
