@@ -446,7 +446,16 @@ sap.ui.define([
                 this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
-                MessageToast.show(this.i18nModel.getText("vendorUpdateSuccess"));
+                MessageBox.show(this.i18nModel.getText("vendorUpdateSuccess"), {
+                    icon: sap.m.MessageBox.Icon.SUCCESS,
+                    title: "Success",
+                    actions: [sap.m.MessageBox.Action.OK],
+                    emphasizedAction: sap.m.MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
+                    onClose: function () {
+                        window.location.reload();
+                    }
+                });
                 return true;
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText(err.message || "Updatefailed"));
