@@ -3,43 +3,118 @@ sap.ui.define([
     "../utils/validation",
     "../model/formatter",
     "sap/m/MessageToast",
-], function (BaseController, utils, Formatter, MessageToast) {
+    "sap/m/MessageBox",
+], function (BaseController, utils, Formatter, MessageToast, MessageBox) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.VendorDetail", {
         Formatter: Formatter,
         onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteVendorDetail").attachMatched(this._onRouteMatched, this);
+
+            // Ensure LoginModel (url + headers) exists for OTP ajax calls,
+            // even when the vendor opens this page via a direct deep-link
+            // before any commonLoginFunction has run.
+            this.initializeLoginModel();
+
+            var oLoginViewModel = new sap.ui.model.json.JSONModel({
+                showOTPField: false,
+                isOtpEntered: false,
+                canResendOTP: true,
+                otpTimer: 0,
+                otpButtonText: "Send OTP"
+            });
+            this.getView().setModel(oLoginViewModel, "LoginViewModel");
         },
 
         _onRouteMatched: async function (oEvent) {
-            this.getBusyDialog()
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
+            let encodedUserID;
+
+            // Case 1: called from router
+            if (oEvent && typeof oEvent.getParameter === "function") {
+                const oArgs = oEvent.getParameter("arguments") || {};
+                encodedUserID = oArgs.UserID;
+                this._pendingVendorArgs = oArgs;
+            }
+            // Case 2: called manually after OTP login
+            else if (this._pendingVendorArgs) {
+                encodedUserID = this._pendingVendorArgs.UserID;
+            }
+            // Case 3: nothing available
+            else {
+                return;
+            }
+
+            if (!encodedUserID) {
+                return this._goToNotFound();
+            }
+            const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+            if (!base64Regex.test(encodedUserID)) {
+                return this._goToNotFound();
+            }
+            let decodedUserID;
             try {
-                const encodedUserID = oEvent.getParameter("arguments")?.UserID;
-                if (!encodedUserID) {
-                    return this._goToNotFound();
-                }
-                const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-                if (!base64Regex.test(encodedUserID)) {
-                    return this._goToNotFound();
-                }
-                let decodedUserID;
-                try {
-                    decodedUserID = atob(encodedUserID);
-                } catch {
-                    return this._goToNotFound();
-                }
-                if (btoa(decodedUserID) !== encodedUserID) {
-                    return this._goToNotFound();
-                }
-                const bValid = await this._validateVendorUserID(decodedUserID);
-                if (!bValid) {
-                    return this._goToNotFound();
-                }
-                this.sUserID = decodedUserID;
+                decodedUserID = atob(encodedUserID);
+            } catch {
+                return this._goToNotFound();
+            }
+            if (btoa(decodedUserID) !== encodedUserID) {
+                return this._goToNotFound();
+            }
+
+            this.getBusyDialog();
+            let bValid;
+            try {
+                bValid = await this._validateVendorUserID(decodedUserID);
+            } catch (e) {
+                bValid = false;
+            }
+            this.closeBusyDialog();
+            if (!bValid) {
+                return this._goToNotFound();
+            }
+
+            this.sUserID = decodedUserID;
+
+            // ===== OTP VERIFICATION GATE (same as EditBooking) =====
+            var bLoggedIn = localStorage.getItem("isLoggedIn");
+            if (!bLoggedIn) {
+                this._bPendingVendorRoute = true;
+                this.getView().addStyleClass("blur-background");
+
+                MessageBox.information(
+                    "Please verify with OTP to access your details.",
+                    {
+                        title: "Verification Required",
+                        styleClass: "myUnifiedBtn",
+                        actions: [MessageBox.Action.OK],
+                        emphasizedAction: MessageBox.Action.OK,
+                        onClose: function () {
+                            if (!this._oLoginAlertDialog) {
+                                this._oLoginAlertDialog = sap.ui.xmlfragment(
+                                    this.createId("LoginAlertDialog"),
+                                    "sap.ui.com.project1.fragment.AdminDetailsSignin",
+                                    this
+                                );
+                                this.getView().addDependent(this._oLoginAlertDialog);
+                            }
+
+                            this._oLoginAlertDialog.open();
+                        }.bind(this)
+                    }
+                );
+                return;
+            }
+
+            await this._loadVendorPage();
+        },
+
+        _loadVendorPage: async function () {
+            this.getBusyDialog();
+            try {
                 var Layout = this.byId("V_id_ObjectPageLayout");
                 Layout.setSelectedSection(this.byId("V_id_OrderHeaderSection1"));
-
-                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
                 const oEditableModel = new sap.ui.model.json.JSONModel({
                     Edit: false,
@@ -79,11 +154,14 @@ sap.ui.define([
                 const oResp = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
                     UserID: sUserID
                 });
+                const oVendor = oResp?.data?.[0];
                 // ✅ Must exist AND must be in Send Back status
-                return (
-                    oResp?.data?.length === 1 &&
-                    oResp.data[0].Status === "Send Back"
-                );
+                const bValid = oResp?.data?.length === 1 && oVendor.Status === "Send Back";
+                if (bValid) {
+                    // Capture the email tied to this link so we can lock the OTP dialog to it
+                    this._sVendorEmail = oVendor.EmailID || oVendor.Email || "";
+                }
+                return bValid;
             } catch (err) {
                 return false;
             }
@@ -1132,6 +1210,283 @@ sap.ui.define([
 
                 reader.readAsDataURL(oFile);
             });
+        },
+
+        // ===== OTP LOGIN DIALOG HANDLERS (mirrors EditBooking) =====
+
+        onEmailliveChange: function (oEvent) {
+            utils._LCvalidateEmail(oEvent);
+        },
+
+        onLoginOtpLive: function (e) {
+            const vm = this.getView().getModel("LoginViewModel");
+            const input = e.getSource();
+
+            let val = e.getParameter("value").replace(/\D/g, "");
+            if (val.length > 6) val = val.slice(0, 6);
+
+            input.setValue(val);
+
+            const isValid = val.length === 6;
+            vm.setProperty("/isOtpEntered", isValid);
+
+            if (val.length === 0) {
+                input.setValueState("None");
+            } else if (!isValid) {
+                input.setValueState("Error");
+                input.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
+            } else {
+                input.setValueState("None");
+            }
+        },
+
+        onPressOTP: async function () {
+            const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+            const sEmail = oEmailIDCtrl?.getValue()?.trim();
+
+            // 1. Format validation
+            if (!utils._LCvalidateEmail(oEmailIDCtrl, "ID")) {
+                MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
+                return;
+            }
+
+            // 2. Must match the email tied to this verification link
+            if (!this._sVendorEmail || sEmail.toLowerCase() !== this._sVendorEmail.toLowerCase()) {
+                oEmailIDCtrl.setValueState("Error");
+                oEmailIDCtrl.setValueStateText("Entered email does not match the email associated with this link.");
+                MessageToast.show("Entered email does not match the email associated with this link.");
+                return;
+            }
+            oEmailIDCtrl.setValueState("None");
+
+            const payload = {
+                EmailID: sEmail,
+                Type: "OTP"
+            };
+
+            this.getBusyDialog();
+            try {
+                const oResp = await this.ajaxCreateWithJQuery("HostelSendBackOTPEmail", payload);
+
+                if (oResp?.success) {
+                    MessageToast.show(oResp.message || this.i18nModel.getText("oTPSentCheckyourEmail"));
+                    this._oResetUser = { EmailID: sEmail };
+
+                    const oOtpCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+                    if (oOtpCtrl) {
+                        oOtpCtrl.setValue("");
+                        oOtpCtrl.setValueState("None");
+                        oOtpCtrl.setValueStateText("");
+                        oOtpCtrl.focus();
+                    }
+
+                    this._startOtpTimer();
+                } else {
+                    MessageToast.show(oResp?.message || this.i18nModel.getText("noUserFoundwithGivenIDName"));
+                }
+            } catch (err) {
+                const sMsg = err?.responseJSON?.message || err?.message || this.i18nModel.getText("forgotOtpSendFailed");
+                MessageToast.show(sMsg);
+                console.error("Vendor HostelSendOTP error:", err);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        _verifyOTPWithBackend: async function (otp) {
+            this.getBusyDialog();
+            try {
+                const oResp = await this.ajaxReadWithJQuery("HM_Login", {
+                    EmailID: this._oResetUser?.EmailID,
+                    OTP: otp.trim()
+                });
+
+                // Cache the verified user for onSignIn to reuse (avoid double OTP consumption)
+                if (oResp?.success === true) {
+                    this._oVerifiedUser = oResp?.data?.[0] || null;
+                }
+                return oResp?.success === true;
+            } catch (err) {
+                console.error("OTP Verify Error:", err);
+                return false;
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onSignIn: async function () {
+            const oFragment = this._oLoginAlertDialog;
+            const ctrlEmailId = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+            const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+
+            const sEmail = ctrlEmailId?.getValue()?.trim();
+            const sOTP = ctrlOTP?.getValue()?.trim();
+
+            // 1. Email format validation
+            if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
+                MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
+                return;
+            }
+
+            // 2. Must match the email tied to this verification link
+            if (!this._sVendorEmail || sEmail.toLowerCase() !== this._sVendorEmail.toLowerCase()) {
+                ctrlEmailId.setValueState("Error");
+                ctrlEmailId.setValueStateText("Entered email does not match the email associated with this link.");
+                MessageToast.show("Entered email does not match the email associated with this link.");
+                return;
+            }
+            ctrlEmailId.setValueState("None");
+
+            if (!sOTP) {
+                ctrlOTP.setValueState("Error");
+                ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                return;
+            }
+
+            if (!/^\d{6}$/.test(sOTP)) {
+                ctrlOTP.setValueState("Error");
+                ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                return;
+            }
+
+            ctrlOTP.setValueState("None");
+
+            var bResumed = false;
+            this.getBusyDialog();
+
+            try {
+                const isValid = await this._verifyOTPWithBackend(sOTP);
+                if (!isValid) {
+                    MessageToast.show("Incorrect OTP");
+                    return;
+                }
+
+                const user = this._oVerifiedUser;
+                this._oVerifiedUser = null;
+
+                // Security: the verified user must match the vendor this link belongs to
+                if (!user?.UserID || user.UserID !== this.sUserID) {
+                    MessageToast.show("This verification link does not belong to the entered email.");
+                    return;
+                }
+
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("_x9A1p", user._x9A1p);
+                localStorage.setItem("_k7LmQ", user._k7LmQ);
+                localStorage.setItem("_aB39X", btoa(user.UserID));
+                localStorage.setItem("_mN72P", btoa(user.UserName || ""));
+
+                const oUIModel = this.getOwnerComponent().getModel("UIModel");
+                if (oUIModel) {
+                    oUIModel.setProperty("/isLoggedIn", true);
+                }
+                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+                if (oLoginModel) {
+                    oLoginModel.setProperty("/UserID", user.UserID);
+                    oLoginModel.setProperty("/EmployeeID", user.UserID);
+                    oLoginModel.setProperty("/EmployeeName", user.UserName || "");
+                    oLoginModel.setProperty("/UserName", user.UserName || "");
+                    oLoginModel.setProperty("/EmailID", user.EmailID || "");
+                    oLoginModel.setProperty("/isLoggedIn", true);
+                }
+
+                ctrlEmailId?.setValue("");
+                ctrlOTP?.setValue("");
+                ctrlEmailId?.setValueState("None");
+                ctrlOTP?.setValueState("None");
+                this._resetOtpState();
+
+                MessageToast.show("Login Successful");
+
+                this.getView().removeStyleClass("blur-background");
+                if (oFragment) {
+                    oFragment.close();
+                }
+
+                if (this._bPendingVendorRoute) {
+                    this._bPendingVendorRoute = false;
+                    bResumed = true;
+                    await this._loadVendorPage();
+                }
+            } catch (err) {
+                MessageToast.show(err.message || "Invalid Credentials, Please try again");
+            } finally {
+                if (!bResumed) {
+                    this.closeBusyDialog();
+                }
+            }
+        },
+
+        _startOtpTimer: function () {
+            const vm = this.getView().getModel("LoginViewModel");
+
+            this._clearOtpTimer();
+
+            const START = 20;
+
+            vm.setProperty("/canResendOTP", false);
+            vm.setProperty("/otpTimer", START);
+            vm.setProperty("/otpButtonText", "Resend OTP (" + START + "s)");
+
+            this._otpInterval = setInterval(() => {
+                let remaining = vm.getProperty("/otpTimer") - 1;
+
+                if (remaining <= 0) {
+                    this._clearOtpTimer();
+                    vm.setProperty("/otpTimer", 0);
+                    vm.setProperty("/otpButtonText", "Resend OTP");
+                    vm.setProperty("/canResendOTP", true);
+                    return;
+                }
+
+                vm.setProperty("/otpTimer", remaining);
+                vm.setProperty("/otpButtonText", "Resend OTP (" + remaining + "s)");
+            }, 1000);
+        },
+
+        _clearOtpTimer: function () {
+            if (this._otpInterval) {
+                clearInterval(this._otpInterval);
+                this._otpInterval = null;
+            }
+        },
+
+        _resetOtpState: function () {
+            const vm = this.getView().getModel("LoginViewModel");
+
+            this._clearOtpTimer();
+
+            vm.setProperty("/otpTimer", 0);
+            vm.setProperty("/canResendOTP", true);
+            vm.setProperty("/otpButtonText", "Send OTP");
+            vm.setProperty("/showOTPField", false);
+            vm.setProperty("/isOtpEntered", false);
+        },
+
+        onDialogClose: function () {
+            const oEmail = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+            const oOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+
+            if (oEmail) {
+                oEmail.setValue("");
+                oEmail.setValueState("None");
+                oEmail.setValueStateText("");
+            }
+
+            if (oOTP) {
+                oOTP.setValue("");
+                oOTP.setValueState("None");
+                oOTP.setValueStateText("");
+            }
+
+            this._resetOtpState();
+
+            this.getView().removeStyleClass("blur-background");
+            if (this._oLoginAlertDialog) {
+                this._oLoginAlertDialog.close();
+            }
         }
     });
 });
