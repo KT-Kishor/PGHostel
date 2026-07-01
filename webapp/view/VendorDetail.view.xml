@@ -63,13 +63,6 @@
 										<f:toolbar>
 											<m:Toolbar>
 												<m:Title text="{i18n>MVDtitle}" />
-												<m:ToolbarSpacer />
-												<m:Button
-                                                class="myUnifiedBtn"
-                                                text="{= ${editable>/Edit} ? 'Submit' : 'Edit' }"
-                                                press="onEditOrSavePress"
-                                                enabled="{= ${AdminSignupModel>/Status} !== 'Submitted' }"
-                                            />
 											</m:Toolbar>
 										</f:toolbar>
 										<f:content>
@@ -400,6 +393,14 @@
                 </m:items>
                 </m:FlexBox>
                 </m:contentLeft>
+                <m:contentRight>
+                    <m:Button
+                        class="myUnifiedBtn"
+                        text="{= ${editable>/Edit} ? 'Submit' : 'Edit' }"
+                        press="onEditOrSavePress"
+                        enabled="{= ${AdminSignupModel>/Status} !== 'Submitted' }"
+                    />
+                </m:contentRight>
 			</m:Bar>
 		</m:footer>
 	</m:Page>
