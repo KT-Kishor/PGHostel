@@ -2114,9 +2114,8 @@ sap.ui.define([
         },
 
         onPressbugs:function(){
-
-              var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
-    var oRaiseBugModel = this.getView().getModel("RaiseBugModel");
+       var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+       var oRaiseBugModel = this.getView().getModel("RaiseBugModel");
 
     // Set logged-in user details
     oRaiseBugModel.setProperty("/RaisedBy", oLoginData.UserName || "");
