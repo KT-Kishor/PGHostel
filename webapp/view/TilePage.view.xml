@@ -10,6 +10,7 @@
     >
 		<headerContent>
 			<Text
+                id="idWelcomeUser"
                 text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }"
                 class="boldBlueText sapUiLargeMarginBegin"
             />
@@ -27,9 +28,11 @@
                 class="myUnifiedBtn sapUiTinyMarginEnd"
             />
 			<Button
+                id="idLogBtn"
                 press="Tile_onLogPress"
                 tooltip="{i18n>logoutTooltip}"
                 icon="sap-icon://log"
+                class="myUnifiedBtn sapUiTinyMarginEnd"
             />
 		</headerContent>
 		<content>
@@ -392,10 +395,11 @@
         <ToolbarSpacer />
 
         <Button
-            text="{i18n>raisebug}"
-            tooltip="{i18n>proceedToPay}"
+                id="idRaiseBugFooterBtn"
+                text="{i18n>raisebug}"
+                tooltip="{i18n>proceedToPay}"
             visible="true"
-            class="myUnifiedBtn sapUiMediumMarginEnd"
+            class="myUnifiedBtn sapUiSmallMarginEnd"
             press="onPressbugs"
         />
 

@@ -511,7 +511,44 @@ sap.ui.define([
             // descKey_view = read-only variant key (used when role has view-only access)
             // viewOnlyRoles = roles that get the _view variant for this tile
             var aTileConfig = [
-                // ── Category 1: Setup & Configuration ────────────────────────────
+                // ── Header ───────────────────────────────────────────────────────
+                {
+                    id: "idWelcomeUser",
+                    headerKey: "tour_title_welcome",
+                    descKey: "tour_desc_welcome"
+                },
+                {
+                    id: "idMyBookingBtn",
+                    headerKey: "tour_title_mybookings",
+                    descKey: "tour_desc_mybookings"
+                },
+                {
+                    id: "idLogBtn",
+                    headerKey: "logoutTooltip",
+                    descKey: "tour_desc_logout"
+                },
+                // ── Category 1: Vendor Registration ────────────────────────────
+                {
+                    id: "id6roomTile",
+                    headerKey: "manageVendors",
+                    descKey: "tour_desc_vendor"
+                },
+                {
+                    id: "idSupportTile",
+                    headerKey: "supportVendor",
+                    descKey: "tour_desc_support"
+                },
+                {
+                    id: "idRaiseBug",
+                    headerKey: "Bug Details",
+                    descKey: "tour_desc_bug"
+                },
+                {
+                    id: "idmanageAds",
+                    headerKey: "manageAds",
+                    descKey: "tour_desc_ads"
+                },
+                // ── Category 2: Setup & Configuration ────────────────────────────
                 {
                     id: "branchTile",
                     headerKey: "manageBranchDetails",
@@ -560,19 +597,12 @@ sap.ui.define([
                     descKey: "tour_desc_staff"
                     // No viewOnlyRoles — staff tile is fully hidden for Front OfficeEmployee (not shown)
                 },
+                // ── Category 3: Operations ────────────────────────────────────────
                 {
-                    id: "id6roomTile",
-                    headerKey: "manageVendors",
-                    descKey: "tour_desc_vendor"
-                    // ManageVendor role sees only this tile — full access
+                    id: "idBookForYourself",
+                    headerKey: "bookForYourself",
+                    descKey: "tour_desc_book"
                 },
-
-                {
-                    id: "idSupportTile",
-                    headerKey: "supportVendor",
-                    descKey: "tour_desc_support"
-                },
-                // ── Category 2: Operations ────────────────────────────────────────
                 {
                     id: "id3roomTile",
                     headerKey: "manageCustomerDetails",
@@ -586,7 +616,7 @@ sap.ui.define([
                 },
                 {
                     id: "id8roomTile",
-                    headerKey: "returnDeposit",
+                    headerKey: "DepositHeader",
                     descKey: "tour_desc_deposit"
                 },
                 {
@@ -638,6 +668,12 @@ sap.ui.define([
                     id: "TP_DamageDashboard",
                     headerKey: "damageDashboard",
                     descKey: "tour_desc_damageDashboard"
+                },
+                // ── Footer ───────────────────────────────────────────────────────
+                {
+                    id: "idRaiseBugFooterBtn",
+                    headerKey: "raisebug",
+                    descKey: "tour_desc_raisebug"
                 }
             ];
 

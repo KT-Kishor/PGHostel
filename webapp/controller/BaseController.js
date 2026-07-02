@@ -1007,6 +1007,12 @@ sap.ui.define([
     initUniversalTour: function (aSteps) {
       this._aTourSteps = (aSteps || []).slice();
       this._iTourIndex = 0;
+      this._captureTourScroll();
+      this._oTourCurrentAnchor = null;
+      this._fnTourReposition = this._onTourReposition.bind(this);
+      window.addEventListener("scroll", this._fnTourReposition, true);
+      window.addEventListener("resize", this._fnTourReposition);
+      document.body.classList.add("sapUiTourOverlayActive");
       this._showTourStep(0);
     },
 
@@ -1115,16 +1121,15 @@ sap.ui.define([
 
     _openMobileStep: function (oPopover, oAnchor) {
       var that = this;
-      var BOTTOM_MARGIN = 16;
-      var TILE_GAP = 12;
+      var MOBILE_POPOVER_GAP = 14;
       var TILE_ZONE = 0.3; // tile top at 30% of viewport
 
       var vh = window.innerHeight || document.documentElement.clientHeight;
 
       this._setPopoverVisible(oPopover, false);
-      oPopover.setContentWidth("calc(100vw - 32px)");
+      oPopover.setContentWidth("calc(100vw - 40px)");
       oPopover.setOffsetX(0);
-      oPopover.setOffsetY(0);
+      oPopover.setOffsetY(MOBILE_POPOVER_GAP);
       oPopover.setPlacement(sap.m.PlacementType.Bottom);
 
       var aDom = oAnchor.getDomRef();
@@ -1138,9 +1143,11 @@ sap.ui.define([
         aDom.closest(".sapMScrollCont") ||
         aDom.closest(".sapUiScrollDelegate");
 
-      // LAST STEP SPECIAL CASE
-      var bIsLast = (this._iTourIndex === this._aTourSteps.length - 1);
-      if (bIsLast) {
+      // LAST TWO STEPS SPECIAL CASE (footer tile + footer button):
+      // both sit in the page footer, so the default centering-scroll would
+      // lift the footer. Route them through the last-step handler instead.
+      var bIsLastTwo = (this._iTourIndex >= this._aTourSteps.length - 2);
+      if (bIsLastTwo) {
         this._openLastMobileStep(oPopover, oAnchor);
         return;
       }
@@ -1154,6 +1161,7 @@ sap.ui.define([
       } else {
         window.scrollBy({ top: scrollTopTarget, behavior: "instant" });
       }
+      this._positionTourSpotlight();
 
       oPopover.attachEventOnce("afterOpen", function () {
         var oDom = oPopover.getDomRef();
@@ -1165,6 +1173,7 @@ sap.ui.define([
             oScrollCont.style.overflow = "visible";
           }
         }
+        that._positionTourSpotlight();
         that._setPopoverVisible(oPopover, true);
       });
 
@@ -1177,8 +1186,6 @@ sap.ui.define([
 
     _openLastMobileStep: function (oPopover, oAnchor) {
       var that = this;
-      var TILE_GAP = 12;
-      var vh = window.innerHeight || document.documentElement.clientHeight;
 
       // Close popover first if open
       if (oPopover.isOpen()) {
@@ -1193,38 +1200,30 @@ sap.ui.define([
 
     _forceOpenLastPopover: function (oPopover, oAnchor) {
       var that = this;
-      var TILE_GAP = 12;
-      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var vw = window.innerWidth || document.documentElement.clientWidth;
+      var bMobile = (vw < 600);
+      var MOBILE_POPOVER_GAP = 14;
 
       var aDom = oAnchor.getDomRef();
       if (!aDom) { return; }
 
-      var oScroll =
-        aDom.closest(".sapMPageScrollCont") ||
-        aDom.closest(".sapMScrollCont") ||
-        aDom.closest(".sapUiScrollDelegate");
-
-      // Measure popover height
       oPopover.setPlacement(sap.m.PlacementType.Top);
+      if (bMobile) {
+        oPopover.setContentWidth("calc(100vw - 40px)");
+      }
+      oPopover.setOffsetX(0);
+      oPopover.setOffsetY(bMobile ? -MOBILE_POPOVER_GAP : -8);
       this._setPopoverVisible(oPopover, false);
 
       oPopover.attachEventOnce("afterOpen", function () {
         var oDom = oPopover.getDomRef();
         if (oDom) {
+          that._positionTourSpotlight();
           that._setPopoverVisible(oPopover, true);
         }
       });
 
-      // Scroll so tile + popover fully visible
-      var tileRect = aDom.getBoundingClientRect();
-      var popoverHeight = 300; // approximate, or measure dynamically if needed
-      var scrollTopTarget = tileRect.bottom - vh + popoverHeight + TILE_GAP;
-
-      if (oScroll) {
-        oScroll.scrollBy({ top: scrollTopTarget, behavior: "instant" });
-      } else {
-        window.scrollBy({ top: scrollTopTarget, behavior: "instant" });
-      }
+      this._positionTourSpotlight();
 
       oPopover.openBy(oAnchor);
     },
@@ -1253,6 +1252,19 @@ sap.ui.define([
     _openDesktopStep: function (oPopover, oAnchor) {
       var that = this;
 
+      // LAST STEP (footer button): keep the footer where it is. The default
+      // desktop flow would (a) pick Left placement because the button sits on
+      // the far right — making the arrow point in from the popover's right edge
+      // — and (b) center-scroll via scrollIntoView, which lifts the footer
+      // upward. Instead place the popover on Top without any scrolling, exactly
+      // like the mobile last-step path.
+      var bIsLast = (this._iTourIndex === this._aTourSteps.length - 1);
+      if (bIsLast) {
+        oPopover.setContentWidth("360px");
+        this._forceOpenLastPopover(oPopover, oAnchor);
+        return;
+      }
+
       oPopover.setContentWidth("360px");
       oPopover.setOffsetX(0);
       oPopover.setOffsetY(0);
@@ -1266,13 +1278,16 @@ sap.ui.define([
       if (sBest === sap.m.PlacementType.Top) { oPopover.setOffsetY(-GAP); }
 
       oPopover.attachEventOnce("afterOpen", function () {
+        that._positionTourSpotlight();
         that._setPopoverVisible(oPopover, true);
       });
 
       this._scrollToAnchor(oAnchor, function () {
+        that._positionTourSpotlight();
         requestAnimationFrame(function () {
           setTimeout(function () {
             requestAnimationFrame(function () {
+              that._positionTourSpotlight();
               oPopover.openBy(oAnchor);
             });
           }, 100);
@@ -1355,16 +1370,61 @@ sap.ui.define([
         : sap.m.PlacementType.PreferredTopOrFlip;
     },
 
-    // ─── TOUR: Highlight ──────────────────────────────────────────────────────────
+    // ─── TOUR: Highlight (position the spotlight cut-out over the control) ─────
     _highlightElement: function (oControl) {
       document.querySelectorAll(".sapUiTourHighlight").forEach(function (el) {
         el.classList.remove("sapUiTourHighlight");
       });
-      var oDomRef = oControl.getDomRef();
+      this._oTourCurrentAnchor = oControl || null;
+      var oDomRef = oControl && oControl.getDomRef && oControl.getDomRef();
       if (oDomRef) {
         oDomRef.classList.add("sapUiTourHighlight");
-        document.body.classList.add("sapUiTourOverlayActive");
       }
+      this._positionTourSpotlight();
+    },
+
+    // Size/position the spotlight rect to the active control's bounding box
+    _positionTourSpotlight: function () {
+      var oSpot = this._getTourSpotlight();
+      var oControl = this._oTourCurrentAnchor;
+      var oDomRef = oControl && oControl.getDomRef && oControl.getDomRef();
+      if (!oDomRef) {
+        oSpot.style.display = "none";
+        return;
+      }
+      var r = oDomRef.getBoundingClientRect();
+      var bTile = oDomRef.classList.contains("sapMGT") || oDomRef.classList.contains("glassTile");
+      var pad = bTile ? 14 : 8;
+      var radius = bTile ? 28 : 10;
+      var vw = window.innerWidth || document.documentElement.clientWidth;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var left = Math.max(0, r.left - pad);
+      var top = Math.max(0, r.top - pad);
+      oSpot.style.display = "block";
+      oSpot.style.left = left + "px";
+      oSpot.style.top = top + "px";
+      oSpot.style.width = Math.min(vw - left, r.width + pad * 2) + "px";
+      oSpot.style.height = Math.min(vh - top, r.height + pad * 2) + "px";
+      oSpot.style.borderRadius = radius + "px";
+    },
+
+    // Lazily create / fetch the single spotlight element at the body root
+    _getTourSpotlight: function () {
+      if (!this._oTourSpotlight) {
+        this._oTourSpotlight = document.getElementById("tourSpotlight");
+        if (!this._oTourSpotlight) {
+          this._oTourSpotlight = document.createElement("div");
+          this._oTourSpotlight.id = "tourSpotlight";
+          document.body.appendChild(this._oTourSpotlight);
+        }
+      }
+      return this._oTourSpotlight;
+    },
+
+    // Keep the cut-out glued to the control while the page scrolls / resizes
+    _onTourReposition: function () {
+      if (!this._aTourSteps || !this._aTourSteps.length) { return; }
+      this._positionTourSpotlight();
     },
 
     // ─── TOUR: Cleanup ────────────────────────────────────────────────────────────
@@ -1373,12 +1433,40 @@ sap.ui.define([
       document.querySelectorAll(".sapUiTourHighlight").forEach(function (el) {
         el.classList.remove("sapUiTourHighlight");
       });
+      if (this._oTourSpotlight) {
+        this._oTourSpotlight.style.display = "none";
+      }
+      this._oTourCurrentAnchor = null;
+      if (this._fnTourReposition) {
+        window.removeEventListener("scroll", this._fnTourReposition, true);
+        window.removeEventListener("resize", this._fnTourReposition);
+        this._fnTourReposition = null;
+      }
       this._iTourIndex = 0;
       this._aTourSteps = [];
       if (this._oGuidePopover && this._oGuidePopover.isOpen()) {
         this._setPopoverVisible(this._oGuidePopover, true);
         this._oGuidePopover.close();
       }
+      this._restoreTourScroll();
+    },
+
+    // ─── TOUR: remember / restore scroll so the page (and the footer) go back ──
+    _captureTourScroll: function () {
+      var oCont = document.querySelector(".sapMPageScrollCont");
+      this._oTourScrollState = {
+        container: oCont ? oCont.scrollTop : 0,
+        window: window.pageYOffset || document.documentElement.scrollTop || 0
+      };
+    },
+
+    _restoreTourScroll: function () {
+      var state = this._oTourScrollState;
+      this._oTourScrollState = null;
+      if (!state) { return; }
+      var oCont = document.querySelector(".sapMPageScrollCont");
+      if (oCont) { oCont.scrollTop = state.container; }
+      if (state.window) { window.scrollTo(0, state.window); }
     },
 
     // ─── TOUR: Button handlers ────────────────────────────────────────────────────

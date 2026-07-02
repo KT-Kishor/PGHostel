@@ -5020,7 +5020,15 @@ width: 44px !important;
 }
 
 @media (max-width: 600px) {
-    .tourGuidePopover { max-width: 92vw !important; }
+    .sapMPopover.tourGuidePopover {
+        max-width: calc(100vw - 40px) !important;
+    }
+
+    .sapMPopover.tourGuidePopover .sapMPopoverCont,
+    .sapMPopover.tourGuidePopover .sapMIBar.sapMFooter-CTX {
+        width: auto !important;
+        max-width: calc(100vw - 40px) !important;
+    }
 }
 
 /* ─── Hide class: applied BEFORE openBy(), removed in afterOpen ──────────
@@ -5038,16 +5046,29 @@ width: 44px !important;
     transition: opacity 0.18s ease !important;
 }
 
+/* Tour spotlight: a single fixed element at the <body> root whose huge
+   box-shadow casts ONE continuous dark sheet over the whole viewport —
+   header, content and footer all at once — for the entire tour. Because it
+   is position:fixed and body-rooted, it is never clipped by the header /
+   footer / scroll-container overflow (which is what made the old per-element
+   outline dim each region separately). The element itself is transparent, so
+   the active control shows through the moving cut-out and stays clickable. */
+#tourSpotlight {
+    position: fixed;
+    z-index: 999;
+    border-radius: 24px;
+    box-shadow:
+       inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+       inset 0 0 15px 2px rgba(0, 184, 204, 0.7),
+        0 0 0 100vmax rgba(0, 0, 0, 0.75);
+    pointer-events: none;
+    box-sizing: border-box;
+    display: none;
+}
+
 .sapUiTourHighlight {
     position: relative !important;
     z-index: 1000 !important;
-    outline: 2000px solid rgba(0, 0, 0, 0.75) !important;
-    outline-offset: 15px !important;
-    box-shadow:
-        0 0 15px 5px  rgba(255, 255, 255, 0.8),
-        0 0 0    12px rgba(0, 162, 255, 0.4) !important;
-    border-radius: 12px !important;
-    transition: outline-offset 0.25s ease, box-shadow 0.25s ease !important;
 }
 
 .sapUiTourOverlayActive {
