@@ -186,6 +186,7 @@
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
+                        width="25%"
                     >
                         <Text
                             text="{i18n>description}"
@@ -211,7 +212,7 @@
                             />
                             <ExpandableText
                                 text="{BedDetails>Description}"
-                                maxCharacters="20"
+                                maxCharacters="100"
                             />
                         </cells>
                     </ColumnListItem>
