@@ -105,8 +105,8 @@
 							<Text text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>Pincode} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }" wrapping="true"/>
 							<!-- <Text text="{mainModel>Pincode}" /> -->
 							<Text text="{mainModel>STD} {mainModel>Contact}" />
-							<Link text="Logo" press="onpressbranchlogo"/>
-							<Link text="{i18n>view}" press="HF_viewimage"/>
+							<Link text="{i18n>viewLogo}" press="onpressbranchlogo"/>
+							<Link text="{i18n>viewHome}" press="HF_viewimage"/>
 							</cells>
 					</ColumnListItem>
 				</items>
