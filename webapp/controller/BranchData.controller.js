@@ -177,7 +177,7 @@ sap.ui.define([
                     filters.Pincode = sPincode;
                 }
 
-                var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
+                var oData = await this.ajaxReadWithJQuery("HM_BranchData", filters);
 
                 var aBranchData = Array.isArray(oData.data) ?
                     oData.data : [oData.data];
@@ -631,8 +631,7 @@ sap.ui.define([
                 return;
             }
 
-            if (!oImage.Attachment) {
-                const oFileUploader = sap.ui.getCore().byId(oView.createId("BD_id_FileUploader1"));
+            if (!this._hasHomeImageForSave()) {
                 sap.m.MessageToast.show("Please upload Home image");
                 return;
             }
@@ -1025,7 +1024,7 @@ sap.ui.define([
             );
         },
 
-        MD_UpdateTableRow: function() {
+        MD_UpdateTableRow: async function() {
             var oView = this.getView();
             var oTable = this.byId("id_MD_Table");
             var oSelected = oTable.getSelectedItems();
@@ -1045,6 +1044,14 @@ sap.ui.define([
             const oSelectedItem = oSelected[0];
             var oContext = oSelectedItem.getBindingContext("mainModel");
             var oData = oContext.getObject();
+            var oBranchImages = {};
+
+            this.getBusyDialog();
+            try {
+                oBranchImages = await this._readBranchImages(oData.BranchID);
+            } finally {
+                this.closeBusyDialog();
+            }
 
             // ------------------ STATE FILTER ------------------
             const aAllStates = this.getOwnerComponent().getModel("StateModel").getData();
@@ -1060,26 +1067,26 @@ sap.ui.define([
 
             // ------------------ FILE MODELS ------------------
             this.getView().getModel("UploadModel").setData({
-                Photo1: oData.Photo1 || "",
-                Photo1Type: oData.Photo1Type || "",
-                Photo1Name: oData.Photo1Name || ""
+                Photo1: oBranchImages.logoBase64 || "",
+                Photo1Type: oBranchImages.logoType || "",
+                Photo1Name: oBranchImages.logoName || ""
             });
 
             this.getView().getModel("imageModel").setData({
-                Attachment: oData.Attachment || "",
-                AttachmentType: oData.AttachmentType || "",
-                AttachmentName: oData.AttachmentName || ""
+                Attachment: oBranchImages.homeBase64 || "",
+                AttachmentType: oBranchImages.homeType || "",
+                AttachmentName: oBranchImages.homeName || ""
             });
 
             // ------------------ TOKEN MODELS ------------------
-            const aTokens = oData.Photo1Name ? [{
-                key: oData.Photo1Name,
-                text: oData.Photo1Name
+            const aTokens = oBranchImages.logoName ? [{
+                key: oBranchImages.logoName,
+                text: oBranchImages.logoName
             }] : [];
 
-            const aTokenImages = oData.AttachmentName ? [{
-                key: oData.AttachmentName,
-                text: oData.AttachmentName
+            const aTokenImages = oBranchImages.homeName ? [{
+                key: oBranchImages.homeName,
+                text: oBranchImages.homeName
             }] : [];
 
             this.getView().getModel("tokenModel").setData({
@@ -1091,18 +1098,18 @@ sap.ui.define([
             });
 
             // ------------------ UploaderData MODEL ------------------
-            const aLogoData = oData.Photo1Name ? [{
-                filename: oData.Photo1Name,
-                fileType: oData.Photo1Type || "",
-                size: oData.Photo1 ? atob(oData.Photo1).length : 0,
-                base64: oData.Photo1 || ""
+            const aLogoData = oBranchImages.logoName ? [{
+                filename: oBranchImages.logoName,
+                fileType: oBranchImages.logoType || "",
+                size: oBranchImages.logoBase64 ? atob(oBranchImages.logoBase64).length : 0,
+                base64: oBranchImages.logoBase64 || ""
             }] : [];
 
-            const aImageData = oData.AttachmentName ? [{
-                filename: oData.AttachmentName,
-                fileType: oData.AttachmentType || "",
-                size: oData.Attachment ? atob(oData.Attachment).length : 0,
-                base64: oData.Attachment || ""
+            const aImageData = oBranchImages.homeName ? [{
+                filename: oBranchImages.homeName,
+                fileType: oBranchImages.homeType || "",
+                size: oBranchImages.homeBase64 ? atob(oBranchImages.homeBase64).length : 0,
+                base64: oBranchImages.homeBase64 || ""
             }] : [];
 
             this.getView().setModel(new sap.ui.model.json.JSONModel({
@@ -1180,6 +1187,69 @@ sap.ui.define([
             this._resetBranchValueStates();
             this._applyCountryStateCityFilters();
             this.oDialog.open();
+        },
+
+        _readBranchImages: async function(sBranchID) {
+            var oResponse = await this.ajaxReadWithJQuery("HM_BranchImage", {
+                BranchID: sBranchID,
+                Image: "BothImage"
+            });
+            var aImages = Array.isArray(oResponse.data) ? oResponse.data : (Array.isArray(oResponse) ? oResponse : [oResponse.data || oResponse]);
+            var oImages = {
+                logoBase64: "",
+                logoType: "",
+                logoName: "",
+                homeBase64: "",
+                homeType: "",
+                homeName: ""
+            };
+
+            aImages.forEach(function(oImage) {
+                if (!oImage) return;
+
+                var sImageType = oImage.ImageType || oImage.Image || oImage.Type || "";
+                var sImageBase64 = oImage.ImageData || oImage.Base64 || "";
+                var sImageFileType = oImage.FileType || "image/jpeg";
+                var sImageFileName = oImage.FileName || "";
+
+                if (sImageType === "Logo") {
+                    oImages.logoBase64 = sImageBase64;
+                    oImages.logoType = sImageFileType;
+                    oImages.logoName = sImageFileName || "Logo";
+                }
+
+                if (sImageType === "Home") {
+                    oImages.homeBase64 = sImageBase64;
+                    oImages.homeType = sImageFileType;
+                    oImages.homeName = sImageFileName || "Home Image";
+                }
+
+                if (oImage.Photo1) {
+                    oImages.logoBase64 = oImage.Photo1;
+                    oImages.logoType = oImage.Photo1Type || "image/jpeg";
+                    oImages.logoName = oImage.Photo1Name || "Logo";
+                }
+
+                if (oImage.Attachment) {
+                    oImages.homeBase64 = oImage.Attachment;
+                    oImages.homeType = oImage.AttachmentType || "image/jpeg";
+                    oImages.homeName = oImage.AttachmentName || "Home Image";
+                }
+
+                if (!sImageType && oImage.Logo) {
+                    oImages.logoBase64 = oImage.Logo;
+                    oImages.logoType = oImage.LogoType || "image/jpeg";
+                    oImages.logoName = oImage.LogoName || "Logo";
+                }
+
+                if (!sImageType && oImage.Home) {
+                    oImages.homeBase64 = oImage.Home;
+                    oImages.homeType = oImage.HomeType || "image/jpeg";
+                    oImages.homeName = oImage.HomeName || "Home Image";
+                }
+            });
+
+            return oImages;
         },
 
         _resetBranchValueStates: function() {
@@ -1884,6 +1954,16 @@ sap.ui.define([
             if (iIndex > -1) {
                 aData.splice(iIndex, 1);
                 oModel.setProperty("/attachmentslogo", aData);
+                if (!aData.length) {
+                    this.getView().getModel("UploadModel").setData({
+                        Photo1: "",
+                        Photo1Type: "",
+                        Photo1Name: ""
+                    });
+                    this.getView().getModel("tokenModel").setData({
+                        tokens: []
+                    });
+                }
             }
         },
         onTokenImageDelete: function(oEvent) {
@@ -1899,155 +1979,126 @@ sap.ui.define([
             if (iIndex > -1) {
                 aData.splice(iIndex, 1);
                 oModel.setProperty("/attachmentimage", aData);
+                if (!aData.length) {
+                    this.getView().getModel("imageModel").setData({
+                        Attachment: "",
+                        AttachmentType: "",
+                        AttachmentName: ""
+                    });
+                    this.getView().getModel("tokenImageModel").setData({
+                        imageTokens: []
+                    });
+                }
             }
+        },
+
+        _hasHomeImageForSave: function() {
+            var oImage = this.getView().getModel("imageModel").getData() || {};
+            var aHomeImages = this.getView().getModel("UploaderData").getProperty("/attachmentimage") || [];
+            return !!oImage.Attachment && aHomeImages.some(function(oFile) {
+                return !!(oFile && oFile.base64 && !oFile.isProcessing);
+            });
         },
 
 
 
         onpressbranchlogo: function(oEvent) {
-            var oContext = oEvent.getSource().getBindingContext("mainModel");
-            var oData = oContext.getObject();
-
-            if (!oData.Photo1 || !oData.Photo1.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisbranch"));
-                return;
-            }
-            var sBase64 = oData.Photo1.replace(/\s/g, "");
-            var sPhotoName = oData.Photo1Name || "Photo";
-            if (sBase64 && !sBase64.startsWith("data:image")) {
-                sBase64 = "data:image/jpeg;base64," + sBase64;
-            }
-             const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${oData.Photo1Type || "image/jpeg"};base64,${sBase64}`;
-
-
-                // Create a temporary image to detect orientation and dimensions
-                const oImg = new Image();
-
-                oImg.onload = function () {
-
-                    const viewportW = window.innerWidth * 0.8;
-                    const viewportH = window.innerHeight * 0.8;
-
-                    const imgRatio = oImg.width / oImg.height;
-
-                    let finalWidth = viewportW;
-                    let finalHeight = viewportW / imgRatio;
-
-                    if (finalHeight > viewportH) {
-                        finalHeight = viewportH;
-                        finalWidth = viewportH * imgRatio;
-                    }
-
-                    const oHtml = new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
-            <div class="preview-image-container">
-                <img src="${sImageSrc}" />
-            </div>
-        `
-                    });
-
-                    this._oComplaintPreviewDialog = new sap.m.Dialog({
-                        title: sPhotoName || "Document Preview",
-                        contentWidth: finalWidth + "px",
-                        contentHeight: finalHeight + "px",
-                        draggable: true,
-                        resizable: true,
-                        contentPadding: "0rem",
-                        horizontalScrolling: false,
-                        verticalScrolling: false,
-                        content: [oHtml],
-                        beginButton: new sap.m.Button({
-                            text: "Close",
-                            addstyleClass: "myUnifiedBtn",
-                            press: () => this._oComplaintPreviewDialog.close()
-                        }),
-                        afterClose: () => {
-                            this._oComplaintPreviewDialog.destroy();
-                            this._oComplaintPreviewDialog = null;
-                        }
-                    });
-
-                    this.getView().addDependent(this._oComplaintPreviewDialog);
-                    this._oComplaintPreviewDialog.open();
-
-                }.bind(this);
-
-                oImg.src = sImageSrc;
-                return;
+            this._loadAndPreviewBranchImage(oEvent, "Logo");
         },
 
         HF_viewimage: function(oEvent) {
-            var oContext = oEvent.getSource().getBindingContext("mainModel");
-            var oData = oContext.getObject();
+            this._loadAndPreviewBranchImage(oEvent, "Home");
+        },
 
-            if (!oData.Attachment || !oData.Attachment.length) {
-                sap.m.MessageToast.show(this.i18nModel.getText("noDocumentFoundforthisbranch"));
+        _loadAndPreviewBranchImage: async function(oEvent, sImageType) {
+            var oContext = oEvent.getSource().getBindingContext("mainModel");
+            var oData = oContext && oContext.getObject();
+            var sMissingMessage = sImageType === "Logo" ? "No logo found for this branch" : "No home image found for this branch";
+
+            if (!oData || !oData.BranchID) {
+                sap.m.MessageToast.show(sMissingMessage);
                 return;
             }
-            var sBase64 = oData.Attachment.replace(/\s/g, "");
-            var sPhotoName = oData.AttachmentName || "Attachment";
-            if (sBase64 && !sBase64.startsWith("data:image")) {
-                sBase64 = "data:image/jpeg;base64," + sBase64;
+
+            this.getBusyDialog();
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_BranchImage", {
+                    BranchID: oData.BranchID,
+                    Image: sImageType
+                });
+                var oImageData = Array.isArray(oResponse.data) ? oResponse.data[0] : (oResponse.data || oResponse);
+                var sBase64 = oImageData && (oImageData.ImageData || oImageData.Image || oImageData.Photo1 || oImageData.Attachment);
+
+                if (!sBase64 || !sBase64.length) {
+                    sap.m.MessageToast.show(sMissingMessage);
+                    return;
+                }
+
+                var sPhotoName = oImageData.FileName || oImageData.Photo1Name || oImageData.AttachmentName || sImageType;
+                var sMimeType = oImageData.FileType || oImageData.Photo1Type || oImageData.AttachmentType || "image/jpeg";
+                this._openBranchImagePreview(sBase64, sPhotoName, sMimeType, sMissingMessage);
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                this.closeBusyDialog();
             }
-            const sImageSrc = sBase64.includes("data:") ? sBase64 : `data:${oData.Photo1Type || "image/jpeg"};base64,${sBase64}`;
+        },
 
+        _openBranchImagePreview: function(sBase64, sPhotoName, sMimeType, sMissingMessage) {
+            sBase64 = sBase64.replace(/\s/g, "");
+            var sImageSrc = sBase64.includes("data:") ? sBase64 : "data:" + sMimeType + ";base64," + sBase64;
+            const oImg = new Image();
 
-                // Create a temporary image to detect orientation and dimensions
-                const oImg = new Image();
+            oImg.onload = function() {
+                const viewportW = window.innerWidth * 0.8;
+                const viewportH = window.innerHeight * 0.8;
+                const imgRatio = oImg.width / oImg.height;
+                let finalWidth = viewportW;
+                let finalHeight = viewportW / imgRatio;
 
-                oImg.onload = function () {
+                if (finalHeight > viewportH) {
+                    finalHeight = viewportH;
+                    finalWidth = viewportH * imgRatio;
+                }
 
-                    const viewportW = window.innerWidth * 0.8;
-                    const viewportH = window.innerHeight * 0.8;
-
-                    const imgRatio = oImg.width / oImg.height;
-
-                    let finalWidth = viewportW;
-                    let finalHeight = viewportW / imgRatio;
-
-                    if (finalHeight > viewportH) {
-                        finalHeight = viewportH;
-                        finalWidth = viewportH * imgRatio;
-                    }
-
-                    const oHtml = new sap.ui.core.HTML({
-                        sanitizeContent: false,
-                        content: `
+                const oHtml = new sap.ui.core.HTML({
+                    sanitizeContent: false,
+                    content: `
             <div class="preview-image-container">
                 <img src="${sImageSrc}" />
             </div>
         `
-                    });
+                });
 
-                    this._oComplaintPreviewDialog = new sap.m.Dialog({
-                        title: sPhotoName || "Document Preview",
-                        contentWidth: finalWidth + "px",
-                        contentHeight: finalHeight + "px",
-                        draggable: true,
-                        resizable: true,
-                        contentPadding: "0rem",
-                        horizontalScrolling: false,
-                        verticalScrolling: false,
-                        content: [oHtml],
-                        beginButton: new sap.m.Button({
-                            text: "Close",
-                            addstyleClass: "myUnifiedBtn",
-                            press: () => this._oComplaintPreviewDialog.close()
-                        }),
-                        afterClose: () => {
-                            this._oComplaintPreviewDialog.destroy();
-                            this._oComplaintPreviewDialog = null;
-                        }
-                    });
+                this._oComplaintPreviewDialog = new sap.m.Dialog({
+                    title: sPhotoName || "Document Preview",
+                    contentWidth: finalWidth + "px",
+                    contentHeight: finalHeight + "px",
+                    draggable: true,
+                    resizable: true,
+                    contentPadding: "0rem",
+                    horizontalScrolling: false,
+                    verticalScrolling: false,
+                    content: [oHtml],
+                    beginButton: new sap.m.Button({
+                        text: "Close",
+                        press: () => this._oComplaintPreviewDialog.close()
+                    }).addStyleClass("myUnifiedBtn"),
+                    afterClose: () => {
+                        this._oComplaintPreviewDialog.destroy();
+                        this._oComplaintPreviewDialog = null;
+                    }
+                });
 
-                    this.getView().addDependent(this._oComplaintPreviewDialog);
-                    this._oComplaintPreviewDialog.open();
+                this.getView().addDependent(this._oComplaintPreviewDialog);
+                this._oComplaintPreviewDialog.open();
+            }.bind(this);
 
-                }.bind(this);
+            oImg.onerror = function() {
+                sap.m.MessageToast.show(sMissingMessage);
+            }.bind(this);
 
-                oImg.src = sImageSrc;
-                return;
+            oImg.src = sImageSrc;
         },
 
         HF_viewroom: function(oEvent) {

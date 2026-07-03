@@ -54,9 +54,6 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column demandPopin="true" width="7rem"> 
-						<Text text="{i18n>logoname}" tooltip="{i18n>logoname}"/>
-					</Column>
 					<Column demandPopin="true" width="10rem">
 						<Text text="{i18n>MSbranchCode}" tooltip="{i18n>MSbranchCode}"/>
 					</Column>
@@ -81,6 +78,9 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>contactNumber}" tooltip="{i18n>contactNumber}" />
 					</Column>
+					<Column demandPopin="true" width="7rem"> 
+						<Text text="{i18n>logoname}" tooltip="{i18n>logoname}"/>
+					</Column>
 					<Column demandPopin="true">
 						<Text text="{i18n>homeimage}" tooltip="{i18n>homeimage}"/>
 					</Column>
@@ -89,13 +89,6 @@
 				<items>
 					<ColumnListItem>
 						<cells>
-							<HBox alignItems="Center">
-								<Avatar
-                                    src="{= ${mainModel>Photo1} ? 'data:image/jpeg;base64,' + ${mainModel>Photo1} : '' }"
-                                    displayShape="Square" displaySize="L"
-                                    press="onpressbranchlogo" fallbackIcon="sap-icon://attachment-photo"
-                                    class="sapUiTinyMarginEnd sapUiAvatarImageContain" />
-							</HBox>
 							<VBox>
 								<Text text="{mainModel>Name}" />
 								<Text text="{= '(' + ${mainModel>BranchID} + ')' }" />
@@ -112,6 +105,7 @@
 							<Text text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>Pincode} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }" wrapping="true"/>
 							<!-- <Text text="{mainModel>Pincode}" /> -->
 							<Text text="{mainModel>STD} {mainModel>Contact}" />
+							<Link text="Logo" press="onpressbranchlogo"/>
 							<Link text="{i18n>view}" press="HF_viewimage"/>
 							</cells>
 					</ColumnListItem>
