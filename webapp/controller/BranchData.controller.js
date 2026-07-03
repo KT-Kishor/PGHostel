@@ -64,6 +64,7 @@ sap.ui.define([
             });
 
             this.getView().setModel(oUploaderData, "UploaderData");
+            this._mBranchImageCache = {};
         },
 
         _onRouteMatched: async function() {
@@ -685,6 +686,10 @@ sap.ui.define([
                             UserID: oData.UserID
                         }
                     });
+                }
+                if (Payload.BranchID) {
+                    delete this._mBranchImageCache[Payload.BranchID + "|Logo"];
+                    delete this._mBranchImageCache[Payload.BranchID + "|Home"];
                 }
                 await this.Onsearch(true);
 
@@ -2020,6 +2025,14 @@ sap.ui.define([
                 return;
             }
 
+            var sCacheKey = oData.BranchID + "|" + sImageType;
+            var oCachedImage = this._mBranchImageCache && this._mBranchImageCache[sCacheKey];
+
+            if (oCachedImage) {
+                this._openBranchImagePreview(oCachedImage.base64, oCachedImage.name, oCachedImage.mimeType, sMissingMessage);
+                return;
+            }
+
             this.getBusyDialog();
             try {
                 var oResponse = await this.ajaxReadWithJQuery("HM_BranchImage", {
@@ -2036,6 +2049,11 @@ sap.ui.define([
 
                 var sPhotoName = oImageData.FileName || oImageData.Photo1Name || oImageData.AttachmentName || sImageType;
                 var sMimeType = oImageData.FileType || oImageData.Photo1Type || oImageData.AttachmentType || "image/jpeg";
+                this._mBranchImageCache[sCacheKey] = {
+                    base64: sBase64,
+                    name: sPhotoName,
+                    mimeType: sMimeType
+                };
                 this._openBranchImagePreview(sBase64, sPhotoName, sMimeType, sMissingMessage);
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText);
