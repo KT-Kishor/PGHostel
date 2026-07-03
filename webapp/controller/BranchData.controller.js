@@ -2079,6 +2079,7 @@ sap.ui.define([
                     finalWidth = viewportH * imgRatio;
                 }
 
+                const bIsPhone = sap.ui.Device.system.phone;
                 const oHtml = new sap.ui.core.HTML({
                     sanitizeContent: false,
                     content: `
@@ -2090,8 +2091,9 @@ sap.ui.define([
 
                 this._oComplaintPreviewDialog = new sap.m.Dialog({
                     title: sPhotoName || "Document Preview",
-                    contentWidth: finalWidth + "px",
-                    contentHeight: finalHeight + "px",
+                    contentWidth: bIsPhone ? "100%" : finalWidth + "px",
+                    contentHeight: bIsPhone ? "100%" : finalHeight + "px",
+                    stretchOnPhone: true,
                     draggable: true,
                     resizable: true,
                     contentPadding: "0rem",
@@ -2107,6 +2109,8 @@ sap.ui.define([
                         this._oComplaintPreviewDialog = null;
                     }
                 });
+
+                this._oComplaintPreviewDialog.addStyleClass("branchImagePreviewDialog");
 
                 this.getView().addDependent(this._oComplaintPreviewDialog);
                 this._oComplaintPreviewDialog.open();
