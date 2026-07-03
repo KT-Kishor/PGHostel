@@ -882,7 +882,8 @@ sap.ui.define([
                                         contentType: "application/json",
                                         data: JSON.stringify({
                                             filters: {
-                                                RoomNo: data.RoomNo
+                                                RoomNo: data.RoomNo,
+                                                BranchCode: data.BranchCode
                                             }
                                         }),
                                         headers: {
