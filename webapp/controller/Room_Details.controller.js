@@ -241,41 +241,6 @@ sap.ui.define([
                 })
             );
         });
-
-    // ===== Branch Unique =====
-    let oBranchCombo = oView.byId("PO_id_RBranch");
-    oBranchCombo.destroyItems();
-
-    let uniqueBranches = new Map();
-
-    data.forEach(item => {
-
-        if (item.BranchCode && !uniqueBranches.has(item.BranchCode)) {
-
-            uniqueBranches.set(item.BranchCode, {
-                BranchCode: item.BranchCode,
-                BranchName: item.BranchName,
-                City: item.City
-            });
-
-        }
-
-    });
-
-    Array.from(uniqueBranches.values())
-        .sort((a, b) => a.BranchCode.localeCompare(b.BranchCode))
-        .forEach(item => {
-
-            oBranchCombo.addItem(
-                new sap.ui.core.ListItem({
-                    key: item.BranchCode,
-                    text: item.BranchCode + " - " + item.BranchName,
-                    additionalText: item.City
-                })
-            );
-
-        });
-
 },
 
         HM_AddRoom: function (oEvent) {

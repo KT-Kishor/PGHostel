@@ -67,15 +67,15 @@
                         <fb:control>
                             <ComboBox
                                 id="PO_id_RBranch"
-                                 items="{RoomDetailsModel>/}"
+                                 items="{BranchModel>/}"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                             >
                                
                                   <core:ListItem
-                        key="{RoomDetailsModel>BranchCode}"
-                        text="{RoomDetailsModel>BranchCode} - {RoomDetailsModel>BranchName}"
-                        additionalText="{RoomDetailsModel>City}"
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"
                     />
                             </ComboBox>
                         </fb:control>

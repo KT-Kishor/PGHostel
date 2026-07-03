@@ -15,11 +15,11 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem name="Name" label="{i18n>MSbranchCode}" groupName="Group" visibleInFilterBar="true">
 						<fb:control>
-							<ComboBox id="MD_id_BranchCode" items="{branchModel>/}" showSecondaryValues="true"
+							<ComboBox id="MD_id_BranchCode" items="{mainModel>/}" showSecondaryValues="true"
                                 showClearIcon="true" width="100%">
 								<core:ListItem
-                                    key="{branchModel>BranchID}" text="{branchModel>BranchID} - {branchModel>Name}"
-                                    additionalText="{branchModel>City}"/>
+                                    key="{mainModel>BranchID}" text="{mainModel>BranchID} - {mainModel>Name}"
+                                    additionalText="{mainModel>City}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

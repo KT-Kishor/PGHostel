@@ -120,7 +120,7 @@ sap.ui.define([
             });
         },
 
-        Onsearch: async function() {
+        Onsearch: async function(flag) {
             try {
 
                 const oLoginmodel = this.getOwnerComponent().getModel("LoginModel").getData();
@@ -182,7 +182,7 @@ sap.ui.define([
                 var aBranchData = Array.isArray(oData.data) ?
                     oData.data : [oData.data];
 
-                if (!this._originalBranchData) {
+                if (!this._originalBranchData || flag===true) {
                     this._originalBranchData = aBranchData;
                 }
 
@@ -687,7 +687,7 @@ sap.ui.define([
                         }
                     });
                 }
-                await this.Onsearch();
+                await this.Onsearch(true);
 
                 const oUploaderModel = this.getView().getModel("UploaderData");
                 oUploaderModel.setProperty("/attachmentimage", []);
@@ -1010,7 +1010,7 @@ sap.ui.define([
                                         }
                                     });
                                 }
-                                await this.Onsearch();
+                                await this.Onsearch(true);
                                 sap.m.MessageToast.show(this.i18nModel.getText("selectedRecordsDeletedSuccessfully"));
                             } catch (err) {
                                 console.error("Delete failed:", err);

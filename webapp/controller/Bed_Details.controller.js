@@ -633,34 +633,34 @@ sap.ui.define([
                 });
 
             // ===== Branch Unique =====
-            let oBranchCombo = oView.byId("PO_id_Branch");
-            oBranchCombo.destroyItems();
+            // let oBranchCombo = oView.byId("PO_id_Branch");
+            // oBranchCombo.destroyItems();
 
-            let uniqueBranches = new Map();
+            // let uniqueBranches = new Map();
 
-            data.forEach(item => {
+            // data.forEach(item => {
 
-                if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
+            //     if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
 
-                    uniqueBranches.set(item.BranchID, {
-                        BranchID: item.BranchID,
-                        BranchName: item.BranchName,
-                        City: item.City
-                    });
+            //         uniqueBranches.set(item.BranchID, {
+            //             BranchID: item.BranchID,
+            //             BranchName: item.BranchName,
+            //             City: item.City
+            //         });
 
-                }
-            });
+            //     }
+            // });
 
-            Array.from(uniqueBranches.values()).sort((a, b) => a.BranchID.localeCompare(b.BranchID)).forEach(item => {
-                    oBranchCombo.addItem(
-                        new sap.ui.core.ListItem({
-                            key: item.BranchID,
-                            text: item.BranchID + " - " + item.BranchName,
-                            additionalText: item.City
-                        })
-                    );
+            // Array.from(uniqueBranches.values()).sort((a, b) => a.BranchID.localeCompare(b.BranchID)).forEach(item => {
+            //         oBranchCombo.addItem(
+            //             new sap.ui.core.ListItem({
+            //                 key: item.BranchID,
+            //                 text: item.BranchID + " - " + item.BranchName,
+            //                 additionalText: item.City
+            //             })
+            //         );
 
-                });
+            //     });
 
         },
 
