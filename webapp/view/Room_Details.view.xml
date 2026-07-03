@@ -94,6 +94,12 @@
 					<OverflowToolbar>
 						<Title text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"/>
 						<ToolbarSpacer />
+							<Button
+                            text="{i18n>changeRoom}"
+                            press="HM_changeRoomPrice"
+                            tooltip="{i18n>changeRoomPrice}"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
 						<Button
                             text="{i18n>createRoom}"
                             press="HM_AddRoom"
@@ -101,8 +107,8 @@
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
 						<Button
-                            text="{i18n>MSedit}"
-                            tooltip="{i18n>MSedit}"
+                            text="{i18n>editprice}"
+                            tooltip="{i18n>editprice}"
                             press="HM_EditRoom"
                             class="myUnifiedBtn"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>

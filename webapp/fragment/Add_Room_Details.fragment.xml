@@ -44,7 +44,7 @@
                     valueStateText="Select Property Name"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
-                    editable="{= !${RoomModel>/_isEditing} }"
+                    editable="{= !${RoomModel>/_isEditing} &amp;&amp; !${RoomModel>/_isRoomEditing} }"
                 >
                     <core:ListItem
                         key="{BranchModel>BranchID}"
@@ -65,7 +65,7 @@
                     items="{BedTypeModel>/}"
                     selectionChange=".onBedTypeChange"
                     valueStateText="{i18n>pleaseSelectValidBedType}"
-                    editable="{= !${RoomModel>/_isEditing} }"
+                    editable="{= !${RoomModel>/_isEditing} &amp;&amp; !${RoomModel>/_isRoomEditing} }"
                 >
                     <core:ListItem
                         key="{= ${BedTypeModel>Name} + ' - ' + ${BedTypeModel>ACType} }"

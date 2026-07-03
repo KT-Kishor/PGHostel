@@ -43,9 +43,9 @@ sap.ui.define([
             this.Customerdata()
             //  this.closeBusyDialog()
         },
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
+        getGroupHeader: function (oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
         Customerdata: function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -192,56 +192,56 @@ sap.ui.define([
             })
         },
 
-      _populateUniqueFilterValues: function (data) {
+        _populateUniqueFilterValues: function (data) {
 
-    let oView = this.getView();
+            let oView = this.getView();
 
-    // ===== Room No Unique =====
-    let oRoomCombo = oView.byId("RD_id_CustomerName1");
-    oRoomCombo.destroyItems();
+            // ===== Room No Unique =====
+            let oRoomCombo = oView.byId("RD_id_CustomerName1");
+            oRoomCombo.destroyItems();
 
-    let uniqueRooms = new Set();
+            let uniqueRooms = new Set();
 
-    data.forEach(item => {
-        if (item.RoomNo) {
-            uniqueRooms.add(item.RoomNo);
-        }
-    });
+            data.forEach(item => {
+                if (item.RoomNo) {
+                    uniqueRooms.add(item.RoomNo);
+                }
+            });
 
-    Array.from(uniqueRooms)
-        .sort()
-        .forEach(room => {
-            oRoomCombo.addItem(
-                new sap.ui.core.Item({
-                    key: room,
-                    text: room
-                })
-            );
-        });
+            Array.from(uniqueRooms)
+                .sort()
+                .forEach(room => {
+                    oRoomCombo.addItem(
+                        new sap.ui.core.Item({
+                            key: room,
+                            text: room
+                        })
+                    );
+                });
 
-    // ===== Bed Type Unique =====
-    let oBedTypeCombo = oView.byId("RD_id_CompanyName1");
-    oBedTypeCombo.destroyItems();
+            // ===== Bed Type Unique =====
+            let oBedTypeCombo = oView.byId("RD_id_CompanyName1");
+            oBedTypeCombo.destroyItems();
 
-    let uniqueBedTypes = new Set();
+            let uniqueBedTypes = new Set();
 
-    data.forEach(item => {
-        if (item.BedTypeName) {
-            uniqueBedTypes.add(item.BedTypeName);
-        }
-    });
+            data.forEach(item => {
+                if (item.BedTypeName) {
+                    uniqueBedTypes.add(item.BedTypeName);
+                }
+            });
 
-    Array.from(uniqueBedTypes)
-        .sort()
-        .forEach(type => {
-            oBedTypeCombo.addItem(
-                new sap.ui.core.Item({
-                    key: type,
-                    text: type
-                })
-            );
-        });
-},
+            Array.from(uniqueBedTypes)
+                .sort()
+                .forEach(type => {
+                    oBedTypeCombo.addItem(
+                        new sap.ui.core.Item({
+                            key: type,
+                            text: type
+                        })
+                    );
+                });
+        },
 
         HM_AddRoom: function (oEvent) {
             var oView = this.getView();
@@ -266,7 +266,9 @@ sap.ui.define([
                     NoofPerson: "",
                     RoomNo: "",
                     Price: "",
-                    _isEditing: false
+                    _isEditing: false,
+                    _isRoomEditing: false
+
                 });
             }
 
@@ -330,6 +332,9 @@ sap.ui.define([
 
             // Update filtered data for dropdown
             oBedTypeModel.setProperty("/", aFiltered);
+
+            this.getView().byId("idRoomNumber").setEditable(true);
+
 
             // --- Open Dialog ---
             this.AR_Dialog.open();
@@ -403,10 +408,12 @@ sap.ui.define([
                 oModel.setProperty("/editable", true);
             }
         },
-        HM_EditRoom: function (oEvent) {
+        HM_EditRoom: async function (oEvent) {
+
             var oView = this.getView();
             var oTable = this.byId("id_ARD_Table");
             var oSelected = oTable.getSelectedItems();
+
 
             if (!oSelected || oSelected.length === 0) {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordEditRoom"));
@@ -439,6 +446,8 @@ sap.ui.define([
                 _isEditing: true
             });
             this.RoomNo = oData.RoomNo
+            this.BranchCode = oData.BranchCode
+
             this.BedTypeName = oData.BedTypeName
 
             var sBranchCode = oData.BranchCode;
@@ -528,6 +537,8 @@ sap.ui.define([
                     oInput.setValueState("None");
                 }
             });
+            this.getView().byId("idRoomNumber").setEditable(false);
+
 
             // --- Open Dialog ---
             this.AR_Dialog.open();
@@ -547,7 +558,7 @@ sap.ui.define([
 
         },
 
-        AR_onsavebuttonpress: function () {
+        AR_onsavebuttonpress: async function () {
             var oView = this.getView();
             var oRoomModel = oView.getModel("RoomModel");
             var oRoomDetailsModel = oView.getModel("RoomDetailsModel");
@@ -598,7 +609,7 @@ sap.ui.define([
 
                 // Check if RoomNo already exists
                 var oExistingRoom = aRoomDetails.find(function (room) {
-                    return room.RoomNo === Payload.RoomNo;
+                    return room.RoomNo === Payload.RoomNo && room.BranchCode === Payload.BranchCode;
                 });
 
                 var selectedBedTypeName = Payload.BedTypeName.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
@@ -685,43 +696,84 @@ sap.ui.define([
                     data: Payload
                 };
 
-
-                if (Payload._isEditing === true) {
-                    // Always do PUT when editing
-                    sMethod = "PUT";
-                    oBody.filters = {
-                        RoomNo: this.RoomNo      // Original RoomNo before edit
-                    };
-                }
+                var isEditing = Payload._isEditing;
+                var _isRoomEditing = Payload._isRoomEditing;
 
                 delete Payload._isEditing;
-                this.getBusyDialog()
+                delete Payload._isRoomEditing;
 
-                $.ajax({
-                    url: sUrl,
-                    method: sMethod,
-                    contentType: "application/json",
-                    headers: {
-                        name: "$2a$12$LC.eHGIEwcbEWhpi9gEA.umh8Psgnlva2aGfFlZLuMtPFjrMDwSui",
-                        password: "$2a$12$By8zKifvRcfxTbabZJ5ssOsheOLdAxA2p6/pdaNvv1xy1aHucPm0u"
-                    },
-                    data: JSON.stringify(oBody),
-                    success: function (response) {
-                        sap.m.MessageToast.show(
-                            sMethod === "POST" ?
-                                "Room Added Successfully!" :
-                                "Room Updated Successfully!"
-                        );
-                        this.Onsearch("true");
-                        this.BedTypedetails()
+                 var sRoomNo = this.RoomNo;
+                 var sBranchCode = this.BranchCode;
 
-                        this.AR_Dialog.close();
-                    }.bind(this),
-                    error: function (err) {
-                        sap.m.MessageBox.error(this.i18nModel.getText("errorSavingRoomData"));
-                       this.closeBusyDialog()
-                    }.bind(this)
-                });
+               if (isEditing || _isRoomEditing) {
+
+    let oBody;
+
+    if (_isRoomEditing) {
+
+        oBody = {
+            tableName: "HM_Rooms",
+          data:[ 
+            { data: {
+                RoomNo: Payload.RoomNo
+            },
+            filters: {
+                RoomNo: sRoomNo,
+                BranchCode: sBranchCode
+            }
+        }
+        ]
+
+        };
+
+    } else {
+
+        const selectedRoomNos = this.getView()
+            .getModel("RoomDetailsModel")
+            .getData()
+            .filter(item =>
+                item.BedTypeName === Payload.BedTypeName &&
+                item.BranchCode === Payload.BranchCode
+            )
+            .map(item => item.RoomNo);
+
+        const updateData = {
+            YearPrice: Payload.YearPrice,
+            MonthPrice: Payload.MonthPrice,
+            Price: Payload.Price
+        };
+
+        oBody = {
+            tableName: "HM_Rooms",
+            data: selectedRoomNos.map(roomNo => ({
+                data: updateData,
+                filters: {
+                    RoomNo: roomNo,
+                    BranchCode: this.BranchCode
+                }
+            }))
+        };
+    }
+
+    this.getBusyDialog();
+
+    await this.ajaxUpdateWithJQuery("HM_Rooms", oBody);
+}else {
+
+                    const oBody = {
+                        data: Payload
+                    };
+
+                    this.getBusyDialog();
+
+                    await this.ajaxCreateWithJQuery("HM_Rooms", oBody);
+                }
+                this.Onsearch("true");
+                this.BedTypedetails()
+
+                this.AR_Dialog.close();
+
+
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving"));
                 return;
@@ -811,7 +863,7 @@ sap.ui.define([
                     ],
                     styleClass: "myUnifiedBtn",
                     onClose: async function (sAction) {
-                         // Remove selection on Cancel
+                        // Remove selection on Cancel
                         if (sAction === sap.m.MessageBox.Action.CANCEL) {
                             table.removeSelections(true);
                             return;
@@ -865,7 +917,7 @@ sap.ui.define([
         },
 
         Onsearch: function (flag, bBusyAlreadyOpen) {
-            
+
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -908,11 +960,11 @@ sap.ui.define([
             if (sbedtype) {
                 filters.BedTypeName = sbedtype
             }
-             if (sBranchCode) {
+            if (sBranchCode) {
                 filters.BranchCode = sBranchCode.split('-')[0];
             }
 
-             if (!bBusyAlreadyOpen) {
+            if (!bBusyAlreadyOpen) {
                 this.getBusyDialog();
             }
             this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
@@ -926,7 +978,7 @@ sap.ui.define([
                     const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
-                        BranchName: branch ? branch.Name : bed.BranchCode ,// fallback
+                        BranchName: branch ? branch.Name : bed.BranchCode,// fallback
                         City: branch ? branch.City : "",
                     };
                 });
@@ -973,7 +1025,7 @@ sap.ui.define([
         RD_onPressClear: function () {
             this.getView().byId("RD_id_CustomerName1").setSelectedKey("")
             this.getView().byId("RD_id_CompanyName1").setSelectedKey("")
-                this.getView().byId("PO_id_RBranch").setSelectedKey("")
+            this.getView().byId("PO_id_RBranch").setSelectedKey("")
         },
 
         onRoomNoInputLiveChange: function (oEvent) {
@@ -1011,5 +1063,46 @@ sap.ui.define([
             this.CommonLogoutFunction();
             this.getView().getModel("RoomDetailsModel").setData({});
         },
+         HM_changeRoomPrice: async function (oEvent) {
+
+            var oView = this.getView();
+            var oTable = this.byId("id_ARD_Table");
+            var oSelected = oTable.getSelectedItems();
+
+
+            if (!oSelected || oSelected.length === 0) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordEditRoom"));
+                return;
+            }
+            if (oSelected.length > 1) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoedit"));
+                return;
+            }
+
+            var oContext = oSelected[0].getBindingContext("RoomDetailsModel");
+            var oData = oContext.getObject();
+
+
+
+            
+                 if (!this.AR_Dialog) {
+                this.AR_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.Add_Room_Details", this);
+                oView.addDependent(this.AR_Dialog);
+            }
+               
+            this.AR_Dialog.open();
+
+            this.getView().byId("idRoomNumber").setEditable(true);
+
+            // Prepare RoomModel with selected data
+            var oRoomModel = oView.getModel("RoomModel");
+            oRoomModel.setData({
+                ...oData,
+                _isRoomEditing: true,
+                 editable:false
+            });
+              this.RoomNo = oData.RoomNo
+            this.BranchCode = oData.BranchCode
+        }
     });
 });
