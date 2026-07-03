@@ -547,21 +547,20 @@ sap.ui.define([
 
             // Create Carousel Pages
             var aPages = aImages.map(function (oImg) {
-                return new sap.m.VBox({
+                return new sap.m.FlexBox({
                     alignItems: "Center",
                     justifyContent: "Center",
+                    renderType: "Bare",
                     width: "100%",
                     height: "100%",
                     items: [
                         new sap.m.Image({
                             src: oImg.src,
                             densityAware: false,
-                            decorative: false,
-                            width: "100%",
-                            height: "100%"
-                        }).addStyleClass("carouselImage")
+                            decorative: false
+                        }).addStyleClass("supportCarouselImage")
                     ]
-                });
+                }).addStyleClass("supportCarouselImagePage");
             });
 
             // Carousel
@@ -570,13 +569,13 @@ sap.ui.define([
                 width: "100%",
                 height: "100%",
                 showPageIndicator: false
-            });
+            }).addStyleClass("supportImageCarousel");
 
             // Dialog
             var oDialog = new sap.m.Dialog({
                 title: "Advertisement Pictures",
-                contentWidth: "60%",
-                contentHeight: "70%",
+                contentWidth: "80vw",
+                contentHeight: "80vh",
                 horizontalScrolling: false,
                 verticalScrolling: false,
                 content: [oCarousel],
@@ -593,7 +592,7 @@ sap.ui.define([
                 }
             });
 
-            oDialog.addStyleClass("ImageDialogNoPadding");
+            oDialog.addStyleClass("supportImageDialog");
             oDialog.open();
         }
     });

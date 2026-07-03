@@ -221,14 +221,20 @@ sap.ui.define([
                         if (!base64.startsWith("data:image")) {
                             base64 = "data:" + img.type + ";base64," + base64;
                         }
-                        return new sap.m.Image({
-                            src: base64,
+                        return new sap.m.FlexBox({
                             width: "100%",
                             height: "100%",
-                            style: "object-fit: cover; display:block; margin:0; padding:0;",
-                            densityAware: false,
-                            decorative: false,
-                        });
+                            alignItems: "Center",
+                            justifyContent: "Center",
+                            renderType: "Bare",
+                            items: [
+                                new sap.m.Image({
+                                    src: base64,
+                                    densityAware: false,
+                                    decorative: false,
+                                }).addStyleClass("supportCarouselImage")
+                            ]
+                        }).addStyleClass("supportCarouselImagePage");
                     });
                     this._openImageDialog(aCarouselImages);
                 })
@@ -243,15 +249,16 @@ sap.ui.define([
             var oCarousel = new sap.m.Carousel({
                 pages: aImages,
                 width: "100%",
-                height: "400px",
+                height: "100%",
                 showPageIndicator: false
-            });
+            }).addStyleClass("supportImageCarousel");
             this._oDialog = new sap.m.Dialog({
                 title: "Support Images",
-                contentWidth: "60%",
-                contentHeight: "60%",
+                contentWidth: "80vw",
+                contentHeight: "80vh",
                 resizable: true,
                 draggable: true,
+                verticalScrolling: false,
                 content: [oCarousel],
                 endButton: new sap.m.Button({
                     text: "Close",
@@ -262,7 +269,7 @@ sap.ui.define([
                 afterClose: () => {
                     this._oDialog.destroy();
                 }
-            });
+            }).addStyleClass("supportImageDialog");
             this._oDialog.open();
         },
 

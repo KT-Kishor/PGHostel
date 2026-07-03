@@ -265,12 +265,20 @@ sap.ui.define([
                     if (!base64.startsWith("data:image")) {
                         base64 = "data:" + img.type + ";base64," + base64;
                     }
-                    return new sap.ui.core.HTML({
-                        content:
-                            '<div class="preview-image-container">' +
-                                '<img src="' + base64 + '" />' +
-                            '</div>'
-                    });
+                    return new sap.m.FlexBox({
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "Center",
+                        justifyContent: "Center",
+                        renderType: "Bare",
+                        items: [
+                            new sap.m.Image({
+                                src: base64,
+                                densityAware: false,
+                                decorative: false,
+                            }).addStyleClass("supportCarouselImage")
+                        ]
+                    }).addStyleClass("supportCarouselImagePage");
                 });
 
                 this._openImageDialog(aCarouselImages);
@@ -287,12 +295,12 @@ sap.ui.define([
                 width: "100%",
                 height: "100%",
                 showPageIndicator: false
-            });
+            }).addStyleClass("supportImageCarousel");
 
             this._oDialog = new sap.m.Dialog({
                 title: "Support Images",
-                contentWidth: "80%",
-                contentHeight: "80%",
+                contentWidth: "80vw",
+                contentHeight: "80vh",
                 resizable: true,
                 draggable: true,
                 verticalScrolling: false,
@@ -309,7 +317,7 @@ sap.ui.define([
                     this._oDialog.destroy();
                     this._oDialog = null;
                 }
-            });
+            }).addStyleClass("supportImageDialog");
             this._oDialog.open();
         },
 
