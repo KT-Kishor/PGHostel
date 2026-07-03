@@ -638,7 +638,7 @@ sap.ui.define([
                 });
 
 
-                if (aFiltered.length === 0 && !Payload._isEditing) {
+                if (aFiltered.length === 0 && !Payload._isEditing && !Payload._isRoomEditing) {
                     sap.m.MessageToast.show(this.i18nModel.getText("allRoomsforthisBedTypeAlreadyCreated"));
                     var oMatch = aRoomDetails.find(item =>
                         item.BedTypeName === Payload.BedTypeName &&
