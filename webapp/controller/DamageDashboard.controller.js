@@ -33,7 +33,6 @@ sap.ui.define([
                 else {
                     return MessageToast.show("Login branch not found");
                 }
-                this._aUserBranches = oLogin.BranchCode ? oLogin.BranchCode.split(",").map(b => b.trim()) : [];
                 await this._loadUserBranches();
                 this._setDefaultDates();
                 await this.DD_search();
@@ -47,8 +46,14 @@ sap.ui.define([
         _loadUserBranches: async function () {
             const oData = await this.ajaxReadWithJQuery("HM_Branch", {});
             let aAllBranches = Array.isArray(oData.data) ? oData.data : [oData.data];
-            let aFiltered = aAllBranches.filter(b =>
-                this._aUserBranches.includes(b.BranchID));
+            let aFiltered;
+            if (this._aUserBranches.includes("ALL")) {
+                aFiltered = aAllBranches;
+            } else {
+                aFiltered = aAllBranches.filter(b =>
+                    this._aUserBranches.includes(b.BranchID)
+                );
+            }
             this.getView().setModel(new JSONModel(aFiltered), "branchModel");
         },
 
@@ -72,15 +77,17 @@ sap.ui.define([
                 if (!aSelectedBranches || aSelectedBranches.length === 0) {
                     aBranchesToUse = this._aUserBranches || [];
                 } else {
-                    aBranchesToUse = aSelectedBranches.filter(b =>
-                        this._aUserBranches.includes(b)
-                    );
+                    aBranchesToUse = this._aUserBranches.includes("ALL")
+                        ? aSelectedBranches
+                        : aSelectedBranches.filter(b =>
+                            this._aUserBranches.includes(b)
+                        );
                     if (aBranchesToUse.length === 0) {
                         sap.m.MessageToast.show("Unauthorized branch selected");
                         return;
                     }
                 }
-                const branchPayload = aBranchesToUse.join(",");
+                const branchPayload = aBranchesToUse.includes("ALL") ? "" : aBranchesToUse.join(",");
                 const oRange = this.byId("id_DD_year");
                 const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
                     pattern: "yyyy-MM-dd"
