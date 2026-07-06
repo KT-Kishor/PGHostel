@@ -728,7 +728,7 @@ sap.ui.define([
 
                     }
 
-                    //  If no match OR only expired → proceed with your code
+                    // If there is no active overlap, proceed with the coupon creation.
                     oCoupon.CreatedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
                     oCoupon.CreatedBy =
                         oView.getModel("LoginModel")
@@ -863,8 +863,7 @@ sap.ui.define([
             let aData = Array.isArray(oResult?.data) ? oResult.data : (oResult?.data ? [oResult.data] : []);
             const mPriority = {
                 Active: 1,
-                Inactive: 2,
-                Expired: 3
+                Inactive: 2
             };
 
             return aData.map(c => ({

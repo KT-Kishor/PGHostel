@@ -75,10 +75,6 @@
                                     text="Active"
                                 />
                                 <core:Item
-                                    key="Expired"
-                                    text="Expired"
-                                />
-                                <core:Item
                                     key="Inactive"
                                     text="Inactive"
                                 />

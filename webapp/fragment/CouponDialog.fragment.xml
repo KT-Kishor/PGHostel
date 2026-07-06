@@ -149,10 +149,6 @@
                             key="Inactive"
                             text="Inactive"
                         />
-                        <core:Item
-                            key="Expired"
-                            text="Expired"
-                        />
                     </ComboBox>
                     <Label
                         required="true"

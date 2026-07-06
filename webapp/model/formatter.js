@@ -256,10 +256,6 @@ sap.ui.define([
                 return "Success";   // Green
             }
 
-            if (sStatus === "Expired") {
-                return "Warning";   // Yellow / Orange
-            }
-
             if (sStatus === "Inactive") {
                 return "Error";     // Red
             }
