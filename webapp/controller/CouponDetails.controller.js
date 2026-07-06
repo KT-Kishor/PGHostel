@@ -1546,29 +1546,27 @@ sap.ui.define([
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-            //  Dynamic Discount Line Logic
             let sDiscountDetailLine = "";
             if (oCoupon.DiscountType === "Percentage") {
                 sDiscountDetailLine = oCoupon.UptoValue ? `💰 Max Discount: ${oCoupon.UptoValue}\n` : "";
             } else {
-                // Fixed Amount ke liye direct value dikhayenge
                 sDiscountDetailLine = `💰 Discount Value: ${oCoupon.DiscountValue}\n`;
             }
 
             return (
-                `🎉 StayVriksha – ${sBranchName} Special Deal! 🎊\n\n` +
+                `🎉 StayVriksha.in – ${sBranchName} Special Deal! 🎊\n\n` +
                 `Don't miss out on this exclusive coupon 🎉\n\n` +
-                `🔑 Code: ${oCoupon.CouponCode}\n` +
+                `🔑 Coupon Code: ${oCoupon.CouponCode}\n` +
                 `📅 Valid: ${sStartDate} → ${sEndDate}\n` +
                 `💰 Min Order: ${oCoupon.MinOrderValue}\n` +
-                sDiscountDetailLine + 
-                `\nUse this coupon while booking with StayVriksha and enjoy instant savings! 🙌\n\n` +
-                `📌 Terms & Conditions:: \n` +
-                ` • Applicable for new bookings only\n` +
-                ` • Cannot be combined with other offers or promotions\n\n` +
+                sDiscountDetailLine +
+                `\nUse this coupon while booking ${sBranchName} from StayVriksha.in and enjoy instant savings! 🙌\n\n` +
+                `📌 Terms & Conditions: \n` +
+                ` • Applicable for new bookings at ${sBranchName} Only\n` +
+                ` • Cannot be combined with other offers or promotions\n` +
+                ` • StayVriksha.in and the ${sBranchName} reserve the right to modify or cancel the coupon\n\n` +
                 ` • Book now and grab the deal before it ends! 🚀\n\n` +
-
-                `— StayVriksha | ${sBranchName} Management`
+                `— ${sBranchName} on StayVriksha.in`
             );
         },
 
@@ -1577,34 +1575,21 @@ sap.ui.define([
             const sStartDate = this.Formatter.formatDate(oCoupon.StartDate);
             const sEndDate = this.Formatter.formatDate(oCoupon.EndDate);
 
-            //  Dynamic Discount Text for Email body
-            let sOfferText = "";
-            if (oCoupon.DiscountType === "Percentage") {
-                sOfferText = oCoupon.UptoValue ? ` Maximum discount up to ${oCoupon.UptoValue}` : "";
-            } else {
-                sOfferText = ` Discount Value of ${oCoupon.DiscountValue}`;
-            }
-
             return (
                 `Dear Customer,\n\n` +
-                `We are pleased to share with you the StayVriksha coupon code: ${oCoupon.CouponCode}, with a ${sOfferText}\n\n` +
-                // `We are pleased to share you coupon code: ${oCoupon.CouponCode} and ${sOfferText}\n\n` + //  Updated logic
-                `You can use this coupon during the booking creation process ` +
-                `to avail the applicable discount.\n` +
-                `Please ensure to enter the code correctly at the time of booking.\n\n` +
-
-                `If you have any questions or need support, feel free to contact us.\n\n` +
-
+                `We are pleased to share your exclusive coupon code for your next stay via StayVriksha.in.\n\n` +
+                `Coupon Code: ${oCoupon.CouponCode}\n\n` +
+                `You can apply this coupon code during the booking process on StayVriksha.in to avail your discount at ${sBranchName}.\n` +
+                `Please ensure to enter the code correctly before completing your booking.\n\n` +
+                `If you have any questions or need support, feel free to contact us or the StayVriksha support team.\n\n` +
                 `Terms & Conditions\n` +
                 `This coupon code is valid from ${sStartDate} to ${sEndDate}.\n` +
-                `The coupon is applicable only for new bookings made during the validity period ` +
-                `and requires a minimum order value of ${oCoupon.MinOrderValue}.\n` +
-                `This coupon cannot be combined with any other offers or discounts.\n` +
-                `The company reserves the right to modify or cancel the coupon at any time.\n\n` +
-
-                `Thank you for choosing StayVriksha.\n\n` +
+                `The coupon is applicable only for new bookings made for ${sBranchName} via the StayVriksha platform during the validity period, with a minimum order value of ${oCoupon.MinOrderValue}.\n` +
+                `This coupon cannot be combined with any other promotional offers or discounts.\n` +
+                `StayVriksha.in and the property reserve the right to modify or cancel the coupon at any time.\n` +
+                `Thank you for choosing StayVriksha.in and ${sBranchName} for your stay.\n\n` +
                 `Best regards,\n` +
-                `StayVriksha | ${sBranchName} Management`
+                `StayVriksha`
             );
         },
 
