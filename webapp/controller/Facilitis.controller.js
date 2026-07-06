@@ -71,7 +71,7 @@ sap.ui.define([
         FC_onSearch: async function() {
             var aFilterItems = this.byId("FO_id_FilterbarEmployee").getFilterGroupItems();
             var params = {};
-
+              
             aFilterItems.forEach(function(oItem) {
                 var oControl = oItem.getControl();
                 if (!oControl) return;
@@ -127,6 +127,16 @@ sap.ui.define([
                 }
             }
 
+           var sFacilityName = this.getView().byId("FN_id_FacilityName").getSelectedKey() || this.getView().byId("FN_id_FacilityName").getValue();
+           var sBranchCode = this.getView().byId("FN_id_BranchCode").getSelectedKey() || this.getView().byId("FN_id_BranchCode").getValue();
+
+            if(sFacilityName){
+                filter.FacilityName = sFacilityName;
+            }
+            if(sBranchCode){
+                filter.BranchCode = sBranchCode;
+            }
+
             if (filter.showBusy) {
                 this.getBusyDialog();
             }
@@ -153,7 +163,7 @@ sap.ui.define([
                 });
                 this.getOwnerComponent().setModel(new JSONModel(responseData), "Facilities");
 
-                if (filter.filter === "Initial" && this.sPath === "TilePage") {
+                if (sBranchCode==="" && sFacilityName==="" && filter.filter === "Initial" && this.sPath === "TilePage") {
                     const facilitiesData = [
                         ...new Map(
                             responseData
