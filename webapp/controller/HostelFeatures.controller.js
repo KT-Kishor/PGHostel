@@ -4,14 +4,14 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/export/Spreadsheet",
     "sap/m/MessageToast"
-], function(BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
+], function (BaseController, utils, MessageBox, Spreadsheet, MessageToast) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.HostelFeatures", {
-        onInit: function() {
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteHostelFeatures").attachMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             try {
                 this.getBusyDialog();
                 var LoginFUnction = await this.commonLoginFunction("ManageAmenities");
@@ -49,11 +49,11 @@ sap.ui.define([
             }
         },
 
-        getGroupHeader: function(oGroup) {
+        getGroupHeader: function (oGroup) {
             return this.getStyledGroupHeader(oGroup);
         },
 
-        _loadBranchCode: async function() {
+        _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
@@ -85,7 +85,7 @@ sap.ui.define([
             }
         },
 
-        HM_AddHostelFeature: function() {
+        HM_AddHostelFeature: function () {
             const oView = this.getView();
 
             if (!this.ARD_Dialog) {
@@ -116,7 +116,7 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HM_EditHostelFeature: function() {
+        HM_EditHostelFeature: function () {
             const oTable = this.byId("HF_HostelFeatureTable");
             const oSelected = oTable.getSelectedItems();
 
@@ -161,31 +161,31 @@ sap.ui.define([
             this.ARD_Dialog.open();
         },
 
-        HF_onCancelButtonPress: function() {
+        HF_onCancelButtonPress: function () {
             this.ARD_Dialog.close();
             this.byId("HFF_id_BranchCode").setValueState("None");
             this.byId("HF_HostelFeatureTable").removeSelections(true);
         },
 
-        onNameInputLiveChange: function(oEvent) {
+        onNameInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onFacilityNameChange: function(oEvent) {
+        onFacilityNameChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidateMandatoryField(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        onHostelbranchChange: function(oEvent) {
+        onHostelbranchChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        HF_onsavebuttonpress: async function() {
+        HF_onsavebuttonpress: async function () {
             const oView = this.getView();
             const oHostelFeaturesModel = oView.getModel("HostelFeaturesModel");
             const oDescControl = sap.ui.getCore().byId(this.getView().createId("HFF_id_Description"));
@@ -208,7 +208,7 @@ sap.ui.define([
             }
 
             //  Duplicate check
-            var bDuplicate = aHostelData.some(function(facility) {
+            var bDuplicate = aHostelData.some(function (facility) {
                 if (Payload.ID && facility.ID === Payload.ID) return false; // Skip comparing the same record during update
                 return (
                     facility.BranchCode === Payload.BranchCode &&
@@ -274,7 +274,7 @@ sap.ui.define([
             }
         },
 
-        onFacilityFileChange: async function(oEvent) {
+        onFacilityFileChange: async function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             if (!oFile) return;
 
@@ -316,9 +316,9 @@ sap.ui.define([
                     return;
                 }
 
-                const base64 = await new Promise(function(resolve, reject) {
+                const base64 = await new Promise(function (resolve, reject) {
                     const reader = new FileReader();
-                    reader.onload = function() { resolve(reader.result.split(",")[1]); };
+                    reader.onload = function () { resolve(reader.result.split(",")[1]); };
                     reader.onerror = reject;
                     reader.readAsDataURL(processedFile);
                 });
@@ -347,7 +347,7 @@ sap.ui.define([
             }
         },
 
-        _addBusyProcessingRow: function() {
+        _addBusyProcessingRow: function () {
             const oModel = this.getView().getModel("tokenModel");
             oModel.setData({
                 tokens: [{
@@ -357,7 +357,7 @@ sap.ui.define([
             });
         },
 
-        onTokenDelete: function(oEvent) {
+        onTokenDelete: function (oEvent) {
             this.getView().getModel("UploadModel").setData({
                 Photo1: "",
                 Photo1Type: "",
@@ -368,7 +368,7 @@ sap.ui.define([
             });
         },
 
-        Onsearch: function(flag, bBusyAlreadyOpen) {
+        Onsearch: function (flag, bBusyAlreadyOpen) {
             const oExistingModel = this.getOwnerComponent()
                 .getModel("LoginModel")
                 .getData();
@@ -441,8 +441,8 @@ sap.ui.define([
             }
 
             if (!bBusyAlreadyOpen) {
-                        this.getBusyDialog();
-                    }
+                this.getBusyDialog();
+            }
 
             return this.ajaxReadWithJQuery(
                 "HM_HostelFeatures",
@@ -473,8 +473,28 @@ sap.ui.define([
                 });
 
                 if (!this._originalBedData || flag === "true") {
-                    this._originalBedData = response;
+
+                    const facilitiesData = [
+                        ...new Map(
+                            response
+                                .filter(item => item.Type)
+                                .map(item => [item.Type.trim(), item])
+                        ).values()
+                    ];
+
+                    if (!this._originalBedData) {
+                        this._originalBedData = facilitiesData;
+                    } else {
+                        // Append old + new and remove duplicates by Type
+                        this._originalBedData = [
+                            ...new Map(
+                                [...this._originalBedData, ...facilitiesData]
+                                    .map(item => [item.Type.trim(), item])
+                            ).values()
+                        ];
+                    }
                 }
+
 
                 const model = new sap.ui.model.json.JSONModel(response);
 
@@ -496,7 +516,7 @@ sap.ui.define([
 
         },
 
-        _populateUniqueFilterValues: function(data) {
+        _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 HF_id_FacilityName: new Set(),
             };
@@ -518,7 +538,7 @@ sap.ui.define([
             });
         },
 
-        HM_DeleteHostelFeature: async function() {
+        HM_DeleteHostelFeature: async function () {
             var oTable = this.byId("HF_HostelFeatureTable");
             var aSelectedItems = oTable.getSelectedItems();
 
@@ -537,77 +557,77 @@ sap.ui.define([
 
             MessageBox.confirm(
                 `Are you sure you want to Delete the Selected Amenities: ${sNames}?`, {
-                    icon: MessageBox.Icon.WARNING,
-                    title: "Confirm Deletion",
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    emphasizedAction: MessageBox.Action.NO,
-                    styleClass: "myUnifiedBtn",
-                    onClose: async function(sAction) {
-                        if (sAction === MessageBox.Action.YES) {
-                            try {
-                                that.getBusyDialog()
+                icon: MessageBox.Icon.WARNING,
+                title: "Confirm Deletion",
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                emphasizedAction: MessageBox.Action.NO,
+                styleClass: "myUnifiedBtn",
+                onClose: async function (sAction) {
+                    if (sAction === MessageBox.Action.YES) {
+                        try {
+                            that.getBusyDialog()
 
-                                // Collect all delete promises
-                                const aDeletePromises = aSelectedItems.map(async (item) => {
-                                    var oData = item.getBindingContext("HostelFeatures").getObject();
-                                    await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
-                                        filters: {
-                                            ID: oData.ID
-                                        }
-                                    });
+                            // Collect all delete promises
+                            const aDeletePromises = aSelectedItems.map(async (item) => {
+                                var oData = item.getBindingContext("HostelFeatures").getObject();
+                                await that.ajaxDeleteWithJQuery("HM_HostelFeatures", {
+                                    filters: {
+                                        ID: oData.ID
+                                    }
                                 });
+                            });
 
-                                // Wait for all deletions to complete
-                                await Promise.all(aDeletePromises);
-                                await that.Onsearch("true"); // refresh table
-                            } catch (err) {
-                                that.closeBusyDialog()
-                                sap.m.MessageToast.show(err.message || err.responseText);
-                            } finally {
-                                that.closeBusyDialog()
-                                sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
-                                oTable.removeSelections(true);
-                            }
-                        } else {
+                            // Wait for all deletions to complete
+                            await Promise.all(aDeletePromises);
+                            await that.Onsearch("true"); // refresh table
+                        } catch (err) {
+                            that.closeBusyDialog()
+                            sap.m.MessageToast.show(err.message || err.responseText);
+                        } finally {
+                            that.closeBusyDialog()
+                            sap.m.MessageToast.show(that.i18nModel.getText("hostelFeatureDeletedSuccessfully"));
                             oTable.removeSelections(true);
                         }
+                    } else {
+                        oTable.removeSelections(true);
                     }
                 }
+            }
             );
         },
 
-        _resetFacilityValueStates: function() {
+        _resetFacilityValueStates: function () {
             ["HFF_id_FacilityName", "HFF_id_Description"].forEach(id => {
                 const oField = this.byId(id);
                 if (oField) oField.setValueState("None");
             });
         },
 
-        FC_onPressClear: function() {
+        FC_onPressClear: function () {
             this.getView().byId("HF_id_FacilityName").setSelectedKey("")
             this.getView().byId("HF_id_BranchCode").setSelectedKey("")
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("TilePage");
             this.getView().getModel("HostelFeatures").setData({});
         },
 
-        onHome: function() {
+        onHome: function () {
             this.CommonLogoutFunction();
         },
 
-        HF_viewroom: function(oEvent) {
+        HF_viewroom: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("HostelFeatures");
             var oData = oContext.getObject();
 
             if (!oData.Photo1 || !oData.Photo1.length) {
                 sap.m.MessageBox.information(
                     "No image is uploaded.", {
-                        title: "Information",
-                        styleClass: "myUnifiedBtn"
-                    }
+                    title: "Information",
+                    styleClass: "myUnifiedBtn"
+                }
                 );
                 return;
             }
@@ -622,7 +642,7 @@ sap.ui.define([
             // Create a temporary image to detect orientation and dimensions
             const oImg = new Image();
 
-            oImg.onload = function() {
+            oImg.onload = function () {
 
                 const viewportW = window.innerWidth * 0.8;
                 const viewportH = window.innerHeight * 0.8;
@@ -676,37 +696,37 @@ sap.ui.define([
             return;
         },
 
-        onAmenitieTypeChange: function(oEvent) {
+        onAmenitieTypeChange: function (oEvent) {
             var oInput = oEvent.getSource();
             utils._LCstrictValidationComboBox(oEvent);
             if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
         },
 
-        createTableSheet: function() {
+        createTableSheet: function () {
             return [{
-                    label: "Property Name",
-                    property: "BranchName",
-                    type: "string"
-                },
-                {
-                    label: "Amenities Name",
-                    property: "FacilityName",
-                    type: "string"
-                },
-                {
-                    label: "Type",
-                    property: "Type",
-                    type: "string"
-                },
-                {
-                    label: "Description",
-                    property: "Description",
-                    type: "string"
-                }
+                label: "Property Name",
+                property: "BranchName",
+                type: "string"
+            },
+            {
+                label: "Amenities Name",
+                property: "FacilityName",
+                type: "string"
+            },
+            {
+                label: "Type",
+                property: "Type",
+                type: "string"
+            },
+            {
+                label: "Description",
+                property: "Description",
+                type: "string"
+            }
             ]
         },
 
-        HF_onDownload: function() {
+        HF_onDownload: function () {
             const oModel = this.byId("HF_HostelFeatureTable").getModel("HostelFeatures").getData();
             if (!oModel || oModel.length === 0) {
                 MessageToast.show(this.i18nModel.getText("MSnodata"));

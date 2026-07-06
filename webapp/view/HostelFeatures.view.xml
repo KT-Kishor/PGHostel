@@ -66,7 +66,8 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>type}" tooltip="{i18n>type}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column 
+					  demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>description}" tooltip="{i18n>description}"/>
 					</Column>
 					<Column demandPopin="true">
@@ -78,7 +79,7 @@
 						<cells>
 							<Text text="{HostelFeatures>FacilityName}" />
 							<Text text="{HostelFeatures>Type}" />
-							<ExpandableText text="{HostelFeatures>Description}" maxCharacters="20"/>
+							<ExpandableText text="{HostelFeatures>Description}" maxCharacters="100"/>
 							<Button text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }"/>
 						</cells>
 					</ColumnListItem>
