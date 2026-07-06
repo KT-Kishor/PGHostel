@@ -1141,17 +1141,23 @@ sap.ui.define([
 
         async _loadRecipientContacts() {
             try {
-                const sRole = this._oLoggedInUser?.Role || "";
+                // const sRole = this._oLoggedInUser?.Role || "";
+
+                // // Decide filter STRICTLY by role
+                // const oFilter =
+                //     sRole === "SuperAdmin" ? {} // backend returns everything
+                //     :
+                //     {
+                //         BranchCode: this._allowedBranches
+                //     };
+
+                // console.log("HM_CustomerContact filter:", oFilter);
+
 
                 // Decide filter STRICTLY by role
-                const oFilter =
-                    sRole === "SuperAdmin" ? {} // backend returns everything
-                    :
-                    {
-                        BranchCode: this._allowedBranches
-                    };
+                // Load every customer contact; branch filtering is intentionally not applied.
 
-                console.log("HM_CustomerContact filter:", oFilter);
+                const oFilter = {};
 
                 const oResponse = await this.ajaxReadWithJQuery(
                     "HM_CustomerContact",
@@ -1474,7 +1480,7 @@ sap.ui.define([
                             // }),
 
                             //  EMAIL → TRIGGERS EXISTING FLOW
-                            createItem("image/Email.png", "Email to Customers", () => {
+                            createItem("image/Email.png", "Email to Existing Customers", () => {
                                 this._oSharePopover.close();
                                 this.onShareCoupon(); //  THIS is the key
                             }),
