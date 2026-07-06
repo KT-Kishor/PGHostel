@@ -1229,6 +1229,17 @@
   border-color: #000000;
 }
 
+.facilityNoImageText {
+  display: inline-block;
+  padding: 14px 18px;
+  border: 1px dashed #008b96;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #00b7c7 !important;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .sapMGT {
   background: #ffffff !important;
   color: #008c9e !important;

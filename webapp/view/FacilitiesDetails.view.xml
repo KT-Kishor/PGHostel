@@ -269,11 +269,16 @@
                                             type="Warning"
                                             showIcon="true"
                                             class="sapUiSmallMarginBottom"
-                                        />
+										/>
 									</m:HBox>
+									<m:Text
+										text="No image uploaded."
+										visible="{= !${editable>/Edit} &amp;&amp; (!${DisplayImagesModel>/DisplayImages} || ${DisplayImagesModel>/DisplayImages}.length === 0) }"
+										class="facilityNoImageText sapUiSmallMargin"
+									/>
 									<m:HBox
-                                        id="FD_id_ImagesContainer"
-                                        wrap="Wrap"
+										id="FD_id_ImagesContainer"
+										wrap="Wrap"
                                         justifyContent="Start"
                                         alignItems="Start"
                                         class="sapUiSmallMargin"

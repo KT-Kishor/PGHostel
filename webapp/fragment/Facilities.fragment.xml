@@ -206,7 +206,7 @@
         >
 			<!-- Informational Message Strip -->
 			<MessageStrip
-                text="Please upload only JPG, JPEG, or PNG images with a maximum file size of 2 MB."
+                text="Upload up to 3 images (JPG, JPEG, or PNG format)."
                 showIcon="true"
                 type="Warning"
                 class="sapUiTinyMarginBottom"
