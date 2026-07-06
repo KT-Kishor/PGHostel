@@ -271,11 +271,16 @@
                                             class="sapUiSmallMarginBottom"
 										/>
 									</m:HBox>
-									<m:Text
-										text="No image uploaded."
+									<m:HBox
+										width="100%"
+										justifyContent="Center"
 										visible="{= !${editable>/Edit} &amp;&amp; (!${DisplayImagesModel>/DisplayImages} || ${DisplayImagesModel>/DisplayImages}.length === 0) }"
-										class="facilityNoImageText sapUiSmallMargin"
-									/>
+									>
+										<m:Text
+											text="No image uploaded."
+											class="facilityNoImageText sapUiSmallMargin"
+										/>
+									</m:HBox>
 									<m:HBox
 										id="FD_id_ImagesContainer"
 										wrap="Wrap"
