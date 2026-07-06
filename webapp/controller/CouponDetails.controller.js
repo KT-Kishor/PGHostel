@@ -487,7 +487,6 @@ sap.ui.define([
 
         _createColumnConfig: function () {
             return [
-                { label: "Status", property: "Status", type: "String" },
                 { label: "Branch Name", property: "BranchName", type: "String" },
                 { label: "Coupon Code", property: "CouponCode", type: "String" },
                 { label: "Discount Type", property: "DiscountType", type: "String" },
@@ -499,6 +498,7 @@ sap.ui.define([
                 { label: "End Date", property: "EndDate", type: "String" },
                 { label: "Created At", property: "CreatedAt", type: "String" },
                 { label: "Created By", property: "CreatedBy", type: EdmType.String },
+                { label: "Status", property: "Status", type: "String" },
             ];
         },
 
