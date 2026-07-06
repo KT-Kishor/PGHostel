@@ -1587,7 +1587,7 @@ sap.ui.define([
 
             return (
                 `Dear Customer,\n\n` +
-                `We are pleased to share with you the coupon code:  ${oCoupon.CouponCode}, with a ${sOfferText}\n\n` +
+                `We are pleased to share with you the StayVriksha coupon code: ${oCoupon.CouponCode}, with a ${sOfferText}\n\n` +
                 // `We are pleased to share you coupon code: ${oCoupon.CouponCode} and ${sOfferText}\n\n` + //  Updated logic
                 `You can use this coupon during the booking creation process ` +
                 `to avail the applicable discount.\n` +
@@ -1602,9 +1602,9 @@ sap.ui.define([
                 `This coupon cannot be combined with any other offers or discounts.\n` +
                 `The company reserves the right to modify or cancel the coupon at any time.\n\n` +
 
-                `Thank you for choosing our service.\n\n` +
+                `Thank you for choosing StayVriksha.\n\n` +
                 `Best regards,\n` +
-                `${sBranchName} Management`
+                `StayVriksha | ${sBranchName} Management`
             );
         },
 
