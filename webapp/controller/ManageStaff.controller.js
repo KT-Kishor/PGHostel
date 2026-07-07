@@ -46,16 +46,16 @@ sap.ui.define([
             return this.getStyledGroupHeader(oGroup);
         },
 
-        _setStaffActionButtonsVisible: function(bVisible) {
-            this.byId("MS_id_EditButton")?.setVisible(bVisible);
-            this.byId("MS_id_DeleteButton")?.setVisible(bVisible);
+        _setStaffActionButtonsEnabled: function(bEnabled) {
+            this.byId("MS_id_EditButton")?.setEnabled(bEnabled);
+            this.byId("MS_id_DeleteButton")?.setEnabled(bEnabled);
         },
 
         onStaffSelectionChange: function(oEvent) {
             const oSelectedItem = oEvent.getParameter("listItem");
             const oData = oSelectedItem?.getBindingContext("mainModel")?.getObject();
 
-            this._setStaffActionButtonsVisible(oData?.Role !== "Admin");
+            this._setStaffActionButtonsEnabled(oData?.Role !== "Admin");
         },
 
         _initEmptyMDModel: function() {
@@ -143,7 +143,7 @@ sap.ui.define([
 
             if (oData.Role === "Admin") {
                 oTable.removeSelections(true);
-                this._setStaffActionButtonsVisible(true);
+                this._setStaffActionButtonsEnabled(true);
                 return MessageToast.show(this.i18nModel.getText("MSadminEditRestricted"));
             }
 
@@ -227,7 +227,7 @@ sap.ui.define([
             // this._clearManualFields();
             this._resetValueStates();
             this.byId("MS_id_ManageStaff").removeSelections();
-            this._setStaffActionButtonsVisible(true);
+            this._setStaffActionButtonsEnabled(true);
             if (this.ARD_Dialog) this.ARD_Dialog.close();
         },
 
@@ -496,7 +496,7 @@ sap.ui.define([
 
             if (oData.Role === "Admin") {
                 oTable.removeSelections(true);
-                this._setStaffActionButtonsVisible(true);
+                this._setStaffActionButtonsEnabled(true);
                 MessageToast.show(this.i18nModel.getText("MSadminDeleteRestricted"));
                 return;
             }
@@ -525,11 +525,11 @@ sap.ui.define([
                                 that.closeBusyDialog()
                                 MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
                                 oTable.removeSelections(true);
-                                that._setStaffActionButtonsVisible(true);
+                                that._setStaffActionButtonsEnabled(true);
                             }
                         } else {
                             oTable.removeSelections(true);
-                            that._setStaffActionButtonsVisible(true);
+                            that._setStaffActionButtonsEnabled(true);
                         }
                     }
                 }
@@ -933,8 +933,10 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("MSnodata"));
                 return;
             }
+            const aBranches = this.getView().getModel("BranchModel")?.getData() || [];
             const adjustedData = oModel.map(item => ({
                 ...item,
+                BranchCode: this.Formatter.formatBranchNames(item.BranchCode, aBranches),
                 MobileNo: item.MobileNo ? String(item.MobileNo) : "",
                 MobileNo: item.STDCode + " " + item.MobileNo,
                 UserName: item.Salutation + " " + item.UserName,
