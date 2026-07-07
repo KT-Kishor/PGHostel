@@ -264,6 +264,7 @@ sap.ui.define([
                     this.ARD_Dialog.close();
                     sap.m.MessageToast.show(this.i18nModel.getText("amenitiesAddedSuccessfully"));
                 }
+             
 
                 await this.Onsearch("true");
             } catch (err) {
@@ -472,27 +473,42 @@ sap.ui.define([
 
                 });
 
-                if (!this._originalBedData || flag === "true") {
 
-                    const facilitiesData = [
+
+                if (!this._originalBedData) {
+                    this._originalBedData = [];
+                }
+
+                if (!sFacilityName && !sBranchCode) {
+
+                    // Remove deleted records
+                    this._originalBedData = this._originalBedData.filter(oldItem =>
+                        response.some(newItem =>
+                            newItem.ID?.trim() === oldItem.ID?.trim()
+                        )
+                    );
+
+                    // Merge old + new (updates existing and adds new)
+                    this._originalBedData = [
                         ...new Map(
-                            response
-                                .filter(item => item.Type)
-                                .map(item => [item.Type.trim(), item])
+                            [...this._originalBedData, ...response]
+                                .filter(item => item.ID)
+                                .map(item => [item.ID.toString().trim(), item])
                         ).values()
                     ];
 
-                    if (!this._originalBedData) {
-                        this._originalBedData = facilitiesData;
-                    } else {
-                        // Append old + new and remove duplicates by Type
-                        this._originalBedData = [
-                            ...new Map(
-                                [...this._originalBedData, ...facilitiesData]
-                                    .map(item => [item.Type.trim(), item])
-                            ).values()
-                        ];
-                    }
+                } else if (flag === "true" || !this._originalBedData.length) {
+
+
+                    // Remove deleted records
+
+                    this._originalBedData = [
+                        ...new Map(
+                            response
+                                .filter(item => item.ID)
+                                .map(item => [item.ID.toString().trim(), item])
+                        ).values()
+                    ];
                 }
 
 
@@ -579,6 +595,8 @@ sap.ui.define([
 
                             // Wait for all deletions to complete
                             await Promise.all(aDeletePromises);
+                        
+
                             await that.Onsearch("true"); // refresh table
                         } catch (err) {
                             that.closeBusyDialog()

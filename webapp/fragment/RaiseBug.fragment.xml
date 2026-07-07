@@ -87,9 +87,9 @@
 					placeholder="Enter email"/>
 
 				 <!-- Upload Image -->
-				<Label text="{i18n>addImage}" />
+				<Label id="idAddImageLabel" text="{i18n>addImage}" />
 
-			<VBox alignItems="Start" width="100%" renderType="Bare">
+			<VBox id="RB_id_ImageBox" alignItems="Start" width="100%" renderType="Bare">
 
     <!-- Upload Button -->
     <HBox width="100%">
@@ -118,6 +118,15 @@
     </List>
 
 </VBox>
+	<Label text="{i18n>comments}" required="true"/>
+				<TextArea
+					id="RB_id_comments"
+					rows="4"
+                    liveChange="onCommentsChange"
+                    valueStateText="Enter the comments"
+					placeholder="Enter comments"
+					value="{RaiseBugModel>/Comments}"
+					maxLength="300"/>
 
 			</f:content>
 		</f:SimpleForm>

@@ -39,9 +39,9 @@
                 placeholder="{i18n>enterAmenitiesName}" maxLength="60" liveChange=".onFacilityNameChange" valueStateText="{i18n>enterAmenitiesName}"/>
                 <!-- Amenity TYpe -->
 				<Label text="{i18n>type}" required="true"/>
-				<ComboBox id="HFF_id_Amenities" items="{AmenityNameModel>/}" value="{HostelFeaturesModel>/Type}"
+				<ComboBox id="HFF_id_Amenities" items="{AmenitiType>/}" value="{HostelFeaturesModel>/Type}"
                 placeholder="{i18n>enterType}" valueStateText="{i18n>enterType}" change="onAmenitieTypeChange">
-					<core:Item key="{AmenityNameModel>ID}" text="{AmenityNameModel>AmenitiName}"/>
+					<core:Item key="{AmenitiType>ID}" text="{AmenitiType>AmenitiName}"/>
 				</ComboBox>
 				<!-- Description -->
 				<Label text="{i18n>description}" required="true"/>

@@ -67,6 +67,8 @@
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>
 						<ToolbarSpacer />
+							<Button text="{i18n>Edit}" tooltip="{i18n>Edit}"
+                        press="RB_edit" class="myUnifiedBtn"/>
 						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
                         press="RB_resolve" class="myUnifiedBtn"/>
 						<Button text="{i18n>download}" icon="sap-icon://excel-attachment"

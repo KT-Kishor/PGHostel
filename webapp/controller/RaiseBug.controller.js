@@ -415,5 +415,94 @@ sap.ui.define([
                 oSheet.destroy();
             });
         },
+        RB_edit:function(oEvent){
+            var oView = this.getView();
+
+             var table = this.byId("idBugTable");
+            var selected = table.getSelectedItem();
+
+            if (!selected) {
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoedit"));
+                return;
+            }
+            var oContext = selected.getBindingContext("RaiseBugModel");
+            var Data = oContext.getObject();
+
+            if(Data.Status==="Resolved"){
+                   sap.m.MessageToast.show(this.i18nModel.getText("resolvedBugCannotBeModified"));
+                return;
+            }
+
+
+                //   if(Data.Status==="Resolved")
+              if (!this.ED_Dialog) {
+                this.ED_Dialog = sap.ui.xmlfragment(
+                    oView.getId(),
+                    "sap.ui.com.project1.fragment.RaiseBug",
+                    this
+                );
+                oView.addDependent(this.ED_Dialog);
+            }
+                this.ED_Dialog.open();
+                this.byId("RB_id_appname").setValue(Data.AppName).setEditable(false);
+                this.byId("RB_id_bugDescription").setValue(Data.BugDescription).setEditable(false);
+                this.byId("RB_id_RaisedBy").setValue(Data.RaisedBy).setEditable(false);
+                this.byId("RB_id_Email").setValue(Data.Email).setEditable(false);
+                
+                this.byId("RB_id_FileUploader1").setVisible(false);
+                this.byId("idAddImageLabel").setVisible(false);
+                this.byId("RB_id_ImageBox").setVisible(false);
+                this.byId("RB_id_comments").setValue(Data.Comment).setVisible(true).setValueState("None");
+
+            },
+            onCommentsChange:function(oEvent){
+                utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+            },
+            onBugSubmit:function(){
+                 var table = this.byId("idBugTable");
+            var selected = table.getSelectedItem();
+            var oContext = selected.getBindingContext("RaiseBugModel");
+            var Data = oContext.getObject();
+
+                      
+           if (
+                !utils._LCvalidateMandatoryField(this.byId("RB_id_comments"), "ID")
+            ){
+                MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+                 return;
+            }
+
+               this.getBusyDialog();
+            this.ajaxCreateWithJQuery("sendmailtoCustomer", 
+                {
+                 "BugID": Data.BugID,
+                "Email": Data.Email,
+                "Name": Data.RaisedBy,
+                "Comment": this.byId("RB_id_comments").getValue(),
+                "Status": "Customer Action",
+            })
+                .then((oData) => {
+                     this.CD_read();
+                    this.ED_Dialog.close();
+                })
+                .catch((oError) => {
+                    MessageToast.show("Error while updating Bug request");
+                })
+                .finally(() => {
+                    this.closeBusyDialog();
+                    MessageToast.show("Bug Updated Successfully");
+                    table.removeSelections()
+                    this.ED_Dialog.close();
+
+                });   
+        },
+        RB_onCancelButtonPress: function () {
+            this.byId("idBugTable").removeSelections()
+            if (this.ED_Dialog) {
+                this.ED_Dialog.close();
+            }
+        }
+
+         
     });
 });

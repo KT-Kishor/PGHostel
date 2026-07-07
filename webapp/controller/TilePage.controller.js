@@ -2167,6 +2167,8 @@ sap.ui.define([
                     this._RaiseBugDialog = oDialog;
                     this.getView().addDependent(oDialog);
                     oDialog.open();
+                     this.byId("RB_id_comments").setVisible(false);
+
 
                     this._RaiseBugDialog.attachAfterClose(() => {
                  
