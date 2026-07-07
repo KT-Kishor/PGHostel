@@ -1,5 +1,4 @@
 [
-    { "RoleID": "HM001", "RoleName": "Admin" },
     { "RoleID": "HM002", "RoleName": "Branch Manager" },
     { "RoleID": "HM003", "RoleName": "Front Office Employee" },
     { "RoleID": "HM004", "RoleName": "Housekeeping" }

@@ -46,6 +46,18 @@ sap.ui.define([
             return this.getStyledGroupHeader(oGroup);
         },
 
+        _setStaffActionButtonsVisible: function(bVisible) {
+            this.byId("MS_id_EditButton")?.setVisible(bVisible);
+            this.byId("MS_id_DeleteButton")?.setVisible(bVisible);
+        },
+
+        onStaffSelectionChange: function(oEvent) {
+            const oSelectedItem = oEvent.getParameter("listItem");
+            const oData = oSelectedItem?.getBindingContext("mainModel")?.getObject();
+
+            this._setStaffActionButtonsVisible(oData?.Role !== "Admin");
+        },
+
         _initEmptyMDModel: function() {
             const emptyData = {
                 Salutation: "",
@@ -129,6 +141,12 @@ sap.ui.define([
 
             const oData = oSelected.getBindingContext("mainModel").getObject();
 
+            if (oData.Role === "Admin") {
+                oTable.removeSelections(true);
+                this._setStaffActionButtonsVisible(true);
+                return MessageToast.show(this.i18nModel.getText("MSadminEditRestricted"));
+            }
+
             if (!this.ARD_Dialog) {
                 this.ARD_Dialog = sap.ui.xmlfragment(
                     this.getView().getId(),
@@ -209,6 +227,7 @@ sap.ui.define([
             // this._clearManualFields();
             this._resetValueStates();
             this.byId("MS_id_ManageStaff").removeSelections();
+            this._setStaffActionButtonsVisible(true);
             if (this.ARD_Dialog) this.ARD_Dialog.close();
         },
 
@@ -325,6 +344,9 @@ sap.ui.define([
             var sCity = oView.byId("MS_id_City").getSelectedKey() ||
                 oView.byId("MS_id_City").getValue();
 
+            var oBranchFilter = oView.byId("MS_id_BranchCode");
+            var sBranchCode = oBranchFilter.getSelectedKey() || oBranchFilter.getValue();
+
             // Branch Codes (from login)
             let aBranchCodes = [];
 
@@ -378,6 +400,10 @@ sap.ui.define([
                     );
                 }
 
+                if (sBranchCode) {
+                    finalData = finalData.filter(item => this._matchesStaffBranch(item, sBranchCode));
+                }
+
                 const model = new sap.ui.model.json.JSONModel(finalData);
                 this.getView().setModel(model, "mainModel");
 
@@ -388,6 +414,19 @@ sap.ui.define([
             }).finally(() => {
                 this.closeBusyDialog()
             });
+        },
+
+        _matchesStaffBranch: function(oStaff, sBranchValue) {
+            const sSearch = (sBranchValue || "").trim().toLowerCase();
+            if (!sSearch) return true;
+
+            const aBranchTokens = [oStaff.BranchCode, oStaff.BranchName]
+                .filter(Boolean)
+                .flatMap(value => String(value).split(","))
+                .map(value => value.trim().toLowerCase())
+                .filter(Boolean);
+
+            return aBranchTokens.some(value => value === sSearch || value.includes(sSearch));
         },
 
         _populateUniqueFilterValues: function(data) {
@@ -439,6 +478,7 @@ sap.ui.define([
                         }));
                     });
             }
+
         },
 
         HM_DeleteHostelFeature: async function() {
@@ -453,6 +493,13 @@ sap.ui.define([
             var that = this;
             var oData = oSelectedItem.getBindingContext("mainModel").getObject();
             var sName = oData.UserName;
+
+            if (oData.Role === "Admin") {
+                oTable.removeSelections(true);
+                this._setStaffActionButtonsVisible(true);
+                MessageToast.show(this.i18nModel.getText("MSadminDeleteRestricted"));
+                return;
+            }
 
             MessageBox.confirm(
                 `Are you sure you want to delete the Staff record: ${sName}?`, {
@@ -478,9 +525,11 @@ sap.ui.define([
                                 that.closeBusyDialog()
                                 MessageToast.show(that.i18nModel.getText("MSdeletemsg"));
                                 oTable.removeSelections(true);
+                                that._setStaffActionButtonsVisible(true);
                             }
                         } else {
                             oTable.removeSelections(true);
+                            that._setStaffActionButtonsVisible(true);
                         }
                     }
                 }
@@ -490,6 +539,7 @@ sap.ui.define([
         FC_onPressClear: function() {
             this.getView().byId("MS_id_UserID").setSelectedKey("");
             this.getView().byId("MS_id_City").setSelectedKey("")
+            this.getView().byId("MS_id_BranchCode").setSelectedKey("")
         },
 
         onNavBack: function() {
@@ -887,7 +937,8 @@ sap.ui.define([
                 ...item,
                 MobileNo: item.MobileNo ? String(item.MobileNo) : "",
                 MobileNo: item.STDCode + " " + item.MobileNo,
-                UserName: item.Salutation + " " + item.UserName
+                UserName: item.Salutation + " " + item.UserName,
+                DateOfBirth: this.Formatter.DateFormat(item.DateOfBirth) || ""
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -914,11 +965,6 @@ sap.ui.define([
 
         createTableSheet: function() {
             return [{
-                    label: "Role",
-                    property: "Role",
-                    type: "string"
-                },
-                {
                     label: "User ID",
                     property: "UserID",
                     type: "string"
@@ -929,13 +975,18 @@ sap.ui.define([
                     type: "string"
                 },
                 {
-                    label: "Email ID",
-                    property: "EmailID",
+                    label: "Branch Code",
+                    property: "BranchCode",
                     type: "string"
                 },
                 {
-                    label: "Branch Code",
-                    property: "BranchCode",
+                    label: "Role",
+                    property: "Role",
+                    type: "string"
+                },
+                {
+                    label: "Date of Birth",
+                    property: "DateOfBirth",
                     type: "string"
                 },
                 {
@@ -944,18 +995,18 @@ sap.ui.define([
                     type: "string"
                 },
                 {
+                    label: "Email ID",
+                    property: "EmailID",
+                    type: "string"
+                },
+                {
                     label: "Mobile Number",
                     property: "MobileNo",
                     type: "string"
                 },
                 {
-                    label: "Country",
-                    property: "Country",
-                    type: "string"
-                },
-                {
-                    label: "State",
-                    property: "State",
+                    label: "Address",
+                    property: "Address",
                     type: "string"
                 },
                 {
@@ -964,8 +1015,13 @@ sap.ui.define([
                     type: "string"
                 },
                 {
-                    label: "Address",
-                    property: "Address",
+                    label: "State",
+                    property: "State",
+                    type: "string"
+                },
+                {
+                    label: "Country",
+                    property: "Country",
                     type: "string"
                 }
             ]

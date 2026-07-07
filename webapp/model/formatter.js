@@ -577,6 +577,13 @@ formatBranchNames: function (sBranchCodes, aBranches) {
             return aNames.join(", ");
         },
 
+        formatFullAddress: function (sAddress, sCity, sState, sCountry) {
+            return [sAddress, sCity, sState, sCountry]
+                .map(part => (part || "").trim())
+                .filter(Boolean)
+                .join(", ");
+        },
+
          formatSelectionMode: function (sValue) {
 
             if (!sValue) {

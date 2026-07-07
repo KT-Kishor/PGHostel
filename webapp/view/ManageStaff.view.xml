@@ -27,6 +27,28 @@
 				class="filterBarTheme">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
+                        name="BranchCode"
+                        label="{i18n>branchCode}"
+                        groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="MS_id_BranchCode"
+								width="100%"
+								items="{BranchModel>/}"
+								placeholder="{i18n>selectBranch}"
+								selectedKey=""
+								showSecondaryValues="true"
+								showClearIcon="true">
+								<core:ListItem
+									key="{BranchModel>BranchID}"
+									text="{BranchModel>BranchID} - {BranchModel>Name}"
+									additionalText="{BranchModel>City}"
+								/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
                         name="UserID"
                         label="{i18n>MVUserID}"
                         groupName="Group"
@@ -59,6 +81,7 @@
 			<Table id="MS_id_ManageStaff"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
+                selectionChange="onStaffSelectionChange"
                 width="auto"
                 busyIndicatorDelay="0"
                 items="{path: 'mainModel>/', sorter: {path: 'Role',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
@@ -68,9 +91,9 @@
 						<ToolbarSpacer />
 						<Button text="{i18n>MSadd}" press="HM_AddHostelFeature" tooltip="{i18n>MSadd}"
                             class="myUnifiedBtn"/>
-						<Button text="{i18n>MSedit}" press="HM_EditHostelFeature" tooltip="{i18n>MSedit}"
+						<Button id="MS_id_EditButton" text="{i18n>MSedit}" press="HM_EditHostelFeature" tooltip="{i18n>MSedit}"
                             class="myUnifiedBtn"/>
-						<Button text="{i18n>MSdelete}" press="HM_DeleteHostelFeature" tooltip="{i18n>MSdelete}"
+						<Button id="MS_id_DeleteButton" text="{i18n>MSdelete}" press="HM_DeleteHostelFeature" tooltip="{i18n>MSdelete}"
                             class="myUnifiedBtn"/>
 						<Button text="{i18n>download}" tooltip="{i18n>download}" press="MS_onDownload" icon="sap-icon://excel-attachment"
                             class="myUnifiedBtn"/>
@@ -79,6 +102,12 @@
 				<columns>
 					<Column demandPopin="true">
 						<Text text="{i18n>MVstaffName}" tooltip="{i18n>MVstaffName}"/>
+					</Column>
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>MVrole}" tooltip="{i18n>MVrole}"/>
+					</Column> -->
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>MVDDOB}" tooltip="{i18n>MVDDOB}"/>
 					</Column>
 					<Column demandPopin="true" width="15%" minScreenWidth="Tablet">
 						<Text text="{i18n>emailId}" tooltip="{i18n>emailId}"/>
@@ -92,9 +121,9 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>MSmobileNo}" tooltip="{i18n>MSmobileNo}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<!-- <Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>city}" tooltip="{i18n>city}"/>
-					</Column>
+					</Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
 						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
 					</Column>
@@ -103,6 +132,8 @@
 					<ColumnListItem>
 						<cells>
 							<Text text="{mainModel>Salutation} {mainModel>UserName} ({mainModel>UserID})"/>
+							<!-- <Text text="{mainModel>Role}"/> -->
+							<Text text="{path: 'mainModel>DateOfBirth', formatter: '.Formatter.DateFormat'}"/>
 							<Text text="{mainModel>EmailID}"/>
 							<Text text="{
 									parts: [
@@ -114,8 +145,8 @@
 							/>
 							<Text text="{mainModel>Gender}" />
 							<Text text="{mainModel>STDCode} {mainModel>MobileNo}"/>
-							<Text text="{mainModel>City}" />
-							<Text text="{mainModel>Address}"  wrapping="true"/>
+							<!-- <Text text="{mainModel>City}" /> -->
+							<Text text="{parts: [{path: 'mainModel>Address'}, {path: 'mainModel>City'}, {path: 'mainModel>State'}, {path: 'mainModel>Country'}], formatter: '.Formatter.formatFullAddress'}"  wrapping="true"/>
 						</cells>
 					</ColumnListItem>
 				</items>
