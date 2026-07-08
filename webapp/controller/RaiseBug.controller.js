@@ -467,6 +467,24 @@ sap.ui.define([
             onCommentsChange:function(oEvent){
                 utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
             },
+           onBugTableSelectionChange: function () {
+    var oTable = this.byId("idBugTable");
+    var oSelectedItem = oTable.getSelectedItem();
+    var oButton = this.byId("ideditButton");
+    var oresolveButton = this.byId("idresolveButton");
+
+
+    if (!oSelectedItem) {
+        oButton.setEnabled(false);
+        return;
+    }
+
+    var oData = oSelectedItem.getBindingContext("RaiseBugModel").getObject();
+
+    oButton.setEnabled(oData.Status !== "Resolved");
+    oresolveButton.setEnabled(oData.Status !== "Resolved");
+
+},
             onBugSubmit:function(){
                  var table = this.byId("idBugTable");
             var selected = table.getSelectedItem();

@@ -1,0 +1,62 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="SC_id_ValueHelpDialog"
+        title="{i18n>couponDetails}"
+        contentWidth="50%"
+    >
+        <content>
+            <Table
+            sticky="ColumnHeaders"
+                id="SC_id_VHDTable"
+                items="{ShowCouponDetails>/}"
+            >
+                <columns>
+                    <Column>
+                        <Text text="{i18n>CDCouponCode}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>CDMinOrderValue}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>CDDiscountType}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>CDDiscountValue}" />
+                    </Column>
+                      <Column>
+                        <Text text="{i18n>Description}" />
+                    </Column>
+                    
+                </columns>
+                <items>
+                    <ColumnListItem
+                        type="Active"
+                        press="SC_onVHDPick"
+                    >    
+                        <cells>
+                            <Text text="{ShowCouponDetails>CouponCode}" />
+                            <Text
+                                text="{ShowCouponDetails>MinOrderValue}"
+                            />
+                            <Text text="{ShowCouponDetails>DiscountType}" />
+                            <Text text="{ShowCouponDetails>DiscountValue}" />
+                            <Text text="{ShowCouponDetails>Description}" />
+
+
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button
+                text="{i18n>close}"
+                type="Transparent"
+                press="SC_onVHDClose"
+            />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

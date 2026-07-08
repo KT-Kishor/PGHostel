@@ -158,7 +158,7 @@
                             <Label text="End Date" />
                             <DatePicker
                                 id="BookEnddate_ID"
-                                value="{HostelModel>/EndDate}"
+                                value="{HostelModel>/StartDate}"
                                 valueFormat="dd/MM/yyyy"
                                 displayFormat="dd/MM/yyyy"
                                 editable="{BookingView>/endDateEditable}"
@@ -531,7 +531,7 @@
                             wrap="NoWrap"
                             class="sapUiTinyMarginTop"
                         >
-                            <Input
+                            <!-- <Input
                                 value="{HostelModel>/CouponCode}"
                                 placeholder="Enter coupon code"
                                 liveChange="onCouponLiveChange"
@@ -539,7 +539,18 @@
                                 width="100%"
                                 maxLength="15"
                                 submit="onApplyCoupon"
-                            >
+                            > -->
+                            <Input
+                    value="{HostelModel>/CouponCode}"
+                                placeholder="Enter coupon code"
+                                liveChange="onCouponLiveChange"
+                                class="sapUiSmallMarginEnd couponInput"
+                                width="100%"
+                                maxLength="15"
+                    showValueHelp="true"
+                    valueHelpRequest="BV_onOpenVH"
+                    valueStateText="{i18n>modelValueState}"
+                >
                                 <layoutData>
                                     <FlexItemData
                                         growFactor="1"

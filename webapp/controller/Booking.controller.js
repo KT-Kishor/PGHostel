@@ -6955,6 +6955,70 @@
         onchangeConpanyAddress: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
+         parseDate:function (dateStr) {
+    var parts = dateStr.split("/"); // ["08","07","2026"]
+    return new Date(parts[2], parts[1] - 1, parts[0]); // year, month(0-based), day
+        },
+
+       BV_onOpenVH: async function () {
+    var oHostelModel = this.getView().getModel("HostelModel");
+
+    var BranchCode = oHostelModel.getProperty("/BranchCode");
+    var bookingStartDate =oHostelModel.getProperty("/StartDate") ? this.parseDate(oHostelModel.getProperty("/StartDate")):"";
+    var bookingEndDate =oHostelModel.getProperty("/EndDate") ? this.parseDate(oHostelModel.getProperty("/EndDate")):"";
+
+    if(!bookingStartDate){
+        MessageToast.show("Please select the dates before checking coupons")
+        return;
+    }
+
+    if (!this.SC_Dialog) {
+        this.SC_Dialog = sap.ui.xmlfragment(
+            "sap.ui.com.project1.fragment.ShowCoupon",
+            this
+        );
+        this.getView().addDependent(this.SC_Dialog);
+    }
+
+    this.getBusyDialog();
+
+    const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+        Status: "Active",
+        BranchCode: BranchCode
+    });
+
+    this.closeBusyDialog();
+
+    // Show only coupons valid for the selected booking dates
+var aFilteredCoupons = oResponse.data.filter(function (coupon) {
+
+    var couponStart = new Date(coupon.StartDate);
+    var couponEnd = new Date(coupon.EndDate);
+
+    return bookingStartDate >= couponStart &&
+           bookingStartDate <= couponEnd;
+
+}.bind(this));
+
+    this.getView().setModel(
+        new sap.ui.model.json.JSONModel(aFilteredCoupons),
+        "ShowCouponDetails"
+    );
+
+    this.SC_Dialog.open();
+},
+        SC_onVHDPick: function (oEvent) {
+    var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
+
+    this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
+
+    this.SC_Dialog.close();
+
+  
+},
+        SC_onVHDClose:function(){
+              this.SC_Dialog.close();
+        }
 
 
     });
