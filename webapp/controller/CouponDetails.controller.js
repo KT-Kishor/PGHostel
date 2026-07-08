@@ -494,6 +494,7 @@ sap.ui.define([
                 { label: "Maximum Discount", property: "UptoValue", type: "String" },
                 { label: "Max Uses", property: "MaxUses", type: "String" },
                 { label: "Min Order Value", property: "MinOrderValue", type: "String" },
+                { label: "Description", property: "Description", type: "String" },
                 { label: "Start Date", property: "StartDate", type: "String" },
                 { label: "End Date", property: "EndDate", type: "String" },
                 { label: "Created At", property: "CreatedAt", type: "String" },

@@ -103,6 +103,10 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
 					</Column>
+
+						<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>Comment}" tooltip="{i18n>Comment}"/>
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
@@ -118,6 +122,8 @@
                             state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
 							<Link text="{i18n>view}" press="HF_viewroom"/>
+							<Link text="{i18n>Viewcomment}" press="HF_viewComments" />
+
 						</cells>
 					</ColumnListItem>
 				</items>

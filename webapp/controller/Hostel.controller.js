@@ -452,7 +452,7 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        _populateUniqueFilterValues: function (data) {
+        _populateUniqueFilterValuesBranch: function (data) {
             let uniqueValues = {
                 id_Branch: new Set(),
             };
@@ -2911,7 +2911,9 @@ sap.ui.define([
                     index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
-                this._populateUniqueFilterValues(aUnique)
+                this._populateUniqueFilterValues(localdata)
+                this._populateUniqueFilterValuesBranch(localdata)
+
 
 
                 // Default selections
@@ -2935,7 +2937,7 @@ sap.ui.define([
             let uniqueValues = {
                 id_Roomtype: new Set(),
                 id_Area: new Set(),
-                id_Branch: new Set()
+                // id_Branch: new Set()
             
             };
 
@@ -2946,14 +2948,14 @@ sap.ui.define([
                 if (item.LandMark && item.LandMark.trim()) {
                     uniqueValues.id_Area.add(item.LandMark.trim());
                 }
-                if (item.City && item.City.trim()) {
-                    uniqueValues.id_Branch.add(item.City.trim());
-                }
+                // if (item.City && item.City.trim()) {
+                //     uniqueValues.id_Branch.add(item.City.trim());
+                // }
             });
 
             let oView = this.getView();
 
-            ["id_Roomtype", "id_Area","id_Branch"].forEach(field => {
+            ["id_Roomtype", "id_Area"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -3002,7 +3004,7 @@ sap.ui.define([
 
                      }
                       if(this.isShowmore===true){
- var data = this.getOwnerComponent().getModel("sBRModel").getData()
+             var data = this.getOwnerComponent().getModel("sBRModel").getData()
                 var Branchdata = data.filter((item) => {
                 return item.City === Scity
             })
@@ -3025,6 +3027,8 @@ sap.ui.define([
 
                     this.getView().getModel("AreaModel").setData(aUpdatedData);
                     this._populateUniqueFilterValues(aUpdatedData)
+                    this._populateUniqueFilterValuesBranch(this.getOwnerComponent().getModel("sBRModel").getData())
+
 
                 } else {
                     const oBRModel = oView.getModel("BranchModel");

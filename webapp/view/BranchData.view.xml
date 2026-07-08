@@ -69,6 +69,9 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
     					<Text text="Edit Before" tooltip="Edit Before"/>
 					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+    					<Text text="Check IN / Out" tooltip="Check IN / Out"/>
+					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
 						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
 					</Column>
@@ -101,6 +104,12 @@
 							</VBox>
 							<Text text="{parts: ['mainModel>StartingPrice','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{mainModel>EditBefore} Hrs" />
+                        <HBox alignItems="Center">
+    <Text text="{mainModel>CheckinTime}" />
+    <Text text=" to " class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+    <Text text="{mainModel>CheckoutTime}" />
+</HBox>
+
 							<!-- <Text text="{parts: ['mainModel>Penalty','mainModel>Currency'], formatter: '.Formatter.formatPrice'}"/> -->
 							<Text text="{= ${mainModel>Address} + ', ' + ${mainModel>City} + ', ' + ${mainModel>Pincode} + ', ' + ${mainModel>State} + ', ' + ${mainModel>Country} }" wrapping="true"/>
 							<!-- <Text text="{mainModel>Pincode}" /> -->

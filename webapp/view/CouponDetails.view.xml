@@ -250,16 +250,27 @@
                             tooltip="{i18n>CDMinOrderValue}"
                         />
                     </Column>
+
+                      <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                        width="20%"
+                    >
+                        <Text
+                            text="{i18n>Description}"
+                            tooltip="{i18n>Description}"
+                        />
+                    </Column>
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>startDate}"
-                            tooltip="{i18n>startDate}"
+                            text="{i18n>Date}"
+                            tooltip="{i18n>Date}"
                         />
                     </Column>
-                    <Column
+                    <!-- <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
@@ -267,7 +278,7 @@
                             text="{i18n>endDate}"
                             tooltip="{i18n>endDate}"
                         />
-                    </Column>
+                    </Column> -->
                     <!-- <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Status"/></Column> -->
                     <Column
                         minScreenWidth="Desktop"
@@ -278,7 +289,7 @@
                             tooltip="{i18n>CDCreatedAt}"
                         />
                     </Column>
-                    <Column
+                    <!-- <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
@@ -286,7 +297,7 @@
                             text="{i18n>CDCreatedBy}"
                             tooltip="{i18n>CDCreatedBy}"
                         />
-                    </Column>
+                    </Column> -->
                 </columns>
                 <!-- Row template -->
                 <items>
@@ -304,17 +315,33 @@
                             <!-- <Text text="{CouponModel>UsedCount}" /> -->
                             <!-- <Text text="{CouponModel>PerUserLimit}" /> -->
                             <Text text="{CouponModel>MinOrderValue}" />
-                            <Text
+                            <Text text="{CouponModel>Description}" />
+
+                            <VBox>
+    <Text
+        text="{path: 'CouponModel>StartDate', formatter: '.Formatter.formatDate'}" />
+        <Text
+        text="To"
+        textAlign="Center"
+        width="50%" />
+    <Text
+        text="{path: 'CouponModel>EndDate', formatter: '.Formatter.formatDate'}" />
+</VBox>
+
+                            <!-- <Text
                                 text="{    path: 'CouponModel>StartDate',    formatter: '.Formatter.formatDate'}"
                             />
                             <Text
                                 text="{    path: 'CouponModel>EndDate',    formatter: '.Formatter.formatDate'}"
-                            />
+                            /> -->
                             <!-- <ObjectStatus text="{CouponModel>Status}" state="{ path: 'CouponModel>Status', formatter: '.Formatter.formatStatusState' }"/> -->
+<VBox >
                             <Text
                                 text="{    path: 'CouponModel>CreatedAt',    formatter: '.Formatter.formatDate'}"
                             />
-                            <Text text="{CouponModel>CreatedBy}" />
+                            <Text text="{CouponModel>CreatedBy}" 
+                            class="sapUiTinyMarginTop"/>
+                            </VBox>
                         </cells>
                     </ColumnListItem>
                 </items>

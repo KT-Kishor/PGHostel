@@ -5,7 +5,10 @@ sap.ui.define([
     "sap/m/MessageToast",
     "../utils/validation",
     "sap/ui/export/Spreadsheet",
-], function (BaseController, Formatter, JSONModel, MessageToast, utils, Spreadsheet) {
+    "sap/suite/ui/commons/Timeline",
+    "sap/suite/ui/commons/TimelineItem"
+
+], function (BaseController, Formatter, JSONModel, MessageToast, utils, Spreadsheet,Timeline,TimelineItem) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.RaiseBug", {
@@ -322,11 +325,7 @@ sap.ui.define([
         },
 
         createTableSheet: function () {
-            return [{
-                label: "Status",
-                property: "Status",
-                type: "string"
-            },
+            return [
             {
                 label: "Bug ID",
                 property: "BugID",
@@ -360,6 +359,16 @@ sap.ui.define([
             {
                 label: "Resolved Date",
                 property: "ResolvedDate",
+                type: "string"
+            },
+            {
+                label: "Status",
+                property: "Status",
+                type: "string"
+            },
+            {
+                label: "Comments",
+                property: "Comment",
                 type: "string"
             },
             ]
@@ -480,6 +489,10 @@ sap.ui.define([
                 "Name": Data.RaisedBy,
                 "Comment": this.byId("RB_id_comments").getValue(),
                 "Status": "Customer Action",
+                "CommentedBy":this.getView().getModel("LoginModel").getData().EmployeeName,
+                "CommentDateTime":new Date().toISOString(),
+                "ApplicationName":"HM_Raisebug"
+
             })
                 .then((oData) => {
                      this.CD_read();
@@ -501,7 +514,75 @@ sap.ui.define([
             if (this.ED_Dialog) {
                 this.ED_Dialog.close();
             }
+        },
+        HF_viewComments: async function (oEvent) {
+    var that = this;
+
+    var oContext = oEvent.getSource().getBindingContext("RaiseBugModel");
+    var sBugID = oContext.getObject().BugID;
+
+    var filters = {
+        BugID: sBugID
+    };
+
+    try {
+        this.getBusyDialog()
+        var oData = await this.ajaxReadWithJQuery("HM_BugComment", filters);
+
+        var aComments = Array.isArray(oData.data) ? oData.data : [];
+
+        var oJsonModel = new sap.ui.model.json.JSONModel(aComments);
+
+        this.closeBusyDialog()
+
+        if (!that._oCommentDialog) {
+
+            var oTimeline = new sap.suite.ui.commons.Timeline({
+                enableScroll: true,
+                showHeaderBar: false,
+                content: {
+                    path: "/",
+                    template: new sap.suite.ui.commons.TimelineItem({
+                        userName: "{CommentedBy}",
+                        dateTime: "{CommentDateTime}",
+                        title: "{Status}",
+                        text: "{Comment}"
+                    })
+                }
+            });
+
+            oTimeline.setModel(oJsonModel);
+
+            that._oCommentDialog = new sap.m.Dialog({
+                title: "Bug Comments",
+                contentWidth: "25rem",
+                contentHeight: "15rem",
+                verticalScrolling: false,
+                horizontalScrolling: false,
+                draggable: true,
+                resizable: true,
+                content: [oTimeline],
+                endButton: new sap.m.Button({
+                    text: "Close",
+                    press: function () {
+                        that._oCommentDialog.close();
+                    }
+                })
+            });
+
+            that.getView().addDependent(that._oCommentDialog);
+
+        } else {
+            that._oCommentDialog.getContent()[0].setModel(oJsonModel);
         }
+
+        that._oCommentDialog.open();
+
+    } catch (oError) {
+        console.error(oError);
+        sap.m.MessageToast.show("Failed to load comments.");
+    }
+}
 
          
     });

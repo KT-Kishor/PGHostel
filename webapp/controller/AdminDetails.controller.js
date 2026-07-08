@@ -1182,6 +1182,10 @@ sap.ui.define([
                 }
             }
         },
+        onMemberNamehCange:function(oEvent){
+
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
 
         onUnitTextChange: function (oEvent, flag) {
 
@@ -1503,8 +1507,7 @@ sap.ui.define([
             }
             var oGroup = sap.ui.getCore().byId("id_Period");
 
-            var selectionmode = oPayload.SelectionMode ||
-                this.SelectionMode;
+            var selectionmode = this.SelectionMode || oPayload.SelectionMode;
             if (selectionmode === "PERSON_QTY") {
                 if (
                     !utils._LCstrictValidationComboBox(sap.ui.getCore().byId("editFacilityName"), "ID") ||
@@ -2466,6 +2469,8 @@ sap.ui.define([
             var oSelectedData = oContext.getObject();
 
             this.SelectionModeedit = oSelectedData.SelectionMode
+            this.SelectionMode = oSelectedData.SelectionMode
+
 
             if (oSelectedData.UnitText === "Package Price") {
                 sap.m.MessageToast.show(this.i18nModel.getText("wecannoteditthePackagePricefacility"));

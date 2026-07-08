@@ -357,6 +357,36 @@ sap.ui.define([
                     label: "Starting Price",
                     property: "StartingPrice",
                     type: "string"
+                },
+                 {
+                    label: "Edit Before",
+                    property: "EditBefore",
+                    type: "string"
+                },
+                 {
+                    label: "Check In Time",
+                    property: "CheckinTime",
+                    type: "string"
+                },
+                 {
+                    label: "Check out Time",
+                    property: "CheckoutTime",
+                    type: "string"
+                },
+                 {
+                    label: "Country",
+                    property: "Country",
+                    type: "string"
+                },
+                 {
+                    label: "State",
+                    property: "State",
+                    type: "string"
+                },
+                 {
+                    label: "City",
+                    property: "City",
+                    type: "string"
                 }
             ]
         },
@@ -371,7 +401,7 @@ sap.ui.define([
                 ...item,
                 Pincode: item.Pincode ? String(item.Pincode) : "",
                 Contact: item.Contact ? String(item.Contact) : "",
-                Penalty: item.Penalty + " " + item.Currency,
+                Penalty: item.Penalty ?tem.Penalty + " " + item.Currency: "",
                 Contact: item.STD + " " + item.Contact
             }));
             const aCols = this.createTableSheet();
