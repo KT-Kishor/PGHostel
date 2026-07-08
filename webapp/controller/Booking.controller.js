@@ -845,6 +845,16 @@
             }, 0);
         },
 
+        _getFirstAvailableNumber: function () {
+            for (let iIndex = 0; iIndex < arguments.length; iIndex++) {
+                const vValue = arguments[iIndex];
+                if (vValue !== undefined && vValue !== null && vValue !== "") {
+                    return this._toNumber(vValue);
+                }
+            }
+            return 0;
+        },
+
         _setFacilitySelectionSummary: function (oFacility) {
             const aParts = [];
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -968,7 +978,7 @@
 
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
-            const fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+            const fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.UnitPrice);
             const oUnits = this._getBookingUnits();
             const iChargeableDayCount = this._getFacilityChargeableDayCount();
             const iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
@@ -1001,8 +1011,10 @@
                 });
 
                 const iSelectedPersonCount = aValidLines.length;
-                const fPackagePrice = this._toNumber(
-                    oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice
+                const fPackagePrice = this._getFirstAvailableNumber(
+                    oFacility.MinimumPrice,
+                    oFacility.SelectedPrice,
+                    oFacility.CurrentPrice
                 );
                 const sFacilityChargeType = this._getFacilityChargeType(oFacility);
 
@@ -1094,7 +1106,7 @@
                             PricePerMonth: this._toNumber(oFacility.PerMonthPrice),
                             PricePerYear: this._toNumber(oFacility.PerYearPrice),
                             Selected: !!oSelectedFacility.FacilityID,
-                            SelectedPrice: this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price),
+                            SelectedPrice: this._getFirstAvailableNumber(oSelectedFacility.SelectedPrice, oSelectedFacility.Price),
                             SelectedPriceType: oSelectedFacility.SelectedPriceType || oSelectedFacility.UnitText || "",
                             Quantity: this._toNumber(oSelectedFacility.Quantity) || 1,
                             SelectedPersonIds: Array.isArray(oSelectedFacility.SelectedPersonIds)
@@ -2020,7 +2032,7 @@
                     })
                     .map(function (oFacility) {
                         const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
-                        const fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.UnitPrice);
+                        const fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.UnitPrice);
                         const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
                         const sCurrency = oFacility.Currency || "INR";
                         const fPeriodMultiplier = fnGetPeriodMultiplier(sPriceType);
@@ -2072,8 +2084,10 @@
 
                             const iSelectedPersonCount = aValidLines.length;
 
-                            const fPackagePrice = this._toNumber(
-                                oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice
+                            const fPackagePrice = this._getFirstAvailableNumber(
+                                oFacility.MinimumPrice,
+                                oFacility.SelectedPrice,
+                                oFacility.CurrentPrice
                             );
 
                             const aNames = aValidLines.map(function (oLine) {
@@ -2313,8 +2327,8 @@
             const fPerMonth = this._toNumber(oFacility.PricePerMonth);
             const fPerYear = this._toNumber(oFacility.PricePerYear);
 
-            function addOption(sKey, sLabel, fPrice) {
-                if (fPrice > 0) {
+            function addOption(sKey, sLabel, fPrice, bAllowZero) {
+                if (fPrice > 0 || (bAllowZero && fPrice === 0)) {
                     aOptions.push({
                         key: sKey,
                         text: sLabel + " - " + fPrice + " " + (oFacility.Currency || "INR"),
@@ -2324,9 +2338,7 @@
             }
 
             if (sSelectionMode === "PERSON_QTY") {
-                if (fMinimumPrice > 0) {
-                    addOption("Package Price", "Package Price", fMinimumPrice);
-                }
+                addOption("Package Price", "Package Price", fMinimumPrice, true);
 
                 return aOptions;
             }
@@ -5953,7 +5965,7 @@
             // const sCustomerID = oHostelModel.getProperty("/CustomerID") || "";
             const sCurrency = oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR";
             const sUnitText = oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "";
-            const fUnitPrice = this._toNumber(oFacility.Price || oFacility.SelectedPrice || oFacility.UnitPrice || 0);
+            const fUnitPrice = this._getFirstAvailableNumber(oFacility.Price, oFacility.SelectedPrice, oFacility.UnitPrice);
             const sChargeType = oFacility.FacilityChargeType || "";
             const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
@@ -6006,8 +6018,11 @@
             }
 
             if (sSelectionMode === "PERSON_QTY") {
-                const fPackagePrice = this._toNumber(
-                    oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice || fUnitPrice
+                const fPackagePrice = this._getFirstAvailableNumber(
+                    oFacility.MinimumPrice,
+                    oFacility.SelectedPrice,
+                    oFacility.CurrentPrice,
+                    fUnitPrice
                 );
 
                 return aPersonQuantities.filter(function (oLine) {

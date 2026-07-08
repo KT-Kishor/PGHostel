@@ -951,7 +951,7 @@ sap.ui.define([
             var aPersonBreakdown = [];
 
             if (sSelectionMode === "PERSON") {
-                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice);
+                var fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice);
                 var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
 
                 aSelectedPersonIds.forEach(function (sPersonId) {
@@ -1045,8 +1045,10 @@ sap.ui.define([
                 }.bind(this));
 
             } else if (sSelectionMode === "PERSON_QTY") {
-                var fPackagePrice = this._toNumber(
-                    oFacility.MinimumPrice || oFacility.SelectedPrice || oFacility.CurrentPrice
+                var fPackagePrice = this._getFirstAvailableNumber(
+                    oFacility.MinimumPrice,
+                    oFacility.SelectedPrice,
+                    oFacility.CurrentPrice
                 );
                 var sFacilityChargeType = this._getFacilityChargeType(oFacility);
 
@@ -2473,16 +2475,16 @@ sap.ui.define([
 
         _deriveEditFacilitySelectedPrice: function (oSelectedFacility, oFacility, sSelectionMode) {
             if (sSelectionMode === "PERSON_QTY") {
-                return this._toNumber(
-                    oFacility.MinimumPrice ||
-                    oSelectedFacility.MinimumPrice ||
-                    oSelectedFacility.PackagePrice ||
-                    oSelectedFacility.SelectedPrice ||
+                return this._getFirstAvailableNumber(
+                    oFacility.MinimumPrice,
+                    oSelectedFacility.MinimumPrice,
+                    oSelectedFacility.PackagePrice,
+                    oSelectedFacility.SelectedPrice,
                     oSelectedFacility.Price
                 );
             }
 
-            var fSelectedPrice = this._toNumber(oSelectedFacility.SelectedPrice || oSelectedFacility.Price || oSelectedFacility.BasicFacilityPrice);
+            var fSelectedPrice = this._getFirstAvailableNumber(oSelectedFacility.SelectedPrice, oSelectedFacility.Price, oSelectedFacility.BasicFacilityPrice);
             var fSavedTotal = this._toNumber(oSelectedFacility.SavedTotalAmount);
             var iQuantity = Math.max(parseInt(oSelectedFacility.Quantity || oSelectedFacility.SavedQuantity, 10) || 0, 0);
             var iPersonQtyTotal = Array.isArray(oSelectedFacility.PersonQuantities)
@@ -2532,14 +2534,14 @@ sap.ui.define([
                 oFacility.SelectionModeLabel = this._getFacilitySelectionModeLabel(oFacility.SelectionMode);
 
                 if (oFacility.Selected) {
-                    var fSavedPrice = this._toNumber(oFacility.SelectedPrice || oFacility.Price || oFacility.BasicFacilityPrice || oFacility.CurrentPrice);
+                    var fSavedPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.Price, oFacility.BasicFacilityPrice, oFacility.CurrentPrice);
                     var sSavedPriceType = oFacility.SelectedPriceType || oFacility.UnitText || (oMatchedOption && oMatchedOption.key) || "Unit Price";
 
                     if (oFacility.SelectionMode === "PERSON_QTY") {
-                        fSavedPrice = this._toNumber(
-                            oFacility.MinimumPrice ||
-                            oFacility.PackagePrice ||
-                            fSavedPrice ||
+                        fSavedPrice = this._getFirstAvailableNumber(
+                            oFacility.MinimumPrice,
+                            oFacility.PackagePrice,
+                            fSavedPrice,
                             (oMatchedOption && oMatchedOption.price)
                         );
                         sSavedPriceType = "Package Price";
@@ -2625,7 +2627,7 @@ sap.ui.define([
 
                     // Build a facility-like object with per-item dates for _calculateFacilityTotal
                     var oCalcItem = {
-                        BasicFacilityPrice: oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice || 0,
+                        BasicFacilityPrice: this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice),
                         UnitText: sPriceType,
                         Quantity: oFacility.Quantity || 1,
                         FacilityChargeType: sFacilityChargeType
@@ -2751,7 +2753,7 @@ sap.ui.define([
                         DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                         Currency: sCurrency,
                         SelectionMode: sSelectionMode,
-                        Price: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
+                        Price: this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice),
                         UnitText: sPriceType,
                         FacilityChargeType: sFacilityChargeType,
                         Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
@@ -2773,7 +2775,7 @@ sap.ui.define([
                                 "Package Price"
                             )
                             : this._formatFacilityPriceWithUnit(
-                                this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
+                                this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice),
                                 sCurrency,
                                 sPriceType
                             ),
@@ -2824,7 +2826,7 @@ sap.ui.define([
             // Build calc item with appropriate dates based on condition 1/2
             var bUseBookingDates = this._isBookingDateDependentFacility(oFacility);
             var oCalcItem = {
-                BasicFacilityPrice: this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice),
+                BasicFacilityPrice: this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice),
                 UnitText: sPriceType,
                 Quantity: oFacility.Quantity || 1,
                 FacilityChargeType: this._getFacilityChargeType(oFacility)
@@ -3102,7 +3104,7 @@ sap.ui.define([
                 BranchCode: oFacility.BranchCode,
                 Currency: oSelectedFacility.Currency || oFacility.Currency || oHostelModel.getProperty("/Currency") || "INR",
                 Image: this._getFacilityImageSource(oFacility),
-                BasicFacilityPrice: this._toNumber(oSelectedFacility.BasicFacilityPrice || oSelectedFacility.Price || oFacility.BasicFacilityPrice || oFacility.UnitPrice),
+                BasicFacilityPrice: this._getFirstAvailableNumber(oSelectedFacility.BasicFacilityPrice, oSelectedFacility.Price, oFacility.BasicFacilityPrice, oFacility.UnitPrice),
                 UnitPrice: this._toNumber(oFacility.UnitPrice),
                 PricePerHour: this._toNumber(oFacility.PerHourPrice),
                 PricePerDay: this._toNumber(oFacility.PerDayPrice),
@@ -3536,7 +3538,7 @@ sap.ui.define([
             } else {
                 // ── SINGLE / QTY modes ──
                 fGrandTotal = this._getFacilityCardTotalAmount(oFacility);
-                var fPrice = this._toNumber(oFacility.SelectedPrice || oFacility.CurrentPrice || oFacility.BasicFacilityPrice);
+                var fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice);
                 var sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
                 var iQuantity = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
                 var iDayCount = this._getDayCount(sFacStart, sFacEnd);

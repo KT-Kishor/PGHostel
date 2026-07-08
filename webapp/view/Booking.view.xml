@@ -743,7 +743,7 @@
 
                                     <ColumnListItem
                                         vAlign="Middle"
-                                        visible="{= ${HostelModel>/TotalFacilityPrice} > 0}"
+                                        visible="{= ${HostelModel>/AllSelectedFacilities}.length > 0}"
                                     >
                                         <cells>
                                             <HBox
