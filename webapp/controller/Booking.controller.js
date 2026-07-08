@@ -4457,20 +4457,23 @@
         },
 
         _getVisibleCardCount: function () {
-            const bIsMobile = sap.ui.Device.support.touch && window.innerWidth <= 1024;
+            // Only true phones show a single card. Tablets and desktop use the
+            // dynamic fit calculation below (tablet naturally fits 2 cards,
+            // desktop fits 3+ depending on the available carousel width).
+            const bIsPhone = window.innerWidth <= 600;
 
             const oViewport = this.byId("facilityViewport");
             if (!oViewport || !oViewport.getDomRef()) {
-                return bIsMobile ? 1 : 3;
+                return bIsPhone ? 1 : 3;
             }
 
             const iContainerWidth = oViewport.getDomRef().clientWidth;
             if (!iContainerWidth || iContainerWidth <= 0) {
-                return bIsMobile ? 1 : 3;
+                return bIsPhone ? 1 : 3;
             }
 
-            // On mobile, always show 1 card
-            if (bIsMobile) {
+            // On phones, always show 1 card
+            if (bIsPhone) {
                 return 1;
             }
 
@@ -4478,6 +4481,8 @@
             const iGap = this._iFacilityCardGap || 16;
 
             // How many cards fit: floor((availableWidth + gap) / (cardWidth + gap))
+            // This adapts dynamically to the available space so tablets show 2
+            // and desktops show 3 or more based on the viewport width.
             const iFit = Math.floor((iContainerWidth + iGap) / (iCardWidth + iGap));
             return Math.max(1, iFit);
         },
@@ -4640,6 +4645,44 @@
             oContainer.addItem(oRow);
             this._attachFacilitySwipeHandlers();
             this._renderFacilityDots();
+
+            // On first paint the viewport DOM width may not be settled yet, so
+            // the initial page-size calculation can be wrong (e.g. tablets show
+            // 1.5 clipped cards). Re-check once the layout settles and re-render
+            // only if the correct visible count differs from what we just drew.
+            this._scheduleFacilityLayoutRecheck(iPageSize);
+        },
+
+        _scheduleFacilityLayoutRecheck: function (iRenderedPageSize) {
+            if (this._bFacilityLayoutRechecking) {
+                return;
+            }
+            this._bFacilityLayoutRechecking = true;
+
+            var that = this;
+            window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(function () {
+                    that._bFacilityLayoutRechecking = false;
+
+                    if (!that.getView() || !that.getView().getDomRef()) {
+                        return;
+                    }
+                    var oViewport = that.byId("facilityViewport");
+                    if (!oViewport || !oViewport.getDomRef()) {
+                        return;
+                    }
+
+                    var iCorrectPageSize = that._getVisibleCardCount();
+                    if (iCorrectPageSize !== iRenderedPageSize) {
+                        that._iFacilityPageSize = iCorrectPageSize;
+                        var aFacilities = (that.getView().getModel("FacilityModel")
+                            && that.getView().getModel("FacilityModel").getProperty("/Facilities")) || [];
+                        var iMaxStart = Math.max(aFacilities.length - 1, 0);
+                        that._iFacilityStartIndex = Math.min(that._iFacilityStartIndex || 0, iMaxStart);
+                        that._renderFacilityCards();
+                    }
+                });
+            });
         },
 
 
