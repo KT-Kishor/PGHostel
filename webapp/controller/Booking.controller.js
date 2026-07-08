@@ -6349,7 +6349,9 @@
                         }
 
                         if (sUserID) {
-                            this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+                            const oLoginModel = sap.ui.getCore().getModel("LoginModel") || this.getView().getModel("LoginModel");
+                            const sRole = oLoginModel ? String(oLoginModel.getProperty("/Role") || "").trim() : "";
+                            this.getOwnerComponent().getRouter().navTo(sRole === "Customer" ? "RouteManageProfile" : "RouteMyBookings");
                             return;
                         }
 
