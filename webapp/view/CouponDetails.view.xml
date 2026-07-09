@@ -312,8 +312,8 @@
         formatter: '.Formatter.formatDiscount'
     }"
 />  
-<Text text="{CouponModel>MinOrderValue}" />
-                            <Text text="{CouponModel>UptoValue}" />
+<Text text="{path: 'CouponModel>MinOrderValue', formatter: '.Formatter.formatAmountINR'}" />
+                            <Text text="{path: 'CouponModel>UptoValue', formatter: '.Formatter.formatAmountINR'}" />
                             <Text text="{CouponModel>MaxUses}" />
                             <!-- <Text text="{CouponModel>UsedCount}" /> -->
                             <!-- <Text text="{CouponModel>PerUserLimit}" /> -->

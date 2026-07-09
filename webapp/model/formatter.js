@@ -253,12 +253,19 @@ sap.ui.define([
     }
 
     if (sDiscountType === "Percentage") {
-        return sDiscountType + " (" + vDiscountValue + "%)";
+        return vDiscountValue + " %";
     } else if (sDiscountType === "Fixed Amount") {
-       return sDiscountType + " (" + vDiscountValue + ")";
+       return vDiscountValue + " INR";
     }
 
-    return sDiscountType + " (" + vDiscountValue + ")";
+    return vDiscountValue;
+},
+
+        formatAmountINR: function (vValue) {
+    if (vValue === null || vValue === undefined || vValue === "") {
+        return "";
+    }
+    return vValue + " INR";
 },
 
         formatStatusState: function (sStatus) {

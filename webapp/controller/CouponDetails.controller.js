@@ -460,6 +460,9 @@ sap.ui.define([
 
             const aFormattedData = aData.map(item => ({
                 ...item,
+                DiscountValue: Formatter.formatDiscount(item.DiscountType, item.DiscountValue),
+                MinOrderValue: Formatter.formatAmountINR(item.MinOrderValue),
+                UptoValue: Formatter.formatAmountINR(item.UptoValue),
                 StartDate: Formatter.formatDate(item.StartDate),
                 EndDate: Formatter.formatDate(item.EndDate),
                 CreatedAt: Formatter.formatDate(item.CreatedAt)
