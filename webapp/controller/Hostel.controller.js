@@ -111,8 +111,16 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var bBusyOnLoad = sessionStorage.getItem("hostelBusyOnLoad") === "true";
+            sessionStorage.removeItem("hostelBusyOnLoad");
+            if (bBusyOnLoad) {
+                this._bBusyFromBooking = true;
+                this.getBusyDialog();
+            }
             var LoginFunction = await this.commonLoginFunction("LoginPage");
-            this.closeBusyDialog();
+            if (!bBusyOnLoad) {
+                this.closeBusyDialog();
+            }
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");
             if (oTabHeader) oTabHeader.setSelectedKey(sStoredTab);
@@ -275,6 +283,15 @@ sap.ui.define([
             // }
 
             this.onAfterAnimate()
+
+            // Fallback: ensure the booking busy dialog is closed even if the home
+            // image preload never reports completion.
+            if (bBusyOnLoad) {
+                setTimeout(function () {
+                    this._bBusyFromBooking = false;
+                    this.closeBusyDialog();
+                }.bind(this), 3000);
+            }
         },
         onAfterAnimate: function () {
             var oHome = this.byId("idHome");
@@ -300,7 +317,11 @@ sap.ui.define([
 
                     setTimeout(function () {
                         oHome.setBusy(false);
-                    }, 300);
+                        if (this._bBusyFromBooking) {
+                            this._bBusyFromBooking = false;
+                            this.closeBusyDialog();
+                        }
+                    }.bind(this), 300);
 
                     // Clear any existing interval to prevent memory leaks
                     if (this._imageInterval) {

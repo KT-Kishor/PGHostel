@@ -335,6 +335,7 @@
         },
 
         onHome: function () {
+            sessionStorage.setItem("hostelBusyOnLoad", "true");
             this.navBackFromBooking();
         },
 
