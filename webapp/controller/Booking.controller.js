@@ -7020,17 +7020,14 @@
 
     var BranchCode = oHostelModel.getProperty("/BranchCode");
 
-      var bookingStartDate =oHostelModel.getProperty("/BookingDate") ? this.parseDate(oHostelModel.getProperty("/BookingDate")):new Date();
+      var bookingStartDate =new Date();
 
    
  
 
      bookingStartDate.setHours(0, 0, 0, 0);
 
-    if(!bookingStartDate){
-        MessageToast.show("Please select the dates before checking coupons")
-        return;
-    }
+  
 
     if (!this.SC_Dialog) {
         this.SC_Dialog = sap.ui.xmlfragment(

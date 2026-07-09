@@ -255,7 +255,7 @@ sap.ui.define([
     if (sDiscountType === "Percentage") {
         return sDiscountType + " (" + vDiscountValue + "%)";
     } else if (sDiscountType === "Fixed Amount") {
-        return sDiscountType + " (vDiscountValue)";
+       return sDiscountType + " (" + vDiscountValue + ")";
     }
 
     return sDiscountType + " (" + vDiscountValue + ")";
