@@ -216,7 +216,7 @@
                     header="{i18n>bookForYourself}"
                     press="TileV_onpressBookForYourself"
                 >
-						<TileContent unit="{i18n>bookForYourselfSub}">
+						<TileContent unit="{i18n>NewBooking}">
 							<ImageContent src="sap-icon://add-activity"/>
 						</TileContent>
 					</GenericTile>

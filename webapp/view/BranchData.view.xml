@@ -70,7 +70,7 @@
     					<Text text="Edit Before" tooltip="Edit Before"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-    					<Text text="Check IN / Out" tooltip="Check IN / Out"/>
+    					<Text text="Check IN / OUT" tooltip="Check IN / OUT"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
 						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>
