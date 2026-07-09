@@ -1654,7 +1654,12 @@ sap.ui.define([
         },
 
         _navAfterEditBooking: function () {
-            this.getOwnerComponent().getRouter().navTo(this._sReturnRouteAfterEdit || "RouteManageProfile");
+            var oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            var sRole = oLoginModel && oLoginModel.getProperty ? String(oLoginModel.getProperty("/Role") || "").trim() : "";
+            // Customer role returns to ManageProfile; all other roles return to MyBookings
+            var sRoute = sRole === "Customer" ? "RouteManageProfile" : "RouteMyBookings";
+            this._sReturnRouteAfterEdit = sRoute;
+            this.getOwnerComponent().getRouter().navTo(sRoute);
         },
 
         _getPaymentDialogField: function (sFieldId) {
