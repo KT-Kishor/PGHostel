@@ -105,10 +105,14 @@
             var LoginFUnction = await this.commonLoginFunction("Booking");
             if (!LoginFUnction) return;
 
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
+            if (performance.navigation && performance.navigation.type === 1) {
+                this.closeBusyDialog();
+                var oLoginModel = this.getOwnerComponent().getModel("LoginModel") || this.getView().getModel("LoginModel");
+                var sRole = oLoginModel ? String(oLoginModel.getProperty("/Role") || "").trim() : "";
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                oRouter.navTo(sRole === "Customer" ? "RouteHostel" : "TilePage", {}, true);
+                return;
+            }
 
             let oHostelModel = sap.ui.getCore().getModel("HostelModel") || this.getView().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
