@@ -960,16 +960,18 @@ sap.ui.define([
                     this._applyAdminBookingECContainsFilter();
                     this._FragmentDatePickersReadOnly([this.getView().createId("AB_id_NC_DOB")]);
                     this._resetAdminBookingModel();
-                    this._loadAdminBookingBranches();
-                    this._loadAdminBookingExistingCustomers();
                     oDialog.open();
+                    this._loadAdminBookingBranches().then(function () {
+                        this._loadAdminBookingExistingCustomers();
+                    }.bind(this));
                 }.bind(this));
             } else {
                 this._resetAdminBookingModel();
                 this._FragmentDatePickersReadOnly([this.getView().createId("AB_id_NC_DOB")]);
-                this._loadAdminBookingBranches();
-                this._loadAdminBookingExistingCustomers();
                 this._AdminBookingDialog.open();
+                this._loadAdminBookingBranches().then(function () {
+                    this._loadAdminBookingExistingCustomers();
+                }.bind(this));
             }
         },
 
