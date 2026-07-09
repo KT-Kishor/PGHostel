@@ -420,16 +420,18 @@
                             wrap="NoWrap"
                             class="sapUiTinyMarginTop"
                         >
-                            <Input
-                                value="{HostelModel>/CouponCode}"
+                          
+                              <Input
+                    value="{HostelModel>/CouponCode}"
                                 placeholder="Enter coupon code"
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
                                 maxLength="15"
-                                submit="onApplyCoupon"
-                                enabled="{BookingView>/editModeEnabled}"
-                            >
+                    showValueHelp="true"
+                    valueHelpRequest="BV_onOpenVH"
+                    valueStateText="{i18n>modelValueState}"
+                >
                                 <layoutData>
                                     <FlexItemData
                                         growFactor="1"

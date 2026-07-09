@@ -461,7 +461,7 @@ sap.ui.define([
                 this.byId("RB_id_FileUploader1").setVisible(false);
                 this.byId("idAddImageLabel").setVisible(false);
                 this.byId("RB_id_ImageBox").setVisible(false);
-                this.byId("RB_id_comments").setValue(Data.Comment).setVisible(true).setValueState("None");
+                this.byId("RB_id_comments").setValue("").setVisible(true).setValueState("None");
 
             },
             onCommentsChange:function(oEvent){

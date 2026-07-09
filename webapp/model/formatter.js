@@ -247,9 +247,19 @@ sap.ui.define([
             }
         },
 
-        formatDiscountValue: function (v, t) {
-            return t === "Percentage" ? v + " %" : v;
-        },
+        formatDiscount: function (sDiscountType, vDiscountValue) {
+    if (!sDiscountType) {
+        return "";
+    }
+
+    if (sDiscountType === "Percentage") {
+        return sDiscountType + " (" + vDiscountValue + "%)";
+    } else if (sDiscountType === "Fixed Amount") {
+        return sDiscountType + " (vDiscountValue)";
+    }
+
+    return sDiscountType + " (" + vDiscountValue + ")";
+},
 
         formatStatusState: function (sStatus) {
             if (sStatus === "Active") {

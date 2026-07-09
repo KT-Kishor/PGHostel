@@ -134,7 +134,7 @@ sap.ui.define([
             sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            this.iTop = 5; // records per load
+            this.iTop = 4; // records per load
             this.iSkip = 0; // starting index
 
             this.flag = false
@@ -1127,7 +1127,7 @@ sap.ui.define([
             if (page && page.scrollTo) page.scrollTo(0, 0);
 
             this.flag = true;
-            this.iTop = 5;
+            this.iTop = 4;
             this.iSkip = 0;
             this.roomtype = true;
 
@@ -1159,7 +1159,7 @@ sap.ui.define([
 
 
                     try {
-                        const response = await this.ajaxReadWithJQuery("HM_Branch", "");
+                        const response = await this.ajaxReadWithJQuery("HM_BranchData", "");
                         aData = response?.data || [];
                         this.Branchlength = aData.length;
 
@@ -2764,7 +2764,7 @@ sap.ui.define([
             sap.m.URLHelper.redirect(sUrl, true);
         },
         onSearchRooms: async function () {
-            this.iTop = 5
+            this.iTop = 4
             this.iSkip = 0
             this.flag = true
             // const oContainer = this.byId("idBedTypeFlex");
@@ -2831,7 +2831,7 @@ sap.ui.define([
 
 
         Branch: async function (filter) {
-            const response = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            const response = await this.ajaxReadWithJQuery("HM_GetBranchImage", filter);
             this.Branchlength = response?.data.length || 0;
             this.getView().setModel(new JSONModel(response?.data), "BranchModel");
 
@@ -2839,9 +2839,14 @@ sap.ui.define([
             let aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
+        Branchdata:async function(){
+            const response = await this.ajaxReadWithJQuery("HM_BranchData", "");
+            let aData = response?.data || [];
+            return Array.isArray(aData) ? aData : [];
+        },
 
         _loadRoomsPageData: async function () {
-            this.iTop = 5;
+            this.iTop = 4;
             this.iSkip = 0;
 
             this.roomtype = false
@@ -2855,11 +2860,14 @@ sap.ui.define([
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
+                  
+                 var BranchNewData=this.getOwnerComponent().getModel("branchModel1");
 
-                var localdata=await this.Branch("")
+                 if(!BranchNewData){
+                var localdata=await this.Branchdata()
 
                this.getOwnerComponent().getModel("sBRModel").setData(localdata)
-
+                 }
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
@@ -2911,8 +2919,8 @@ sap.ui.define([
                     index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
-                this._populateUniqueFilterValues(localdata)
-                this._populateUniqueFilterValuesBranch(localdata)
+                this._populateUniqueFilterValues(data)
+                this._populateUniqueFilterValuesBranch(data)
 
 
 
@@ -2983,7 +2991,7 @@ sap.ui.define([
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
-                    let response = await this.ajaxReadWithJQuery("HM_Branch", {
+                    let response = await this.ajaxReadWithJQuery("HM_GetBranchImage", {
                         City: Scity,
                         LandMark: sBranchCode,
                         Name: BranchName,
@@ -3032,8 +3040,7 @@ sap.ui.define([
 
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
-                    aBranchesData = oBRModel?.getData() || [];
-                      
+                    aBranchesData = oBRModel?.getData() || [];  
                 }
                 let aFilteredBranches = [];
                 if (Scity && !sBranchCode) {

@@ -7013,17 +7013,19 @@
         onchangeConpanyAddress: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
-         parseDate:function (dateStr) {
-    var parts = dateStr.split("/"); // ["08","07","2026"]
-    return new Date(parts[2], parts[1] - 1, parts[0]); // year, month(0-based), day
-        },
+      
 
        BV_onOpenVH: async function () {
     var oHostelModel = this.getView().getModel("HostelModel");
 
     var BranchCode = oHostelModel.getProperty("/BranchCode");
-    var bookingStartDate =oHostelModel.getProperty("/StartDate") ? this.parseDate(oHostelModel.getProperty("/StartDate")):"";
-    var bookingEndDate =oHostelModel.getProperty("/EndDate") ? this.parseDate(oHostelModel.getProperty("/EndDate")):"";
+
+      var bookingStartDate =oHostelModel.getProperty("/BookingDate") ? this.parseDate(oHostelModel.getProperty("/BookingDate")):new Date();
+
+   
+ 
+
+     bookingStartDate.setHours(0, 0, 0, 0);
 
     if(!bookingStartDate){
         MessageToast.show("Please select the dates before checking coupons")
@@ -7052,6 +7054,10 @@ var aFilteredCoupons = oResponse.data.filter(function (coupon) {
 
     var couponStart = new Date(coupon.StartDate);
     var couponEnd = new Date(coupon.EndDate);
+
+
+    couponStart.setHours(0, 0, 0, 0);
+    couponEnd.setHours(23, 59, 59, 999);
 
     return bookingStartDate >= couponStart &&
            bookingStartDate <= couponEnd;
