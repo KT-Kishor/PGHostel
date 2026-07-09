@@ -126,6 +126,9 @@
             this.getView().setModel(new JSONModel(this._getFacilityModelInitialData()), "FacilityModel");
             this.getView().setModel(new JSONModel(this._getFacilitySelectionInitialData()), "FacilitySelection");
             this.getView().setModel(new JSONModel(this._getPaymentModelInitialData()), "PaymentModel");
+            this._bMemberDataLoaded = false;
+            this._bMemberDataLoading = false;
+            this._sLastPrimaryMemberId = "SELF";
             this._resetBookingPageModels();
             oHostelModel.setData(oIncomingBookingData);
 
@@ -160,6 +163,7 @@
 
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
+            oHostelModel.setProperty("/MemberList", []);
 
             if (!sUserID) {
                 console.warn("Cannot load member data: UserID not available");
@@ -171,6 +175,10 @@
             // Load member data in background
             this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID })
                 .then(oResponse => {
+                    if (oHostelModel.getProperty("/UserID") !== sUserID) {
+                        return;
+                    }
+
                     if (oResponse && oResponse.data) {
                         const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [];
                         oHostelModel.setProperty("/MemberList", aMemberList)
@@ -2770,6 +2778,7 @@
         _loadMasterMembersForDialog: function () {
             const oBookingView = this.getView().getModel("BookingView");
             const oHostelModel = this.getView().getModel("HostelModel");
+            const sCurrentUserID = String(oHostelModel.getProperty("/UserID") || "").trim();
             let aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
             let aServerMemberList = Array.isArray(oHostelModel.getProperty("/MemberList"))
                 ? oHostelModel.getProperty("/MemberList") : [];
@@ -2803,6 +2812,8 @@
             });
             aServerMemberList = aServerMemberList.filter(function (oMember) {
                 return !isSelfMember(oMember);
+            }).filter(function (oMember) {
+                return !sCurrentUserID || String(oMember.UserID || "").trim() === sCurrentUserID;
             });
             aSelectedMembers = aSelectedMembers.filter(function (oMember) {
                 return !isSelfMember(oMember);
@@ -4876,7 +4887,7 @@
         },
 
         _prefillLoggedInUser: function () {
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel") || this.getView().getModel("LoginModel");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel") || this.getView().getModel("LoginModel") || sap.ui.getCore().getModel("LoginModel");
             const oHostelModel = this.getView().getModel("HostelModel");
 
             if (!oLoginModel || !oHostelModel) {

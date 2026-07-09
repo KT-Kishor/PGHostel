@@ -757,15 +757,34 @@ sap.ui.define([
 
    CommonLogoutFunction: function () {
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-      const oUIModel = this.getOwnerComponent().getModel("UIModel");
-      oUIModel.setProperty("/isLoggedIn", false);
-      if (oLoginModel) {
+        const oUIModel = this.getOwnerComponent().getModel("UIModel");
+        oUIModel.setProperty("/isLoggedIn", false);
+        if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/UserID", "");
         oLoginModel.setProperty("/UserName", "");
         oLoginModel.setProperty("/EmployeeName", "");
         oLoginModel.setProperty("/Role", "");
         oLoginModel.setProperty("/BranchCode", "");
+        oLoginModel.setProperty("/Salutation", "");
+        oLoginModel.setProperty("/EmailID", "");
+        oLoginModel.setProperty("/STDCode", "");
+        oLoginModel.setProperty("/MobileNo", "");
+        oLoginModel.setProperty("/Gender", "");
+        oLoginModel.setProperty("/Country", "");
+        oLoginModel.setProperty("/State", "");
+        oLoginModel.setProperty("/City", "");
+        oLoginModel.setProperty("/Address", "");
+        oLoginModel.setProperty("/DateofBirth", "");
+        oLoginModel.setProperty("/FileContent", "");
+        oLoginModel.setProperty("/Photo", "");
+
+        const oEmptyHostelModel = new JSONModel({});
+        this.getOwnerComponent().setModel(oEmptyHostelModel, "HostelModel");
+        sap.ui.getCore().setModel(oEmptyHostelModel, "HostelModel");
+        this.getOwnerComponent().setModel(new JSONModel({}), "UserModel");
+        sap.ui.getCore().setModel(null, "profileData");
+        sap.ui.getCore().setModel(null, "LoginModel");
 
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("_x9A1p");
@@ -780,8 +799,8 @@ sap.ui.define([
 
     initializeLoginModel: function () {
       let oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-      if (!oLoginModel) {
-        oLoginModel = new JSONModel({
+        if (!oLoginModel) {
+          oLoginModel = new JSONModel({
           // Database connection
           url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
           headers: {
@@ -793,6 +812,7 @@ sap.ui.define([
         });
         this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
       }
+      sap.ui.getCore().setModel(oLoginModel, "LoginModel");
     },
     commonLoginFunction: async function (value) {
       const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -890,6 +910,7 @@ sap.ui.define([
           oLoginModel = new sap.ui.model.json.JSONModel({});
           this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
         }
+        sap.ui.getCore().setModel(oLoginModel, "LoginModel");
 
         // Set User Data
         oLoginModel.setProperty("/EmployeeID", user.UserID || "");
