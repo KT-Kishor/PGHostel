@@ -142,7 +142,7 @@
                     <items>
                         <GenericTile
                             header="{i18n>perDay}"
-                            subheader="{ parts:['HostelModel>/Price','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            subheader="{path:'HostelModel>/Price', formatter:'.Formatter.fromatNumber'} {HostelModel>/Currency}"
                             class=" defaultTile priceItem"
                             frameType="OneByHalf"
                             press=".onSelectPricePlan"
@@ -157,7 +157,7 @@
                         </GenericTile>
                         <GenericTile
                             header="{i18n>perMonth}"
-                            subheader="{ parts:['HostelModel>/MonthPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            subheader="{path:'HostelModel>/MonthPrice', formatter:'.Formatter.fromatNumber'} {HostelModel>/Currency}"
                             class=" defaultTile priceItem"
                             frameType="OneByHalf"
                             press=".onSelectPricePlan"
@@ -172,7 +172,7 @@
                         </GenericTile>
                         <GenericTile
                             header="{i18n>perYear}"
-                            subheader="{ parts:['HostelModel>/YearPrice','HostelModel>/Currency'], formatter: '.Formatter.formatCurrency' }"
+                            subheader="{path:'HostelModel>/YearPrice', formatter:'.Formatter.fromatNumber'} {HostelModel>/Currency}"
                             class=" defaultTile priceItem"
                             frameType="OneByHalf"
                             press=".onSelectPricePlan"

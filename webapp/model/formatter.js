@@ -338,8 +338,10 @@ sap.ui.define([
                 return "";
             }
 
-            var oFormat = sap.ui.core.format.NumberFormat.getCurrencyInstance({
-                currencyCode: false,
+            var oFormat = sap.ui.core.format.NumberFormat.getFloatInstance({
+                groupingBaseSize: 3,
+                groupingSize: 2,
+                minIntegerDigits: 1,
                 minFractionDigits: 2,
                 maxFractionDigits: 2
             });

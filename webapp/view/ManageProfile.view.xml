@@ -447,8 +447,7 @@
                         <Text text="{profileData>customerName}" />
                         <Text text="{profileData>BookingDate}" />
                         <Text text="{profileData>room}" />
-                        <Text text="{ parts:['profileData>amount','profileData>currency'],
-                          formatter:'.Formatter.formatCurrency'}"/>
+                        <Text text="{path:'profileData>amount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
                         <ObjectStatus text="{profileData>status}"
                          state="{ path:'profileData>status', formatter:'.Formatter.formatObjectStatus'}"/>
                     </cells>

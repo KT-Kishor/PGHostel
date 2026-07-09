@@ -141,10 +141,7 @@
                         <Text text="{myBookings>customerName}" />
                         <Text text="{myBookings>BookingDate}" />
                         <Text text="{myBookings>room}" />
-                        <Text text="{
-                            parts: ['myBookings>amount', 'myBookings>currency'],
-                            formatter: '.Formatter.formatCurrency'
-                        }" />
+                        <Text text="{path:'myBookings>amount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}" />
                         <ObjectStatus
                             text="{myBookings>status}"
                             state="{path: 'myBookings>status', formatter: '.Formatter.formatObjectStatus'}"
