@@ -135,46 +135,7 @@ sap.ui.define([
             var oRouteQuery = oArgs["?query"] || oArgs.query || {};
             this._sReturnRouteAfterEdit = oRouteQuery.FromMyBookings === "true" || oRouteQuery.FromMyBookings === true ? "RouteMyBookings" : "RouteManageProfile";
 
-            // const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            // const bLoggedIn = oUIModel.getData().isLoggedIn;
-
-            var bLoggedIn = localStorage.getItem("isLoggedIn")
-
-            // LOGIN CHECK
-            if (!bLoggedIn) {
-                this._bPendingEditRoute = true;
-                this.getView().addStyleClass("blur-background");
-
-                MessageBox.information(
-                    "Please log in to manage booking.",
-                    {
-                        title: "Login Required",
-                        styleClass: "myUnifiedBtn",
-                        actions: [MessageBox.Action.OK],
-                        emphasizedAction: MessageBox.Action.OK,
-
-                        onClose: function () {
-                            if (!this._oLoginAlertDialog) {
-
-                                this._oLoginAlertDialog = sap.ui.xmlfragment(
-                                    this.createId("LoginAlertDialog"),
-                                    "sap.ui.com.project1.fragment.AdminDetailsSignin",
-                                    this
-                                );
-
-                                this.getView().addDependent(this._oLoginAlertDialog);
-                            }
-
-                            this._oLoginAlertDialog.open();
-
-                        }.bind(this)
-                    }
-                );
-
-                return;
-            }
-
-            var sBookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
+            var sBookingID = this.BookingID;
             var sMemberID = oArgs.MemberID ? atob(decodeURIComponent(oArgs.MemberID)) : "";
 
             if (!sBookingID) {
@@ -182,8 +143,73 @@ sap.ui.define([
                 return;
             }
 
-            var LoginFUnction = await this.commonLoginFunction("Booking");
-            if (!LoginFUnction) return;
+            // ===== OTP VERIFICATION GATE =====
+            // Direct access is granted ONLY if EITHER:
+            //   (a) already OTP-verified for THIS booking in this session, OR
+            //   (b) currently logged in AS this exact booking's customer
+            //      (logged-in UserID === booking owner UserID).
+            // Anyone else (not logged in, OR logged in as a different account like
+            // admin/another customer) must prove they own the booking via OTP.
+            var bAccessAllowed = false;
+
+            // (a) already OTP-verified for THIS booking in this session
+            if (sessionStorage.getItem("bookingVerified_" + sBookingID) === "true") {
+                bAccessAllowed = true;
+            } else {
+                // Fetch the booking's owner UserID to check (b)
+                try {
+                    this.getBusyDialog();
+                    var oPreFetch = await this.ajaxReadWithJQuery("HM_Customer", {
+                        BookingID: sBookingID,
+                        MemberID: sMemberID
+                    });
+                    this.closeBusyDialog();
+                    this._oPrefetchedCustomerResponse = oPreFetch;
+                    var sOwnerUserID = (oPreFetch && oPreFetch.Customers && oPreFetch.Customers.UserID) || "";
+                    bAccessAllowed = this._isBookingAccessAllowed(sOwnerUserID);
+                } catch (e) {
+                    this.closeBusyDialog();
+                }
+            }
+
+            if (!bAccessAllowed) {
+                this._bPendingEditRoute = true;
+                this.getView().addStyleClass("blur-background");
+
+                MessageBox.information(
+                    "Please verify with OTP to access your booking.",
+                    {
+                        title: "Verification Required",
+                        styleClass: "myUnifiedBtn",
+                        actions: [MessageBox.Action.OK],
+                        emphasizedAction: MessageBox.Action.OK,
+
+                        onClose: function () {
+                            if (!this._oLoginAlertDialog) {
+                                this._oLoginAlertDialog = sap.ui.xmlfragment(
+                                    this.createId("LoginAlertDialog"),
+                                    "sap.ui.com.project1.fragment.AdminDetailsSignin",
+                                    this
+                                );
+                                this.getView().addDependent(this._oLoginAlertDialog);
+                            }
+                            this._oLoginAlertDialog.open();
+                        }.bind(this)
+                    }
+                );
+                return;
+            }
+
+            // If access is via session-verified (OTP, not main login), skip
+            // commonLoginFunction and just ensure the LoginModel exists for
+            // API calls. If logged in normally, run commonLoginFunction as before.
+            var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+            if (bLoggedIn) {
+                var LoginFUnction = await this.commonLoginFunction("Booking");
+                if (!LoginFUnction) return;
+            } else {
+                this.initializeLoginModel();
+            }
 
             var oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
@@ -216,11 +242,12 @@ sap.ui.define([
 
             try {
                 this.getBusyDialog()
-                // 1. Fetch booking data using HM_Customer
-                var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
+                // 1. Fetch booking data using HM_Customer (reuse pre-fetched response if available)
+                var oResponse = this._oPrefetchedCustomerResponse || await this.ajaxReadWithJQuery("HM_Customer", {
                     BookingID: sBookingID,
                     MemberID: sMemberID
                 });
+                this._oPrefetchedCustomerResponse = null;
 
                 var oCustomer = oResponse && oResponse.Customers || oResponse && oResponse.value && oResponse.value[0] || {};
                 var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
@@ -423,6 +450,38 @@ sap.ui.define([
                 MessageBox.error("Unable to load booking details for edit.");
             } finally {
                 this.closeBusyDialog();
+            }
+        },
+
+        // Returns true ONLY if the current user is allowed to view this booking
+        // without re-verifying: they are currently logged in AS this exact
+        // booking's customer (logged-in UserID === booking owner UserID).
+        _isBookingAccessAllowed: function (sOwnerUserID) {
+            if (!sOwnerUserID) {
+                return false;
+            }
+            var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+            var sLoggedInUserID = this._getLoggedInUserID();
+            return bLoggedIn && sLoggedInUserID === sOwnerUserID;
+        },
+
+        // Safely decodes the currently logged-in UserID from localStorage.
+        _getLoggedInUserID: function () {
+            try {
+                var sEncoded = localStorage.getItem("_aB39X");
+                if (!sEncoded) {
+                    return "";
+                }
+                return atob(sEncoded) || "";
+            } catch (e) {
+                return "";
+            }
+        },
+
+        // Clears any per-booking "verified" flag (e.g. on dialog cancel / logout).
+        _clearBookingVerifiedFlag: function () {
+            if (this.BookingID) {
+                sessionStorage.removeItem("bookingVerified_" + this.BookingID);
             }
         },
 
@@ -4291,12 +4350,11 @@ sap.ui.define([
 
                 this.CustomerEmail = sEmail;
 
-                localStorage.setItem("isLoggedIn", "true");
-                this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
-                localStorage.setItem("_aB39X",btoa(customer.UserID));
-                localStorage.setItem("_mN72P",btoa(customer.CustomerName));
-                localStorage.setItem("_x9A1p",customer._x9A1p);
-                localStorage.setItem("_k7LmQ",customer._k7LmQ);
+                // Mark THIS booking as OTP-verified for the current browser session.
+                // We intentionally do NOT overwrite the main app login session tokens
+                // (localStorage / LoginModel), so an already-logged-in admin or
+                // different customer session is not corrupted by this verification.
+                sessionStorage.setItem("bookingVerified_" + this.BookingID, "true");
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
@@ -4305,7 +4363,7 @@ sap.ui.define([
                 ctrlEmailId?.setValueState("None");
                 ctrlOTP?.setValueState("None");
 
-                sap.m.MessageToast.show("Login Successful");
+                sap.m.MessageToast.show("Verification Successful");
 
                 if (this._bPendingEditRoute) {
 
@@ -4965,6 +5023,10 @@ sap.ui.define([
         },
 
         onDialogClose: function() {
+
+            // User cancelled the OTP dialog — do not auto-resume the page load
+            this._bPendingEditRoute = false;
+            this._oResetUser = null;
 
             const oEmail = sap.ui.core.Fragment.byId(
                 this.createId("LoginAlertDialog"),

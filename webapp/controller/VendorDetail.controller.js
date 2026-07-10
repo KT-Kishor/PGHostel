@@ -77,9 +77,13 @@ sap.ui.define([
 
             this.sUserID = decodedUserID;
 
-            // ===== OTP VERIFICATION GATE (same as EditBooking) =====
-            var bLoggedIn = localStorage.getItem("isLoggedIn");
-            if (!bLoggedIn) {
+            // ===== OTP VERIFICATION GATE =====
+            // Direct access is granted ONLY if EITHER:
+            //   (a) already OTP-verified for THIS vendor in this session, OR
+            //   (b) currently logged in AS this exact vendor (logged-in UserID === link's vendor UserID).
+            // Anyone else (not logged in, OR logged in as a different account like admin/customer)
+            // must prove they own the vendor's email via OTP.
+            if (!this._isVendorAccessAllowed()) {
                 this._bPendingVendorRoute = true;
                 this.getView().addStyleClass("blur-background");
 
@@ -108,6 +112,43 @@ sap.ui.define([
             }
 
             await this._loadVendorPage();
+        },
+
+        // Returns true ONLY if the current user is allowed to view this vendor page
+        // without re-verifying: either they are logged in AS this vendor, or they
+        // already passed OTP verification for this vendor in the current session.
+        _isVendorAccessAllowed: function () {
+            if (!this.sUserID) {
+                return false;
+            }
+            // (a) already OTP-verified for THIS vendor in this session
+            if (sessionStorage.getItem("vendorVerified_" + this.sUserID) === "true") {
+                return true;
+            }
+            // (b) currently logged in AS this exact vendor
+            var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+            var sLoggedInUserID = this._getLoggedInUserID();
+            return bLoggedIn && sLoggedInUserID === this.sUserID;
+        },
+
+        // Safely decodes the currently logged-in UserID from localStorage.
+        _getLoggedInUserID: function () {
+            try {
+                var sEncoded = localStorage.getItem("_aB39X");
+                if (!sEncoded) {
+                    return "";
+                }
+                return atob(sEncoded) || "";
+            } catch (e) {
+                return "";
+            }
+        },
+
+        // Clears any per-vendor "verified" flag (e.g. on dialog cancel / logout).
+        _clearVendorVerifiedFlag: function () {
+            if (this.sUserID) {
+                sessionStorage.removeItem("vendorVerified_" + this.sUserID);
+            }
         },
 
         _loadVendorPage: async function () {
@@ -1381,25 +1422,11 @@ sap.ui.define([
                     return;
                 }
 
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("_x9A1p", user._x9A1p);
-                localStorage.setItem("_k7LmQ", user._k7LmQ);
-                localStorage.setItem("_aB39X", btoa(user.UserID));
-                localStorage.setItem("_mN72P", btoa(user.UserName || ""));
-
-                const oUIModel = this.getOwnerComponent().getModel("UIModel");
-                if (oUIModel) {
-                    oUIModel.setProperty("/isLoggedIn", true);
-                }
-                const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-                if (oLoginModel) {
-                    oLoginModel.setProperty("/UserID", user.UserID);
-                    oLoginModel.setProperty("/EmployeeID", user.UserID);
-                    oLoginModel.setProperty("/EmployeeName", user.UserName || "");
-                    oLoginModel.setProperty("/UserName", user.UserName || "");
-                    oLoginModel.setProperty("/EmailID", user.EmailID || "");
-                    oLoginModel.setProperty("/isLoggedIn", true);
-                }
+                // Mark THIS vendor as OTP-verified for the current browser session.
+                // We intentionally do NOT overwrite the main app login session tokens
+                // (localStorage / LoginModel), so an already-logged-in admin or
+                // customer session is not corrupted by this vendor verification.
+                sessionStorage.setItem("vendorVerified_" + this.sUserID, "true");
 
                 ctrlEmailId?.setValue("");
                 ctrlOTP?.setValue("");
@@ -1407,7 +1434,7 @@ sap.ui.define([
                 ctrlOTP?.setValueState("None");
                 this._resetOtpState();
 
-                MessageToast.show("Login Successful");
+                MessageToast.show("Verification Successful");
 
                 this.getView().removeStyleClass("blur-background");
                 if (oFragment) {
@@ -1491,6 +1518,11 @@ sap.ui.define([
             }
 
             this._resetOtpState();
+
+            // User cancelled the OTP dialog — do not auto-resume the page load
+            this._bPendingVendorRoute = false;
+            this._oResetUser = null;
+            this._oVerifiedUser = null;
 
             this.getView().removeStyleClass("blur-background");
             if (this._oLoginAlertDialog) {
