@@ -143,33 +143,21 @@ sap.ui.define([
                 return;
             }
 
-            // ===== OTP VERIFICATION GATE =====
-            // Direct access is granted ONLY if EITHER:
-            //   (a) already OTP-verified for THIS booking in this session, OR
-            //   (b) currently logged in AS this exact booking's customer
-            //      (logged-in UserID === booking owner UserID).
-            // Anyone else (not logged in, OR logged in as a different account like
-            // admin/another customer) must prove they own the booking via OTP.
+            // Allow access only when the current login belongs to this deeplink booking owner.
+            // A different/no active user must complete OTP, which then becomes the active login.
             var bAccessAllowed = false;
-
-            // (a) already OTP-verified for THIS booking in this session
-            if (sessionStorage.getItem("bookingVerified_" + sBookingID) === "true") {
-                bAccessAllowed = true;
-            } else {
-                // Fetch the booking's owner UserID to check (b)
-                try {
-                    this.getBusyDialog();
-                    var oPreFetch = await this.ajaxReadWithJQuery("HM_Customer", {
-                        BookingID: sBookingID,
-                        MemberID: sMemberID
-                    });
-                    this.closeBusyDialog();
-                    this._oPrefetchedCustomerResponse = oPreFetch;
-                    var sOwnerUserID = (oPreFetch && oPreFetch.Customers && oPreFetch.Customers.UserID) || "";
-                    bAccessAllowed = this._isBookingAccessAllowed(sOwnerUserID);
-                } catch (e) {
-                    this.closeBusyDialog();
-                }
+            try {
+                this.getBusyDialog();
+                var oPreFetch = await this.ajaxReadWithJQuery("HM_Customer", {
+                    BookingID: sBookingID,
+                    MemberID: sMemberID
+                });
+                this.closeBusyDialog();
+                this._oPrefetchedCustomerResponse = oPreFetch;
+                var sOwnerUserID = (oPreFetch && oPreFetch.Customers && oPreFetch.Customers.UserID) || "";
+                bAccessAllowed = this._isBookingAccessAllowed(sOwnerUserID);
+            } catch (e) {
+                this.closeBusyDialog();
             }
 
             if (!bAccessAllowed) {
@@ -200,16 +188,8 @@ sap.ui.define([
                 return;
             }
 
-            // If access is via session-verified (OTP, not main login), skip
-            // commonLoginFunction and just ensure the LoginModel exists for
-            // API calls. If logged in normally, run commonLoginFunction as before.
-            var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-            if (bLoggedIn) {
-                var LoginFUnction = await this.commonLoginFunction("Booking");
-                if (!LoginFUnction) return;
-            } else {
-                this.initializeLoginModel();
-            }
+            var LoginFUnction = await this.commonLoginFunction("Booking");
+            if (!LoginFUnction) return;
 
             var oHostelModel = sap.ui.getCore().getModel("HostelModel");
             if (!oHostelModel) {
@@ -453,9 +433,7 @@ sap.ui.define([
             }
         },
 
-        // Returns true ONLY if the current user is allowed to view this booking
-        // without re-verifying: they are currently logged in AS this exact
-        // booking's customer (logged-in UserID === booking owner UserID).
+        // Returns true only when the active login belongs to this booking owner.
         _isBookingAccessAllowed: function (sOwnerUserID) {
             if (!sOwnerUserID) {
                 return false;
@@ -478,11 +456,57 @@ sap.ui.define([
             }
         },
 
-        // Clears any per-booking "verified" flag (e.g. on dialog cancel / logout).
-        _clearBookingVerifiedFlag: function () {
-            if (this.BookingID) {
-                sessionStorage.removeItem("bookingVerified_" + this.BookingID);
+        _applyVerifiedUserLogin: async function (user) {
+            this.initializeLoginModel();
+
+            // Keep Component.js unchanged: first invalidate the old shared login so
+            // other tabs run the existing storage-listener logout, then write the
+            // OTP-verified user as the single active session.
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("_x9A1p");
+            localStorage.removeItem("_k7LmQ");
+            localStorage.removeItem("_aB39X");
+            localStorage.removeItem("_mN72P");
+
+            await new Promise(function (resolve) {
+                setTimeout(resolve, 300);
+            });
+
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("_x9A1p", user._x9A1p || "");
+            localStorage.setItem("_k7LmQ", user._k7LmQ || "");
+            localStorage.setItem("_aB39X", btoa(user.UserID || ""));
+            localStorage.setItem("_mN72P", btoa(user.UserName || user.CustomerName || ""));
+
+            var oUIModel = this.getOwnerComponent().getModel("UIModel");
+            if (oUIModel) {
+                oUIModel.setProperty("/isLoggedIn", true);
             }
+
+            var oLoginModel = this.getOwnerComponent().getModel("LoginModel") || new JSONModel({});
+            this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
+            sap.ui.getCore().setModel(oLoginModel, "LoginModel");
+            oLoginModel.setData(Object.assign({}, oLoginModel.getData() || {}, {
+                isLoggedIn: true,
+                EmployeeID: user.UserID || "",
+                UserID: user.UserID || "",
+                Salutation: user.Salutation || "",
+                EmployeeName: user.UserName || user.CustomerName || "",
+                UserName: user.UserName || user.CustomerName || "",
+                EmailID: user.EmailID || user.CustomerEmail || user.Email || "",
+                Role: user.Role || "",
+                BranchCode: user.BranchCode || "",
+                STDCode: user.STDCode || "",
+                MobileNo: user.MobileNo || user.Mobile || "",
+                Gender: user.Gender || "",
+                Country: user.Country || "",
+                State: user.State || "",
+                City: user.City || "",
+                Address: user.Address || "",
+                DateofBirth: user.DateOfBirth ? this.Formatter.DateFormat(user.DateOfBirth) : "",
+                FileContent: user.FileContent || "",
+                Photo: user.FileContent ? "data:image/png;base64," + user.FileContent : ""
+            }));
         },
 
         /**
@@ -4350,11 +4374,7 @@ sap.ui.define([
 
                 this.CustomerEmail = sEmail;
 
-                // Mark THIS booking as OTP-verified for the current browser session.
-                // We intentionally do NOT overwrite the main app login session tokens
-                // (localStorage / LoginModel), so an already-logged-in admin or
-                // different customer session is not corrupted by this verification.
-                sessionStorage.setItem("bookingVerified_" + this.BookingID, "true");
+                await this._applyVerifiedUserLogin(customer);
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
@@ -4363,7 +4383,7 @@ sap.ui.define([
                 ctrlEmailId?.setValueState("None");
                 ctrlOTP?.setValueState("None");
 
-                sap.m.MessageToast.show("Verification Successful");
+                sap.m.MessageToast.show("Login Successful");
 
                 if (this._bPendingEditRoute) {
 
