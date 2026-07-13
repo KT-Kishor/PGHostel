@@ -5161,6 +5161,12 @@ sap.ui.define([
         },
 
           BV_onOpenVH: async function () {
+    var oBookingView = this.getView().getModel("BookingView");
+
+    if (!oBookingView || !oBookingView.getProperty("/editModeEnabled")) {
+        return;
+    }
+
     var oHostelModel = this.getView().getModel("HostelModel");
 
     var BranchCode = oHostelModel.getProperty("/BranchCode");
@@ -5223,7 +5229,8 @@ var aFilteredCoupons = oResponse.data.filter(function (coupon) {
 
     this.SC_Dialog.close();
 
-  
+    this._resetCouponState(true);
+    this.onApplyCoupon();
 },
         SC_onVHDClose:function(){
               this.SC_Dialog.close();

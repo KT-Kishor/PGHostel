@@ -550,6 +550,7 @@
                     showValueHelp="true"
                     valueHelpRequest="BV_onOpenVH"
                     valueStateText="{i18n>modelValueState}"
+                    submit="onApplyCoupon"
                 >
                                 <layoutData>
                                     <FlexItemData

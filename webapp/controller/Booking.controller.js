@@ -7076,7 +7076,8 @@ var aFilteredCoupons = oResponse.data.filter(function (coupon) {
 
     this.SC_Dialog.close();
 
-  
+    this._resetCouponState(true);
+    this.onApplyCoupon();
 },
         SC_onVHDClose:function(){
               this.SC_Dialog.close();
