@@ -2539,14 +2539,22 @@ sap.ui.define([
 
 
             if (oSelectedData.FacilityChargeType === "DAILY") {
-                sap.ui.getCore().byId("editquantity").setVisible(true)
+                if(oSelectedData.SelectionMode==="PERSON_QTY"){
+                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
+                }else{
+                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
+                }
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(0)
                 sap.ui.getCore().byId("editStartDate").setEditable(true)
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else if (oSelectedData.FacilityChargeType === "Entire Booking") {
-                sap.ui.getCore().byId("editquantity").setVisible(true)
+                 if(oSelectedData.SelectionMode==="PERSON_QTY"){
+                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
+                }else{
+                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
+                }
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(1)
                 sap.ui.getCore().byId("editStartDate").setEditable(false)
