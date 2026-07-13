@@ -2427,7 +2427,9 @@ sap.ui.define([
                 "Room Heater": "../image/Room Heater.jpeg",
                 "Study Room Access": "../image/Study Room.png",
                 "Others": "../image/defaultFacility.png",
-                "Extra Pillow" : "../image/pillow.jpg"
+                "Extra Pillow" : "../image/pillow.jpg",
+                "Extra Bed": "../image/ExtraBed.png",
+
             };
 
             return list

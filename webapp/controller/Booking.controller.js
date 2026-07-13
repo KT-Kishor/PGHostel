@@ -5010,7 +5010,7 @@
                 "air conditioner": "./image/Air Conditioner.jpeg",
                 "room heater": "./image/Room Heater.jpeg",
                 "study room access": "./image/Study Room.png",
-                "extra bed": "./image/ExtraBed.jpg",
+                "extra bed": "./image/ExtraBed.png",
                 "extra pillow": "../image/pillow.jpg"
 
             };
