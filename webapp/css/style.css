@@ -7223,3 +7223,10 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
     width: 100% !important;
     box-sizing: border-box;
 }
+
+.couponTitle {
+  color: #008b96 !important;
+}
+.couponTitleOpp {
+  color: #6b7280 !important;
+}

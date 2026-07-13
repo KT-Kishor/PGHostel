@@ -15,19 +15,31 @@
             >
                 <columns>
                     <Column>
-                        <Text text="{i18n>CDCouponCode}" />
+                        <Text class="couponTitleOpp" text="{i18n>CDCouponCode}" />
                     </Column>
-                    <Column>
-                        <Text text="{i18n>CDMinOrderValue}" />
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text class="couponTitleOpp" text="{i18n>CDMinOrderValue}" />
                     </Column>
-                    <Column>
+                    <!-- <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
                         <Text text="{i18n>CDDiscountType}" />
+                    </Column> -->
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text class="couponTitleOpp" text="{i18n>CouponOffer}" />
                     </Column>
-                    <Column>
-                        <Text text="{i18n>CDDiscountValue}" />
-                    </Column>
-                      <Column>
-                        <Text text="{i18n>Description}" />
+                    <Column
+                        minScreenWidth="Desktop"
+                        demandPopin="true"
+                    >
+                        <Text class="couponTitleOpp" text="{i18n>Description}" />
                     </Column>
                     
                 </columns>
@@ -37,13 +49,32 @@
                         press="SC_onVHDPick"
                     >    
                         <cells>
-                            <Text text="{ShowCouponDetails>CouponCode}" />
+                            <Title class="couponTitle" text="{ShowCouponDetails>CouponCode}" />
                             <Text
                                 text="{ShowCouponDetails>MinOrderValue}"
+                                wrapping="true"
+                                class="couponTitleOpp"
                             />
-                            <Text text="{ShowCouponDetails>DiscountType}" />
-                            <Text text="{ShowCouponDetails>DiscountValue}" />
-                            <Text text="{ShowCouponDetails>Description}" />
+                            <!-- <Text
+                                text="{ShowCouponDetails>DiscountType}"
+                                wrapping="true"
+                            /> -->
+                            <Text
+                                text="{
+                                    parts: [
+                                        { path: 'ShowCouponDetails>DiscountType' },
+                                        { path: 'ShowCouponDetails>DiscountValue' }
+                                        
+                                    ],
+                                    formatter: '.Formatter.formatDiscount'
+                                } OFF" class="couponTitle"
+                                wrapping="true"
+                            />
+                            <Text
+                                text="{ShowCouponDetails>Description}"
+                                wrapping="true"
+                                class="couponTitleOpp"
+                            />
 
 
                         </cells>
@@ -56,6 +87,7 @@
                 text="{i18n>close}"
                 type="Transparent"
                 press="SC_onVHDClose"
+                class="myUnifiedBtn"
             />
         </beginButton>
     </Dialog>
