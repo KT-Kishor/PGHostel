@@ -121,7 +121,7 @@
 							<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
 							<!-- <ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
                             state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
-							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
+							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDateString'}}"/>
 							<Link text="{i18n>view}" press="HF_viewroom"/>
 							<Link text="{i18n>Viewcomment}" press="HF_viewComments" />
 

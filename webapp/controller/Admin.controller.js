@@ -316,7 +316,6 @@ sap.ui.define([
             let uniqueValues = {
                 PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
-                PO_id_Status: new Set(),
                 PO_id_CustomerName: new Set()
             };
 
@@ -327,9 +326,7 @@ sap.ui.define([
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
                 }
-                if (item.Status) {
-                    uniqueValues.PO_id_Status.add(item.Status.trim());
-                }
+              
                 if (item.CustomerName) {
                     uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
                 }
@@ -337,7 +334,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["PO_id_BookingId","PO_id_CompanyName", "PO_id_Status", "PO_id_CustomerName"].forEach(field => {
+            ["PO_id_BookingId","PO_id_CompanyName","PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 

@@ -6675,7 +6675,9 @@
                     `${Formatter.formatDate(item.StartDate) || "-"}`,
                     `${Formatter.formatDate(item.EndDate) || "-"}`,
                     `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
-                    item.UnitText || "-",
+                     item.UnitText === "Unit Price"
+                        ? `${item.UnitText} (${item.Quantity || 1} Qty)`
+                        : (item.UnitText || "-"),
                     `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`,
                 ]);
 

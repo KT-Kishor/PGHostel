@@ -2472,10 +2472,10 @@ sap.ui.define([
             this.SelectionMode = oSelectedData.SelectionMode
 
 
-            if (oSelectedData.UnitText === "Package Price") {
-                sap.m.MessageToast.show(this.i18nModel.getText("wecannoteditthePackagePricefacility"));
-                return;
-            }
+            // if (oSelectedData.UnitText === "Package Price") {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("wecannoteditthePackagePricefacility"));
+            //     return;
+            // }
             var editCouponCode = sap.ui.getCore().byId("ID_editCouponCode");
 
             if (editCouponCode) {
@@ -2525,10 +2525,17 @@ sap.ui.define([
                 this.HM_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Admin_Edit", this);
                 oView.addDependent(this.HM_Dialog);
             }
-            sap.ui.getCore().byId("idUnitType").setVisible(true)
             this.HM_Dialog.open();
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
+
+
+            if(oSelectedData.SelectionMode==="PERSON_QTY"){
+            sap.ui.getCore().byId("idUnitType").setVisible(false)
+            }else{
+            sap.ui.getCore().byId("idUnitType").setVisible(true)
+
+            }
 
 
             if (oSelectedData.FacilityChargeType === "DAILY") {
@@ -3802,8 +3809,8 @@ sap.ui.define([
                 CustomerEmail: ID.CustomerEmail || "",
                 BedType: ID.BedType || "",
                 BookingDate: ID.BookingDate,
-                StartDate: ID.StartDate,
-                EndDate: ID.EndDate,
+                StartDate: ID.StartDate?ID.StartDate.split('/').reverse().join('-'):"",
+                EndDate: ID.EndDate?ID.EndDate.split('/').reverse().join('-'):"",
                 MemberID: ID.MemberID || "",
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.RentPrice || 0,

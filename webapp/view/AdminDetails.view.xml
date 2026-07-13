@@ -1304,11 +1304,11 @@
                 <contentRight>
                     <!-- Confirm -->
                     <Button
-                        text="Approve Booking"
-                        tooltip="Approve Booking"
+                        text="Confirm Booking"
+                        tooltip="Confirm Booking"
                         press="HM_ConfirmRoom"
                         class="myUnifiedBtn"
-                        visible="{= ${CustomerData>/Status} === 'New' }"
+                        visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected'}"
                     />
 
                     <!-- Reject -->

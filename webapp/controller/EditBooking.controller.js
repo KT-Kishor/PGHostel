@@ -14,7 +14,7 @@ sap.ui.define([
 
             this.getOwnerComponent().getRouter().getRoute("RouteEditBooking").attachMatched(this._onEditRouteMatched, this);
 
-            this._iFacilityStartIndex = 0;  
+            this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // fallback; recalculated dynamically
             this._iFacilityCardWidth = 250;
             this._iFacilityCardGap = 16;
@@ -53,9 +53,9 @@ sap.ui.define([
                 comfirmpass: "",
                 minDate: new Date(2000, 0, 1)
             }), "LoginMode");
-          
 
-       
+
+
             this._fnTableResizeHandler =
                 this._updateTableColumnWidths.bind(this);
 
@@ -65,7 +65,7 @@ sap.ui.define([
                 "resize",
                 this._fnTableResizeHandler
             );
-            
+
         },
         onExit: function () {
 
@@ -203,7 +203,7 @@ sap.ui.define([
             this._backupFacilityModel = null;
             this._backupFacilitySelection = null;
             this._backupAllFacilities = null;
-            
+
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
             oBookingViewData.editModeEnabled = false; // Start in read-only mode
@@ -211,7 +211,7 @@ sap.ui.define([
             oBookingViewData.isAdminUpdatedYes = false; // Will be set after loading
             oBookingViewData.isWithin48HoursOfCheckIn = false; // Will be set after loading
             oBookingViewData.showEditButton = false; // Will be set after loading
-            
+
             this.getView().setModel(oHostelModel, "HostelModel");
             this.getView().setModel(new JSONModel(oBookingViewData), "BookingView");
             this.getView().setModel(new JSONModel(this._getFacilityModelInitialData ? this._getFacilityModelInitialData() : this._getDefaultFacilityData()), "FacilityModel");
@@ -326,7 +326,7 @@ sap.ui.define([
                     try {
                         aExistingPayments = await this._readEditPaymentsByBookingId(sBookingID);
                     } catch (payErr) {
-                    // Ignore payment fetch error
+                        // Ignore payment fetch error
                     }
                 }
 
@@ -360,7 +360,7 @@ sap.ui.define([
                     this._aAllFacilities = oFacilitiesResponse.data || [];
                     this._processFacilitiesForEdit();
                 } else {
-                // Fallback: load facilities separately
+                    // Fallback: load facilities separately
                     await this._loadFacilities();
                 }
 
@@ -379,7 +379,7 @@ sap.ui.define([
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
                 oHostelModel.refresh(true);
-                
+
                 // Check if status is "New" and update BookingView model accordingly
                 var oBookingView = this.getView().getModel("BookingView");
                 var bIsStatusNew = sStatus === "New";
@@ -415,7 +415,7 @@ sap.ui.define([
                 if (bIsEditableStatus && bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
-                        "This booking has been updated as per your request. To make any further changes, please contact " + sBranchName + ". \n\nThank you for your cooperation!\n" ,
+                        "This booking has been updated as per your request. To make any further changes, please contact " + sBranchName + ". \n\nThank you for your cooperation!\n",
                         {
                             title: "Booking Status Updated",
                             styleClass: "myUnifiedBtn",
@@ -1475,7 +1475,7 @@ sap.ui.define([
             var fPaidAmount = this._toNumber(fPaymentPaidAmount);
             var fCurrentGrandTotal = this._toNumber(fGrandTotal);
             var fRefundAmount = 0;
-            
+
             if (fExplicitRefundAmount !== undefined && fExplicitRefundAmount !== null) {
                 // Use explicit refund amount when provided
                 fRefundAmount = Number(Math.max(this._toNumber(fExplicitRefundAmount), 0).toFixed(2));
@@ -1491,8 +1491,8 @@ sap.ui.define([
                 "/RefundMessage",
                 fRefundAmount > 0
                     ? "A refund of " + fRefundAmount.toFixed(2) +
-                        " " + (oHostelModel.getProperty("/Currency") || "INR") +
-                        " is due. This amount will be refunded during check-out."
+                    " " + (oHostelModel.getProperty("/Currency") || "INR") +
+                    " is due. This amount will be refunded during check-out."
                     : ""
             );
         },
@@ -1786,12 +1786,12 @@ sap.ui.define([
         _getEditDifferencePaymentType: function () {
             var oViewPaymentModel = this.getView().getModel("PaymentModel");
             var sPaymentType = oViewPaymentModel && oViewPaymentModel.getProperty("/PaymentType");
-            
+
             // Default to "PayOnCheckIn" if not specified, keep "PayOnCheckIn" as is
             if (!sPaymentType) {
                 sPaymentType = "PayOnCheckIn";
             }
-            
+
             return sPaymentType;
         },
 
@@ -2062,7 +2062,7 @@ sap.ui.define([
                 var oHostelModel = this.getView().getModel("HostelModel");
                 var sBookingID = oHostelModel.getProperty("/BookingID");
                 var sMemberID = oHostelModel.getProperty("/EditMemberID") || "";
-                
+
                 // 1. Fetch current booking data to check payment status
                 var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
                     BookingID: sBookingID,
@@ -2074,13 +2074,13 @@ sap.ui.define([
                 var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
                 var fOriginalGrandTotal = parseFloat(oBooking.RentPrice || oBooking.GrandTotal || 0);
                 var oBookingView = this.getView().getModel("BookingView");
-                
+
                 // Build the update payload
                 var oPayloadData = this._buildBookingCreatePayload();
                 const oMainData = oPayloadData.data[0];
                 oPayloadData.data[0].BookingID = sBookingID;
 
-               const pdfBase64 = await this.onGeneratePDF(oMainData);
+                const pdfBase64 = await this.onGeneratePDF(oMainData);
 
                 var oHostelData = oHostelModel.getData();
 
@@ -2105,7 +2105,7 @@ sap.ui.define([
                 oHostelModel.setProperty("/HasExistingPayments", aPayments.length > 0);
                 oHostelModel.setProperty("/PaymentPaidAmount", fPaymentPaidAmount);
                 this._syncEditRefundInfo(fPaymentPaidAmount, fNewGrandTotal);
-                
+
                 // 2. Check payment status
                 if (aPayments.length === 0) {
                     // Case 1: Pay at check-in (offline) - update directly with filters
@@ -2119,17 +2119,17 @@ sap.ui.define([
                 } else {
                     // Case 2: Online payment - compare new grand total with paid amount
                     var fBalance = fNewGrandTotal - fPaymentPaidAmount;
-                    
+
                     if (fBalance < 0) {
                         // New total is less than paid amount - refund case
                         var fRefundAmount = Math.abs(fBalance); // This is positive
-                        
+
                         // Set refund info BEFORE updating so message strip is visible
                         this._syncEditRefundInfo(fPaymentPaidAmount, fNewGrandTotal, fRefundAmount);
-                        
+
                         // Refund flow does not create a new payment entry.
                         this._prepareEditUpdatePayments(oPayloadData.data[0], []);
-                        
+
                         // Update booking with filters first
                         var oPayload = this._buildEditUpdatePayload(oPayloadData.data, sBookingID);
                         await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
@@ -2149,7 +2149,7 @@ sap.ui.define([
                     } else {
                         // New total equals paid amount - no payment change needed
                         this._prepareEditUpdatePayments(oPayloadData.data[0], []);
-                        
+
                         var oPayload = this._buildEditUpdatePayload(oPayloadData.data, sBookingID);
 
                         await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
@@ -2165,7 +2165,7 @@ sap.ui.define([
                 this.closeBusyDialog();
             }
         },
-        
+
         _openPaymentDialogForDifference: function () {
             if (!this._oPaymentDialog) {
                 // Load PaymentPage fragment
@@ -2184,7 +2184,7 @@ sap.ui.define([
                 this._oPaymentDialog.open();
             }
         },
-        
+
         _parseTimeToHours: function (sTime) {
             if (!sTime) return 0;
             sTime = sTime.trim().toUpperCase();
@@ -2234,13 +2234,13 @@ sap.ui.define([
             var iMonth = oDate.getMonth() + 1;
             var iYear = oDate.getFullYear();
             return (iDay < 10 ? "0" + iDay : iDay) + "/" +
-                   (iMonth < 10 ? "0" + iMonth : iMonth) + "/" +
-                   iYear;
+                (iMonth < 10 ? "0" + iMonth : iMonth) + "/" +
+                iYear;
         },
 
         _setupPaymentDialog: function () {
             if (!this._oPaymentDialog) return;
-            
+
             var oHostelModel = this.getView().getModel("HostelModel");
             var sPaymentType = this._getEditDifferencePaymentType();
             var fDifferenceAmount = Number(this._toNumber(this._fDifferenceAmount).toFixed(2));
@@ -2254,10 +2254,10 @@ sap.ui.define([
                 PayableNow: sPaymentType === "PayOnCheckIn" ? 0 : fDifferenceAmount,
                 RemainingBalance: 0
             });
-            
+
             this._oPaymentDialog.setModel(oPaymentModel, "PaymentModel");
             this._oPaymentDialog.setModel(oHostelModel, "HostelModel");
-            
+
             // Set dialog title
             var oCustomHeader = this._oPaymentDialog.getCustomHeader();
             if (oCustomHeader && oCustomHeader.getContentMiddle) {
@@ -2269,14 +2269,14 @@ sap.ui.define([
                     }
                 }
             }
-            
+
             // Resolve fragment fields through the dialog-prefixed global IDs.
             var oAmountField = this._getPaymentDialogField("idAmount");
             if (oAmountField) {
                 oAmountField.setValue(fDifferenceAmount.toFixed(2));
                 oAmountField.setEditable(false);
             }
-            
+
             // Update payment type field
             var oPaymentTypeField = this._getPaymentDialogField("idPaymentTypeField");
             if (oPaymentTypeField) {
@@ -2299,7 +2299,7 @@ sap.ui.define([
 
             this._setPaymentDialogSections(sPaymentType);
         },
-        
+
         _onPaymentSubmit: async function () {
             try {
                 var oPaymentModel = this._oPaymentDialog.getModel("PaymentModel");
@@ -2311,12 +2311,12 @@ sap.ui.define([
                 }
 
                 this.getBusyDialog();
-                
+
                 // Create payment payload
                 var oHostelModel = this.getView().getModel("HostelModel");
                 var fAmount = Number(this._toNumber(oPaymentData.Amount || this._fDifferenceAmount).toFixed(2));
                 var bPayOnCheckIn = String(oPaymentData.PaymentType || "").trim() === "PayOnCheckIn";
-                
+
                 // Update booking with payment
                 var oPayload = {
                     data: this._oUpdatePayload,
@@ -2324,9 +2324,9 @@ sap.ui.define([
                         BookingID: this._sBookingID
                     }
                 };
-                
+
                 this._prepareEditUpdatePayments(oPayload.data[0], []);
-                
+
                 await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
                 await this._deleteRemovedFacilityItems(this._aDeletedFacilityIds);
 
@@ -2356,22 +2356,22 @@ sap.ui.define([
                     this._toNumber(oHostelModel.getProperty("/PaymentPaidAmount")) + (bPayOnCheckIn ? 0 : this._toNumber(this._fDifferenceAmount)),
                     oHostelModel.getProperty("/GrandTotal")
                 );
-                
+
                 this._oPaymentDialog.close();
-                
+
                 this._handleEditBookingSuccess(bPayOnCheckIn
                     ? "Booking updated successfully."
                     : "Payment successful and booking updated.");
-                
+
             } catch (oError) {
                 MessageBox.error("Payment failed: " + (oError.message || "Unknown error"));
             } finally {
                 this.closeBusyDialog();
             }
         },
-        
+
         _generateUUID: function () {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
@@ -2736,7 +2736,7 @@ sap.ui.define([
                             (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0
                                 ? oFacility.RawFacilityItems[0].TotalHour : null) || null;
                     } else if (Array.isArray(oFacility.RawFacilityItems) && oFacility.RawFacilityItems.length > 0) {
-                    // Condition 2: facility has admin-set dates/times — use them
+                        // Condition 2: facility has admin-set dates/times — use them
                         var oFirstRaw = oFacility.RawFacilityItems[0];
                         oCalcItem.StartDate = oFirstRaw.StartDate || oFacility.StartDate || oBookingStart || null;
                         oCalcItem.EndDate = oFirstRaw.EndDate || oFacility.EndDate || oBookingEnd || null;
@@ -3340,7 +3340,7 @@ sap.ui.define([
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
             var oFacilitySelection = this.getView().getModel("FacilitySelection");
-            
+
             // Create optimized backups - shallow copy for simple models, deep copy only for complex ones
             var oHostelData = oHostelModel.getData();
             var oBookingViewData = oBookingView.getData();
@@ -3356,7 +3356,7 @@ sap.ui.define([
             this._backupFacilitySelection = JSON.parse(JSON.stringify(oFacilitySelectionData));
             // Backup _aAllFacilities array which contains selection state
             this._backupAllFacilities = JSON.parse(JSON.stringify(this._aAllFacilities || []));
-            
+
             oBookingView.setProperty("/editModeEnabled", true);
         },
 
@@ -3388,7 +3388,7 @@ sap.ui.define([
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
             var oFacilitySelection = this.getView().getModel("FacilitySelection");
-            
+
             // Restore original data from backup if it exists
             if (this._backupHostelModel) {
                 // JSON.stringify converts Date objects to strings; restore TodayDate as a real Date
@@ -3417,14 +3417,14 @@ sap.ui.define([
             // Apply facility price filter to ensure facility model is properly synced with _aAllFacilities
             // This updates the FacilityModel's /Facilities array with correct Selected state and prices
             this._applyEditFacilityPriceFilter();
-            
+
             // Reset facility carousel to first page
             this._iFacilityStartIndex = 0;
-            
+
             // Re-render facility cards and sync with occupants
             this._renderFacilityCards();
             this._syncSelectedFacilityPersonsWithOccupants();
-            
+
             // Ensure edit mode is disabled
             oBookingView.setProperty("/editModeEnabled", false);
 
@@ -3824,439 +3824,441 @@ sap.ui.define([
             // based on editModeEnabled property
         },
 
-       onGeneratePDF: async function(data) {
-                const booking = data.Booking?.[0] || {};
-                const facilities = data.FacilityItems || [];
-                const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
+        onGeneratePDF: async function (data) {
+            const booking = data.Booking?.[0] || {};
+            const facilities = data.FacilityItems || [];
+            const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
-                let filter = { BranchID: [booking.BranchCode]};
-                const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
-                const company = oCompanyDetailsModel.data[0] || {};
-                const checkinTime = company.CheckinTime || "11:00 AM";
-                const checkoutTime = company.CheckoutTime || "10:00 PM";
+            let filter = { BranchID: [booking.BranchCode] };
+            const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            const company = oCompanyDetailsModel.data[0] || {};
+            const checkinTime = company.CheckinTime || "11:00 AM";
+            const checkoutTime = company.CheckoutTime || "10:00 PM";
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: "portrait",
-                    unit: "mm",
-                    format: "a4"
-                });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
 
-                const currency = (booking.Currency || "INR").trim();
-                let currentY = 15;
+            const currency = (booking.Currency || "INR").trim();
+            let currentY = 15;
 
-                const PRIMARY_COLOR = [20, 170, 183];
-                const ACCENT_COLOR = [244, 185, 66];
-                const LIGHT_GRAY = [245, 245, 245];
-                const BORDER_LIGHT = [230, 230, 230];
+            const PRIMARY_COLOR = [20, 170, 183];
+            const ACCENT_COLOR = [244, 185, 66];
+            const LIGHT_GRAY = [245, 245, 245];
+            const BORDER_LIGHT = [230, 230, 230];
 
-                const checkNewPage = (requiredSpace = 20) => {
-                    if (currentY + requiredSpace > 280) {
-                        doc.addPage();
-                        currentY = 20;
-                        return true;
-                    }
-                    return false;
-                };
-
-                // ========== HEADER SECTION ==========
-                doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.rect(0, 0, 210, 32, "F"); 
-
-                doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.rect(0, 32, 210, 2.5, "F");
-
-                // Title
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(24);
-                doc.setTextColor(255, 255, 255);
-                doc.text("BOOKING VOUCHER", 20, 20);
-
-                // Compact Right Box
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(255, 255, 255);
-                doc.roundedRect(145, 9, 45, 10, 3, 3, "FD");
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(8.5);
-                doc.setTextColor(...PRIMARY_COLOR);
-                doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15);
-
-                currentY = 40;
-
-                // ================= PROPERTY =================
-                checkNewPage(50);
-
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.setLineWidth(0.5);
-                doc.roundedRect(15, currentY, 180, 45, 5, 5, "FD");
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(16);
-                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text(company.Name || "StayVriksha", 20, currentY + 10);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9);
-                doc.setTextColor(80, 80, 80);
-                let address = doc.splitTextToSize(company.Address || "Kalpavriksha Karekal layout, Near, Railway Bridge, Kalaburagi, Karnataka", 130);
-                doc.text(address, 20, currentY + 18);
-
-                let contactY = currentY + 18 + (address.length * 4);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Contact: ${company.Contact || "9122333333"}`, 20, contactY);
-                doc.text(`Email: ${company.EmailID || "contact@pskhostel.com"}`, 20, contactY + 5);
-
-                if (company.GeoLocation) {
-                    doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                    doc.textWithLink("View Property on Map", 20, contactY + 10, {
-                        url: company.GeoLocation
-                    });
+            const checkNewPage = (requiredSpace = 20) => {
+                if (currentY + requiredSpace > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                    return true;
                 }
+                return false;
+            };
 
-                currentY += 55;
+            // ========== HEADER SECTION ==========
+            doc.setFillColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.rect(0, 0, 210, 32, "F");
 
-               // ================= GUEST & STAY =================
-                checkNewPage(45); 
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(0, 32, 210, 2.5, "F");
 
-                let guestBoxY = currentY;
-                var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
-                let guestBody = [];
+            // Title
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(255, 255, 255);
+            doc.text("BOOKING VOUCHER", 20, 20);
 
-                Memberdata.forEach((member, index) => {
-                    guestBody.push([
-                        (index + 1).toString(),
-                        `${member.Salutation || ""} ${member.Name || "-"}`,
-                        member.Gender || "-",
-                        Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
-                        member.Relation || "-"
-                    ]);
+            // Compact Right Box
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(255, 255, 255);
+            doc.roundedRect(145, 9, 45, 10, 3, 3, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            doc.setTextColor(...PRIMARY_COLOR);
+            doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15);
+
+            currentY = 40;
+
+            // ================= PROPERTY =================
+            checkNewPage(50);
+
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(15, currentY, 180, 45, 5, 5, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text(company.Name || "StayVriksha", 20, currentY + 10);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            let address = doc.splitTextToSize(company.Address || "Kalpavriksha Karekal layout, Near, Railway Bridge, Kalaburagi, Karnataka", 130);
+            doc.text(address, 20, currentY + 18);
+
+            let contactY = currentY + 18 + (address.length * 4);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Contact: ${company.Contact || "9122333333"}`, 20, contactY);
+            doc.text(`Email: ${company.EmailID || "contact@pskhostel.com"}`, 20, contactY + 5);
+
+            if (company.GeoLocation) {
+                doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.textWithLink("View Property on Map", 20, contactY + 10, {
+                    url: company.GeoLocation
                 });
+            }
 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12);
-                doc.setTextColor(...PRIMARY_COLOR);
-                doc.text("GUEST DETAILS", 24, guestBoxY + 8);
+            currentY += 55;
 
-                doc.autoTable({
-                    startY: guestBoxY + 12,
-                    margin: { left: 20, right: 15 },
-                    head: [["Sl.No", "Guest Name", "Gender", "Age", "Relation"]],
-                    body: guestBody,
-                    theme: "grid",
-                    styles: {
-                        font: "helvetica",
-                        fontSize: 8,
-                        cellPadding: 2,
-                        lineColor: [220, 220, 220],
-                        lineWidth: 0.1
-                    },
-                    headStyles: {
-                        fillColor: PRIMARY_COLOR,
-                        textColor: [255, 255, 255],
-                        fontStyle: "bold",
-                        halign: "center"
-                    },
-                    columnStyles: {
+            // ================= GUEST & STAY =================
+            checkNewPage(45);
+
+            let guestBoxY = currentY;
+            var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
+            let guestBody = [];
+
+            Memberdata.forEach((member, index) => {
+                guestBody.push([
+                    (index + 1).toString(),
+                    `${member.Salutation || ""} ${member.Name || "-"}`,
+                    member.Gender || "-",
+                    Formatter.formatAgeFromDOBOrAge(member.Age) || "-",
+                    member.Relation || "-"
+                ]);
+            });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(...PRIMARY_COLOR);
+            doc.text("GUEST DETAILS", 24, guestBoxY + 8);
+
+            doc.autoTable({
+                startY: guestBoxY + 12,
+                margin: { left: 20, right: 15 },
+                head: [["Sl.No", "Guest Name", "Gender", "Age", "Relation"]],
+                body: guestBody,
+                theme: "grid",
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                    cellPadding: 2,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1
+                },
+                headStyles: {
+                    fillColor: PRIMARY_COLOR,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    halign: "center"
+                },
+                columnStyles: {
                     0: { cellWidth: 15, halign: "center" },
                     1: { cellWidth: 'auto' },
                     2: { cellWidth: 25, halign: "center" },
                     3: { cellWidth: 25, halign: "center" },
                     4: { cellWidth: 30, halign: "center" }
                 }
-                });
+            });
 
-                // Dynamic Box Height over-render handling
-                let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 10;
-                doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-                doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
-                doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-                
-                // Colored Side Bar Accent
-                doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
+            // Dynamic Box Height over-render handling
+            let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 10;
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
 
-                currentY = guestBoxY + guestBoxHeight + 12;
+            // Colored Side Bar Accent
+            doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
 
-                // ---------- STAY DETAILS (DYNAMICALLY CALCULATED) ----------
-                checkNewPage(45);
+            currentY = guestBoxY + guestBoxHeight + 12;
 
-                let stayStartY = currentY;
+            // ---------- STAY DETAILS (DYNAMICALLY CALCULATED) ----------
+            checkNewPage(45);
 
-                // Text offset placements relative to stayStartY
-                let titleOffset = 10;
-                let row1Offset = 22;
-                let row2Offset = 34;
+            let stayStartY = currentY;
 
-                // Calculate dynamic container boundary height based on the final row offset
-                let stayCardHeight = row2Offset + 8; 
+            // Text offset placements relative to stayStartY
+            let titleOffset = 10;
+            let row1Offset = 22;
+            let row2Offset = 34;
 
-                doc.setFillColor(...LIGHT_GRAY);
-                doc.setDrawColor(...BORDER_LIGHT);
-                doc.roundedRect(15, stayStartY, 180, stayCardHeight, 4, 4, "FD");
+            // Calculate dynamic container boundary height based on the final row offset
+            let stayCardHeight = row2Offset + 8;
 
-                doc.setFillColor(...ACCENT_COLOR);
-                doc.rect(15, stayStartY, 5, stayCardHeight, "F");
+            doc.setFillColor(...LIGHT_GRAY);
+            doc.setDrawColor(...BORDER_LIGHT);
+            doc.roundedRect(15, stayStartY, 180, stayCardHeight, 4, 4, "FD");
 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12);
-                doc.setTextColor(...PRIMARY_COLOR);
-                doc.text("STAY DETAILS", 24, stayStartY + titleOffset);
+            doc.setFillColor(...ACCENT_COLOR);
+            doc.rect(15, stayStartY, 5, stayCardHeight, "F");
 
-                // Row 1 Fields
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(9);
-                doc.setTextColor(90, 90, 90);
-                doc.text("Check-in Date", 24, stayStartY + row1Offset);
-                doc.text("Room Type", 115, stayStartY + row1Offset);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(...PRIMARY_COLOR);
+            doc.text("STAY DETAILS", 24, stayStartY + titleOffset);
 
-                doc.setFont("helvetica", "normal");
-                doc.setTextColor(50, 50, 50);
-                doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60, stayStartY + row1Offset);
-                doc.text(booking.BedType || "-", 150, stayStartY + row1Offset);
+            // Row 1 Fields
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(90, 90, 90);
+            doc.text("Check-in Date", 24, stayStartY + row1Offset);
+            doc.text("Room Type", 115, stayStartY + row1Offset);
 
-                // Row 2 Fields
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(90, 90, 90);
-                doc.text("Check-out Date", 24, stayStartY + row2Offset);
-                doc.text("No Of Guests", 115, stayStartY + row2Offset);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(50, 50, 50);
+            doc.text(booking.StartDate ? Formatter.formatDate(booking.StartDate) : "-", 60, stayStartY + row1Offset);
+            doc.text(booking.BedType || "-", 150, stayStartY + row1Offset);
 
-                doc.setFont("helvetica", "normal");
-                doc.setTextColor(50, 50, 50);
-                doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, stayStartY + row2Offset);
-                doc.text(String(booking.NoOfPersons || "-"), 150, stayStartY + row2Offset);
+            // Row 2 Fields
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(90, 90, 90);
+            doc.text("Check-out Date", 24, stayStartY + row2Offset);
+            doc.text("No Of Guests", 115, stayStartY + row2Offset);
 
-                // Baseline spacing derived dynamically from computed layout card structure
-                currentY = stayStartY + stayCardHeight + 12;
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(50, 50, 50);
+            doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, stayStartY + row2Offset);
+            doc.text(String(booking.NoOfPersons || "-"), 150, stayStartY + row2Offset);
 
-                // ================= FACILITY DETAILS =================
-                if (facilities.length > 0) {
-                    if (currentY + 20 > 280) {
-                        doc.addPage();
-                        currentY = 20;
-                    }
+            // Baseline spacing derived dynamically from computed layout card structure
+            currentY = stayStartY + stayCardHeight + 12;
 
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(14);
-                    doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                    doc.text("FACILITY DETAILS", 15, currentY);
-
-                    doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                    doc.setLineWidth(0.8);
-                    doc.line(15, currentY + 3, 70, currentY + 3);
-
-                    currentY += 8;
-
-                    let tableBody = facilities.map((item, index) => [
-                        (index + 1).toString(),
-                        item.FacilityName || "-",
-                        `${Formatter.formatDate(item.StartDate) || "-"}`,
-                        `${Formatter.formatDate(item.EndDate) || "-"}`,
-                        `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
-                        item.UnitText || "-",
-                        `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
-                    ]);
-
-                    doc.autoTable({
-                        startY: currentY,
-                        margin: { left: 15, right: 15 },
-                        head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
-                        body: tableBody,
-                        theme: 'striped',
-                        styles: {
-                            font: "helvetica",
-                            fontSize: 9,
-                            cellPadding: 2,
-                            lineColor: [220, 220, 220],
-                            lineWidth: 0.1,
-                            valign: "middle"
-                        },
-                        headStyles: {
-                            fillColor: PRIMARY_COLOR,
-                            textColor: [255, 255, 255],
-                            fontStyle: "bold",
-                            fontSize: 10,
-                            halign: "center"
-                        },
-                        columnStyles: {
-                            0: { cellWidth: 12, halign: "center" },
-                            1: { cellWidth: 'auto', halign: "left" },
-                            2: { cellWidth: 24, halign: "center" },
-                            3: { cellWidth: 24, halign: "center" },
-                            4: { cellWidth: 24, halign: "right" },
-                            5: { cellWidth: 18, halign: "center" },
-                            6: { cellWidth: 28, halign: "right" }
-                        }
-                    });
-
-                    currentY = doc.lastAutoTable.finalY + 12;
-                }
-
-                // ========== PAYMENT SUMMARY (DYNAMICALLY CALCULATED) ==========
-                const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
-                const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
-                const subTotal = roomRent + facilityTotal;
-                const discount = parseFloat(booking.Discount) || 0;
-                let grandTotal = oHostelModel.GrandTotal;
-
-                const hasCGST = booking.GSTType === "CGST/SGST";
-                const hasIGST = booking.GSTType === "IGST";
-
-                // Calculate unique lines to isolate precise box height requirements
-                let linesCount = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
-                let paymentBoxHeight = (linesCount * 7) + 25;
-
-                if (currentY + paymentBoxHeight > 280) {
+            // ================= FACILITY DETAILS =================
+            if (facilities.length > 0) {
+                if (currentY + 20 > 280) {
                     doc.addPage();
                     currentY = 20;
                 }
 
-                let paymentStartY = currentY;
-
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(244, 185, 66);
-                doc.setLineWidth(0.3);
-                doc.roundedRect(15, paymentStartY, 180, paymentBoxHeight, 4, 4, "FD");
-
                 doc.setFont("helvetica", "bold");
-                doc.setFontSize(13);
+                doc.setFontSize(14);
                 doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text("PAYMENT SUMMARY", 20, paymentStartY + 10);
+                doc.text("FACILITY DETAILS", 15, currentY);
 
-                let summaryY = paymentStartY + 20;
-                const leftX = 20;
-                const rightX = 185;
+                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.setLineWidth(0.8);
+                doc.line(15, currentY + 3, 70, currentY + 3);
 
-                const addLine = (label, value, isGrandTotal = false) => {
-                    if (isGrandTotal) {
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(12);
-                        doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                    } else {
-                        doc.setFont("helvetica", "normal");
-                        doc.setFontSize(10);
-                        doc.setTextColor(80, 80, 80);
+                currentY += 8;
+
+                let tableBody = facilities.map((item, index) => [
+                    (index + 1).toString(),
+                    item.FacilityName || "-",
+                    `${Formatter.formatDate(item.StartDate) || "-"}`,
+                    `${Formatter.formatDate(item.EndDate) || "-"}`,
+                    `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
+                      item.UnitText === "Unit Price"
+                        ? `${item.UnitText} (${item.Quantity || 1} Qty)`
+                        : (item.UnitText || "-"),
+                     `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
+                ]);
+
+                doc.autoTable({
+                    startY: currentY,
+                    margin: { left: 15, right: 15 },
+                    head: [['Sl.No', 'Particular', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']],
+                    body: tableBody,
+                    theme: 'striped',
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 9,
+                        cellPadding: 2,
+                        lineColor: [220, 220, 220],
+                        lineWidth: 0.1,
+                        valign: "middle"
+                    },
+                    headStyles: {
+                        fillColor: PRIMARY_COLOR,
+                        textColor: [255, 255, 255],
+                        fontStyle: "bold",
+                        fontSize: 10,
+                        halign: "center"
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 12, halign: "center" },
+                        1: { cellWidth: 'auto', halign: "left" },
+                        2: { cellWidth: 24, halign: "center" },
+                        3: { cellWidth: 24, halign: "center" },
+                        4: { cellWidth: 24, halign: "right" },
+                        5: { cellWidth: 18, halign: "center" },
+                        6: { cellWidth: 28, halign: "right" }
                     }
+                });
 
-                    doc.text(label, leftX, summaryY);
-                    doc.text(value, rightX, summaryY, { align: "right" });
-                    summaryY += 7;
-                };
+                currentY = doc.lastAutoTable.finalY + 12;
+            }
 
-                addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+            // ========== PAYMENT SUMMARY (DYNAMICALLY CALCULATED) ==========
+            const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
+            const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
+            const subTotal = roomRent + facilityTotal;
+            const discount = parseFloat(booking.Discount) || 0;
+            let grandTotal = oHostelModel.GrandTotal;
 
-                // Render Facility Total row line only if there's actual value or entries
-                if (facilityTotal > 0 || facilities.length > 0) {
-                    addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            const hasCGST = booking.GSTType === "CGST/SGST";
+            const hasIGST = booking.GSTType === "IGST";
+
+            // Calculate unique lines to isolate precise box height requirements
+            let linesCount = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
+            let paymentBoxHeight = (linesCount * 7) + 25;
+
+            if (currentY + paymentBoxHeight > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
+
+            let paymentStartY = currentY;
+
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(244, 185, 66);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(15, paymentStartY, 180, paymentBoxHeight, 4, 4, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("PAYMENT SUMMARY", 20, paymentStartY + 10);
+
+            let summaryY = paymentStartY + 20;
+            const leftX = 20;
+            const rightX = 185;
+
+            const addLine = (label, value, isGrandTotal = false) => {
+                if (isGrandTotal) {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                } else {
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.setTextColor(80, 80, 80);
                 }
+
+                doc.text(label, leftX, summaryY);
+                doc.text(value, rightX, summaryY, { align: "right" });
+                summaryY += 7;
+            };
+
+            addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+
+            // Render Facility Total row line only if there's actual value or entries
+            if (facilityTotal > 0 || facilities.length > 0) {
+                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+            }
 
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
-                if (hasCGST) {
-                    const cgst = parseFloat(oHostelModel.CGST) || 0;
-                    const sgst = parseFloat(oHostelModel.SGST) || 0;
-                    addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
-                    addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
-                } else if (hasIGST) {
-                    const igst = parseFloat(oHostelModel.IGST) || 0;
-                    addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
-                }
+            if (hasCGST) {
+                const cgst = parseFloat(oHostelModel.CGST) || 0;
+                const sgst = parseFloat(oHostelModel.SGST) || 0;
+                addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
+                addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
+            } else if (hasIGST) {
+                const igst = parseFloat(oHostelModel.IGST) || 0;
+                addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+            }
 
-                if (discount > 0) {
-                    addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
-                }
+            if (discount > 0) {
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+            }
 
-                summaryY += 1;
-                doc.setDrawColor(200, 200, 200);
-                doc.setLineWidth(0.3);
-                doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
+            summaryY += 1;
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
 
-                summaryY += 2;
-                addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
+            summaryY += 2;
+            addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
 
-                currentY = paymentStartY + paymentBoxHeight + 12;
+            currentY = paymentStartY + paymentBoxHeight + 12;
 
-                // ========== AMOUNT IN WORDS ==========
-                if (currentY + 30 > 280) {
-                    doc.addPage();
-                    currentY = 20;
-                }
+            // ========== AMOUNT IN WORDS ==========
+            if (currentY + 30 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
 
-                doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
-                doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
-                doc.roundedRect(15, currentY, 180, 20, 4, 4, "FD");
+            doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
+            doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+            doc.roundedRect(15, currentY, 180, 20, 4, 4, "FD");
 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(10);
-                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text("Amount in Words:", 20, currentY + 8);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("Amount in Words:", 20, currentY + 8);
 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9);
-                doc.setTextColor(80, 80, 80);
-                const words = await this.convertNumberToWords(grandTotal, currency);
-                const wrappedWords = doc.splitTextToSize(words || "Zero Rupees Only", 160);
-                doc.text(wrappedWords, 20, currentY + 15);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            const words = await this.convertNumberToWords(grandTotal, currency);
+            const wrappedWords = doc.splitTextToSize(words || "Zero Rupees Only", 160);
+            doc.text(wrappedWords, 20, currentY + 15);
 
-                currentY += 28;
+            currentY += 28;
 
-                // ========== IMPORTANT INFORMATION ==========
-                if (currentY + 50 > 280) {
-                    doc.addPage();
-                    currentY = 20;
-                }
+            // ========== IMPORTANT INFORMATION ==========
+            if (currentY + 50 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
 
-                doc.setFillColor(255, 250, 240);
-                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
+            doc.setFillColor(255, 250, 240);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.roundedRect(15, currentY, 180, 40, 4, 4, "FD");
 
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(11);
-                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text("IMPORTANT INFORMATION", 20, currentY + 8);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+            doc.text("IMPORTANT INFORMATION", 20, currentY + 8);
 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(100, 100, 100);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
 
-                const infoItems = [
-                    "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
-                    "• GST invoice available at the property upon request",
-                    `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
-                    "• Early check-in/late check-out subject to availability"
-                ];
+            const infoItems = [
+                "• Valid government ID required at check-in (Aadhaar, Passport, Driver's License)",
+                "• GST invoice available at the property upon request",
+                `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
+                "• Early check-in/late check-out subject to availability"
+            ];
 
-                let infoY = currentY + 16;
-                infoItems.forEach((item) => {
-                    doc.text(item, 20, infoY);
-                    infoY += 5;
-                });
+            let infoY = currentY + 16;
+            infoItems.forEach((item) => {
+                doc.text(item, 20, infoY);
+                infoY += 5;
+            });
 
-                currentY += 48;
+            currentY += 48;
 
-                // ========== FOOTER ==========
-                if (currentY + 15 > 280) {
-                    doc.addPage();
-                    currentY = 20;
-                }
+            // ========== FOOTER ==========
+            if (currentY + 15 > 280) {
+                doc.addPage();
+                currentY = 20;
+            }
 
-                doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.setLineWidth(0.3);
-                doc.line(15, currentY, 195, currentY);
+            doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.setLineWidth(0.3);
+            doc.line(15, currentY, 195, currentY);
 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(120, 120, 120);
-                doc.text("Thank you for choosing us! We look forward to hosting you.", 15, currentY + 5);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(120, 120, 120);
+            doc.text("Thank you for choosing us! We look forward to hosting you.", 15, currentY + 5);
 
-                doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
+            doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+            doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
 
-                return doc.output("datauristring").split(",")[1];
-            },
+            return doc.output("datauristring").split(",")[1];
+        },
 
-           onpressLogin: function () {
+        onpressLogin: function () {
             if (!this._oSignDialog) {
                 this._oSignDialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.SignInSignup", this);
                 this.getView().addDependent(this._oSignDialog);
@@ -4301,9 +4303,9 @@ sap.ui.define([
             this._oSignDialog.open();
         },
 
-     // Signin section
+        // Signin section
 
-        onSignIn: async function() {
+        onSignIn: async function () {
             var oView = this.getView();
             var vm = oView.getModel("LoginViewModel");
             var oFragment = this._oLoginAlertDialog;
@@ -4389,7 +4391,7 @@ sap.ui.define([
 
                     this._bPendingEditRoute = false;
 
-                    this ._onEditRouteMatched();
+                    this._onEditRouteMatched();
                 }
 
                 this.getView().removeStyleClass("blur-background");
@@ -4405,7 +4407,7 @@ sap.ui.define([
                 }
             }
         },
-        onSubmitNewPassword: async function() {
+        onSubmitNewPassword: async function () {
             const oNew = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             const oConf = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "confPass");
 
@@ -4525,14 +4527,14 @@ sap.ui.define([
             }, 1000);
         },
 
-        _clearOtpTimer: function() {
+        _clearOtpTimer: function () {
             if (this._otpInterval) {
                 clearInterval(this._otpInterval);
                 this._otpInterval = null;
             }
         },
 
-        _resetOtpState: function() {
+        _resetOtpState: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             this._clearOtpTimer();
@@ -4556,7 +4558,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
         },
 
-        onValidateUser: async function() {
+        onValidateUser: async function () {
             const oEmailCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId");
             const isValid =
                 utils._LCvalidateEmail(sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpEmailId"), "ID")
@@ -4602,11 +4604,11 @@ sap.ui.define([
             }
         },
 
-        _verifyOTPWithBackend: async function(otp) {
+        _verifyOTPWithBackend: async function (otp) {
             this.getBusyDialog()
             try {
                 // Call the BaseController Generic Read method
-                  const oResp = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
+                const oResp = await this.ajaxReadWithJQuery("HM_VerifyOTP", {
                     BookingID: this.BookingID,
                     OTP: otp.trim()
                 });
@@ -4622,7 +4624,7 @@ sap.ui.define([
             }
         },
 
-        onPressOTP: async function() {
+        onPressOTP: async function () {
 
             const oEmailIDCtrl = sap.ui.core.Fragment.byId(
                 this.createId("LoginAlertDialog"),
@@ -4709,11 +4711,11 @@ sap.ui.define([
         },
 
 
-        onShowForgotUser: function() {
+        onShowForgotUser: function () {
             this._showForgotSection("secForgotUser");
         },
 
-        _onVerifyOTP: async function() {
+        _onVerifyOTP: async function () {
             const vm = this.getView().getModel("LoginViewModel");
             const flow = vm.getProperty("/authFlow");
 
@@ -4770,7 +4772,7 @@ sap.ui.define([
             try {
 
                 const resp = await this.ajaxReadWithJQuery("HM_Customer", {
-                   BookingID: this.BookingID,
+                    BookingID: this.BookingID,
                     OTP: otp
                 });
 
@@ -4785,8 +4787,8 @@ sap.ui.define([
 
             }
         },
-        
-        _startOtpCooldown: function(iSeconds = 20) {
+
+        _startOtpCooldown: function (iSeconds = 20) {
             const vm = this.getView().getModel("LoginViewModel");
             let remaining = iSeconds;
 
@@ -4814,7 +4816,7 @@ sap.ui.define([
             }, 1000);
         },
 
-        _resetOtpCooldown: function() {
+        _resetOtpCooldown: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             if (this._otpInterval) {
@@ -4825,7 +4827,7 @@ sap.ui.define([
             vm.setProperty("/otpButtonText", "Send OTP");
             vm.setProperty("/canResendOTP", false);
         },
-        _clearAllAuthFields: function() {
+        _clearAllAuthFields: function () {
             const ids = [
                 "signInuserid", "signInusername", "signinPassword",
                 "fpEmailId", "fpOTP",
@@ -4842,7 +4844,7 @@ sap.ui.define([
             this._oResetUser = null;
         },
 
-        onBackToLogin: function() {
+        onBackToLogin: function () {
             // Clean auth data & any internal flags
             this._clearAllAuthFields();
 
@@ -4865,7 +4867,7 @@ sap.ui.define([
             this._resetOtpState();
 
         },
-        onForgotPassword: function() {
+        onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
 
             vm.setProperty("/authFlow", "forgot");
@@ -4873,25 +4875,25 @@ sap.ui.define([
             vm.setProperty("/dialogTitle", "Reset Password"); //
         },
 
-        onUserlivechange: function(oEvent) {
+        onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onEmailliveChange: function(oEvent) {
+        onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
-        onSigninPasswordLive: function(oEvent) {
+        onSigninPasswordLive: function (oEvent) {
             utils._LCvalidatePassword(oEvent);
         },
 
-        SM_onTogglePasswordVisibility: function(oEvent) {
+        SM_onTogglePasswordVisibility: function (oEvent) {
             const oInput = oEvent.getSource();
             const isPassword = oInput.getType() === "Password";
 
             oInput.setType(isPassword ? "Text" : "Password");
             oInput.setValueHelpIconSrc(isPassword ? "sap-icon://hide" : "sap-icon://show");
         },
-        _getLoginFragmentControl: function(localId) {
+        _getLoginFragmentControl: function (localId) {
             // 1) If you stored the fragment instance (best practice), use it
             if (this._oLoginFragment && typeof this._oLoginFragment.byId === "function") {
                 const c = this._oLoginFragment.byId(localId);
@@ -4975,7 +4977,7 @@ sap.ui.define([
             return null;
         },
 
-        SM_onChnageSetAndConfirm: function(oEvent) {
+        SM_onChnageSetAndConfirm: function (oEvent) {
             const oInput = oEvent.getSource();
             if (!oInput) {
                 return;
@@ -4996,7 +4998,7 @@ sap.ui.define([
             utils._LCvalidatePassword(oInput, oStrengthText);
         },
 
-        SM_onGenerateForgotPassword: function() {
+        SM_onGenerateForgotPassword: function () {
             var oPwdInput = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "newPass");
             var oStrength = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "fpPasswordStrengthText");
 
@@ -5010,7 +5012,7 @@ sap.ui.define([
             oPwdInput.setValue(pwd);
             utils._LCvalidatePassword(oPwdInput, oStrength);
         },
-        onSelectLoginMode: function(e) {
+        onSelectLoginMode: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const mode = e.getSource().getText().toLowerCase();
 
@@ -5042,7 +5044,7 @@ sap.ui.define([
             }
         },
 
-        onDialogClose: function() {
+        onDialogClose: function () {
 
             // User cancelled the OTP dialog — do not auto-resume the page load
             this._bPendingEditRoute = false;
@@ -5078,7 +5080,7 @@ sap.ui.define([
                 this._oLoginAlertDialog.close();
             }
         },
-        onLoginOtpLive: function(e) {
+        onLoginOtpLive: function (e) {
             const vm = this.getView().getModel("LoginViewModel");
             const input = e.getSource();
 
@@ -5100,7 +5102,7 @@ sap.ui.define([
                 input.setValueState("None");
             }
         },
-        _addPasswordGenerateIcon: function() {
+        _addPasswordGenerateIcon: function () {
 
             const aInputs = [
                 sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "signUpPassword"),
@@ -5121,7 +5123,7 @@ sap.ui.define([
             });
         },
 
-        SM_onCopyPassword: function(oEvent) {
+        SM_onCopyPassword: function (oEvent) {
             const oIcon = oEvent.getSource();
             const oInput = oIcon.getParent();
 
@@ -5155,85 +5157,85 @@ sap.ui.define([
                     }
                 });
         },
-          parseDate:function (dateStr) {
-    var parts = dateStr.split("/"); // ["08","07","2026"]
-    return new Date(parts[2], parts[1] - 1, parts[0]); // year, month(0-based), day
+        parseDate: function (dateStr) {
+            var parts = dateStr.split("/"); // ["08","07","2026"]
+            return new Date(parts[2], parts[1] - 1, parts[0]); // year, month(0-based), day
         },
 
-          BV_onOpenVH: async function () {
-    var oBookingView = this.getView().getModel("BookingView");
+        BV_onOpenVH: async function () {
+            var oBookingView = this.getView().getModel("BookingView");
 
-    if (!oBookingView || !oBookingView.getProperty("/editModeEnabled")) {
-        return;
-    }
+            if (!oBookingView || !oBookingView.getProperty("/editModeEnabled")) {
+                return;
+            }
 
-    var oHostelModel = this.getView().getModel("HostelModel");
+            var oHostelModel = this.getView().getModel("HostelModel");
 
-    var BranchCode = oHostelModel.getProperty("/BranchCode");
+            var BranchCode = oHostelModel.getProperty("/BranchCode");
 
-      var bookingStartDate =oHostelModel.getProperty("/BookingDate") ? new Date(oHostelModel.getProperty("/BookingDate")):new Date();
-
-   
- 
-
-     bookingStartDate.setHours(0, 0, 0, 0);
-
-    if(!bookingStartDate){
-        MessageToast.show("Please select the dates before checking coupons")
-        return;
-    }
-
-    if (!this.SC_Dialog) {
-        this.SC_Dialog = sap.ui.xmlfragment(
-            "sap.ui.com.project1.fragment.ShowCoupon",
-            this
-        );
-        this.getView().addDependent(this.SC_Dialog);
-    }
-
-    this.getBusyDialog();
-
-    const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
-        Status: "Active",
-        BranchCode: BranchCode
-    });
-
-    this.closeBusyDialog();
-
-    // Show only coupons valid for the selected booking dates
-var aFilteredCoupons = oResponse.data.filter(function (coupon) {
-
-    var couponStart = new Date(coupon.StartDate);
-    var couponEnd = new Date(coupon.EndDate);
+            var bookingStartDate = oHostelModel.getProperty("/BookingDate") ? new Date(oHostelModel.getProperty("/BookingDate")) : new Date();
 
 
-    couponStart.setHours(0, 0, 0, 0);
-    couponEnd.setHours(23, 59, 59, 999);
 
-    return bookingStartDate >= couponStart &&
-           bookingStartDate <= couponEnd;
 
-}.bind(this));
+            bookingStartDate.setHours(0, 0, 0, 0);
 
-    this.getView().setModel(
-        new sap.ui.model.json.JSONModel(aFilteredCoupons),
-        "ShowCouponDetails"
-    );
+            if (!bookingStartDate) {
+                MessageToast.show("Please select the dates before checking coupons")
+                return;
+            }
 
-    this.SC_Dialog.open();
-},
+            if (!this.SC_Dialog) {
+                this.SC_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.ShowCoupon",
+                    this
+                );
+                this.getView().addDependent(this.SC_Dialog);
+            }
+
+            this.getBusyDialog();
+
+            const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+                Status: "Active",
+                BranchCode: BranchCode
+            });
+
+            this.closeBusyDialog();
+
+            // Show only coupons valid for the selected booking dates
+            var aFilteredCoupons = oResponse.data.filter(function (coupon) {
+
+                var couponStart = new Date(coupon.StartDate);
+                var couponEnd = new Date(coupon.EndDate);
+
+
+                couponStart.setHours(0, 0, 0, 0);
+                couponEnd.setHours(23, 59, 59, 999);
+
+                return bookingStartDate >= couponStart &&
+                    bookingStartDate <= couponEnd;
+
+            }.bind(this));
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(aFilteredCoupons),
+                "ShowCouponDetails"
+            );
+
+            this.SC_Dialog.open();
+        },
         SC_onVHDPick: function (oEvent) {
-    var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
+            var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
 
-    this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
+            this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
 
-    this.SC_Dialog.close();
+            this.SC_Dialog.close();
 
-    this._resetCouponState(true);
-    this.onApplyCoupon();
-},
-        SC_onVHDClose:function(){
-              this.SC_Dialog.close();
+            this._resetCouponState(true);
+            this.onApplyCoupon();
+        },
+        SC_onVHDClose: function () {
+            this.SC_Dialog.close();
         }
     });
 });

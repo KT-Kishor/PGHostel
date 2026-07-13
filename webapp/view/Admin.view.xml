@@ -107,12 +107,12 @@
 						<fb:control>
 							<ComboBox
                                 id="PO_id_Status"
-                                items="{HostelModel>/}"
+                                items="{AdminStatus>/}"
                                 showClearIcon="true"
                             >
-								<core:ListItem
-                                    key="{HostelModel>Status}"
-                                    text="{HostelModel>Status}"
+								<core:Item
+                                    key="{AdminStatus>Status}"
+                                    text="{AdminStatus>Status}"
                                 />
 							</ComboBox>
 						</fb:control>

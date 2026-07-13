@@ -186,7 +186,7 @@ sap.ui.define([
                     return;
                 }
                 // Format Date
-                var sResolvedDate = oDate.toISOString().split("T")[0];;
+                var sResolvedDate = oDate.toISOString();
 
                 var Payload = {
                     "BugID": SPData.BugID,
@@ -533,25 +533,44 @@ sap.ui.define([
                 this.ED_Dialog.close();
             }
         },
-        HF_viewComments: async function (oEvent) {
+      HF_viewComments: async function (oEvent) {
     var that = this;
 
     var oContext = oEvent.getSource().getBindingContext("RaiseBugModel");
-    var sBugID = oContext.getObject().BugID;
+    var oObject = oContext.getObject();
+
+    var sBugID = oObject.BugID;
+    var sResolvedDescription = oObject.ResolvedDescription;
+    var sResolvedDate = oObject.ResolvedDate;
+
 
     var filters = {
         BugID: sBugID
     };
 
     try {
-        this.getBusyDialog()
+        this.getBusyDialog();
+
         var oData = await this.ajaxReadWithJQuery("HM_BugComment", filters);
 
         var aComments = Array.isArray(oData.data) ? oData.data : [];
 
+        // Add Resolved Description as the last timeline item
+        if (sResolvedDescription && sResolvedDescription.trim()) {
+
+        
+
+            aComments.push({
+                CommentedBy: "Support Team", // Change if required
+                CommentDateTime: new Date(sResolvedDate),
+                Status: "Resolved",
+                Comment: sResolvedDescription
+            });
+        }
+
         var oJsonModel = new sap.ui.model.json.JSONModel(aComments);
 
-        this.closeBusyDialog()
+        this.closeBusyDialog();
 
         if (!that._oCommentDialog) {
 
@@ -597,6 +616,7 @@ sap.ui.define([
         that._oCommentDialog.open();
 
     } catch (oError) {
+        this.closeBusyDialog();
         console.error(oError);
         sap.m.MessageToast.show("Failed to load comments.");
     }

@@ -74,6 +74,11 @@
         "uri": "model/AmenitiType.json",
         "preload": true
       },
+      "AdminStatus": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/AdminStatus.json",
+        "preload": true
+      },
       "CompanyInvoiceStatus": {
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/CompanyInvoiceStatus.json",

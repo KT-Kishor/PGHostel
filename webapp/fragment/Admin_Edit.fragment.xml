@@ -85,6 +85,7 @@
                     value="{edit>/UnitText}"
                     change="onUnitTextChange"
                     width="100%"
+
                     valueStateText="{i18n>plaeseSelectUnit}"
                 >
                     <core:Item
@@ -107,10 +108,9 @@
 
                 />
                     <RadioButtonGroup id="id_Period" columns="2" select=".onPeriodTypeSelect" 
-                        visible="{= ${edit>/UnitText} === 'Unit Price' }"
+                        visible="{= ${edit>/UnitText} === 'Unit Price' || ${edit>/UnitText} === 'Package Price' }"
                         editable="false"
-
-                  >
+                          >
                                 <buttons>
                                     <RadioButton text="Daily" />
                                     <RadioButton text="Entire Booking" />
@@ -168,7 +168,8 @@
                 <Select
                     id="idMonthYearSelectFragment"
                     width="100%"
-                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' }"
+                    visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' 
+                    &amp;&amp; ${edit>/SelectionMode} !== 'PERSON_QTY'}"
                     selectedKey="{edit>/TotalUnits}"
                     change=".onMonthYearChange"
                 >
@@ -230,6 +231,8 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onEditDateChange"
+                    maxDate="{CustomerData>/minEndDate}"
+
                     valueStateText="{i18n>plaeseSelectDate}"
                 />
                 <!-- Days -->
