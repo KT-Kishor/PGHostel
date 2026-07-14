@@ -20,6 +20,12 @@ sap.ui.define([
             }
             return sDate;
         },
+        formatDateString: function (sDate) {
+            if (sDate) {
+                return sDate.split("T")[0].split("-").reverse().join("/");
+            }
+            return "";
+        },
 
         calculateFacilityTotal: function (fPrice, iDays) {
             if (!fPrice || !iDays) return "₹ 0";
@@ -195,7 +201,7 @@ sap.ui.define([
                     return "Error";
                 case "Offer Sent":
                     return "Indication06";
-              case "Received":
+                case "Received":
                     return "Success";
                 case "Invoiced":
                     return "Success";
@@ -227,19 +233,19 @@ sap.ui.define([
                     return "Indication03";
                 case "Payment Partially":
                     return "Indication01";
-                    case "Recovered":
-                        return "Success"
+                case "Recovered":
+                    return "Success"
                 case "Pending":
                     return "Indication01"
-                      case "Open":
+                case "Open":
                     return "Indication01"
-                    case "In Progress":
+                case "In Progress":
                     return "Warning"
-                    case "Damage Claimed":
+                case "Damage Claimed":
                     return "Success"
-                      case "Partially Recovered":
+                case "Partially Recovered":
                     return "Indication06"
-                       case "Confirmed":
+                case "Confirmed":
                     return "Success"
                 default:
                     return "Indication01";
@@ -248,25 +254,25 @@ sap.ui.define([
         },
 
         formatDiscount: function (sDiscountType, vDiscountValue) {
-    if (!sDiscountType) {
-        return "";
-    }
+            if (!sDiscountType) {
+                return "";
+            }
 
-    if (sDiscountType === "Percentage") {
-        return vDiscountValue + " %";
-    } else if (sDiscountType === "Fixed Amount") {
-       return vDiscountValue + " INR";
-    }
+            if (sDiscountType === "Percentage") {
+                return vDiscountValue + " %";
+            } else if (sDiscountType === "Fixed Amount") {
+                return vDiscountValue + " INR";
+            }
 
-    return vDiscountValue;
-},
+            return vDiscountValue;
+        },
 
         formatAmountINR: function (vValue) {
-    if (vValue === null || vValue === undefined || vValue === "") {
-        return "";
-    }
-    return vValue + " INR";
-},
+            if (vValue === null || vValue === undefined || vValue === "") {
+                return "";
+            }
+            return vValue + " INR";
+        },
 
         formatStatusState: function (sStatus) {
             if (sStatus === "Active") {
@@ -372,41 +378,41 @@ sap.ui.define([
             // Other units
             return `${price} ${currency} ${unitText}`;
         },
-         formatPerDayText: function (sPriceType, iDays) {
-    if (sPriceType === "Per Day") {
-        return iDays ? iDays + " Days" : "";
-    }
-    return "";
-},
+        formatPerDayText: function (sPriceType, iDays) {
+            if (sPriceType === "Per Day") {
+                return iDays ? iDays + " Days" : "";
+            }
+            return "";
+        },
 
-formatPerMonthYearText: function (sPriceType, iMonths) {
+        formatPerMonthYearText: function (sPriceType, iMonths) {
 
-    if (sPriceType === "Per Month") {
-        return iMonths + (iMonths > 1 ? " Months" : " Month");
-    }
+            if (sPriceType === "Per Month") {
+                return iMonths + (iMonths > 1 ? " Months" : " Month");
+            }
 
-    if (sPriceType === "Per Year") {
-        return iMonths + (iMonths > 1 ? " Years" : " Year");
-    }
+            if (sPriceType === "Per Year") {
+                return iMonths + (iMonths > 1 ? " Years" : " Year");
+            }
 
-    return "";
-},
-formatDurationText: function (sPriceType, iMonths, iDays) {
+            return "";
+        },
+        formatDurationText: function (sPriceType, iMonths, iDays) {
 
-    if (sPriceType === "Per Day") {
-        return iDays ? iDays + " Days" : "";
-    }
+            if (sPriceType === "Per Day") {
+                return iDays ? iDays + " Days" : "";
+            }
 
-    if (sPriceType === "Per Month") {
-        return iMonths ? iMonths + (iMonths > 1 ? " Months" : " Month") : "";
-    }
+            if (sPriceType === "Per Month") {
+                return iMonths ? iMonths + (iMonths > 1 ? " Months" : " Month") : "";
+            }
 
-    if (sPriceType === "Per Year") {
-        return iMonths ? iMonths + (iMonths > 1 ? " Years" : " Year") : "";
-    }
+            if (sPriceType === "Per Year") {
+                return iMonths ? iMonths + (iMonths > 1 ? " Years" : " Year") : "";
+            }
 
-    return "";
-},
+            return "";
+        },
 
         formatMonthlyPaymentText: function (iSelectedPerson, sSelectedPriceType) {
 
@@ -459,45 +465,45 @@ formatDurationText: function (sPriceType, iMonths, iDays) {
 
             return oDateFormat.format(oDate);
         },
-    getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
+        getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
 
-    if (!sType) {
-        return "";
-    }
+            if (!sType) {
+                return "";
+            }
 
-    if (sType === "Per Day") {
-        return iTotalDays || 0;
-    }
+            if (sType === "Per Day") {
+                return iTotalDays || 0;
+            }
 
-    if (sType === "Per Month" || sType === "Per Year") {
-        return iSelectedMonths || 0;
-    }
+            if (sType === "Per Month" || sType === "Per Year") {
+                return iSelectedMonths || 0;
+            }
 
-    return "";
-}
-,
-formatCGSTLabel: function (sGSTValue) {
+            return "";
+        }
+        ,
+        formatCGSTLabel: function (sGSTValue) {
 
-    const gst = Number(sGSTValue) || 0;
-    const cgst = gst;
+            const gst = Number(sGSTValue) || 0;
+            const cgst = gst;
 
-    return `CGST (${cgst}%):`;
-},
-formatSGSTLabel: function (sGSTValue) {
+            return `CGST (${cgst}%):`;
+        },
+        formatSGSTLabel: function (sGSTValue) {
 
-    const gst = Number(sGSTValue) || 0;
-    const sgst = gst;
+            const gst = Number(sGSTValue) || 0;
+            const sgst = gst;
 
-    return `SGST (${sgst}%):`;
-},
-formatIGSTLabel: function (sGSTValue) {
+            return `SGST (${sgst}%):`;
+        },
+        formatIGSTLabel: function (sGSTValue) {
 
-    const gst = Number(sGSTValue) || 0;
-    const igst = gst;
+            const gst = Number(sGSTValue) || 0;
+            const igst = gst;
 
-    return `IGST (${igst}%):`;
-},
- joinWithSlash: function (mode, txnId) {
+            return `IGST (${igst}%):`;
+        },
+        joinWithSlash: function (mode, txnId) {
             if (!mode && !txnId) return "";
             if (!mode) return txnId;
             if (!txnId) return mode;
@@ -505,83 +511,83 @@ formatIGSTLabel: function (sGSTValue) {
         },
 
 
-canEditComplaint: function (sStatus) {
-    if (!sStatus) {
-        return false;
-    }
-    const status = sStatus.trim().toLowerCase();
-    return status !== "in progress" && status !== "resolved";
-},
+        canEditComplaint: function (sStatus) {
+            if (!sStatus) {
+                return false;
+            }
+            const status = sStatus.trim().toLowerCase();
+            return status !== "in progress" && status !== "resolved";
+        },
 
-formatAgeFromDOBOrAge: function (sDateValue) {
-    // sDateValue is the value from BookingView>Age field, which contains a date string like "2016-04-19"
-    if (!sDateValue || sDateValue === "") {
-        return "";
-    }
+        formatAgeFromDOBOrAge: function (sDateValue) {
+            // sDateValue is the value from BookingView>Age field, which contains a date string like "2016-04-19"
+            if (!sDateValue || sDateValue === "") {
+                return "";
+            }
 
-    // First, check if it's already a numeric age (like "25")
-    const ageNum = parseInt(sDateValue, 10);
-    if (!isNaN(ageNum) && ageNum.toString() === sDateValue.trim()) {
-        // It's a plain number, treat as already calculated age
-        if (ageNum === 0) {
-            return "0 years";
-        } else if (ageNum === 1) {
-            return "1 year";
-        } else {
-            return ageNum + " years";
-        }
-    }
+            // First, check if it's already a numeric age (like "25")
+            const ageNum = parseInt(sDateValue, 10);
+            if (!isNaN(ageNum) && ageNum.toString() === sDateValue.trim()) {
+                // It's a plain number, treat as already calculated age
+                if (ageNum === 0) {
+                    return "0 years";
+                } else if (ageNum === 1) {
+                    return "1 year";
+                } else {
+                    return ageNum + " years";
+                }
+            }
 
-    // Otherwise, it's a date string - parse it
-    let birthDate;
-    if (typeof sDateValue === 'string') {
-        // Handle YYYY-MM-DD format from backend (e.g., "2016-04-19")
-         let parts
-        if(sDateValue.includes("/")) {
-            sDateValue.split("/").reverse().join("-"); // Convert "19/04/2016" to "2016-04-19"
-        }
-         parts = sDateValue.split("-");
-        if (parts.length === 3) {
-            birthDate = new Date(parts[0], parts[1] - 1, parts[2]);
-        } else {
-            // Try parsing as-is (could be other format)
-            birthDate = new Date(sDateValue);
-        }
-    } else if (sDateValue instanceof Date) {
-        birthDate = sDateValue;
-    } else {
-        return "";
-    }
+            // Otherwise, it's a date string - parse it
+            let birthDate;
+            if (typeof sDateValue === 'string') {
+                // Handle YYYY-MM-DD format from backend (e.g., "2016-04-19")
+                let parts
+                if (sDateValue.includes("/")) {
+                    sDateValue.split("/").reverse().join("-"); // Convert "19/04/2016" to "2016-04-19"
+                }
+                parts = sDateValue.split("-");
+                if (parts.length === 3) {
+                    birthDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                } else {
+                    // Try parsing as-is (could be other format)
+                    birthDate = new Date(sDateValue);
+                }
+            } else if (sDateValue instanceof Date) {
+                birthDate = sDateValue;
+            } else {
+                return "";
+            }
 
-    // Check if date is valid
-    if (isNaN(birthDate.getTime())) {
-        return sDateValue; // Return raw value if can't parse
-    }
+            // Check if date is valid
+            if (isNaN(birthDate.getTime())) {
+                return sDateValue; // Return raw value if can't parse
+            }
 
-    // Calculate age
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const dayDiff = today.getDate() - birthDate.getDate();
+            // Calculate age
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
 
-    // Adjust age if birthday hasn't occurred yet this year
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-        age--;
-    }
+            // Adjust age if birthday hasn't occurred yet this year
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
 
-    // Format with "year" or "years"
-    if (age < 0) {
-        return "";
-    } else if (age === 0) {
-        return "0 years";
-    } else if (age === 1) {
-        return "1 year";
-    } else {
-        return age + " years";
-    }
-},
+            // Format with "year" or "years"
+            if (age < 0) {
+                return "";
+            } else if (age === 0) {
+                return "0 years";
+            } else if (age === 1) {
+                return "1 year";
+            } else {
+                return age + " years";
+            }
+        },
 
-formatBranchNames: function (sBranchCodes, aBranches) {
+        formatBranchNames: function (sBranchCodes, aBranches) {
             if (!sBranchCodes || !aBranches || !Array.isArray(aBranches)) {
                 return "";
             }
@@ -603,7 +609,7 @@ formatBranchNames: function (sBranchCodes, aBranches) {
                 .join(", ");
         },
 
-         formatSelectionMode: function (sValue) {
+        formatSelectionMode: function (sValue) {
 
             if (!sValue) {
                 return "";
@@ -625,62 +631,62 @@ formatBranchNames: function (sBranchCodes, aBranches) {
             }).join(", ");
 
         },
-     formatFacilityDetails: function (
-    iQty,
-    sPrice,
-    sCurrency,
-    sChargeType
-) {
+        formatFacilityDetails: function (
+            iQty,
+            sPrice,
+            sCurrency,
+            sChargeType
+        ) {
 
-    var aText = [];
+            var aText = [];
 
-    // Quantity
-    if (iQty && iQty !== 0) {
-        aText.push("Minimum quantity " + iQty);
-    }
+            // Quantity
+            if (iQty && iQty !== 0) {
+                aText.push("Minimum quantity " + iQty);
+            }
 
-    // Price
-    if (sPrice && parseFloat(sPrice) !== 0) {
+            // Price
+            if (sPrice && parseFloat(sPrice) !== 0) {
 
-        var sFormattedPrice =
-            parseFloat(sPrice).toFixed(2);
+                var sFormattedPrice =
+                    parseFloat(sPrice).toFixed(2);
 
-        aText.push(
-            "with a price of " +
-            sFormattedPrice +
-            " " +
-            (sCurrency || "")
-        );
-    }
+                aText.push(
+                    "with a price of " +
+                    sFormattedPrice +
+                    " " +
+                    (sCurrency || "")
+                );
+            }
 
-    // Charge Type Mapping
-    var oChargeTypeMap = {
-        "SINGLE": "Per Room",
-        "QTY": "Per Quantity",
-        "PERSON": "Per Person",
-        "PERSON_QTY": "Per Package",
-        "Entire Booking": "Once Per Booking"
-    };
+            // Charge Type Mapping
+            var oChargeTypeMap = {
+                "SINGLE": "Per Room",
+                "QTY": "Per Quantity",
+                "PERSON": "Per Person",
+                "PERSON_QTY": "Per Package",
+                "Entire Booking": "Once Per Booking"
+            };
 
-    // Billing Frequency
-    if (sChargeType) {
+            // Billing Frequency
+            if (sChargeType) {
 
-        var sDisplayChargeType =
-            oChargeTypeMap[sChargeType] || sChargeType;
+                var sDisplayChargeType =
+                    oChargeTypeMap[sChargeType] || sChargeType;
 
-        aText.push("Charged " + sDisplayChargeType);
-    }
+                aText.push("Charged " + sDisplayChargeType);
+            }
 
-    // If no values available
-    if (aText.length === 0) {
-        return "-";
-    }
+            // If no values available
+            if (aText.length === 0) {
+                return "-";
+            }
 
-    return aText.join(" ");
+            return aText.join(" ");
 
-},
+        },
 
 
-        
+
     }
 });

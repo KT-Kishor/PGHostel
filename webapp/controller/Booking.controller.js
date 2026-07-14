@@ -16,7 +16,7 @@
 
     return BaseController.extend("sap.ui.com.project1.controller.Booking", {
         Formatter: Formatter,
-        onInit: function () {   
+        onInit: function () {
             this.getOwnerComponent().getRouter().getRoute("RouteBooking").attachMatched(this._onRouteMatched, this);
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // fallback; recalculated dynamically
@@ -697,7 +697,7 @@
 
 
 
-  
+
 
         _isUnitBasedFacility: function (oFacility) {
             return this._getFacilitySelectionMode(oFacility) === "PERSON_QTY";
@@ -1089,7 +1089,7 @@
                         // const bIsPersonQty = sSelectionMode === "PERSON_QTY";
                         // const iMinimumQty = bIsPersonQty ? (parseInt(oFacility.MinimumQty, 10) || 0) : 0;
                         // const fMinimumPrice = bIsPersonQty ? (parseFloat(oFacility.MinimumPrice) || 0) : 0;
-             
+
 
                         const sSelectionMode = oSelectedFacility.SelectionMode || oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
                         const bIsPersonQty = sSelectionMode === "PERSON_QTY";
@@ -1141,7 +1141,7 @@
                             MinimumPrice: fMinimumPrice,
                             PackageQty: iMinimumQty,
                             PackagePrice: fMinimumPrice
-                            
+
                         };
                     }.bind(this));
 
@@ -1381,7 +1381,7 @@
                 packagePrice: fMinimumPrice,
                 editModeEnabled: bEditModeEnabled
             });
-            
+
 
             const oFacilityPopover = this._getFacilitySelectionDialog();
 
@@ -1427,7 +1427,7 @@
 
 
 
- 
+
 
 
         // 
@@ -1483,7 +1483,7 @@
                                         wrapping: true
                                     }).addStyleClass("sapUiTinyMarginEnd"),
                                 ]
-                                    }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
                             // Informational MessageStrip for PERSON_QTY facilities with valid minimum offer
                             new sap.m.VBox({
@@ -1738,7 +1738,7 @@
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
-                       
+
                             new sap.m.VBox({
                                 visible: {
                                     parts: [
@@ -2009,269 +2009,269 @@
         },
 
 
-            _rebuildSelectedFacilities: function () {
-                const oModel = this.getView().getModel("HostelModel");
-                const oFacilityModel = this.getView().getModel("FacilityModel");
-                const oUnits = this._getBookingUnits();
+        _rebuildSelectedFacilities: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const oFacilityModel = this.getView().getModel("FacilityModel");
+            const oUnits = this._getBookingUnits();
 
-                const aOccupants = this._getOccupantOptions ? this._getOccupantOptions() : [];
+            const aOccupants = this._getOccupantOptions ? this._getOccupantOptions() : [];
 
-                const fnGetPersonName = function (sPersonId) {
-                    const oFound = aOccupants.find(function (oPerson) {
-                        return oPerson.id === sPersonId;
-                    });
-                    return oFound ? oFound.name : sPersonId;
-                };
+            const fnGetPersonName = function (sPersonId) {
+                const oFound = aOccupants.find(function (oPerson) {
+                    return oPerson.id === sPersonId;
+                });
+                return oFound ? oFound.name : sPersonId;
+            };
 
-                const fnGetPeriodMultiplier = function (sPriceType) {
-                    if (sPriceType === "Per Day") {
-                        return oUnits.days || 1;
-                    }
-                    if (sPriceType === "Per Month") {
-                        return oUnits.months || 1;
-                    }
-                    if (sPriceType === "Per Year") {
-                        return oUnits.years || 1;
-                    }
-                    if (sPriceType === "Unit Price") {
-                        return 1;
-                    }
+            const fnGetPeriodMultiplier = function (sPriceType) {
+                if (sPriceType === "Per Day") {
+                    return oUnits.days || 1;
+                }
+                if (sPriceType === "Per Month") {
+                    return oUnits.months || 1;
+                }
+                if (sPriceType === "Per Year") {
+                    return oUnits.years || 1;
+                }
+                if (sPriceType === "Unit Price") {
                     return 1;
-                };
+                }
+                return 1;
+            };
 
-                const aSelectedFacilities = (this._aAllFacilities || [])
-                    .filter(function (oFacility) {
-                        return !!oFacility.Selected;
-                    })
-                    .map(function (oFacility) {
-                        const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
-                        const fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.UnitPrice);
-                        const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
-                        const sCurrency = oFacility.Currency || "INR";
-                        const fPeriodMultiplier = fnGetPeriodMultiplier(sPriceType);
-                        const sFacilityChargeType = this._getFacilityChargeType(oFacility);
-                        const iChargeableDayCount = this._getFacilityChargeableDayCount();
-                        const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
-                        const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
+            const aSelectedFacilities = (this._aAllFacilities || [])
+                .filter(function (oFacility) {
+                    return !!oFacility.Selected;
+                })
+                .map(function (oFacility) {
+                    const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+                    const fPrice = this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.UnitPrice);
+                    const sPriceType = oFacility.SelectedPriceType || oFacility.CurrentPriceType || "Unit Price";
+                    const sCurrency = oFacility.Currency || "INR";
+                    const fPeriodMultiplier = fnGetPeriodMultiplier(sPriceType);
+                    const sFacilityChargeType = this._getFacilityChargeType(oFacility);
+                    const iChargeableDayCount = this._getFacilityChargeableDayCount();
+                    const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
+                    const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
 
-                        let fTotal = 0;
-                        let sBreakdown = "";
-                        let sAllocationDetails = "";
+                    let fTotal = 0;
+                    let sBreakdown = "";
+                    let sAllocationDetails = "";
 
-                        if (sSelectionMode === "SINGLE") {
-                            fTotal = fPrice * fPeriodMultiplier;
-                            sBreakdown = "Room (1) x " + fPeriodMultiplier + " " + sPriceType;
-                            sAllocationDetails = JSON.stringify({
-                                selectionMode: sSelectionMode,
-                                roomCount: 1
-                            });
-                        } else if (sSelectionMode === "QTY") {
-                            const iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
-                            fTotal = fPrice * fPeriodMultiplier * iQty;
-                            sBreakdown = "Qty (" + iQty + ") x " + fPeriodMultiplier + " " + sPriceType;
-                            sAllocationDetails = JSON.stringify({
-                                selectionMode: sSelectionMode,
-                                quantity: iQty
-                            });
-                        } else if (sSelectionMode === "PERSON") {
-                            const aNames = aSelectedPersonIds.map(function (sPersonId) {
-                                return fnGetPersonName(sPersonId);
-                            });
-                            const iPersonCount = aSelectedPersonIds.length;
+                    if (sSelectionMode === "SINGLE") {
+                        fTotal = fPrice * fPeriodMultiplier;
+                        sBreakdown = "Room (1) x " + fPeriodMultiplier + " " + sPriceType;
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            roomCount: 1
+                        });
+                    } else if (sSelectionMode === "QTY") {
+                        const iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+                        fTotal = fPrice * fPeriodMultiplier * iQty;
+                        sBreakdown = "Qty (" + iQty + ") x " + fPeriodMultiplier + " " + sPriceType;
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            quantity: iQty
+                        });
+                    } else if (sSelectionMode === "PERSON") {
+                        const aNames = aSelectedPersonIds.map(function (sPersonId) {
+                            return fnGetPersonName(sPersonId);
+                        });
+                        const iPersonCount = aSelectedPersonIds.length;
 
-                            fTotal = fPrice * fPeriodMultiplier * iPersonCount;
-                            sBreakdown = "For: " + aNames.join(", ") + " x " + fPeriodMultiplier + " " + sPriceType;
-                            sAllocationDetails = JSON.stringify({
-                                selectionMode: sSelectionMode,
-                                selectedPersons: aSelectedPersonIds.map(function (sPersonId) {
-                                    return {
-                                        personId: sPersonId,
-                                        personName: fnGetPersonName(sPersonId)
-                                    };
-                                })
-                            });
-                        } else if (sSelectionMode === "PERSON_QTY") {
-                            const aValidLines = aPersonQuantities.filter(function (oLine) {
-                                return (parseInt(oLine.qty, 10) || 0) > 0;
-                            });
+                        fTotal = fPrice * fPeriodMultiplier * iPersonCount;
+                        sBreakdown = "For: " + aNames.join(", ") + " x " + fPeriodMultiplier + " " + sPriceType;
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            selectedPersons: aSelectedPersonIds.map(function (sPersonId) {
+                                return {
+                                    personId: sPersonId,
+                                    personName: fnGetPersonName(sPersonId)
+                                };
+                            })
+                        });
+                    } else if (sSelectionMode === "PERSON_QTY") {
+                        const aValidLines = aPersonQuantities.filter(function (oLine) {
+                            return (parseInt(oLine.qty, 10) || 0) > 0;
+                        });
 
-                            const iSelectedPersonCount = aValidLines.length;
+                        const iSelectedPersonCount = aValidLines.length;
 
-                            const fPackagePrice = this._getFirstAvailableNumber(
-                                oFacility.MinimumPrice,
-                                oFacility.SelectedPrice,
-                                oFacility.CurrentPrice
-                            );
+                        const fPackagePrice = this._getFirstAvailableNumber(
+                            oFacility.MinimumPrice,
+                            oFacility.SelectedPrice,
+                            oFacility.CurrentPrice
+                        );
 
-                            const aNames = aValidLines.map(function (oLine) {
-                                return oLine.personName || fnGetPersonName(oLine.personId);
-                            });
+                        const aNames = aValidLines.map(function (oLine) {
+                            return oLine.personName || fnGetPersonName(oLine.personId);
+                        });
 
-                            if (sFacilityChargeType === "DAILY") {
-                                fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
-                                sBreakdown = "For: " + aNames.join(", ") +
-                                    " | Daily x " + iChargeableDayCount + " day(s)";
-                            } else {
-                                fTotal = fPackagePrice * iSelectedPersonCount;
-                                sBreakdown = "For: " + aNames.join(", ") +
-                                    " | Once per booking";
-                            }
-
-                            sAllocationDetails = JSON.stringify({
-                                selectionMode: sSelectionMode,
-                                facilityChargeType: sFacilityChargeType,
-                                chargeableDays: sFacilityChargeType === "DAILY" ? iChargeableDayCount : 0,
-                                selectedPersons: aValidLines.map(function (oLine) {
-                                    return {
-                                        personId: oLine.personId,
-                                        personName: oLine.personName || fnGetPersonName(oLine.personId),
-                                        quantity: parseInt(oLine.qty, 10) || 0
-                                    };
-                                })
-                            });
+                        if (sFacilityChargeType === "DAILY") {
+                            fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
+                            sBreakdown = "For: " + aNames.join(", ") +
+                                " | Daily x " + iChargeableDayCount + " day(s)";
                         } else {
-                            fTotal = fPrice * fPeriodMultiplier;
-                            sBreakdown = "x " + fPeriodMultiplier + " " + sPriceType;
-                            sAllocationDetails = JSON.stringify({
-                                selectionMode: "SINGLE",
-                                roomCount: 1
-                            });
+                            fTotal = fPackagePrice * iSelectedPersonCount;
+                            sBreakdown = "For: " + aNames.join(", ") +
+                                " | Once per booking";
                         }
 
-                        return {
-                            FacilityID: oFacility.FacilityID,
-                            CatalogFacilityID: oFacility.CatalogFacilityID || oFacility.ID,
-                            FacilityName: oFacility.FacilityName,
-                            DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
-                            Currency: sCurrency,
-                            SelectionMode: sSelectionMode,
-                            Price: fPrice,
-                            UnitText: sPriceType,
-                            FacilityChargeType: sFacilityChargeType,
-                            Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
-                            SelectedPersonIds: aSelectedPersonIds.slice(),
-                            PersonQuantities: aPersonQuantities.map(function (oLine) {
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: sSelectionMode,
+                            facilityChargeType: sFacilityChargeType,
+                            chargeableDays: sFacilityChargeType === "DAILY" ? iChargeableDayCount : 0,
+                            selectedPersons: aValidLines.map(function (oLine) {
                                 return {
                                     personId: oLine.personId,
                                     personName: oLine.personName || fnGetPersonName(oLine.personId),
-                                    qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
+                                    quantity: parseInt(oLine.qty, 10) || 0
                                 };
-                            }),
-                            // Minimum package fields for PERSON_QTY facilities
-                            MinimumQty: parseInt(oFacility.MinimumQty, 10) || 0,
-                            MinimumPrice: parseFloat(oFacility.MinimumPrice) || 0,
-                            AllocationDetails: sAllocationDetails,
-                            RateText: sSelectionMode === "PERSON_QTY"
-                                ? this._formatFacilityPriceWithUnit(
-                                    this._toNumber(oFacility.MinimumPrice),
-                                    sCurrency,
-                                    "Package Price"
-                                )
-                                : this._formatFacilityPriceWithUnit(fPrice, sCurrency, sPriceType),
-                            TotalAmount: Number(fTotal.toFixed(2)),
-                            BreakdownText: sBreakdown,
-                            RawFacilityItems: Array.isArray(oFacility.RawFacilityItems)
-                                ? oFacility.RawFacilityItems.map(function (oItem) {
-                                    return Object.assign({}, oItem);
-                                })
-                                : []
-                        };
-                    }.bind(this));
-                oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
-                oModel.setProperty("/FacilityDiscounts", []);
-                oModel.setProperty("/TotalFacilityDiscount", 0);
-                oModel.setProperty("/HasFacilityOfferDiscount", false);
-                oModel.setProperty("/HasValidFacilityOffer", false);
-                oModel.setProperty(
-                    "/TotalFacilityPrice",
-                    Number(
-                        aSelectedFacilities.reduce(function (sum, oItem) {
-                            return sum + (this._toNumber(oItem.TotalAmount));
-                        }.bind(this), 0).toFixed(2)
-                    )
-                );
+                            })
+                        });
+                    } else {
+                        fTotal = fPrice * fPeriodMultiplier;
+                        sBreakdown = "x " + fPeriodMultiplier + " " + sPriceType;
+                        sAllocationDetails = JSON.stringify({
+                            selectionMode: "SINGLE",
+                            roomCount: 1
+                        });
+                    }
 
-                if (oFacilityModel) {
-                    oFacilityModel.refresh(true);
-                }
+                    return {
+                        FacilityID: oFacility.FacilityID,
+                        CatalogFacilityID: oFacility.CatalogFacilityID || oFacility.ID,
+                        FacilityName: oFacility.FacilityName,
+                        DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
+                        Currency: sCurrency,
+                        SelectionMode: sSelectionMode,
+                        Price: fPrice,
+                        UnitText: sPriceType,
+                        FacilityChargeType: sFacilityChargeType,
+                        Quantity: Math.max(parseInt(oFacility.Quantity, 10) || 1, 1),
+                        SelectedPersonIds: aSelectedPersonIds.slice(),
+                        PersonQuantities: aPersonQuantities.map(function (oLine) {
+                            return {
+                                personId: oLine.personId,
+                                personName: oLine.personName || fnGetPersonName(oLine.personId),
+                                qty: Math.max(parseInt(oLine.qty, 10) || 0, 0)
+                            };
+                        }),
+                        // Minimum package fields for PERSON_QTY facilities
+                        MinimumQty: parseInt(oFacility.MinimumQty, 10) || 0,
+                        MinimumPrice: parseFloat(oFacility.MinimumPrice) || 0,
+                        AllocationDetails: sAllocationDetails,
+                        RateText: sSelectionMode === "PERSON_QTY"
+                            ? this._formatFacilityPriceWithUnit(
+                                this._toNumber(oFacility.MinimumPrice),
+                                sCurrency,
+                                "Package Price"
+                            )
+                            : this._formatFacilityPriceWithUnit(fPrice, sCurrency, sPriceType),
+                        TotalAmount: Number(fTotal.toFixed(2)),
+                        BreakdownText: sBreakdown,
+                        RawFacilityItems: Array.isArray(oFacility.RawFacilityItems)
+                            ? oFacility.RawFacilityItems.map(function (oItem) {
+                                return Object.assign({}, oItem);
+                            })
+                            : []
+                    };
+                }.bind(this));
+            oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
+            oModel.setProperty("/FacilityDiscounts", []);
+            oModel.setProperty("/TotalFacilityDiscount", 0);
+            oModel.setProperty("/HasFacilityOfferDiscount", false);
+            oModel.setProperty("/HasValidFacilityOffer", false);
+            oModel.setProperty(
+                "/TotalFacilityPrice",
+                Number(
+                    aSelectedFacilities.reduce(function (sum, oItem) {
+                        return sum + (this._toNumber(oItem.TotalAmount));
+                    }.bind(this), 0).toFixed(2)
+                )
+            );
 
-                this._renderFacilityCards();
-                },
-            // Calculate discounts for PERSON_QTY facilities with valid minimum offer
-            // const aFacilityDiscounts = [];
-            // let fTotalDiscount = 0;
-            // let bHasValidFacilityOfferDiscount = false;
-            // let bHasValidFacilityOffer = false;
+            if (oFacilityModel) {
+                oFacilityModel.refresh(true);
+            }
 
-            // aSelectedFacilities.forEach(function (oFacility) {
-            //     // Check if this is a PERSON_QTY facility with valid minimum offer
-            //     const bIsValidOffer = oFacility.SelectionMode === "PERSON_QTY" &&
-            //         oFacility.MinimumQty > 0 &&
-            //         oFacility.MinimumPrice >= 0;
+            this._renderFacilityCards();
+        },
+        // Calculate discounts for PERSON_QTY facilities with valid minimum offer
+        // const aFacilityDiscounts = [];
+        // let fTotalDiscount = 0;
+        // let bHasValidFacilityOfferDiscount = false;
+        // let bHasValidFacilityOffer = false;
 
-            //     if (bIsValidOffer) {
-            //         bHasValidFacilityOffer = true;
+        // aSelectedFacilities.forEach(function (oFacility) {
+        //     // Check if this is a PERSON_QTY facility with valid minimum offer
+        //     const bIsValidOffer = oFacility.SelectionMode === "PERSON_QTY" &&
+        //         oFacility.MinimumQty > 0 &&
+        //         oFacility.MinimumPrice >= 0;
 
-            //         const iTotalQty = oFacility.PersonQuantities.reduce(function (iSum, oLine) {
-            //             return iSum + (oLine.qty || 0);
-            //         }, 0);
+        //     if (bIsValidOffer) {
+        //         bHasValidFacilityOffer = true;
 
-            //         if (iTotalQty > 0) {
-            //             // Calculate normal offer price: first MinimumQty units at Price
-            //             // The offer applies once for the entire booking regardless of charge type
-            //             const iMinQty = Math.min(iTotalQty, oFacility.MinimumQty);
-            //             const fNormalOfferPrice = iMinQty * oFacility.Price;
+        //         const iTotalQty = oFacility.PersonQuantities.reduce(function (iSum, oLine) {
+        //             return iSum + (oLine.qty || 0);
+        //         }, 0);
 
-            //             // Calculate discount amount (can be positive when MinimumPrice < normal price)
-            //             const fDiscountAmount = Math.max(fNormalOfferPrice - oFacility.MinimumPrice, 0);
+        //         if (iTotalQty > 0) {
+        //             // Calculate normal offer price: first MinimumQty units at Price
+        //             // The offer applies once for the entire booking regardless of charge type
+        //             const iMinQty = Math.min(iTotalQty, oFacility.MinimumQty);
+        //             const fNormalOfferPrice = iMinQty * oFacility.Price;
 
-            //             if (fDiscountAmount > 0 || oFacility.MinimumPrice === 0) {
-            //                 // Discount is calculated once for the entire booking
-            //                 // NOT multiplied by days even for DAILY charge type
-            //                 const fAdjustedDiscount = fDiscountAmount;
+        //             // Calculate discount amount (can be positive when MinimumPrice < normal price)
+        //             const fDiscountAmount = Math.max(fNormalOfferPrice - oFacility.MinimumPrice, 0);
 
-            //                 // Create discount entry even if discount amount is 0 (for MinimumPrice = 0 case)
-            //                 // This ensures we track that there's a valid offer
-            //                 aFacilityDiscounts.push({
-            //                     FacilityName: oFacility.FacilityName,
-            //                     MinimumQty: oFacility.MinimumQty,
-            //                     MinimumPrice: oFacility.MinimumPrice,
-            //                     DiscountAmount: Number(fAdjustedDiscount.toFixed(2)),
-            //                     DisplayText: "Offer Discount - " + oFacility.FacilityName + ": first " +
-            //                         oFacility.MinimumQty + " units at ₹" + oFacility.MinimumPrice.toFixed(0) +
-            //                         " (applied once per booking)",
-            //                     HasDiscount: fAdjustedDiscount > 0
-            //                 });
+        //             if (fDiscountAmount > 0 || oFacility.MinimumPrice === 0) {
+        //                 // Discount is calculated once for the entire booking
+        //                 // NOT multiplied by days even for DAILY charge type
+        //                 const fAdjustedDiscount = fDiscountAmount;
 
-            //                 fTotalDiscount += fAdjustedDiscount;
-            //                 if (fAdjustedDiscount > 0) {
-            //                     bHasValidFacilityOfferDiscount = true;
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }.bind(this));
+        //                 // Create discount entry even if discount amount is 0 (for MinimumPrice = 0 case)
+        //                 // This ensures we track that there's a valid offer
+        //                 aFacilityDiscounts.push({
+        //                     FacilityName: oFacility.FacilityName,
+        //                     MinimumQty: oFacility.MinimumQty,
+        //                     MinimumPrice: oFacility.MinimumPrice,
+        //                     DiscountAmount: Number(fAdjustedDiscount.toFixed(2)),
+        //                     DisplayText: "Offer Discount - " + oFacility.FacilityName + ": first " +
+        //                         oFacility.MinimumQty + " units at ₹" + oFacility.MinimumPrice.toFixed(0) +
+        //                         " (applied once per booking)",
+        //                     HasDiscount: fAdjustedDiscount > 0
+        //                 });
 
-            // oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
-            // oModel.setProperty("/FacilityDiscounts", aFacilityDiscounts);
-            // oModel.setProperty("/TotalFacilityDiscount", Number(fTotalDiscount.toFixed(2)));
-            // oModel.setProperty("/HasFacilityOfferDiscount", bHasValidFacilityOfferDiscount);
-            // oModel.setProperty("/HasValidFacilityOffer", bHasValidFacilityOffer);
+        //                 fTotalDiscount += fAdjustedDiscount;
+        //                 if (fAdjustedDiscount > 0) {
+        //                     bHasValidFacilityOfferDiscount = true;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }.bind(this));
 
-            // // Attach hover for discount info icon if needed
-            // if (bHasValidFacilityOffer) {
-            //     setTimeout(function () {
-            //         this._attachFacilityDiscountInfoHover();
-            //     }.bind(this), 100);
-            // }
-            // oModel.setProperty(
-            //     "/TotalFacilityPrice",
-            //     Number(
-            //         aSelectedFacilities.reduce(function (sum, oItem) {
-            //             return sum + (this._toNumber(oItem.TotalAmount));
-            //         }.bind(this), 0).toFixed(2)
-            //     )
-            // );
+        // oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
+        // oModel.setProperty("/FacilityDiscounts", aFacilityDiscounts);
+        // oModel.setProperty("/TotalFacilityDiscount", Number(fTotalDiscount.toFixed(2)));
+        // oModel.setProperty("/HasFacilityOfferDiscount", bHasValidFacilityOfferDiscount);
+        // oModel.setProperty("/HasValidFacilityOffer", bHasValidFacilityOffer);
+
+        // // Attach hover for discount info icon if needed
+        // if (bHasValidFacilityOffer) {
+        //     setTimeout(function () {
+        //         this._attachFacilityDiscountInfoHover();
+        //     }.bind(this), 100);
+        // }
+        // oModel.setProperty(
+        //     "/TotalFacilityPrice",
+        //     Number(
+        //         aSelectedFacilities.reduce(function (sum, oItem) {
+        //             return sum + (this._toNumber(oItem.TotalAmount));
+        //         }.bind(this), 0).toFixed(2)
+        //     )
+        // );
         // },
 
 
@@ -2891,7 +2891,7 @@
 
             // Check if member data is already loaded
             if (this._bMemberDataLoaded === true) {
-            // Data is ready, proceed immediately
+                // Data is ready, proceed immediately
                 this._loadMasterMembersForDialog();
                 const oDialog = await this._getMemberSelectionDialog();
                 oDialog.open();
@@ -6206,7 +6206,7 @@
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),
-                    Deposit:oHostelModel.getProperty("/Deposit") || 0,
+                    Deposit: oHostelModel.getProperty("/Deposit") || 0,
                     // PaymentDetails: [this._getPaymentPayloadDetails()]
                     PaymentDetails: (this.getView().getModel("PaymentModel").getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn" ? [] : [this._getPaymentPayloadDetails()]
                 }]
@@ -6439,7 +6439,7 @@
             }
         },
 
-         onGeneratePDF: async function (data) {
+        onGeneratePDF: async function (data) {
             const booking = data.Booking?.[0] || {};
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
@@ -6452,9 +6452,9 @@
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4",
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4",
             });
 
             const currency = (booking.Currency || "INR").trim();
@@ -6466,12 +6466,12 @@
             const BORDER_LIGHT = [230, 230, 230];
 
             const checkNewPage = (requiredSpace = 20) => {
-            if (currentY + requiredSpace > 280) {
-                doc.addPage();
-                currentY = 20;
-                return true;
-            }
-            return false;
+                if (currentY + requiredSpace > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                    return true;
+                }
+                return false;
             };
 
             // ========== HEADER SECTION ==========
@@ -6496,7 +6496,7 @@
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
             doc.text(
-            `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15,);
+                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15,);
 
             currentY = 40;
 
@@ -6525,16 +6525,16 @@
             doc.text(`Email: ${company.EmailID || ""}`, 20, contactY + 5);
 
             if (company.GeoLocation) {
-            doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-            doc.textWithLink("View Property on Map", 20, contactY + 10, {
-                url: company.GeoLocation,
-            });
+                doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
+                doc.textWithLink("View Property on Map", 20, contactY + 10, {
+                    url: company.GeoLocation,
+                });
             }
 
             currentY += 55;
 
             // ================= GUEST & STAY =================
-            checkNewPage(45); 
+            checkNewPage(45);
 
             var Memberdata = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
             let guestBody = [];
@@ -6590,7 +6590,7 @@
             doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
             doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
             doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-            
+
             // Colored Side Bar Accent
             doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
@@ -6608,7 +6608,7 @@
             let row2Offset = 34;
 
             // Calculate dynamic container boundary height based on the final row offset
-            let stayCardHeight = row2Offset + 8; 
+            let stayCardHeight = row2Offset + 8;
 
             // Render background structure with calculated dynamic heights
             doc.setFillColor(...LIGHT_GRAY);
@@ -6669,17 +6669,44 @@
 
                 currentY += 8;
 
-                let tableBody = facilities.map((item, index) => [
-                    (index + 1).toString(),
-                    item.FacilityName || "-",
-                    `${Formatter.formatDate(item.StartDate) || "-"}`,
-                    `${Formatter.formatDate(item.EndDate) || "-"}`,
-                    `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
-                     item.UnitText === "Unit Price"
-                        ? `${item.UnitText} (${item.Quantity || 1} Qty)`
-                        : (item.UnitText || "-"),
-                    `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`,
-                ]);
+                let tableBody = facilities.map((item, index) => {
+
+                    let sUnitText = item.UnitText || "-";
+
+                    if (item.StartDate && item.EndDate) {
+                        const startDate = new Date(item.StartDate);
+                        const endDate = new Date(item.EndDate);
+
+                        // Difference in days (inclusive)
+                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                            sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
+                        } else if (sUnitText === "Per Day") {
+                            sUnitText = `${sUnitText}\n(${diffDays} Days)`;
+                        } else if (sUnitText === "Per Month") {
+                            const months =
+                                (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                                (endDate.getMonth() - startDate.getMonth());
+
+                            sUnitText = `${sUnitText}\n(${months} Month${months > 1 ? "s" : ""})`;
+                        } else if (sUnitText === "Per Year") {
+                            const years = endDate.getFullYear() - startDate.getFullYear();
+
+                            sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
+                        }
+                    }
+
+                    return [
+                        (index + 1).toString(),
+                        item.FacilityName || "-",
+                        Formatter.formatDate(item.StartDate) || "-",
+                        Formatter.formatDate(item.EndDate) || "-",
+                        Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
+                        sUnitText,
+                        Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)
+                    ];
+                });
 
                 doc.autoTable({
                     startY: currentY,
@@ -6703,12 +6730,12 @@
                         halign: "center",
                     },
                     columnStyles: {
-                        0: { cellWidth: 12, halign: "center" },
+                        0: { cellWidth: 14, halign: "center" },
                         1: { cellWidth: "auto", halign: "left" },
                         2: { cellWidth: 24, halign: "center" },
                         3: { cellWidth: 24, halign: "center" },
                         4: { cellWidth: 24, halign: "right" },
-                        5: { cellWidth: 18, halign: "center" },
+                        5: { cellWidth: 20, halign: "center" },
                         6: { cellWidth: 28, halign: "right" },
                     },
                 });
@@ -6770,12 +6797,16 @@
 
             addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
 
-             // Render Facility Total row line only if there's actual value or entries
+            // Render Facility Total row line only if there's actual value or entries
             if (facilityTotal > 0 || facilities.length > 0) {
                 addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
             }
 
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
+
+            if (discount > 0) {
+                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+            }
 
             if (hasCGST) {
                 const cgst = parseFloat(oHostelModel.CGST) || 0;
@@ -6787,9 +6818,7 @@
                 addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
             }
 
-            if (discount > 0) {
-                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-            }
+
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
@@ -6803,8 +6832,8 @@
 
             // ========== AMOUNT IN WORDS ==========
             if (currentY + 25 > 280) {
-            doc.addPage();
-            currentY = 20;
+                doc.addPage();
+                currentY = 20;
             }
 
             doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
@@ -6821,8 +6850,8 @@
             doc.setTextColor(80, 80, 80);
             const words = await this.convertNumberToWords(grandTotal, currency);
             const wrappedWords = doc.splitTextToSize(
-            words || "Zero Rupees Only",
-            160,
+                words || "Zero Rupees Only",
+                160,
             );
             doc.text(wrappedWords, 20, currentY + 15);
 
@@ -6830,8 +6859,8 @@
 
             // ========== IMPORTANT INFORMATION ==========
             if (currentY + 45 > 280) {
-            doc.addPage();
-            currentY = 20;
+                doc.addPage();
+                currentY = 20;
             }
 
             doc.setFillColor(255, 250, 240);
@@ -6848,24 +6877,24 @@
             doc.setTextColor(100, 100, 100);
 
             const infoItems = [
-            "• Valid government ID required at check-in (Passport, Driver's License, etc.)",
-            "• GST invoice available at the property upon request",
-            `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
-            "• Early check-in/late check-out subject to availability",
+                "• Valid government ID required at check-in (Passport, Driver's License, etc.)",
+                "• GST invoice available at the property upon request",
+                `• Check-in: ${checkinTime} | Check-out: ${checkoutTime}`,
+                "• Early check-in/late check-out subject to availability",
             ];
 
             let infoY = currentY + 16;
             infoItems.forEach((item) => {
-            doc.text(item, 20, infoY);
-            infoY += 5;
+                doc.text(item, 20, infoY);
+                infoY += 5;
             });
 
             currentY += 48;
 
             // ========== FOOTER ==========
             if (currentY + 15 > 280) {
-            doc.addPage();
-            currentY = 20;
+                doc.addPage();
+                currentY = 20;
             }
 
             doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
@@ -6876,14 +6905,14 @@
             doc.setFontSize(8);
             doc.setTextColor(120, 120, 120);
             doc.text(
-            "Thank you for choosing us! We look forward to hosting you.",
-            15,
-            currentY + 5,
+                "Thank you for choosing us! We look forward to hosting you.",
+                15,
+                currentY + 5,
             );
 
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.text("Premium Hospitality Experience", 195, currentY + 5, {
-            align: "right",
+                align: "right",
             });
 
             // ✅ RETURN BASE64 (IMPORTANT CHANGE)
@@ -7016,73 +7045,73 @@
         onchangeConpanyAddress: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent)
         },
-      
-
-       BV_onOpenVH: async function () {
-    var oHostelModel = this.getView().getModel("HostelModel");
-
-    var BranchCode = oHostelModel.getProperty("/BranchCode");
-
-      var bookingStartDate =new Date();
-
-   
- 
-
-     bookingStartDate.setHours(0, 0, 0, 0);
-
-  
-
-    if (!this.SC_Dialog) {
-        this.SC_Dialog = sap.ui.xmlfragment(
-            "sap.ui.com.project1.fragment.ShowCoupon",
-            this
-        );
-        this.getView().addDependent(this.SC_Dialog);
-    }
-
-    this.getBusyDialog();
-
-    const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
-        Status: "Active",
-        BranchCode: BranchCode
-    });
-
-    this.closeBusyDialog();
-
-    // Show only coupons valid for the selected booking dates
-var aFilteredCoupons = oResponse.data.filter(function (coupon) {
-
-    var couponStart = new Date(coupon.StartDate);
-    var couponEnd = new Date(coupon.EndDate);
 
 
-    couponStart.setHours(0, 0, 0, 0);
-    couponEnd.setHours(23, 59, 59, 999);
+        BV_onOpenVH: async function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
 
-    return bookingStartDate >= couponStart &&
-           bookingStartDate <= couponEnd;
+            var BranchCode = oHostelModel.getProperty("/BranchCode");
 
-}.bind(this));
+            var bookingStartDate = new Date();
 
-    this.getView().setModel(
-        new sap.ui.model.json.JSONModel(aFilteredCoupons),
-        "ShowCouponDetails"
-    );
 
-    this.SC_Dialog.open();
-},
+
+
+            bookingStartDate.setHours(0, 0, 0, 0);
+
+
+
+            if (!this.SC_Dialog) {
+                this.SC_Dialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.ShowCoupon",
+                    this
+                );
+                this.getView().addDependent(this.SC_Dialog);
+            }
+
+            this.getBusyDialog();
+
+            const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+                Status: "Active",
+                BranchCode: BranchCode
+            });
+
+            this.closeBusyDialog();
+
+            // Show only coupons valid for the selected booking dates
+            var aFilteredCoupons = oResponse.data.filter(function (coupon) {
+
+                var couponStart = new Date(coupon.StartDate);
+                var couponEnd = new Date(coupon.EndDate);
+
+
+                couponStart.setHours(0, 0, 0, 0);
+                couponEnd.setHours(23, 59, 59, 999);
+
+                return bookingStartDate >= couponStart &&
+                    bookingStartDate <= couponEnd;
+
+            }.bind(this));
+
+            this.getView().setModel(
+                new sap.ui.model.json.JSONModel(aFilteredCoupons),
+                "ShowCouponDetails"
+            );
+
+            this.SC_Dialog.open();
+        },
         SC_onVHDPick: function (oEvent) {
-    var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
+            var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
 
-    this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
+            this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
 
-    this.SC_Dialog.close();
+            this.SC_Dialog.close();
 
-    this._resetCouponState(true);
-    this.onApplyCoupon();
-},
-        SC_onVHDClose:function(){
-              this.SC_Dialog.close();
+            this._resetCouponState(true);
+            this.onApplyCoupon();
+        },
+        SC_onVHDClose: function () {
+            this.SC_Dialog.close();
         }
 
 

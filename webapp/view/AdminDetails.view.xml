@@ -1321,14 +1321,14 @@
                     />
                     <!-- Refund Amount -->
                     <Button
-                        text="Set GST"
+                        text="ADD Customer GST"
                         id="idGST"
                         tooltip="GST Setup"
                         press="onGSTBooking"
                         visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin' || ${LoginModel>/Role} === 'Front Office Employee') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
                         class="myUnifiedBtn"
-                    />
+                    />  
                     <Button
                         text="{i18n>MSedit}"
                         id="idedit"

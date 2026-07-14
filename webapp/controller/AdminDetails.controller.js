@@ -576,6 +576,15 @@ sap.ui.define([
                     Documents: Documents
                 };
                 oCustomerData.Documents = oData.Documents
+                this._originalDocuments = JSON.parse(
+    JSON.stringify(oData.Documents || [])
+);
+
+                     this._originalFacilityItems=JSON.parse(
+    JSON.stringify(oCustomer.FacilityItems  || [])
+); 
+
+
 
                 let sDate = this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.BookingDate || "");
 
@@ -1728,31 +1737,68 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
                 return;
             }
-            if (oPayload.UnitText === "Package Price") {
-                const newStart = this._parseDate(oPayload.StartDate);
-                const newEnd = this._parseDate(oPayload.EndDate);
+         // EDIT
+if (oPayload.UnitText === "Package Price" && this.edit === false) {
 
-                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+    const newStart = this._parseDate(oPayload.StartDate);
+    const newEnd = this._parseDate(oPayload.EndDate);
 
-                    // Only check for SAME member
-                    if (item.MemberName !== oPayload.MemberName) {
-                        return false;
-                    }
+    const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
 
-                    const oldStart = this._parseDate(item.StartDate);
-                    const oldEnd = this._parseDate(item.EndDate);
+        // Skip current edited record
+        if (index === this._editIndex) {
+            return false;
+        }
 
-                    // Block ONLY if dates overlap
-                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityChargeType === "DAILY" && item.FacilityName === oPayload.FacilityName;
+        if (item.MemberName !== oPayload.MemberName) {
+            return false;
+        }
 
-                    return isOverlap;
-                });
+        const oldStart = this._parseDate(item.StartDate);
+        const oldEnd = this._parseDate(item.EndDate);
 
-                if (oDuplicatedates) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-                    return;
-                }
-            }
+        return (
+            newStart <= oldEnd &&
+            newEnd >= oldStart &&
+            item.FacilityChargeType === "DAILY" &&
+            item.FacilityName === oPayload.FacilityName
+        );
+    });
+
+    if (oDuplicatedates) {
+        sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+        return;
+    }
+}
+
+// ADD
+if (oPayload.UnitText === "Package Price" && this.edit === true) {
+
+    const newStart = this._parseDate(oPayload.StartDate);
+    const newEnd = this._parseDate(oPayload.EndDate);
+
+    const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+        if (item.MemberName !== oPayload.MemberName) {
+            return false;
+        }
+
+        const oldStart = this._parseDate(item.StartDate);
+        const oldEnd = this._parseDate(item.EndDate);
+
+        return (
+            newStart <= oldEnd &&
+            newEnd >= oldStart &&
+            item.FacilityChargeType === "DAILY" &&
+            item.FacilityName === oPayload.FacilityName
+        );
+    });
+
+    if (oDuplicatedates) {
+        sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+        return;
+    }
+}
 
                     if(!oPayload.MemberName && this.edit===true){
                        const newStart = this._parseDate(oPayload.StartDate);
@@ -2579,7 +2625,7 @@ sap.ui.define([
             if (oSelectedData.UnitText === "Per Month" || oSelectedData.UnitText === "Per Year") {
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
 
-            } else {
+            } else if(oSelectedData.FacilityChargeType !== "Entire Booking") {
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
             }
 
@@ -3862,6 +3908,73 @@ sap.ui.define([
             var oFacilitiesModel = this.getView().getModel("Facilities");
             var aFacilities = oFacilitiesModel.getData();
 
+
+            let editedSections = [];
+
+/* ============================
+   Booking Information
+=============================*/
+if (
+    CustomerData.StartDate !== Bookingdata.StartDate ||
+    CustomerData.EndDate !== Bookingdata.EndDate ||
+    CustomerData.BedType !== Bookingdata.BedTypeName
+) {
+    editedSections.push("Booking Information");
+}
+
+/* ============================
+   Personal Information
+=============================*/
+if (
+    CustomerData.CustomerName !== Bookingdata.CustomerName ||
+    CustomerData.MobileNo !== Bookingdata.MobileNo ||
+    CustomerData.CustomerEmail !== Bookingdata.CustomerEmail ||
+    CustomerData.Gender !== Bookingdata.Gender ||
+    CustomerData.DateOfBirth !== Bookingdata.DateOfBirth ||
+    CustomerData.Country !== Bookingdata.Country ||
+    CustomerData.State !== Bookingdata.State ||
+    CustomerData.City !== Bookingdata.City ||
+    CustomerData.Address !== Bookingdata.Address
+) {
+    editedSections.push("Personal Information");
+}
+
+/* ============================
+   Customer Documents
+=============================*/
+if (
+    JSON.stringify(this._originalDocuments || []) !==
+    JSON.stringify(CustomerData.Documents || [])
+) {
+    editedSections.push("Documents");
+}
+
+
+
+/* ============================
+   Facility Details
+=============================*/
+
+// const normalizeFacilities = (facilities, isCurrent = true) => {
+//     return (facilities || [])
+//         .map(item => ({
+//             FacilityID: item.FacilityID,
+//             FacilityName: item.FacilityName,
+//             UnitText: item.UnitText,
+//             FacilitiPrice: parseFloat(isCurrent ? item.Price : item.FacilitiPrice) || 0
+//         }))
+//         .sort((a, b) => a.FacilityID.localeCompare(b.FacilityID));
+// };
+
+// const currentFacilities = normalizeFacilities(CustomerData.AllSelectedFacilities, true);
+// const originalFacilities = normalizeFacilities(this._originalFacilityItems, false);
+
+// if (JSON.stringify(currentFacilities) !== JSON.stringify(originalFacilities)) {
+//     editedSections.push("Facility Details");
+// }
+
+// Add to payload
+
             const oHostelModel = this.getView().getModel("HostelModel");
 
             const oInput = this.byId("CD_ID_idPhone")
@@ -4398,6 +4511,8 @@ sap.ui.define([
                 return item.MemberID;
             });
 
+
+
             var Payload = {
                 "CustomerName": Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
@@ -4416,6 +4531,7 @@ sap.ui.define([
                 "PropertySTD": CustomerData.PropertySTD,
                 "PropertyMobileNo": CustomerData.PropertyMobileNo,
                 "PropertyEmail": CustomerData.PropertyEmail,
+                    "EditedSections": editedSections,  
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
                     "RentPrice": CustomerData.GrandTotal,

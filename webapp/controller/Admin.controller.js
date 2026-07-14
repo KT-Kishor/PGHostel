@@ -456,7 +456,7 @@ sap.ui.define([
             oStartDate.setHours(0, 0, 0, 0);
             oToday.setHours(0, 0, 0, 0);
 
-            if (oStartDate.getTime() !== oToday.getTime() && this.data.Status !== "Confirmed") {
+            if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
                 sap.m.MessageToast.show("Room can be assigned only on start date");
                 return;
             }
@@ -864,7 +864,7 @@ sap.ui.define([
                         title: "Confirm Navigation",
                         icon: sap.m.MessageBox.Icon.INFORMATION,
                         actions: [
-                            // sap.m.MessageBox.Action.OK,
+                            sap.m.MessageBox.Action.OK,
                             sap.m.MessageBox.Action.CANCEL,
                         ],
 
@@ -1124,10 +1124,26 @@ sap.ui.define([
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.byId("PO_id_Date").setValue("");
         },
+onPaymentModeChange: function (oEvent) {
+    var oComboBox = oEvent.getSource();
+    utils._LCstrictValidationComboBox(oComboBox, "ID");
 
-        onPaymentModeChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-        },
+    var sPaymentMode = oComboBox.getSelectedKey();
+
+    if (sPaymentMode === "Cash") {
+        var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+
+        this.getView().getModel("HostelModel").setProperty(
+            "/TransactionID",
+            oLoginData.EmployeeName
+        );
+        sap.ui.getCore().byId("id_TransactionID").setEditable(false)
+    } else {
+        this.getView().getModel("HostelModel").setProperty("/TransactionID", "");
+        sap.ui.getCore().byId("id_TransactionID").setEditable(true)
+
+    }
+},
         onRoomNoChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },

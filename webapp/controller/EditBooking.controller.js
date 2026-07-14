@@ -4047,17 +4047,44 @@ sap.ui.define([
 
                 currentY += 8;
 
-                let tableBody = facilities.map((item, index) => [
-                    (index + 1).toString(),
-                    item.FacilityName || "-",
-                    `${Formatter.formatDate(item.StartDate) || "-"}`,
-                    `${Formatter.formatDate(item.EndDate) || "-"}`,
-                    `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)}`,
-                      item.UnitText === "Unit Price"
-                        ? `${item.UnitText} (${item.Quantity || 1} Qty)`
-                        : (item.UnitText || "-"),
-                     `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)}`
-                ]);
+                let tableBody = facilities.map((item, index) => {
+
+                    let sUnitText = item.UnitText || "-";
+
+                    if (item.StartDate && item.EndDate) {
+                        const startDate = new Date(item.StartDate);
+                        const endDate = new Date(item.EndDate);
+
+                        // Difference in days (inclusive)
+                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                            sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
+                        } else if (sUnitText === "Per Day") {
+                            sUnitText = `${sUnitText} (${diffDays} Days)`;
+                        } else if (sUnitText === "Per Month") {
+                            const months =
+                                (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                                (endDate.getMonth() - startDate.getMonth());
+
+                            sUnitText = `${sUnitText}\n(${months} Month${months > 1 ? "s" : ""})`;
+                        } else if (sUnitText === "Per Year") {
+                            const years = endDate.getFullYear() - startDate.getFullYear();
+
+                            sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
+                        }
+                    }
+
+                    return [
+                        (index + 1).toString(),
+                        item.FacilityName || "-",
+                        Formatter.formatDate(item.StartDate) || "-",
+                        Formatter.formatDate(item.EndDate) || "-",
+                        Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
+                        sUnitText,
+                        Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)
+                    ];
+                });
 
                 doc.autoTable({
                     startY: currentY,
@@ -4081,12 +4108,12 @@ sap.ui.define([
                         halign: "center"
                     },
                     columnStyles: {
-                        0: { cellWidth: 12, halign: "center" },
+                        0: { cellWidth: 14, halign: "center" },
                         1: { cellWidth: 'auto', halign: "left" },
                         2: { cellWidth: 24, halign: "center" },
                         3: { cellWidth: 24, halign: "center" },
                         4: { cellWidth: 24, halign: "right" },
-                        5: { cellWidth: 18, halign: "center" },
+                        5: { cellWidth: 20, halign: "center" },
                         6: { cellWidth: 28, halign: "right" }
                     }
                 });
@@ -4154,6 +4181,10 @@ sap.ui.define([
 
             addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
 
+             if (discount > 0) {
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
+            }
+
             if (hasCGST) {
                 const cgst = parseFloat(oHostelModel.CGST) || 0;
                 const sgst = parseFloat(oHostelModel.SGST) || 0;
@@ -4164,9 +4195,7 @@ sap.ui.define([
                 addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
             }
 
-            if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
-            }
+           
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
