@@ -14,6 +14,12 @@ sap.ui.define([
 
             this.getOwnerComponent().getRouter().getRoute("RouteEditBooking").attachMatched(this._onEditRouteMatched, this);
 
+            // Hide the home button from the shared BookingHeader fragment for this page only
+            var oHomeBtn = this.byId("headerHomeBtn");
+            if (oHomeBtn) {
+                oHomeBtn.setVisible(false);
+            }
+
             this._iFacilityStartIndex = 0;
             this._iFacilityPageSize = 3; // fallback; recalculated dynamically
             this._iFacilityCardWidth = 250;

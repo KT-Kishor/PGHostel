@@ -17,6 +17,7 @@
         </contentLeft>
         <contentRight>
             <Button
+                id="headerHomeBtn"
                 icon="sap-icon://home"
                 press="onHome"
             />

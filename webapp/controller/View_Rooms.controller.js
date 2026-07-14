@@ -41,6 +41,24 @@ sap.ui.define([
             // }
             // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
 
+            // Restore login state on entry so the booking flow does not
+            // prompt for login when localStorage / UIModel briefly disagree.
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const oCoreLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oLoggedUser = oCoreLoginModel?.getData?.() || {};
+            const bLoggedIn =
+                localStorage.getItem("isLoggedIn") === "true" ||
+                !!(oLoggedUser.UserID || oLoggedUser.EmployeeID);
+
+            if (bLoggedIn) {
+                if (oUIModel) {
+                    oUIModel.setProperty("/isLoggedIn", true);
+                }
+                if (localStorage.getItem("isLoggedIn") !== "true") {
+                    localStorage.setItem("isLoggedIn", "true");
+                }
+            }
+
             // Clear the HostelModel when returning to this view
             const oHostelModel = this.getView().getModel("HostelModel");
             if (oHostelModel) {
@@ -2033,16 +2051,55 @@ sap.ui.define([
             }
         },
 
+        /**
+         * R    esilient login check for the booking flow.
+         *
+         * Login state lives in three places that can briefly fall out of sync:
+         *   - UIModel > /isLoggedIn  (component-level, stable across views)
+         *   - localStorage.isLoggedIn (can be transiently cleared by the
+         *     cross-tab storage sync in Component.js or the inactivity timer)
+         *   - core LoginModel > /UserID (populated after a successful login)
+         *
+         * If ANY source says the user is logged in, we treat them as logged in
+         * and re-sync the other sources so later checks stay consistent. This
+         * prevents the intermittent "please log in" prompt when localStorage is
+         * momentarily wiped by another tab.
+         */
+        _isUserLoggedIn: function () {
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oUser = oLoginModel?.getData?.() || {};
+
+            const bFromUIModel = oUIModel?.getProperty("/isLoggedIn") === true;
+            const bFromStorage = localStorage.getItem("isLoggedIn") === "true";
+            const bFromLoginModel = !!(oUser.UserID || oUser.EmployeeID);
+
+            const bLoggedIn = bFromUIModel || bFromStorage || bFromLoginModel;
+
+            // Re-sync sources so subsequent checks stay consistent.
+            if (bLoggedIn) {
+                if (oUIModel && !bFromUIModel) {
+                    oUIModel.setProperty("/isLoggedIn", true);
+                }
+                if (!bFromStorage) {
+                    localStorage.setItem("isLoggedIn", "true");
+                }
+            }
+
+            return bLoggedIn;
+        },
         onConfirmBooking: async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const bLoggedIn = localStorage.getItem("isLoggedIn");
-
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oUser = oLoginModel?.getData?.() || {};
 
             // -------------------------
-            // LOGIN CHECK
+            // LOGIN CHECK (resilient, multi-source)
+            // localStorage can be transiently cleared by cross-tab sync in
+            // Component.js, so never rely on a single source.
             // -------------------------
+            const bLoggedIn = this._isUserLoggedIn();
+
             if (!bLoggedIn) {
                 this._pendingBookingNav = true;
                 MessageBox.information(
