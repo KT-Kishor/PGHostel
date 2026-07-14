@@ -221,7 +221,7 @@
                             tooltip="{i18n>addDeposit}"
                             press="onPressEditDeposit"
                             class="myUnifiedBtn"
-                            
+                            visible="{= ${LoginModel>/Role} === 'Admin' || ${LoginModel>/Role} === 'Branch Manager' }"
                         />
                         <Button
                             text="{i18n>returnDeposit}"

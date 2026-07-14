@@ -49,27 +49,16 @@
                     />
 
                 <!-- Deposit Amount -->
-                <Label text="Deposit Amount"/>
+                <Label text="Deposit Amount" required="true"/>
                 <Input
                     id="depositAmount"
                     value="{DepositModel>DepositAmount}"
                     type="Number"
-                    placeholder="Enter Deposit Amount" editable="false"/>
+                    maxLength="10"
+                    placeholder="Enter Deposit Amount"/>
 
-                <!-- Return Date -->
-                <Label text="Return Date" required="true"/>
-                <DatePicker
-                    id="returnDate"
-                    visible="{=${DepositModel>Status} === 'Returned'}"
-                    change="onreturndate"
-                    value="{DepositModel>ReturnDepositDate}"
-                    displayFormat="dd/MM/yyyy"
-                    valueFormat="yyyy-MM-dd"
-                    valueStateText="Enter return date"
-                    />
-
-                <!-- Deposit Mode / Transaction ID -->
-                <Label text="Deposit Mode / Transaction ID" required="true"/>
+                <!-- Deposit Mode -->
+                <Label text="Deposit Mode" required="true"/>
                  <ComboBox
                     id="depositModeTxn"
                     selectedKey="{DepositModel>DepositMode}"
@@ -85,32 +74,47 @@
                         key="Cash"
                         text="Cash"
                     />
-                    <core:ListItem
-                        key="Card"
-                        text="Card"
-                    />
-                    
-                    </ComboBox>
-              
 
-                <!-- Taken By -->
+                    </ComboBox>
+                <Label text="Transaction ID"/>
+                <Input
+                    id="depositTransactionID"
+                    value="{DepositModel>DepositTransactionID}"
+                    placeholder="Enter Transaction ID"
+                    editable="{= ${DepositModel>DepositMode} === 'UPI' || ${DepositModel>DepositMode} === 'Card' }"/>
+
+
+                <!-- Received By -->
                 <Label text="Received By"/>
                 <Input
                     id="takenBy"
                     value="{DepositModel>DepositTakenBy}"
                     placeholder="Enter Staff Name" editable="false"/>
 
+                <!-- Return Date -->
+                <Label text="Return Date" required="true"/>
+                <DatePicker
+                    id="returnDate"
+                    visible="{=${DepositModel>Status} === 'Returned'}"
+                    change="onreturndate"
+                    value="{DepositModel>ReturnDepositDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    valueStateText="Enter return date"
+                    />
+
                 <!-- Return Amount -->
-                <Label text="Return Amount"/>
+                <Label text="Return Amount" required="true"/>
                 <Input
                 visible="{=${DepositModel>Status} === 'Returned'}"
                     id="returnAmount"
                     type="Number"
+                    maxLength="10"
                     value="{DepositModel>ReturnDepositAmount}"
-                    placeholder="Enter Return Amount" editable="false"/>
+                    placeholder="Enter Return Amount"/>
 
-                <!-- Return Mode / Transaction ID -->
-                <Label text="Return Mode / Transaction ID" required="true"/>
+                <!-- Return Mode -->
+                <Label text="Return Mode" required="true"/>
                 <ComboBox
                 visible="{=${DepositModel>Status} === 'Returned'}"
                     id="returnModeTxn"
@@ -126,12 +130,16 @@
                         key="Cash"
                         text="Cash"
                     />
-                    <core:ListItem
-                        key="Card"
-                        text="Card"
-                    />
-                    
+            
+
                     </ComboBox>
+                <Label text="Transaction ID"/>
+                <Input
+                    id="returnTransactionID"
+                    visible="{=${DepositModel>Status} === 'Returned'}"
+                    value="{DepositModel>ReturnDepositTransactionID}"
+                    placeholder="Enter Transaction ID"
+                    editable="{= ${DepositModel>ReturnDepositMode} === 'UPI' || ${DepositModel>ReturnDepositMode} === 'Card' }"/>
 
                 <!-- Return By -->
                 <Label text="Return By"/>

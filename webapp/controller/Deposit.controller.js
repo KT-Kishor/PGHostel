@@ -1175,8 +1175,15 @@ sap.ui.define([
         this.getView().addDependent(this._oDepositDialog);
     }
 
-    // Bind selected row to fragment
-    this._oDepositDialog.setBindingContext(oContext, "DepositModel");
+    // Bind a COPY of the selected row so edits don't mutate the table.
+    // The table must always reflect backend data until a successful save.
+    var oEditModel = new JSONModel(JSON.parse(JSON.stringify(oContext.getObject())));
+    this._oDepositDialog.setModel(oEditModel, "DepositModel");
+    this._oDepositDialog.bindElement({ path: "/", model: "DepositModel" });
+
+    // Reset cached transaction IDs for this edit session
+    this._depositTxnCache = "";
+    this._returnTxnCache = "";
 
     // Open dialog
     this._oDepositDialog.open();
@@ -1189,10 +1196,27 @@ utils._LCvalidateMandatoryField(oEvent)
 },
 onDepositmodeChange:function(oEvent){
 utils._LCstrictValidationComboBox(oEvent)
+var oInput = this.byId("depositTransactionID");
+if (oEvent.getSource().getSelectedKey() === "Cash") {
+    this._depositTxnCache = oInput.getValue();
+    oInput.setValue("");
+} else if (this._depositTxnCache) {
+    oInput.setValue(this._depositTxnCache);
+}
 },
 onreturnModechange:function(oEvent){
 utils._LCstrictValidationComboBox(oEvent)
+var oReturnInput = this.byId("returnTransactionID");
+if (oEvent.getSource().getSelectedKey() === "Cash") {
+    this._returnTxnCache = oReturnInput.getValue();
+    oReturnInput.setValue("");
+} else if (this._returnTxnCache) {
+    oReturnInput.setValue(this._returnTxnCache);
+}
 },
+
+
+
 onSaveDeposit: async function () {
 
    var oView = this.getView();
@@ -1207,36 +1231,113 @@ onSaveDeposit: async function () {
  
              
 
-    // Get selected row data
-    var oContext = oSelectedItem.getBindingContext("DepositModel");
-    var oDeposit = oContext.getObject();
+    // Get edited data from the dialog's local copy (NOT the table row).
+    // The table stays untouched until the backend save succeeds.
+    var oDeposit = this._oDepositDialog.getModel("DepositModel").getData();
      var sStatus = oDeposit.Status || "";
 
- const oDepositDate = this.byId("depositDate");
-const oReturnDate = this.byId("returnDate");
-const oDepositMode = this.byId("depositModeTxn");
-const oReturnMode = this.byId("returnModeTxn");
+    const oDepositDate = this.byId("depositDate");
+    const oDepositAmount = this.byId("depositAmount");
+    const oDepositMode = this.byId("depositModeTxn");
+    const oDepositTxn = this.byId("depositTransactionID");
+    const oReturnDate = this.byId("returnDate");
+    const oReturnAmount = this.byId("returnAmount");
+    const oReturnMode = this.byId("returnModeTxn");
+    const oReturnTxn = this.byId("returnTransactionID");
 
-let isModeValid = false;
+    const isReturned = sStatus === "Returned";
 
-if (sStatus === "Received") {
-    // Validate only deposit fields
-    isModeValid =
-        oDepositDate.getDateValue() &&
-        oDepositMode.getSelectedKey();
-} else {
-    // Validate all fields
-    isModeValid =
-        oDepositDate.getDateValue() &&
-        oReturnDate.getDateValue() &&
-        oDepositMode.getSelectedKey() &&
-        oReturnMode.getSelectedKey();
-}
+    let bValid = true;
 
-if (!isModeValid) {
-    MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-    return;
-}    
+    // Sequential validation in field order (value states + single generic toast)
+    // 1. Deposit Date
+    if (!oDepositDate.getDateValue()) {
+        oDepositDate.setValueState("Error");
+        oDepositDate.setValueStateText("Enter deposit date");
+        bValid = false;
+    } else {
+        oDepositDate.setValueState("None");
+    }
+
+    // 2. Deposit Amount - required, max 10 digits
+    const sDepositAmount = (oDepositAmount.getValue() || "").trim();
+    if (!sDepositAmount || parseFloat(sDepositAmount) <= 0) {
+        oDepositAmount.setValueState("Error");
+        oDepositAmount.setValueStateText("Enter deposit amount");
+        bValid = false;
+    } else if (sDepositAmount.length > 10) {
+        oDepositAmount.setValueState("Error");
+        oDepositAmount.setValueStateText("Deposit amount cannot exceed 10 digits");
+        bValid = false;
+    } else {
+        oDepositAmount.setValueState("None");
+    }
+
+    // 3. Deposit Mode
+    if (!oDepositMode.getSelectedKey()) {
+        oDepositMode.setValueState("Error");
+        oDepositMode.setValueStateText("Select deposit mode");
+        bValid = false;
+    } else {
+        oDepositMode.setValueState("None");
+    }
+
+    // 4. Deposit Transaction ID - required only for UPI
+    if (oDepositMode.getSelectedKey() === "UPI" && !(oDepositTxn.getValue() || "").trim()) {
+        oDepositTxn.setValueState("Error");
+        oDepositTxn.setValueStateText("Enter transaction ID");
+        bValid = false;
+    } else {
+        oDepositTxn.setValueState("None");
+    }
+
+    if (isReturned) {
+        // 5. Return Date
+        if (!oReturnDate.getDateValue()) {
+            oReturnDate.setValueState("Error");
+            oReturnDate.setValueStateText("Enter return date");
+            bValid = false;
+        } else {
+            oReturnDate.setValueState("None");
+        }
+
+        // 6. Return Amount - required, max 10 digits
+        const sReturnAmount = (oReturnAmount.getValue() || "").trim();
+        if (!sReturnAmount || parseFloat(sReturnAmount) <= 0) {
+            oReturnAmount.setValueState("Error");
+            oReturnAmount.setValueStateText("Enter return amount");
+            bValid = false;
+        } else if (sReturnAmount.length > 10) {
+            oReturnAmount.setValueState("Error");
+            oReturnAmount.setValueStateText("Return amount cannot exceed 10 digits");
+            bValid = false;
+        } else {
+            oReturnAmount.setValueState("None");
+        }
+
+        // 7. Return Mode
+        if (!oReturnMode.getSelectedKey()) {
+            oReturnMode.setValueState("Error");
+            oReturnMode.setValueStateText("Select return mode");
+            bValid = false;
+        } else {
+            oReturnMode.setValueState("None");
+        }
+
+        // 8. Return Transaction ID - required only for UPI
+        if (oReturnMode.getSelectedKey() === "UPI" && !(oReturnTxn.getValue() || "").trim()) {
+            oReturnTxn.setValueState("Error");
+            oReturnTxn.setValueStateText("Enter transaction ID");
+            bValid = false;
+        } else {
+            oReturnTxn.setValueState("None");
+        }
+    }
+
+    if (!bValid) {
+        MessageToast.show(this.i18nModel.getText("MSfillallfields"));
+        return;
+    }
 
     var sBookingID = oDeposit.BookingID;
 
@@ -1247,11 +1348,6 @@ if (!isModeValid) {
     // Validate required fields
     if (!oDeposit.CustomerName || oDeposit.CustomerName.trim() === "") {
         MessageToast.show("Customer name is required");
-        return;
-    }
-
-    if (!oDeposit.DepositAmount || parseFloat(oDeposit.DepositAmount) <= 0) {
-        MessageToast.show("Deposit amount must be greater than zero");
         return;
     }
 
@@ -1275,18 +1371,20 @@ if (!isModeValid) {
     // Build update payload
     const updateData = {
         BookingID: sBookingID,
-      
+
         DepositDate: depositDate,
-       
+        DepositAmount: oDeposit.DepositAmount || "",
+
         DepositMode: oDeposit.DepositMode || "",
         DepositTransactionID: oDeposit.DepositTransactionID || "",
-      
+
         ReturnDepositDate: returnDate,
-  
+        ReturnDepositAmount: oDeposit.ReturnDepositAmount || "",
+
         ReturnDepositMode: oDeposit.ReturnDepositMode || "",
         ReturnDepositTransactionID: oDeposit.ReturnDepositTransactionID || "",
-     
-      
+
+
     };
 
     this.getBusyDialog();

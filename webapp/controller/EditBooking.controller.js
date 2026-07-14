@@ -3772,26 +3772,25 @@ sap.ui.define([
             var oBookingView = this.getView().getModel("BookingView");
             var bEditModeEnabled = oBookingView && oBookingView.getProperty("/editModeEnabled");
 
-            if (bEditModeEnabled) {
-                MessageBox.warning(
-                    "Do you really want to go back? All saved changes will be lost",
-                    {
-                        actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
-                        emphasizedAction: MessageBox.Action.OK,
-                        styleClass: "myUnifiedBtn",
-                        onClose: function (sAction) {
-                            if (sAction !== MessageBox.Action.OK) {
-                                return;
-                            }
-                            this._resetBookingPageModels();
-                            this._navAfterEditBooking();
-                        }.bind(this)
-                    }
-                );
-            } else {
-                this._resetBookingPageModels();
-                this._navAfterEditBooking();
-            }
+            var sMessage = bEditModeEnabled
+                ? "Do you really want to go back? All saved changes will be lost"
+                : "Do you want to go back?";
+
+            MessageBox.warning(
+                sMessage,
+                {
+                    actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (sAction) {
+                        if (sAction !== MessageBox.Action.OK) {
+                            return;
+                        }
+                        this._resetBookingPageModels();
+                        this._navAfterEditBooking();
+                    }.bind(this)
+                }
+            );
         },
 
         _getDefaultFacilityData: function () {

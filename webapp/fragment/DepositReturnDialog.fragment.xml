@@ -102,10 +102,7 @@
                         key="UPI"
                         text="UPI"
                     />
-                    <core:Item
-                        key="CARD"
-                        text="CARD"
-                    />
+             
 
                 </ComboBox>
 
