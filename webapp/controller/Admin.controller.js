@@ -457,7 +457,7 @@ sap.ui.define([
             oToday.setHours(0, 0, 0, 0);
 
             if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
-                sap.m.MessageToast.show("Room can be assigned only on start date");
+                sap.m.MessageToast.show("Room can only be assigned on the booking start date");
                 return;
             }
 
@@ -1226,6 +1226,16 @@ onPaymentModeChange: function (oEvent) {
             {
                 label: "Bed Type",
                 property: "BedType",
+                type: "string"
+            },
+             {
+                label: "Coupon Code",
+                property: "CouponCode",
+                type: "string"
+            },
+             {
+                label: "Total Cost",
+                property: "RentPrice",
                 type: "string"
             },
             {

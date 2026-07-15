@@ -6685,7 +6685,7 @@
                         const endDate = new Date(item.EndDate);
 
                         // Difference in days (inclusive)
-                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
                         if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
@@ -6706,7 +6706,9 @@
 
                     return [
                         (index + 1).toString(),
-                        item.FacilityName || "-",
+                         item.MemberName
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),

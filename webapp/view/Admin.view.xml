@@ -220,6 +220,7 @@
 					<Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
+                        width="20%"
                     >
 						<Text
                             text="{i18n>contactInformation}"
@@ -269,6 +270,7 @@
                         press="AD_onPressEditDetails"
                     >
 						<cells>
+                        
 							<Text text="{HostelModel>CustomerName}" />
 							<Text text="{HostelModel>BookingID}" />
 							<Text text="{HostelModel>PaymentType}" />
@@ -296,7 +298,7 @@
     <Text text="{HostelModel>BedType}" />
 
     <HBox visible="{= !!${HostelModel>RoomNo} }">
-        <Label text="Room No:" />
+        <Text text="Room No:" />
         <Text text="{HostelModel>RoomNo}" />
     </HBox>
 </VBox>

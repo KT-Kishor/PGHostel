@@ -4062,7 +4062,7 @@ sap.ui.define([
                         const endDate = new Date(item.EndDate);
 
                         // Difference in days (inclusive)
-                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
                         if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
                             sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
@@ -4083,7 +4083,9 @@ sap.ui.define([
 
                     return [
                         (index + 1).toString(),
-                        item.FacilityName || "-",
+                         item.MemberName
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
@@ -5224,12 +5226,12 @@ sap.ui.define([
                 return;
             }
 
-            if (!this.SC_Dialog) {
-                this.SC_Dialog = sap.ui.xmlfragment(
+            if (!this.EC_Dialog) {
+                this.EC_Dialog = sap.ui.xmlfragment(
                     "sap.ui.com.project1.fragment.ShowCoupon",
                     this
                 );
-                this.getView().addDependent(this.SC_Dialog);
+                this.getView().addDependent(this.EC_Dialog);
             }
 
             this.getBusyDialog();
@@ -5261,20 +5263,20 @@ sap.ui.define([
                 "ShowCouponDetails"
             );
 
-            this.SC_Dialog.open();
+            this.EC_Dialog.open();
         },
         SC_onVHDPick: function (oEvent) {
             var oSelectedData = oEvent.getSource().getBindingContext("ShowCouponDetails").getObject();
 
             this.getView().getModel("HostelModel").setProperty("/CouponCode", oSelectedData.CouponCode);
 
-            this.SC_Dialog.close();
+            this.EC_Dialog.close();
 
             this._resetCouponState(true);
             this.onApplyCoupon();
         },
         SC_onVHDClose: function () {
-            this.SC_Dialog.close();
+            this.EC_Dialog.close();
         }
     });
 });

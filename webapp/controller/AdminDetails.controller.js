@@ -7839,7 +7839,7 @@ sap.ui.define([
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
                         if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
-                            sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
+                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
                         } else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
@@ -7853,11 +7853,17 @@ sap.ui.define([
 
                             sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
                         }
+                        else if (sUnitText === "Per Hour") {
+
+                            sUnitText = `${sUnitText}\n(${item.TotalHour} Hour${Number(item.TotalHour) > 1 ? "s" : ""})`;
+                        }
                     }
 
                     return [
                         (index + 1).toString(),
-                        item.FacilityName || "-",
+                        item.MemberName
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            : (item.FacilityName || "-"),
                         item.StartDate,
                         item.EndDate,
                         Formatter.fromatNumber(

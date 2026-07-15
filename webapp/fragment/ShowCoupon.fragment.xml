@@ -10,7 +10,6 @@
         <content>
             <Table
             sticky="ColumnHeaders"
-                id="SC_id_VHDTable"
                 noDataText="{i18n>noCouponsAvailable}"
                 class="couponTitle"
                 items="{ShowCouponDetails>/}"
