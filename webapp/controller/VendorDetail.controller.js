@@ -528,8 +528,8 @@ sap.ui.define([
                     actions: [sap.m.MessageBox.Action.OK],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
                     styleClass: "myUnifiedBtn",
-                    onClose: function () {
-                        window.location.reload();
+                    onClose: () => {
+                        this.CommonLogoutFunction();
                     }
                 });
                 return true;
