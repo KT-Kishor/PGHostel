@@ -782,7 +782,9 @@ sap.ui.define([
                 // Call API with proper structure
                 const apiPayload = {
                     filters: {
-                        DepositID: oDeposit.DepositID
+                        DepositID: oDeposit.DepositID,
+                               flag:"false"
+
                     },
                     data: updateData
                 };
@@ -1393,7 +1395,8 @@ onSaveDeposit: async function () {
 
         const apiPayload = {
             filters: {
-                BookingID: sBookingID
+                BookingID: sBookingID,
+                flag:"true"
             },
             data: updateData
         };
