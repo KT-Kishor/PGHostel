@@ -4,16 +4,135 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
     "../utils/validation",
-], function (BaseController, MessageBox, MessageToast, JSONModel, utils) {
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+], function (BaseController, MessageBox, MessageToast, JSONModel, utils, Filter, FilterOperator) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.Document",
         {
             onInit: function () {
                 this.getOwnerComponent().getRouter().getRoute("RouteUploadDocs").attachMatched(this._onRouteMatched, this);
+                this.initializeLoginModel();
+
+                var oLoginViewModel = new JSONModel({
+                    showOTPField: false,
+                    isOtpEntered: false,
+                    canResendOTP: true,
+                    otpTimer: 0,
+                    otpButtonText: "Send OTP"
+                });
+                this.getView().setModel(oLoginViewModel, "LoginViewModel");
             },
 
             _onRouteMatched: async function (oEvent) {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
+                let oArgs;
+                if (oEvent && typeof oEvent.getParameter === "function") {
+                    oArgs = oEvent.getParameter("arguments") || {};
+                    this._pendingDocumentArgs = oArgs;
+                } else if (this._pendingDocumentArgs) {
+                    oArgs = this._pendingDocumentArgs;
+                } else {
+                    return;
+                }
+
+                const sEncodedCustomerID = oArgs.EncodedCustomerID;
+                const sMemberID = oArgs.MemberID;
+                const sDecodedCustomerID = this._decodeRoutePart(sEncodedCustomerID);
+                const sDecodedMemberID = this._decodeRoutePart(sMemberID);
+
+                if (!sDecodedCustomerID || !sDecodedMemberID) {
+                    return this._goToNotFound();
+                }
+
+                this._decodedCustomerID = sDecodedCustomerID;
+                this._decodedMemberID = sDecodedMemberID;
+
+                try {
+                    await this.onSearch(this._decodedMemberID);
+                } catch (e) {
+                    return this._goToNotFound();
+                }
+
+                const oData = this.getView().getModel("BookingView")?.getData() || {};
+                const aMembers = oData.Members || [];
+                const oOwnerMember = aMembers.find(function (oMember) {
+                    return oMember && oMember.UserID;
+                }) || {};
+                this.sUserID = oOwnerMember.UserID || "";
+
+                if (!this.sUserID) {
+                    return this._goToNotFound();
+                }
+
+                const bAllUpdated = aMembers.length > 0 && aMembers.every(member =>
+                    member.Documents &&
+                    member.Documents.length > 0 &&
+                    member.Documents.every(doc => doc.Status === "Updated")
+                );
+
+                if (bAllUpdated) {
+                    return this._goToNotFound();
+                }
+
+                try {
+                    const oResp = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
+                        UserID: this.sUserID
+                    });
+                    const oUser = oResp?.data?.[0] || {};
+                    this._sDocumentEmail = oUser.EmailID || oUser.Email || oOwnerMember.EmailID || oOwnerMember.Email || "";
+                } catch (e) {
+                    this._sDocumentEmail = oOwnerMember.EmailID || oOwnerMember.Email || "";
+                }
+
+                if (!this._isDocumentAccessAllowed()) {
+                    this._bPendingDocumentRoute = true;
+                    this.getView().addStyleClass("blur-background");
+
+                    MessageBox.information(
+                        "Please verify with OTP to access document upload.",
+                        {
+                            title: "Verification Required",
+                            styleClass: "myUnifiedBtn",
+                            actions: [MessageBox.Action.OK],
+                            emphasizedAction: MessageBox.Action.OK,
+                            onClose: function () {
+                                this._openOtpDialog();
+                            }.bind(this)
+                        }
+                    );
+                    return;
+                }
+
+                this._openMemberDialog();
+
+            },
+            _goToNotFound: function () {
+                this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
+            },
+
+            _decodeRoutePart: function (sValue) {
+                if (!sValue) {
+                    return "";
+                }
+
+                const sEncoded = decodeURIComponent(sValue);
+                const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+                if (!base64Regex.test(sEncoded)) {
+                    return "";
+                }
+
+                try {
+                    const sDecoded = atob(sEncoded);
+                    return btoa(sDecoded) === sEncoded ? sDecoded : "";
+                } catch (e) {
+                    return "";
+                }
+            },
+
+            _openMemberDialog: function () {
                 if (!this._oMemberDialog) {
                     this._oMemberDialog = sap.ui.xmlfragment(
                         this.getView().getId(),
@@ -25,35 +144,88 @@ sap.ui.define([
                 }
 
                 this._oMemberDialog.open();
-                const sEncodedCustomerID = oEvent.getParameter("arguments")?.EncodedCustomerID;
-                const sMemberID = oEvent.getParameter("arguments")?.MemberID;
+            },
 
-
-
-
-                const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-
-
-
-                this._decodedMemberID = atob(sMemberID);
-
-                await this.onSearch(this._decodedMemberID)
-
-
-                const oData = this.getView().getModel("BookingView").getData();
-
-                const bAllUpdated = oData.Members.every(member =>
-                    member.Documents.length > 0 &&
-                    member.Documents.every(doc => doc.Status === "Updated")
-                );
-
-                if (bAllUpdated) {
-                    this._goToNotFound();
+            _openOtpDialog: function () {
+                if (!this._oLoginAlertDialog) {
+                    this._oLoginAlertDialog = sap.ui.xmlfragment(
+                        this.createId("LoginAlertDialog"),
+                        "sap.ui.com.project1.fragment.AdminDetailsSignin",
+                        this
+                    );
+                    this.getView().addDependent(this._oLoginAlertDialog);
                 }
 
+                this._oLoginAlertDialog.open();
             },
-            _goToNotFound: function () {
-                this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
+
+            _isDocumentAccessAllowed: function () {
+                if (!this.sUserID) {
+                    return false;
+                }
+
+                var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+                var sLoggedInUserID = this._getLoggedInUserID();
+                return bLoggedIn && sLoggedInUserID === this.sUserID;
+            },
+
+            _getLoggedInUserID: function () {
+                try {
+                    var sEncoded = localStorage.getItem("_aB39X");
+                    if (!sEncoded) {
+                        return "";
+                    }
+                    return atob(sEncoded) || "";
+                } catch (e) {
+                    return "";
+                }
+            },
+
+            _applyVerifiedUserLogin: async function (user) {
+                this.initializeLoginModel();
+
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("_x9A1p");
+                localStorage.removeItem("_k7LmQ");
+                localStorage.removeItem("_aB39X");
+                localStorage.removeItem("_mN72P");
+
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 300);
+                });
+
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("_x9A1p", user._x9A1p || "");
+                localStorage.setItem("_k7LmQ", user._k7LmQ || "");
+                localStorage.setItem("_aB39X", btoa(user.UserID || ""));
+                localStorage.setItem("_mN72P", btoa(user.UserName || user.CustomerName || user.VendorName || ""));
+
+                var oUIModel = this.getOwnerComponent().getModel("UIModel");
+                if (oUIModel) {
+                    oUIModel.setProperty("/isLoggedIn", true);
+                }
+
+                var oLoginModel = this.getOwnerComponent().getModel("LoginModel") || new JSONModel({});
+                this.getOwnerComponent().setModel(oLoginModel, "LoginModel");
+                sap.ui.getCore().setModel(oLoginModel, "LoginModel");
+                oLoginModel.setData(Object.assign({}, oLoginModel.getData() || {}, {
+                    isLoggedIn: true,
+                    EmployeeID: user.UserID || "",
+                    UserID: user.UserID || "",
+                    Salutation: user.Salutation || "",
+                    EmployeeName: user.UserName || user.CustomerName || user.VendorName || "",
+                    UserName: user.UserName || user.CustomerName || user.VendorName || "",
+                    EmailID: user.EmailID || user.Email || "",
+                    Role: user.Role || "",
+                    BranchCode: user.BranchCode || "",
+                    STDCode: user.STDCode || "",
+                    MobileNo: user.MobileNo || user.Mobile || "",
+                    Gender: user.Gender || "",
+                    Country: user.Country || "",
+                    State: user.State || "",
+                    City: user.City || "",
+                    Address: user.Address || ""
+                }));
             },
 
             onFileUpload: function (oEvent) {
@@ -326,21 +498,24 @@ sap.ui.define([
 
 
             onSearch: async function (_decodedMemberID) {
-                this.getBusyDialog()
-                debugger
-                var item = await this.ajaxReadWithJQuery("HM_MemberDoc", {
-                    MemberIDs: [this._decodedMemberID].join(",").replace(/\s+/g, "")
-                });
+                this.getBusyDialog();
+                try {
+                    var item = await this.ajaxReadWithJQuery("HM_MemberDoc", {
+                        MemberIDs: [_decodedMemberID || this._decodedMemberID].join(",").replace(/\s+/g, "")
+                    });
 
-                var aMember = Array.isArray(item.data) ?
-                    item.data : [item.data];
+                    var aMember = Array.isArray(item.data) ?
+                        item.data : [item.data];
 
-                var oMemberModel = new sap.ui.model.json.JSONModel({
-                    Members: aMember
-                });
+                    var oMemberModel = new sap.ui.model.json.JSONModel({
+                        Members: aMember
+                    });
 
-                this.getView().setModel(oMemberModel, "BookingView");
-                this.closeBusyDialog();
+                    this.getView().setModel(oMemberModel, "BookingView");
+                    return aMember;
+                } finally {
+                    this.closeBusyDialog();
+                }
             },
 
             BI_onButtonPress: function () {
@@ -1043,15 +1218,252 @@ sap.ui.define([
                                 oController._oMemberDialog.destroy();
                                 oController._oMemberDialog = null;
                             }
-
-                            oController.getOwnerComponent()
-                                .getRouter()
-                                .navTo("RouteHostel");
+                            oController.CommonLogoutFunction();
                         }
                     }
                 });
 
             },
+
+            onEmailliveChange: function (oEvent) {
+                utils._LCvalidateEmail(oEvent);
+            },
+
+            onLoginOtpLive: function (oEvent) {
+                const vm = this.getView().getModel("LoginViewModel");
+                const input = oEvent.getSource();
+                let val = oEvent.getParameter("value").replace(/\D/g, "");
+
+                if (val.length > 6) {
+                    val = val.slice(0, 6);
+                }
+
+                input.setValue(val);
+                vm.setProperty("/isOtpEntered", val.length === 6);
+
+                if (!val) {
+                    input.setValueState("None");
+                } else if (val.length !== 6) {
+                    input.setValueState("Error");
+                    input.setValueStateText(this.i18nModel.getText("entervaliddigitOTP"));
+                } else {
+                    input.setValueState("None");
+                }
+            },
+
+            onPressOTP: async function () {
+                const oEmailIDCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+                const sEmail = oEmailIDCtrl?.getValue()?.trim();
+
+                if (!utils._LCvalidateEmail(oEmailIDCtrl, "ID")) {
+                    MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
+                    return;
+                }
+
+                if (!this._sDocumentEmail || sEmail.toLowerCase() !== this._sDocumentEmail.toLowerCase()) {
+                    oEmailIDCtrl.setValueState("Error");
+                    oEmailIDCtrl.setValueStateText("Entered email does not match the email associated with this link.");
+                    MessageToast.show("Entered email does not match the email associated with this link.");
+                    return;
+                }
+
+                oEmailIDCtrl.setValueState("None");
+
+                const payload = {
+                    EmailID: sEmail,
+                    Type: "OTP"
+                };
+
+                this.getBusyDialog();
+                try {
+                    const oResp = await this.ajaxCreateWithJQuery("HostelSendOTP", payload);
+
+                    if (oResp?.success) {
+                        MessageToast.show(oResp.message || this.i18nModel.getText("oTPSentCheckyourEmail"));
+                        this._oResetUser = { EmailID: sEmail };
+
+                        const oOtpCtrl = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+                        if (oOtpCtrl) {
+                            oOtpCtrl.setValue("");
+                            oOtpCtrl.setValueState("None");
+                            oOtpCtrl.setValueStateText("");
+                            oOtpCtrl.focus();
+                        }
+
+                        this._startOtpTimer();
+                    } else {
+                        MessageToast.show(oResp?.message || this.i18nModel.getText("usernotFoundUnabletoSendOTP"));
+                    }
+                } catch (err) {
+                    const sMsg = err?.responseJSON?.message || err?.message || this.i18nModel.getText("forgotOtpSendFailed");
+                    MessageToast.show(sMsg);
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            _verifyOTPWithBackend: async function (otp) {
+                this.getBusyDialog();
+                try {
+                    const oResp = await this.ajaxReadWithJQuery("HM_Login", {
+                        EmailID: this._oResetUser?.EmailID,
+                        OTP: otp.trim()
+                    });
+
+                    if (oResp?.success === true) {
+                        this._oVerifiedUser = oResp?.data?.[0] || null;
+                    }
+
+                    return oResp?.success === true;
+                } catch (err) {
+                    return false;
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            onSignIn: async function () {
+                const oFragment = this._oLoginAlertDialog;
+                const ctrlEmailId = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+                const ctrlOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+                const sEmail = ctrlEmailId?.getValue()?.trim();
+                const sOTP = ctrlOTP?.getValue()?.trim();
+
+                if (!utils._LCvalidateEmail(ctrlEmailId, "ID")) {
+                    MessageToast.show(this.i18nModel.getText("MSenterValidEmail"));
+                    return;
+                }
+
+                if (!this._sDocumentEmail || sEmail.toLowerCase() !== this._sDocumentEmail.toLowerCase()) {
+                    ctrlEmailId.setValueState("Error");
+                    ctrlEmailId.setValueStateText("Entered email does not match the email associated with this link.");
+                    MessageToast.show("Entered email does not match the email associated with this link.");
+                    return;
+                }
+
+                ctrlEmailId.setValueState("None");
+
+                if (!sOTP || !/^\d{6}$/.test(sOTP)) {
+                    ctrlOTP.setValueState("Error");
+                    ctrlOTP.setValueStateText(this.i18nModel.getText("Entervalid6digitOTP"));
+                    MessageToast.show(this.i18nModel.getText("Entervalid6digitOTP"));
+                    return;
+                }
+
+                ctrlOTP.setValueState("None");
+                this.getBusyDialog();
+
+                try {
+                    const isValid = await this._verifyOTPWithBackend(sOTP);
+                    if (!isValid) {
+                        MessageToast.show("Incorrect OTP");
+                        return;
+                    }
+
+                    const user = this._oVerifiedUser;
+                    this._oVerifiedUser = null;
+
+                    if (!user?.UserID || user.UserID !== this.sUserID) {
+                        MessageToast.show("This verification link does not belong to the entered email.");
+                        return;
+                    }
+
+                    await this._applyVerifiedUserLogin(user);
+
+                    ctrlEmailId?.setValue("");
+                    ctrlOTP?.setValue("");
+                    ctrlEmailId?.setValueState("None");
+                    ctrlOTP?.setValueState("None");
+                    this._resetOtpState();
+
+                    MessageToast.show("Login Successful");
+                    this.getView().removeStyleClass("blur-background");
+
+                    if (oFragment) {
+                        oFragment.close();
+                    }
+
+                    if (this._bPendingDocumentRoute) {
+                        this._bPendingDocumentRoute = false;
+                        this._openMemberDialog();
+                    }
+                } catch (err) {
+                    MessageToast.show(err.message || "Invalid Credentials, Please try again");
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            _startOtpTimer: function () {
+                const vm = this.getView().getModel("LoginViewModel");
+                const START = 20;
+
+                this._clearOtpTimer();
+                vm.setProperty("/canResendOTP", false);
+                vm.setProperty("/otpTimer", START);
+                vm.setProperty("/otpButtonText", "Resend OTP (" + START + "s)");
+
+                this._otpInterval = setInterval(() => {
+                    let remaining = vm.getProperty("/otpTimer") - 1;
+
+                    if (remaining <= 0) {
+                        this._clearOtpTimer();
+                        vm.setProperty("/otpTimer", 0);
+                        vm.setProperty("/otpButtonText", "Resend OTP");
+                        vm.setProperty("/canResendOTP", true);
+                        return;
+                    }
+
+                    vm.setProperty("/otpTimer", remaining);
+                    vm.setProperty("/otpButtonText", "Resend OTP (" + remaining + "s)");
+                }, 1000);
+            },
+
+            _clearOtpTimer: function () {
+                if (this._otpInterval) {
+                    clearInterval(this._otpInterval);
+                    this._otpInterval = null;
+                }
+            },
+
+            _resetOtpState: function () {
+                const vm = this.getView().getModel("LoginViewModel");
+
+                this._clearOtpTimer();
+                vm.setProperty("/otpTimer", 0);
+                vm.setProperty("/canResendOTP", true);
+                vm.setProperty("/otpButtonText", "Send OTP");
+                vm.setProperty("/showOTPField", false);
+                vm.setProperty("/isOtpEntered", false);
+            },
+
+            onDialogClose: function () {
+                const oEmail = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "emailInput");
+                const oOTP = sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "otpInput");
+
+                if (oEmail) {
+                    oEmail.setValue("");
+                    oEmail.setValueState("None");
+                    oEmail.setValueStateText("");
+                }
+
+                if (oOTP) {
+                    oOTP.setValue("");
+                    oOTP.setValueState("None");
+                    oOTP.setValueStateText("");
+                }
+
+                this._resetOtpState();
+                this._bPendingDocumentRoute = false;
+                this._oResetUser = null;
+                this._oVerifiedUser = null;
+                this.getView().removeStyleClass("blur-background");
+
+                if (this._oLoginAlertDialog) {
+                    this._oLoginAlertDialog.close();
+                }
+            },
+
             onMemberSearch: function (oEvent) {
                 const sValue = String(oEvent.getParameter("newValue") || oEvent.getParameter("query") || "").trim();
                 const oTable = sap.ui.getCore().byId("abmemberSelectTable");
