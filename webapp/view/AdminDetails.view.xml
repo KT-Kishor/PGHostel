@@ -328,7 +328,7 @@
 
             <VBox>
                 <Panel
-                    headerText="{= 'Personal Information - ' + ${CustomerData>/CustomerName} }"
+                    headerText="{= 'Profile Information - ' + ${CustomerData>/CustomerName} }"
                     expandable="false"
                     class="customPanelHeader"
                 >
@@ -360,16 +360,15 @@
                             />
                             <Text
                                 text="{= ${CustomerData>/Salutation} + ' ' + ${CustomerData>/CustomerName} }"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
 
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>fullname}"
-                            />
+                            /> -->
                             <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
 
-                            <Select
+                            <!-- <Select
                                 selectedKey="{Bookingmodel>/Salutation}"
                                 visible="{VisibleModel>/visible}"
                                 change="onAdminChangeSalutation"
@@ -396,8 +395,8 @@
                                         cellsLarge="2"
                                     />
                                 </layoutData>
-                            </Select>
-                            <Input
+                            </Select> -->
+                            <!-- <Input
                                 value="{Bookingmodel>/CustomerName}"
                                 maxLength="50"
                                 visible="{VisibleModel>/visible}"
@@ -406,7 +405,7 @@
                                 liveChange="onChange"
                                 width="41.5%"
                                 placeholder="Enter full name"
-                            />
+                            /> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -414,9 +413,8 @@
                             />
                             <Text
                                 text="{CustomerData>/DateOfBirth}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
-
+<!-- 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MVDDOB}"
@@ -430,7 +428,7 @@
                                 id="AD_id_Date"
                                 valueStateText="{i18n>enterDateofBirth}"
                                 change="onDateChange"
-                            />
+                            /> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -438,10 +436,9 @@
                             />
                             <Text
                                 text="{CustomerData>/Gender}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
 
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MVgender}"
                             />
@@ -466,7 +463,7 @@
                                     key="Other"
                                     text="Other"
                                 />
-                            </ComboBox>
+                            </ComboBox> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -474,10 +471,9 @@
                             />
                             <Text
                                 text="{CustomerData>/CustomerEmail}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
 
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>email}"
                             />
@@ -491,7 +487,7 @@
                                 valueStateText="{i18n>enterEmailId}"
                                 change="onChangemail"
                                 placeholder="Enter email ID"
-                            />
+                            /> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -499,10 +495,9 @@
                             />
                             <Text
                                 text="{CustomerData>/Country}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
 
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MVDcountry}"
                             />
@@ -523,7 +518,7 @@
                                     text="{CountryModel>countryName}"
                                     additionalText="{CountryModel>code}"
                                 />
-                            </ComboBox>
+                            </ComboBox> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -531,9 +526,8 @@
                             />
                             <Text
                                 text="{CustomerData>/State}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MVDstate}"
                             />
@@ -552,16 +546,15 @@
                                     key="{StateModel>stateName}"
                                     text="{StateModel>stateName}"
                                 />
-                            </ComboBox>
+                            </ComboBox> -->
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>city}"
                             />
                             <Text
                                 text="{CustomerData>/City}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>city}"
                             />
@@ -584,7 +577,7 @@
                                     text="{CityModel>cityName}"
                                     additionalText="{CityModel>branchCode}"
                                 />
-                            </ComboBox>
+                            </ComboBox> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -592,10 +585,9 @@
                             />
                             <Text
                                 text="{CustomerData>/Address}"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
 
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>address}"
                             />
@@ -609,7 +601,7 @@
                                 valueStateText="{i18n>enterAddress}"
                                 liveChange="onChange"
                                 placeholder="Enter address"
-                            />
+                            /> -->
 
                             <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
@@ -617,19 +609,18 @@
                             />
                             <Text
                                 text="{= ${CustomerData>/STDCode} + ' ' + ${CustomerData>/MobileNo} }"
-                                visible="{= !${VisibleModel>/visible} }"
                             />
                             <!-- <Text text="{CustomerData>/MobileNo}" visible="{= !${VisibleModel>/visible} }" /> -->
-                            <Label
+                            <!-- <Label
                                 required="{= ${VisibleModel>/visible} ? true : false }"
                                 text="{i18n>MSmobileNo}"
-                            />
+                            /> -->
                             <!-- <Input id="CC_id_STDCode" value="{Bookingmodel>/STDCode}" visible="{VisibleModel>/visible}">
                                 <layoutData>
                                     <f:ColumnElementData cellsSmall="2" cellsLarge="1" />
                                 </layoutData>
                             </Input> -->
-
+<!-- 
                             <ComboBox
                                 change="onSTDChange"
                                 id="CC_id_STDCode"
@@ -652,9 +643,9 @@
                                         cellsLarge="2"
                                     />
                                 </layoutData>
-                            </ComboBox>
+                            </ComboBox> -->
                             <!-- Phone Number -->
-                            <Input
+                            <!-- <Input
                                 id="CD_ID_idPhone"
                                 value="{Bookingmodel>/MobileNo}"
                                 placeholder="{i18n>enterContactNumber}"
@@ -662,7 +653,7 @@
                                 valueStateText="{i18n>enterContactNumber}"
                                 visible="{VisibleModel>/visible}"
                                 width="41.5%"
-                            />
+                            /> -->
                         </f:content>
                     </f:SimpleForm>
                     <FlexBox

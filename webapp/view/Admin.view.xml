@@ -235,16 +235,22 @@
                             tooltip="{i18n>startEndDate}"
                         />
 					</Column>
-					<Column demandPopin="true">
+					<!-- <Column demandPopin="true">
 						<Text
                             text="{i18n>roomNumber}"
                             tooltip="{i18n>roomNumber}"
                         />
-					</Column>
+					</Column> -->
 					<Column demandPopin="true">
 						<Text
-                            text="{i18n>bedType}"
-                            tooltip="{i18n>bedType}"
+                            text="{i18n>bedTyperoomno}"
+                            tooltip="{i18n>bedTyperoomno}"
+                        />
+					</Column>
+                    <Column demandPopin="true">
+						<Text
+                            text="{i18n>CDCouponCode}"
+                            tooltip="{i18n>CDCouponCode}"
                         />
 					</Column>
 					<Column
@@ -286,8 +292,17 @@
                                     text="{path:'HostelModel>EndDate',formatter: '.Formatter.formatDate'}"
                                 />
 							</VBox>
-							<Text text="{HostelModel>RoomNo}" />
-							<Text text="{HostelModel>BedType}" />
+						<VBox>
+    <Text text="{HostelModel>BedType}" />
+
+    <HBox visible="{= !!${HostelModel>RoomNo} }">
+        <Label text="Room No:" />
+        <Text text="{HostelModel>RoomNo}" />
+    </HBox>
+</VBox>
+
+							<Text text="{HostelModel>CouponCode}" />
+
 							<ObjectStatus
                                 inverted="false"
                                 text="{HostelModel>Status}"

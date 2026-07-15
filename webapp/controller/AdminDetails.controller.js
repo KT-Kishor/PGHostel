@@ -32,8 +32,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
-             
-          
+
+
 
 
 
@@ -176,14 +176,14 @@ sap.ui.define([
             this.getView().byId("idPaymentMethod1").setValueState("None")
             this.getView().byId("Ad_id_editStartDate").setValueState("None")
             this.getView().byId("editEndDate").setValueState("None")
-            this.getView().byId("AD_id_CustomerName").setValueState("None")
-            this.getView().byId("AD_id_Date").setValueState("None")
-            this.getView().byId("Ad_id_gender").setValueState("None")
-            this.getView().byId("Ad_id_CustomerEmail").setValueState("None")
-            this.getView().byId("CC_id_Country").setValueState("None")
-            this.getView().byId("CC_id_State").setValueState("None")
-            this.getView().byId("CC_id_City").setValueState("None")
-            this.getView().byId("CD_ID_idPhone").setValueState("None")
+            // this.getView().byId("AD_id_CustomerName").setValueState("None")
+            // this.getView().byId("AD_id_Date").setValueState("None")
+            // this.getView().byId("Ad_id_gender").setValueState("None")
+            // this.getView().byId("Ad_id_CustomerEmail").setValueState("None")
+            // this.getView().byId("CC_id_Country").setValueState("None")
+            // this.getView().byId("CC_id_State").setValueState("None")
+            // this.getView().byId("CC_id_City").setValueState("None")
+            // this.getView().byId("CD_ID_idPhone").setValueState("None")
         },
 
         OnRoom: function () {
@@ -577,12 +577,12 @@ sap.ui.define([
                 };
                 oCustomerData.Documents = oData.Documents
                 this._originalDocuments = JSON.parse(
-    JSON.stringify(oData.Documents || [])
-);
+                    JSON.stringify(oData.Documents || [])
+                );
 
-                     this._originalFacilityItems=JSON.parse(
-    JSON.stringify(oCustomer.FacilityItems  || [])
-); 
+                this._originalFacilityItems = JSON.parse(
+                    JSON.stringify(oCustomer.FacilityItems || [])
+                );
 
 
 
@@ -948,7 +948,7 @@ sap.ui.define([
         },
 
         onAddFacilityDetails: function () {
-            this.edit=true
+            this.edit = true
             var data = this.getView().getModel("Bookingmodel").getData()
             this._editIndex = undefined;
             this.byId("Ad_id_idFacilityRoomTableDetails").removeSelections()
@@ -1191,7 +1191,7 @@ sap.ui.define([
                 }
             }
         },
-        onMemberNamehCange:function(oEvent){
+        onMemberNamehCange: function (oEvent) {
 
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
@@ -1300,7 +1300,7 @@ sap.ui.define([
             let sUnit = oModel.getProperty("/UnitText") || "Unit Price";
             let sStartDate = oModel.getProperty("/StartDate"); // use let to allow reassignment
             let sEndDate = oModel.getProperty("/EndDate"); // use let
-            var Bookingstartdate=this.getView().getModel("Bookingmodel").getProperty("/StartDate").includes("/") ? this.getView().getModel("Bookingmodel").getProperty("/StartDate").split("/").reverse().join("-") : this.getView().getModel("Bookingmodel").getProperty("/StartDate");
+            var Bookingstartdate = this.getView().getModel("Bookingmodel").getProperty("/StartDate").includes("/") ? this.getView().getModel("Bookingmodel").getProperty("/StartDate").split("/").reverse().join("-") : this.getView().getModel("Bookingmodel").getProperty("/StartDate");
 
             if (sUnit === "Package Price") {
                 sUnit = "Unit Price"
@@ -1330,11 +1330,11 @@ sap.ui.define([
             if (sEndDate.includes("/")) {
                 sEndDate = sEndDate.split("/").reverse().join("-");
             }
-            if(sStartDate!== ""){
+            if (sStartDate !== "") {
                 sap.ui.getCore().byId("editEndDate").setMinDate(new Date(sStartDate))
 
             }
-                sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
+            sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
 
             if (sStartDate !== "" && sEndDate !== "") {
                 if (sEndDate <= sStartDate) {
@@ -1737,178 +1737,178 @@ sap.ui.define([
                 sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
                 return;
             }
-         // EDIT
-if (oPayload.UnitText === "Package Price" && this.edit === false) {
+            // EDIT
+            if (oPayload.UnitText === "Package Price" && this.edit === false) {
 
-    const newStart = this._parseDate(oPayload.StartDate);
-    const newEnd = this._parseDate(oPayload.EndDate);
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
 
-    const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
 
-        // Skip current edited record
-        if (index === this._editIndex) {
-            return false;
-        }
-
-        if (item.MemberName !== oPayload.MemberName) {
-            return false;
-        }
-
-        const oldStart = this._parseDate(item.StartDate);
-        const oldEnd = this._parseDate(item.EndDate);
-
-        return (
-            newStart <= oldEnd &&
-            newEnd >= oldStart &&
-            item.FacilityChargeType === "DAILY" &&
-            item.FacilityName === oPayload.FacilityName
-        );
-    });
-
-    if (oDuplicatedates) {
-        sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-        return;
-    }
-}
-
-// ADD
-if (oPayload.UnitText === "Package Price" && this.edit === true) {
-
-    const newStart = this._parseDate(oPayload.StartDate);
-    const newEnd = this._parseDate(oPayload.EndDate);
-
-    const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
-
-        if (item.MemberName !== oPayload.MemberName) {
-            return false;
-        }
-
-        const oldStart = this._parseDate(item.StartDate);
-        const oldEnd = this._parseDate(item.EndDate);
-
-        return (
-            newStart <= oldEnd &&
-            newEnd >= oldStart &&
-            item.FacilityChargeType === "DAILY" &&
-            item.FacilityName === oPayload.FacilityName
-        );
-    });
-
-    if (oDuplicatedates) {
-        sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-        return;
-    }
-}
-
-                    if(!oPayload.MemberName && this.edit===true){
-                       const newStart = this._parseDate(oPayload.StartDate);
-                        const newEnd = this._parseDate(oPayload.EndDate);
-
-                        const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
-
-
-
-                            const oldStart = this._parseDate(item.StartDate);
-                            const oldEnd = this._parseDate(item.EndDate);
-
-                            //  Block ONLY if dates overlap
-                            const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName; 
-
-                            return isOverlap;
-                        });
-
-                        if (oDuplicatedates) {
-                            sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-                            return;
-                        }
+                    // Skip current edited record
+                    if (index === this._editIndex) {
+                        return false;
                     }
 
-                     if(!oPayload.MemberName && this.edit===false){
-                       const newStart = this._parseDate(oPayload.StartDate);
-            const newEnd = this._parseDate(oPayload.EndDate);
+                    if (item.MemberName !== oPayload.MemberName) {
+                        return false;
+                    }
 
-            const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
 
-                //  Skip same row while editing
-                if (this.edit === false && index === this._editIndex) {
-                    return false;
+                    return (
+                        newStart <= oldEnd &&
+                        newEnd >= oldStart &&
+                        item.FacilityChargeType === "DAILY" &&
+                        item.FacilityName === oPayload.FacilityName
+                    );
+                });
+
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                    return;
                 }
-
-                const oldStart = this._parseDate(item.StartDate);
-                const oldEnd = this._parseDate(item.EndDate);
-
-                return (
-                    newStart <= oldEnd &&
-                    newEnd >= oldStart &&
-                    item.FacilityName === oPayload.FacilityName
-                );
-            });
-
-            if (oDuplicatedates) {
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText("dateOverlapExists")
-                );
-                return;
             }
+
+            // ADD
+            if (oPayload.UnitText === "Package Price" && this.edit === true) {
+
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
+
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+                    if (item.MemberName !== oPayload.MemberName) {
+                        return false;
                     }
 
-                     if(oPayload.MemberName && this.edit===true){
-                     const newStart = this._parseDate(oPayload.StartDate);
-                        const newEnd = this._parseDate(oPayload.EndDate);
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
 
-                        const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+                    return (
+                        newStart <= oldEnd &&
+                        newEnd >= oldStart &&
+                        item.FacilityChargeType === "DAILY" &&
+                        item.FacilityName === oPayload.FacilityName
+                    );
+                });
 
-                            //  Only check for SAME member
-                            if (item.MemberName !== oPayload.MemberName) {
-                                return false;
-                            }
-
-                            const oldStart = this._parseDate(item.StartDate);
-                            const oldEnd = this._parseDate(item.EndDate);
-
-                            //  Block ONLY if dates overlap
-                            const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
-
-                            return isOverlap;
-                        });
-
-                        if (oDuplicatedates) {
-                            sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
-                            return;
-                        }
-                    }
-                      if (oPayload.MemberName && this.edit===false) {
-                         const newStart = this._parseDate(oPayload.StartDate);
-            const newEnd = this._parseDate(oPayload.EndDate);
-
-            const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
-
-                  if (item.MemberName !== oPayload.MemberName) {
-                                return false;
-                            }
-
-                //  Skip same row while editing
-                if (this.edit === false && index === this._editIndex) {
-                    return false;
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                    return;
                 }
-
-                const oldStart = this._parseDate(item.StartDate);
-                const oldEnd = this._parseDate(item.EndDate);
-
-                return (
-                    newStart <= oldEnd &&
-                    newEnd >= oldStart &&
-                    item.FacilityName === oPayload.FacilityName
-                );
-            });
-
-            if (oDuplicatedates) {
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText("dateOverlapExists")
-                );
-                return;
             }
+
+            if (!oPayload.MemberName && this.edit === true) {
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
+
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+
+
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
+
+                    //  Block ONLY if dates overlap
+                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+
+                    return isOverlap;
+                });
+
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                    return;
+                }
+            }
+
+            if (!oPayload.MemberName && this.edit === false) {
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
+
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+
+                    //  Skip same row while editing
+                    if (this.edit === false && index === this._editIndex) {
+                        return false;
                     }
+
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
+
+                    return (
+                        newStart <= oldEnd &&
+                        newEnd >= oldStart &&
+                        item.FacilityName === oPayload.FacilityName
+                    );
+                });
+
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText("dateOverlapExists")
+                    );
+                    return;
+                }
+            }
+
+            if (oPayload.MemberName && this.edit === true) {
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
+
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find(item => {
+
+                    //  Only check for SAME member
+                    if (item.MemberName !== oPayload.MemberName) {
+                        return false;
+                    }
+
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
+
+                    //  Block ONLY if dates overlap
+                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+
+                    return isOverlap;
+                });
+
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("dateOverlapExists"));
+                    return;
+                }
+            }
+            if (oPayload.MemberName && this.edit === false) {
+                const newStart = this._parseDate(oPayload.StartDate);
+                const newEnd = this._parseDate(oPayload.EndDate);
+
+                const oDuplicatedates = oCustomerData.AllSelectedFacilities.find((item, index) => {
+
+                    if (item.MemberName !== oPayload.MemberName) {
+                        return false;
+                    }
+
+                    //  Skip same row while editing
+                    if (this.edit === false && index === this._editIndex) {
+                        return false;
+                    }
+
+                    const oldStart = this._parseDate(item.StartDate);
+                    const oldEnd = this._parseDate(item.EndDate);
+
+                    return (
+                        newStart <= oldEnd &&
+                        newEnd >= oldStart &&
+                        item.FacilityName === oPayload.FacilityName
+                    );
+                });
+
+                if (oDuplicatedates) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText("dateOverlapExists")
+                    );
+                    return;
+                }
+            }
             // UPDATE existing OR ADD new
             if (this._editIndex !== undefined) {
                 oCustomerData.AllSelectedFacilities[this._editIndex] =
@@ -1954,7 +1954,7 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
         },
 
         onEditBooking: async function () {
-            this.applyCountryStateCityFilters();
+            // this.applyCountryStateCityFilters();
 
             const oMobile = this.byId("CD_ID_idPhone");
             const oView = this.getView();
@@ -1995,11 +1995,11 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
             var model = this.getView().getModel("Bookingmodel");
             var aAvailableBeds = this.getView().getModel("Availablebeds").getData();
 
-            if (data.STDCode === "+91") {
-                oMobile.setMaxLength(10);
-            } else {
-                oMobile.setMaxLength(18);
-            }
+            // if (data.STDCode === "+91") {
+            //     oMobile.setMaxLength(10);
+            // } else {
+            //     oMobile.setMaxLength(18);
+            // }
 
             var filteredBeds = aAvailableBeds.filter(function (bed) {
 
@@ -2048,11 +2048,11 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
             model.setProperty("/Salutation", data.Salutation);
             model.setProperty("/Address", data.Address);
 
-            if (model.getProperty("/Salutation") === "Dr.") {
-                this.getView().byId("Ad_id_gender").setEnabled(true);
-            } else {
-                this.getView().byId("Ad_id_gender").setEnabled(false);
-            }
+            // if (model.getProperty("/Salutation") === "Dr.") {
+            //     this.getView().byId("Ad_id_gender").setEnabled(true);
+            // } else {
+            //     this.getView().byId("Ad_id_gender").setEnabled(false);
+            // }
 
             if (data.PaymentType === "Per Month") {
                 model.setProperty("/UnitText", "monthly");
@@ -2500,7 +2500,7 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
         },
 
         onEditFacilityDetails: function () {
-            this.edit=false
+            this.edit = false
             var data = this.getView().getModel("Bookingmodel").getData()
             var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
             var oSelectedItem = oTable.getSelectedItem();
@@ -2576,19 +2576,19 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
 
 
-            if(oSelectedData.SelectionMode==="PERSON_QTY"){
-            sap.ui.getCore().byId("idUnitType").setVisible(false)
-            }else{
-            sap.ui.getCore().byId("idUnitType").setVisible(true)
+            if (oSelectedData.SelectionMode === "PERSON_QTY") {
+                sap.ui.getCore().byId("idUnitType").setVisible(false)
+            } else {
+                sap.ui.getCore().byId("idUnitType").setVisible(true)
 
             }
 
 
             if (oSelectedData.FacilityChargeType === "DAILY") {
-                if(oSelectedData.SelectionMode==="PERSON_QTY"){
-                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
-                }else{
-                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
+                if (oSelectedData.SelectionMode === "PERSON_QTY") {
+                    sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
+                } else {
+                    sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
                 }
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(0)
@@ -2596,10 +2596,10 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
                 sap.ui.getCore().byId("editDays").setVisible(true)
             } else if (oSelectedData.FacilityChargeType === "Entire Booking") {
-                 if(oSelectedData.SelectionMode==="PERSON_QTY"){
-                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
-                }else{
-                sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
+                if (oSelectedData.SelectionMode === "PERSON_QTY") {
+                    sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(false)
+                } else {
+                    sap.ui.getCore().byId("editquantity").setVisible(true).setEditable(true)
                 }
 
                 sap.ui.getCore().byId("id_Period").setSelectedIndex(1)
@@ -2625,7 +2625,7 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
             if (oSelectedData.UnitText === "Per Month" || oSelectedData.UnitText === "Per Year") {
                 sap.ui.getCore().byId("editEndDate").setEditable(false)
 
-            } else if(oSelectedData.FacilityChargeType !== "Entire Booking") {
+            } else if (oSelectedData.FacilityChargeType !== "Entire Booking") {
                 sap.ui.getCore().byId("editEndDate").setEditable(true)
             }
 
@@ -3746,26 +3746,26 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
             var ID = this.getView().getModel("CustomerData").getData()
 
 
-             var RoomData=this.getOwnerComponent().getModel("RoomDetailsModel").getData()
-           var HostelData= this.getOwnerComponent().getModel("HostelModelcheckrooms").getData().filter((item)=>{
-             
-        return      (item.Status==="Assigned" || item.Status==="Confirmed")  &&
-                item.BedType===ID.BedType &&
-                item.BranchCode===ID.BranchCode
-                
+            var RoomData = this.getOwnerComponent().getModel("RoomDetailsModel").getData()
+            var HostelData = this.getOwnerComponent().getModel("HostelModelcheckrooms").getData().filter((item) => {
+
+                return (item.Status === "Assigned" || item.Status === "Confirmed") &&
+                    item.BedType === ID.BedType &&
+                    item.BranchCode === ID.BranchCode
+
             })
 
-            var SelectedRoom = RoomData.filter((item)=>{
-                
-              return   item.BedTypeName===ID.BedType &&
-                       item.BranchCode===ID.BranchCode
+            var SelectedRoom = RoomData.filter((item) => {
+
+                return item.BedTypeName === ID.BedType &&
+                    item.BranchCode === ID.BranchCode
             })
 
-            if(SelectedRoom[0].NoofPerson <=HostelData.length){
+            if (SelectedRoom[0].NoofPerson <= HostelData.length) {
                 sap.m.MessageBox.error("No rooms available for the selected bed type. Please assign a different bed type or check room availability.");
                 return;
             }
-           
+
             this.getBusyDialog();
             const pdfBase64 = await this.onGeneratePDF();
             this.closeBusyDialog();
@@ -3863,8 +3863,8 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
                 CustomerEmail: ID.CustomerEmail || "",
                 BedType: ID.BedType || "",
                 BookingDate: ID.BookingDate,
-                StartDate: ID.StartDate?ID.StartDate.split('/').reverse().join('-'):"",
-                EndDate: ID.EndDate?ID.EndDate.split('/').reverse().join('-'):"",
+                StartDate: ID.StartDate ? ID.StartDate.split('/').reverse().join('-') : "",
+                EndDate: ID.EndDate ? ID.EndDate.split('/').reverse().join('-') : "",
                 MemberID: ID.MemberID || "",
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
                 RentPrice: ID.RentPrice || 0,
@@ -3901,7 +3901,7 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
 
         },
 
-        onSaveBooking1: function () {
+        onSaveBooking1: async function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
@@ -3911,69 +3911,19 @@ if (oPayload.UnitText === "Package Price" && this.edit === true) {
 
             let editedSections = [];
 
-/* ============================
-   Booking Information
-=============================*/
-if (
-    CustomerData.StartDate !== Bookingdata.StartDate ||
-    CustomerData.EndDate !== Bookingdata.EndDate ||
-    CustomerData.BedType !== Bookingdata.BedTypeName
-) {
-    editedSections.push("Booking Information");
-}
 
-/* ============================
-   Personal Information
-=============================*/
-if (
-    CustomerData.CustomerName !== Bookingdata.CustomerName ||
-    CustomerData.MobileNo !== Bookingdata.MobileNo ||
-    CustomerData.CustomerEmail !== Bookingdata.CustomerEmail ||
-    CustomerData.Gender !== Bookingdata.Gender ||
-    CustomerData.DateOfBirth !== Bookingdata.DateOfBirth ||
-    CustomerData.Country !== Bookingdata.Country ||
-    CustomerData.State !== Bookingdata.State ||
-    CustomerData.City !== Bookingdata.City ||
-    CustomerData.Address !== Bookingdata.Address
-) {
-    editedSections.push("Personal Information");
-}
-
-/* ============================
-   Customer Documents
-=============================*/
-if (
-    JSON.stringify(this._originalDocuments || []) !==
-    JSON.stringify(CustomerData.Documents || [])
-) {
-    editedSections.push("Documents");
-}
+            if (
+                JSON.stringify(this._originalDocuments || []) !==
+                JSON.stringify(CustomerData.Documents || [])
+            ) {
+                editedSections.push("Customer Documents");
+            }
 
 
 
-/* ============================
-   Facility Details
-=============================*/
 
-// const normalizeFacilities = (facilities, isCurrent = true) => {
-//     return (facilities || [])
-//         .map(item => ({
-//             FacilityID: item.FacilityID,
-//             FacilityName: item.FacilityName,
-//             UnitText: item.UnitText,
-//             FacilitiPrice: parseFloat(isCurrent ? item.Price : item.FacilitiPrice) || 0
-//         }))
-//         .sort((a, b) => a.FacilityID.localeCompare(b.FacilityID));
-// };
 
-// const currentFacilities = normalizeFacilities(CustomerData.AllSelectedFacilities, true);
-// const originalFacilities = normalizeFacilities(this._originalFacilityItems, false);
 
-// if (JSON.stringify(currentFacilities) !== JSON.stringify(originalFacilities)) {
-//     editedSections.push("Facility Details");
-// }
-
-// Add to payload
 
             const oHostelModel = this.getView().getModel("HostelModel");
 
@@ -3983,16 +3933,16 @@ if (
             const isMandatoryValid = (
                 utils._LCstrictValidationComboBox(this.byId("Ad_id_RoomType"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("idPaymentMethod1"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_editStartDate"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("AD_id_CustomerName"), "ID") &&
-                utils._LCvalidateDate(this.byId("AD_id_Date"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("Ad_id_gender"), "ID") &&
-                utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") &&
-                utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
+                utils._LCvalidateMandatoryField(this.byId("Ad_id_editStartDate"), "ID")
+                // utils._LCvalidateMandatoryField(this.byId("AD_id_CustomerName"), "ID") &&
+                // utils._LCvalidateDate(this.byId("AD_id_Date"), "ID") &&
+                // utils._LCstrictValidationComboBox(this.byId("Ad_id_gender"), "ID") &&
+                // utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
+                // utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
+                // utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
+                // utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") &&
+                // utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
+                // utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
             Bookingdata.EndDate = (Bookingdata.EndDate).includes("/") ? Bookingdata.EndDate : Bookingdata.EndDate.split('-').reverse().join('/')
             var BookingdataEndDate = (Bookingdata.EndDate).includes("/") ? this._parseDate(Bookingdata.EndDate) : Bookingdata.EndDate
@@ -4219,17 +4169,17 @@ if (
             }
 
 
-            if (Bookingdata.STDCode === "+91") {
-                if (Bookingdata.MobileNo.length === 10) {
-                    oInput.setValueState("None");
+            // if (Bookingdata.STDCode === "+91") {
+            //     if (Bookingdata.MobileNo.length === 10) {
+            //         oInput.setValueState("None");
 
-                } else {
-                    oInput.setValueState("Error");
-                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+            //     } else {
+            //         oInput.setValueState("Error");
+            //         sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
 
-                    return;
-                }
-            }
+            //         return;
+            //     }
+            // }
 
             if (!isMandatoryValid) {
                 sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
@@ -4511,6 +4461,8 @@ if (
                 return item.MemberID;
             });
 
+            const pdfBase64 = await this.onGeneratePDF();
+
 
 
             var Payload = {
@@ -4531,7 +4483,12 @@ if (
                 "PropertySTD": CustomerData.PropertySTD,
                 "PropertyMobileNo": CustomerData.PropertyMobileNo,
                 "PropertyEmail": CustomerData.PropertyEmail,
-                    "EditedSections": editedSections,  
+                "EditedSections": editedSections,
+                "pdfAttachment": {
+                    "fileName": "BookingVoucher.pdf",
+                    "mimeType": "application/pdf",
+                    "content": pdfBase64
+                },
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
                     "RentPrice": CustomerData.GrandTotal,
@@ -5130,12 +5087,12 @@ if (
             }
             /* ================= PDF PREVIEW ================= */
 
-           if (sMimeType === "application/pdf") {
+            if (sMimeType === "application/pdf") {
                 const byteCharacters = atob(sBase64);
                 const byteArrays = [];
 
                 for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                    const slice =byteCharacters.slice(offset, offset + 512);
+                    const slice = byteCharacters.slice(offset, offset + 512);
                     const byteNumbers = new Array(slice.length);
                     for (let i = 0; i < slice.length; i++) {
                         byteNumbers[i] = slice.charCodeAt(i);
@@ -5144,7 +5101,7 @@ if (
                     byteArrays.push(new Uint8Array(byteNumbers));
                 }
 
-                const blob = new Blob(byteArrays, { type: "application/pdf"});
+                const blob = new Blob(byteArrays, { type: "application/pdf" });
                 const sBlobUrl = URL.createObjectURL(blob);
                 this._pdfBlobUrl = sBlobUrl;
 
@@ -5158,7 +5115,7 @@ if (
 
                     MessageToast.show("File downloaded successfully");
                     return;
-            }
+                }
 
                 const sIframe = `
                 <div style="
@@ -5194,7 +5151,7 @@ if (
                 oDialog.open();
                 return;
             }
-              this.onDownloadPreview();
+            this.onDownloadPreview();
             sap.m.MessageToast.show("Preview not supported");
         },
         onDownloadPreview: function () {
@@ -7789,11 +7746,11 @@ if (
 
             // Dynamic surrounding frame calculation
             let guestBoxHeight = (doc.lastAutoTable.finalY - guestBoxY) + 6;
-        
+
             doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
             doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
             doc.roundedRect(15, guestBoxY, 180, guestBoxHeight, 4, 4, "S");
-            
+
             // Colored Side Bar Accent
             doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(15, guestBoxY, 5, guestBoxHeight, "F");
@@ -7803,7 +7760,7 @@ if (
             // ========== STAY DETAILS ==========
             checkNewPage(65);
 
-            const stayCardHeight = 55; 
+            const stayCardHeight = 55;
             doc.setFillColor(LIGHT_GRAY[0], LIGHT_GRAY[1], LIGHT_GRAY[2]);
             doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
             doc.roundedRect(15, currentY, 180, stayCardHeight, 4, 4, "FD");
@@ -7870,15 +7827,48 @@ if (
 
                 currentY += 8;
 
-                let tableBody = facilities.map((item, index) => [
-                    (index + 1).toString(),
-                    item.FacilityName || "-",
-                    item.StartDate || "-",
-                    item.EndDate || "-",
-                    `${Formatter.fromatNumber(parseFloat(item.Price) || 0)}`,
-                    item.UnitText || "-",
-                    `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)}`
-                ]);
+                let tableBody = facilities.map((item, index) => {
+
+                    let sUnitText = item.UnitText || "-";
+
+                    if (item.StartDate && item.EndDate) {
+                        const startDate = new Date(item.StartDate.split('/').reverse().join('-'));
+                        const endDate = new Date(item.EndDate.split('/').reverse().join('-'));
+
+                        // Difference in days (inclusive)
+                        const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                            sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
+                        } else if (sUnitText === "Per Day") {
+                            sUnitText = `${sUnitText}\n(${diffDays} Days)`;
+                        } else if (sUnitText === "Per Month") {
+                            const months =
+                                (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                                (endDate.getMonth() - startDate.getMonth());
+
+                            sUnitText = `${sUnitText}\n(${months} Month${months > 1 ? "s" : ""})`;
+                        } else if (sUnitText === "Per Year") {
+                            const years = endDate.getFullYear() - startDate.getFullYear();
+
+                            sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
+                        }
+                    }
+
+                    return [
+                        (index + 1).toString(),
+                        item.FacilityName || "-",
+                        item.StartDate,
+                        item.EndDate,
+                        Formatter.fromatNumber(
+                            item.BasicFacilityPrice
+                                ? parseFloat(item.BasicFacilityPrice)
+                                : item.Price
+                        ),
+                        sUnitText,
+                        Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)
+                    ];
+                });
 
                 doc.autoTable({
                     startY: currentY,
@@ -7906,19 +7896,19 @@ if (
                         fillColor: [250, 250, 250]
                     },
                     columnStyles: {
-                        0: { cellWidth: 12, halign: "center" },
+                        0: { cellWidth: 14, halign: "center" },
                         1: { cellWidth: 'auto', halign: "left" },
                         2: { cellWidth: 24, halign: "center" },
                         3: { cellWidth: 24, halign: "center" },
                         4: { cellWidth: 24, halign: "right" },
-                        5: { cellWidth: 16, halign: "center" },
+                        5: { cellWidth: 20, halign: "center" },
                         6: { cellWidth: 24, halign: "right" }
                     }
                 });
 
                 currentY = doc.lastAutoTable.finalY + 12;
             }
-            
+
             // ========== PAYMENT SUMMARY ==========
             const roomRent = parseFloat(data.RentPrice) || 0;
             const facilityTotal = parseFloat(data.TotalFacilityPrice) || 0;
@@ -7931,7 +7921,7 @@ if (
 
             // Safely estimate dynamic lines based on setup
             let estimatedLines = 6 + (hasCGST ? 2 : hasIGST ? 1 : 0);
-            const summaryHeight = (estimatedLines * 6.5) + 15; 
+            const summaryHeight = (estimatedLines * 6.5) + 15;
 
             // Dynamic safe page-break execution 
             if (currentY + summaryHeight > 280) {
@@ -7966,13 +7956,20 @@ if (
             };
 
             addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
-            
+
             // Render Facility Total row line only if there's actual value or entries
             if (facilityTotal > 0 || facilities.length > 0) {
                 addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
             }
 
-            addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
+            if (discount > 0) {
+                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+            }
+
+            const finalSubTotal = Number(subTotal) - Number(discount);
+
+
+            addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
 
             if (hasCGST) {
                 const cgst = parseFloat(data.CGST) || 0;
@@ -7986,9 +7983,7 @@ if (
                 grandTotal += igst;
             }
 
-            if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
-            }
+
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
@@ -8003,7 +7998,7 @@ if (
             // Draw clean background style layout safely
             doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.setLineWidth(0.3);
-            doc.roundedRect(15, startY, 180, finalHeight, 4, 4, "D"); 
+            doc.roundedRect(15, startY, 180, finalHeight, 4, 4, "D");
 
             currentY = startY + finalHeight + 10;
 
@@ -8655,7 +8650,7 @@ if (
             });
         },
 
-        _previewDocument:async function (oDoc) {
+        _previewDocument: async function (oDoc) {
 
             const sRawSource = String(
                 oDoc?.File ||
@@ -8704,64 +8699,64 @@ if (
 
             const autoDecodeBase64 = function (sValue) {
 
-            if (!sValue) {
-                return "";
-            }
-
-            let current = String(sValue)
-                .replace(/\s/g, "");
-
-            for (let i = 0; i < 10; i++) {
-
-                // Already detected encoded file signatures
-                if (
-                    current.startsWith("iVB") ||      // PNG
-                    current.startsWith("/9j") ||      // JPG
-                    current.startsWith("JVBER") ||    // PDF
-                    current.startsWith("UklGR")       // WEBP
-                ) {
-                    return current;
+                if (!sValue) {
+                    return "";
                 }
 
-                try {
+                let current = String(sValue)
+                    .replace(/\s/g, "");
 
-                    const decoded = atob(current);
+                for (let i = 0; i < 10; i++) {
 
-                    // RAW PDF bytes
-                    if (decoded.startsWith("%PDF")) {
-                        return btoa(decoded);
-                    }
-
-                    // RAW PNG bytes
+                    // Already detected encoded file signatures
                     if (
-                        decoded.length > 4 &&
-                        decoded.charCodeAt(0) === 137 &&
-                        decoded.charCodeAt(1) === 80
+                        current.startsWith("iVB") ||      // PNG
+                        current.startsWith("/9j") ||      // JPG
+                        current.startsWith("JVBER") ||    // PDF
+                        current.startsWith("UklGR")       // WEBP
                     ) {
-                        return btoa(decoded);
+                        return current;
                     }
 
-                    // RAW JPEG bytes
-                    if (
-                        decoded.length > 3 &&
-                        decoded.charCodeAt(0) === 255 &&
-                        decoded.charCodeAt(1) === 216
-                    ) {
-                        return btoa(decoded);
-                    }
+                    try {
 
-                    current = decoded.replace(/\s/g, "");
+                        const decoded = atob(current);
+
+                        // RAW PDF bytes
+                        if (decoded.startsWith("%PDF")) {
+                            return btoa(decoded);
+                        }
+
+                        // RAW PNG bytes
+                        if (
+                            decoded.length > 4 &&
+                            decoded.charCodeAt(0) === 137 &&
+                            decoded.charCodeAt(1) === 80
+                        ) {
+                            return btoa(decoded);
+                        }
+
+                        // RAW JPEG bytes
+                        if (
+                            decoded.length > 3 &&
+                            decoded.charCodeAt(0) === 255 &&
+                            decoded.charCodeAt(1) === 216
+                        ) {
+                            return btoa(decoded);
+                        }
+
+                        current = decoded.replace(/\s/g, "");
 
                     } catch (e) {
 
-                                console.error("Decode failed:", e);
+                        console.error("Decode failed:", e);
 
-                                break;
-                            }
-                        }
+                        break;
+                    }
+                }
 
-                        return current;
-                    };
+                return current;
+            };
 
             const sBase64 = normalizeBase64(
                 autoDecodeBase64(sRawBase64)
@@ -8896,7 +8891,7 @@ if (
 
             // ================= IMAGE PREVIEW =================
 
-         
+
 
             if (sMimeType.indexOf("image/") === 0) {
                 const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
@@ -8962,12 +8957,12 @@ if (
             // ================= PDF PREVIEW =================
 
 
-           if (sMimeType === "application/pdf") {
+            if (sMimeType === "application/pdf") {
                 const byteCharacters = atob(sBase64);
                 const byteArrays = [];
 
                 for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                    const slice =byteCharacters.slice(offset, offset + 512);
+                    const slice = byteCharacters.slice(offset, offset + 512);
                     const byteNumbers = new Array(slice.length);
                     for (let i = 0; i < slice.length; i++) {
                         byteNumbers[i] = slice.charCodeAt(i);
@@ -8976,7 +8971,7 @@ if (
                     byteArrays.push(new Uint8Array(byteNumbers));
                 }
 
-                const blob = new Blob(byteArrays, { type: "application/pdf"});
+                const blob = new Blob(byteArrays, { type: "application/pdf" });
                 const sBlobUrl = URL.createObjectURL(blob);
                 this._pdfBlobUrl = sBlobUrl;
 
@@ -8990,7 +8985,7 @@ if (
 
                     MessageToast.show("File downloaded successfully");
                     return;
-            }
+                }
 
                 const sIframe = `
                 <div style="
@@ -9232,14 +9227,18 @@ if (
             var oModel = this.getView().getModel("CustomerData");
             var oData = oModel.getData();
 
-            var aDocs = oData.Documents || [];
+            var aDocs = oData.AllMembers || [];
 
             // keep only valid docs
             var allMembers = aDocs
-                .filter(doc => doc.MemberID && doc.MemberName)
+                .filter(doc => doc.MemberID && doc.Name)
                 .map(doc => ({
                     MemberID: doc.MemberID,
-                    Name: doc.MemberName
+                    Name: doc.Name,
+                    Gender: doc.Gender,
+                    DateOfBirth: doc.DateOfBirth,
+                    Relation: doc.Relation,
+                    Salutation: doc.Salutation
                 }));
 
             oModel.setProperty("/AllMembers", allMembers);

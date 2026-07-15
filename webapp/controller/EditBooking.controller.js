@@ -4185,11 +4185,16 @@ sap.ui.define([
                 addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
             }
 
-            addLine("Sub Total", ` ${Formatter.fromatNumber(subTotal)}`);
+                if (discount > 0) {
+                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+                }
 
-             if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)}`);
-            }
+                const finalSubTotal = Number(subTotal) - Number(discount);
+
+
+                 addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
+
+           
 
             if (hasCGST) {
                 const cgst = parseFloat(oHostelModel.CGST) || 0;
