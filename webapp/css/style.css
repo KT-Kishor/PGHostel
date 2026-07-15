@@ -7230,3 +7230,7 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
 .couponTitleOpp {
   color: #6b7280 !important;
 }
+/* this is used to lower case in object pagelayout header titles */
+.sapMITBFilter .sapMITBText .sapMITHTextContent { 
+text-transform: none !important;
+}
