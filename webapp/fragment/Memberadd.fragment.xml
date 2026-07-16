@@ -192,7 +192,7 @@
                 />
                 
                 <HBox
-                    width="100%"
+                    width="90%"
                     alignItems="Center"
 
                 >
@@ -205,8 +205,8 @@
                         valueStateText="{i18n>selectIDProof}"
                         selectionChange="onNewMemberDocumentTypeChange"
                         change="onNewMemberDocumentTypeChange"
-                        width="{= ${device>/system/phone} ? '80%' : '12rem'}"
-                        class="sapUiSmallMarginEnd"
+                        width="{= ${device>/system/phone} ? '45%' : '100%'}"
+                        class="sapUiTinyMarginEnd"
                     >
                         <core:Item
                             key="Aadhaar Card"
@@ -229,14 +229,14 @@
                    <!-- Upload Button -->
                 <unified:FileUploader
                     id="AD_id_FileUploader"
-                    width="{= ${device>/system/phone} ? '100%' : '8rem'}"
+                    width="{= ${device>/system/phone} ? '100%' : '100%'}"
                     visible="{= !${BookingView>/NewMemberDraft/Documents/0/FileName} }"
                     buttonOnly="true"
                     sameFilenameAllowed="true"
                     change="onFileUpload"
                     buttonText="Upload"
                     fileType="pdf,jpg,jpeg,png,webp"
-                    class="sapUiTinyMarginEnd myUnifiedBtn"
+                    class="sapUiTinyMarginBegin sapUiTinyMarginEnd myUnifiedBtn"
                 />
 
                 <!-- Info Icon -->
