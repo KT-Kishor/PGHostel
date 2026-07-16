@@ -9,7 +9,9 @@
         contentWidth="35rem"
         contentHeight="auto"
         draggable="true"
-        resizable="true">
+        resizable="true"
+        afterClose="onEditDialogAfterClose"
+        escapeHandler=".onEditDialogEscape">
 
         <f:SimpleForm
             editable="true"
@@ -81,7 +83,7 @@
                     id="depositTransactionID"
                     value="{DepositModel>DepositTransactionID}"
                     placeholder="Enter Transaction ID"
-                    editable="{= ${DepositModel>DepositMode} === 'UPI' || ${DepositModel>DepositMode} === 'Card' }"/>
+                    enabled="{= ${DepositModel>DepositMode} === 'UPI' || ${DepositModel>DepositMode} === 'Card' }"/>
 
 
                 <!-- Received By -->
@@ -139,7 +141,7 @@
                     visible="{=${DepositModel>Status} === 'Returned'}"
                     value="{DepositModel>ReturnDepositTransactionID}"
                     placeholder="Enter Transaction ID"
-                    editable="{= ${DepositModel>ReturnDepositMode} === 'UPI' || ${DepositModel>ReturnDepositMode} === 'Card' }"/>
+                    enabled="{= ${DepositModel>ReturnDepositMode} === 'UPI' || ${DepositModel>ReturnDepositMode} === 'Card' }"/>
 
                 <!-- Return By -->
                 <Label text="Return By"/>

@@ -1412,6 +1412,7 @@ onSaveDeposit: async function () {
         if (this._oDepositDialog) {
             this._oDepositDialog.close();
         }
+        this._clearTableSelection();
         await this.onDepositSearch();
 
     } catch (err) {
@@ -1424,8 +1425,23 @@ onSaveDeposit: async function () {
     }
 },
 
-onCancelDeposit:function(){
-    this._oDepositDialog.close()
-}
+onCancelDeposit: function () {
+    this._clearTableSelection();
+    this._oDepositDialog.close();
+},
+
+onEditDialogEscape: function (oEvent) {
+    this._clearTableSelection();
+    if (this._oDepositDialog) {
+        this._oDepositDialog.close();
+    }
+    if (oEvent) {
+        oEvent.preventDefault();
+    }
+},
+
+onEditDialogAfterClose: function () {
+    this._clearTableSelection();
+},
     });
 });
