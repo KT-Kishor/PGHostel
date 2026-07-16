@@ -7799,7 +7799,7 @@ sap.ui.define([
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
             doc.text(`${data.BedType || "-"}`, 150, currentY + 22);
-            doc.text(`${data.NoOfPersons || "-"}`, 150, currentY + 34);
+            doc.text(`${data.AllMembers.length || "-"}`, 150, currentY + 34);
             doc.text(`${data.Status || "-"}`, 150, currentY + 46);
 
             // CRITICAL FIX: Establish baseline spacing after the Stay Card

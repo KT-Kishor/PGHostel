@@ -3,7 +3,6 @@
     xmlns:core="sap.ui.core"
 >
     <Dialog
-        id="SC_id_ValueHelpDialog"
         title="{i18n>couponDetails}"
         contentWidth="50%"
     >

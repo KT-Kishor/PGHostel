@@ -1415,9 +1415,15 @@
             this._oFacilityRemoveButton.setVisible(!!oFacility.Selected);
             this._oFacilityRemoveButton.setEnabled(bEditModeEnabled);
 
-            // Set initial focus on Confirm button instead of Cancel
-            if (this._oFacilityConfirmButton) {
+            // Set initial focus on Confirm button instead of Cancel — but only
+            // when it is enabled. In read-only mode Confirm is disabled, and
+            // focusing a disabled control leaves focus outside the popup, which
+            // prevents UI5 from arming the outside-click autoclose. Falling back
+            // to the popover's default focus keeps autoclose working.
+            if (this._oFacilityConfirmButton && bEditModeEnabled) {
                 oFacilityPopover.setInitialFocus(this._oFacilityConfirmButton);
+            } else {
+                oFacilityPopover.setInitialFocus(null);
             }
 
             if (oOpenBy && oFacilityPopover.openBy) {
