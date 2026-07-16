@@ -228,78 +228,119 @@ sap.ui.define([
                 }));
             },
 
-            onFileUpload: function (oEvent) {
-
-                const oFileUploader = oEvent.getSource();
-
+            onFileUpload: async function (oEvent) {
                 const oModel = this.getView().getModel("BookingView");
+                const oUploader = sap.ui.getCore().byId("AD_id_FileUploader");
 
-                const oFile = oEvent.getParameter("files") &&
-                    oEvent.getParameter("files")[0];
+                const file = oEvent.getParameter("files")?.[0];
+                if (!file) return;
 
-                if (!oFile) {
-                    return;
-                }
-
-                const iMaxSize = 2 * 1024 * 1024;
-
-                const sDocType = oModel.getProperty(
-                    "/NewMemberDraft/Documents/0/DocumentType"
-                );
-
+                const sDocType = oModel.getProperty("/NewMemberDraft/Documents/0/DocumentType");
                 if (!sDocType) {
                     sap.m.MessageToast.show("Please select document type first");
-                    oFileUploader.clear();
+                    if (oUploader) oUploader.clear();
                     return;
                 }
 
-                // Size validation
-                if (oFile.size > iMaxSize) {
-                    sap.m.MessageToast.show(oFile.name + " exceeds the 2 MB size limit.");
-                    oFileUploader.clear();
-                    return;
-                }
-
-                const sFileName = oFile.name || "";
-
+                const sFileName = file.name || "";
                 const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
-
-                const bAllowedExt = [
-                    "jpg",
-                    "jpeg",
-                    "png",
-                    "webp",
-                    "pdf"
-                ].includes(sExt);
-
+                const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
                 if (!bAllowedExt) {
-
-                    sap.m.MessageToast.show(
-                        "Only PDF, JPG, JPEG, PNG, WEBP allowed"
-                    );
-
-                    oFileUploader.clear();
+                    sap.m.MessageToast.show("Only PDF, JPG, JPEG, PNG, WEBP allowed");
+                    if (oUploader) oUploader.clear();
                     return;
                 }
 
-                const oReader = new FileReader();
+                const sTempId = this._addBusyProcessingRow();
+                this._showBusyOnUploader(true);
 
-                oReader.onload = function (oLoadEvent) {
+                let processedFile = file;
+                const MAX_SIZE_MB = 2;
+                const fileSizeMB = file.size / (1024 * 1024);
+                const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
 
-                    const sBase64 = String(oLoadEvent.target.result || "").split(",")[1] || "";
+                try {
+                    if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        this.getBusyDialog();
+                        const options = {
+                            maxSizeMB: 1.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(file, options);
+                        this.closeBusyDialog();
+                    } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+                        sap.m.MessageToast.show(file.name + " exceeds the 2 MB size limit.");
+                        if (oUploader) oUploader.clear();
+                        this._removeProcessingRow(sTempId);
+                        this._showBusyOnUploader(false);
+                        oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
+                        return;
+                    }
+
+                    const base64 = await new Promise(function (resolve, reject) {
+                        const reader = new FileReader();
+                        reader.onload = function () { resolve(reader.result.split(",")[1]); };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(processedFile);
+                    });
 
                     let sNewName = sDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
-
                     sNewName += "." + sExt;
 
-                    oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
-                    oModel.setProperty("/NewMemberDraft/Documents/0/FileType", oFile.type || "");
-                    oModel.setProperty("/NewMemberDraft/Documents/0/File", sBase64);
-                    oModel.refresh(true);
-                };
+                    this._removeProcessingRow(sTempId);
 
-                oReader.readAsDataURL(oFile);
+                    oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
+                    oModel.setProperty("/NewMemberDraft/Documents/0/FileType", processedFile.type || "");
+                    oModel.setProperty("/NewMemberDraft/Documents/0/File", base64);
+                    oModel.refresh(true);
+
+                } catch (err) {
+                    this.closeBusyDialog();
+                    this._removeProcessingRow(sTempId);
+                    console.error(err);
+                    sap.m.MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+                } finally {
+                    if (oUploader) oUploader.clear();
+                    this._showBusyOnUploader(false);
+                    oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
+                }
             },
+
+            _addBusyProcessingRow: function () {
+                const oModel = this.getView().getModel("BookingView");
+                const sTempId = "__processing__" + Date.now();
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileName", "Compressing...");
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileType", "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/File", "");
+                oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", true);
+                oModel.setProperty("/NewMemberDraft/Documents/0/tempId", sTempId);
+                oModel.refresh(true);
+                return sTempId;
+            },
+
+            _removeProcessingRow: function (sTempId) {
+                const oModel = this.getView().getModel("BookingView");
+                const sCurrentTempId = oModel.getProperty("/NewMemberDraft/Documents/0/tempId");
+                if (sCurrentTempId === sTempId) {
+                    oModel.setProperty("/NewMemberDraft/Documents/0/FileName", "");
+                    oModel.setProperty("/NewMemberDraft/Documents/0/FileType", "");
+                    oModel.setProperty("/NewMemberDraft/Documents/0/File", "");
+                    oModel.setProperty("/NewMemberDraft/Documents/0/tempId", "");
+                }
+            },
+
+            _showBusyOnUploader: function (bBusy) {
+                const oUploader = sap.ui.getCore().byId("AD_id_FileUploader");
+                if (oUploader) {
+                    oUploader.setBusy(bBusy);
+                }
+            },
+
             onEditMemberFromDialog: function (oEvent) {
 
                 if (!this.MM_Dialog) {
@@ -650,12 +691,44 @@ sap.ui.define([
                 });
             },
 
+            _bufferToBase64: function (oFileBuffer) {
+                if (!(oFileBuffer && typeof oFileBuffer === "object" && oFileBuffer.type === "Buffer" && Array.isArray(oFileBuffer.data))) {
+                    return oFileBuffer || "";
+                }
+
+                try {
+                    const aBytes = oFileBuffer.data;
+                    const iChunkSize = 0x8000;
+                    let sBinary = "";
+
+                    for (let i = 0; i < aBytes.length; i += iChunkSize) {
+                        const aChunk = aBytes.slice(i, i + iChunkSize);
+                        sBinary += String.fromCharCode.apply(null, aChunk);
+                    }
+
+                    return btoa(sBinary);
+                } catch (e) {
+                    console.warn("[_bufferToBase64] Failed to convert Buffer to base64:", e);
+                    return "";
+                }
+            },
+
             _previewDocument: async function (oDoc) {
 
+                const oNormalizedDoc = {
+                    File: this._bufferToBase64(oDoc?.File),
+                    Document: this._bufferToBase64(oDoc?.Document),
+                    Attachment: this._bufferToBase64(oDoc?.Attachment),
+                    FileType: oDoc?.FileType || "",
+                    MimeType: oDoc?.MimeType || "",
+                    FileName: oDoc?.FileName || "",
+                    DocumentName: oDoc?.DocumentName || ""
+                };
+
                 const sRawSource = String(
-                    oDoc?.File ||
-                    oDoc?.Document ||
-                    oDoc?.Attachment ||
+                    oNormalizedDoc?.File ||
+                    oNormalizedDoc?.Document ||
+                    oNormalizedDoc?.Attachment ||
                     ""
                 ).trim();
 
@@ -703,8 +776,9 @@ sap.ui.define([
                         return "";
                     }
 
-                    let current = String(sValue)
-                        .replace(/\s/g, "");
+                    // Normalize up front so URL-safe chars / missing padding
+                    // don't make the first atob() throw.
+                    let current = normalizeBase64(sValue);
 
                     for (let i = 0; i < 10; i++) {
 
@@ -718,41 +792,56 @@ sap.ui.define([
                             return current;
                         }
 
+                        let decoded;
+
                         try {
 
-                            const decoded = atob(current);
-
-                            // RAW PDF bytes
-                            if (decoded.startsWith("%PDF")) {
-                                return btoa(decoded);
-                            }
-
-                            // RAW PNG bytes
-                            if (
-                                decoded.length > 4 &&
-                                decoded.charCodeAt(0) === 137 &&
-                                decoded.charCodeAt(1) === 80
-                            ) {
-                                return btoa(decoded);
-                            }
-
-                            // RAW JPEG bytes
-                            if (
-                                decoded.length > 3 &&
-                                decoded.charCodeAt(0) === 255 &&
-                                decoded.charCodeAt(1) === 216
-                            ) {
-                                return btoa(decoded);
-                            }
-
-                            current = decoded.replace(/\s/g, "");
+                            decoded = atob(current);
 
                         } catch (e) {
 
-                            console.error("Decode failed:", e);
-
-                            break;
+                            // current is not valid base64. Return the last
+                            // known-good value rather than propagating a
+                            // corrupted/undecodable string into the data URL.
+                            return current;
                         }
+
+                        // RAW PDF bytes
+                        if (decoded.startsWith("%PDF")) {
+                            return btoa(decoded);
+                        }
+
+                        // RAW PNG bytes
+                        if (
+                            decoded.length > 4 &&
+                            decoded.charCodeAt(0) === 137 &&
+                            decoded.charCodeAt(1) === 80
+                        ) {
+                            return btoa(decoded);
+                        }
+
+                        // RAW JPEG bytes
+                        if (
+                            decoded.length > 3 &&
+                            decoded.charCodeAt(0) === 255 &&
+                            decoded.charCodeAt(1) === 216
+                        ) {
+                            return btoa(decoded);
+                        }
+
+                        // Only keep unwrapping if the decoded payload is
+                        // itself another base64 string; otherwise stop and
+                        // return the current (valid) base64 layer.
+                        const next = normalizeBase64(decoded);
+
+                        if (
+                            next === current ||
+                            !/^[A-Za-z0-9+/]+={0,2}$/.test(next)
+                        ) {
+                            return current;
+                        }
+
+                        current = next;
                     }
 
                     return current;
