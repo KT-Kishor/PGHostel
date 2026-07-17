@@ -188,7 +188,6 @@
 
                 <Label
                     text="{i18n>uploadDocument}"
-                    required="true"
                 />
                 
                 <HBox

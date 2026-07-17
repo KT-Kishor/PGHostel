@@ -310,6 +310,8 @@
                                 displayFormat="dd/MM/yyyy"
                                 valueFormat="dd/MM/yyyy"
                                 change="onBookingEditDateChange"
+                                valueStateText="{i18n>selectEndDate}"
+
                                 width="55%"
                             />
 
@@ -326,367 +328,7 @@
                 </Panel>
             </VBox>
 
-            <VBox>
-                <Panel
-                    headerText="{= 'Profile Information - ' + ${CustomerData>/CustomerName} }"
-                    expandable="false"
-                    class="customPanelHeader"
-                >
-                    <f:SimpleForm
-                        id="SimpleFormChangeColumn_oneGroup"
-                        busyIndicatorDelay="0"
-                        editable="true"
-                        layout="ColumnLayout"
-                        labelSpanXL="2"
-                        labelSpanL="3"
-                        labelSpanM="2"
-                        labelSpanS="12"
-                        adjustLabelSpan="false"
-                        emptySpanXL="0"
-                        emptySpanL="0"
-                        emptySpanM="0"
-                        emptySpanS="0"
-                        columnsXL="3"
-                        columnsL="2"
-                        columnsM="2"
-                        singleContainerFullSize="false"
-                    >
-                        <!-- Personal Information -->
-                        <f:content>
-                            <core:Title text="" />
-                            <Label
-                                text="{i18n>fullname}"
-                            />
-                            <Text
-                                text="{= ${CustomerData>/Salutation} + ' ' + ${CustomerData>/CustomerName} }"
-                            />
-
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>fullname}"
-                            /> -->
-                            <!-- <Text text="{CustomerData>/CustomerName}" visible="{= !${VisibleModel>/visible} }" /> -->
-
-                            <!-- <Select
-                                selectedKey="{Bookingmodel>/Salutation}"
-                                visible="{VisibleModel>/visible}"
-                                change="onAdminChangeSalutation"
-                            >
-                                <core:Item
-                                    key="Mr."
-                                    text="Mr."
-                                />
-                                <core:Item
-                                    key="Ms."
-                                    text="Ms."
-                                />
-                                <core:Item
-                                    key="Mrs."
-                                    text="Mrs."
-                                />
-                                <core:Item
-                                    key="Dr."
-                                    text="Dr."
-                                />
-                                <layoutData>
-                                    <f:ColumnElementData
-                                        cellsSmall="3"
-                                        cellsLarge="2"
-                                    />
-                                </layoutData>
-                            </Select> -->
-                            <!-- <Input
-                                value="{Bookingmodel>/CustomerName}"
-                                maxLength="50"
-                                visible="{VisibleModel>/visible}"
-                                id="AD_id_CustomerName"
-                                valueStateText="{i18n>enterCustomerName}"
-                                liveChange="onChange"
-                                width="41.5%"
-                                placeholder="Enter full name"
-                            /> -->
-
-                            <Label
-                                text="{i18n>MVDDOB}"
-                            />
-                            <Text
-                                text="{CustomerData>/DateOfBirth}"
-                            />
-<!-- 
-                            <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>MVDDOB}"
-                            />
-                            <DatePicker
-                                width="55%"
-                                value="{Bookingmodel>/DateOfBirth}"
-                                displayFormat="dd/MM/yyyy"
-                                valueFormat="dd/MM/yyyy"
-                                visible="{VisibleModel>/visible}"
-                                id="AD_id_Date"
-                                valueStateText="{i18n>enterDateofBirth}"
-                                change="onDateChange"
-                            /> -->
-
-                            <Label
-                                text="{i18n>MVgender}"
-                            />
-                            <Text
-                                text="{CustomerData>/Gender}"
-                            />
-
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>MVgender}"
-                            />
-                            <ComboBox
-                                width="55%"
-                                selectedKey="{Bookingmodel>/Gender}"
-                                visible="{VisibleModel>/visible}"
-                                id="Ad_id_gender"
-                                valueStateText="{i18n>selectGender}"
-                                change="onChange"
-                                placeholder="Select gender"
-                            >
-                                <core:Item
-                                    key="Male"
-                                    text="Male"
-                                />
-                                <core:Item
-                                    key="Female"
-                                    text="Female"
-                                />
-                                <core:Item
-                                    key="Other"
-                                    text="Other"
-                                />
-                            </ComboBox> -->
-
-                            <Label
-                                text="{i18n>email}"
-                            />
-                            <Text
-                                text="{CustomerData>/CustomerEmail}"
-                            />
-
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>email}"
-                            />
-                            <Input
-                                width="55%"
-                                value="{Bookingmodel>/CustomerEmail}"
-                                type="Email"
-                                maxLength="50"
-                                visible="{VisibleModel>/visible}"
-                                id="Ad_id_CustomerEmail"
-                                valueStateText="{i18n>enterEmailId}"
-                                change="onChangemail"
-                                placeholder="Enter email ID"
-                            /> -->
-
-                            <Label
-                                text="{i18n>MVDcountry}"
-                            />
-                            <Text
-                                text="{CustomerData>/Country}"
-                            />
-
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>MVDcountry}"
-                            />
-                            <ComboBox
-                                width="55%"
-                                id="CC_id_Country"
-                                change="MC_onChangeCountry"
-                                placeholder="{i18n>enterCountry}"
-                                valueStateText="{i18n>selectCountry}"
-                                items="{path:'CountryModel>/',length:1000}"
-                                selectedKey="{Bookingmodel>/Country}"
-                                showSecondaryValues="true"
-                                visible="{VisibleModel>/visible}"
-                                selectionChange="onCountrySelectionChange"
-                            >
-                                <core:ListItem
-                                    key="{CountryModel>countryName}"
-                                    text="{CountryModel>countryName}"
-                                    additionalText="{CountryModel>code}"
-                                />
-                            </ComboBox> -->
-
-                            <Label
-                                text="{i18n>MVDstate}"
-                            />
-                            <Text
-                                text="{CustomerData>/State}"
-                            />
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>MVDstate}"
-                            />
-                            <ComboBox
-                                width="55%"
-                                id="CC_id_State"
-                                change="CC_onChangeState"
-                                placeholder="{i18n>enterState}"
-                                valueStateText="{i18n>selectState}"
-                                items="{path:'StateModel>/',length:1000}"
-                                selectedKey="{Bookingmodel>/State}"
-                                showSecondaryValues="true"
-                                visible="{VisibleModel>/visible}"
-                            >
-                                <core:ListItem
-                                    key="{StateModel>stateName}"
-                                    text="{StateModel>stateName}"
-                                />
-                            </ComboBox> -->
-                            <Label
-                                text="{i18n>city}"
-                            />
-                            <Text
-                                text="{CustomerData>/City}"
-                            />
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>city}"
-                            />
-                            <ComboBox
-                                width="55%"
-                                id="CC_id_City"
-                                change="onChange"
-                                valueStateText="{i18n>cityValueText}"
-                                placeholder="{i18n>enterCity}"
-                                items="{
-                                        path:'CityModel>/',
-                                        length:1000
-                                    }"
-                                value="{Bookingmodel>/City}"
-                                showSecondaryValues="true"
-                                visible="{VisibleModel>/visible}"
-                            >
-                                <core:ListItem
-                                    key="{CityModel>cityName}"
-                                    text="{CityModel>cityName}"
-                                    additionalText="{CityModel>branchCode}"
-                                />
-                            </ComboBox> -->
-
-                            <Label
-                                text="{i18n>address}"
-                            />
-                            <Text
-                                text="{CustomerData>/Address}"
-                            />
-
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>address}"
-                            />
-                            <TextArea
-                                value="{Bookingmodel>/Address}"
-                                maxLength="150"
-                                visible="{VisibleModel>/visible}"
-                                id="Ad_id_Address"
-                                width="55%"
-                                rows="3"
-                                valueStateText="{i18n>enterAddress}"
-                                liveChange="onChange"
-                                placeholder="Enter address"
-                            /> -->
-
-                            <Label
-                                text="{i18n>MSmobileNo}"
-                            />
-                            <Text
-                                text="{= ${CustomerData>/STDCode} + ' ' + ${CustomerData>/MobileNo} }"
-                            />
-                            <!-- <Text text="{CustomerData>/MobileNo}" visible="{= !${VisibleModel>/visible} }" /> -->
-                            <!-- <Label
-                                required="{= ${VisibleModel>/visible} ? true : false }"
-                                text="{i18n>MSmobileNo}"
-                            /> -->
-                            <!-- <Input id="CC_id_STDCode" value="{Bookingmodel>/STDCode}" visible="{VisibleModel>/visible}">
-                                <layoutData>
-                                    <f:ColumnElementData cellsSmall="2" cellsLarge="1" />
-                                </layoutData>
-                            </Input> -->
-<!-- 
-                            <ComboBox
-                                change="onSTDChange"
-                                id="CC_id_STDCode"
-                                placeholder="STD code"
-                                valueStateText="{i18n>MSselectCode}"
-                                showSecondaryValues="true"
-                                items="{path:'CountryModel>/', length:1000}"
-                                selectedKey="{Bookingmodel>/STDCode}"
-                                filterSecondaryValues="true"
-                                visible="{VisibleModel>/visible}"
-                            >
-                                <core:ListItem
-                                    key="{CountryModel>stdCode}"
-                                    text="{CountryModel>stdCode}"
-                                    additionalText="{CountryModel>code}"
-                                />
-                                <layoutData>
-                                    <f:ColumnElementData
-                                        cellsSmall="3"
-                                        cellsLarge="2"
-                                    />
-                                </layoutData>
-                            </ComboBox> -->
-                            <!-- Phone Number -->
-                            <!-- <Input
-                                id="CD_ID_idPhone"
-                                value="{Bookingmodel>/MobileNo}"
-                                placeholder="{i18n>enterContactNumber}"
-                                liveChange="onmobileChange"
-                                valueStateText="{i18n>enterContactNumber}"
-                                visible="{VisibleModel>/visible}"
-                                width="41.5%"
-                            /> -->
-                        </f:content>
-                    </f:SimpleForm>
-                    <FlexBox
-                        alignItems="Start"
-                        justifyContent="Start"
-                        class="sapUiSmallMarginTop"
-                        items="{ path: 'CustomerData>/Persons' }"
-                    >
-                        <VBox
-                            width="260px"
-                            class="sapUiSmallMargin"
-                        >
-                            <Title
-                                text="{= 'Facilities for ' + (${CustomerData>CustomerName} || 'Person') }"
-                                level="H6"
-                            />
-                            <FlexBox
-                                justifyContent="Start"
-                                items="{ path: 'CustomerData>PersonFacilitiesSummary' }"
-                            >
-                                <VBox
-                                    width="200px"
-                                    height="200px"
-                                    class="sapUiSmallMargin serviceCard"
-                                    alignItems="Center"
-                                    justifyContent="Center"
-                                    visible="{= !!${CustomerData>FacilityName} }"
-                                >
-                                    <Image
-                                        src="{CustomerData>Image}"
-                                        width="180px"
-                                        height="140px"
-                                        densityAware="false"
-                                    />
-                                    <Text text="{CustomerData>FacilityName}" />
-                                    <Text
-                                        text="{= '₹ ' + ${CustomerData>Price}}"
-                                    />
-                                </VBox>
-                            </FlexBox>
-                        </VBox>
-                    </FlexBox>
+           
 
                     <VBox class="sapUiMediumMarginBottom">
                         <Panel
@@ -713,8 +355,8 @@
                                         />
                                         <ToolbarSpacer />
                                         <Button
-                                            text="{i18n>uploadDocuments}"
-                                            tooltip="{i18n>uploadDocuments}"
+                                            text="{i18n>Manage Member}"
+                                            tooltip="{i18n>Manage Member}"
                                             press="onUploadDocumentFile"
                                             class="myUnifiedBtn"
                                             visible="{VisibleModel>/visible}"
@@ -722,49 +364,86 @@
                                     </Toolbar>
                                 </headerToolbar>
                                 <columns>
+                                  <Column
+                                            id="primaryColumn"
+                                            width="6rem"
+                                            visible="{= ${CustomerData>/Documents}.length > 1 }"
+
+
+                                    >
+                                        <Text text="Primary" />
+                                    </Column>
                                     <Column demandPopin="true">
                                         <Text
                                             text="{i18n>membername}"
                                             tooltip="{i18n>membername}"
                                         />
                                     </Column>
-                                    <Column demandPopin="true">
+                                      <Column demandPopin="true">
                                         <Text
-                                            text="{i18n>filename}"
-                                            tooltip="{i18n>filename}"
+                                            text="{i18n>age}"
+                                            tooltip="{i18n>age}"
                                         />
                                     </Column>
+                                      <Column demandPopin="true">
+                                        <Text
+                                            text="{i18n>Gender}"
+                                            tooltip="{i18n>Gender}"
+                                        />
+                                    </Column>
+                                       <Column demandPopin="true">
+                                        <Text
+                                            text="{i18n>Relationship}"
+                                            tooltip="{i18n>Relationship}"
+                                        />
+                                    </Column>
+                                   
+                                 
                                     <Column demandPopin="true">
                                         <Text
                                             text="{i18n>MVDdocumenttype}"
                                             tooltip="{i18n>MVDdocumenttype}"
                                         />
                                     </Column>
-                                    <Column
-                                        demandPopin="true"
-                                        minScreenWidth="Tablet"
-                                    >
+                                  
+                                       <Column demandPopin="true">
                                         <Text
-                                            text="{i18n>FileType}"
-                                            tooltip="{i18n>FileType}"
+                                            text="{i18n>Document}"
+                                            tooltip="{i18n>Document}"
                                         />
                                     </Column>
                                 </columns>
                                 <items>
                                     <ColumnListItem>
                                         <cells>
+                                         <RadioButton
+                                                groupName="primaryOccupantGroup"
+                                                selected="{CustomerData>IsPrimary}"
+                                                select="onPrimaryOccupantRadioSelect"
+                                                enabled="{VisibleModel>/visible}"
+                                          visible="{= ${CustomerData>/Documents}.length > 1 }"
+                                            />
                                             <Text
                                                 text="{CustomerData>MemberName}"
                                             />
-                                            <Link
-                                                text="{CustomerData>FileName}"
-                                                press="onFileNameLinkPress"
+                                          
+                                                  <Text 
+                                                text="{path: 'CustomerData>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
                                             />
+                                             <Text
+                                                text="{CustomerData>Gender}"
+                                            />
+                                              <Text
+                                                text="{CustomerData>Relation}"
+                                            />
+                                           
                                             <Text
                                                 text="{CustomerData>DocumentType}"
                                             />
-                                            <Text
-                                                text="{CustomerData>FileType}"
+                                         
+                                             <Link
+                                                text="{CustomerData>FileName}"
+                                                press="onFileNameLinkPress"
                                             />
                                         </cells>
                                     </ColumnListItem>
@@ -1251,8 +930,7 @@
                             </HBox>
                         </VBox>
                     </FlexBox>
-                </Panel>
-            </VBox>
+              
         </ScrollContainer>
         <!-- <footer>
         
