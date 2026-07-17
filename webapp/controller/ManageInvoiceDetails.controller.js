@@ -549,7 +549,7 @@ sap.ui.define([
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
                     mergedData.InvDate = new Date();
-                    mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate);
+                    mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate, startDate, endDate);
                     oModel.setData(mergedData);
 
                     const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
@@ -883,7 +883,16 @@ sap.ui.define([
 
                 oModel.setProperty("/InvoiceDate", selectedDate);
                 oModel.setProperty("/PayByDate", payByDate);
-                oModel.setProperty("/InvoiceDescription", this._getInvoiceDescription(selectedDate));
+
+                const paymentType = oModel.getProperty("/PaymentType");
+                const startDate = new Date(oModel.getProperty("/StartDate"));
+                const endDate = new Date(oModel.getProperty("/EndDate"));
+
+                oModel.setProperty(
+                    "/InvoiceDescription",
+                    this._getInvoiceDescription(paymentType, startDate, endDate)
+                );
+
                 utils._LCvalidateDate(oEvent);
             },
 
@@ -895,18 +904,31 @@ sap.ui.define([
                 utils._LCvalidateDate(oEvent);
             },
 
-            _getInvoiceDescription: function(oDate) {
-                if (!oDate) return "";
+            _getInvoiceDescription: function (paymentType, startDate, endDate) {
+                if (!startDate) {
+                    return "";
+                }
 
                 const aMonths = [
                     "January", "February", "March", "April", "May", "June",
                     "July", "August", "September", "October", "November", "December"
                 ];
 
-                const monthName = aMonths[oDate.getMonth()];
-                const year = oDate.getFullYear();
+                // Format: DD/MM/YYYY
+                const formatDate = function (oDate) {
+                    const day = String(oDate.getDate()).padStart(2, "0");
+                    const month = String(oDate.getMonth() + 1).padStart(2, "0");
+                    const year = oDate.getFullYear();
+                    return `${day}/${month}/${year}`;
+                };
 
-                return `Invoice for ${monthName} ${year}`;
+                // Per Month
+                if (paymentType === "Per Month") {
+                    return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
+                }
+
+                // Per Day / Year / Others
+                return `Invoice for ${formatDate(startDate)} - ${formatDate(endDate)}`;
             },
 
             CID_onPressAddInvoiceItems: function(oEvent) {
