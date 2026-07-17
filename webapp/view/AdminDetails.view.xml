@@ -1260,7 +1260,7 @@
         </footer> -->
 
         <footer>
-            <Bar id="idFooterBar">
+            <Bar id="idFooterBar" class="footerBtnBar">
                 <contentLeft>
                 <FlexBox class="profile-footer-scroll-text" alignItems="Center">
                 <items>

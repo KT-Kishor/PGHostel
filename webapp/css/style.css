@@ -1871,6 +1871,17 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   margin-right: 0 !important;
 }
 
+/* Footer buttons: equal spacing between all buttons */
+.footerBtnBar .sapMBarRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footerBtnBar .sapMBarRight .myUnifiedBtn {
+  margin: 0 !important;
+}
+
 .customBoldTitle {
   font-weight: bold;
   font-size: 1.5rem;
