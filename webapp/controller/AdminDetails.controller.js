@@ -4615,7 +4615,10 @@ if (documents.length > 1) {
                 "Documents": CustomerData.Documents
                     .filter(function (item) {
                         // Skip if MemberID exists in DraftModel
-                        return !aDraftMemberIds.includes(item.MemberID);
+                         return (
+            !aDraftMemberIds.includes(item.MemberID) &&
+            item.FileName
+        );
                     })
                     .map(function (item) {
                         return {
