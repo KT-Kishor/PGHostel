@@ -645,20 +645,20 @@ sap.ui.define([
 
         _createDepositColumnConfig: function () {
             return [
-                { label: "Property Name", property: "BranchName", type: "string" },
-                { label: "Booking ID", property: "BookingID", type: "String" },
-                { label: "Customer Name", property: "CustomerName", type: "String" },
-                { label: "Deposit Date", property: "DepositDate", type: "string" },
-                { label: "Deposit Amount", property: "DepositAmount", type: "Number" },
-                { label: "Deposit Mode", property: "DepositMode", type: "String" },
-                { label: "Transaction ID", property: "DepositTransactionID", type: "String" },
-                { label: "Deposit Taken By", property: "DepositTakenBy", type: "String" },
-                { label: "Return Date", property: "ReturnDepositDate", type: "String" },
-                { label: "Return Amount", property: "ReturnDepositAmount", type: "Number" },
-                { label: "Return Mode", property: "ReturnDepositMode", type: "String" },
-                { label: "Return Transaction ID", property: "ReturnDepositTransactionID", type: "String" },
-                { label: "Return Deposit By", property: "ReturnDepositBy", type: "String" },
-                { label: "Status", property: "Status", type: "String" }
+                { label: "Property Name", property: "BranchName", type: EdmType.String },
+                { label: "Booking ID", property: "BookingID", type: EdmType.String },
+                { label: "Customer Name", property: "CustomerName", type: EdmType.String },
+                { label: "Deposit Date", property: "DepositDate", type: EdmType.String },
+                { label: "Deposit Amount", property: "DepositAmount", type: EdmType.String },
+                { label: "Deposit Mode", property: "DepositMode", type: EdmType.String },
+                { label: "Transaction ID", property: "DepositTransactionID", type: EdmType.String },
+                { label: "Deposit Taken By", property: "DepositTakenBy", type: EdmType.String },
+                { label: "Return Date", property: "ReturnDepositDate", type: EdmType.String },
+                { label: "Return Amount", property: "ReturnDepositAmount", type: EdmType.String },
+                { label: "Return Mode", property: "ReturnDepositMode", type: EdmType.String },
+                { label: "Return Transaction ID", property: "ReturnDepositTransactionID", type: EdmType.String },
+                { label: "Return Deposit By", property: "ReturnDepositBy", type: EdmType.String },
+                { label: "Status", property: "Status", type: EdmType.String }
             ];
         },
 
