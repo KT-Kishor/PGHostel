@@ -74,7 +74,40 @@ sap.ui.define([
             var model = new JSONModel({});
             this.getView().setModel(model, "Member")
         },
+            MPonAddressChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+                      },
+                    
+                        onChangeSalutation: function(oEvent) {
+            const oSalutation = oEvent.getSource();
+            const sKey = oSalutation.getSelectedKey();
 
+            // Gender control from the same view
+            const oGender = this.byId("id_gender1");
+
+            if (!oGender) {
+                console.error(this.i18nModel.getText("nogenderselect"));
+                return;
+            }
+
+            // Reset gender
+            oGender.setSelectedKey("");
+            oGender.setEnabled(true);
+
+            // Auto-select based on salutation
+            if (sKey === "Mr.") {
+                oGender.setSelectedKey("Male");
+                oGender.setEnabled(false);
+            } else if (sKey === "Ms." || sKey === "Mrs.") {
+                oGender.setSelectedKey("Female");
+                oGender.setEnabled(false);
+            } else if (sKey === "Other.") {
+                oGender.setSelectedKey("Other");
+                oGender.setEnabled(false);
+            }
+
+            utils._LCstrictValidationSelect(oSalutation);
+        },
         ManageData: async function() {
             // always read current user from models instead of relying solely on cached variable
             let oUser = this.getView().getModel("LoginModel")?.getData() ||
@@ -1768,6 +1801,11 @@ oProfileModel.setProperty("/photo", sPhoto);
             if (!isEditMode) {
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
+                if(data.Salutation==="Dr."){
+                     this.getView().byId("id_gender1").setEnabled(true)
+                }else{
+                     this.getView().byId("id_gender1").setEnabled(false)
+                }
                 return;
             }
             const isMandatoryValid = (
