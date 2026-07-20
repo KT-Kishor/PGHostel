@@ -557,17 +557,49 @@ sap.ui.define([
                     CustCompanyAddress: oCustomer.Bookings?.[0]?.CustCompanyAddress
                 };
                 const AllMembers = oCustomer.Members;
+                const primaryMemberID = (oCustomer.Bookings?.[0]?.MemberID || "")
+                    .split(",")[0]
+                    .trim();
 
-                // 2. Map through documents to inject the Member Name
-                const Documents = (oCustomer.Documents || []).map(doc => {
-                    // Find the member object where IDs match
-                    const oMember = AllMembers.find(member => member.MemberID === doc.MemberID);
+                const primaryMemberIDs = (oCustomer.Bookings?.[0]?.MemberID || "")
+                    .split(",")
+                    .map(id => id.trim())
+                    .filter(Boolean);
 
-                    return {
-                        ...doc,
-                        // Add the MemberName property; default to 'Unknown' if not found
-                        MemberName: oMember ? oMember.Name : "Unknown Member"
-                    };
+
+                const filteredMembers = AllMembers.filter(member =>
+                    primaryMemberIDs.includes(member.MemberID)
+                );
+
+
+                const Documents = filteredMembers.flatMap(member => {
+                    const memberDocs = (oCustomer.Documents || []).filter(
+                        doc => doc.MemberID === member.MemberID
+                    );
+
+                    if (memberDocs.length > 0) {
+                        return memberDocs.map(doc => ({
+                            ...doc,
+                            MemberName: member.Name,
+                            DateOfBirth: this.Formatter.formatAgeFromDOBOrAge(member.DateOfBirth),
+                            Relation: member.Relation,
+                            Gender: member.Gender,
+                            IsPrimary: member.MemberID.trim() === primaryMemberID
+                        }));
+                    }
+
+                    return [{
+                        MemberID: member.MemberID,
+                        MemberName: member.Name,
+                        DateOfBirth: member.DateOfBirth,
+                        Relation: member.Relation,
+                        Gender: member.Gender,
+                        DocumentID: "",
+                        DocumentName: "",
+                        FileName: "",
+                        FileUrl: "",
+                        IsPrimary: member.MemberID.trim() === primaryMemberID
+                    }];
                 });
 
                 // Final result object
@@ -751,6 +783,7 @@ sap.ui.define([
                         FacilityBasicprice = FacilityBasicprice.UnitPrice !== "0" ? FacilityBasicprice.UnitPrice : FacilityBasicprice.MinimumPrice
 
                     }
+                 
 
                     const fPrice = parseFloat(f.FacilitiPrice || 0);
 
@@ -822,7 +855,7 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-
+                 
                     // Store final facility record
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
@@ -843,6 +876,7 @@ sap.ui.define([
                         MemberID: f.MemberID,
                         TotalHour: f.TotalHour,
                         quantity: f.Quantity,
+                        packagequantity: f.UnitText === "Package Price" && f.FacilityChargeType==="DAILY" ? (Number(f.Quantity) * days) : f.Quantity,
                         SelectionMode: f.SelectionMode,
                         Image: f.Image,
                         Currency: f.Currency,
@@ -978,7 +1012,7 @@ sap.ui.define([
             sap.ui.getCore().byId("editHours").setVisible(false)
             sap.ui.getCore().byId("editFacilityName").setValueState("None").setSelectedKey("")
             sap.ui.getCore().byId("editStartDate").setValueState("None").setEditable(true)
-            sap.ui.getCore().byId("editEndDate").setValueState("None")
+            sap.ui.getCore().byId("editEndDate").setValueState("None").setMinDate(new Date(data.StartDate.split("/").reverse().join("-")))
             sap.ui.getCore().byId("editquantity").setValueState("None")
             sap.ui.getCore().byId("editMembername").setVisible(false).setSelectedKey("").setValueState("None")
 
@@ -1669,6 +1703,8 @@ sap.ui.define([
                     //     finalPrice = basePrice * iquantity * iDays;
                     // }
                     finalPrice = basePrice * iDays;
+                    oPayload.packagequantity=iquantity * iDays
+                    
 
                 } else if (selectionmode === "PERSON_QTY") {
                     // if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
@@ -1685,6 +1721,7 @@ sap.ui.define([
 
                     // }
                     finalPrice = this.SelectedFacility.MinimumPrice
+                    oPayload.packagequantity=iquantity
                 } else if (selectionmode === "QTY" && this.SelectedFacility.UnitPrice !== "0") {
                     finalPrice = basePrice * iquantity;
                 } else {
@@ -1693,6 +1730,25 @@ sap.ui.define([
                 }
 
             }
+              oPayload.SelectionMode = selectionmode
+
+            if (oPayload.SelectionMode === "PERSON_QTY") {
+                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
+            }
+              
+            if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
+                oPayload.UnitText = "Package Price"
+            }
+             if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="DAILY"){
+                    oPayload.packagequantity=iquantity * iDays
+                    oPayload.UnitText = "Package Price"
+                    finalPrice = basePrice * iDays;
+            }else if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="Entire Booking"){
+                    oPayload.packagequantity = iquantity
+                    oPayload.UnitText = "Package Price"
+                    finalPrice = basePrice;
+            }
+
             if (oPayload.CouponDiscount !== "") {
                 finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
             }
@@ -1712,15 +1768,7 @@ sap.ui.define([
 
             oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
-            oPayload.SelectionMode = selectionmode
-
-            if (oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
-            }
-
-            if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.UnitText = "Package Price"
-            }
+          
             // Remove unwanted fields
 
             // Ensure array exists
@@ -1728,15 +1776,15 @@ sap.ui.define([
                 oCustomerData.AllSelectedFacilities = [];
             }
 
-            const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
-                item.FacilityName === oPayload.FacilityName &&
-                item.FacilityChargeType === "Entire Booking" && item.MemberName === oPayload.MemberName
-            );
+            // const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
+            //     item.FacilityName === oPayload.FacilityName &&
+            //     item.FacilityChargeType === "Entire Booking" && item.MemberName === oPayload.MemberName
+            // );
 
-            if (oDuplicate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
-                return;
-            }
+            // if (oDuplicate) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
+            //     return;
+            // }
             // EDIT
             if (oPayload.UnitText === "Package Price" && this.edit === false) {
 
@@ -1758,9 +1806,9 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     return (
-                        newStart <= oldEnd &&
-                        newEnd >= oldStart &&
-                        item.FacilityChargeType === "DAILY" &&
+                        newStart < oldEnd &&
+                        newEnd > oldStart &&
+                        (item.FacilityChargeType === "DAILY" || item.FacilityChargeType === "Entire Booking") &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -1787,9 +1835,9 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     return (
-                        newStart <= oldEnd &&
-                        newEnd >= oldStart &&
-                        item.FacilityChargeType === "DAILY" &&
+                        newStart < oldEnd &&
+                        newEnd > oldStart &&
+                        (item.FacilityChargeType === "DAILY" || item.FacilityChargeType === "Entire Booking") &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -1812,7 +1860,7 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     //  Block ONLY if dates overlap
-                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+                    const isOverlap = newStart < oldEnd && newEnd > oldStart && item.FacilityName === oPayload.FacilityName;
 
                     return isOverlap;
                 });
@@ -1838,8 +1886,8 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     return (
-                        newStart <= oldEnd &&
-                        newEnd >= oldStart &&
+                        newStart < oldEnd &&
+                        newEnd > oldStart &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -1867,7 +1915,7 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     //  Block ONLY if dates overlap
-                    const isOverlap = newStart <= oldEnd && newEnd >= oldStart && item.FacilityName === oPayload.FacilityName;
+                    const isOverlap = newStart < oldEnd && newEnd > oldStart && item.FacilityName === oPayload.FacilityName;
 
                     return isOverlap;
                 });
@@ -1896,8 +1944,8 @@ sap.ui.define([
                     const oldEnd = this._parseDate(item.EndDate);
 
                     return (
-                        newStart <= oldEnd &&
-                        newEnd >= oldStart &&
+                        newStart < oldEnd &&
+                        newEnd > oldStart &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -2717,7 +2765,8 @@ sap.ui.define([
             sap.ui.getCore().byId("editHours").setValueState("None")
             sap.ui.getCore().byId("editFacilityName").setValueState("None")
             sap.ui.getCore().byId("editStartDate").setValueState("None")
-            sap.ui.getCore().byId("editEndDate").setValueState("None")
+            sap.ui.getCore().byId("editEndDate").setValueState("None").setMinDate(new Date(sStartDate))
+
         },
 
         onDeleteFacilityDetails: function () {
@@ -3683,8 +3732,21 @@ sap.ui.define([
             const documents = CustomerData.Documents || [];
 
             // valid MemberIDs
-            const validMemberIds = new Set(CustomerData.AllMembers.map(d => d.MemberID));
+            const validMemberIds = new Set(CustomerData.Documents.map(d => d.MemberID));
 
+            if (validMemberIds.size === 0) {
+    sap.m.MessageToast.show("Please select at least one member");
+    return;
+}
+
+if (documents.length > 1) {
+    const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
+
+    if (!hasPrimaryMember) {
+        sap.m.MessageToast.show("Please select a primary member.");
+        return;
+    }
+}
             // split invalid vs valid
             const toDelete = [];
             const toKeep = [];
@@ -3702,7 +3764,9 @@ sap.ui.define([
 
             if (toDelete.length === 0) {
                 // nothing to delete → directly proceed
+
                 await this.onSaveBooking1();
+
                 return;
             }
 
@@ -3735,7 +3799,7 @@ sap.ui.define([
                     await Promise.all(deletePromises);
 
                     // 3. NOW proceed to next step
-                    this.onSaveBooking1();
+                      this.onSaveBooking1();
 
                 }.bind(this)
             }
@@ -3900,6 +3964,20 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
 
         },
+        onPrimaryOccupantRadioSelect: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("CustomerData");
+            const sSelectedMemberID = oContext.getProperty("MemberID");
+
+            const oModel = this.getView().getModel("CustomerData");
+            const aDocuments = oModel.getProperty("/Documents");
+
+            aDocuments.forEach(item => {
+                item.IsPrimary = (item.MemberID === sSelectedMemberID);
+            });
+
+            oModel.setProperty("/Documents", aDocuments);
+            oModel.refresh(true);
+        },
 
         onSaveBooking1: async function () {
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
@@ -3918,12 +3996,6 @@ sap.ui.define([
             ) {
                 editedSections.push("Customer Documents");
             }
-
-
-
-
-
-
 
             const oHostelModel = this.getView().getModel("HostelModel");
 
@@ -3944,6 +4016,11 @@ sap.ui.define([
                 // utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
                 // utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
             );
+            
+            if (!isMandatoryValid) {
+                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                return;
+            }
             Bookingdata.EndDate = (Bookingdata.EndDate).includes("/") ? Bookingdata.EndDate : Bookingdata.EndDate.split('-').reverse().join('/')
             var BookingdataEndDate = (Bookingdata.EndDate).includes("/") ? this._parseDate(Bookingdata.EndDate) : Bookingdata.EndDate
 
@@ -3956,6 +4033,16 @@ sap.ui.define([
                 "yearly": "Per Year",
                 "daily": "Per Day"
             };
+            if (paymentMap[Bookingdata.UnitText] === "Per Day") {
+
+                var bValid = utils._LCvalidateMandatoryField(this.byId("editEndDate"), "ID");
+
+                if (!bValid) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+
+                    return;
+                }
+            }
 
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
@@ -4167,27 +4254,6 @@ sap.ui.define([
 
                 return;
             }
-
-
-            // if (Bookingdata.STDCode === "+91") {
-            //     if (Bookingdata.MobileNo.length === 10) {
-            //         oInput.setValueState("None");
-
-            //     } else {
-            //         oInput.setValueState("Error");
-            //         sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-
-            //         return;
-            //     }
-            // }
-
-            if (!isMandatoryValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-                return;
-            }
-
-            // Map UnitText to desired PaymentType
-
 
             // Normalize UnitText: trim and lowercase
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
@@ -4461,6 +4527,20 @@ sap.ui.define([
                 return item.MemberID;
             });
 
+            const aMembers = CustomerData.Documents || [];
+
+            // Primary member first
+            const primaryMember = aMembers.find(m => m.IsPrimary);
+
+            // Remaining members
+            const otherMembers = aMembers.filter(m => !m.IsPrimary);
+
+            // Create comma-separated MemberIDs
+            const SelectedmemberIds = [
+                ...(primaryMember ? [primaryMember.MemberID] : []),
+                ...otherMembers.map(m => m.MemberID)
+            ].join(",");
+
             const pdfBase64 = await this.onGeneratePDF();
 
 
@@ -4503,7 +4583,7 @@ sap.ui.define([
                     "TotalRoomprice": CustomerData.RentPrice,
                     "GSTType": CustomerData.GSTType,
                     "GSTValue": CustomerData.GSTValue,
-                    "MemberID": memberIds,
+                    "MemberID": SelectedmemberIds,
                     "AdminUpdated": "YES",
                     "Status": CustomerData.Status,
                     "BookingID": CustomerData.BookingID
@@ -4536,7 +4616,10 @@ sap.ui.define([
                 "Documents": CustomerData.Documents
                     .filter(function (item) {
                         // Skip if MemberID exists in DraftModel
-                        return !aDraftMemberIds.includes(item.MemberID);
+                         return (
+            !aDraftMemberIds.includes(item.MemberID) &&
+            item.FileName
+        );
                     })
                     .map(function (item) {
                         return {
@@ -4552,13 +4635,13 @@ sap.ui.define([
             };
 
 
-            var memberIds = CustomerData.AllMembers
-                .map(doc => doc.MemberID)
-                .join(",");
+            // var memberIds = CustomerData.AllMembers
+            //     .map(doc => doc.MemberID)
+            //     .join(",");
 
-            this.MemberID = memberIds
+            this.MemberID = SelectedmemberIds
 
-            Payload.Booking[0].MemberID = memberIds;
+            // Payload.Booking[0].MemberID = memberIds;
 
             if (this.flag === true && this.index !== 0) {
                 var PaymentPayload = {
@@ -4573,7 +4656,6 @@ sap.ui.define([
                     "BranchName": CustomerData.BranchName || "",
 
                 }
-                this.getBusyDialog()
 
                 this.ajaxCreateWithJQuery("HM_PaymentDetail", {
                     data: PaymentPayload,
@@ -4581,9 +4663,8 @@ sap.ui.define([
                 })
             }
             // Send payload
-            this.getBusyDialog()
 
-            this.ajaxUpdateWithJQuery("HM_Customer", {
+              this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
                     BookingID: CustomerData.BookingID
@@ -4598,6 +4679,7 @@ sap.ui.define([
                     }
                     this.flag = false
 
+                    
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
@@ -4606,7 +4688,6 @@ sap.ui.define([
                     sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
                     console.error(err);
                 });
-
         },
         onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
@@ -4840,51 +4921,85 @@ sap.ui.define([
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
             var oItem = oEvent.getParameter("listItem");
             var oCtx = oItem.getBindingContext("CustomerData");
-            var iIndex = oCtx.getPath().split("/").pop();
-            var oDoc = aDocs[iIndex];
+            var oDoc = oCtx.getObject();
 
             var that = this;
 
             // If saved document → ask confirmation + AJAX delete
-            if (oDoc.DocumentID) {
-                MessageBox.confirm(
-                    "This Document is already Saved. Do you want to Delete it?", {
-                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                    styleClass: "myUnifiedBtn",
-                    onClose: function (sAction) {
+            // if (oDoc.DocumentID) {
+            //     MessageBox.confirm(
+            //         "This Document is already Saved. Do you want to Delete it?", {
+            //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            //             styleClass: "myUnifiedBtn",
+            //             onClose: function (sAction) {
 
-                        if (sAction === MessageBox.Action.YES) {
-                            that.getBusyDialog()
-                            that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
-                                filters: {
-                                    DocumentID: oDoc.DocumentID
-                                }
-                            })
-                                .then(function () {
-                                    // Remove from model
-                                    aDocs.splice(iIndex, 1);
-                                    oCustomerModel.setProperty("/Documents", aDocs);
-                                    oCustomerModel.refresh(true)
-                                    that.closeBusyDialog()
+            //                 if (sAction === MessageBox.Action.YES) {
+            //                     that.getBusyDialog();
 
-                                    sap.m.MessageToast.show(that.i18nModel.getText("docdeletedSuccess"));
+            //                     that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
+            //                         filters: {
+            //                             DocumentID: oDoc.DocumentID
+            //                         }
+            //                     })
+            //                     .then(function () {
 
-                                })
-                                .catch(function () {
-                                    sap.m.MessageToast.show(that.i18nModel.getText("failedDeleteDocumentfromServer"));
-                                });
-                        }
-                    }
-                }
-                );
-            } else {
-                // No DocumentID → only local delete
-                aDocs.splice(iIndex, 1);
-                oCustomerModel.setProperty("/Documents", aDocs);
-                oCustomerModel.refresh(true)
+            //                         // Remove only the deleted document
+            //                         aDocs = aDocs.filter(function (doc) {
+            //                             return doc.DocumentID !== oDoc.DocumentID;
+            //                         });
 
-                sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
-            }
+            //                         oCustomerModel.setProperty("/Documents", aDocs);
+            //                         oCustomerModel.refresh(true);
+
+            //                         that.closeBusyDialog();
+
+            //                         sap.m.MessageToast.show(
+            //                             that.i18nModel.getText("docdeletedSuccess")
+            //                         );
+            //                     })
+            //                     .catch(function () {
+            //                         that.closeBusyDialog();
+
+            //                         sap.m.MessageToast.show(
+            //                             that.i18nModel.getText("failedDeleteDocumentfromServer")
+            //                         );
+            //                     });
+            //                 }
+            //             }
+            //         }
+            //     );
+            // } else {
+
+            // Remove only the selected local document
+        var oModel = this.getView().getModel("CustomerData");
+
+// Remove from Documents
+aDocs = aDocs.filter(function (doc) {
+    return !(
+        doc.MemberID === oDoc.MemberID &&
+        doc.DocumentName === oDoc.DocumentName &&
+        doc.FileName === oDoc.FileName
+    );
+});
+
+oModel.setProperty("/Documents", aDocs);
+
+// Update only the affected member in AllMembers
+var allMembers = oModel.getProperty("/AllMembers") || [];
+
+// Get all MemberIDs present in aDocs
+var memberIds = new Set(aDocs.map(doc => doc.MemberID));
+
+// Keep only members whose MemberID exists in aDocs
+allMembers = allMembers.filter(function (member) {
+    return memberIds.has(member.MemberID);
+});
+
+oModel.setProperty("/AllMembers", allMembers);
+oModel.refresh(true);
+
+sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
+            // }
         },
 
         onFileNameLinkPress: async function (oEvent) {
@@ -7838,9 +7953,16 @@ sap.ui.define([
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                        if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
-                        } else if (sUnitText === "Per Day") {
+                        } else if(sUnitText === "Package Price"){
+                            if(item.FacilityChargeType==="Entire Booking"){
+                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            }else{
+                            sUnitText = `${sUnitText}\n(${Number(item.quantity) * diffDays || 1} Qty)`;
+                            }
+                        }
+                        else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
                             const months =
@@ -8368,35 +8490,36 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberGenderCombo"), "ID") &&
                 (oMember.Relation === "Self" ||
                     utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID")
-                ) && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
+                )
+                //  && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
             ) {
 
                 // ================= DOCUMENT VALIDATION =================
 
-                if (
-                    !oMember.Documents ||
-                    !oMember.Documents[0] ||
-                    !oMember.Documents[0].DocumentType
-                ) {
+                // if (
+                //     !oMember.Documents ||
+                //     !oMember.Documents[0] ||
+                //     !oMember.Documents[0].DocumentType
+                // ) {
 
-                    sap.m.MessageToast.show(
-                        "Please select document type"
-                    );
+                //     sap.m.MessageToast.show(
+                //         "Please select document type"
+                //     );
 
-                    return;
-                }
+                //     return;
+                // }
 
-                if (
-                    (this._mode === "CREATE" || this._mode === "UPDATE") &&
-                    !oMember.Documents[0].File
-                ) {
+                // if (
+                //     (this._mode === "CREATE" || this._mode === "UPDATE") &&
+                //     !oMember.Documents[0].File
+                // ) {
 
-                    sap.m.MessageToast.show(
-                        "Please upload a document"
-                    );
+                //     sap.m.MessageToast.show(
+                //         "Please upload a document"
+                //     );
 
-                    return;
-                }
+                //     return;
+                // }
 
                 // ================= MEMBER ID =================
 
@@ -9032,7 +9155,6 @@ sap.ui.define([
                 "Unsupported document format."
             );
         },
-
         onUploadDocumentFile: async function () {
 
             if (!this.UD_Dialog) {
@@ -9048,33 +9170,29 @@ sap.ui.define([
 
             var sPropertyType = this.getView()
                 .getModel("CustomerData")
-                .getData().PropertyType;
+                .getProperty("/PropertyType");
 
             var oTable = sap.ui.getCore().byId("abmemberSelectTable");
 
             if (sPropertyType === "Hostel") {
                 oTable.setMode("SingleSelectLeft");
-                oTable.removeSelections(true);
             } else {
                 oTable.setMode("MultiSelect");
             }
 
-            var oCustomerData = this.getView()
-                .getModel("CustomerData")
-                .getData();
+            oTable.removeSelections(true);
+
+            var oCustomerModel = this.getView().getModel("CustomerData");
+            var oCustomerData = oCustomerModel.getData();
 
             var userID = oCustomerData.UserID;
 
-            // Existing selected MemberIDs
-            var aSelectedMemberIds = [];
+            // Get selected MemberIDs from Documents
+            var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
-            if (oCustomerData.MemberID) {
-                aSelectedMemberIds = oCustomerData.MemberID
-                    .split(",")
-                    .map(function (id) {
-                        return id.trim();
-                    });
-            }
+            var aSelectedMemberIds = aDocs.map(function (doc) {
+                return doc.MemberID;
+            });
 
             const filter = {
                 UserID: userID
@@ -9086,39 +9204,37 @@ sap.ui.define([
 
                 var item = await this.ajaxReadWithJQuery("HM_Member", filter);
 
-                var aMember = Array.isArray(item.data) ?
-                    item.data : [item.data];
+                var aMember = Array.isArray(item.data) ? item.data : [item.data];
 
+                // Show ALL members
                 var oMemberModel = new sap.ui.model.json.JSONModel({
                     Members: aMember
                 });
 
                 this.getView().setModel(oMemberModel, "BookingView");
 
-                // Wait for table binding
+                // Wait for binding and pre-select only members in Documents
                 setTimeout(function () {
 
                     oTable.getItems().forEach(function (oItem) {
 
-                        var oData = oItem
-                            .getBindingContext("BookingView")
-                            .getObject();
+                        var oMember = oItem.getBindingContext("BookingView").getObject();
 
-                        if (aSelectedMemberIds.includes(oData.MemberID)) {
+                        if (aSelectedMemberIds.includes(oMember.MemberID)) {
                             oTable.setSelectedItem(oItem, true);
                         }
 
                     });
 
-                }, 300);
+                }, 200);
 
                 this.UD_Dialog.open();
 
             } catch (e) {
                 sap.m.MessageBox.error("Failed to load members");
+            } finally {
+                this.closeBusyDialog();
             }
-
-            this.closeBusyDialog();
         },
         onMemberSelectionChange: function (oEvent) {
 
@@ -9190,22 +9306,30 @@ sap.ui.define([
             var oCustomerModel = this.getView().getModel("BookingView");
             var aDocs = oCustomerModel.getProperty("/Documents") || [];
 
+
+            var oModel = this.getView().getModel("CustomerData");
+            var oData = oModel.getData();
+
+            const primaryMemberID = (oData.MemberID || "")
+                .split(",")[0]
+                .trim();
+
             // validate filename before pushing
-            for (let oItem of aSelectedItems) {
+            // for (let oItem of aSelectedItems) {
 
-                var oContext = oItem.getBindingContext("BookingView");
-                var oData = oContext.getObject();
+            //     var oContext = oItem.getBindingContext("BookingView");
+            //     var oData = oContext.getObject();
 
-                var aMemberDocs = oData.Documents || [];
+            //     var aMemberDocs = oData.Documents || [];
 
 
-                if (aMemberDocs.length === 0) {
-                    sap.m.MessageBox.error(
-                        "Document is missing for member: " + (oData.Name || "")
-                    );
-                    return;
-                }
-            }
+            //     if (aMemberDocs.length === 0) {
+            //         sap.m.MessageBox.error(
+            //             "Document is missing for member: " + (oData.Name || "")
+            //         );
+            //         return;
+            //     }
+            // }
 
             // push documents
             aSelectedItems.forEach(function (oItem) {
@@ -9215,6 +9339,7 @@ sap.ui.define([
 
                 var doc = oData.Documents[0];
 
+
                 if (doc) {
                     aDocs.push({
                         DocumentID: doc.DocumentID,
@@ -9223,24 +9348,38 @@ sap.ui.define([
                         MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
                         FileName: doc.FileName,
                         FileType: doc.FileType,
-                        File: doc.File
+                        File: doc.File,
+                        Relation: oData.Relation,
+                        Gender: oData.Gender,
+                        DateOfBirth: oData.Gender,
+                        IsPrimary: oData.MemberID === primaryMemberID
+
+                    });
+                }else{
+                      aDocs.push({
+                        MemberID: oData.MemberID,
+                        MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
+                        Relation: oData.Relation,
+                        Gender: oData.Gender,
+                        DateOfBirth: oData.Gender,
+                        IsPrimary: oData.MemberID === primaryMemberID
+
                     });
                 }
             });
 
             this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
 
-            var oModel = this.getView().getModel("CustomerData");
-            var oData = oModel.getData();
 
-            var aDocs = oData.AllMembers || [];
+
+            var aDocs = oData.Documents || [];
 
             // keep only valid docs
             var allMembers = aDocs
-                .filter(doc => doc.MemberID && doc.Name)
+                .filter(doc => doc.MemberID && doc.MemberName)
                 .map(doc => ({
                     MemberID: doc.MemberID,
-                    Name: doc.Name,
+                    Name: doc.MemberName,
                     Gender: doc.Gender,
                     DateOfBirth: doc.DateOfBirth,
                     Relation: doc.Relation,
@@ -9251,7 +9390,7 @@ sap.ui.define([
 
             this.UD_Dialog.close();
 
-            sap.m.MessageToast.show("Selected member documents added successfully");
+            sap.m.MessageToast.show("Selected member added successfully");
         }
     });
 });

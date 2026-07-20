@@ -30,6 +30,40 @@
                 columnsM="1"
             >
                 <f:content>
+                 <Label
+                   id="id_Payment"
+                    text="Payment Mode"
+                    required="true"
+                />
+                <ComboBox
+                    id="idInvoicePaymentMode"
+                    placeholder="Select payment mode"
+                    selectedKey="{PaymentModel>/PaymentType}"
+                    valueStateText="Select payment mode"
+                    change="onPaymentModeChange"
+
+                >
+                    <core:ListItem
+                        key="UPI"
+                        text="UPI"
+                    />
+                      <core:ListItem
+                        key="Cash"
+                        text="Cash"
+                    />
+                </ComboBox>
+
+                 <Label
+                        text="{i18n>recievedby}"
+                    />
+                    <Input
+                        value="{PaymentModel>/ReceivedBy}"
+                        id="idrecivedby"
+                        editable="false"
+                        visible="false"
+                    />
+
+                
                     <Label
                         text="{i18n>invoiceTransactionID}"
                         required="true"
@@ -40,6 +74,7 @@
                         liveChange="onLiveTransactionID"
                         placeholder="{i18n>enterTransactionID}"
                         valueStateText="{i18n>invoiceTransactionIDValueText}"
+                        visible="false"
                         maxLength="30"
                     />
                     <Label
@@ -146,7 +181,7 @@
             >
                 <columns>
                     <Column minScreenWidth="Tablet">
-                        <Text text="{i18n>invoiceTransactionID}" />
+                        <Text text="{i18n>invoiceTransactionIDpersonname}" />
                     </Column>
                     <Column minScreenWidth="Tablet">
                         <Text text="{i18n>invoiceReceivedDate}" />
@@ -187,7 +222,7 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{PaymentDetailModel>TransactionId}" />
+                            <Text text="{= ${PaymentDetailModel>TransactionId}? ${PaymentDetailModel>TransactionId} : ${PaymentDetailModel>ReceivedBy} }" />
                             <Text
                                 text="{path:'PaymentDetailModel>ReceivedDate', formatter:'.Formatter.formatDate'}"
                             />

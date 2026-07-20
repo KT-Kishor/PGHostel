@@ -107,7 +107,15 @@
 
             BaseController.prototype.onExit.call(this);
         },
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
+            const HostelModel = sap.ui.getCore().getModel("HostelModel");
+            let sBranchCode = HostelModel ? HostelModel.getProperty("/BranchCode") : "";
+
+            if (sBranchCode) {
+                sessionStorage.setItem("BranchCode", sBranchCode);
+            } else {
+                sBranchCode = sessionStorage.getItem("BranchCode");
+            }
             this.getBusyDialog();
             var LoginFUnction = await this.commonLoginFunction("Booking");
             if (!LoginFUnction) return;
@@ -117,9 +125,16 @@
                 var oLoginModel = this.getOwnerComponent().getModel("LoginModel") || this.getView().getModel("LoginModel");
                 var sRole = oLoginModel ? String(oLoginModel.getProperty("/Role") || "").trim() : "";
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                oRouter.navTo(sRole === "Customer" ? "RouteHostel" : "TilePage", {}, true);
+                if (sRole === "Customer") {
+                    oRouter.navTo("RouteViewRooms", {
+                        sPath: sBranchCode
+                    }, true);
+                } else {
+                    oRouter.navTo("TilePage", {}, true);
+                }
                 return;
             }
+
 
             let oHostelModel = sap.ui.getCore().getModel("HostelModel") || this.getView().getModel("HostelModel");
             const oIncomingBookingData = oHostelModel ? JSON.parse(JSON.stringify(oHostelModel.getData() || {})) : {};
@@ -5142,6 +5157,10 @@
                 this._updateAutoEndDate();
             }
 
+            if (sPlan === "Per Day") {
+                oModel.setProperty("/EndDate", "");
+            }
+
             this._rebuildSelectedFacilities();
             this._refreshCouponAndSummary({ checkDateWindow: true });
         },
@@ -6693,9 +6712,16 @@
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                        if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
-                        } else if (sUnitText === "Per Day") {
+                        } else if (sUnitText === "Package Price") {
+                            if (item.FacilityChargeType === "Entire Booking") {
+                                sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            } else {
+                                sUnitText = `${sUnitText}\n(${Number(item.quantity) * diffDays || 1} Qty)`;
+                            }
+                        }
+                        else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
                             const months =
@@ -6712,7 +6738,7 @@
 
                     return [
                         (index + 1).toString(),
-                         item.MemberName
+                        item.MemberName
                             ? `${item.FacilityName}\n(Member: ${item.MemberName})`
                             : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
@@ -6817,16 +6843,16 @@
                 addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
             }
 
-              if (discount > 0) {
+            if (discount > 0) {
                 addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
-                }
+            }
 
-                const finalSubTotal = Number(subTotal) - Number(discount);
+            const finalSubTotal = Number(subTotal) - Number(discount);
 
 
-                 addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
+            addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
 
-          
+
 
             if (hasCGST) {
                 const cgst = parseFloat(oHostelModel.CGST) || 0;

@@ -140,19 +140,29 @@
                             text="{i18n>fullname}"
                             required="{profileData>/isEditMode}"
                         />
-                        <Select selectedKey="{profileData>/Salutation}">
+                      
+                        <Select selectedKey="{profileData>/Salutation}" change="onChangeSalutation">
                             <core:Item
                                 key="Mr."
                                 text="Mr."
                             />
                             <core:Item
+                                key="Ms."
+                                text="Ms."
+                            />
+                            <core:Item
                                 key="Mrs."
                                 text="Mrs."
                             />
-                            <core:Item
-                                key="Miss"
-                                text="Miss"
+                              <core:Item
+                                key="Dr."
+                                text="Dr."
                             />
+                              <core:Item
+                                key="Other."
+                                text="Other."
+                            />
+                            
                         </Select>
 
                         <Input
@@ -292,7 +302,7 @@
                             placeholder="{i18n>selectGender}"
                             selectedKey="{profileData>/gender}"
                             valueStateText="{i18n>pleaseselectGender}"
-                            change="onChange"
+                            change="MPonAddressChange"
                         >
                             <core:Item
                                 key="Male"
@@ -321,6 +331,7 @@
                             liveChange="MPonAddressChange"
                             growing="false"
                             width="100%"
+                            valueStateText="Enter the address"
                         />
                     </f:content>
                 </f:SimpleForm>

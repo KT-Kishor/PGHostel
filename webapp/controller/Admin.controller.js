@@ -527,21 +527,27 @@ sap.ui.define([
             sap.ui.getCore().byId("id_ActualAmount").setValue("").setEnabled(true);
 
 
+            var depositRequired = Deposit ? Number(Deposit.Deposit) : 0;
+
+            // Show the deposit section only when a deposit is actually required
+            // (booking not yet assigned AND required deposit greater than zero).
+            var bShowDeposit = this.data.Status !== "Assigned" && depositRequired > 0;
+            this._bDepositRequired = bShowDeposit;
+
             if (this.data.Status === "Assigned") {
                 sap.ui.getCore().byId("idRoomNumber1")
                     .setSelectedKey(this.data.RoomNo)
                     .setValueState("None");
-                this.getView().getModel("Visiblemodel").setProperty("/Visible", false);
 
             } else {
                 sap.ui.getCore().byId("idRoomNumber1")
                     .setSelectedKey("")
                     .setValueState("None");
-                this.getView().getModel("Visiblemodel").setProperty("/Visible", true);
 
             }
-            sap.ui.getCore().byId("id_DepositAmount").setValue(Deposit.Deposit);
-            this.Deposit = Deposit.Deposit
+            this.getView().getModel("Visiblemodel").setProperty("/Visible", bShowDeposit);
+            sap.ui.getCore().byId("id_DepositAmount").setValue(depositRequired);
+            this.Deposit = depositRequired
 
             this.HM_Dialog.open();
         },
@@ -701,11 +707,25 @@ sap.ui.define([
 
             /* ================= VALIDATIONS ================= */
 
-            if (ID.Status === "Confirmed" && this.selectedIndex === 0) {
+            if (this._bDepositRequired && ID.Status === "Confirmed" && this.selectedIndex === 0) {
                 if (
                     !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
                     !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
                     (!utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID")) ||
+                    !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
+                ) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText(
+                            "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                        )
+                    );
+                    return;
+                }
+            }
+
+            // When no deposit is required, the deposit fields are hidden; only the room must be validated.
+            if (!this._bDepositRequired && ID.Status === "Confirmed") {
+                if (
                     !utils._LCstrictValidationComboBox(oView.byId("idRoomNumber1"), "ID")
                 ) {
                     sap.m.MessageToast.show(
@@ -772,11 +792,11 @@ sap.ui.define([
 
             /* ================= PAYLOAD ================= */
 
-            if (Number(DepositAmount) > Number(this.Deposit)) {
+            if (this._bDepositRequired && Number(DepositAmount) > Number(this.Deposit)) {
                 sap.m.MessageToast.show("Deposit amount cannot be more than the required deposit of " + this.Deposit);
                 return;
             }
-            if (Number(DepositAmount) === 0 && this.selectedIndex === 0) {
+            if (this._bDepositRequired && Number(DepositAmount) === 0 && this.selectedIndex === 0) {
                 sap.m.MessageToast.show("Deposit amount cannot be set to zero");
                 return;
             }

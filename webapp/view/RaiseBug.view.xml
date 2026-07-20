@@ -85,7 +85,7 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>appname}" tooltip="{i18n>appname}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true" minScreenWidth="Tablet" width="25%">
 						<Text text="{i18n>bugdetails}" tooltip="{i18n>bugdetails}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
@@ -94,18 +94,18 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Email}" tooltip="{i18n>Email}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true" minScreenWidth="Tablet" width="7rem">
 						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
 					</Column>
 					<!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>Status}" tooltip="{i18n>Status}"/></Column> -->
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true" minScreenWidth="Tablet" width="7rem">
 						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
+					<Column demandPopin="true" minScreenWidth="Tablet" width="4rem">
 						<Text text="{i18n>image}" tooltip="{i18n>image}"/>
 					</Column>
 
-						<Column demandPopin="true" minScreenWidth="Tablet">
+						<Column demandPopin="true" minScreenWidth="Tablet" width="7rem">
 						<Text text="{i18n>Comment}" tooltip="{i18n>Comment}"/>
 					</Column>
 				</columns>
@@ -115,7 +115,7 @@
 							<Text text="{RaiseBugModel>BugID}" />
 							<!-- <Text text="{SupportModel>IssueName}" /> -->
 							<Text text="{RaiseBugModel>AppName}" />
-							<ExpandableText text="{RaiseBugModel>BugDescription}" maxCharacters="20"/>
+							<ExpandableText text="{RaiseBugModel>BugDescription}" maxCharacters="100"/>
 							<Text text="{RaiseBugModel>RaisedBy}" />
 							<Text text="{RaiseBugModel>Email}" />
 							<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
