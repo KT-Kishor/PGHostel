@@ -365,9 +365,21 @@ sap.ui.define([
 
                                 return false;
                             });
+                                const aBranchData =
+                            this.getOwnerComponent().getModel("BranchModel")?.getData() || [];
+
+                        const aFinalData = aFilteredData.map(item => {
+                            const oBranch = aBranchData.find(
+                                br => br.BranchID === item.BranchCode
+                            );
+                            return {
+                                ...item,
+                                BranchName: oBranch?.Name || ""
+                            };
+                        });
 
                             this.getView().setModel(
-                                new sap.ui.model.json.JSONModel(aFilteredData),
+                                new sap.ui.model.json.JSONModel(aFinalData),
                                 "ManageCustomerModel"
                             );
 
@@ -2767,7 +2779,7 @@ sap.ui.define([
                         doc.autoTable({
                             startY: currentY,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: paymentBody,
                             theme: 'grid',
@@ -2889,7 +2901,6 @@ sap.ui.define([
 
             CID_onPressGenerateSelectedPDF: async function () {
                 try {
-                    this.getBusyDialog()
 
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
@@ -2901,6 +2912,7 @@ sap.ui.define([
                         MessageToast.show("Please select at least one invoice item");
                         return;
                     }
+                    this.getBusyDialog()
 
                     //  SELECTED ITEMS 
                     const aInvoiceItems = aSelectedItems.map(oItem =>

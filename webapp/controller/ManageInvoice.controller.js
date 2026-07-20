@@ -78,7 +78,7 @@ sap.ui.define(
                         filters.BranchID = oExistingModel.BranchCode;
                     }
                     try {
-                        const oView = this.getView();
+                        const oView = this.getOwnerComponent();
 
                         const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", filters);
 

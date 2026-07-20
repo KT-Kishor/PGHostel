@@ -783,6 +783,7 @@ sap.ui.define([
                         FacilityBasicprice = FacilityBasicprice.UnitPrice !== "0" ? FacilityBasicprice.UnitPrice : FacilityBasicprice.MinimumPrice
 
                     }
+                 
 
                     const fPrice = parseFloat(f.FacilitiPrice || 0);
 
@@ -854,7 +855,7 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-
+                 
                     // Store final facility record
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
@@ -875,6 +876,7 @@ sap.ui.define([
                         MemberID: f.MemberID,
                         TotalHour: f.TotalHour,
                         quantity: f.Quantity,
+                        packagequantity: f.UnitText === "Package Price" && f.FacilityChargeType==="DAILY" ? (Number(f.Quantity) * days) : f.Quantity,
                         SelectionMode: f.SelectionMode,
                         Image: f.Image,
                         Currency: f.Currency,
@@ -1701,6 +1703,8 @@ sap.ui.define([
                     //     finalPrice = basePrice * iquantity * iDays;
                     // }
                     finalPrice = basePrice * iDays;
+                    oPayload.packagequantity=iquantity * iDays
+                    
 
                 } else if (selectionmode === "PERSON_QTY") {
                     // if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
@@ -1717,6 +1721,7 @@ sap.ui.define([
 
                     // }
                     finalPrice = this.SelectedFacility.MinimumPrice
+                    oPayload.packagequantity=iquantity
                 } else if (selectionmode === "QTY" && this.SelectedFacility.UnitPrice !== "0") {
                     finalPrice = basePrice * iquantity;
                 } else {
@@ -1725,6 +1730,25 @@ sap.ui.define([
                 }
 
             }
+              oPayload.SelectionMode = selectionmode
+
+            if (oPayload.SelectionMode === "PERSON_QTY") {
+                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
+            }
+              
+            if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
+                oPayload.UnitText = "Package Price"
+            }
+             if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="DAILY"){
+                    oPayload.packagequantity=iquantity * iDays
+                    oPayload.UnitText = "Package Price"
+                    finalPrice = basePrice * iDays;
+            }else if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="Entire Booking"){
+                    oPayload.packagequantity = iquantity
+                    oPayload.UnitText = "Package Price"
+                    finalPrice = basePrice;
+            }
+
             if (oPayload.CouponDiscount !== "") {
                 finalPrice = finalPrice - (Number(oPayload.CouponDiscount) || 0);
             }
@@ -1744,15 +1768,7 @@ sap.ui.define([
 
             oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
-            oPayload.SelectionMode = selectionmode
-
-            if (oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
-            }
-
-            if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
-                oPayload.UnitText = "Package Price"
-            }
+          
             // Remove unwanted fields
 
             // Ensure array exists
@@ -1760,15 +1776,15 @@ sap.ui.define([
                 oCustomerData.AllSelectedFacilities = [];
             }
 
-            const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
-                item.FacilityName === oPayload.FacilityName &&
-                item.FacilityChargeType === "Entire Booking" && item.MemberName === oPayload.MemberName
-            );
+            // const oDuplicate = oCustomerData.AllSelectedFacilities.find(item =>
+            //     item.FacilityName === oPayload.FacilityName &&
+            //     item.FacilityChargeType === "Entire Booking" && item.MemberName === oPayload.MemberName
+            // );
 
-            if (oDuplicate) {
-                sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
-                return;
-            }
+            // if (oDuplicate) {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("facilityAlreadyAdded"));
+            //     return;
+            // }
             // EDIT
             if (oPayload.UnitText === "Package Price" && this.edit === false) {
 
@@ -1792,7 +1808,7 @@ sap.ui.define([
                     return (
                         newStart < oldEnd &&
                         newEnd > oldStart &&
-                        item.FacilityChargeType === "DAILY" &&
+                        (item.FacilityChargeType === "DAILY" || item.FacilityChargeType === "Entire Booking") &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -1821,7 +1837,7 @@ sap.ui.define([
                     return (
                         newStart < oldEnd &&
                         newEnd > oldStart &&
-                        item.FacilityChargeType === "DAILY" &&
+                        (item.FacilityChargeType === "DAILY" || item.FacilityChargeType === "Entire Booking") &&
                         item.FacilityName === oPayload.FacilityName
                     );
                 });
@@ -3748,7 +3764,9 @@ if (documents.length > 1) {
 
             if (toDelete.length === 0) {
                 // nothing to delete → directly proceed
+
                 await this.onSaveBooking1();
+
                 return;
             }
 
@@ -3781,7 +3799,7 @@ if (documents.length > 1) {
                     await Promise.all(deletePromises);
 
                     // 3. NOW proceed to next step
-                    this.onSaveBooking1();
+                      this.onSaveBooking1();
 
                 }.bind(this)
             }
@@ -4237,23 +4255,6 @@ if (documents.length > 1) {
                 return;
             }
 
-
-            // if (Bookingdata.STDCode === "+91") {
-            //     if (Bookingdata.MobileNo.length === 10) {
-            //         oInput.setValueState("None");
-
-            //     } else {
-            //         oInput.setValueState("Error");
-            //         sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
-
-            //         return;
-            //     }
-            // }
-
-
-            // Map UnitText to desired PaymentType
-
-
             // Normalize UnitText: trim and lowercase
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
@@ -4655,7 +4656,6 @@ if (documents.length > 1) {
                     "BranchName": CustomerData.BranchName || "",
 
                 }
-                this.getBusyDialog()
 
                 this.ajaxCreateWithJQuery("HM_PaymentDetail", {
                     data: PaymentPayload,
@@ -4663,9 +4663,8 @@ if (documents.length > 1) {
                 })
             }
             // Send payload
-            this.getBusyDialog()
 
-            this.ajaxUpdateWithJQuery("HM_Customer", {
+              this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
                     BookingID: CustomerData.BookingID
@@ -4680,6 +4679,7 @@ if (documents.length > 1) {
                     }
                     this.flag = false
 
+                    
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
@@ -4688,7 +4688,6 @@ if (documents.length > 1) {
                     sap.m.MessageToast.show(this.i18nModel.getText("errorSavingBooking"));
                     console.error(err);
                 });
-
         },
         onTransactionIDChange: function (oEvent) {
             const oInput = oEvent.getSource();
@@ -7954,9 +7953,16 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                        if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
-                        } else if (sUnitText === "Per Day") {
+                        } else if(sUnitText === "Package Price"){
+                            if(item.FacilityChargeType==="Entire Booking"){
+                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            }else{
+                            sUnitText = `${sUnitText}\n(${Number(item.quantity) * diffDays || 1} Qty)`;
+                            }
+                        }
+                        else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
                             const months =

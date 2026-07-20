@@ -57,9 +57,11 @@
                                         >
 											<core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
-                                                text="{ManageCustomerModel>CustomerName}"
+                                                text="{ManageCustomerModel>BranchName} - {ManageCustomerModel>CustomerName}"
                                                 additionalText="{ManageCustomerModel>BookingID}"
                                             />
+                                            
+                               
 										</m:ComboBox>
 										<m:Label
                                             visible="{visiablityPlay>/createVisi}"
@@ -918,55 +920,46 @@
                         class="myUnifiedBtn"
                     /> -->
 					<!-- Edit / Save -->
-					<m:Button
-                        visible="{= ${visiablityPlay>/Edit}
-                            &amp;&amp; (
-                                ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'SuperAdmin'
-                                || ${LoginModel>/Role} === 'Branch Manager'
-                                || ${LoginModel>/Role} === 'Front Office Employee'
-                            )
-                        }"
-                        text="{= ${visiablityPlay>/editable} === true ? 'Save' : 'Edit'}"
-                        press="CID_onPressEdit"
-                        class="sendMail myUnifiedBtn"
-                    />
-					<!-- Multi Email -->
-					<!-- <m:Button
-                        visible="{= ${visiablityPlay>/MultiEmail}
-                            &amp;&amp; (
-                                ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'SuperAdmin'
-                                || ${LoginModel>/Role} === 'Branch Manager'
-                                || ${LoginModel>/Role} === 'Front Office Employee'
-                            )
-                        }"
-                        text="{i18n>sendInvoiceText}"
-                        tooltip="{i18n>sendInvoiceText}"
-                        press="CID_onPressSendMultipalEmail"
-                        class="myUnifiedBtn"
-                    /> -->
-					<!-- Generate PDF -->
-					<m:MenuButton
-                        visible="{= 
-                            ${visiablityPlay>/merge}
-                            &amp;&amp; (
-                                ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'SuperAdmin'
-                                || ${LoginModel>/Role} === 'Branch Manager'
-                                || ${LoginModel>/Role} === 'Front Office Employee'
-                                || (
-                                    ${LoginModel>/Role} === 'Customer'
-                                    &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
-                                )
-                            )
-                        }"
-                        text="{i18n>GeneratePDF}"
-                        tooltip="{i18n>GeneratePDF}"
-                        class="myUnifiedBtn">
-						<m:menu>
-							<m:Menu>
-								<m:MenuItem
+						<m:HBox
+    justifyContent="End"
+    alignItems="Center"
+    renderType="Bare"
+>
+    <m:Button
+        visible="{= ${visiablityPlay>/Edit}
+            &amp;&amp; (
+                ${LoginModel>/Role} === 'Admin'
+                || ${LoginModel>/Role} === 'SuperAdmin'
+                || ${LoginModel>/Role} === 'Branch Manager'
+                || ${LoginModel>/Role} === 'Front Office Employee'
+            )
+        }"
+        text="{= ${visiablityPlay>/editable} ? 'Save' : 'Edit'}"
+        press="CID_onPressEdit"
+        class="sendMail myUnifiedBtn"
+    />
+
+    <m:MenuButton
+        visible="{= 
+            ${visiablityPlay>/merge}
+           &amp;&amp; (
+                ${LoginModel>/Role} === 'Admin'
+                || ${LoginModel>/Role} === 'SuperAdmin'
+                || ${LoginModel>/Role} === 'Branch Manager'
+                || ${LoginModel>/Role} === 'Front Office Employee'
+                || (
+                    ${LoginModel>/Role} === 'Customer'
+                    &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
+                )
+            )
+        }"
+        text="{i18n>GeneratePDF}"
+        tooltip="{i18n>GeneratePDF}"
+        class="myUnifiedBtn">
+
+        <m:menu>
+            <m:Menu>
+               <m:MenuItem
                                     text="{i18n>GeneratePDF}"
                                     press="CID_onPressGeneratePdf" visible="{= 
                                     (
@@ -1000,9 +993,11 @@
                                         &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
                                     )
                                 }" />
-							</m:Menu>
-						</m:menu>
-					</m:MenuButton>
+            </m:Menu>
+        </m:menu>
+    </m:MenuButton>
+
+</m:HBox>
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

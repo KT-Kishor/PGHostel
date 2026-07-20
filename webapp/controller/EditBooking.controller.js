@@ -4064,9 +4064,16 @@ sap.ui.define([
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" || sUnitText === "Package Price") {
+                        if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
-                        } else if (sUnitText === "Per Day") {
+                        } else if(sUnitText === "Package Price"){
+                            if(item.FacilityChargeType==="Entire Booking"){
+                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            }else{
+                            sUnitText = `${sUnitText}\n(${Number(item.quantity) * diffDays || 1} Qty)`;
+                            }
+                        }
+                         else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText} (${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
                             const months =

@@ -168,9 +168,9 @@ sap.ui.define([
         formatObjectStatus: function (sStatus) {
             switch (sStatus) {
                 case "New":
-                    return "Indication05";
+                    return "Indication06";
                 case "Confirmed":
-                    return "Success";
+                    return "Indication05";
                 case "Renew":
                     return "Indication03";
                 case "Active":
