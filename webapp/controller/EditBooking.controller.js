@@ -4073,7 +4073,7 @@ sap.ui.define([
                               const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
 
-                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)\n${totalQty} Qty`;
+                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)`;
                             }
                         }
                          else if (sUnitText === "Per Day") {

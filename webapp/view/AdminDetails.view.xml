@@ -590,9 +590,7 @@ ${CustomerData>FacilityChargeType} === 'DAILY'
       Number(${CustomerData>quantity}) +
       '/day × ' +
       Number(${CustomerData>TotalDays}) +
-      ' days)\n(' +
-      Number(${CustomerData>packagequantity}) +
-      ' Qty)'
+      ' days)'
 
             : ${CustomerData>UnitText} + ' (' +
 
