@@ -158,6 +158,7 @@
                                 value="{HostelModel>/EndDate}"
                                 valueFormat="dd/MM/yyyy"
                                 displayFormat="dd/MM/yyyy"
+                                minDate="{HostelModel>/TodayDate}"
                                 editable="{= ${BookingView>/endDateEditable} &amp;&amp; ${BookingView>/editModeEnabled} }"
                                 valueStateText="End date must be after start date"
                                 change="onEndDateChange"
