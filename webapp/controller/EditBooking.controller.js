@@ -4070,7 +4070,10 @@ sap.ui.define([
                             if(item.FacilityChargeType==="Entire Booking"){
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                             }else{
-                            sUnitText = `${sUnitText}\n(${Number(item.Quantity) * diffDays || 1} Qty)`;
+                              const dailyQty = Number(item.Quantity) || 1;
+                                const totalQty = dailyQty * diffDays;
+
+                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)\n${totalQty} Qty`;
                             }
                         }
                          else if (sUnitText === "Per Day") {
