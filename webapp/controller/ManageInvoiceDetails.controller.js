@@ -1784,45 +1784,32 @@ sap.ui.define([
                     }
 
                     var totalPaid = paidAmount + allReceivedAmount;
+                    this.visiablityPlay.setProperty("/CInvoice", true);
 
-            
                     if (totalPaid === 0) {
-
                         if (status === "Payment Partially" || status === "Payment Received") {
                             oSelectedModel.setProperty("/Status", this._previousInvoiceStatus);
                             oSource.setValue(this._previousInvoiceStatus);
                         }
-
                         this._previousInvoiceStatus = status;
                     }
                     else if (totalPaid > 0 && dueAmount > 0) {
-
                         if (status !== "Payment Partially") {
-
                             oSelectedModel.setProperty("/Status", "Payment Partially");
                             oSource.setValue("Payment Partially");
                             status = "Payment Partially";
-
-                            this.visiablityPlay.setProperty("/editable", false);
                         }
-
                         this._previousInvoiceStatus = "Payment Partially";
                     }
-
                     else if (totalPaid >= totalAmount || dueAmount === 0) {
-
                         if (status !== "Payment Received") {
-
                             MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
 
                             oSelectedModel.setProperty("/Status", "Payment Received");
                             oSource.setValue("Payment Received");
-                             status = "Payment Received";
-                            this.visiablityPlay.setProperty("/editable", false);
-
+                            status = "Payment Received";
                             return;
                         }
-
                         this._previousInvoiceStatus = "Payment Received";
                     }
 
@@ -1837,7 +1824,6 @@ sap.ui.define([
                     status === "Payment Partially" ||
                     status === "Open"
                 ) {
-
                     var oView = that.getView();
 
                     sap.ui.core.Fragment.load({
@@ -3860,6 +3846,9 @@ sap.ui.define([
                 const existingItems = oView.getModel("ManageInvoiceItemModel")
                     .getProperty("/ManageInvoiceItem") || [];
 
+                const existingInvoices = oView.getModel("ManageInvoiceModel")?.getProperty("/ManageInvoice") || [];
+                const invoiceIndex = existingInvoices.length;
+
                 const roomRent = existingItems.find(i =>
                     i.Particulars.includes("Room Rent")
                 );
@@ -3872,60 +3861,67 @@ sap.ui.define([
                 cycleStart.setHours(0, 0, 0, 0);
                 cycleEnd.setHours(0, 0, 0, 0);
 
-                const existingFacilities = existingItems.filter(i =>
-                    i.Particulars.includes("Facility")
-                );
-
                 const nonFacilityItems = existingItems.filter(i =>
-                    !i.Particulars.includes("Facility")
+                    !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty")
                 );
 
                 const dbFacilitiesRaw = oData.commentData || [];
-
-                const newFacilityItems = [];
+                const processedFacilityItems = [];
 
                 dbFacilitiesRaw.forEach((f) => {
-
                     let fStart = new Date(f.StartDate);
                     let fEnd = new Date(f.EndDate);
 
                     fStart.setHours(0, 0, 0, 0);
                     fEnd.setHours(0, 0, 0, 0);
 
-                    if (fEnd < cycleStart || fStart > cycleEnd) return;
+                    const bookingUnit = f.PaymentType?.toLowerCase() || "";
+
+                    if (bookingUnit !== "per day") {
+                        if (fEnd < cycleStart || fStart > cycleEnd) return;
+                    }
 
                     const effectiveStart = fStart > cycleStart ? fStart : cycleStart;
                     const effectiveEnd = fEnd < cycleEnd ? fEnd : cycleEnd;
+
+                    const selectionMode = f.SelectionMode?.toUpperCase();
+                    const chargeType = f.FacilityChargeType?.toUpperCase();
+                    const unit = f.UnitText?.toLowerCase();
+
+                    if (invoiceIndex > 0) {
+                        if (
+                            (selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING") ||
+                            (selectionMode === "QTY" && unit === "unit price")
+                        ) {
+                            return; 
+                        }
+                    }
 
                     let particulars = "";
                     const memberSuffix = f.MemberName ? ` (${f.MemberName})` : "";
 
                     if (f.FacilityName === "Penalty Charges") {
                         particulars = `Penalty Charges${memberSuffix}`;
-                    } else if (f.UnitText === "Per Hour") {
+                    } else if (unit === "per hour") {
                         const hrs = Number(f.TotalHour) || 1;
                         particulars = `${f.FacilityName} - Facility (${hrs} Hours)${memberSuffix}`;
                     } else {
                         particulars = `${f.FacilityName} - Facility${memberSuffix}`;
                     }
 
-                    const startStr = this.Formatter.DateFormat(effectiveStart);
-                    const endStr = this.Formatter.DateFormat(effectiveEnd);
-                    const isAlreadyExists = existingFacilities.some(e =>
-                        e.Particulars === particulars &&
-                        e.StartDate === startStr &&
-                        e.EndDate === endStr
-                    );
+                    const startStr = this._formatDateLocal(effectiveStart);
+                    const endStr = this._formatDateLocal(effectiveEnd);
 
-                    if (isAlreadyExists) return;
+                    const facilityTotal = this._calculateFacilityTotal(f, cycleStart, cycleEnd, invoiceIndex);
 
-                    //  ADD NEW 
-                    newFacilityItems.push({
+                    if (facilityTotal <= 0 && invoiceIndex > 0) return;
+
+                    processedFacilityItems.push({
                         ItemID: null,
+                        FacilityID: f.FacilityID, 
                         InvNo: nonFacilityItems[0]?.InvNo,
                         Particulars: particulars,
                         UnitText: f.UnitText,
-
                         DurationText: this._getDurationText(
                             f.UnitText,
                             effectiveStart,
@@ -3934,9 +3930,8 @@ sap.ui.define([
                             f.SelectionMode,
                             f.Quantity
                         ),
-
                         GrossPrice: Number(f.BasicFacilityPrice) || 0,
-                        Total: this._calculateFacilityTotal(f, cycleStart, cycleEnd, 0),
+                        Total: facilityTotal,
                         StartDate: startStr,
                         EndDate: endStr,
                         Currency: f.Currency || "INR",
@@ -3952,8 +3947,7 @@ sap.ui.define([
 
                 const finalItems = [
                     ...nonFacilityItems,
-                    ...existingFacilities,
-                    ...newFacilityItems
+                    ...processedFacilityItems
                 ];
 
                 finalItems.forEach((item, index) => {
