@@ -1763,33 +1763,92 @@ sap.ui.define([
 
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
                     var oSource = oEventOrStatus.getSource();
-                    if (typeof oSource.getValue === "function") {
-                        status = oSource.getValue();
-                        this.visiablityPlay.setProperty("/Form", true);
-                        this.visiablityPlay.setProperty("/Table", false);
+                    status = oSource.getValue();
+                    this.visiablityPlay.setProperty("/Form", true);
+                    this.visiablityPlay.setProperty("/Table", false);
+
+                    var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+                    var oSelectedCustomer = oSelectedModel.getData();
+
+                    var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
+
+                    var paidAmount = Number(oSelectedCustomer.PaidAmount) || 0;
+                    var totalAmount = Number(oSelectedCustomer.TotalAmount) || 0;
+
+                    var allReceivedAmount = 0;
+                    var dueAmount = Number(oSelectedCustomer.BalanceAmount) || 0;
+
+                    if (oInvoicePaymentModel) {
+                        allReceivedAmount = Number(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+                        dueAmount = Number(oInvoicePaymentModel.getProperty("/AllDueAmount")) || dueAmount;
                     }
+
+                    var totalPaid = paidAmount + allReceivedAmount;
+
+            
+                    if (totalPaid === 0) {
+
+                        if (status === "Payment Partially" || status === "Payment Received") {
+                            oSelectedModel.setProperty("/Status", this._previousInvoiceStatus);
+                            oSource.setValue(this._previousInvoiceStatus);
+                        }
+
+                        this._previousInvoiceStatus = status;
+                    }
+                    else if (totalPaid > 0 && dueAmount > 0) {
+
+                        if (status !== "Payment Partially") {
+
+                            oSelectedModel.setProperty("/Status", "Payment Partially");
+                            oSource.setValue("Payment Partially");
+                            status = "Payment Partially";
+
+                            this.visiablityPlay.setProperty("/editable", false);
+                        }
+
+                        this._previousInvoiceStatus = "Payment Partially";
+                    }
+
+                    else if (totalPaid >= totalAmount || dueAmount === 0) {
+
+                        if (status !== "Payment Received") {
+
+                            MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
+
+                            oSelectedModel.setProperty("/Status", "Payment Received");
+                            oSource.setValue("Payment Received");
+                             status = "Payment Received";
+                            this.visiablityPlay.setProperty("/editable", false);
+
+                            return;
+                        }
+
+                        this._previousInvoiceStatus = "Payment Received";
+                    }
+
                 } else if (typeof oEventOrStatus === "string") {
                     status = oEventOrStatus;
                     this.visiablityPlay.setProperty("/Form", false);
                     this.visiablityPlay.setProperty("/Table", true);
                 }
 
-                if (status === "Payment Received" || status === "Payment Partially" || status === "Open") {
+                if (
+                    status === "Payment Received" ||
+                    status === "Payment Partially" ||
+                    status === "Open"
+                ) {
+
                     var oView = that.getView();
-                    if (!that.oDialog) {
-                        sap.ui.core.Fragment.load({
-                            name: "sap.ui.com.project1.fragment.ManageInvoice",
-                            controller: that
-                        }).then(function (oDialog) {
-                            that.oDialog = oDialog;
-                            oView.addDependent(oDialog);
-                            oDialog.open();
-                            that.modelFunction();
-                        });
-                    } else {
-                        that.oDialog.open();
+
+                    sap.ui.core.Fragment.load({
+                        name: "sap.ui.com.project1.fragment.ManageInvoice",
+                        controller: that
+                    }).then(function (oDialog) {
+                        that.oDialog = oDialog;
+                        oView.addDependent(oDialog);
+                        oDialog.open();
                         that.modelFunction();
-                    }
+                    });
                 }
             },
 
@@ -1919,6 +1978,7 @@ sap.ui.define([
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
+                    this._previousInvoiceStatus = invoiceData.Status;
                     return;
                 }
 
