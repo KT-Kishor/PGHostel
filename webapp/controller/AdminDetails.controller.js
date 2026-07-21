@@ -3724,87 +3724,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onSaveBooking: async function () {
-            const oModel = this.getView().getModel("CustomerData");
-            const CustomerData = oModel.getData();
-
-            const facilityItems = CustomerData.AllSelectedFacilities || [];
-            const documents = CustomerData.Documents || [];
-
-            // valid MemberIDs
-            const validMemberIds = new Set(CustomerData.Documents.map(d => d.MemberID));
-
-            if (validMemberIds.size === 0) {
-    sap.m.MessageToast.show("Please select at least one member");
-    return;
-}
-
-if (documents.length > 1) {
-    const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
-
-    if (!hasPrimaryMember) {
-        sap.m.MessageToast.show("Please select a primary member.");
-        return;
-    }
-}
-            // split invalid vs valid
-            const toDelete = [];
-            const toKeep = [];
-
-            facilityItems.forEach(f => {
-
-                if (!validMemberIds.has(f.MemberID) && f.MemberID !== "") {
-                    toDelete.push(f);
-                } else if (!f.MemberID) {
-                    toKeep.push(f);
-                } else {
-                    toKeep.push(f);
-                }
-            });
-
-            if (toDelete.length === 0) {
-                // nothing to delete → directly proceed
-
-                await this.onSaveBooking1();
-
-                return;
-            }
-
-            // confirmation
-            sap.m.MessageBox.confirm(
-                "Some facilities are assigned to different members and will be removed. Do you want to continue?", {
-                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                emphasizedAction: sap.m.MessageBox.Action.YES,
-                styleClass: "myUnifiedBtn",
-                onClose: async function (oAction) {
-                    if (oAction !== sap.m.MessageBox.Action.YES) {
-                        return;
-                    }
-
-                    // 1. update UI first
-                    oModel.setProperty("/AllSelectedFacilities", toKeep);
-
-                    // 2. delete backend records sequentially or parallel
-
-                    const deletePromises = toDelete.map(f => {
-                        if (f.FacilityID) {
-                            return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
-                                filters: {
-                                    FacilityID: f.FacilityID
-                                }
-                            });
-                        }
-                    });
-
-                    await Promise.all(deletePromises);
-
-                    // 3. NOW proceed to next step
-                      this.onSaveBooking1();
-
-                }.bind(this)
-            }
-            );
-        },
+       
 
         HM_ConfirmRoom: async function (oEvent) {
             var ID = this.getView().getModel("CustomerData").getData()
@@ -3978,18 +3898,96 @@ if (documents.length > 1) {
             oModel.setProperty("/Documents", aDocuments);
             oModel.refresh(true);
         },
+         onSaveBooking: async function () {
+            const oModel = this.getView().getModel("CustomerData");
+            const CustomerData = oModel.getData();
+
+            const facilityItems = CustomerData.AllSelectedFacilities || [];
+            const documents = CustomerData.Documents || [];
+
+            // valid MemberIDs
+            const validMemberIds = new Set(CustomerData.Documents.map(d => d.MemberID));
+
+            if (validMemberIds.size === 0) {
+    sap.m.MessageToast.show("Please select at least one member");
+    return;
+}
+
+if (documents.length > 1) {
+    const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
+
+    if (!hasPrimaryMember) {
+        sap.m.MessageToast.show("Please select a primary member.");
+        return;
+    }
+}
+            // split invalid vs valid
+            const toDelete = [];
+            const toKeep = [];
+
+            facilityItems.forEach(f => {
+
+                if (!validMemberIds.has(f.MemberID) && f.MemberID !== "") {
+                    toDelete.push(f);
+                } else if (!f.MemberID) {
+                    toKeep.push(f);
+                } else {
+                    toKeep.push(f);
+                }
+            });
+
+            if (toDelete.length === 0) {
+                // nothing to delete → directly proceed
+                // onSaveBooking
+    this.onSaveBooking1();
+
+                return;
+            }
+
+            // confirmation
+            sap.m.MessageBox.confirm(
+                "Some facilities are assigned to different members and will be removed. Do you want to continue?", {
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                emphasizedAction: sap.m.MessageBox.Action.YES,
+                styleClass: "myUnifiedBtn",
+                onClose: async function (oAction) {
+                    if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return;
+                    }
+
+                    // 1. update UI first
+                    oModel.setProperty("/AllSelectedFacilities", toKeep);
+
+                    // 2. delete backend records sequentially or parallel
+
+                    const deletePromises = toDelete.map(f => {
+                        if (f.FacilityID) {
+                            return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
+                                filters: {
+                                    FacilityID: f.FacilityID
+                                }
+                            });
+                        }
+                    });
+
+                    await Promise.all(deletePromises);
+
+                    // 3. NOW proceed to next step
+                      this.onSaveBooking1();
+
+                }.bind(this)
+            }
+            );
+        },
 
         onSaveBooking1: async function () {
+            
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
             var oFacilitiesModel = this.getView().getModel("Facilities");
             var aFacilities = oFacilitiesModel.getData();
-
-
             let editedSections = [];
-
-
             if (
                 JSON.stringify(this._originalDocuments || []) !==
                 JSON.stringify(CustomerData.Documents || [])
@@ -4006,18 +4004,11 @@ if (documents.length > 1) {
                 utils._LCstrictValidationComboBox(this.byId("Ad_id_RoomType"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("idPaymentMethod1"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("Ad_id_editStartDate"), "ID")
-                // utils._LCvalidateMandatoryField(this.byId("AD_id_CustomerName"), "ID") &&
-                // utils._LCvalidateDate(this.byId("AD_id_Date"), "ID") &&
-                // utils._LCstrictValidationComboBox(this.byId("Ad_id_gender"), "ID") &&
-                // utils._LCvalidateEmail(this.byId("Ad_id_CustomerEmail"), "ID") &&
-                // utils._LCstrictValidationComboBox(this.byId("CC_id_Country"), "ID") &&
-                // utils._LCstrictValidationComboBox(this.byId("CC_id_State"), "ID") &&
-                // utils._LCvalidateMandatoryField(this.byId("CC_id_City"), "ID") &&
-                // utils._LCvalidateMandatoryField(this.byId("Ad_id_Address"), "ID") &&
-                // utils._LCstrictValidationComboBox(this.byId("CC_id_STDCode"), "ID")
+                
             );
             
             if (!isMandatoryValid) {
+
                 sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
                 return;
             }
@@ -4541,6 +4532,9 @@ if (documents.length > 1) {
                 ...otherMembers.map(m => m.MemberID)
             ].join(",");
 
+
+             this.getBusyDialog()
+
             const pdfBase64 = await this.onGeneratePDF();
 
 
@@ -4657,12 +4651,15 @@ if (documents.length > 1) {
 
                 }
 
+
                 this.ajaxCreateWithJQuery("HM_PaymentDetail", {
                     data: PaymentPayload,
 
                 })
             }
             // Send payload
+            this.getBusyDialog();
+
 
               this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],

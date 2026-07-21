@@ -4068,9 +4068,9 @@ sap.ui.define([
                             sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
                         } else if(sUnitText === "Package Price"){
                             if(item.FacilityChargeType==="Entire Booking"){
-                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                             }else{
-                            sUnitText = `${sUnitText}\n(${Number(item.quantity) * diffDays || 1} Qty)`;
+                            sUnitText = `${sUnitText}\n(${Number(item.Quantity) * diffDays || 1} Qty)`;
                             }
                         }
                          else if (sUnitText === "Per Day") {
