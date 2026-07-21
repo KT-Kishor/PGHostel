@@ -57,7 +57,9 @@
                                         >
 											<core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
-                                                text="{ManageCustomerModel>BranchName} - {ManageCustomerModel>CustomerName}"
+                                               text="{= ${ManageCustomerModel>BranchName}
+    ? ${ManageCustomerModel>BranchName} + ' - ' + ${ManageCustomerModel>CustomerName}
+    : ${ManageCustomerModel>CustomerName} }"
                                                 additionalText="{ManageCustomerModel>BookingID}"
                                             />
                                             
