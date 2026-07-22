@@ -4866,6 +4866,7 @@
             oModel.setProperty("/AvailablePaymentMethods", aPaymentMethods);
             oModel.setProperty("/SelectedMonths", String(oData.SelectedMonths || "1"));
             oModel.setProperty("/TodayDate", oData.TodayDate instanceof Date ? oData.TodayDate : oToday);
+            oModel.setProperty("/EndDateMinDate", oModel.getProperty("/TodayDate"));
             oModel.setProperty("/AllSelectedFacilities", Array.isArray(oData.AllSelectedFacilities) ? oData.AllSelectedFacilities : []);
             oModel.setProperty("/TotalFacilityPrice", this._toNumber(oData.TotalFacilityPrice));
             oModel.setProperty("/CouponCode", oData.CouponCode || "");
@@ -5148,6 +5149,7 @@
                 MessageToast.show("Start date cannot be before today");
                 oModel.setProperty("/StartDate", "");
                 oModel.setProperty("/EndDate", "");
+                this._updateEndDateMinDate(null);
                 this._rebuildSelectedFacilities();
                 this._refreshCouponAndSummary({ checkDateWindow: true });
                 return;
@@ -5159,10 +5161,29 @@
 
             if (sPlan === "Per Day") {
                 oModel.setProperty("/EndDate", "");
+                this._updateEndDateMinDate(oStartDate);
             }
 
             this._rebuildSelectedFacilities();
             this._refreshCouponAndSummary({ checkDateWindow: true });
+        },
+
+        // For "Per Day" plans, the end date must be at least one day after the
+        // selected start date. Updates the End Date picker's own minDate property
+        // (/EndDateMinDate) so the Start Date picker's constraint is never affected.
+        _updateEndDateMinDate: function (oStartDate) {
+            const oModel = this.getView().getModel("HostelModel");
+
+            if (!oStartDate) {
+                // No valid start date: fall back to today as the minimum.
+                oModel.setProperty("/EndDateMinDate", oModel.getProperty("/TodayDate"));
+                return;
+            }
+
+            const oMinEndDate = new Date(oStartDate);
+            oMinEndDate.setDate(oMinEndDate.getDate() + 1);
+            oMinEndDate.setHours(0, 0, 0, 0);
+            oModel.setProperty("/EndDateMinDate", oMinEndDate);
         },
 
         onEndDateChange: function (oEvent) {
