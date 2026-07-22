@@ -1067,6 +1067,7 @@ sap.ui.define([
             var oBookingModel = this.getView().getModel("edit");
             var sUnitText = oBookingModel.getProperty("/UnitText") || this.byId("idPaymentMethod1").getSelectedKey(); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
+           var Bookingunit= this.getView().getModel("Bookingmodel").getProperty("/UnitText")
 
             if (OrginalRentPrice === "0.00") {
                 sap.m.MessageToast.show(this.i18nModel.getText("diffBooking"));
@@ -1082,7 +1083,17 @@ sap.ui.define([
                 aAllowedRateTypes = ["Per Day", "Per Hour"];
             } else if (sUnitText === "Per Hour") {
                 aAllowedRateTypes = ["Per Hour"];
-            } else {
+            } else if(sUnitText === "Package Price"){
+               if(Bookingunit=== "Per Month" || Bookingunit === "monthly"){
+                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+
+               }else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
+                aAllowedRateTypes = ["Per Day", "Per Hour"];
+            } else if (Bookingunit === "Per Hour") {
+                aAllowedRateTypes = ["Per Hour"];
+            }
+        }
+            else {
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
 
