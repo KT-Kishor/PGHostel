@@ -563,9 +563,29 @@
                         <items>
                             <ColumnListItem>
                                 <cells>
-                                    <Text
+                                    <!-- <Text
                                         text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }"
-                                    />
+                                    /> -->
+                                    <Text
+    text="{=
+        ${CustomerData>FacilityName}
+        + (${CustomerData>MemberName}
+            ? ' (' + ${CustomerData>MemberName} + ')'
+            : '')
+        + (
+            ${CustomerData>FacilityChargeType} === 'DAILY'
+                ? '\n('
+                  + Number(${CustomerData>quantity})
+                  + ' Qty / day)'
+               
+                : ${CustomerData>FacilityChargeType} === 'Entire Booking'
+                    ? '\n('
+                      + Number(${CustomerData>quantity})
+                      + ' Qty)'
+                    : ''
+        )
+    }"
+/>
                                     <Text
                                         text="{
                                                 parts: [
@@ -582,17 +602,19 @@
                                         text="{path:'CustomerData>EndDate'}"
                                     />
                                     <!-- <Text text="{CustomerData>UnitText}" /> -->
-          <Text
+       <Text
     text="{=
-      ${CustomerData>UnitText} === 'Package Price' &amp;&amp;
-${CustomerData>FacilityChargeType} === 'DAILY'
-    ? 'Package Price\n(' +
-      Number(${CustomerData>quantity}) +
-      '/day × ' +
-      Number(${CustomerData>TotalDays}) +
-      ' days)'
+        ${CustomerData>UnitText} === 'Package Price' &amp;&amp;
+        ${CustomerData>FacilityChargeType} === 'DAILY'
+            ? 'Package Price (' +
+              Number(${CustomerData>TotalDays}) +
+              ' days)'
 
-            : ${CustomerData>UnitText} + ' (' +
+        : ${CustomerData>UnitText} === 'Package Price' &amp;&amp;
+          ${CustomerData>FacilityChargeType} === 'Entire Booking'
+            ? 'Package Price'
+
+        : ${CustomerData>UnitText} + ' (' +
 
             (
                 ${CustomerData>UnitText} === 'Per Month'
@@ -614,9 +636,6 @@ ${CustomerData>FacilityChargeType} === 'DAILY'
                     ? Number(${CustomerData>TotalHour}) + ' ' +
                       (Number(${CustomerData>TotalHour}) === 1 ? 'Hour' : 'Hours') +
                       (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
-
-                : ${CustomerData>UnitText} === 'Package Price'
-                    ? Number(${CustomerData>packagequantity}) + ' Qty'
 
                 : Number(${CustomerData>quantity}) + ' Qty'
             ) + ')'
