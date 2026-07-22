@@ -1372,7 +1372,7 @@ sap.ui.define([
                 const oView = this.getView();
                 const oSelectedCustomerModel = oView.getModel("SelectedCustomerModel").getData();
                 const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
-                var FilterModel = this.getView().getModel("FilteredSOWModel").getData()
+                var FilterModel = this.getView().getModel("FilteredSOWModel").getData();
 
                 const oModel = {
                     subTotal: oSelectedCustomerModel.SubTotalInGST,
@@ -1398,10 +1398,9 @@ sap.ui.define([
                 const oPayload = {
                     InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    CustomerName: (sMode === 'update') ? oSelectedCustomerModel.CustomerName : oSelectedCustomerModel.CustomerName,
+                    CustomerName: oSelectedCustomerModel.CustomerName || "",
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
-                    PermanentAddress: (oSelectedCustomerModel.PermanentAddress) || "",
-                    // PAN: (oSelectedCustomerModel.PAN) || "",
+                    PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
                     MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
                     AmountInFCurrency: FilterModel.Currency === "INR" ?
                         (!isNaN(oSelectedCustomerModel.AmountInFCurrency) ? oSelectedCustomerModel.AmountInFCurrency : "0") : parseFloat(oModel.subTotal) || 0,
@@ -1422,7 +1421,7 @@ sap.ui.define([
                     PayByDate: (sMode === 'update') ? oSelectedCustomerModel.PayByDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.PayByDate).split('/').reverse().join('-') || "",
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
-                    LUT: (oSelectedCustomerModel.LUT) || "",
+                    LUT: oSelectedCustomerModel.LUT || "",
                     IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
                     BookingID: oSelectedCustomerModel.BookingID || "",
                     BranchCode: oSelectedCustomerModel.BranchCode || "",
@@ -1436,16 +1435,18 @@ sap.ui.define([
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
                     DueAmount: oSelectedCustomerModel.BalanceAmount || ""
                 };
+
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
-                    this.getBusyDialog()
+                    this.getBusyDialog();
                     MessageToast.show(this.i18nModel.getText("companyTableValidation"));
                     return false;
                 }
+
                 for (let i = 0; i < aItemsRaw.length; i++) {
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
-                        this.getBusyDialog()
+                        this.getBusyDialog();
                         sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
                         return false;
                     }
@@ -1462,15 +1463,14 @@ sap.ui.define([
                         GSTCalculation: item.GSTCalculation,
                         Discount: item.Discount,
                         DurationText: item.DurationText,
-                        StartDate: item.StartDate.split('/').reverse().join('-'),
-                        EndDate: item.EndDate.split('/').reverse().join('-'),
+                        StartDate: item.StartDate.includes('/') ? item.StartDate.split('/').reverse().join('-') : item.StartDate,
+                        EndDate: item.EndDate.includes('/') ? item.EndDate.split('/').reverse().join('-') : item.EndDate,
                     };
+
                     if (sMode === "update") {
                         let filters;
                         if (item.flag === "create" || !item.ItemID) {
-                            filters = {
-                                flag: "create"
-                            };
+                            filters = { flag: "create" };
                         } else {
                             filters = {
                                 InvNo: oSelectedCustomerModel.InvNo,
@@ -1756,25 +1756,28 @@ sap.ui.define([
             onChangeInvoiceStatus: function (oEventOrStatus) {
                 var that = this;
                 var status = "";
+
                 if (that.oDialog) {
                     that.oDialog.destroy();
                     that.oDialog = null;
                 }
 
+                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
                     var oSource = oEventOrStatus.getSource();
                     status = oSource.getValue();
-                    this.visiablityPlay.setProperty("/Form", true);
-                    this.visiablityPlay.setProperty("/Table", false);
 
-                    var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
-                    var oSelectedCustomer = oSelectedModel.getData();
+                    if (this.visiablityPlay) {
+                        this.visiablityPlay.setProperty("/Form", true);
+                        this.visiablityPlay.setProperty("/Table", false);
+                        this.visiablityPlay.setProperty("/CInvoice", true);
+                    }
 
+                    var oSelectedCustomer = oSelectedModel ? oSelectedModel.getData() : {};
                     var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
 
                     var paidAmount = Number(oSelectedCustomer.PaidAmount) || 0;
                     var totalAmount = Number(oSelectedCustomer.TotalAmount) || 0;
-
                     var allReceivedAmount = 0;
                     var dueAmount = Number(oSelectedCustomer.BalanceAmount) || 0;
 
@@ -1784,7 +1787,6 @@ sap.ui.define([
                     }
 
                     var totalPaid = paidAmount + allReceivedAmount;
-                    this.visiablityPlay.setProperty("/CInvoice", true);
 
                     if (totalPaid === 0) {
                         if (status === "Payment Partially" || status === "Payment Received") {
@@ -1792,7 +1794,7 @@ sap.ui.define([
                             oSource.setValue(this._previousInvoiceStatus);
                         }
                         this._previousInvoiceStatus = status;
-                    }
+                    } 
                     else if (totalPaid > 0 && dueAmount > 0) {
                         if (status !== "Payment Partially") {
                             oSelectedModel.setProperty("/Status", "Payment Partially");
@@ -1800,11 +1802,10 @@ sap.ui.define([
                             status = "Payment Partially";
                         }
                         this._previousInvoiceStatus = "Payment Partially";
-                    }
+                    } 
                     else if (totalPaid >= totalAmount || dueAmount === 0) {
                         if (status !== "Payment Received") {
                             MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
-
                             oSelectedModel.setProperty("/Status", "Payment Received");
                             oSource.setValue("Payment Received");
                             status = "Payment Received";
@@ -1812,13 +1813,20 @@ sap.ui.define([
                         }
                         this._previousInvoiceStatus = "Payment Received";
                     }
-
-                } else if (typeof oEventOrStatus === "string") {
+                }else if (typeof oEventOrStatus === "string") {
                     status = oEventOrStatus;
-                    this.visiablityPlay.setProperty("/Form", false);
-                    this.visiablityPlay.setProperty("/Table", true);
-                }
 
+                    if (oSelectedModel) {
+                        oSelectedModel.setProperty("/Status", status);
+                    }
+                    this._previousInvoiceStatus = status;
+
+                    if (this.visiablityPlay) {
+                        this.visiablityPlay.setProperty("/Form", true);
+                        this.visiablityPlay.setProperty("/Table", false);
+                        this.visiablityPlay.setProperty("/CInvoice", true);
+                    }
+                }
                 if (
                     status === "Payment Received" ||
                     status === "Payment Partially" ||
@@ -1833,7 +1841,10 @@ sap.ui.define([
                         that.oDialog = oDialog;
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        that.modelFunction();
+
+                        if (typeof that.modelFunction === "function") {
+                            that.modelFunction();
+                        }
                     });
                 }
             },
@@ -3821,21 +3832,44 @@ sap.ui.define([
             onRefreshInvoice: async function () {
                 try {
                     const oView = this.getView();
-                    const oModel = oView.getModel("SelectedCustomerModel").getData();
+                    const oSelectedModel = oView.getModel("SelectedCustomerModel");
+                    const oModelData = oSelectedModel ? oSelectedModel.getData() : {};
+
+                    // 1. Get the item count BEFORE running refresh
+                    const existingItems = oView.getModel("ManageInvoiceItemModel")
+                        ?.getProperty("/ManageInvoiceItem") || [];
+                    const initialItemCount = existingItems.length;
 
                     this.getBusyDialog();
 
+                    // 2. Fetch updated facility items
                     const oData = await this.ajaxReadWithJQuery("HM_BookingFacilityItems", {
-                        BookingID: oModel.BookingID,
+                        BookingID: oModelData.BookingID,
                     });
 
+                    // 3. Process new items list
                     const finalItems = this._prepareInvoiceItems(oData);
 
+                    // 4. Update model with new items
                     oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
 
+                    // 5. Recalculate invoice totals and balance due
                     await this.totalAmountCalculation();
+
+                    // 6. Check if new line items were added AND there is an outstanding due amount
+                    const updatedCustomerData = oSelectedModel.getData();
+                    const balanceAmount = Number(updatedCustomerData.BalanceAmount) || 0;
+                    const newItemAdded = finalItems.length > initialItemCount;
+
+                    if (newItemAdded && balanceAmount > 0) {
+                        MessageToast.show("New line items added. Opening payment screen...");
+
+                        // Automatically updates status to 'Payment Partially' and opens the ManageInvoice fragment
+                        this.onChangeInvoiceStatus("Payment Partially");
+                    }
+
                 } catch (e) {
-                    MessageToast.show(e.message);
+                    MessageToast.show(e.message || "Error refreshing invoice");
                 } finally {
                     this.closeBusyDialog();
                 }
@@ -3850,7 +3884,7 @@ sap.ui.define([
                 const invoiceIndex = existingInvoices.length;
 
                 const roomRent = existingItems.find(i =>
-                    i.Particulars.includes("Room Rent")
+                    i.Particulars && i.Particulars.includes("Room Rent")
                 );
 
                 if (!roomRent) return existingItems;
@@ -3862,7 +3896,12 @@ sap.ui.define([
                 cycleEnd.setHours(0, 0, 0, 0);
 
                 const nonFacilityItems = existingItems.filter(i =>
-                    !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty")
+                    !i.Particulars.includes("Facility") && 
+                    !i.Particulars.includes("Meals") && 
+                    !i.Particulars.includes("Laundry") && 
+                    !i.Particulars.includes("Housekeeping") && 
+                    !i.Particulars.includes("Pillow") && 
+                    !i.Particulars.includes("Penalty")
                 );
 
                 const dbFacilitiesRaw = oData.commentData || [];
@@ -3916,9 +3955,12 @@ sap.ui.define([
 
                     if (facilityTotal <= 0 && invoiceIndex > 0) return;
 
+                    const existingFacility = existingItems.find(i => 
+                        i.Particulars && i.Particulars.trim() === particulars.trim()
+                    );
+
                     processedFacilityItems.push({
-                        ItemID: null,
-                        FacilityID: f.FacilityID, 
+                        ItemID: existingFacility ? existingFacility.ItemID : null,
                         InvNo: nonFacilityItems[0]?.InvNo,
                         Particulars: particulars,
                         UnitText: f.UnitText,
