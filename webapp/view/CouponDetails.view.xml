@@ -131,7 +131,7 @@
                 id="couponTable"
                 selectionChange="onCouponSelectionChange"
                 items="{path:'CouponModel>/',
-                sorter:{path:'Status', descending:false, group:true}, groupHeaderFactory:'.createGroupHeader'}"
+                sorter:[{path:'Status', descending:false, group:true}, {path:'BranchName', descending:false}], groupHeaderFactory:'.createGroupHeader'}"
                 mode="MultiSelect"
                 sticky="ColumnHeaders,HeaderToolbar"
                 growing="true"

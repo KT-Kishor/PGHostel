@@ -203,16 +203,14 @@ sap.ui.define([
                 const oResult = await this.ajaxReadWithJQuery("HM_Coupon", params);
 
                 const aData = this._normalizeCouponResult(oResult);
-                this.getView().getModel("CouponModel").setData(aData);
-                this._applyCouponGroupingAndSorting();
 
                 // ======== Branch Name ========
-
                 aData.forEach(coupon => {
                     coupon.BranchName = this._branchMap[coupon.BranchCode] || "-";
                 });
 
                 this.getView().getModel("CouponModel").setData(aData);
+                this._applyCouponGroupingAndSorting();
             } catch (err) {
                 sap.m.MessageBox.error(err?.responseJSON?.message || err?.message || "Failed to filter coupons.");
             } finally {
@@ -858,8 +856,7 @@ sap.ui.define([
                         text: oCtx.getProperty("Status") + " Coupons"
                     };
                 }),
-                new sap.ui.model.Sorter("EndDate", false),
-                new sap.ui.model.Sorter("DiscountValue", true)
+                new sap.ui.model.Sorter("BranchName", false)
             ]);
         },
 
