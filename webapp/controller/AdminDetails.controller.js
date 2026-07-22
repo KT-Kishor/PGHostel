@@ -1093,6 +1093,16 @@ sap.ui.define([
                 aAllowedRateTypes = ["Per Hour"];
             }
         }
+        else if(sUnitText === "Unit Price"){
+               if(Bookingunit=== "Per Month" || Bookingunit === "monthly"){
+                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+
+               }else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
+                aAllowedRateTypes = ["Per Day", "Per Hour"];
+            } else if (Bookingunit === "Per Hour") {
+                aAllowedRateTypes = ["Per Hour"];
+            }
+        }
             else {
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
