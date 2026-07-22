@@ -1039,6 +1039,7 @@ sap.ui.define([
             var oUnitType = sap.ui.getCore().byId("idUnitType");
             sap.ui.getCore().byId("editPrice").setValue("");
             sap.ui.getCore().byId("FU_id_Currency").setSelectedKey("");
+            sap.ui.getCore().byId("editMembername").setSelectedKey("")
 
             // 1. Selected Facility Key
             var sSelectedFacility = oEvent.getSource().getSelectedKey();
@@ -7954,12 +7955,13 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                             sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
                         } else if(sUnitText === "Package Price"){
                             if(item.FacilityChargeType==="Entire Booking"){
-                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                            this.qty=`(${item.quantity || 1} Qty)`
+                            sUnitText = `${sUnitText}`;
                             }else{
                               const dailyQty = Number(item.quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-
-                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)`;
+                                this.qty=`(${dailyQty} Qty / day)`
+                                sUnitText = `${sUnitText}\n(${diffDays} days)`;
                             }
                         }
                         else if (sUnitText === "Per Day") {
@@ -7981,10 +7983,13 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                         }
                     }
 
+                    const showQty =
+                         item.FacilityChargeType === "Entire Booking" ||
+                           item.FacilityChargeType === "DAILY";
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         item.StartDate,
                         item.EndDate,

@@ -6737,13 +6737,14 @@
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
-                                sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
+                                this.qty=`(${item.Quantity || 1} Qty)`
+                                sUnitText = `${sUnitText}`;
                             } else {
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-
-                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)`;
-                            }
+                                this.qty=`(${dailyQty} Qty / day)`
+                                sUnitText = `${sUnitText}\n(${diffDays} days)`;
+                                 }
                         }
                         else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
@@ -6759,12 +6760,16 @@
                             sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
                         }
                     }
+                    const showQty =
+                         item.FacilityChargeType === "Entire Booking" ||
+                           item.FacilityChargeType === "DAILY";
 
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
+                            
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),

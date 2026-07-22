@@ -365,18 +365,18 @@ sap.ui.define([
 
                                 return false;
                             });
-                                const aBranchData =
-                            this.getOwnerComponent().getModel("BranchModel")?.getData() || [];
+                            const aBranchData =
+                                this.getOwnerComponent().getModel("BranchModel")?.getData() || [];
 
-                        const aFinalData = aFilteredData.map(item => {
-                            const oBranch = aBranchData.find(
-                                br => br.BranchID === item.BranchCode
-                            );
-                            return {
-                                ...item,
-                                BranchName: oBranch?.Name || ""
-                            };
-                        });
+                            const aFinalData = aFilteredData.map(item => {
+                                const oBranch = aBranchData.find(
+                                    br => br.BranchID === item.BranchCode
+                                );
+                                return {
+                                    ...item,
+                                    BranchName: oBranch?.Name || ""
+                                };
+                            });
 
                             this.getView().setModel(
                                 new sap.ui.model.json.JSONModel(aFinalData),
@@ -2883,7 +2883,63 @@ sap.ui.define([
                         currentY = 20;
                     }
                     doc.setFontSize(11);
-                    doc.text("Thank you for staying with us.", margin - 2, currentY);
+                    doc.text("Thank you for staying with us.", margin, currentY);
+
+                    // --------------------------------------------------
+                    // Reserve space above footer
+                    // --------------------------------------------------
+                    const footerHeight = 35;      // Same as your footer
+                    const signatureHeight = 25;   // Space needed for signatures
+
+                    currentY += 32;
+
+                    if (currentY + signatureHeight > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
+
+
+                    // ================= SIGNATURES =================
+
+                    const leftX = margin;
+                    const rightX = pageWidth - margin;
+                    const lineLength = 40; // Decreased line width (adjust as needed)
+
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(12);
+
+                    // --- Row 1: Cashier & Guest Sign ---
+
+                    // 1. Left side: "Cashier ____"
+                    const cashierLabel = "Cashier ";
+                    doc.text(cashierLabel, leftX, currentY);
+
+                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                    const lineStartX = leftX + cashierTextWidth;
+
+                    // Draw shorter straight horizontal line
+                    doc.setLineWidth(0.5);
+                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                    // 2. Right side: "guest sign ____"
+                    const guestLabel = "Guest sign ";
+                    const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                    // Draw shorter straight horizontal line on the right end
+                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+
+                    // Place "guest sign" right before the line
+                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                    // --- Row 2: Created By ---
+
+                    currentY += 10;
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(12);
+
+                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                    doc.text(createdByText, leftX, currentY);
 
                     const totalPages = doc.internal.getNumberOfPages();
                     for (let i = 1; i <= totalPages; i++) {
@@ -2928,11 +2984,20 @@ sap.ui.define([
                 }
 
                 // GSTIN
-                if (company && company.GSTIN) {
+                if (company) {
                     doc.setFontSize(10);
-                    doc.text(`GSTIN : ${company.GSTIN}`, footerWidth - 5, currentYPosition, {
-                        align: 'right'
-                    });
+
+                    const gstValue = company?.GSTIN || "NA";
+
+                    // Give extra right margin only for "NA"
+                    const rightMargin = gstValue === "NA" ? 18 : 5;
+
+                    doc.text(
+                        `GSTIN : ${gstValue}`,
+                        footerWidth - rightMargin,
+                        currentYPosition,
+                        { align: "right" }
+                    );
                 }
 
                 if (company && company.Address) {
@@ -3300,6 +3365,65 @@ sap.ui.define([
                     doc.setFont("times", "bold");
                     doc.text("Thank you for staying with us.", margin, currentY + 5);
 
+
+
+                    // --------------------------------------------------
+                    // Reserve space above footer
+                    // --------------------------------------------------
+                    const footerHeight = 35;      // Same as your footer
+                    const signatureHeight = 25;   // Space needed for signatures
+
+                    currentY += 32;
+
+                    if (currentY + signatureHeight > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
+
+                    // ================= SIGNATURES =================
+
+                    // ================= SIGNATURES =================
+
+                    const leftX = margin;
+                    const rightX = pageWidth - margin;
+                    const lineLength = 40; // Decreased line width (adjust as needed)
+
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(12);
+
+                    // --- Row 1: Cashier & Guest Sign ---
+
+                    // 1. Left side: "Cashier ____"
+                    const cashierLabel = "Cashier ";
+                    doc.text(cashierLabel, leftX, currentY);
+
+                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                    const lineStartX = leftX + cashierTextWidth;
+
+                    // Draw shorter straight horizontal line
+                    doc.setLineWidth(0.5);
+                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                    // 2. Right side: "guest sign ____"
+                    const guestLabel = "Guest sign ";
+                    const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                    // Draw shorter straight horizontal line on the right end
+                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+
+                    // Place "guest sign" right before the line
+                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                    // --- Row 2: Created By ---
+
+                    currentY += 10;
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(12);
+
+                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                    doc.text(createdByText, leftX, currentY);
+
                     //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
                     for (let i = 1; i <= totalPages; i++) {
@@ -3644,7 +3768,7 @@ sap.ui.define([
                         doc.autoTable({
                             startY: 25,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: paymentRes.commentData.map((p, i) => ([
                                 i + 1,
@@ -3932,7 +4056,7 @@ sap.ui.define([
                             (selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING") ||
                             (selectionMode === "QTY" && unit === "unit price")
                         ) {
-                            return; 
+                            return;
                         }
                     }
 

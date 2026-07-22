@@ -4068,12 +4068,14 @@ sap.ui.define([
                             sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
                         } else if(sUnitText === "Package Price"){
                             if(item.FacilityChargeType==="Entire Booking"){
-                            sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
-                            }else{
-                              const dailyQty = Number(item.Quantity) || 1;
-                                const totalQty = dailyQty * diffDays;
+                                this.qty=`(${item.Quantity || 1} Qty)`
+                                sUnitText = `${sUnitText}`;
 
-                                sUnitText = `${sUnitText}\n(${dailyQty}/day × ${diffDays} days)`;
+                            }else{
+                                const dailyQty = Number(item.Quantity) || 1;
+                                const totalQty = dailyQty * diffDays;
+                                this.qty=`(${dailyQty} Qty / day)`
+                                sUnitText = `${sUnitText}\n(${diffDays} days)`;
                             }
                         }
                          else if (sUnitText === "Per Day") {
@@ -4091,10 +4093,14 @@ sap.ui.define([
                         }
                     }
 
+                       const showQty =
+                         item.FacilityChargeType === "Entire Booking" ||
+                           item.FacilityChargeType === "DAILY";
+
                     return [
                         (index + 1).toString(),
                          item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})`
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
