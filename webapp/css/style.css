@@ -1882,6 +1882,29 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   margin: 0 !important;
 }
 
+/* MenuButton with .myUnifiedBtn renders taller than a plain Button because its
+   gradient .sapMBtnInner stretches to the full wrapper height (arrow included).
+   Constrain it to the plain button's height/radius so they match in the footer. */
+.myUnifiedBtn.sapMMenuBtn,
+.myUnifiedBtn.sapMMenuBtn .sapMBtn {
+  height: auto !important;
+  vertical-align: middle !important;
+}
+
+.myUnifiedBtn.sapMMenuBtn .sapMBtnInner {
+  height: 1.62rem !important;
+  line-height: 1.2rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Force the MenuButton dropdown arrow icon to white (defaults to theme blue).
+   The arrow is a ::after pseudo-element on .sapMBtnInner, not a real icon node. */
+.sapMIBar .myUnifiedBtn.sapMMenuBtn.sapMMenuBtnRegular .sapMBtnInner::after,
+.myUnifiedBtn.sapMMenuBtn.sapMMenuBtnRegular .sapMBtnInner::after,
+.myUnifiedBtn.sapMMenuBtn.sapMMenuBtnRegular:hover .sapMBtnInner::after {
+  color: #ffffff !important;
+}
+
 .customBoldTitle {
   font-weight: bold;
   font-size: 1.5rem;
