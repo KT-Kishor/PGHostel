@@ -463,6 +463,16 @@ sap.ui.define([
         },
 
         _applyVerifiedUserLogin: async function (user) {
+            var sUserID = String(user && user.UserID || "").trim();
+            var sUserName = String(user && (user.UserName || user.CustomerName || user.EmployeeName || "")).trim();
+
+            if (!sUserID || !sUserName || typeof dcodeIO === "undefined" || !dcodeIO.bcrypt) {
+                throw new Error("Unable to create a valid login session");
+            }
+
+            var sEncryptedUserID = user._x9A1p || dcodeIO.bcrypt.hashSync(sUserID, 10);
+            var sEncryptedUserName = user._k7LmQ || dcodeIO.bcrypt.hashSync(sUserName, 10);
+
             this.initializeLoginModel();
 
             // Keep Component.js unchanged: first invalidate the old shared login so
@@ -479,10 +489,10 @@ sap.ui.define([
             });
 
             localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("_x9A1p", user._x9A1p || "");
-            localStorage.setItem("_k7LmQ", user._k7LmQ || "");
-            localStorage.setItem("_aB39X", btoa(user.UserID || ""));
-            localStorage.setItem("_mN72P", btoa(user.UserName || user.CustomerName || ""));
+            localStorage.setItem("_x9A1p", sEncryptedUserID);
+            localStorage.setItem("_k7LmQ", sEncryptedUserName);
+            localStorage.setItem("_aB39X", btoa(sUserID));
+            localStorage.setItem("_mN72P", btoa(sUserName));
 
             var oUIModel = this.getOwnerComponent().getModel("UIModel");
             if (oUIModel) {
@@ -494,11 +504,11 @@ sap.ui.define([
             sap.ui.getCore().setModel(oLoginModel, "LoginModel");
             oLoginModel.setData(Object.assign({}, oLoginModel.getData() || {}, {
                 isLoggedIn: true,
-                EmployeeID: user.UserID || "",
-                UserID: user.UserID || "",
+                EmployeeID: sUserID,
+                UserID: sUserID,
                 Salutation: user.Salutation || "",
-                EmployeeName: user.UserName || user.CustomerName || "",
-                UserName: user.UserName || user.CustomerName || "",
+                EmployeeName: sUserName,
+                UserName: sUserName,
                 EmailID: user.EmailID || user.CustomerEmail || user.Email || "",
                 Role: user.Role || "",
                 BranchCode: user.BranchCode || "",
@@ -513,6 +523,45 @@ sap.ui.define([
                 FileContent: user.FileContent || "",
                 Photo: user.FileContent ? "data:image/png;base64," + user.FileContent : ""
             }));
+        },
+
+        _getFirstResponseRecord: function (oResponse) {
+            var vData = oResponse && (oResponse.data || oResponse.value || oResponse.Customers);
+
+            if (Array.isArray(vData)) {
+                return vData[0] || null;
+            }
+
+            return vData || null;
+        },
+
+        _resolveVerifiedBookingLoginUser: async function (oOtpCustomer, sEmail) {
+            var oPrefetchedCustomer = this._oPrefetchedCustomerResponse && this._oPrefetchedCustomerResponse.Customers || {};
+            var aCandidates = [
+                { UserID: oPrefetchedCustomer.UserID },
+                { UserID: oOtpCustomer && oOtpCustomer.UserID },
+                { EmailID: sEmail },
+                { EmailID: oOtpCustomer && (oOtpCustomer.EmailID || oOtpCustomer.CustomerEmail || oOtpCustomer.Email) }
+            ];
+
+            for (var i = 0; i < aCandidates.length; i++) {
+                var oFilter = aCandidates[i];
+                if (!oFilter.UserID && !oFilter.EmailID) {
+                    continue;
+                }
+
+                try {
+                    var oLoginResponse = await this.ajaxReadWithJQuery("HM_Login", oFilter);
+                    var oUser = this._getFirstResponseRecord(oLoginResponse);
+                    if (oUser && oUser.UserID && (oUser.UserName || oUser.CustomerName || oUser.EmployeeName)) {
+                        return oUser;
+                    }
+                } catch (e) {
+                    // Try the next identifier; OTP responses can vary by occupant type.
+                }
+            }
+
+            return null;
         },
 
         /**
@@ -4420,11 +4469,16 @@ sap.ui.define([
                     OTP: sOTP
                 });
 
-                const customer = result.data[0]
+                const customer = this._getFirstResponseRecord(result);
+                const user = await this._resolveVerifiedBookingLoginUser(customer, sEmail);
+
+                if (!user) {
+                    throw new Error("Unable to create a valid login session");
+                }
 
                 this.CustomerEmail = sEmail;
 
-                await this._applyVerifiedUserLogin(customer);
+                await this._applyVerifiedUserLogin(user);
 
                 // ================= RESET =================
                 ctrlEmailId?.setValue("");
