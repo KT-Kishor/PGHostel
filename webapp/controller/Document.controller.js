@@ -1263,6 +1263,19 @@ sap.ui.define([
                 // Get Members data from model
                 var aMembers = this.getView().getModel("BookingView").getProperty("/Members") || [];
 
+                var aMissingDocumentMembers = aMembers.filter(function (oMember) {
+                    var oDoc = oMember.Documents && oMember.Documents[0];
+                    return !oDoc || !String(oDoc.FileName || "").trim();
+                });
+
+                if (aMissingDocumentMembers.length) {
+                    MessageBox.warning("Please upload document for all members before submitting.", {
+                        title: "Document Required",
+                        styleClass: "myUnifiedBtn"
+                    });
+                    return;
+                }
+
                 // Create Payload
                 const oPayload = {
                     Members: aMembers.map(function (oMember) {
