@@ -174,21 +174,6 @@
                     visible="{visiblePlay>/isIndia}"
                 />
 				<Label
-                    text="{i18n>type}"
-                    labelFor="groupC"
-                />
-				<RadioButtonGroup
-                    visible="{visiblePlay>/CC_id_CustInput}"
-                    select="onRadioButtonChange"
-                    selectedIndex="{visiblePlay>/selectedIndex}"
-                    id="MC_id_groupCustGst"
-                    columns="2"
-                    editable="true"
-                >
-					<RadioButton text="{i18n>cgst}" />
-					<RadioButton text="{i18n>igst}" />
-				</RadioButtonGroup>
-				<Label
                     visible="{visiblePlay>/CC_id_CustInput}"
                     text="{i18n>taxPercentage}"
                 />

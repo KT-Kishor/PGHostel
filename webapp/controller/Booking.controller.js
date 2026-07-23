@@ -4886,9 +4886,7 @@
             oModel.setProperty("/CustomerStateCode", oData.CustomerStateCode || "");
             oModel.setProperty("/SourceStateCode", oData.SourceStateCode || "");
             oModel.setProperty("/BookingSubTotal", this._toNumber(oData.BookingSubTotal));
-            oModel.setProperty("/CGST", this._toNumber(oData.CGST));
-            oModel.setProperty("/SGST", this._toNumber(oData.SGST));
-            oModel.setProperty("/IGST", this._toNumber(oData.IGST));
+            oModel.setProperty("/Tax", this._toNumber(oData.Tax));
             oModel.setProperty("/Documents", Array.isArray(oData.Documents) ? oData.Documents : []);
             oBookingView.setProperty("/showCustomerDocumentUpload", false);
             oModel.setProperty("/BookingPayload", oData.BookingPayload || null);
@@ -5539,15 +5537,11 @@
 
         _calculateTaxBreakup: function (fTaxableAmount) {
             const oModel = this.getView().getModel("HostelModel");
-            const sPropertyType = String(oModel.getProperty("/PropertyType") || "").trim();
-            const bSupportsCustomerGST = this._supportsCustomerGSTOverride(sPropertyType);
             const sGSTType = String(oModel.getProperty("/GSTType") || "").trim();
             const fGSTValue = this._toNumber(oModel.getProperty("/GSTValue"));
             const sPropertyGSTIN = String(oModel.getProperty("/PropertyGSTIN") || oModel.getProperty("/GSTIN") || "").trim().toUpperCase();
             const sCustomerGSTIN = String(oModel.getProperty("/CustomerGSTIN") || "").trim().toUpperCase();
-            let fCGST = 0;
-            let fSGST = 0;
-            let fIGST = 0;
+            let fTax = 0;
             let sEffectiveGSTType = sGSTType;
             let fEffectiveGSTValue = 0;
             let sSourceStateCode = "";
@@ -5556,30 +5550,16 @@
             if (sGSTType || fGSTValue > 0) {
                 fEffectiveGSTValue = fGSTValue;
 
-                if (bSupportsCustomerGST && this._isValidGSTINValue(sCustomerGSTIN) && this._isValidGSTINValue(sPropertyGSTIN)) {
+                if (this._isValidGSTINValue(sCustomerGSTIN) && this._isValidGSTINValue(sPropertyGSTIN)) {
                     sSourceStateCode = sPropertyGSTIN.substring(0, 2);
                     sCustomerStateCode = sCustomerGSTIN.substring(0, 2);
-
-                    if (sSourceStateCode === sCustomerStateCode) {
-                        sEffectiveGSTType = "CGST/SGST";
-                    } else {
-                        sEffectiveGSTType = "IGST";
-                    }
                 }
 
-                if (sEffectiveGSTType === "CGST/SGST") {
-                    const fHalfGSTValue = fEffectiveGSTValue;
-                    fCGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
-                    fSGST = Number((fTaxableAmount * fHalfGSTValue / 100).toFixed(2));
-                } else if (sEffectiveGSTType === "IGST") {
-                    fIGST = Number((fTaxableAmount * fEffectiveGSTValue / 100).toFixed(2));
-                }
+                fTax = Number((fTaxableAmount * fEffectiveGSTValue / 100).toFixed(2));
             }
 
             return {
-                CGST: fCGST,
-                SGST: fSGST,
-                IGST: fIGST,
+                Tax: fTax,
                 EffectiveGSTType: sEffectiveGSTType,
                 EffectiveGSTValue: fEffectiveGSTValue,
                 SourceStateCode: sSourceStateCode,
@@ -5712,14 +5692,12 @@
             oModel.setProperty("/BookingSubTotal", fSubTotal);
             oModel.setProperty("/BookingNetSubTotal", fDiscountedSubTotal);
             oModel.setProperty("/FacilityOfferDiscountTotal", fFacilityDiscount); // Already have TotalFacilityDiscount but adding clearer name
-            oModel.setProperty("/CGST", oTaxBreakup.CGST);
-            oModel.setProperty("/SGST", oTaxBreakup.SGST);
-            oModel.setProperty("/IGST", oTaxBreakup.IGST);
+            oModel.setProperty("/Tax", oTaxBreakup.Tax);
             oModel.setProperty("/EffectiveGSTType", oTaxBreakup.EffectiveGSTType);
             oModel.setProperty("/EffectiveGSTValue", oTaxBreakup.EffectiveGSTValue);
             oModel.setProperty("/SourceStateCode", oTaxBreakup.SourceStateCode);
             oModel.setProperty("/CustomerStateCode", oTaxBreakup.CustomerStateCode);
-            oModel.setProperty("/GrandTotal", Number(Math.max(fDiscountedSubTotal + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST, 0).toFixed(2)));
+            oModel.setProperty("/GrandTotal", Number(Math.max(fDiscountedSubTotal + oTaxBreakup.Tax, 0).toFixed(2)));
         },
 
         _parseDate: function (vDate) {
@@ -5824,7 +5802,7 @@
             const fTaxableAmount = this._getOnlinePaymentTaxableAmount();
             const oTaxBreakup = this._calculateTaxBreakup(fTaxableAmount);
             const fPayableNow = Number(Math.max(
-                fTaxableAmount + oTaxBreakup.CGST + oTaxBreakup.SGST + oTaxBreakup.IGST,
+                fTaxableAmount + oTaxBreakup.Tax,
                 0
             ).toFixed(2));
 
@@ -6219,6 +6197,7 @@
                 CouponCode: oHostelModel.getProperty("/AppliedCouponCode") || "",
                 TotalRoomprice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
                 UserID: oHostelModel.getProperty("/UserID") || "",
+                GST: "Tax",
                 GSTType: sEffectiveGSTType,
                 GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
                 GSTIN: sPropertyGSTIN,
@@ -6820,12 +6799,10 @@
             const discount = parseFloat(booking.Discount) || 0;
             const deposit = parseFloat(data.Deposit) || 0;
             let grandTotal = oHostelModel.GrandTotal;
-
-            const hasCGST = booking.GSTType === "CGST/SGST";
-            const hasIGST = booking.GSTType === "IGST";
+            const tax = parseFloat(oHostelModel.Tax) || 0;
 
             // Calculate dynamic calculation box matrix properties
-            let lineCounter = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
+            let lineCounter = 4 + (tax > 0 ? 1 : 0) + (discount > 0 ? 1 : 0);
             let paymentBoxHeight = (lineCounter * 7) + 25;
 
             if (currentY + paymentBoxHeight > 280) {
@@ -6881,16 +6858,8 @@
 
             addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
 
-
-
-            if (hasCGST) {
-                const cgst = parseFloat(oHostelModel.CGST) || 0;
-                const sgst = parseFloat(oHostelModel.SGST) || 0;
-                addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
-                addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
-            } else if (hasIGST) {
-                const igst = parseFloat(oHostelModel.IGST) || 0;
-                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+            if (tax > 0) {
+                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)}`);
             }
 
 

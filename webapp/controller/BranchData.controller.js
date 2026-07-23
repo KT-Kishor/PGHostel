@@ -41,7 +41,6 @@ sap.ui.define([
             this.getView().setModel(oeditable, "editableModel");
             this.getView().setModel(new sap.ui.model.json.JSONModel({
                 CC_id_CustInput: false,
-                selectedIndex: -1,
                 isIndia: false
             }), "visiblePlay");
             this.getView().setModel(new sap.ui.model.json.JSONModel({
@@ -688,7 +687,7 @@ sap.ui.define([
                 Photo1: oUpload.Photo1,
                 Attachment: oImage.Attachment,
                 GSTIN: Payload.GSTIN,
-                Type: Payload.Type,
+                Type: "IGST",
                 Value: Payload.Value,
                 Photo1Type: oUpload.Photo1Type,
                 Photo1Name: oUpload.Photo1Name,
@@ -1210,14 +1209,6 @@ sap.ui.define([
 
             const bHasGST = !!oData.GSTIN;
             oVisible.setProperty("/CC_id_CustInput", bHasGST);
-
-            if (oData.Type === "CGST") {
-                oVisible.setProperty("/selectedIndex", 0);
-            } else if (oData.Type === "IGST") {
-                oVisible.setProperty("/selectedIndex", 1);
-            } else {
-                oVisible.setProperty("/selectedIndex", -1);
-            }
             this._resetFacilityValueStates();
             this._resetBranchValueStates();
             this._applyCountryStateCityFilters();
@@ -2211,7 +2202,6 @@ sap.ui.define([
             if (!sValue) {
                 oInput.setValueState("None");
                 visiModel.setProperty("/CC_id_CustInput", false);
-                visiModel.setProperty("/selectedIndex", -1);
                 dataModel.setProperty("/Type", "");
                 dataModel.setProperty("/Value", "");
                 return true;
@@ -2220,30 +2210,16 @@ sap.ui.define([
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("gstError"));
                 visiModel.setProperty("/CC_id_CustInput", false);
-                visiModel.setProperty("/selectedIndex", -1);
                 return false;
             }
             oInput.setValueState("None");
             visiModel.setProperty("/CC_id_CustInput", true);
-            const stateCode = sValue.substring(0, 2);
+            dataModel.setProperty("/Type", "IGST");
             if (previousGST && previousGST !== sValue) {
-                dataModel.setProperty("/Value", "");
+                dataModel.setProperty("/Value", "18");
             }
-            if (stateCode === "29") {
-                visiModel.setProperty("/selectedIndex", 0);
-                dataModel.setProperty("/Type", "CGST/SGST");
-                if (!dataModel.getProperty("/Value")) {
-                    dataModel.setProperty("/Value", "9");
-                }
-            } else if (stateCode === "22") {
-                visiModel.setProperty("/selectedIndex", 1);
-                dataModel.setProperty("/Type", "IGST");
-                if (!dataModel.getProperty("/Value")) {
-                    dataModel.setProperty("/Value", "18");
-                }
-            } else {
-                visiModel.setProperty("/selectedIndex", 0);
-                dataModel.setProperty("/Type", "CGST/SGST");
+            if (!dataModel.getProperty("/Value")) {
+                dataModel.setProperty("/Value", "18");
             }
             // store current GST as previous
             dataModel.setProperty("/GSTIN_PREV", sValue);
@@ -2282,18 +2258,5 @@ sap.ui.define([
             }
         },
 
-        onRadioButtonChange: function(oEvent) {
-            const oButtonGroup = oEvent.getSource();
-            const selectedIndex = oButtonGroup.getSelectedIndex();
-            const dataModel = this.getView().getModel("MDmodel");
-            const visiModel = this.getView().getModel("visiblePlay");
-
-            visiModel.setProperty("/selectedIndex", selectedIndex);
-            if (selectedIndex === 0) {
-                dataModel.setProperty("/Type", "CGST/SGST");
-            } else if (selectedIndex === 1) {
-                dataModel.setProperty("/Type", "IGST");
-            }
-        },
     })
 });

@@ -972,12 +972,12 @@
 
                                     <ColumnListItem
                                         vAlign="Middle"
-                                        visible="{= ${HostelModel>/CGST} > 0}"
+                                        visible="{= ${HostelModel>/Tax} > 0}"
                                         class="greyGST"
                                     >
                                         <cells>
                                             <Text
-                                                text="{= ${HostelModel>/CGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'CGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue}  : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'CGST'}"
+                                                text="{= ${HostelModel>/EffectiveGSTValue} > 0 ? 'Tax (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'Tax'}"
                                             />
 
                                             <HBox
@@ -987,61 +987,7 @@
                                                 class="greyGST"
                                             >
                                                 <Text
-                                                    text="{path: 'HostelModel>/CGST', formatter: '.Formatter.fromatNumber'}"
-                                                    class="sapUiTinyMarginEnd"
-                                                />
-                                                <Text
-                                                    text="{HostelModel>/Currency}"
-                                                />
-                                            </HBox>
-                                        </cells>
-                                    </ColumnListItem>
-
-                                    <ColumnListItem
-                                        vAlign="Middle"
-                                        visible="{= ${HostelModel>/SGST} > 0}"
-                                        class="greyGST"
-                                    >
-                                        <cells>
-                                            <Text
-                                                text="{= ${HostelModel>/SGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'SGST (' + (${HostelModel>/EffectiveGSTType} === 'CGST/SGST' ? ${HostelModel>/EffectiveGSTValue} : ${HostelModel>/EffectiveGSTValue}) + '%)' : 'SGST'}"
-                                            />
-
-                                            <HBox
-                                                justifyContent="End"
-                                                alignItems="Center"
-                                                renderType="Bare"
-                                                class="greyGST"
-                                            >
-                                                <Text
-                                                    text="{path: 'HostelModel>/SGST', formatter: '.Formatter.fromatNumber'}"
-                                                    class="sapUiTinyMarginEnd"
-                                                />
-                                                <Text
-                                                    text="{HostelModel>/Currency}"
-                                                />
-                                            </HBox>
-                                        </cells>
-                                    </ColumnListItem>
-
-                                    <ColumnListItem
-                                        vAlign="Middle"
-                                        visible="{= ${HostelModel>/IGST} > 0}"
-                                        class="greyGST"
-                                    >
-                                        <cells>
-                                            <Text
-                                                text="{= ${HostelModel>/IGST} > 0 &amp;&amp; ${HostelModel>/EffectiveGSTValue} > 0 ? 'IGST (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'IGST'}"
-                                            />
-
-                                            <HBox
-                                                justifyContent="End"
-                                                alignItems="Center"
-                                                renderType="Bare"
-                                                class="greyGST"
-                                            >
-                                                <Text
-                                                    text="{path: 'HostelModel>/IGST', formatter: '.Formatter.fromatNumber'}"
+                                                    text="{path: 'HostelModel>/Tax', formatter: '.Formatter.fromatNumber'}"
                                                     class="sapUiTinyMarginEnd"
                                                 />
                                                 <Text

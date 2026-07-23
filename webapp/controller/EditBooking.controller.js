@@ -4151,12 +4151,10 @@ sap.ui.define([
             const subTotal = roomRent + facilityTotal;
             const discount = parseFloat(booking.Discount) || 0;
             let grandTotal = oHostelModel.GrandTotal;
-
-            const hasCGST = booking.GSTType === "CGST/SGST";
-            const hasIGST = booking.GSTType === "IGST";
+            const tax = parseFloat(oHostelModel.Tax) || 0;
 
             // Calculate unique lines to isolate precise box height requirements
-            let linesCount = 4 + (hasCGST ? 2 : hasIGST ? 1 : 0) + (discount > 0 ? 1 : 0);
+            let linesCount = 4 + (tax > 0 ? 1 : 0) + (discount > 0 ? 1 : 0);
             let paymentBoxHeight = (linesCount * 7) + 25;
 
             if (currentY + paymentBoxHeight > 280) {
@@ -4213,15 +4211,8 @@ sap.ui.define([
                  addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
 
            
-
-            if (hasCGST) {
-                const cgst = parseFloat(oHostelModel.CGST) || 0;
-                const sgst = parseFloat(oHostelModel.SGST) || 0;
-                addLine(`CGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
-                addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
-            } else if (hasIGST) {
-                const igst = parseFloat(oHostelModel.IGST) || 0;
-                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+            if (tax > 0) {
+                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)}`);
             }
 
            
