@@ -45,7 +45,7 @@
                     selectionChange="onMemberSelectionChange"
                 >
                     <columns>
-                        <Column><Text text="Full Name" /></Column>
+                        <Column width="{= ${device>/system/phone} ? '50%' : 'auto'}"><Text text="Full Name" /></Column>
                         <Column ><Text text="Age" /></Column>
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Relationship" /></Column>

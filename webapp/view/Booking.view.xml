@@ -314,7 +314,7 @@
                                         <Text text="Primary" />
                                     </Column>
 
-                                    <Column id="nameColumn">
+                                    <Column id="nameColumn" width="{= ${device>/system/phone} ? '48%' : 'auto'}">
                                         <Text text="Full Name" />
                                     </Column>
                                     <Column
