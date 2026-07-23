@@ -409,11 +409,14 @@ sap.ui.define([
             },
             onSaveNewMember: function () {
 
-                var oView = sap.ui.getCore();
-
                 var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
 
-                var oDocumentTypeCombo = oView.byId("AD_id_DocumentType");
+                var oSalutation = this._getMemberDialogControl("AD_idSelect");
+                var oMemberName = this._getMemberDialogControl("AD_id_MemberName");
+                var oMemberDOB = this._getMemberDialogControl("AD_id_MemberDOB");
+                var oMemberGender = this._getMemberDialogControl("AD_id_MemberGenderCombo");
+                var oMemberRelation = this._getMemberDialogControl("AD_id_MemberRelationCombo");
+                var oDocumentTypeCombo = this._getMemberDialogControl("AD_id_DocumentType");
                 var oDocument = oMember.Documents && oMember.Documents[0] ? oMember.Documents[0] : {};
                 var sDocumentTypeValue = String(
                     oDocumentTypeCombo.getSelectedKey() ||
@@ -422,12 +425,12 @@ sap.ui.define([
                     ""
                 ).trim();
 
-                if (utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"), "ID") &&
-                    utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"), "ID") &&
-                    utils._LCvalidateDate(oView.byId("AD_id_MemberDOB"), "ID") &&
-                    utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberGenderCombo"), "ID") &&
+                if (utils._LCstrictValidationComboBox(oSalutation, "ID") &&
+                    utils._LCvalidateMandatoryField(oMemberName, "ID") &&
+                    utils._LCvalidateDate(oMemberDOB, "ID") &&
+                    utils._LCstrictValidationComboBox(oMemberGender, "ID") &&
                     (oMember.Relation === "Self" ||
-                        utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID")
+                        utils._LCstrictValidationComboBox(oMemberRelation, "ID")
                     )
                 ) {
 
@@ -438,9 +441,15 @@ sap.ui.define([
                         return;
                     }
 
-                    if (sDocumentTypeValue && !oDocument.File) {
+                    if (sDocumentTypeValue && !String(oDocument.File || "").trim()) {
                         oDocumentTypeCombo.setValueState("Error");
                         oDocumentTypeCombo.setValueStateText("Please upload the selected document");
+
+                        var oFileUploader = this._getMemberDialogControl("AD_id_FileUploader");
+                        if (oFileUploader) {
+                            oFileUploader.setValueState("Error");
+                            oFileUploader.setValueStateText("Please upload the selected document");
+                        }
 
                         sap.m.MessageToast.show(
                             "Please upload the selected document or clear the document type."
@@ -450,6 +459,10 @@ sap.ui.define([
                     }
 
                     oDocumentTypeCombo.setValueState("None");
+                    var oFileUploaderClear = this._getMemberDialogControl("AD_id_FileUploader");
+                    if (oFileUploaderClear) {
+                        oFileUploaderClear.setValueState("None");
+                    }
 
                     // ================= MEMBER ID =================
 
@@ -536,10 +549,16 @@ sap.ui.define([
                 oModel.setProperty("/NewMemberDraft/Documents/0/DocumentType", "");
                 oModel.refresh(true);
 
-                const oFileUploader = sap.ui.getCore().byId("AD_id_FileUploader");
+                const oFileUploader = this._getMemberDialogControl("AD_id_FileUploader");
+                const oDocumentTypeCombo = this._getMemberDialogControl("AD_id_DocumentType");
 
                 if (oFileUploader) {
                     oFileUploader.clear();
+                    oFileUploader.setValueState("None");
+                }
+
+                if (oDocumentTypeCombo) {
+                    oDocumentTypeCombo.setValueState("None");
                 }
             },
 
@@ -1230,7 +1249,16 @@ sap.ui.define([
                     return true;
                 }
 
+                const oDocument = this.getView().getModel("BookingView").getProperty("/NewMemberDraft/Documents/0") || {};
+                if (String(oDocument.File || "").trim()) {
+                    oComboBox.setValueState("None");
+                }
+
                 return utils._LCstrictValidationComboBox(oComboBox, "ID");
+            },
+
+            _getMemberDialogControl: function (sId) {
+                return sap.ui.core.Fragment.byId(this.getView().getId(), sId) || sap.ui.getCore().byId(sId);
             },
 
             // OnSubmit: function () {
