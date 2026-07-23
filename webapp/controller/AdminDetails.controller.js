@@ -7979,6 +7979,17 @@ sap.ui.define([
 
                 currentY += 8;
 
+                facilities.sort((a, b) => {
+                    if (!a.StartDate || !b.StartDate) {
+                        return 0;
+                    }
+
+                    const dateA = new Date(a.StartDate.split('/').reverse().join('-'));
+                    const dateB = new Date(b.StartDate.split('/').reverse().join('-'));
+
+                    return dateA - dateB;
+                });
+
                 let tableBody = facilities.map((item, index) => {
 
                     let sUnitText = item.UnitText || "-";
@@ -8542,7 +8553,13 @@ sap.ui.define([
                 )
                 //  && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
             ) {
-
+                
+                if(oMember.Documents[0].DocumentType){
+                    if(oMember.Documents[0].File===""){
+                        MessageToast.show("Please upload a document")
+                        return
+                    }
+                }
                 // ================= DOCUMENT VALIDATION =================
 
                 // if (

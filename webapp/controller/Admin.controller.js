@@ -39,14 +39,14 @@ sap.ui.define([
                 dateRangeControl.setSecondDateValue(fyEnd);
             }
             // this._loadHostelMasterData();
-                 var sPath = oEvent.getParameter("arguments").sPath;
-                 this.sPath = oEvent.getParameter("arguments").sPath;
+            var sPath = oEvent.getParameter("arguments").sPath;
+            this.sPath = oEvent.getParameter("arguments").sPath;
 
-            if(sPath==="TilePage"){
-            this.getView().byId("PO_id_CompanyName").setSelectedKey("")
-            this.getView().byId("PO_id_Status").setSelectedKey("")
-            this.getView().byId("PO_id_BookingId").setSelectedKey("")
-            this.getView().byId("PO_id_CustomerName").setSelectedKey("")
+            if (sPath === "TilePage") {
+                this.getView().byId("PO_id_CompanyName").setSelectedKey("")
+                this.getView().byId("PO_id_Status").setSelectedKey("")
+                this.getView().byId("PO_id_BookingId").setSelectedKey("")
+                this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             }
 
 
@@ -58,7 +58,7 @@ sap.ui.define([
                 this.getOwnerComponent().setModel(model, "RoomDetailsModel");
             })
 
-            
+
 
             var model = new JSONModel({
                 BranchCode: "",
@@ -75,11 +75,11 @@ sap.ui.define([
             this.getView().setModel(model, "Visiblemodel")
             this.BedTypedetails();
         },
-        
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
+
+        getGroupHeader: function (oGroup) {
+            return this.getStyledGroupHeader(oGroup);
         },
-        
+
         _loadBranchCode: async function () {
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
@@ -164,7 +164,7 @@ sap.ui.define([
 
         Cust_read: function (flag, bBusyAlreadyOpen) {
             try {
-                 if (!bBusyAlreadyOpen) {
+                if (!bBusyAlreadyOpen) {
                     this.getBusyDialog();
                 }
 
@@ -272,7 +272,7 @@ sap.ui.define([
                             BranchName: branch ? branch.Name : customer.BranchCode // fallback
                         };
                     });
-                    if ((!this._originalRoomdata || flag === true) && this.sPath==="TilePage") {
+                    if ((!this._originalRoomdata || flag === true) && this.sPath === "TilePage") {
                         this._originalRoomdata = mappedData;
                     }
 
@@ -280,7 +280,7 @@ sap.ui.define([
                     this.getView().setModel(oModel, "HostelModel");
                     this.getOwnerComponent().setModel(oModel, "HostelModelcheckrooms");
 
-                 
+
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
                     this._addNoDataToComboBoxes();
@@ -291,25 +291,25 @@ sap.ui.define([
             }
         },
 
-        _addNoDataToComboBoxes: function() {
-    const comboBoxes = [
-        "PO_id_BookingId",
-        "PO_id_CompanyName",    // RoomNo filter
-        "PO_id_Status",         // Status filter  
-        "PO_id_CustomerName"    // CustomerName filter
-    ];
-    
-    comboBoxes.forEach(sId => {
-        const oComboBox = this.byId(sId);
-        if (oComboBox && oComboBox.getItems().length === 0) {
-            oComboBox.insertItem(new sap.ui.core.ListItem({
-                key: "",
-                text: "No Data",
-                textAlign: "Center"
-            }), 0);
-        }
-    });
-},
+        _addNoDataToComboBoxes: function () {
+            const comboBoxes = [
+                "PO_id_BookingId",
+                "PO_id_CompanyName",    // RoomNo filter
+                "PO_id_Status",         // Status filter  
+                "PO_id_CustomerName"    // CustomerName filter
+            ];
+
+            comboBoxes.forEach(sId => {
+                const oComboBox = this.byId(sId);
+                if (oComboBox && oComboBox.getItems().length === 0) {
+                    oComboBox.insertItem(new sap.ui.core.ListItem({
+                        key: "",
+                        text: "No Data",
+                        textAlign: "Center"
+                    }), 0);
+                }
+            });
+        },
 
 
         _populateUniqueFilterValues: function (data) {
@@ -326,7 +326,7 @@ sap.ui.define([
                 if (item.RoomNo && item.RoomNo.trim()) {
                     uniqueValues.PO_id_CompanyName.add(item.RoomNo.trim());
                 }
-              
+
                 if (item.CustomerName) {
                     uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
                 }
@@ -334,7 +334,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["PO_id_BookingId","PO_id_CompanyName","PO_id_CustomerName"].forEach(field => {
+            ["PO_id_BookingId", "PO_id_CompanyName", "PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -419,7 +419,10 @@ sap.ui.define([
         HM_AssignRoom: function (oEvent) {
             this.selectedIndex = 0
 
+
             var Beddata = this.getView().getModel("BedTypeModel").getData()
+
+            var Hostelmodel = this.getView().getModel("HostelModel").getData()
 
             var table = this.byId("idPOTable");
             var selected = table.getSelectedItem();
@@ -431,6 +434,11 @@ sap.ui.define([
 
             var Model = selected.getBindingContext("HostelModel");
             this.data = Model.getObject();
+
+            var BranchData = this.getView().getModel("BranchModel").getData().find((item) => {
+                return item.BranchID === this.data.BranchCode
+            })
+
             const bedName = this.data.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
             const acType = this.data.BedType.includes("NON-AC") ? "NON-AC" : "AC";
 
@@ -486,6 +494,21 @@ sap.ui.define([
                     RoomNo: room.RoomNo
                 };
             });
+
+            if(BranchData.PropertyType==="Rented Properties" || BranchData.PropertyType==="Hotel" || BranchData.PropertyType==="Service Apartments"){
+            let hostelData = this.getView().getModel("HostelModel").getData();
+
+            availableRoomNos = availableRoomNos.filter(roomNo => {
+                return (
+                    roomNo.RoomNo === this.data.RoomNo ||
+                    !hostelData.some(item =>
+                        item.RoomNo === roomNo.RoomNo &&
+                        item.Status === "Assigned"
+                    )
+                );
+            });
+
+        }
 
             var oAvailableRoomsModel = new sap.ui.model.json.JSONModel(availableRoomNos);
             this.getView().setModel(oAvailableRoomsModel, "AvailableRoomsModel");
@@ -808,6 +831,7 @@ sap.ui.define([
                     CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
+                    MemberID: ID.MemberID,
                     Status: "Assigned"
                 };
 
@@ -821,8 +845,8 @@ sap.ui.define([
             } else if (DepositAmount) {
                 Payload = {
                     CustomerEmail: ID.CustomerEmail,
-                    UserID:ID.UserID,
-                    MemberID:ID.MemberID,
+                    UserID: ID.UserID,
+                    MemberID: ID.MemberID,
                     CustomerName: ID.CustomerName,
                     DepositAmount: parseInt(DepositAmount),
                     DepositCurrency: "INR",
@@ -847,8 +871,8 @@ sap.ui.define([
                     CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
-                    UserID:ID.UserID,
-                    MemberID:ID.MemberID,
+                    UserID: ID.UserID,
+                    MemberID: ID.MemberID,
                     Status: "Assigned"
                 };
 
@@ -877,6 +901,9 @@ sap.ui.define([
                     }),
                     "InvoiceNavContext"
                 );
+                
+                 if(ID.Status==="Confirmed"){
+
 
                 sap.m.MessageBox.confirm(
                     "Are you sure you want to proceed to the invoice?",
@@ -906,6 +933,7 @@ sap.ui.define([
                         }
                     }
                 );
+            }
 
             } catch (oError) {
 
@@ -939,7 +967,7 @@ sap.ui.define([
                             //     from: "Customerdetails"
                             // });
                             this.HM_Dialog.close();
-                            this.byId("idPOTable").removeSelections();  
+                            this.byId("idPOTable").removeSelections();
                         }
 
                         // If Cancel → Do nothing
@@ -1144,26 +1172,26 @@ sap.ui.define([
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
             this.byId("PO_id_Date").setValue("");
         },
-onPaymentModeChange: function (oEvent) {
-    var oComboBox = oEvent.getSource();
-    utils._LCstrictValidationComboBox(oComboBox, "ID");
+        onPaymentModeChange: function (oEvent) {
+            var oComboBox = oEvent.getSource();
+            utils._LCstrictValidationComboBox(oComboBox, "ID");
 
-    var sPaymentMode = oComboBox.getSelectedKey();
+            var sPaymentMode = oComboBox.getSelectedKey();
 
-    if (sPaymentMode === "Cash") {
-        var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+            if (sPaymentMode === "Cash") {
+                var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
 
-        this.getView().getModel("HostelModel").setProperty(
-            "/TransactionID",
-            oLoginData.EmployeeName
-        );
-        sap.ui.getCore().byId("id_TransactionID").setEditable(false)
-    } else {
-        this.getView().getModel("HostelModel").setProperty("/TransactionID", "");
-        sap.ui.getCore().byId("id_TransactionID").setEditable(true)
+                this.getView().getModel("HostelModel").setProperty(
+                    "/TransactionID",
+                    oLoginData.EmployeeName
+                );
+                sap.ui.getCore().byId("id_TransactionID").setEditable(false)
+            } else {
+                this.getView().getModel("HostelModel").setProperty("/TransactionID", "");
+                sap.ui.getCore().byId("id_TransactionID").setEditable(true)
 
-    }
-},
+            }
+        },
         onRoomNoChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
@@ -1177,11 +1205,11 @@ onPaymentModeChange: function (oEvent) {
         AD_onPressEditDetails: function (oEvent) {
             var sCustomerID = oEvent.getSource().getBindingContext("HostelModel").getObject().BookingID;
             var sEncodedID = btoa(sCustomerID.toString());
-            var sMemberID =  oEvent.getSource().getBindingContext("HostelModel").getObject().MemberID;
+            var sMemberID = oEvent.getSource().getBindingContext("HostelModel").getObject().MemberID;
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
-                xPath : sMemberID,
+                xPath: sMemberID,
                 from: "Customerdetails"
             });
         },
@@ -1194,75 +1222,75 @@ onPaymentModeChange: function (oEvent) {
                     type: "string"
                 },
                 {
-                label: "Customer ID",
-                property: "CustomerID",
-                type: "string"
-            },
-            {
-                label: "Customer Name",
-                property: "CustomerName",
-                type: "string"
-            },
-            {
-                label: "Booking ID",
-                property: "BookingID",
-                type: "string"
-            },
-            {
-                label: "Booking Date",
-                property: "BookingDate",
-                type: "string"
-            },
-            {
-                label: "Gender",
-                property: "Gender",
-                type: "string"
-            },
-            {
-                label: "Contact Information",
-                property: "MobileNo",
-                type: "string"
-            },
-            {
-                label: "Email ID ",
-                property: "CustomerEmail",
-                type: "string"
-            },
-            {
-                label: "Start Date",
-                property: "StartDate",
-                type: "string"
-            },
-            {
-                label: "End Date",
-                property: "EndDate",
-                type: "string"
-            },
-            {
-                label: "Room Number",
-                property: "RoomNo",
-                type: "string"
-            },
-            {
-                label: "Bed Type",
-                property: "BedType",
-                type: "string"
-            },
-             {
-                label: "Coupon Code",
-                property: "CouponCode",
-                type: "string"
-            },
-             {
-                label: "Total Cost",
-                property: "RentPrice",
-                type: "string"
-            },
-            {
-                label: "Status",
-                property: "Status",
-                type: "string"
-            }
+                    label: "Customer ID",
+                    property: "CustomerID",
+                    type: "string"
+                },
+                {
+                    label: "Customer Name",
+                    property: "CustomerName",
+                    type: "string"
+                },
+                {
+                    label: "Booking ID",
+                    property: "BookingID",
+                    type: "string"
+                },
+                {
+                    label: "Booking Date",
+                    property: "BookingDate",
+                    type: "string"
+                },
+                {
+                    label: "Gender",
+                    property: "Gender",
+                    type: "string"
+                },
+                {
+                    label: "Contact Information",
+                    property: "MobileNo",
+                    type: "string"
+                },
+                {
+                    label: "Email ID ",
+                    property: "CustomerEmail",
+                    type: "string"
+                },
+                {
+                    label: "Start Date",
+                    property: "StartDate",
+                    type: "string"
+                },
+                {
+                    label: "End Date",
+                    property: "EndDate",
+                    type: "string"
+                },
+                {
+                    label: "Room Number",
+                    property: "RoomNo",
+                    type: "string"
+                },
+                {
+                    label: "Bed Type",
+                    property: "BedType",
+                    type: "string"
+                },
+                {
+                    label: "Coupon Code",
+                    property: "CouponCode",
+                    type: "string"
+                },
+                {
+                    label: "Total Cost",
+                    property: "RentPrice",
+                    type: "string"
+                },
+                {
+                    label: "Status",
+                    property: "Status",
+                    type: "string"
+                }
             ]
         },
 
@@ -1277,7 +1305,7 @@ onPaymentModeChange: function (oEvent) {
                 BookingDate: Formatter.formatDate(item.BookingDate),
                 StartDate: Formatter.formatDate(item.StartDate),
                 EndDate: Formatter.formatDate(item.EndDate),
-                MobileNo: item.STDCode+ " "+ item.MobileNo
+                MobileNo: item.STDCode + " " + item.MobileNo
                 // Pincode: item.Pincode ? String(item.Pincode) : "",
                 // Contact: item.Contact ? String(item.Contact) : ""
             }));

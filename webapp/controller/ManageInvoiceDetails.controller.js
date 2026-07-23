@@ -2095,7 +2095,7 @@ sap.ui.define([
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
                         this.visiablityPlay.setProperty("/MultiEmail", hasDue);
-                        this.visiablityPlay.setProperty("/Edit", hasDue);
+                        this.visiablityPlay.setProperty("/Edit", true);
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         this.visiablityPlay.setProperty("/merge", true);
@@ -4439,7 +4439,7 @@ sap.ui.define([
 
 
             // TOTAL MONTHS
-            calculateTotalMonths: function (startDate, endDate) {
+            _calculateTotalMonths: function (startDate, endDate) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
 

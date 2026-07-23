@@ -10,6 +10,7 @@
         afterClose=".onEditDialogClose"
         contentWidth="28rem"
         contentHeight="auto"
+        draggable="true"   
     >
         <customHeader>
             <Bar class="barheader">

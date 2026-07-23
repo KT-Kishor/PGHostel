@@ -456,7 +456,7 @@
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressDelete"
                                                 />
-												<m:Button text="Refresh" press="onRefreshInvoice"
+												<m:Button text="Update Item" press="onRefreshInvoice"
                                                 visible="{visiablityPlay>/refresh}" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
 											</m:OverflowToolbar>

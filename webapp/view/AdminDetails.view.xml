@@ -1023,7 +1023,7 @@
                         id="idGST"
                         tooltip="GST Setup"
                         press="onGSTBooking"
-                        visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin' || ${LoginModel>/Role} === 'Front Office Employee') 
+                        visible="{= !${VisibleModel>/visible} &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') 
                                  &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
                         class="myUnifiedBtn"
                     />  
@@ -1044,6 +1044,7 @@
                                              &amp;&amp; (
                                            ${LoginModel>/Role} === 'Admin'
                                            || ${LoginModel>/Role} === 'SuperAdmin'
+                                           || ${LoginModel>/Role} === 'Branch Manager'
                                            || ${LoginModel>/Role} === 'Front Office Employee'
                                               )
                                             )
@@ -1069,7 +1070,7 @@
                         press="onChekout"
                         visible="{= ${CustomerData>/Status} === 'Assigned' 
                                     &amp;&amp; !${VisibleModel>/visible} &amp;&amp; ${CustomerData>/Status} !== 'New'
-                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin' ||  ${LoginModel>/Role} === 'Front Office Employee') }"
+                                    &amp;&amp; (${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager' ||  ${LoginModel>/Role} === 'Front Office Employee') }"
                     />
 
                     <Button
