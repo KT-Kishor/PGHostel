@@ -352,6 +352,12 @@ sap.ui.define([
                 oHostelModel.setProperty("/EditMemberID", sMemberID);
                 oHostelModel.setProperty("/HasExistingPayments", aExistingPayments.length > 0);
                 oHostelModel.setProperty("/PaymentPaidAmount", fPaymentPaidAmount);
+                var oLoadedPrimaryMember = (oEditData.FamilyMembers || []).find(function (oMember) {
+                    return oMember && oMember.IsPrimary;
+                });
+                this._sLastPrimaryMemberId = oLoadedPrimaryMember
+                    ? String(oLoadedPrimaryMember.id || oLoadedPrimaryMember.MemberID || "").trim()
+                    : "SELF";
 
                 this._initializeBookingData();
                 this._prefillLoggedInUser();
