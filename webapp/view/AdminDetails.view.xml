@@ -853,7 +853,11 @@
                                 visible="{= ${CustomerData>/IGST} > 0 }"
                             >
                                 <Label
-                                    text="{= 'IGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                                text="{=
+    ${CustomerData>/GSTLabel} === 'Tax'
+        ? 'Tax Amount (' + ${CustomerData>/GSTValue} + '%):'
+        : 'IGST (' + ${CustomerData>/GSTValue} + '%):'
+}"
                                     class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                                 />
                                 <Text

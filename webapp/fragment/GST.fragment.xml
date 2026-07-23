@@ -41,22 +41,7 @@
                     visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"
                 />
 
-                <Label
-                    text="GST Type"
-                    visible="{= ${GSTModel>/GSTPercentage} ? true : false }"
-                />
-                <RadioButtonGroup
-                    id="idGSTType"
-                    columns="2"
-                    select="onGSTTypeSelect"
-                    editable="false"
-                    visible="{= ${GSTModel>/GSTPercentage} ? true : false }"
-                >
-                    <buttons>
-                        <RadioButton text="IGST" />
-                        <RadioButton text="CGST/SGST" />
-                    </buttons>
-                </RadioButtonGroup>
+               
 
                 <Label
                     text="GST Percentage"
@@ -73,6 +58,19 @@
                     visible="{= ${GSTModel>/GSTPercentage} ? true : false }"
                 />
 
+                 <Label
+                    text="GST Type"
+                />
+                <RadioButtonGroup
+                    id="idGSTType"
+                    columns="2"
+                    select="onGSTTypeSelect"
+                >
+                    <buttons>
+                        <RadioButton text="IGST" />
+                        <RadioButton text="CGST/SGST" />
+                    </buttons>
+                </RadioButtonGroup>
                 <Label
                     text="Cusomer GSTIN"
                     required="true"

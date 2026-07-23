@@ -3196,7 +3196,7 @@ sap.ui.define([
 
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
-                        ["Date :", Formatter.formatDate(oCustomerModel.InvDate)],
+                        ["Date :", oCustomerModel.InvDate.includes("-")?Formatter.formatDate(oCustomerModel.InvDate):oCustomerModel.InvDate],
                         ["Room No :", oCustomerModel.RoomNo]
                     ];
 

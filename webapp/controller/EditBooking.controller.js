@@ -4221,7 +4221,7 @@ sap.ui.define([
                 addLine(`SGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
             } else if (hasIGST) {
                 const igst = parseFloat(oHostelModel.IGST) || 0;
-                addLine(`IGST (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
             }
 
            

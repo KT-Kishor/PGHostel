@@ -478,6 +478,7 @@ sap.ui.define([
                 var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
 
+
                 var Paymentpaid = aPayment
                     .filter(item => item.BookingID === oCustomer.BookingID && item.Used !== "Y")
                     .reduce((sum, item) => sum + Number(item.Amount || 0), 0);
@@ -500,7 +501,6 @@ sap.ui.define([
 
                 var Branch = aBranch.find((item) => {
                     return item.BranchID === oCustomer.Bookings?.[0]?.BranchCode
-
                 })
 
                 const oCustomerData = {
@@ -538,6 +538,7 @@ sap.ui.define([
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
                     GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
                     GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
+                    orgGSTValue: Branch.Value || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
                     PropertySTD: Branch.STD || "",
@@ -547,10 +548,9 @@ sap.ui.define([
                     MemberID: oCustomer.Bookings?.[0]?.MemberID || "",
                     EndDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.EndDate || ""),
                     minEndDate: new Date(oCustomer.Bookings?.[0]?.EndDate || ""),
-
+                    GSTLabel: oCustomer.Bookings?.[0]?.GST || "",
                     AllSelectedFacilities: oCustomer.FacilityItems || [],
                     AllMembers: oCustomer.Members || [],
-
                     Documents: oCustomer.Documents || [],
                     CustomerGSTIN: oCustomer.Bookings?.[0]?.CustomerGSTIN,
                     CustCompanyName: oCustomer.Bookings?.[0]?.CustCompanyName,
@@ -783,7 +783,7 @@ sap.ui.define([
                         FacilityBasicprice = FacilityBasicprice.UnitPrice !== "0" ? FacilityBasicprice.UnitPrice : FacilityBasicprice.MinimumPrice
 
                     }
-                 
+
 
                     const fPrice = parseFloat(f.FacilitiPrice || 0);
 
@@ -855,7 +855,7 @@ sap.ui.define([
                         fTotal = fPrice;
                         otherFacilitiesTotal += fTotal;
                     }
-                 
+
                     // Store final facility record
                     aAllFacilities.push({
                         PersonName: oPerson.FullName || `Person ${iIndex + 1}`,
@@ -876,7 +876,7 @@ sap.ui.define([
                         MemberID: f.MemberID,
                         TotalHour: f.TotalHour,
                         quantity: f.Quantity,
-                        packagequantity: f.UnitText === "Package Price" && f.FacilityChargeType==="DAILY" ? (Number(f.Quantity) * days) : f.Quantity,
+                        packagequantity: f.UnitText === "Package Price" && f.FacilityChargeType === "DAILY" ? (Number(f.Quantity) * days) : f.Quantity,
                         SelectionMode: f.SelectionMode,
                         Image: f.Image,
                         Currency: f.Currency,
@@ -1067,7 +1067,7 @@ sap.ui.define([
             var oBookingModel = this.getView().getModel("edit");
             var sUnitText = oBookingModel.getProperty("/UnitText") || this.byId("idPaymentMethod1").getSelectedKey(); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
-           var Bookingunit= this.getView().getModel("Bookingmodel").getProperty("/UnitText")
+            var Bookingunit = this.getView().getModel("Bookingmodel").getProperty("/UnitText")
 
             if (OrginalRentPrice === "0.00") {
                 sap.m.MessageToast.show(this.i18nModel.getText("diffBooking"));
@@ -1083,26 +1083,26 @@ sap.ui.define([
                 aAllowedRateTypes = ["Per Day", "Per Hour"];
             } else if (sUnitText === "Per Hour") {
                 aAllowedRateTypes = ["Per Hour"];
-            } else if(sUnitText === "Package Price"){
-               if(Bookingunit=== "Per Month" || Bookingunit === "monthly"){
-                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+            } else if (sUnitText === "Package Price") {
+                if (Bookingunit === "Per Month" || Bookingunit === "monthly") {
+                    aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
 
-               }else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
-                aAllowedRateTypes = ["Per Day", "Per Hour"];
-            } else if (Bookingunit === "Per Hour") {
-                aAllowedRateTypes = ["Per Hour"];
+                } else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
+                    aAllowedRateTypes = ["Per Day", "Per Hour"];
+                } else if (Bookingunit === "Per Hour") {
+                    aAllowedRateTypes = ["Per Hour"];
+                }
             }
-        }
-        else if(sUnitText === "Unit Price"){
-               if(Bookingunit=== "Per Month" || Bookingunit === "monthly"){
-                aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
+            else if (sUnitText === "Unit Price") {
+                if (Bookingunit === "Per Month" || Bookingunit === "monthly") {
+                    aAllowedRateTypes = ["Per Month", "Per Day", "Per Hour"];
 
-               }else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
-                aAllowedRateTypes = ["Per Day", "Per Hour"];
-            } else if (Bookingunit === "Per Hour") {
-                aAllowedRateTypes = ["Per Hour"];
+                } else if (Bookingunit === "Per Day" || Bookingunit === "daily") {
+                    aAllowedRateTypes = ["Per Day", "Per Hour"];
+                } else if (Bookingunit === "Per Hour") {
+                    aAllowedRateTypes = ["Per Hour"];
+                }
             }
-        }
             else {
                 aAllowedRateTypes = ["Per Day", "Per Month", "Per Year", "Per Hour"];
             }
@@ -1725,8 +1725,8 @@ sap.ui.define([
                     //     finalPrice = basePrice * iquantity * iDays;
                     // }
                     finalPrice = basePrice * iDays;
-                    oPayload.packagequantity=iquantity * iDays
-                    
+                    oPayload.packagequantity = iquantity * iDays
+
 
                 } else if (selectionmode === "PERSON_QTY") {
                     // if (sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 && this.SelectedFacility.MinimumQty && iquantity <= this.SelectedFacility.MinimumQty
@@ -1743,7 +1743,7 @@ sap.ui.define([
 
                     // }
                     finalPrice = this.SelectedFacility.MinimumPrice
-                    oPayload.packagequantity=iquantity
+                    oPayload.packagequantity = iquantity
                 } else if (selectionmode === "QTY" && this.SelectedFacility.UnitPrice !== "0") {
                     finalPrice = basePrice * iquantity;
                 } else {
@@ -1752,23 +1752,23 @@ sap.ui.define([
                 }
 
             }
-              oPayload.SelectionMode = selectionmode
+            oPayload.SelectionMode = selectionmode
 
             if (oPayload.SelectionMode === "PERSON_QTY") {
                 oPayload.FacilityChargeType = sap.ui.getCore().byId("id_Period").getSelectedIndex() === 1 ? "Entire Booking" : "DAILY"
             }
-              
+
             if (oPayload.UnitText === "Unit Price" && oPayload.SelectionMode === "PERSON_QTY") {
                 oPayload.UnitText = "Package Price"
             }
-             if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="DAILY"){
-                    oPayload.packagequantity=iquantity * iDays
-                    oPayload.UnitText = "Package Price"
-                    finalPrice = basePrice * iDays;
-            }else if(oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType==="Entire Booking"){
-                    oPayload.packagequantity = iquantity
-                    oPayload.UnitText = "Package Price"
-                    finalPrice = basePrice;
+            if (oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType === "DAILY") {
+                oPayload.packagequantity = iquantity * iDays
+                oPayload.UnitText = "Package Price"
+                finalPrice = basePrice * iDays;
+            } else if (oPayload.UnitText === "Package Price" && oPayload.FacilityChargeType === "Entire Booking") {
+                oPayload.packagequantity = iquantity
+                oPayload.UnitText = "Package Price"
+                finalPrice = basePrice;
             }
 
             if (oPayload.CouponDiscount !== "") {
@@ -1790,7 +1790,7 @@ sap.ui.define([
 
             oPayload.MemberID = matchedMember ? matchedMember.MemberID : "";
 
-          
+
             // Remove unwanted fields
 
             // Ensure array exists
@@ -3746,7 +3746,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-       
+
 
         HM_ConfirmRoom: async function (oEvent) {
             var ID = this.getView().getModel("CustomerData").getData()
@@ -3920,7 +3920,7 @@ sap.ui.define([
             oModel.setProperty("/Documents", aDocuments);
             oModel.refresh(true);
         },
-         onSaveBooking: async function () {
+        onSaveBooking: async function () {
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -3931,18 +3931,18 @@ sap.ui.define([
             const validMemberIds = new Set(CustomerData.Documents.map(d => d.MemberID));
 
             if (validMemberIds.size === 0) {
-    sap.m.MessageToast.show("Please select at least one member");
-    return;
-}
+                sap.m.MessageToast.show("Please select at least one member");
+                return;
+            }
 
-if (documents.length > 1) {
-    const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
+            if (documents.length > 1) {
+                const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
 
-    if (!hasPrimaryMember) {
-        sap.m.MessageToast.show("Please select a primary member.");
-        return;
-    }
-}
+                if (!hasPrimaryMember) {
+                    sap.m.MessageToast.show("Please select a primary member.");
+                    return;
+                }
+            }
             // split invalid vs valid
             const toDelete = [];
             const toKeep = [];
@@ -3961,7 +3961,7 @@ if (documents.length > 1) {
             if (toDelete.length === 0) {
                 // nothing to delete → directly proceed
                 // onSaveBooking
-    this.onSaveBooking1();
+                this.onSaveBooking1();
 
                 return;
             }
@@ -3995,7 +3995,7 @@ if (documents.length > 1) {
                     await Promise.all(deletePromises);
 
                     // 3. NOW proceed to next step
-                      this.onSaveBooking1();
+                    this.onSaveBooking1();
 
                 }.bind(this)
             }
@@ -4003,7 +4003,7 @@ if (documents.length > 1) {
         },
 
         onSaveBooking1: async function () {
-            
+
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
@@ -4026,9 +4026,9 @@ if (documents.length > 1) {
                 utils._LCstrictValidationComboBox(this.byId("Ad_id_RoomType"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("idPaymentMethod1"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("Ad_id_editStartDate"), "ID")
-                
+
             );
-            
+
             if (!isMandatoryValid) {
 
                 sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
@@ -4555,7 +4555,7 @@ if (documents.length > 1) {
             ].join(",");
 
 
-             this.getBusyDialog()
+            this.getBusyDialog()
 
             const pdfBase64 = await this.onGeneratePDF();
 
@@ -4632,10 +4632,10 @@ if (documents.length > 1) {
                 "Documents": CustomerData.Documents
                     .filter(function (item) {
                         // Skip if MemberID exists in DraftModel
-                         return (
-            !aDraftMemberIds.includes(item.MemberID) &&
-            item.FileName
-        );
+                        return (
+                            !aDraftMemberIds.includes(item.MemberID) &&
+                            item.FileName
+                        );
                     })
                     .map(function (item) {
                         return {
@@ -4683,7 +4683,7 @@ if (documents.length > 1) {
             this.getBusyDialog();
 
 
-              this.ajaxUpdateWithJQuery("HM_Customer", {
+            this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [Payload],
                 filters: {
                     BookingID: CustomerData.BookingID
@@ -4698,7 +4698,7 @@ if (documents.length > 1) {
                     }
                     this.flag = false
 
-                    
+
                     sap.m.MessageToast.show(this.i18nModel.getText("bookingSavedSuccessfully"));
 
                     this.getView().getModel("VisibleModel").setProperty("/visible", false);
@@ -4990,34 +4990,34 @@ if (documents.length > 1) {
             // } else {
 
             // Remove only the selected local document
-        var oModel = this.getView().getModel("CustomerData");
+            var oModel = this.getView().getModel("CustomerData");
 
-// Remove from Documents
-aDocs = aDocs.filter(function (doc) {
-    return !(
-        doc.MemberID === oDoc.MemberID &&
-        doc.DocumentName === oDoc.DocumentName &&
-        doc.FileName === oDoc.FileName
-    );
-});
+            // Remove from Documents
+            aDocs = aDocs.filter(function (doc) {
+                return !(
+                    doc.MemberID === oDoc.MemberID &&
+                    doc.DocumentName === oDoc.DocumentName &&
+                    doc.FileName === oDoc.FileName
+                );
+            });
 
-oModel.setProperty("/Documents", aDocs);
+            oModel.setProperty("/Documents", aDocs);
 
-// Update only the affected member in AllMembers
-var allMembers = oModel.getProperty("/AllMembers") || [];
+            // Update only the affected member in AllMembers
+            var allMembers = oModel.getProperty("/AllMembers") || [];
 
-// Get all MemberIDs present in aDocs
-var memberIds = new Set(aDocs.map(doc => doc.MemberID));
+            // Get all MemberIDs present in aDocs
+            var memberIds = new Set(aDocs.map(doc => doc.MemberID));
 
-// Keep only members whose MemberID exists in aDocs
-allMembers = allMembers.filter(function (member) {
-    return memberIds.has(member.MemberID);
-});
+            // Keep only members whose MemberID exists in aDocs
+            allMembers = allMembers.filter(function (member) {
+                return memberIds.has(member.MemberID);
+            });
 
-oModel.setProperty("/AllMembers", allMembers);
-oModel.refresh(true);
+            oModel.setProperty("/AllMembers", allMembers);
+            oModel.refresh(true);
 
-sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
+            sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
             // }
         },
 
@@ -6202,12 +6202,23 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                 );
                 return;
             }
+            var GSTType = this.sSelectedText
+                ? this.sSelectedText
+                : (sap.ui.getCore().byId("idGSTType").getSelectedIndex() === 0
+                    ? "IGST"
+                    : "CGST/SGST");
+            var GSTValue = GSTType === "IGST"
+                ? Number(CustData.orgGSTValue)
+                : Number(CustData.orgGSTValue) / 2;
 
             var payload = {
                 CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
                 CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
                 CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
                 BookingID: CustData.BookingID,
+                GSTType: this.sSelectedText,
+                GSTValue: GSTValue,
+                GST: ""
             };
 
             this.getBusyDialog();
@@ -6238,16 +6249,23 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
             });
         },
         onGSTTypeSelect: function (oEvent) {
+
+            const CustData = this.getView()
+                .getModel("CustomerData")
+                .getData();
             var oRadioGroup = oEvent.getSource();
 
             // Selected index (0 or 1)
             var iSelectedIndex = oRadioGroup.getSelectedIndex();
 
             // Get selected RadioButton text
-            var sSelectedText = oRadioGroup.getButtons()[iSelectedIndex].getText();
+            this.sSelectedText = oRadioGroup.getButtons()[iSelectedIndex].getText();
 
-            console.log(iSelectedIndex); // 0 or 1
-            console.log(sSelectedText); // "IGST" or "CGST / SGST"
+            if (this.sSelectedText === "IGST") {
+                sap.ui.getCore().byId("idGSTPercentage").setValue(CustData.orgGSTValue)
+            } else {
+                sap.ui.getCore().byId("idGSTPercentage").setValue(Number(CustData.orgGSTValue) / 2)
+            }
         },
 
         onPercentagetLiveChange: function (oEvent) {
@@ -7974,14 +7992,14 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
 
                         if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
-                        } else if(sUnitText === "Package Price"){
-                            if(item.FacilityChargeType==="Entire Booking"){
-                            this.qty=`(${item.quantity || 1} Qty)`
-                            sUnitText = `${sUnitText}`;
-                            }else{
-                              const dailyQty = Number(item.quantity) || 1;
+                        } else if (sUnitText === "Package Price") {
+                            if (item.FacilityChargeType === "Entire Booking") {
+                                this.qty = `(${item.quantity || 1} Qty)`
+                                sUnitText = `${sUnitText}`;
+                            } else {
+                                const dailyQty = Number(item.quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-                                this.qty=`(${dailyQty} Qty / day)`
+                                this.qty = `(${dailyQty} Qty / day)`
                                 sUnitText = `${sUnitText}\n(${diffDays} days)`;
                             }
                         }
@@ -8005,8 +8023,8 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                     }
 
                     const showQty =
-                         item.FacilityChargeType === "Entire Booking" ||
-                           item.FacilityChargeType === "DAILY";
+                        item.FacilityChargeType === "Entire Booking" ||
+                        item.FacilityChargeType === "DAILY";
                     return [
                         (index + 1).toString(),
                         item.MemberName
@@ -8133,7 +8151,12 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                 grandTotal += cgst + sgst;
             } else if (hasIGST) {
                 const igst = parseFloat(data.IGST) || 0;
-                addLine(`IGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(igst)}`);
+                addLine(
+                    data.GSTLabel === "Tax"
+                        ? `Tax Amount (${data.GSTValue}%)`
+                        : `IGST (${data.GSTValue}%)`,
+                    `${Formatter.fromatNumber(igst)}`
+                );
                 grandTotal += igst;
             }
 
@@ -9381,8 +9404,8 @@ sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
                         IsPrimary: oData.MemberID === primaryMemberID
 
                     });
-                }else{
-                      aDocs.push({
+                } else {
+                    aDocs.push({
                         MemberID: oData.MemberID,
                         MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
                         Relation: oData.Relation,
