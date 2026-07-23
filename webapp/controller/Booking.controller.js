@@ -3177,6 +3177,7 @@
         onNewMemberDocumentChange: async function (oEvent) {
             const oModel = this.getView().getModel("BookingView");
             const oFileUploader = this.byId("newMemberFileUploader");
+            const oDocumentTypeCombo = this.byId("newMemberDocumentTypeCombo");
 
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             if (!oFile) return;
@@ -3245,6 +3246,9 @@
                 oModel.setProperty("/NewMemberDraft/Document", base64);
                 oModel.setProperty("/NewMemberDraft/File", base64);
                 oModel.setProperty("/NewMemberDraft/FileType", processedFile.type || "");
+                if (oDocumentTypeCombo) {
+                    oDocumentTypeCombo.setValueState("None");
+                }
                 oModel.refresh(true);
 
             } catch (err) {
@@ -3613,6 +3617,7 @@
                 oComboBox.setSelectedKey("");
                 oComboBox.setValue("");
                 oComboBox.setValueState("None");
+                this.getView().getModel("BookingView").setProperty("/NewMemberDraft/DocumentType", "");
                 return true;
             }
 
@@ -3700,11 +3705,40 @@
             }
 
             // DocumentType validation (optional field - only validate if value present)
-            const sDocumentTypeValue = String(oDocumentTypeCombo.getValue() || "").trim();
+            const sDocumentTypeValue = String(
+                oDocumentTypeCombo.getSelectedKey() ||
+                oDocumentTypeCombo.getValue() ||
+                oDraft.DocumentType ||
+                ""
+            ).trim();
             if (sDocumentTypeValue && !utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID")) {
                 MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                 return;
             }
+
+            const aPendingDeletedDocumentIDs = Array.isArray(oDraft.PendingDeletedDocumentIDs)
+                ? oDraft.PendingDeletedDocumentIDs.map(function (sDocumentID) {
+                    return String(sDocumentID || "").trim();
+                })
+                : [];
+            const sDraftDocumentID = String(oDraft.DocumentID || "").trim();
+            const bExistingDocumentAvailable = !!(
+                sDraftDocumentID &&
+                aPendingDeletedDocumentIDs.indexOf(sDraftDocumentID) < 0
+            );
+            const bHasDocument = !!(
+                String(oDraft.DocumentName || "").trim() ||
+                String(oDraft.Document || "").trim() ||
+                String(oDraft.File || "").trim() ||
+                bExistingDocumentAvailable
+            );
+            if (sDocumentTypeValue && !bHasDocument) {
+                oDocumentTypeCombo.setValueState("Error");
+                oDocumentTypeCombo.setValueStateText("Please upload the selected document");
+                MessageToast.show("Please upload the selected document or clear the document type.");
+                return;
+            }
+            oDocumentTypeCombo.setValueState("None");
 
             oDraft.Salutation = oSalutationCombo.getSelectedKey() || String(oSalutationCombo.getValue() || "").trim();
             oDraft.Name = String(oNameInput.getValue() || "").trim();

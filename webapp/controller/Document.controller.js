@@ -231,6 +231,7 @@ sap.ui.define([
             onFileUpload: async function (oEvent) {
                 const oModel = this.getView().getModel("BookingView");
                 const oUploader = sap.ui.getCore().byId("AD_id_FileUploader");
+                const oDocumentTypeCombo = sap.ui.getCore().byId("AD_id_DocumentType");
 
                 const file = oEvent.getParameter("files")?.[0];
                 if (!file) return;
@@ -297,6 +298,9 @@ sap.ui.define([
                     oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
                     oModel.setProperty("/NewMemberDraft/Documents/0/FileType", processedFile.type || "");
                     oModel.setProperty("/NewMemberDraft/Documents/0/File", base64);
+                    if (oDocumentTypeCombo) {
+                        oDocumentTypeCombo.setValueState("None");
+                    }
                     oModel.refresh(true);
 
                 } catch (err) {
@@ -409,41 +413,43 @@ sap.ui.define([
 
                 var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
 
+                var oDocumentTypeCombo = oView.byId("AD_id_DocumentType");
+                var oDocument = oMember.Documents && oMember.Documents[0] ? oMember.Documents[0] : {};
+                var sDocumentTypeValue = String(
+                    oDocumentTypeCombo.getSelectedKey() ||
+                    oDocumentTypeCombo.getValue() ||
+                    oDocument.DocumentType ||
+                    ""
+                ).trim();
+
                 if (utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"), "ID") &&
                     utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"), "ID") &&
                     utils._LCvalidateDate(oView.byId("AD_id_MemberDOB"), "ID") &&
                     utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberGenderCombo"), "ID") &&
                     (oMember.Relation === "Self" ||
                         utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID")
-                    ) && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
+                    )
                 ) {
 
                     // ================= DOCUMENT VALIDATION =================
 
-                    if (
-                        !oMember.Documents ||
-                        !oMember.Documents[0] ||
-                        !oMember.Documents[0].DocumentType
-                    ) {
+                    if (sDocumentTypeValue && !utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID")) {
+                        sap.m.MessageToast.show(this.i18nModel.getText("fillMandatoryFields"));
+                        return;
+                    }
+
+                    if (sDocumentTypeValue && !oDocument.File) {
+                        oDocumentTypeCombo.setValueState("Error");
+                        oDocumentTypeCombo.setValueStateText("Please upload the selected document");
 
                         sap.m.MessageToast.show(
-                            "Please select document type"
+                            "Please upload the selected document or clear the document type."
                         );
 
                         return;
                     }
 
-                    if (
-                        (this._mode === "CREATE" || this._mode === "UPDATE") &&
-                        !oMember.Documents[0].File
-                    ) {
-
-                        sap.m.MessageToast.show(
-                            "Please upload a document"
-                        );
-
-                        return;
-                    }
+                    oDocumentTypeCombo.setValueState("None");
 
                     // ================= MEMBER ID =================
 
@@ -1220,6 +1226,7 @@ sap.ui.define([
                     oComboBox.setSelectedKey("");
                     oComboBox.setValue("");
                     oComboBox.setValueState("None");
+                    this.getView().getModel("BookingView").setProperty("/NewMemberDraft/Documents/0/DocumentType", "");
                     return true;
                 }
 
