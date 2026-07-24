@@ -6506,7 +6506,7 @@
         },
 
         onGeneratePDF: async function (data) {
-            const booking = data.Booking?.[0] || {};
+            const booking = data.Booking?.[0] || data;
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
 
@@ -6562,18 +6562,51 @@
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
             doc.text(
-                `Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 15,);
+                `Booked On: ${booking.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`, 148, 15,);
 
             currentY = 40;
 
             // ================= PROPERTY =================
             checkNewPage(50);
 
+            // Customer GST details (only shown if customer provided GST info)
+            const sCustGSTIN = String(booking.CustomerGSTIN || "").trim();
+            const sCustCompanyName = String(booking.CustCompanyName || "").trim();
+            const sCustCompanyAddress = String(booking.CustCompanyAddress || "").trim();
+            const sPrimaryOccupantName = String(booking.CustomerName || "").trim();
+            const bShowCustomerGST = !!sCustGSTIN;
+
+            const sBranchGSTIN = String(company.GSTIN || "").trim();
+            const iLeftWidth = bShowCustomerGST ? 80 : 130;
+            const iRightX = 110;
+
+            let address = doc.splitTextToSize(company.Address || "", iLeftWidth);
+            let custAddressLines = bShowCustomerGST
+                ? doc.splitTextToSize(`Address: ${sCustCompanyAddress || "-"}`, 80)
+                : [];
+
+            // Compute column heights
+            let contactY = currentY + 18 + (address.length * 4);
+            let iLeftBottomOffset = 18 + (address.length * 4) + (company.GeoLocation ? 15 : 10);
+            let iRightBottomOffset = bShowCustomerGST
+                ? 33 + (custAddressLines.length * 4)
+                : 0;
+            let iBoxHeight = Math.max(iLeftBottomOffset, iRightBottomOffset, 45) + 4;
+
+            // Box
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.setLineWidth(0.5);
-            doc.roundedRect(15, currentY, 180, 45, 5, 5, "FD");
+            doc.roundedRect(15, currentY, 180, iBoxHeight, 5, 5, "FD");
 
+            // Vertical divider when two columns
+            if (bShowCustomerGST) {
+                doc.setDrawColor(BORDER_LIGHT[0], BORDER_LIGHT[1], BORDER_LIGHT[2]);
+                doc.setLineWidth(0.2);
+                doc.line(105, currentY + 5, 105, currentY + iBoxHeight - 5);
+            }
+
+            // ----- Left column: Branch / Property -----
             doc.setFont("helvetica", "bold");
             doc.setFontSize(16);
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
@@ -6582,22 +6615,42 @@
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(80, 80, 80);
-            let address = doc.splitTextToSize(company.Address || "", 130);
             doc.text(address, 20, currentY + 18);
 
-            let contactY = currentY + 18 + address.length * 4;
             doc.setTextColor(100, 100, 100);
             doc.text(`Contact: ${company.Contact || ""}`, 20, contactY);
             doc.text(`Email: ${company.EmailID || ""}`, 20, contactY + 5);
 
+            doc.text(
+                sBranchGSTIN ? `GST: ${sBranchGSTIN}` : "GST: Not Applicable",
+                20,
+                contactY + 10
+            );
+
             if (company.GeoLocation) {
                 doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
-                doc.textWithLink("View Property on Map", 20, contactY + 10, {
+                doc.textWithLink("View Property on Map", 20, contactY + 15, {
                     url: company.GeoLocation,
                 });
             }
 
-            currentY += 55;
+            // ----- Right column: Customer GST details -----
+            if (bShowCustomerGST) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(16);
+                doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+                doc.text("Customer Details", iRightX, currentY + 10);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8.5);
+                doc.setTextColor(80, 80, 80);
+                doc.text(`Name: ${sPrimaryOccupantName || "-"}`, iRightX, currentY + 18);
+                doc.text(`GST: ${sCustGSTIN}`, iRightX, currentY + 23);
+                doc.text(`Company Name: ${sCustCompanyName || "-"}`, iRightX, currentY + 28);
+                doc.text(custAddressLines, iRightX, currentY + 33);
+            }
+
+            currentY += iBoxHeight + 10;
 
             // ================= GUEST & STAY =================
             checkNewPage(45);
