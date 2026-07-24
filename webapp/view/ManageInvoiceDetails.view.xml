@@ -81,6 +81,7 @@
                                             valueStateText="{i18n>selectBookingID}"
                                             showSecondaryValues="true"
                                             selectedKey="{SelectedCustomerModel>/BookingID}"
+                                            editable="false"
                                         >
 											<core:ListItem
                                                 key="{BookingModel>BookingID}"

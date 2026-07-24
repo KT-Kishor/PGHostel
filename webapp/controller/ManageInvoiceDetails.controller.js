@@ -484,7 +484,9 @@ sap.ui.define([
                     this.byId("CID_id_AddBooking").setSelectedKey("");
 
                     // Reset selected key properly
-                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", "");
+                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingList[0].BookingID);
+                    this.getView().byId("CID_id_AddBooking").setValue(bookingList[0].BookingID)
+                    this.onChangeBookingID()
 
                     // Reset invoice model
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
@@ -497,7 +499,7 @@ sap.ui.define([
 
             onChangeBookingID: async function (oEvent) {
                 try {
-                    const bookingID = oEvent.getSource().getSelectedKey();
+                    const bookingID = oEvent ? oEvent.getSource().getSelectedKey() : this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID")
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingID);
 
                     if (!bookingID) return;
@@ -511,6 +513,17 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
+
+                    if (!bookingDetails) {
+                        sap.m.MessageBox.information(
+                            "This invoice has already been generated.",
+                            {
+                                styleClass: "myUnifiedBtn"
+                            }
+                        )
+                        return;
+
+                    }
 
                     const facilityArray = Array.isArray(oData.data.BookingFacilityItems) ?
                         oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
@@ -705,7 +718,7 @@ sap.ui.define([
 
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalInvoiceItems);
                     await this.totalAmountCalculation();
-                    utils._LCvalidateMandatoryField(oEvent);
+                    // utils._LCvalidateMandatoryField(oEvent);
                 } catch (err) {
                     MessageToast.show(err.message);
                 } finally {
@@ -1651,32 +1664,45 @@ sap.ui.define([
             },
 
             CI_onSelectCGST: function (oEvent) {
+
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData()
                 const bSelected = oEvent.getParameter("selected");
                 const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+                const CustomerData = oCustomerModel.getData();
+
+                var Branch = BranchData.find((item) => {
+                    return item.BranchID === CustomerData.BranchCode
+                })
 
                 if (bSelected) {
                     oCustomerModel.setProperty("/Type", "CGST/SGST");
-                    oCustomerModel.setProperty("/Value", "9");
+                    oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
                     oCustomerModel.setProperty("/IGSTSelected", false);
                 } else {
                     oCustomerModel.setProperty("/Type", "");
-                    oCustomerModel.setProperty("/Value", "18");
+                    oCustomerModel.setProperty("/Value", Branch.Value);
                 }
 
                 this.totalAmountCalculation();
             },
 
             CI_onSelectIGST: function (oEvent) {
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData()
                 const bSelected = oEvent.getParameter("selected");
                 const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+                const CustomerData = oCustomerModel.getData();
+
+                var Branch = BranchData.find((item) => {
+                    return item.BranchID === CustomerData.BranchCode
+                })
 
                 if (bSelected) {
                     oCustomerModel.setProperty("/Type", "IGST");
-                    oCustomerModel.setProperty("/Value", "18");
+                    oCustomerModel.setProperty("/Value", Branch.Value);
                     oCustomerModel.setProperty("/CGSTSelected", false);
                 } else {
                     oCustomerModel.setProperty("/Type", "");
-                    oCustomerModel.setProperty("/Value", "");
+                    oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
                 }
 
                 this.totalAmountCalculation();
@@ -1794,7 +1820,7 @@ sap.ui.define([
                             oSource.setValue(this._previousInvoiceStatus);
                         }
                         this._previousInvoiceStatus = status;
-                    } 
+                    }
                     else if (totalPaid > 0 && dueAmount > 0) {
                         if (status !== "Payment Partially") {
                             oSelectedModel.setProperty("/Status", "Payment Partially");
@@ -1802,7 +1828,7 @@ sap.ui.define([
                             status = "Payment Partially";
                         }
                         this._previousInvoiceStatus = "Payment Partially";
-                    } 
+                    }
                     else if (totalPaid >= totalAmount || dueAmount === 0) {
                         if (status !== "Payment Received") {
                             MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
@@ -1813,7 +1839,7 @@ sap.ui.define([
                         }
                         this._previousInvoiceStatus = "Payment Received";
                     }
-                }else if (typeof oEventOrStatus === "string") {
+                } else if (typeof oEventOrStatus === "string") {
                     status = oEventOrStatus;
 
                     if (oSelectedModel) {
@@ -1912,50 +1938,64 @@ sap.ui.define([
                 var allPaymentData = this.getView().getModel("InvoicePayment");
                 var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
 
-                var totalReceivedAmount = 0;
-                if (allPaymentData) {
-                    totalReceivedAmount = parseFloat(allPaymentData.getProperty("/AllReceivedAmount")) || 0;
-                }
+                // Helper function to safely parse string/number inputs to rounded floats
+                var parseAmount = function (val) {
+                    if (val === null || val === undefined) return 0;
+                    var cleanVal = String(val).replaceAll(',', '').trim();
+                    var parsed = parseFloat(cleanVal);
+                    return isNaN(parsed) ? 0 : parsed;
+                };
 
-                var paidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
+                // Helper function to handle floating point math safely
+                var round2 = function (num) {
+                    return Math.round((num + Number.EPSILON) * 100) / 100;
+                };
 
+                // 1. Get base amounts as clean numbers
+                var totalReceivedAmount = allPaymentData ? parseAmount(allPaymentData.getProperty("/AllReceivedAmount")) : 0;
+                var paidAmount = parseAmount(oNavigationModel.PaidAmount);
+                var totalAmount = parseAmount(paymentModel.getProperty("/TotalAmount"));
+
+                // 2. Format /ReceivedAmount in paymentModel
                 var sValue = paymentModel.getProperty("/ReceivedAmount") || "";
-                sValue = sValue.replaceAll(',', '');
+                sValue = String(sValue).replaceAll(',', '');
                 paymentModel.setProperty("/ReceivedAmount", sValue);
 
-                var totalAmount = parseFloat(paymentModel.getProperty("/TotalAmount")) || 0;
-                var receivedAmount = parseFloat(sValue) || 0;
+                var receivedAmount = parseAmount(sValue);
 
-                var totalPaidTillNow = paidAmount + totalReceivedAmount + receivedAmount;
+                // 3. Safe calculations (prevents 0.1 + 0.2 = 0.30000000000000004 issues)
+                var totalPaidTillNow = round2(paidAmount + totalReceivedAmount + receivedAmount);
+                var dueAmount = Math.max(0, round2(totalAmount - totalPaidTillNow));
 
-                var dueAmount = totalAmount - totalPaidTillNow;
-                if (dueAmount < 0) {
-                    dueAmount = 0;
-                }
-
-                paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
                 this.onChangePaymentConvertionRate();
 
                 if (oEvent) {
-                    var enteredAmount = parseFloat(oEvent.getParameter("value").replaceAll(',', '')) || 0;
+                    var sEventValue = oEvent.getParameter("value") || "";
+                    var enteredAmount = parseAmount(sEventValue);
 
-                    var remainingDue = totalAmount - (paidAmount + totalReceivedAmount);
+                    var remainingDue = Math.max(0, round2(totalAmount - (paidAmount + totalReceivedAmount)));
 
                     this.ResivedAmount = true;
 
-                    if (enteredAmount === remainingDue) {
-                        sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
-                    } else if (enteredAmount > remainingDue) {
+                    if (enteredAmount > remainingDue) {
                         this.ResivedAmount = false;
-                        sap.ui.getCore().byId("idReceivedAmount").setValueState("Error");
+
                         sap.ui.getCore().byId("idReceivedAmount")
+                            .setValueState("Error")
                             .setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
-                    } else {
-                        sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
-                        this.ResivedAmount = true;
+
+                        paymentModel.setProperty("/DueAmount", remainingDue.toFixed(2));
+                        return;
+                    }
+
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
+
+                    if (enteredAmount < remainingDue) {
                         utils._LCvalidateAmountZeroTaking(oEvent);
                     }
                 }
+
+                paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
             },
 
             onChangePaymentConvertionRate: function (oEvent) {
@@ -2050,7 +2090,11 @@ sap.ui.define([
                     return;
                 }
 
-                const isValid = isMandatoryValid && isCurrencyValid && this.ResivedAmount;
+                const isValid = isMandatoryValid && isCurrencyValid;
+                if (!this.ResivedAmount) {
+                    MessageToast.show(this.i18nModel.getText("Receiving amount cannot exceed the due amount"));
+                    return;
+                }
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                     return;
@@ -3031,7 +3075,7 @@ sap.ui.define([
                     const aSelectedItems = oTable.getSelectedItems();
 
                     if (!aSelectedItems.length) {
-                        MessageToast.show("Please select at least one invoice item");
+                        MessageToast.show("Select at least one invoice item before printing");
                         return;
                     }
                     this.getBusyDialog()
@@ -3196,7 +3240,7 @@ sap.ui.define([
 
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
-                        ["Date :", oCustomerModel.InvDate.includes("-")?Formatter.formatDate(oCustomerModel.InvDate):oCustomerModel.InvDate],
+                        ["Date :", oCustomerModel.InvDate.includes("-") ? Formatter.formatDate(oCustomerModel.InvDate) : oCustomerModel.InvDate],
                         ["Room No :", oCustomerModel.RoomNo]
                     ];
 
@@ -3579,6 +3623,15 @@ sap.ui.define([
                         //  ITEM TABLE 
                         const showSAC = !!oModel.GST;
 
+                        const uniqueItems = oCompanyItemModel.filter((item, index, self) =>
+                            index === self.findIndex(x =>
+                                x.Particulars === item.Particulars &&
+                                x.StartDate === item.StartDate &&
+                                x.EndDate === item.EndDate &&
+                                x.Total === item.Total
+                            )
+                        );
+
                         const body = oCompanyItemModel.map((item, index) => {
                             const row = [
                                 index + 1,
@@ -3809,7 +3862,75 @@ sap.ui.define([
                                 }
                             }
                         });
+
+                        let currentY = doc.lastAutoTable.finalY + 15;
+
+                    doc.setFontSize(11);
+                    doc.setFont("times", "bold");
+                    doc.text("Thank you for staying with us.", margin, currentY + 5);
+
+
+
+                    // --------------------------------------------------
+                    // Reserve space above footer
+                    // --------------------------------------------------
+                    const footerHeight = 35;      // Same as your footer
+                    const signatureHeight = 25;   // Space needed for signatures
+
+                    currentY += 32;
+
+                    if (currentY + signatureHeight > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 30;
                     }
+
+                    // ================= SIGNATURES =================
+
+                    // ================= SIGNATURES =================
+
+                    const leftX = margin;
+                    const rightX = pageWidth - margin;
+                    const lineLength = 40; // Decreased line width (adjust as needed)
+
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(12);
+
+                    // --- Row 1: Cashier & Guest Sign ---
+
+                    // 1. Left side: "Cashier ____"
+                    const cashierLabel = "Cashier ";
+                    doc.text(cashierLabel, leftX, currentY);
+
+                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                    const lineStartX = leftX + cashierTextWidth;
+
+                    // Draw shorter straight horizontal line
+                    doc.setLineWidth(0.5);
+                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                    // 2. Right side: "guest sign ____"
+                    const guestLabel = "Guest sign ";
+                    const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                    // Draw shorter straight horizontal line on the right end
+                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+
+                    // Place "guest sign" right before the line
+                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                    // --- Row 2: Created By ---
+
+                    currentY += 10;
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(12);
+
+                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                    doc.text(createdByText, leftX, currentY);
+                    }
+
+
+                 
 
                     //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
@@ -3985,11 +4106,19 @@ sap.ui.define([
                     const balanceAmount = Number(updatedCustomerData.BalanceAmount) || 0;
                     const newItemAdded = finalItems.length > initialItemCount;
 
-                    if (newItemAdded && balanceAmount > 0) {
-                        MessageToast.show("New line items added. Opening payment screen...");
+
+                    if (newItemAdded || balanceAmount > 0) {
 
                         // Automatically updates status to 'Payment Partially' and opens the ManageInvoice fragment
-                        this.onChangeInvoiceStatus("Payment Partially");
+
+                        if (oModelData.Status === "Submitted") {
+                            MessageToast.show("New line items added.");
+                            this.onChangeInvoiceStatus("Submitted");
+                        } else {
+                            MessageToast.show("New line items added. Opening payment screen...");
+                            this.onChangeInvoiceStatus("Payment Partially");
+
+                        }
                     }
 
                 } catch (e) {
@@ -4020,11 +4149,11 @@ sap.ui.define([
                 cycleEnd.setHours(0, 0, 0, 0);
 
                 const nonFacilityItems = existingItems.filter(i =>
-                    !i.Particulars.includes("Facility") && 
-                    !i.Particulars.includes("Meals") && 
-                    !i.Particulars.includes("Laundry") && 
-                    !i.Particulars.includes("Housekeeping") && 
-                    !i.Particulars.includes("Pillow") && 
+                    !i.Particulars.includes("Facility") &&
+                    !i.Particulars.includes("Meals") &&
+                    !i.Particulars.includes("Laundry") &&
+                    !i.Particulars.includes("Housekeeping") &&
+                    !i.Particulars.includes("Pillow") &&
                     !i.Particulars.includes("Penalty")
                 );
 
@@ -4079,7 +4208,7 @@ sap.ui.define([
 
                     if (facilityTotal <= 0 && invoiceIndex > 0) return;
 
-                    const existingFacility = existingItems.find(i => 
+                    const existingFacility = existingItems.find(i =>
                         i.Particulars && i.Particulars.trim() === particulars.trim()
                     );
 
