@@ -682,7 +682,7 @@
                                 text="GSTIN: {HostelModel>/PropertyGSTIN}"
                                 level="H5"
                                 class="sapUiSmallMarginTop sapUiTinyMarginBottom"
-                                visible="{= !!${HostelModel>/EffectiveGSTType} }"
+                                visible="{= !!${HostelModel>/EffectiveGSTType} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                             />
 
                             <Table
