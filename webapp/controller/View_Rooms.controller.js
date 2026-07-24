@@ -2519,8 +2519,6 @@ sap.ui.define([
                     } else if (parseFloat(f.PerYearPrice) > 0) {
                         price = f.PerYearPrice;
                         unit = "Per Year";
-                    } else {
-                        return null;
                     }
 
                     const hasImage = !!(f.Photo1 && f.Photo1.trim());
@@ -2604,14 +2602,7 @@ sap.ui.define([
                 let resp = await this.ajaxReadWithJQuery("HM_HostelFeatures", { BranchCode: sBranchCode });
                 let allList = resp?.data || [];
 
-                // Filter: Type in static amenities (branch already filtered by backend)
-                const oStaticModel = this._oRoomDetailFragment.getModel("AmenitiType");
-                const staticTypes = oStaticModel ? oStaticModel.getData() : [];
-                const validTypes = staticTypes.map(t => t.AmenitiName.toLowerCase());
-
-                const branchAmenities = allList.filter(x =>
-                    validTypes.includes((x.Type || "").toLowerCase())  // Match Type/AmenityType
-                );
+                const branchAmenities = allList;
 
 
 

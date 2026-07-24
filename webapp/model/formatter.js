@@ -340,8 +340,12 @@ sap.ui.define([
             return `Type: ${mime}\nSize: ${readable}`;
         },
         VRD_formatFacilityPrice: function (price, currency, unitText) {
-            if (!price || price === 0 || price === "0") {
+            if (price === "" || price === null || price === undefined) {
                 return "";
+            }
+
+            if (Number(price) === 0) {
+                return "Complimentary";
             }
 
             var oFormat = sap.ui.core.format.NumberFormat.getFloatInstance({
@@ -354,7 +358,7 @@ sap.ui.define([
 
             var formattedPrice = oFormat.format(Number(price));
 
-            var result = formattedPrice;
+            var result = "Starting At - " + formattedPrice;
             if (currency) {
                 result += " " + currency;
             }

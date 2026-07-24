@@ -233,7 +233,7 @@
                                 />
                                 <Text
                                     class="unifiedCardText"
-                                    text="Starting At - {        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"
+                                    text="{        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"
                                 />
                             </VBox>
                         </items>
