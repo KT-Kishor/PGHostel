@@ -2999,24 +2999,42 @@
             }
 
             const oTable = oEvent.getSource();
-            const aSelectedContexts = oTable.getSelectedContexts("BookingView");
-            const oBookingView = this.getView().getModel("BookingView");
-            const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
-            const iAllowedFamilyMembers = iMaxPersons;
 
-            // If selection exceeds allowed family members, trim selection
-            if (aSelectedContexts.length > iAllowedFamilyMembers) {
-                MessageToast.show("Selected room capacity does not allow more members.");
-                this._bAdjustingSelection = true;
-                try {
-                    // Deselect extra items, keep the first iAllowedFamilyMembers selected
-                    const aSelectedItems = oTable.getSelectedItems();
-                    for (let i = iAllowedFamilyMembers; i < aSelectedItems.length; i++) {
-                        oTable.setSelectedItem(aSelectedItems[i], false);
-                    }
-                } finally {
-                    this._bAdjustingSelection = false;
+            // Unchecking a member is always allowed and frees up capacity.
+            if (!oEvent.getParameter("selected")) {
+                return;
+            }
+
+            const oBookingView = this.getView().getModel("BookingView");
+            const iAllowedFamilyMembers = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
+            const aSelectedItems = oTable.getSelectedItems();
+
+            // Still within capacity, nothing to adjust.
+            if (aSelectedItems.length <= iAllowedFamilyMembers) {
+                return;
+            }
+
+            // Capacity exceeded. Only roll back the member(s) checked in THIS change
+            // so that previously checked members remain checked. The user must first
+            // uncheck an existing member before checking a different one.
+            const aChangedItems = (oEvent.getParameter("listItems") || []).slice();
+            if (!aChangedItems.length && oEvent.getParameter("listItem")) {
+                aChangedItems.push(oEvent.getParameter("listItem"));
+            }
+
+            const iPreviouslySelected = aSelectedItems.length - aChangedItems.length;
+            const iRemainingSlots = Math.max(iAllowedFamilyMembers - iPreviouslySelected, 0);
+
+            MessageToast.show("Selected room capacity does not allow more members.");
+            this._bAdjustingSelection = true;
+            try {
+                // Keep only as many of the newly checked members as there is room for
+                // (in table order); deselect the surplus without touching prior selections.
+                for (let i = iRemainingSlots; i < aChangedItems.length; i++) {
+                    oTable.setSelectedItem(aChangedItems[i], false);
                 }
+            } finally {
+                this._bAdjustingSelection = false;
             }
         },
 

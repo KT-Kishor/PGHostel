@@ -348,6 +348,7 @@ sap.ui.define([
 
                 oHostelModel.setData(oEditData);
                 oHostelModel.setProperty("/IsEditMode", true);
+                this._updateEndDateMinDate();
                 oHostelModel.setProperty("/BookingID", sBookingID);
                 oHostelModel.setProperty("/EditMemberID", sMemberID);
                 oHostelModel.setProperty("/HasExistingPayments", aExistingPayments.length > 0);
@@ -3419,6 +3420,7 @@ sap.ui.define([
             this._backupAllFacilities = JSON.parse(JSON.stringify(this._aAllFacilities || []));
 
             oBookingView.setProperty("/editModeEnabled", true);
+            this._updateEndDateMinDate();
         },
 
         // Cancel edit mode and revert to read-only
@@ -5395,8 +5397,22 @@ sap.ui.define([
             this._resetCouponState(true);
             this.onApplyCoupon();
         },
-        SC_onVHDClose: function () {
-            this.EC_Dialog.close();
-        }
-    });
-});
+SC_onVHDClose: function () {
+             this.EC_Dialog.close();
+         },
+         _updateEndDateMinDate: function () {
+             var oHostelModel = this.getView().getModel("HostelModel");
+             var sStartDate = oHostelModel.getProperty("/StartDate");
+             var oStartDate = this._parseDate(sStartDate);
+             var oMinEndDate;
+             if (oStartDate) {
+                 oMinEndDate = new Date(oStartDate);
+                 oMinEndDate.setDate(oMinEndDate.getDate() + 1);
+                 oMinEndDate.setHours(0, 0, 0, 0);
+             } else {
+                 oMinEndDate = oHostelModel.getProperty("/TodayDate");
+             }
+             oHostelModel.setProperty("/EndDateMinDate", oMinEndDate);
+         }
+     });
+ });
