@@ -3767,10 +3767,10 @@ sap.ui.define([
                     item.BranchCode === ID.BranchCode
             })
 
-            if (SelectedRoom[0].NoofPerson <= HostelData.length) {
-                sap.m.MessageBox.error("No rooms available for the selected bed type. Please assign a different bed type or check room availability.");
-                return;
-            }
+            // if (SelectedRoom[0].NoofPerson <= HostelData.length) {
+            //     sap.m.MessageBox.error("No rooms available for the selected bed type. Please assign a different bed type or check room availability.");
+            //     return;
+            // }
 
             this.getBusyDialog();
             const pdfBase64 = await this.onGeneratePDF();
