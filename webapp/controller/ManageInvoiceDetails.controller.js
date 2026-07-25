@@ -518,11 +518,15 @@ sap.ui.define([
                         sap.m.MessageBox.information(
                             "This invoice has already been generated.",
                             {
-                                styleClass: "myUnifiedBtn"
+                                styleClass: "myUnifiedBtn",
+                                onClose: function () {
+                                    this.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
+                                        sPath: "ManageInvoicedetails"
+                                    });
+                                }.bind(this)
                             }
-                        )
+                        );
                         return;
-
                     }
 
                     const facilityArray = Array.isArray(oData.data.BookingFacilityItems) ?
@@ -3865,72 +3869,72 @@ sap.ui.define([
 
                         let currentY = doc.lastAutoTable.finalY + 15;
 
-                    doc.setFontSize(11);
-                    doc.setFont("times", "bold");
-                    doc.text("Thank you for staying with us.", margin, currentY + 5);
+                        doc.setFontSize(11);
+                        doc.setFont("times", "bold");
+                        doc.text("Thank you for staying with us.", margin, currentY + 5);
 
 
 
-                    // --------------------------------------------------
-                    // Reserve space above footer
-                    // --------------------------------------------------
-                    const footerHeight = 35;      // Same as your footer
-                    const signatureHeight = 25;   // Space needed for signatures
+                        // --------------------------------------------------
+                        // Reserve space above footer
+                        // --------------------------------------------------
+                        const footerHeight = 35;      // Same as your footer
+                        const signatureHeight = 25;   // Space needed for signatures
 
-                    currentY += 32;
+                        currentY += 32;
 
-                    if (currentY + signatureHeight > pageHeight - footerHeight) {
-                        doc.addPage();
-                        currentY = 30;
+                        if (currentY + signatureHeight > pageHeight - footerHeight) {
+                            doc.addPage();
+                            currentY = 30;
+                        }
+
+                        // ================= SIGNATURES =================
+
+                        // ================= SIGNATURES =================
+
+                        const leftX = margin;
+                        const rightX = pageWidth - margin;
+                        const lineLength = 40; // Decreased line width (adjust as needed)
+
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(12);
+
+                        // --- Row 1: Cashier & Guest Sign ---
+
+                        // 1. Left side: "Cashier ____"
+                        const cashierLabel = "Cashier ";
+                        doc.text(cashierLabel, leftX, currentY);
+
+                        const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                        const lineStartX = leftX + cashierTextWidth;
+
+                        // Draw shorter straight horizontal line
+                        doc.setLineWidth(0.5);
+                        doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                        // 2. Right side: "guest sign ____"
+                        const guestLabel = "Guest sign ";
+                        const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                        // Draw shorter straight horizontal line on the right end
+                        doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+
+                        // Place "guest sign" right before the line
+                        doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                        // --- Row 2: Created By ---
+
+                        currentY += 10;
+
+                        doc.setFont("times", "normal");
+                        doc.setFontSize(12);
+
+                        const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                        doc.text(createdByText, leftX, currentY);
                     }
 
-                    // ================= SIGNATURES =================
-
-                    // ================= SIGNATURES =================
-
-                    const leftX = margin;
-                    const rightX = pageWidth - margin;
-                    const lineLength = 40; // Decreased line width (adjust as needed)
-
-                    doc.setFont("times", "bold");
-                    doc.setFontSize(12);
-
-                    // --- Row 1: Cashier & Guest Sign ---
-
-                    // 1. Left side: "Cashier ____"
-                    const cashierLabel = "Cashier ";
-                    doc.text(cashierLabel, leftX, currentY);
-
-                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
-                    const lineStartX = leftX + cashierTextWidth;
-
-                    // Draw shorter straight horizontal line
-                    doc.setLineWidth(0.5);
-                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
-
-                    // 2. Right side: "guest sign ____"
-                    const guestLabel = "Guest sign ";
-                    const guestTextWidth = doc.getTextWidth(guestLabel);
-
-                    // Draw shorter straight horizontal line on the right end
-                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
-
-                    // Place "guest sign" right before the line
-                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
-
-                    // --- Row 2: Created By ---
-
-                    currentY += 10;
-
-                    doc.setFont("times", "normal");
-                    doc.setFontSize(12);
-
-                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
-                    doc.text(createdByText, leftX, currentY);
-                    }
 
 
-                 
 
                     //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
