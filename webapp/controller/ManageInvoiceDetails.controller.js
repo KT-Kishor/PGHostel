@@ -1397,12 +1397,26 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
+             
+
+
+                //    const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
+                // const totalAmount = Number(oSelectedCustomerModel.TotalAmount) || 0;
+                // const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
+
+                const totalAmount = Number(FilterModel.TotalAmount) || 0;
                 const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
-                const totalAmount = Number(oSelectedCustomerModel.TotalAmount) || 0;
-                const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
+                const allReceivedAmount = Number(
+                    oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")
+                ) || 0;
+
+                const balanceAmount = totalAmount - (paidAmount + allReceivedAmount);
+
+
+
                 let sFinalStatus = "Submitted";
 
-                if (paidAmount === totalAmount) {
+                if (balanceAmount === 0) {
                     sFinalStatus = "Payment Received";
                 } else if (balanceAmount === totalAmount) {
                     sFinalStatus = "Submitted";
@@ -1446,7 +1460,7 @@ sap.ui.define([
                     CouponDiscount: oSelectedCustomerModel.CouponDiscount || "",
                     UserID: oSelectedCustomerModel.UserID || "",
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
-                    BalanceAmount: oSelectedCustomerModel.BalanceAmount || "",
+                    BalanceAmount: balanceAmount.toString() || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
                     CustomerGSTNO: oSelectedCustomerModel.CustomerGSTNO || "",
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
@@ -1759,6 +1773,32 @@ sap.ui.define([
                             filtres: oPayload.filters,
                             Items: oPayload.items
                         });
+
+
+                        const oData = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
+                            InvNo: this.decodedPath
+                        });
+
+                        const aItems = oData.data.ManageInvoiceItem.map((item, index) => ({
+                            ...item,
+                            IndexNo: index + 1,
+                            StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
+                            EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        }));
+
+                        this.getView().setModel(
+                            new sap.ui.model.json.JSONModel({
+                                ManageInvoiceItem: aItems
+                            }),
+                            "ManageInvoiceItemModel"
+                        );
+
+
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
@@ -1818,6 +1858,14 @@ sap.ui.define([
 
                     var totalPaid = paidAmount + allReceivedAmount;
 
+                    const balanceAmount =
+                        (Number(oSelectedCustomer.TotalAmount) || 0) -
+                        (
+                            (Number(oSelectedCustomer.PaidAmount) || 0) +
+                            (Number(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0)
+                        );
+
+                   
                     if (totalPaid === 0) {
                         if (status === "Payment Partially" || status === "Payment Received") {
                             oSelectedModel.setProperty("/Status", this._previousInvoiceStatus);
@@ -1825,7 +1873,7 @@ sap.ui.define([
                         }
                         this._previousInvoiceStatus = status;
                     }
-                    else if (totalPaid > 0 && dueAmount > 0) {
+                    else if (totalPaid > 0 && balanceAmount > 0) {
                         if (status !== "Payment Partially") {
                             oSelectedModel.setProperty("/Status", "Payment Partially");
                             oSource.setValue("Payment Partially");
@@ -1833,7 +1881,7 @@ sap.ui.define([
                         }
                         this._previousInvoiceStatus = "Payment Partially";
                     }
-                    else if (totalPaid >= totalAmount || dueAmount === 0) {
+                    else if (totalPaid >= totalAmount || balanceAmount === 0) {
                         if (status !== "Payment Received") {
                             MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
                             oSelectedModel.setProperty("/Status", "Payment Received");
@@ -1846,7 +1894,7 @@ sap.ui.define([
                 } else if (typeof oEventOrStatus === "string") {
                     status = oEventOrStatus;
 
-                      if (oSelectedModel && status != "Open") {
+                    if (oSelectedModel && status != "Open") {
                         oSelectedModel.setProperty("/Status", status);
                     }
                     this._previousInvoiceStatus = status;
@@ -2013,7 +2061,7 @@ sap.ui.define([
 
             Readcall: async function (entity, filterValue) {
                 const oData = await this.ajaxReadWithJQuery(entity, filterValue);
-                if (entity === "ManageInvoice") {
+                if (entity === "HM_ManageInvoice") {
                     const invoiceData = oData.data?.[0] || {};
                     invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
@@ -2144,9 +2192,9 @@ sap.ui.define([
                         this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
                         this.visiablityPlay.setProperty("/MultiEmail", hasDue);
                         this.visiablityPlay.setProperty("/Edit", true);
-                        this.visiablityPlay.setProperty("/editable", false);
+                        this.visiablityPlay.setProperty("/editable", true);
                         this.visiablityPlay.setProperty("/CInvoice", false);
-                        this.visiablityPlay.setProperty("/merge", true);
+                        this.visiablityPlay.setProperty("/merge", false);
                         this.visiablityPlay.setProperty("/addInvBtn", false);
                         this.visiablityPlay.setProperty("/refresh", false);
 
@@ -2771,7 +2819,14 @@ sap.ui.define([
                         }
                     }
 
-                      const balanceAmount =
+                    // if (parseFloat(oModel.BalanceAmount) > 0) {
+                    //     summaryBody.push([
+                    //         "Due Amount :",
+                    //         Formatter.fromatNumber(parseFloat(oModel.BalanceAmount))
+                    //     ]);
+                    // }
+
+                    const balanceAmount =
                         (Number(data.TotalAmount) || 0) -
                         (
                             (Number(oModel.PaidAmount) || 0) +
@@ -3772,6 +3827,7 @@ sap.ui.define([
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
                         }
+
                             const balanceAmount =
                         (Number(oModel.TotalAmount) || 0) -
                         (
