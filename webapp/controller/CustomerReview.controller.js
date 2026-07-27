@@ -10,17 +10,31 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteCustomerReview").attachMatched(this._onRouteMatched, this);
         },
 
+        _closeBusyDialog: function () {
+            if (this._pBusyDialog) {
+                this._pBusyDialog.then(function (oBusyDialog) {
+                    oBusyDialog.close();
+                });
+                return;
+            }
+            this.closeBusyDialog()
+        },
+
         _onRouteMatched: async function () {
             this.getBusyDialog()
-            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-            // this.commonLoginFunction();
-            this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
-            this._resetFiltersOnEntry();
-            this._setDefaultDateRange();
-            await this._loadCustomers();
-            await this._buildBranchMap();
-            this._loadBranchFilter();
-            await this._loadCustomerReviews();
+            try {
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                // this.commonLoginFunction();
+                this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+                this._resetFiltersOnEntry();
+                await this._loadCustomers();
+                await this._buildBranchMap();
+                this._loadBranchFilter();
+                await this._loadCustomerReviews();
+            } catch (e) {
+                MessageToast.show("Failed to load customer reviews");
+                this._closeBusyDialog()
+            }
         },
 
         _loadBranchFilter: function () {
@@ -78,62 +92,78 @@ sap.ui.define([
             this._mBranchMap = mBranchMap;
         },
 
-        _loadCustomerReviews: function () {
+        _loadCustomerReviews: async function () {
             var data = this.data;
-            const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
+            const oExistingModel = this.getOwnerComponent().getModel("LoginModel")?.getData() || {};
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             let aBranchCodes = "";
             if (Array.isArray(omainModel) && omainModel.length) {
-                aBranchCodes = omainModel.map(item => item.BranchID).flat().filter(Boolean).join(",");
+                aBranchCodes = omainModel.map(item => item.BranchID || item.BranchCode).flat().filter(Boolean).join(",");
             } else if (oExistingModel.BranchCode) {
                 aBranchCodes = oExistingModel.BranchCode;
             }
             const oDRS = this.byId("CR_id_BranchCode");
             const oRatingCB = this.byId("CR_id_Rating");
             const oSortCB = this.byId("CR_id_Sort");
+            const oBranchCB = this.byId("CR_id_Branch");
+            const oBox = this.byId("CR_id_ReviewContainer");
+            const iRequestId = (this._iReviewRequestId || 0) + 1;
+
+            this._iReviewRequestId = iRequestId;
+            oBox.removeAllItems();
+            this.getBusyDialog()
 
             const dFrom = oDRS.getDateValue();
             const dTo = oDRS.getSecondDateValue();
             const sRating = oRatingCB.getSelectedKey();
             const sSortKey = oSortCB.getSelectedKey();
 
-            // var BedTypeName = `${data?.Name || ""}${data?.Name && data?.ACType ? " - " : ""}${data?.ACType || ""}`;
-            var filters = {
-                // BedType: BedTypeName,
-                StartDate: dFrom ? this.Formatter.formatDate(dFrom).split("/").reverse().join("-") : "",
-                EndDate: dTo ? this.Formatter.formatDate(dTo).split("/").reverse().join("-") : "",
-                OverallRating: sRating || "",
-                SortKey: sSortKey || ""
-            };
-            if (oExistingModel.Role === "Admin" && aBranchCodes) {
-                filters.BranchCode = aBranchCodes;
-                filters.Role = "Admin";
-            } else if (oExistingModel.Role === "SuperAdmin") {
-                filters.BranchCode = "";
-            } else if (data) {
-                filters.BranchCode = data.BranchID;
-            } else {
-                filters.BranchCode = oExistingModel.BranchCode;
+            var filters = {};
+            if (dFrom) {
+                filters.StartDate = this.Formatter.formatDate(dFrom).split("/").reverse().join("-");
             }
-            const sSelectedBranch = this.byId("CR_id_Branch").getSelectedKey();
+            if (dTo) {
+                filters.EndDate = this.Formatter.formatDate(dTo).split("/").reverse().join("-");
+            }
+            if (sRating) {
+                filters.OverallRating = sRating;
+            }
+            if (sSortKey) {
+                filters.SortKey = sSortKey;
+            }
+
+            const sSelectedBranch = oBranchCB.getSelectedKey();
             if (sSelectedBranch) {
                 filters.BranchCode = sSelectedBranch;
+            } else if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.BranchCode = aBranchCodes;
+                filters.Role = "Admin";
+            } else if (oExistingModel.Role !== "SuperAdmin") {
+                const sSelectedDataBranch = data && typeof data === "object" ? (data.BranchID || data.BranchCode || "") : "";
+                filters.BranchCode = sSelectedDataBranch || oExistingModel.BranchCode || "";
             }
-            const that = this;
-            const oBox = this.byId("CR_id_ReviewContainer");
-            oBox.removeAllItems();
-            this.getBusyDialog()
-
-            this.ajaxReadWithJQuery("HM_Feedback", filters).then(function (oData) {
-                const aFeedbacks = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                that._aAllFeedbacks = aFeedbacks;
-                that._applyFilters();
-                that.closeBusyDialog()
-            }).catch(function () {
-                that.closeBusyDialog()
-                MessageToast.show("Failed to load customer reviews");
+            Object.keys(filters).forEach(function (sKey) {
+                if (filters[sKey] === "" || filters[sKey] === null || filters[sKey] === undefined) {
+                    delete filters[sKey];
+                }
             });
+
+            try {
+                const oData = await this.ajaxReadWithJQuery("HM_Feedback", filters);
+                if (this._iReviewRequestId !== iRequestId) {
+                    return;
+                }
+                const aFeedbacks = Array.isArray(oData?.commentData) ? oData.commentData : [oData?.commentData].filter(Boolean);
+                this._aAllFeedbacks = aFeedbacks.filter(Boolean);
+                this._applyFilters();
+            } catch (e) {
+                MessageToast.show("Failed to load customer reviews");
+            } finally {
+                if (this._iReviewRequestId === iRequestId) {
+                    this._closeBusyDialog()
+                }
+            }
         },
 
         onHome: function () {
@@ -263,14 +293,17 @@ sap.ui.define([
         },
 
         CR_onSearch: function () {
-            this._loadCustomerReviews(data);
+            this._loadCustomerReviews();
         },
 
         CR_onPressClear: function () {
             this.byId("CR_id_Rating").setSelectedKey("");
             this.byId("CR_id_Branch").setSelectedKey("");
             this.byId("CR_id_Branch").setValue("");
+            this.byId("CR_id_BranchCode").setDateValue(null);
+            this.byId("CR_id_BranchCode").setSecondDateValue(null);
             this.byId("CR_id_BranchCode").setValue("");
+            this.byId("CR_id_Sort").setSelectedKey("");
             this.byId("CR_id_Sort").setValue("");
         },
 
