@@ -1204,6 +1204,21 @@ sap.ui.define([
                 var normalize = v => (v ? String(v).trim().toLowerCase() : "");
                 var aBranchRooms = aRooms.filter(r => normalize(r.BranchCode) === normalize(sBranchCode));
 
+                // ExtraBed lives on the bed-type records (HM_BedType), not on HM_Rooms.
+                // Fetch them for this branch and key the extra-bed count by
+                // "BedType - ACType" so it can be merged onto each room below.
+                var oExtraBedByBedType = {};
+                try {
+                    var oBedTypeResp = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", { BranchCode: sBranchCode });
+                    var aBedTypes = (oBedTypeResp && oBedTypeResp.data && oBedTypeResp.data.HM_BedType) || [];
+                    aBedTypes.forEach(function (bt) {
+                        var sBTKey = normalize((bt.Name || "") + " - " + (bt.ACType || ""));
+                        oExtraBedByBedType[sBTKey] = bt.ExtraBed || 0;
+                    });
+                } catch (oBedTypeErr) {
+                    console.error("Failed to load bed types for ExtraBed:", oBedTypeErr);
+                }
+
                 // De-duplicate rooms by BedTypeName (booking is done at bed-type level)
                 var oUnique = {};
                 aBranchRooms.forEach(function (r) {
@@ -1229,7 +1244,8 @@ sap.ui.define([
                             Currency: r.Currency || "",
                             Deposit: r.Deposit || "",
                             DepositCurrency: r.DepositCurrency || "",
-                            NoOfPerson: r.NoofPerson || r.NoOfPerson || ""
+                            NoOfPerson: r.NoofPerson || r.NoOfPerson || "",
+                            ExtraBed: oExtraBedByBedType[normalize(sBedTypeName)] || 0
                         };
                     }
                 });
@@ -1914,6 +1930,7 @@ sap.ui.define([
                 Deposit: oRoom.Deposit || "",
                 DepositCurrency: oRoom.DepositCurrency || "",
                 Capacity: oRoom.NoOfPerson || "",
+                ExtraBed: oRoom.ExtraBed || 0,
                 PropertyType: oBranch.PropertyType || "",
                 GSTIN: oBranch.GSTIN || "",
                 PropertyGSTIN: oBranch.GSTIN || "",
