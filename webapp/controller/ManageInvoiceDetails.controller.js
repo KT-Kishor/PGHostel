@@ -1846,7 +1846,7 @@ sap.ui.define([
                 } else if (typeof oEventOrStatus === "string") {
                     status = oEventOrStatus;
 
-                    if (oSelectedModel) {
+                      if (oSelectedModel && status != "Open") {
                         oSelectedModel.setProperty("/Status", status);
                     }
                     this._previousInvoiceStatus = status;
@@ -2769,6 +2769,20 @@ sap.ui.define([
                         if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue) {
                             summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
                         }
+                    }
+
+                      const balanceAmount =
+                        (Number(data.TotalAmount) || 0) -
+                        (
+                            (Number(oModel.PaidAmount) || 0) +
+                            (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
+                        );
+
+                    if (balanceAmount > 0) {
+                        summaryBody.push([
+                            "Due Amount :",
+                            Formatter.fromatNumber(balanceAmount)
+                        ]);
                     }
 
                     // if (parseFloat(oModel.RefundAmount) > 0) {
@@ -3758,6 +3772,19 @@ sap.ui.define([
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
                         }
+                            const balanceAmount =
+                        (Number(oModel.TotalAmount) || 0) -
+                        (
+                            (Number(oModel.PaidAmount) || 0) +
+                            (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
+                        );
+
+                    if (balanceAmount > 0) {
+                        summaryBody.push([
+                            "Due Amount :",
+                            Formatter.fromatNumber(balanceAmount)
+                        ]);
+                    }
 
                         // Total
                         const totalRowIndex = summaryBody.length;
