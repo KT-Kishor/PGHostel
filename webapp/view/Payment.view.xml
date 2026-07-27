@@ -219,8 +219,8 @@
                             <Text
                                 text="{parts:['mainModel>Date'], formatter: '.Formatter.displayFormatDate'}"
                             />
-                            <Text text="{mainModel>PaymentType}" />
                             <Text text="{mainModel>BankTransactionID}" />
+                             <Text text="{mainModel>PaymentType}" />
                             <Text text="{mainModel>BankName}" />
                             <Text
                                 text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"

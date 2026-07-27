@@ -600,7 +600,7 @@
                             <HBox
                                 justifyContent="SpaceBetween"
                                 alignItems="Center"
-                                visible="{BookingView>/showBusinessTravelOption}"
+                                visible="{= ${BookingView>/showBusinessTravelOption} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                             >
                                 <Text text="GST Details(optional)" />
@@ -614,14 +614,14 @@
                             <Label
                                 required="true"
                                 text="GSTIN"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                             />
                             <Input
                                 id="BookGst_ID"
                                 value="{HostelModel>/CustomerGSTIN}"
                                 placeholder="Enter GSTIN"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 liveChange="onGSTINLiveChange"
                                 change="onGSTINChange"
                                 class="sapUiTinyMarginBottom"
@@ -632,14 +632,14 @@
                             <Label
                                 required="true"
                                 text="Company Name"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="required-field-label sapUiTinyMarginBottom"
                             />
                             <Input
                                 id="BookCompanyname_ID"
                                 value="{HostelModel>/CompanyName}"
                                 placeholder="Enter company name (minimum 3 characters)"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                                 width="100%"
                                 change="onchangeCompanyname"
@@ -652,13 +652,13 @@
                             <Label
                                 required="true"
                                 text="Company Address"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="required-field-label sapUiTinyMarginBottom"
                             />
                             <TextArea
                                 value="{HostelModel>/CompanyAddress}"
                                 placeholder="Enter complete company address"
-                                visible="{BookingView>/showBusinessGSTSection}"
+                                visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 rows="3"
                                 class="sapUiTinyMarginBottom"
                                 width="100%"
