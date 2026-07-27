@@ -544,8 +544,10 @@
         },
 
         _supportsCustomerGSTOverride: function (sPropertyType) {
-            const sType = String(sPropertyType || "").trim();
-            return ["Hotel", "Service Apartments", "Rented Properties"].includes(sType);
+            //// if need to hide customer gst then uncomment this 
+            // const sType = String(sPropertyType || "").trim();
+            // return ["Hotel", "Service Apartments", "Rented Properties"].includes(sType);
+            return true;
         },
 
         _shouldShowGSTField: function (sPropertyType) {
