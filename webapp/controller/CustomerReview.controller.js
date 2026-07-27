@@ -19,6 +19,7 @@ sap.ui.define([
             this._setDefaultDateRange();
             await this._loadCustomers();
             await this._buildBranchMap();
+            this._loadBranchFilter();
             await this._loadCustomerReviews();
         },
 
