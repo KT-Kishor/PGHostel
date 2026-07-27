@@ -22,8 +22,34 @@ sap.ui.define([
             await this._loadCustomerReviews();
         },
 
+        _loadBranchFilter: function () {
+            const oLogin = this.getOwnerComponent().getModel("LoginModel").getData() || {};
+            const aBranches = Object.keys(this._mBranchMap || {}).map(sCode => ({
+                BranchCode: sCode,
+                Name: this._mBranchMap[sCode]
+            }));
+            let aItems = aBranches;
+            if (oLogin.Role !== "SuperAdmin") {
+                const aCodes = (oLogin.BranchCode || "").split(",").map(c => c.trim()).filter(Boolean);
+                if (aCodes.length) {
+                    aItems = aBranches.filter(b => aCodes.includes(b.BranchCode));
+                }
+            }
+            this.getView().setModel(new sap.ui.model.json.JSONModel(aItems), "BranchFilterModel");
+        },
+
         _getBranchName: function (sBranchCode) {
             return this._mBranchMap?.[sBranchCode] || sBranchCode || "N/A";
+        },
+
+        onAfterRendering: function () {
+            const oCombo = this.byId("CR_id_Branch");
+            if (oCombo) {
+                oCombo.setFilterFunction((sTerm, oItem) => {
+                    sTerm = sTerm.toLowerCase();
+                    return ((oItem.getText() || "").toLowerCase().includes(sTerm) || (oItem.getAdditionalText() || "").toLowerCase().includes(sTerm));
+                });
+            }
         },
 
         _getCustomerName: function (sCustomerID) {
@@ -88,6 +114,10 @@ sap.ui.define([
                 filters.BranchCode = data.BranchID;
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
+            }
+            const sSelectedBranch = this.byId("CR_id_Branch").getSelectedKey();
+            if (sSelectedBranch) {
+                filters.BranchCode = sSelectedBranch;
             }
             const that = this;
             const oBox = this.byId("CR_id_ReviewContainer");
@@ -237,6 +267,8 @@ sap.ui.define([
 
         CR_onPressClear: function () {
             this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_Branch").setSelectedKey("");
+            this.byId("CR_id_Branch").setValue("");
             this.byId("CR_id_BranchCode").setValue("");
             this.byId("CR_id_Sort").setValue("");
         },
@@ -244,6 +276,7 @@ sap.ui.define([
         _resetFiltersOnEntry: function () {
             const oFilterBar = this.byId("CR_id_Filterbar");
             this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_Branch").setSelectedKey("");
             this.byId("CR_id_Sort").setSelectedKey("");
 
             oFilterBar.clear();

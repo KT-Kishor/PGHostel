@@ -35,6 +35,31 @@
                 >
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
+                            name="BranchCode"
+                            label="{i18n>branchIdName}"
+                            groupName="Group"
+                            visibleInFilterBar="true"
+                        >
+                            <fb:control>
+                                <ComboBox
+                                    id="CR_id_Branch"
+                                    items="{BranchFilterModel>/}"
+                                    showClearIcon="true"
+                                    filterSecondaryValues="true"
+                                    placeholder="Select Branch ID / Name"
+                                    showSecondaryValues="true"
+                                >
+                                    <core:ListItem
+                                        key="{BranchFilterModel>BranchCode}"
+                                        text="{BranchFilterModel>BranchCode}"
+                                        additionalText="{BranchFilterModel>Name}"
+                                    />
+                                </ComboBox>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem
                             name="FeedbackDate"
                             label="Feedback Date"
                             groupName="Group"

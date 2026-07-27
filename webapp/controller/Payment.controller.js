@@ -76,6 +76,8 @@ sap.ui.define([
         prepareMasterFilterData: function (aData) {
             const mBranch = new Map();
             const mBooking = new Map();
+            const mCustomer = new Map();
+            const mTransaction = new Map();
 
             aData.forEach(item => {
                 if (item.BranchCode && !mBranch.has(item.BranchCode)) {
@@ -89,10 +91,24 @@ sap.ui.define([
                         BookingID: item.BookingID
                     });
                 }
+                if (item.CustomerName && item.CustomerName.trim() && !mCustomer.has(item.CustomerName)) {
+                    mCustomer.set(item.CustomerName, {
+                        key: item.CustomerName,
+                        text: item.CustomerName
+                    });
+                }
+                if (item.BankTransactionID && item.BankTransactionID.trim() && !mTransaction.has(item.BankTransactionID)) {
+                    mTransaction.set(item.BankTransactionID, {
+                        key: item.BankTransactionID,
+                        text: item.BankTransactionID
+                    });
+                }
             });
 
             this.getView().setModel(new JSONModel([...mBranch.values()]), "BranchFilterModel");
             this.getView().setModel(new JSONModel([...mBooking.values()]), "BookingFilterModel");
+            this.getView().setModel(new JSONModel([...mCustomer.values()]), "CustomerFilterModel");
+            this.getView().setModel(new JSONModel([...mTransaction.values()]), "TransactionFilterModel");
         },
 
         Onsearch: function (bInitialLoad) {
@@ -100,6 +116,8 @@ sap.ui.define([
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
             const oDateRange = this.byId("P_id_Date");
             const sBookingID = oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
+            const sCustomerName = oView.byId("P_id_CustomerName").getSelectedKey() || oView.byId("P_id_CustomerName").getValue();
+            const sTransactionID = oView.byId("P_id_TransactionID").getSelectedKey() || oView.byId("P_id_TransactionID").getValue();
             let sBranch = "";
             const oBranchCombo = oView.byId("P_id_BranchCode");
             if (oBranchCombo) {
@@ -156,7 +174,7 @@ sap.ui.define([
                 const aDatas = Array.isArray(oResponse?.commentData) ? oResponse.commentData : [];
                 const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
-                const oDatas = aDatas.map(item => {
+                let oDatas = aDatas.map(item => {
                     const branch = branchData.find(br => br.BranchID === item.BranchCode);
                     return {
                         ...item,
@@ -167,6 +185,14 @@ sap.ui.define([
                 if (bInitialLoad && this.fullPaymentData.length === 0) {
                     this.fullPaymentData = oDatas;
                     this.prepareMasterFilterData(oDatas);
+                }
+
+                // Client-side filters (not sent to backend)
+                if (sCustomerName) {
+                    oDatas = oDatas.filter(item => item.CustomerName === sCustomerName);
+                }
+                if (sTransactionID) {
+                    oDatas = oDatas.filter(item => item.BankTransactionID === sTransactionID);
                 }
                 // const mBranchMap = this.buildBranchMap();
                 // aData.forEach(item => {
@@ -216,8 +242,11 @@ sap.ui.define([
         FC_onPressClear: function () {
             const oView = this.getView();
             oView.byId("P_id_BookingID").setSelectedKey("");
-            oView.byId("P_id_BookingID").setSelectedKey("");
             oView.byId("P_id_BranchCode").setSelectedKey("");
+            oView.byId("P_id_CustomerName").setSelectedKey("");
+            oView.byId("P_id_CustomerName").setValue("");
+            oView.byId("P_id_TransactionID").setSelectedKey("");
+            oView.byId("P_id_TransactionID").setValue("");
             const oDate = oView.byId("P_id_Date");
             oDate.setDateValue(null);
             oDate.setSecondDateValue(null);
@@ -247,13 +276,13 @@ sap.ui.define([
                 type: "String"
             },
             {
-                label: "Payment Type",
-                property: "PaymentType",
+                label: "Transaction ID / Name",
+                property: "BankTransactionID",
                 type: "string"
             },
             {
-                label: "Bank Transaction ID",
-                property: "BankTransactionID",
+                label: "Payment Type",
+                property: "PaymentType",
                 type: "string"
             },
             {
