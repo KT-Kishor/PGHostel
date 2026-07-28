@@ -8,20 +8,26 @@
     >
         <content>
             <Table
-            sticky="ColumnHeaders"
+                sticky="ColumnHeaders"
                 noDataText="{i18n>noCouponsAvailable}"
                 class="couponTitle"
                 items="{ShowCouponDetails>/}"
             >
                 <columns>
                     <Column>
-                        <Text class="couponTitleOpp" text="{i18n>CDCouponCode}" />
+                        <Text
+                            class="couponTitleOpp"
+                            text="{i18n>CDCouponCode}"
+                        />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text class="couponTitleOpp" text="{i18n>CDMinOrderValue}" />
+                        <Text
+                            class="couponTitleOpp"
+                            text="{i18n>CDMinOrderValue}"
+                        />
                     </Column>
                     <!-- <Column
                         minScreenWidth="Tablet"
@@ -33,23 +39,41 @@
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text class="couponTitleOpp" text="{i18n>CouponOffer}" />
+                        <Text
+                            class="couponTitleOpp"
+                            text="{i18n>CouponOffer}"
+                        />
                     </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text
+                            class="couponTitleOpp"
+                            text="{i18n>UptoValue}"
+                        />
+                    </Column>
+
                     <Column
                         minScreenWidth="Desktop"
                         demandPopin="true"
                     >
-                        <Text class="couponTitleOpp" text="{i18n>Description}" />
+                        <Text
+                            class="couponTitleOpp"
+                            text="{i18n>Description}"
+                        />
                     </Column>
-                    
                 </columns>
                 <items>
                     <ColumnListItem
                         type="Active"
                         press="SC_onVHDPick"
-                    >    
+                    >
                         <cells>
-                            <Title class="couponTitle" text="{ShowCouponDetails>CouponCode}" />
+                            <Title
+                                class="couponTitle"
+                                text="{ShowCouponDetails>CouponCode}"
+                            />
                             <Text
                                 text="{ShowCouponDetails>MinOrderValue}"
                                 wrapping="true"
@@ -67,16 +91,21 @@
                                         
                                     ],
                                     formatter: '.Formatter.formatDiscount'
-                                } OFF" class="couponTitle"
+                                } OFF"
+                                class="couponTitle"
                                 wrapping="true"
                             />
+                            <Title
+                                class="couponTitle"
+                                text="{ShowCouponDetails>UptoValue}"
+                                wrapping="true"
+                            />
+
                             <Text
                                 text="{ShowCouponDetails>Description}"
                                 wrapping="true"
                                 class="couponTitleOpp"
                             />
-
-
                         </cells>
                     </ColumnListItem>
                 </items>
