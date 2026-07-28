@@ -114,11 +114,32 @@ sap.ui.define([
 
             this._updateTableColumnWidths();
         },
+        /**
+         * Decode a base64 route parameter that may arrive single- OR double-URL-encoded.
+         * navTo with a query object (e.g. the FromMyBookings flag) makes UI5 re-encode the
+         * path params, so a padded value like "MDAwMDI=" reaches us as "MDAwMDI%253D".
+         * Strip every percent-escape layer (base64 output never contains '%'), then atob.
+         */
+        _decodeRouteBase64: function (sValue) {
+            if (!sValue) {
+                return "";
+            }
+            var sDecoded = String(sValue);
+            try {
+                while (sDecoded.indexOf("%") >= 0) {
+                    var sNext = decodeURIComponent(sDecoded);
+                    if (sNext === sDecoded) {
+                        break;
+                    }
+                    sDecoded = sNext;
+                }
+                return atob(sDecoded);
+            } catch (e) {
+                return "";
+            }
+        },
+
         _onEditRouteMatched: async function (oEvent) {
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
             let oArgs;
 
             // Case 1: called from router
@@ -137,12 +158,12 @@ sap.ui.define([
 
             // now safely use oArgs
             this._processEditArgs = oArgs;
-            this.BookingID = oArgs.BookingID ? atob(decodeURIComponent(oArgs.BookingID)) : "";
+            this.BookingID = this._decodeRouteBase64(oArgs.BookingID);
             var oRouteQuery = oArgs["?query"] || oArgs.query || {};
             this._sReturnRouteAfterEdit = oRouteQuery.FromMyBookings === "true" || oRouteQuery.FromMyBookings === true ? "RouteMyBookings" : "RouteManageProfile";
 
             var sBookingID = this.BookingID;
-            var sMemberID = oArgs.MemberID ? atob(decodeURIComponent(oArgs.MemberID)) : "";
+            var sMemberID = this._decodeRouteBase64(oArgs.MemberID);
 
             if (!sBookingID) {
                 MessageBox.error("Booking ID is required for editing.");
