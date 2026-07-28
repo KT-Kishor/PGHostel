@@ -1001,32 +1001,14 @@
                 </contentLeft>
                 <contentRight>
                     <!-- Confirm -->
-                    <Button
-                        text="Confirm Booking"
-                        tooltip="Confirm Booking"
-                        press="HM_ConfirmRoom"
-                        class="myUnifiedBtn"
-                        visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected'}"
-                    />
+                    <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} !== 'Completed'}"/>
+
+                    <Button text="Confirm Booking" tooltip="Confirm Booking" press="HM_ConfirmRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected'}"/>
 
                     <!-- Reject -->
-                    <Button
-                        text="Reject Booking"
-                        tooltip="Reject Booking"
-                        press="HM_RejectRoom"
-                        class="myUnifiedBtn"
-                        visible="{= ${CustomerData>/Status} === 'New' }"
-                    />
+                    <Button text="Reject Booking" tooltip="Reject Booking" press="HM_RejectRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' }" />
                     <!-- Refund Amount -->
-                    <Button
-                        text="ADD Customer GST"
-                        id="idGST"
-                        tooltip="GST Setup"
-                        press="onGSTBooking"
-                        visible="{= !${VisibleModel>/visible} &amp;&amp;  !!${CustomerData>/GSTIN}  &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') 
-                                 &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
-                        class="myUnifiedBtn"
-                    />  
+                    <Button text="ADD Customer GST" id="idGST" tooltip="GST Setup" press="onGSTBooking" visible="{= !${VisibleModel>/visible} &amp;&amp;  !!${CustomerData>/GSTIN}  &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }" class="myUnifiedBtn" />  
                     <Button
                         text="{i18n>MSedit}"
                         id="idedit"

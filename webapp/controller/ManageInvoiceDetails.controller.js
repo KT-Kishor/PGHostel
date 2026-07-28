@@ -20,6 +20,12 @@ sap.ui.define([
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
+                this.BookingID = ""
+                if (sArg.includes(",")) {
+                    this.BookingID = decodeURIComponent(sArg.split(",")[1]);
+                    sArg = "X";
+                }
+
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
 
@@ -198,7 +204,10 @@ sap.ui.define([
                         oCustomerCombo.setEditable(true);
                         await this.onSearch();
                     }
+                    if(this.BookingID) this.onChangeAddCustomer(this.BookingID);
+
                     this.closeBusyDialog()
+
                     return;
                 }
                 this.visiablityPlay.setProperty("/Edit", true);
@@ -317,6 +326,9 @@ sap.ui.define([
                     await this.Readcall("HM_InvoicePaymentDetail", {
                         InvNo: this.decodedPath
                     })
+                    await this.Readcall("fetchHM_InvoicePaymentDetail", {
+                        InvNo: this.decodedPath
+                    });
                     await this.totalAmountCalculation();
 
                     var oFooterBar = this.byId("invoicefooter");
@@ -460,46 +472,61 @@ sap.ui.define([
                 this.CommonLogoutFunction();
             },
 
-            onChangeAddCustomer: async function (oEvent) {
+            onChangeAddCustomer: async function (oEvent, sBookingID) {
                 try {
-                    utils._LCvalidateMandatoryField(oEvent);
+                    let bookingID = "";
 
-                    this.SelectKey = oEvent.getSource().getSelectedItem().getAdditionalText()
-                    const allData = this.getView().getModel("ManageCustomerModel").getData();
+                    // Called from ComboBox change event
+                    if (oEvent && oEvent.getSource) {
+                        utils._LCvalidateMandatoryField(oEvent);
 
-                    // Filter selected customer record
-                    const SelectedData = allData.find(item => item.BookingID === this.SelectKey);
-                    if (!SelectedData) return;
+                        const oSelectedItem = oEvent.getSource().getSelectedItem();
+                        if (!oSelectedItem) {
+                            return;
+                        }
 
-                    // Filter booking list for selected customer
-                    const bookingList = allData.filter(item => item.BookingID === this.SelectKey).map(i => ({
-                        BookingID: i.BookingID,
-                        Status: i.Status
-                    }));
+                        bookingID = oSelectedItem.getAdditionalText();
+                    }
+                    // Called manually
+                    else {
+                        bookingID = sBookingID || oEvent;
+                    }
 
-                    const bookingModel = new sap.ui.model.json.JSONModel(bookingList);
-                    this.getView().setModel(bookingModel, "BookingModel");
+                    this.SelectKey = bookingID;
 
-                    // Reset booking combo
+                    const ManageModel = this.getView().getModel("ManageCustomerModel");
+                    const allData = ManageModel.getData();
+
+                    const bookingList = allData
+                        .filter(item => item.BookingID === bookingID)
+                        .map(item => ({
+                            BookingID: item.BookingID,
+                            Status: item.Status,
+                            CustomerName:item.CustomerName
+                        }));
+                        ManageModel.setProperty("/CustomerName",bookingList[0]?.CustomerName);
+                    if (!bookingList.length) {
+                        return;
+                    }
+
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(bookingList),"BookingModel");
+
                     this.byId("CID_id_AddBooking").setSelectedKey("");
 
-                    // Reset selected key properly
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingList[0].BookingID);
-                    this.getView().byId("CID_id_AddBooking").setValue(bookingList[0].BookingID)
-                    this.onChangeBookingID()
-
-                    // Reset invoice model
+                    this.byId("CID_id_AddBooking").setValue(bookingList[0].BookingID);
+                    this.onChangeBookingID();
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
                 } catch (err) {
                     MessageToast.show(err.message);
                 } finally {
-                    this.closeBusyDialog()
+                    this.closeBusyDialog();
                 }
             },
 
             onChangeBookingID: async function (oEvent) {
                 try {
-                    const bookingID = oEvent ? oEvent.getSource().getSelectedKey() : this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID")
+                    const bookingID = oEvent ? oEvent.getSource().getSelectedKey() : this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID");
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingID);
 
                     if (!bookingID) return;
@@ -1397,7 +1424,7 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-             
+
 
 
                 //    const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
@@ -1840,7 +1867,7 @@ sap.ui.define([
                     if (this.visiablityPlay) {
                         this.visiablityPlay.setProperty("/Form", true);
                         this.visiablityPlay.setProperty("/Table", false);
-                        this.visiablityPlay.setProperty("/CInvoice", true);
+                        // this.visiablityPlay.setProperty("/CInvoice", true);
                     }
 
                     var oSelectedCustomer = oSelectedModel ? oSelectedModel.getData() : {};
@@ -1865,7 +1892,7 @@ sap.ui.define([
                             (Number(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0)
                         );
 
-                   
+
                     if (totalPaid === 0) {
                         if (status === "Payment Partially" || status === "Payment Received") {
                             oSelectedModel.setProperty("/Status", this._previousInvoiceStatus);
@@ -1902,14 +1929,10 @@ sap.ui.define([
                     if (this.visiablityPlay) {
                         this.visiablityPlay.setProperty("/Form", true);
                         this.visiablityPlay.setProperty("/Table", false);
-                        this.visiablityPlay.setProperty("/CInvoice", true);
+                        // this.visiablityPlay.setProperty("/CInvoice", true);
                     }
                 }
-                if (
-                    status === "Payment Received" ||
-                    status === "Payment Partially" ||
-                    status === "Open"
-                ) {
+                if (status === "Payment Received" || status === "Payment Partially" || status === "Open") {
                     var oView = that.getView();
 
                     sap.ui.core.Fragment.load({
@@ -2064,6 +2087,7 @@ sap.ui.define([
                 if (entity === "HM_ManageInvoice") {
                     const invoiceData = oData.data?.[0] || {};
                     invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
+                    invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
@@ -2073,9 +2097,12 @@ sap.ui.define([
 
                 const view = this.getView();
                 view.setModel(new JSONModel(oData.data), "InvoicePayment");
-                view.setModel(new JSONModel({
-                    InvoicePaymentDetail: oData.data
-                }), "PaymentDetailModel");
+
+                if (entity === "fetchHM_InvoicePaymentDetail") {
+                    view.setModel(new JSONModel({
+                        InvoicePaymentDetail: oData.data
+                    }), "PaymentDetailModel");
+                }
 
                 const items = oData.data || [];
 
@@ -2186,6 +2213,9 @@ sap.ui.define([
                             InvNo: this.decodedPath
                         });
                         await this.Readcall("HM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
+                        await this.Readcall("fetchHM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
                         const hasDue = parseFloat(paymentModel.DueAmount) > 0;
@@ -3828,19 +3858,19 @@ sap.ui.define([
                             }
                         }
 
-                            const balanceAmount =
-                        (Number(oModel.TotalAmount) || 0) -
-                        (
-                            (Number(oModel.PaidAmount) || 0) +
-                            (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
-                        );
+                        const balanceAmount =
+                            (Number(oModel.TotalAmount) || 0) -
+                            (
+                                (Number(oModel.PaidAmount) || 0) +
+                                (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
+                            );
 
-                    if (balanceAmount > 0) {
-                        summaryBody.push([
-                            "Due Amount :",
-                            Formatter.fromatNumber(balanceAmount)
-                        ]);
-                    }
+                        if (balanceAmount > 0) {
+                            summaryBody.push([
+                                "Due Amount :",
+                                Formatter.fromatNumber(balanceAmount)
+                            ]);
+                        }
 
                         // Total
                         const totalRowIndex = summaryBody.length;
@@ -4114,7 +4144,9 @@ sap.ui.define([
                         await this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
-
+                        await this.Readcall("fetchHM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
                         var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
                         });

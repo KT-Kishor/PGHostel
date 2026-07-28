@@ -8606,9 +8606,9 @@ sap.ui.define([
                 )
                 //  && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
             ) {
-                
-                if(oMember.Documents[0].DocumentType){
-                    if(oMember.Documents[0].File===""){
+
+                if (oMember.Documents[0].DocumentType) {
+                    if (oMember.Documents[0].File === "") {
                         MessageToast.show("Please upload a document")
                         return
                     }
@@ -9510,6 +9510,13 @@ sap.ui.define([
             this.UD_Dialog.close();
 
             sap.m.MessageToast.show("Selected member added successfully");
+        },
+
+        onGenerateInvoice: function (oEvent) {
+            this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                sPath: "X" + "," + encodeURIComponent(this.getView().getModel("CustomerData").getProperty("/BookingID")),
+                dash: "ManageInvoice"
+            });
         }
     });
 });
