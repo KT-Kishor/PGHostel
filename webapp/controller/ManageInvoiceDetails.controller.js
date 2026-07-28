@@ -26,6 +26,7 @@ sap.ui.define([
                     sArg = "X";
                 }
 
+
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
 
@@ -89,7 +90,7 @@ sap.ui.define([
                     RefundAmount: ""
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
-
+               
                 oView.setModel(new JSONModel({
                     BookingID: "",
                 }), "BookingModel");
@@ -335,6 +336,20 @@ sap.ui.define([
                     if (oFooterBar) {
                         oFooterBar.invalidate();
                     }
+                     const sBookingID = this.SelectedCustomerModel.getProperty("/BookingID");
+
+
+    const oFilter = {
+        BookingID: [sBookingID]
+    };
+
+    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
+    this.getView().setModel(
+    new JSONModel(oBookingData.commentData[0]),
+    "BookinglocalModel"
+);
+
+// this.getView().setModel(oBookingModel, "BookinglocalModel");
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
@@ -2995,8 +3010,10 @@ sap.ui.define([
                         doc.text("Transaction History", margin, currentY);
 
                         currentY += 5;
-
-                        const paymentBody = paymentdata.commentData.map((item, index) => ([
+                          const aSortedPayments = paymentdata.commentData.sort(function (a, b) {
+                        return new Date(b.Date) - new Date(a.Date);
+                          });
+                        const paymentBody = aSortedPayments.map((item, index) => ([
                             index + 1,
                             Formatter.formatDate(item.Date),
                             item.PaymentType || "",

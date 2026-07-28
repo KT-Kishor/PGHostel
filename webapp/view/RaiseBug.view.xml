@@ -62,8 +62,7 @@
                 mode="SingleSelectLeft"
                 width="auto"
 				selectionChange="onBugTableSelectionChange"
-                busyIndicatorDelay="0"
-                items="{path: 'RaiseBugModel>/',sorter: {path: 'Status', group: true}}" >
+                items="{path: 'RaiseBugModel>/',sorter: {path: 'Status', group: true}, length:1000}" >
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>

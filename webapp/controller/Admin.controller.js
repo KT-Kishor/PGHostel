@@ -17,7 +17,7 @@ sap.ui.define([
 
         _onRouteMatched: async function (oEvent) {
             this.getBusyDialog();
-            this.getView().setModel(new JSONModel({}), "HostelModel");
+            this.getView().setModel(new JSONModel([]), "HostelModel");
 
             var LoginFUnction = await this.commonLoginFunction("ManageCustomer");
             if (!LoginFUnction) return;
