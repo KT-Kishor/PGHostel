@@ -2925,6 +2925,9 @@ sap.ui.define([
             aControls.forEach(function (oControl) {
                 oControl.setValueState("None");
             });
-        }
+        },
+        onAmenityImageError: function (oEvent) {
+            oEvent.getSource().setSrc("./image/no-image.png");
+        },
     });
 });

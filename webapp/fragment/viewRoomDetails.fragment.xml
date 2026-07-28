@@ -7,7 +7,6 @@
     xmlns:et="sap.m"
     xmlns:card="sap.ui.integration.widgets"
 >
- 
     <Dialog
         id="roomDetailID"
         initialFocus="focus"
@@ -23,8 +22,8 @@
             <Bar class="barheader">
                 <contentMiddle>
                     <!-- <Title text="{HostelModel>/BedType}" />-->
-                    <core:Icon src="sap-icon://building" /> 
-                    <Title text="{HostelModel>/Area}"/>
+                    <core:Icon src="sap-icon://building" />
+                    <Title text="{HostelModel>/Area}" />
                 </contentMiddle>
                 <contentRight>
                     <Button
@@ -104,36 +103,33 @@
                                     class="descTextLarge"
                                 />
                             </VBox>
-                                                       
+
                             <!-- sap-icon://along-stacked-chart -->
                         </VBox>
                     </l:content>
                     <!-- <Title text="{HostelModel>/Address}" /> -->
+                </l:Grid>
 
-                </l:Grid>               
-                
-                
-                
-<!-- Replace the existing HBox section with this enhanced version -->
-<HBox
-    class="AddressBox AddressInline sapUiSmallMarginBegin sapUiMediumMarginEnd"
-    alignItems="Center"
-    renderType="Bare"
->
-    <core:Icon
-        src="sap-icon://addresses"
-        size="1.5rem"
-        class="AddressIcon"
-    />
+                <!-- Replace the existing HBox section with this enhanced version -->
+                <HBox
+                    class="AddressBox AddressInline sapUiSmallMarginBegin sapUiMediumMarginEnd"
+                    alignItems="Center"
+                    renderType="Bare"
+                >
+                    <core:Icon
+                        src="sap-icon://addresses"
+                        size="1.5rem"
+                        class="AddressIcon"
+                    />
 
-    <Link
-        text="{HostelModel>/Address}"
-        class="AddressTextLarge"
-        wrapping="true"
-        press=".onAddressClick"
-        tooltip="Open in Google Maps"
-    />
-</HBox>
+                    <Link
+                        text="{HostelModel>/Address}"
+                        class="AddressTextLarge"
+                        wrapping="true"
+                        press=".onAddressClick"
+                        tooltip="Open in Google Maps"
+                    />
+                </HBox>
                 <FlexBox
                     id="priceFlex"
                     class="priceFlex sapUiSmallMarginTop"
@@ -185,7 +181,7 @@
                                 />
                             </customData>
                         </GenericTile>
-                     
+
                         <GenericTile
                             id="bookTile"
                             class="priceItem defaultTile bookNowTile"
@@ -198,7 +194,7 @@
                 </FlexBox>
                 <!-- Facilities Header -->
                 <VBox
-                   visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }"
+                    visible="{= ${FacilityModel>/Facilities}.length > 0 || ${FacilityModel>/loading} }"
                 >
                     <Bar
                         id="focus"
@@ -226,6 +222,7 @@
                                 <Image
                                     src="{FacilityModel>Image}"
                                     class="unifiedCardImg"
+                                    error=".onAmenityImageError"
                                 />
                                 <Text
                                     text="{FacilityModel>FacilityName}"
@@ -239,8 +236,10 @@
                         </items>
                     </HBox>
                 </VBox>
-               
-                    <VBox visible="{= !${AmenityModel>/loading} &amp;&amp; ${AmenityModel>/Amenities}.length > 0 }">
+
+                <VBox
+                    visible="{= !${AmenityModel>/loading} &amp;&amp; ${AmenityModel>/Amenities}.length > 0 }"
+                >
                     <Bar
                         design="Header"
                         class="sapUiMediumMarginTop"
@@ -260,7 +259,9 @@
                                 <Image
                                     src="{AmenityModel>ImageSrc}"
                                     class="unifiedCardImg"
+                                    error=".onAmenityImageError"
                                 />
+
                                 <Text
                                     text="{AmenityModel>FacilityName}"
                                     class="unifiedCardTitle"
