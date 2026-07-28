@@ -56,7 +56,7 @@
                     </fb:FilterGroupItem>
                     <fb:FilterGroupItem
                         name="BookingID"
-                        label="{i18n>bookingID}"
+                        label="{i18n>bookingCustomer}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -64,33 +64,15 @@
                             <ComboBox
                                 id="P_id_BookingID"
                                 filterSecondaryValues="true"
-                                placeholder="Select Booking ID"
+                                showSecondaryValues="true"
+                                placeholder="Select Booking ID / Customer Name"
                                 items="{path:'BookingFilterModel>/', sorter:{path:'BookingID', descending:false}}"
                                 showClearIcon="true"
                             >
-                                <core:Item
+                                <core:ListItem
                                     key="{BookingFilterModel>BookingID}"
                                     text="{BookingFilterModel>BookingID}"
-                                />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
-                    <fb:FilterGroupItem
-                        name="CustomerName"
-                        label="{i18n>customerName}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="P_id_CustomerName"
-                                items="{path:'CustomerFilterModel>/', sorter:{path:'text', descending:false}}"
-                                showClearIcon="true"
-                                placeholder="{i18n>selectCustomerName}"
-                            >
-                                <core:Item
-                                    key="{CustomerFilterModel>key}"
-                                    text="{CustomerFilterModel>text}"
+                                    additionalText="{BookingFilterModel>CustomerName}"
                                 />
                             </ComboBox>
                         </fb:control>

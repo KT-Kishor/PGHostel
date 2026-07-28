@@ -76,7 +76,6 @@ sap.ui.define([
         prepareMasterFilterData: function (aData) {
             const mBranch = new Map();
             const mBooking = new Map();
-            const mCustomer = new Map();
             const mTransaction = new Map();
 
             aData.forEach(item => {
@@ -88,13 +87,8 @@ sap.ui.define([
                 }
                 if (item.BookingID && !mBooking.has(item.BookingID)) {
                     mBooking.set(item.BookingID, {
-                        BookingID: item.BookingID
-                    });
-                }
-                if (item.CustomerName && item.CustomerName.trim() && !mCustomer.has(item.CustomerName)) {
-                    mCustomer.set(item.CustomerName, {
-                        key: item.CustomerName,
-                        text: item.CustomerName
+                        BookingID: item.BookingID,
+                        CustomerName: item.CustomerName
                     });
                 }
                 if (item.BankTransactionID && item.BankTransactionID.trim() && !mTransaction.has(item.BankTransactionID)) {
@@ -107,7 +101,6 @@ sap.ui.define([
 
             this.getView().setModel(new JSONModel([...mBranch.values()]), "BranchFilterModel");
             this.getView().setModel(new JSONModel([...mBooking.values()]), "BookingFilterModel");
-            this.getView().setModel(new JSONModel([...mCustomer.values()]), "CustomerFilterModel");
             this.getView().setModel(new JSONModel([...mTransaction.values()]), "TransactionFilterModel");
         },
 
@@ -116,7 +109,6 @@ sap.ui.define([
             const oLogin = this.getOwnerComponent().getModel("LoginModel").getData();
             const oDateRange = this.byId("P_id_Date");
             const sBookingID = oView.byId("P_id_BookingID").getSelectedKey() || oView.byId("P_id_BookingID").getValue();
-            const sCustomerName = oView.byId("P_id_CustomerName").getSelectedKey() || oView.byId("P_id_CustomerName").getValue();
             const sTransactionID = oView.byId("P_id_TransactionID").getSelectedKey() || oView.byId("P_id_TransactionID").getValue();
             let sBranch = "";
             const oBranchCombo = oView.byId("P_id_BranchCode");
@@ -188,9 +180,6 @@ sap.ui.define([
                 }
 
                 // Client-side filters (not sent to backend)
-                if (sCustomerName) {
-                    oDatas = oDatas.filter(item => item.CustomerName === sCustomerName);
-                }
                 if (sTransactionID) {
                     oDatas = oDatas.filter(item => item.BankTransactionID === sTransactionID);
                 }
@@ -214,6 +203,13 @@ sap.ui.define([
             const oCombo = this.byId("P_id_BranchCode");
             if (oCombo) {
                 oCombo.setFilterFunction((sTerm, oItem) => {
+                    sTerm = sTerm.toLowerCase();
+                    return ((oItem.getText() || "").toLowerCase().includes(sTerm) || (oItem.getAdditionalText() || "").toLowerCase().includes(sTerm));
+                });
+            }
+            const oBookingCombo = this.byId("P_id_BookingID");
+            if (oBookingCombo) {
+                oBookingCombo.setFilterFunction((sTerm, oItem) => {
                     sTerm = sTerm.toLowerCase();
                     return ((oItem.getText() || "").toLowerCase().includes(sTerm) || (oItem.getAdditionalText() || "").toLowerCase().includes(sTerm));
                 });
@@ -242,9 +238,8 @@ sap.ui.define([
         FC_onPressClear: function () {
             const oView = this.getView();
             oView.byId("P_id_BookingID").setSelectedKey("");
+            oView.byId("P_id_BookingID").setValue("");
             oView.byId("P_id_BranchCode").setSelectedKey("");
-            oView.byId("P_id_CustomerName").setSelectedKey("");
-            oView.byId("P_id_CustomerName").setValue("");
             oView.byId("P_id_TransactionID").setSelectedKey("");
             oView.byId("P_id_TransactionID").setValue("");
             const oDate = oView.byId("P_id_Date");
