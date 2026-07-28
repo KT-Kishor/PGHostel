@@ -254,7 +254,7 @@ sap.ui.define([
                 const oCard = new sap.ui.integration.widgets.Card({
                     manifest: "cards/CustomerCard.json",
                     parameters: {
-                        CustomerName: this._getCustomerName(f.CustomerID),
+                        CustomerName: f.CustomerName,
                         BedType: f.BedType,
                         OverallRating: Number(f.OverallRating),
                         CleanlinessRating: Number(f.CleanlinessRating),
