@@ -40,16 +40,16 @@
                         <fb:control>
                             <ComboBox
                                 id="P_id_BranchCode"
-                                items="{BranchFilterModel>/}"
+                                items="{BranchModel>/}"
                                 showClearIcon="true"
                                 filterSecondaryValues="true"
                                 placeholder="Select Branch ID / Name"
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
-                                    key="{BranchFilterModel>BranchCode}"
-                                    text="{BranchFilterModel>BranchCode}"
-                                    additionalText="{BranchFilterModel>Name}"
+                                    key="{BranchModel>BranchID}"
+                                    text="{BranchModel>BranchID}"
+                                    additionalText="{BranchModel>Name}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -174,7 +174,7 @@
                             tooltip="{i18n>paymentType}"
                         />
                     </Column>
-                    <Column
+                    <!-- <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
                     >
@@ -182,7 +182,7 @@
                             text="{i18n>bankName}"
                             tooltip="{i18n>bankName}"
                         />
-                    </Column>
+                    </Column> -->
                     <Column
                         demandPopin="true"
                         minScreenWidth="Tablet"
@@ -203,7 +203,7 @@
                             />
                             <Text text="{mainModel>BankTransactionID}" />
                              <Text text="{mainModel>PaymentType}" />
-                            <Text text="{mainModel>BankName}" />
+                            <!-- <Text text="{mainModel>BankName}" /> -->
                             <Text
                                 text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"
                             />
