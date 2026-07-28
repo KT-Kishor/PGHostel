@@ -1445,6 +1445,7 @@ sap.ui.define([
                 AppliedDiscount: oBooking.Discount || 0,
                 AppliedCouponCode: oBooking.CouponCode || "",
                 CouponCode: oBooking.CouponCode || "",
+                OriginalCouponCode: oBooking.CouponCode || "",
                 AppliedCouponData: null,
 
                 // Members & Facilities

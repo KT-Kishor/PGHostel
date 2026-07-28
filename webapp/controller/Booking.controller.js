@@ -5370,6 +5370,11 @@
                 return;
             }
 
+            // Always reset any previously applied coupon before validating the new one,
+            // so a rejected attempt never leaves a stale discount on the grand total.
+            this._resetCouponState(true);
+            this._recalculateSummary();
+
             try {
                 this.getBusyDialog();
                 const oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
@@ -5390,7 +5395,10 @@
                     return;
                 }
 
-                if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
+                var sOriginalCouponCode = String(oModel.getProperty("/OriginalCouponCode") || "").trim();
+                var bIsOriginalCoupon = sOriginalCouponCode && sEnteredCode.toUpperCase() === sOriginalCouponCode.toUpperCase();
+
+                if (!bIsOriginalCoupon && Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
                     oModel.setProperty("/CouponCode", "");
                     MessageToast.show("This coupon cannot be applied to this booking");
                     return;
