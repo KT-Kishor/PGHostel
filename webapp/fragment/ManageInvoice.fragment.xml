@@ -31,7 +31,6 @@
             >
                 <f:content>
                  <Label
-                   id="id_Payment"
                     text="Payment Mode"
                     required="true"
                 />

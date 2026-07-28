@@ -690,7 +690,21 @@ sap.ui.define([
 
         },
 
+        statusFormatter: function (sDueAmount, sReceivedAmount) {
 
+            const dueAmount = parseFloat(sDueAmount) || 0;
+            const receivedAmount = parseFloat(sReceivedAmount) || 0;
+
+            if (receivedAmount <= 0) {
+                return "Submitted";
+            }
+
+            if (dueAmount === 0) {
+                return "Payment Received";
+            }
+
+            return "Payment Partially";
+        }
 
     }
 });

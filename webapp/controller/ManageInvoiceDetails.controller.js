@@ -204,7 +204,7 @@ sap.ui.define([
                         oCustomerCombo.setEditable(true);
                         await this.onSearch();
                     }
-                    if(this.BookingID) this.onChangeAddCustomer(this.BookingID);
+                    if (this.BookingID) this.onChangeAddCustomer(this.BookingID);
 
                     this.closeBusyDialog()
 
@@ -502,14 +502,14 @@ sap.ui.define([
                         .map(item => ({
                             BookingID: item.BookingID,
                             Status: item.Status,
-                            CustomerName:item.CustomerName
+                            CustomerName: item.CustomerName
                         }));
-                        ManageModel.setProperty("/CustomerName",bookingList[0]?.CustomerName);
+                    ManageModel.setProperty("/CustomerName", bookingList[0]?.CustomerName);
                     if (!bookingList.length) {
                         return;
                     }
 
-                    this.getView().setModel(new sap.ui.model.json.JSONModel(bookingList),"BookingModel");
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(bookingList), "BookingModel");
 
                     this.byId("CID_id_AddBooking").setSelectedKey("");
 
@@ -1710,45 +1710,52 @@ sap.ui.define([
 
             CI_onSelectCGST: function (oEvent) {
 
-                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData()
                 const bSelected = oEvent.getParameter("selected");
                 const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
-                const CustomerData = oCustomerModel.getData();
 
-                var Branch = BranchData.find((item) => {
-                    return item.BranchID === CustomerData.BranchCode
-                })
-
-                if (bSelected) {
-                    oCustomerModel.setProperty("/Type", "CGST/SGST");
-                    oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
-                    oCustomerModel.setProperty("/IGSTSelected", false);
-                } else {
-                    oCustomerModel.setProperty("/Type", "");
-                    oCustomerModel.setProperty("/Value", Branch.Value);
+                // Prevent deselect
+                if (!bSelected) {
+                    oCustomerModel.setProperty("/CGSTSelected", true);
+                    return;
                 }
+
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                    this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                const CustomerData = oCustomerModel.getData();
+                const Branch = BranchData.find(item => item.BranchID === CustomerData.BranchCode);
+
+                oCustomerModel.setProperty("/CGSTSelected", true);
+                oCustomerModel.setProperty("/IGSTSelected", false);
+
+                oCustomerModel.setProperty("/Type", "CGST/SGST");
+                oCustomerModel.setProperty("/Value", Number(CustomerData.Value) / 2);
 
                 this.totalAmountCalculation();
             },
 
             CI_onSelectIGST: function (oEvent) {
-                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData()
+
                 const bSelected = oEvent.getParameter("selected");
                 const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
-                const CustomerData = oCustomerModel.getData();
 
-                var Branch = BranchData.find((item) => {
-                    return item.BranchID === CustomerData.BranchCode
-                })
-
-                if (bSelected) {
-                    oCustomerModel.setProperty("/Type", "IGST");
-                    oCustomerModel.setProperty("/Value", Branch.Value);
-                    oCustomerModel.setProperty("/CGSTSelected", false);
-                } else {
-                    oCustomerModel.setProperty("/Type", "");
-                    oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
+                // Prevent deselect
+                if (!bSelected) {
+                    oCustomerModel.setProperty("/IGSTSelected", true);
+                    return;
                 }
+
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                    this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                const CustomerData = oCustomerModel.getData();
+                const Branch = BranchData.find(item => item.BranchID === CustomerData.BranchCode);
+
+                oCustomerModel.setProperty("/IGSTSelected", true);
+                oCustomerModel.setProperty("/CGSTSelected", false);
+
+                oCustomerModel.setProperty("/Type", "IGST");
+                oCustomerModel.setProperty("/Value", Number(Branch.Value));
 
                 this.totalAmountCalculation();
             },
@@ -1772,7 +1779,7 @@ sap.ui.define([
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
 
-            onPressUpdateInvoice: async function () {
+            onPressUpdateInvoice: async function (Value) {
                 try {
                     // var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bIsValid =
@@ -1838,7 +1845,7 @@ sap.ui.define([
                             this.visiablityPlay.setProperty("/MultiEmail", false);
                             // this.visiablityPlay.setProperty("/Edit", false);
                         }
-                        MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
+                        if (Value !== "Dont Show") MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
                         this.closeBusyDialog()
                     } catch (error) {
                         this.closeBusyDialog()
@@ -1852,6 +1859,9 @@ sap.ui.define([
 
             onChangeInvoiceStatus: function (oEventOrStatus) {
                 var that = this;
+                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+
+                this.OldStatus = this.Status
                 var status = "";
 
                 if (that.oDialog) {
@@ -1859,7 +1869,6 @@ sap.ui.define([
                     that.oDialog = null;
                 }
 
-                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
                 if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
                     var oSource = oEventOrStatus.getSource();
                     status = oSource.getValue();
@@ -2089,6 +2098,20 @@ sap.ui.define([
                     invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
                     invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
+                    // ---- GST checkbox derived selection ----
+                    const igst = parseFloat(invoiceData.IGST) || 0;
+                    const cgst = parseFloat(invoiceData.CGST) || 0;
+                    const sgst = parseFloat(invoiceData.SGST) || 0;
+
+                    // reset first
+                    invoiceData.IGSTSelected = false;
+                    invoiceData.CGSTSelected = false;
+
+                    if (igst > 0) {
+                        invoiceData.IGSTSelected = true;
+                    } else if (cgst > 0 || sgst > 0) {
+                        invoiceData.CGSTSelected = true;
+                    }
                     this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
                     this.Status = invoiceData.Status;
                     this._previousInvoiceStatus = invoiceData.Status;
@@ -2208,7 +2231,7 @@ sap.ui.define([
                     });
 
                     if (oData && oData.success) {
-                        this.oDialog.close();
+                        // this.oDialog.close();
                         await this.Readcall("HM_ManageInvoice", {
                             InvNo: this.decodedPath
                         });
@@ -2232,7 +2255,7 @@ sap.ui.define([
                             this.oDialog.destroy();
                             this.oDialog = null;
                         }
-
+                        this.onPressUpdateInvoice("Dont Show");
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         MessageToast.show(this.i18nModel.getText("paymentMessage"));
                     }
@@ -2244,6 +2267,9 @@ sap.ui.define([
             },
 
             onPressInvClose: function () {
+                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+                oSelectedModel.setProperty("/Status", this.OldStatus);
+
                 sap.ui.getCore().byId("MI_id_TransactionID").setValueState("None");
                 sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");

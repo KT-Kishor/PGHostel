@@ -258,7 +258,7 @@
                                             editable="false"
                                             maxLength="15"
                                         />
-										<m:Label
+										<!-- <m:Label
                                             visible="{visiablityPlay>/igstVisi}"
                                             text="{i18n>igst}"
                                             required="true"
@@ -268,7 +268,7 @@
                                             value="{path:'SelectedCustomerModel>/IGST',formatter: '.Formatter.fromatNumber'}"
                                             editable="false"
                                             maxLength="15"
-                                        />
+                                        /> -->
 										<m:Label
                                             visible="{visiablityPlay>/gstVisiable}"
                                             text="{i18n>sgst}"
@@ -339,7 +339,7 @@
 										<m:Label text="{i18n>type}" required="{SelectedCustomerModel>/GSTValid}"/>
 										<m:CheckBox text="{i18n>cgst}" id="CID_id_CheckboxCGST" selected="{SelectedCustomerModel>/CGSTSelected}" select="CI_onSelectCGST"  editable="{visiablityPlay>/editable}" />
 										<m:CheckBox text="{i18n>igst}" id="CDI_id_CheckboxIGST" selected="{SelectedCustomerModel>/IGSTSelected}" select="CI_onSelectIGST"  editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>percentage}" required="{SelectedCustomerModel>/GSTValid}" />
+										<m:Label text="{i18n>taxPercentage}" required="{SelectedCustomerModel>/GSTValid}" />
 										<m:Input value="{SelectedCustomerModel>/Value}" liveChange="CI_onPercentageChange" editable="{visiablityPlay>/editable}" maxLength="10" />
 										<m:Label text="{i18n>address}" />
 										<m:TextArea
@@ -408,13 +408,12 @@
                                             items="{CompanyInvoiceStatus>/}"
                                             value="{SelectedCustomerModel>/Status}"
                                             editable="{visiablityPlay>/CInvoice}"
-                                            change="onChangeInvoiceStatus"
-                                        >
-											<core:Item
+                                            change="onChangeInvoiceStatus">
+
+                                            <core:Item
                                                 key="{CompanyInvoiceStatus>InvoiceStatus}"
-                                                text="{CompanyInvoiceStatus>InvoiceStatus}"
-                                            />
-										</m:ComboBox>
+                                                text="{CompanyInvoiceStatus>InvoiceStatus}" />
+                                        </m:ComboBox>
 									</f:content>
 								</f:SimpleForm>
 							</blocks>
