@@ -536,8 +536,8 @@ sap.ui.define([
                     RefundPaymentpaid: RefundPaymentpaid || "0.00",
                     StartDate: this.Formatter.DateFormat(oCustomer.Bookings?.[0]?.StartDate || ""),
                     minStartDate: new Date(oCustomer.Bookings?.[0]?.StartDate || ""),
-                    GSTType: oCustomer.Bookings?.[0]?.GSTType || "",
-                    GSTValue: oCustomer.Bookings?.[0]?.GSTValue || "",
+                    GSTType: Branch.Type || "",
+                    GSTValue: Branch.Value || "",
                     orgGSTValue: Branch.Value || "",
                     GSTIN: Branch.GSTIN || "",
                     BranchName: Branch.Name || "",
@@ -737,7 +737,7 @@ sap.ui.define([
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode, Deposit)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer);
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer,Branch);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -755,7 +755,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer,Branch) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -899,13 +899,13 @@ sap.ui.define([
             let CGST = 0;
             let IGST = 0;
             let grandTotal = 0;
-            if (oCustomer.Bookings?.[0]?.GSTType === "IGST") {
-                IGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+            if (Branch.Type === "IGST") {
+                IGST = SubTotal * Branch.Value / 100;
                 grandTotal = SubTotal + IGST;
 
             } else {
-                SGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
-                CGST = SubTotal * oCustomer.Bookings?.[0]?.GSTValue / 100;
+                SGST = SubTotal * Branch.Value / 100;
+                CGST = SubTotal * Branch.Value / 100;
                 grandTotal = SubTotal + SGST + CGST;
 
             }
@@ -4597,8 +4597,6 @@ sap.ui.define([
                     "Discount": CustomerData.Discount || 0,
                     "CouponCode": Bookingdata.CouponCode,
                     "TotalRoomprice": CustomerData.RentPrice,
-                    "GSTType": CustomerData.GSTType,
-                    "GSTValue": CustomerData.GSTValue,
                     "MemberID": SelectedmemberIds,
                     "AdminUpdated": "YES",
                     "Status": CustomerData.Status,
@@ -5972,21 +5970,21 @@ sap.ui.define([
             }
 
             // Set values
-            sap.ui.getCore().byId("idBranchGSTNumber")
-                .setValue(CustData.GSTIN || "");
+            // sap.ui.getCore().byId("idBranchGSTNumber")
+            //     .setValue(CustData.GSTIN || "");
 
             sap.ui.getCore().byId("idGSTNumber")
                 .setValue(CustData.CustomerGSTIN || "").setValueState("None");
 
-            sap.ui.getCore().byId("idGSTPercentage")
-                .setValue(CustData.GSTValue || "");
+            // sap.ui.getCore().byId("idGSTPercentage")
+            //     .setValue(CustData.GSTValue || "");
 
 
 
-            sap.ui.getCore().byId("idGSTType")
-                .setSelectedIndex(
-                    CustData.GSTType === "CGST/SGST" ? 1 : 0
-                );
+            // sap.ui.getCore().byId("idGSTType")
+            //     .setSelectedIndex(
+            //         CustData.GSTType === "CGST/SGST" ? 1 : 0
+            //     );
 
             sap.ui.getCore().byId("idCompanyName")
                 .setValue(CustData.CustCompanyName || "").setValueState("None");
@@ -5995,20 +5993,20 @@ sap.ui.define([
                 .setValue(CustData.CustCompanyAddress || "").setValueState("None");
 
             // Branch GST visibility
-            var bHasBranchGST = !!(
-                CustData.GSTIN ||
-                CustData.GSTValue ||
-                CustData.GSTType
-            );
+            // var bHasBranchGST = !!(
+            //     CustData.GSTIN ||
+            //     CustData.GSTValue ||
+            //     CustData.GSTType
+            // );
 
-            sap.ui.getCore().byId("idBranchGSTNumber")
-                .setVisible(!!CustData.GSTIN);
+            // sap.ui.getCore().byId("idBranchGSTNumber")
+            //     .setVisible(!!CustData.GSTIN);
 
-            sap.ui.getCore().byId("idGSTPercentage")
-                .setVisible(!!CustData.GSTValue && CustData.GSTValue !== "0");
+            // sap.ui.getCore().byId("idGSTPercentage")
+            //     .setVisible(!!CustData.GSTValue && CustData.GSTValue !== "0");
 
-            sap.ui.getCore().byId("idGSTType")
-                .setVisible(!!CustData.GSTType);
+            // sap.ui.getCore().byId("idGSTType")
+            //     .setVisible(!!CustData.GSTType);
 
             // ALWAYS show customer fields
             sap.ui.getCore().byId("idGSTNumber")
@@ -6202,23 +6200,23 @@ sap.ui.define([
                 );
                 return;
             }
-            var GSTType = this.sSelectedText
-                ? this.sSelectedText
-                : (sap.ui.getCore().byId("idGSTType").getSelectedIndex() === 0
-                    ? "IGST"
-                    : "CGST/SGST");
-            var GSTValue = GSTType === "IGST"
-                ? Number(CustData.orgGSTValue)
-                : Number(CustData.orgGSTValue) / 2;
+            // var GSTType = this.sSelectedText
+            //     ? this.sSelectedText
+            //     : (sap.ui.getCore().byId("idGSTType").getSelectedIndex() === 0
+            //         ? "IGST"
+            //         : "CGST/SGST");
+            // var GSTValue = GSTType === "IGST"
+            //     ? Number(CustData.orgGSTValue)
+            //     : Number(CustData.orgGSTValue) / 2;
 
             var payload = {
                 CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
                 CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
                 CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
-                BookingID: CustData.BookingID,
-                GSTType: this.sSelectedText,
-                GSTValue: GSTValue,
-                GST: ""
+                BookingID: CustData.BookingID
+                // GSTType: this.sSelectedText,
+                // GSTValue: GSTValue,
+                // GST: ""
             };
 
             this.getBusyDialog();
@@ -8059,7 +8057,7 @@ sap.ui.define([
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
                                 this.qty = `(${item.quantity || 1} Qty)`
-                                sUnitText = `${sUnitText}`;
+                                sUnitText = `${sUnitText} / Entire Stay`;
                             } else {
                                 const dailyQty = Number(item.quantity) || 1;
                                 const totalQty = dailyQty * diffDays;

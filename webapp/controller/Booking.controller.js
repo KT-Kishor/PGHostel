@@ -6832,7 +6832,7 @@
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
                                 this.qty=`(${item.Quantity || 1} Qty)`
-                                sUnitText = `${sUnitText}`;
+                                sUnitText = `${sUnitText} / Entire Stay`;
                             } else {
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;

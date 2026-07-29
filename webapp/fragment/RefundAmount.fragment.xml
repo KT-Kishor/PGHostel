@@ -49,7 +49,7 @@
                     placeholder="Select payment mode"
                     selectedKey="{RefundModel>/PaymentMode}"
                     valueStateText="Select payment mode"
-                    change="onPaymentModeChange"
+                    change="onPaymentModerefundChange"
                 >
                     <core:ListItem
                         key="UPI"
@@ -58,10 +58,6 @@
                     <core:ListItem
                         key="Cash"
                         text="Cash"
-                    />
-                    <core:ListItem
-                        key="Card"
-                        text="Card"
                     />
                 </ComboBox>
 

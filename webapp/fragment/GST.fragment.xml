@@ -30,7 +30,7 @@
             columnsM="1"
         >
             <f:content>
-                <Label
+                <!-- <Label
                     text="Branch GSTIN"
                     visible="{= ${GSTModel>/BranchGSTNumber} ? true : false }"
                 />
@@ -70,7 +70,7 @@
                         <RadioButton text="IGST" />
                         <RadioButton text="CGST/SGST" />
                     </buttons>
-                </RadioButtonGroup>
+                </RadioButtonGroup> -->
                 <Label
                     text="Cusomer GSTIN"
                     required="true"
