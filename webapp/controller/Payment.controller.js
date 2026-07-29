@@ -170,6 +170,7 @@ sap.ui.define([
                     const branch = branchData.find(br => br.BranchID === item.BranchCode);
                     return {
                         ...item,
+                        Payment: item.Payment,
                         BranchName: branch ? branch.Name : item.BranchCode
                     };
                 });
@@ -281,8 +282,8 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Bank Name",
-                property: "BankName",
+                label: "Refund / Paid Amount",
+                property: "Payment",
                 type: "string"
             },
             {

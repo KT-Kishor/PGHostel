@@ -188,6 +188,16 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
+                            text="{i18n>refundPaidAmount}"
+                            tooltip="{i18n>refundPaidAmount}"
+                        />
+                    </Column>
+
+                    <Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+                        <Text
                             text="{i18n>amount}"
                             tooltip="{i18n>amount}"
                         />
@@ -204,6 +214,8 @@
                             <Text text="{mainModel>BankTransactionID}" />
                              <Text text="{mainModel>PaymentType}" />
                             <!-- <Text text="{mainModel>BankName}" /> -->
+                            <Text text="{mainModel>Payment}" />
+
                             <Text
                                 text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"
                             />
