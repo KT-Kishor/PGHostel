@@ -73,11 +73,11 @@ sap.ui.define([
             this.CommonLogoutFunction();
         },
 
-        _onRouteMatched: async function () {
+        _onRouteMatched: async function (oEvent) {
             this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("ManageSecurityDeposit");
             if (!LoginFUnction) return;
-
+           this._sFrom = oEvent.getParameter("arguments").from || "";
             // Bind LoginModel to the view
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
@@ -1143,16 +1143,24 @@ sap.ui.define([
             // Intentionally empty to prevent auto-search
         },
 
-        onNavBack: function () {
-            var oHistory = sap.ui.core.routing.History.getInstance();
-            var sPreviousHash = oHistory.getPreviousHash();
-            if (sPreviousHash !== undefined) {
-                window.history.go(-1);
-            } else {
-                var oRouter = this.getOwnerComponent().getRouter();
-                oRouter.navTo("TilePage", {}, true);
-            }
-        },
+       onNavBack: function () {
+    var oRouter = this.getOwnerComponent().getRouter();
+    if (this._sFrom === "Invoice") {
+        oRouter.navTo("RouteAdmin", { sPath:"TilePage"}, true);   // Replace with your actual route
+        return;
+    }else{
+         oRouter.navTo("TilePage", {}, true);
+    }
+
+    var oHistory = sap.ui.core.routing.History.getInstance();
+    var sPreviousHash = oHistory.getPreviousHash();
+
+    if (sPreviousHash !== undefined) {
+        window.history.go(-1);
+    } else {
+        oRouter.navTo("TilePage", {}, true);
+    }
+},
       onPressEditDeposit: function () {
 
     var oTable = this.byId("depositTable");

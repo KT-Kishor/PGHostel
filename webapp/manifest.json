@@ -339,7 +339,7 @@
         },
         {
           "name": "RouteDeposit",
-          "pattern": "Deposit",
+          "pattern": "Deposit/{from}",
           "target": [
             "TargetDeposit"
           ]

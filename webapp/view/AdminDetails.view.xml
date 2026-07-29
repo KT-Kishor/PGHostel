@@ -1000,6 +1000,7 @@
                 </FlexBox>
                 </contentLeft>
                 <contentRight>
+                <Button id="" text="{i18n>deposit}" class="myUnifiedBtn" press="onPressDeposit" visible="{= ${CustomerData>/Status} === 'Completed'}"/>
                     <!-- Confirm -->
                     <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} === 'Assigned'}"/>
 

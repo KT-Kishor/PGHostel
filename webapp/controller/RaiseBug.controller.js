@@ -24,6 +24,22 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().byId("RB_id_RaisedBy1").setSelectedKey("")
             this.getView().byId("RB_id_Status").setSelectedKey("")
+             var oDateRange = this.byId("RB_id_Dates");
+
+                var oToday = new Date();
+
+                // First day of the month, 2 months back
+                var oStartDate = new Date(
+                    oToday.getFullYear(),
+                    oToday.getMonth() - 3,
+                    1
+                );
+                
+                // Today
+                var oEndDate = new Date();
+
+                oDateRange.setDateValue(oStartDate);
+                oDateRange.setSecondDateValue(oEndDate);
             this.CD_read()
             this._loadAllFilterData()
         },
@@ -31,16 +47,30 @@ sap.ui.define([
         SP_onPressClear: function () {
             this.getView().byId("RB_id_RaisedBy1").setSelectedKey("")
             this.getView().byId("RB_id_Status").setSelectedKey("")
+            this.getView().byId("RB_id_RaisebugID").setSelectedKey("")
         },
 
         CD_read: async function () {
             const SRaisedBy = this.byId("RB_id_RaisedBy1").getSelectedKey() || this.byId("RB_id_RaisedBy1").getValue();
             const SStatus = this.byId("RB_id_Status").getSelectedKey() || this.byId("RB_id_Status").getValue();
+            const BugID = this.byId("RB_id_RaisebugID").getSelectedKey() || this.byId("RB_id_Status").getValue();
+            var oDateRange = this.getView().byId("RB_id_Dates");
+            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                pattern: "yyyy-MM-dd"
+            });
+            var oStartDate = oDateRange.getDateValue();
+            var oEndDate = oDateRange.getSecondDateValue();
+            
 
             let filters = {};
 
             if (SRaisedBy) filters.RaisedBy = SRaisedBy;
             if (SStatus) filters.Status = SStatus;
+            if (BugID) filters.BugID = BugID;
+             if (oStartDate && oEndDate) {
+                filters.StartDate = oDateFormat.format(oStartDate);
+                filters.EndDate = oDateFormat.format(oEndDate);
+            }
 
             this.getBusyDialog();
             await this.ajaxReadWithJQuery("HM_Bug", filters).then((oData) => {
@@ -67,7 +97,8 @@ sap.ui.define([
         _populateUniqueFilterValues: function (data) {
             let uniqueValues = {
                 RB_id_RaisedBy1: new Set(),
-                RB_id_Status: new Set()
+                RB_id_Status: new Set(),
+                RB_id_RaisebugID: new Set()
             };
 
             data.forEach(item => {
@@ -77,11 +108,14 @@ sap.ui.define([
                 if (item.Status && item.Status.trim()) {
                     uniqueValues.RB_id_Status.add(item.Status.trim());
                 }
+                if (item.BugID && item.BugID.trim()) {
+                    uniqueValues.RB_id_RaisebugID.add(item.BugID.trim());
+                }
             });
 
             let oView = this.getView();
 
-            ["RB_id_RaisedBy1", "RB_id_Status"].forEach(field => {
+            ["RB_id_RaisedBy1", "RB_id_Status","RB_id_RaisebugID"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 

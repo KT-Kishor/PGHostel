@@ -9517,6 +9517,12 @@ sap.ui.define([
                 sPath: "X" + "," + encodeURIComponent(this.getView().getModel("CustomerData").getProperty("/BookingID")),
                 dash: "ManageInvoice"
             });
+        },
+        onPressDeposit:function(){
+            var oRouter = this.getOwnerComponent().getRouter()
+           oRouter.navTo("RouteDeposit", {
+        from: "Invoice"   // any identifier for the source page
+    });
         }
     });
 });

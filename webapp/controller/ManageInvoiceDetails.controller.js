@@ -26,7 +26,6 @@ sap.ui.define([
                     sArg = "X";
                 }
 
-
                 var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
                 this.sourceView = sSource || "ManageInvoice";
 
@@ -253,8 +252,11 @@ sap.ui.define([
 
                     if (igst > 0) {
                         this.SelectedCustomerModel.setProperty("/IGSTSelected", true);
+                        this.SelectedCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+
                     } else if (cgst > 0 || sgst > 0) {
                         this.SelectedCustomerModel.setProperty("/CGSTSelected", true);
+                        this.SelectedCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
                     }
 
                     const aItems = oData.data.ManageInvoiceItem.map((item, index) => ({
@@ -1745,7 +1747,7 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/Type", "CGST/SGST");
                 oCustomerModel.setProperty("/Value", Number(CustomerData.Value) / 2);
-
+                oCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
                 this.totalAmountCalculation();
             },
 
@@ -1771,7 +1773,7 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/Type", "IGST");
                 oCustomerModel.setProperty("/Value", Number(Branch.Value));
-
+                oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                 this.totalAmountCalculation();
             },
 
@@ -2127,7 +2129,12 @@ sap.ui.define([
                     } else if (cgst > 0 || sgst > 0) {
                         invoiceData.CGSTSelected = true;
                     }
-                    this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
+                  var oModel =  this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
+                     if (invoiceData.IGSTSelected === true) {
+                 oModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+                    } else if (invoiceData.CGSTSelected === true) {
+                 oModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                    }
                     this.Status = invoiceData.Status;
                     this._previousInvoiceStatus = invoiceData.Status;
                     return;

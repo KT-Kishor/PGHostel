@@ -42,6 +42,22 @@
 				</fb:filterGroupItems>
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
+                        name="Room No"
+                        label="{i18n>bugID}"
+                        groupName="Bugid"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="RB_id_RaisebugID"
+                                showClearIcon="true"
+                                showSecondaryValues="true">
+								<core:ListItem key="{RaiseBugModel>BugID}" text="{RaiseBugModel>BugID}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="Status"
                         label="{i18n>status}"
                         groupName="Group"
@@ -53,6 +69,23 @@
                                 showSecondaryValues="true">
 								<core:ListItem key="{RaiseBugModel>Status}" text="{RaiseBugModel>Status}"/>
 							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Status"
+                        label="{i18n>Createddate}"
+                        groupName="date"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection
+                                id="RB_id_Dates"
+                                name="Dates"
+                                delimiter="to"
+                                displayFormat="dd/MM/yyyy"
+                                valueFormat="yyyy-MM-dd"
+                            />
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
