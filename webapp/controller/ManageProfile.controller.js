@@ -141,13 +141,14 @@ sap.ui.define([
                 }
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
+                const mBranchGSTData = await this._loadBookingBranchGSTData(aBookings);
 
                 const aBranchComboData = this._prepareBranchComboData(aBookings);
                 const aAssignedRoomData = this._prepareAssignedRoomData(aBookings);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
+                const aBookingData = aBookings.map(booking => this._normalizeBookingData(booking, mBranchGSTData));
                 const hasAssignedBooking = aBookings.some(b =>
                     b.Status && b.Status.toLowerCase() === "assigned"
                 );
@@ -271,13 +272,38 @@ sap.ui.define([
             return "Others";
         },
 
-        _calculateBookingAmount: function(booking) {
-            let GSTValue = 0;
+        _loadBookingBranchGSTData: async function(aBookings) {
+            const aBranchIDs = [...new Set((aBookings || []).map(booking =>
+                String(booking.BranchCode || "").trim()
+            ).filter(Boolean))];
+            const aBranchResponses = await Promise.all(aBranchIDs.map(async sBranchID => {
+                let oBranch = {};
 
-            if (booking.GSTType === "IGST") {
-                GSTValue = Number(booking.GSTValue || 0) / 100;
-            } else {
-                GSTValue = (Number(booking.GSTValue || 0) + Number(booking.GSTValue || 0)) / 100;
+                try {
+                    const oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {
+                        BranchID: sBranchID
+                    });
+                    const aBranches = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+                    oBranch = aBranches.find(branch => branch.BranchID === sBranchID) || aBranches[0] || {};
+                } catch (oError) {
+                    console.error("Unable to load GST data for branch " + sBranchID, oError);
+                }
+
+                return [sBranchID, oBranch];
+            }));
+
+            return Object.fromEntries(aBranchResponses);
+        },
+
+        _calculateBookingAmount: function(booking, oBranchData) {
+            let GSTValue = 0;
+            const sGSTType = String(oBranchData?.Type || "").trim().toUpperCase();
+            const fGSTValue = Number(oBranchData?.Value || 0);
+
+            if (sGSTType === "IGST") {
+                GSTValue = fGSTValue / 100;
+            } else if (sGSTType === "CGST/SGST") {
+                GSTValue = (fGSTValue + fGSTValue) / 100;
             }
 
             const roomPrice = Number(booking.TotalRoomprice || 0);
@@ -289,11 +315,13 @@ sap.ui.define([
             return amount.toString();
         },
 
-        _normalizeBookingData: function(booking) {
+        _normalizeBookingData: function(booking, mBranchGSTData) {
             const sCustomerName = [
                 booking.Salutation || "",
                 booking.CustomerName || ""
             ].join(" ").trim();
+            const sBranchCode = String(booking.BranchCode || "").trim();
+            const oBranchData = mBranchGSTData?.[sBranchCode] || {};
 
             return {
                 bookingGroup: this._getBookingGroup(booking),
@@ -312,9 +340,13 @@ sap.ui.define([
 
                 room: booking.BedType || booking.RoomName || booking.RoomNumber || booking.RoomNo || "",
 
-                amount: this._calculateBookingAmount(booking),
+                amount: this._calculateBookingAmount(booking, oBranchData),
                 currency: booking.Currency || "INR",
-                status: booking.Status || booking.BookingStatus || ""
+                status: booking.Status || booking.BookingStatus || "",
+                BranchCode: sBranchCode,
+                GSTIN: oBranchData.GSTIN || "",
+                GSTType: oBranchData.Type || "",
+                GSTValue: oBranchData.Value || 0
             };
         },
 
@@ -2138,6 +2170,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 };
                 const response = await this.ajaxReadWithJQuery("CustomerAndPayment", filter);
                 const aBookings = response?.BookingData || [];
+                const mBranchGSTData = await this._loadBookingBranchGSTData(aBookings);
 
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -2175,7 +2208,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 //     };
                 // });
 
-                const aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
+                const aBookingData = aBookings.map(booking => this._normalizeBookingData(booking, mBranchGSTData));
                 oModel.setProperty("/bookings", aBookingData);
                 this._updateRowCount();
             } catch (err) {
