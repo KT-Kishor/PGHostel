@@ -702,6 +702,7 @@ sap.ui.define([
                 const aMainData = oView.getModel("mainModel").getData() || [];
                 if (this.isEdit && Payload.BranchID) {
                     delete oData.UserID;
+                    delete oData.EmailID;    
                     await this.ajaxUpdateWithJQuery("HM_Branch", {
                         data: oData,
                         filters: {

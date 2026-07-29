@@ -1423,9 +1423,9 @@ sap.ui.define([
                 BranchCode: oBooking.BranchCode || "",
                 CheckInTime: oBranchData.CheckinTime || oBooking.CheckInTime || "",
                 CheckOutTime: oBranchData.CheckoutTime || oBooking.CheckOutTime || "",
-                GSTType: oBranchData.Type || oBooking.GSTType || "",
-                GSTValue: oBranchData.Value || oBooking.GSTValue || 0,
-                GSTIN: oBranchData.GSTIN || oBooking.GSTIN || "",
+                GSTType: oBranchData.Type || "",
+                GSTValue: oBranchData.Value || 0,
+                GSTIN: oBranchData.GSTIN || "",
                 ExtraBed: iExtraBed,
                 AvailableDate: oBooking.AvailableDate || "",
 
@@ -1460,7 +1460,7 @@ sap.ui.define([
                 CompanyName: oBooking.CustCompanyName || "",
                 CompanyAddress: oBooking.CustCompanyAddress || "",
                 IsBusinessTravel: !!oBooking.CustomerGSTIN,
-                PropertyGSTIN: oBranchData.GSTIN || oBooking.GSTIN || "",
+                PropertyGSTIN: oBranchData.GSTIN || "",
 
                 // Discounts / Coupons
                 AppliedDiscount: oBooking.Discount || 0,
@@ -1784,6 +1784,17 @@ sap.ui.define([
         },
 
         _buildEditUpdatePayload: function (aData, sBookingID) {
+            (Array.isArray(aData) ? aData : []).forEach(function (oCustomer) {
+                var aBookings = Array.isArray(oCustomer && oCustomer.Booking) ? oCustomer.Booking : [];
+
+                aBookings.forEach(function (oBooking) {
+                    delete oBooking.GSTIN;
+                    delete oBooking.GSTValueGSTIN;
+                    delete oBooking.GSTValue;
+                    delete oBooking.GSTType;
+                });
+            });
+
             return {
                 data: aData,
                 filters: {
