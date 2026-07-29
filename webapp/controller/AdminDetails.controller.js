@@ -4588,7 +4588,7 @@ sap.ui.define([
                 "Booking": [{
                     "BookingDate": new Date().toISOString().split('T')[0], // current date
                     "RentPrice": CustomerData.GrandTotal,
-                    "NoOfPersons": CustomerData.NoOfPersons,
+                    "NoOfPersons": CustomerData.AllMembers.length,
                     "StartDate": Bookingdata.StartDate.split('/').reverse().join('-'),
                     "EndDate": Bookingdata.EndDate.split('/').reverse().join('-'),
                     "PaymentType": paymentMap[unit] || Bookingdata.UnitText, // fallback
