@@ -75,6 +75,7 @@ sap.ui.define([
                 oModel.setProperty("/roomNo", booking.RoomNo);
                 oModel.setProperty("/branchCode", booking.BranchCode);
                 oModel.setProperty("/BedType", booking.BedType);
+                oModel.setProperty("/customerName", booking.CustomerName);
 
             } catch (e) {
                 this._goToNotFound();
@@ -253,6 +254,7 @@ sap.ui.define([
                         WouldVisitAgain: modelData.visitAgain === "Yes",
                         FeedbackDate: new Date().toISOString().split("T")[0],
                         SubmissionTime: new Date().toTimeString().split(" ")[0],
+                        CustomerName:modelData.customerName,
                         Status: "Submitted"
                     }
                 };
