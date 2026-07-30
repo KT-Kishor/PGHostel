@@ -86,7 +86,10 @@ sap.ui.define([
             try {
                 var oResponse = await this.ajaxReadWithJQuery("CustomerAndPayment", { UserID: sUserID });
                 var aBookings = (oResponse && oResponse.BookingData) || [];
-                var aBookingData = aBookings.map(this._normalizeBookingData.bind(this));
+                var mBranchGSTData = await this._loadBookingBranchGSTData(aBookings);
+                var aBookingData = aBookings.map(function (oBooking) {
+                    return this._normalizeBookingData(oBooking, mBranchGSTData);
+                }.bind(this));
 
                 oModel.setProperty("/bookings", aBookingData);
                 oModel.setProperty("/bookingCount", aBookingData.length);
@@ -281,23 +284,54 @@ sap.ui.define([
             return "Others";
         },
 
-        _calculateBookingAmount: function (oBooking) {
-            var nGstValue = 0;
+        _loadBookingBranchGSTData: async function (aBookings) {
+            var aBranchIDs = Array.from(new Set((aBookings || []).map(function (oBooking) {
+                return String(oBooking.BranchCode || "").trim();
+            }).filter(Boolean)));
+            var aBranchResponses = await Promise.all(aBranchIDs.map(async function (sBranchID) {
+                var oBranch = {};
 
-            if (oBooking.GSTType === "IGST") {
-                nGstValue = Number(oBooking.GSTValue || 0) / 100;
-            } else {
-                nGstValue = (Number(oBooking.GSTValue || 0) + Number(oBooking.GSTValue || 0)) / 100;
+                try {
+                    var oResponse = await this.ajaxReadWithJQuery("HM_BranchData", {
+                        BranchID: sBranchID
+                    });
+                    var aBranches = Array.isArray(oResponse && oResponse.data)
+                        ? oResponse.data
+                        : (oResponse && oResponse.data ? [oResponse.data] : []);
+                    oBranch = aBranches.find(function (oBranchData) {
+                        return oBranchData.BranchID === sBranchID;
+                    }) || aBranches[0] || {};
+                } catch (oError) {
+                    console.error("Unable to load GST data for branch " + sBranchID, oError);
+                }
+
+                return [sBranchID, oBranch];
+            }.bind(this)));
+
+            return Object.fromEntries(aBranchResponses);
+        },
+
+        _calculateBookingAmount: function (oBooking, oBranchData) {
+            var nGstValue = 0;
+            var sGSTType = String(oBranchData && oBranchData.Type || "").trim().toUpperCase();
+            var nBranchGSTValue = Number(oBranchData && oBranchData.Value || 0);
+
+            if (sGSTType === "IGST") {
+                nGstValue = nBranchGSTValue / 100;
+            } else if (sGSTType === "CGST/SGST") {
+                nGstValue = (nBranchGSTValue + nBranchGSTValue) / 100;
             }
 
             return (((Number(oBooking.TotalRoomprice || 0) + Number(oBooking.FacilityPrice || 0)) - Number(oBooking.Discount || 0)) * (1 + nGstValue)).toString();
         },
 
-        _normalizeBookingData: function (oBooking) {
+        _normalizeBookingData: function (oBooking, mBranchGSTData) {
             var sCustomerName = [
                 oBooking.Salutation || "",
                 oBooking.CustomerName || ""
             ].join(" ").trim();
+            var sBranchCode = String(oBooking.BranchCode || "").trim();
+            var oBranchData = mBranchGSTData && mBranchGSTData[sBranchCode] || {};
 
             return {
                 bookingGroup: this._getBookingGroup(oBooking),
@@ -307,9 +341,13 @@ sap.ui.define([
                 BookingDate: this._formatDisplayDate(oBooking.BookingDate),
                 BookingDateSort: oBooking.BookingDate ? new Date(oBooking.BookingDate).getTime() : 0,
                 room: oBooking.BedType || oBooking.RoomName || oBooking.RoomNumber || oBooking.RoomNo || "",
-                amount: this._calculateBookingAmount(oBooking),
+                amount: this._calculateBookingAmount(oBooking, oBranchData),
                 currency: oBooking.Currency || "INR",
-                status: oBooking.Status || oBooking.BookingStatus || ""
+                status: oBooking.Status || oBooking.BookingStatus || "",
+                BranchCode: sBranchCode,
+                GSTIN: oBranchData.GSTIN || "",
+                GSTType: oBranchData.Type || "",
+                GSTValue: oBranchData.Value || 0
             };
         },
 
