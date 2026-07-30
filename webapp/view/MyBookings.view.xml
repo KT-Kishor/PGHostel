@@ -62,6 +62,10 @@
                         key="Members"
                         text="{= ${myBookings>/memberCount} > 0 ? 'Members (' + ${myBookings>/memberCount} + ')' : 'Members' }"
                     />
+                    <IconTabFilter
+                        key="Payment"
+                        text="{= ${myBookings>/paymentCount} > 0 ? 'Payment (' + ${myBookings>/paymentCount} + ')' : 'Payment' }"
+                    />
                 </items>
             </IconTabHeader>
 
@@ -199,6 +203,76 @@
                             tooltip="Upload Document"
                             press="onEditMemberFromDialog"
                             class="myUnifiedBtn"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <!-- ================= PAYMENT TABLE ================= -->
+        <Table
+            id="Id_PaymentTable1"
+            visible="{= ${myBookings>/selectedTab} === 'Payment' }"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No payments found"
+            items="{
+                path:'myBookings>/Payments',
+                sorter:[{ path:'PaymentGroup', group:true }]
+            }"
+            width="auto"
+            class="sapUiSmallMargin customRoundedTable"
+        >
+            <columns>
+                <Column demandPopin="true">
+                    <Text text="{i18n>bookingID}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>customerName}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>invoiceDate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>invoiceNo}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>totalAmount}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>invoiceDueAmount}" />
+                </Column>
+            </columns>
+
+            <items>
+                <ColumnListItem
+                    type="Navigation"
+                    press="onPressManageInvoice"
+                >
+                    <cells>
+                        <Text text="{myBookings>BookingID}" />
+                        <Text text="{myBookings>CustomerName}" />
+                        <Text
+                            text="{path:'myBookings>InvoiceDate', formatter:'.Formatter.formatDate'}"
+                        />
+                        <Text text="{myBookings>InvNo}" />
+                        <Text
+                            text="{path:'myBookings>TotalAmount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}"
+                        />
+                        <Text
+                            text="{path:'myBookings>DueAmount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}"
                         />
                     </cells>
                 </ColumnListItem>

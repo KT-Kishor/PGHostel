@@ -441,6 +441,10 @@ sap.ui.define([
 
                                 this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
 
+                            } else if (this.sourceView === "MyBookings") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
+
                             } else if (this.sourceView === "AdminPage") {
 
                                 this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
@@ -467,6 +471,10 @@ sap.ui.define([
                     if (this.sourceView === "Customerinvoice") {
 
                         this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                    } else if (this.sourceView === "MyBookings") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
 
                     } else if (this.sourceView === "AdminPage") {
 

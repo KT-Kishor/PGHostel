@@ -30,8 +30,10 @@ sap.ui.define([
             return {
                 bookings: [],
                 Members: [],
+                Payments: [],
                 bookingCount: 0,
                 memberCount: 0,
+                paymentCount: 0,
                 selectedTab: "Booking History"
             };
         },
@@ -133,6 +135,61 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }
             }
+        },
+
+        _loadPayments: async function () {
+            var oModel = this.getView().getModel("myBookings");
+            var sUserID = this._getLoggedInUserId();
+
+            if (!sUserID) {
+                oModel.setProperty("/Payments", []);
+                oModel.setProperty("/paymentCount", 0);
+                MessageToast.show("User details not found");
+                return;
+            }
+
+            this.getBusyDialog();
+
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_ManageInvoice", { UserID: sUserID });
+                var aInvoiceData = Array.isArray(oResponse && oResponse.data) ? oResponse.data : ((oResponse && oResponse.data) ? [oResponse.data] : []);
+                var aPayments = aInvoiceData.map(function (oInvoice) {
+                    return {
+                        BookingID: oInvoice.BookingID || oInvoice.BookingId || "",
+                        CustomerName: oInvoice.CustomerName || "",
+                        InvoiceDate: oInvoice.InvoiceDate || oInvoice.InvoiceDateString || "",
+                        InvNo: oInvoice.InvNo || oInvoice.InvNumber || "",
+                        TotalAmount: oInvoice.TotalAmount || oInvoice.GrandTotal || 0,
+                        DueAmount: oInvoice.DueAmount || 0,
+                        currency: oInvoice.Currency || oInvoice.currency || "",
+                        PaymentGroup: oInvoice.Status || "Others"
+                    };
+                });
+
+                oModel.setProperty("/Payments", aPayments);
+                oModel.setProperty("/paymentCount", aPayments.length);
+            } catch (err) {
+                oModel.setProperty("/Payments", []);
+                oModel.setProperty("/paymentCount", 0);
+                MessageToast.show(err.message || err.responseText || "Unable to load payments");
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onPressManageInvoice: function (oEvent) {
+            var oContext = oEvent.getSource().getBindingContext("myBookings");
+            var oPayment = oContext && oContext.getObject();
+
+            if (!oPayment || !oPayment.InvNo) {
+                MessageToast.show("Invoice number not found for this payment");
+                return;
+            }
+
+            this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                sPath: encodeURIComponent(oPayment.InvNo),
+                dash: "MyBookings"
+            });
         },
 
         _normalizeMemberData: function (oResponse) {
@@ -358,6 +415,8 @@ sap.ui.define([
 
             if (sKey === "Members") {
                 await this._loadMembers();
+            } else if (sKey === "Payment") {
+                await this._loadPayments();
             } else {
                 await this._loadBookings();
             }
@@ -369,21 +428,51 @@ sap.ui.define([
             this._updateRowCount();
         },
 
+        _getActiveTable: function (sSelectedTab) {
+            if (sSelectedTab === "Members") {
+                return this.byId("Id_MyBookingMemberTable");
+            }
+            if (sSelectedTab === "Payment") {
+                return this.byId("Id_PaymentTable1");
+            }
+            return this.byId("Id_MyBookingTable");
+        },
+
+        _getCountPath: function (sSelectedTab) {
+            if (sSelectedTab === "Members") {
+                return "/memberCount";
+            }
+            if (sSelectedTab === "Payment") {
+                return "/paymentCount";
+            }
+            return "/bookingCount";
+        },
+
+        _getSearchFilters: function (sSelectedTab, sQuery) {
+            if (sSelectedTab === "Members") {
+                return this._getMemberSearchFilters(sQuery);
+            }
+            if (sSelectedTab === "Payment") {
+                return this._getPaymentSearchFilters(sQuery);
+            }
+            return this._getBookingSearchFilters(sQuery);
+        },
+
         _updateRowCount: function () {
             var oModel = this.getView().getModel("myBookings");
             var sSelectedTab = oModel.getProperty("/selectedTab");
-            var oTable = sSelectedTab === "Members" ? this.byId("Id_MyBookingMemberTable") : this.byId("Id_MyBookingTable");
+            var oTable = this._getActiveTable(sSelectedTab);
             var oBinding = oTable && oTable.getBinding("items");
             var iLength = oBinding ? oBinding.getLength() : 0;
 
-            oModel.setProperty(sSelectedTab === "Members" ? "/memberCount" : "/bookingCount", iLength);
+            oModel.setProperty(this._getCountPath(sSelectedTab), iLength);
         },
 
         onGlobalSearch: function (oEvent) {
             var sQuery = (oEvent.getParameter("newValue") || "").toLowerCase();
             var oModel = this.getView().getModel("myBookings");
             var sSelectedTab = oModel.getProperty("/selectedTab");
-            var oTable = sSelectedTab === "Members" ? this.byId("Id_MyBookingMemberTable") : this.byId("Id_MyBookingTable");
+            var oTable = this._getActiveTable(sSelectedTab);
             var oBinding = oTable && oTable.getBinding("items");
             var aFilters = [];
 
@@ -393,7 +482,7 @@ sap.ui.define([
 
             if (sQuery) {
                 aFilters = [new Filter({
-                    filters: sSelectedTab === "Members" ? this._getMemberSearchFilters(sQuery) : this._getBookingSearchFilters(sQuery),
+                    filters: this._getSearchFilters(sSelectedTab, sQuery),
                     and: false
                 })];
             }
@@ -405,7 +494,7 @@ sap.ui.define([
         _filterCurrentTable: function (aFilters) {
             var oModel = this.getView().getModel("myBookings");
             var sSelectedTab = oModel.getProperty("/selectedTab");
-            var oTable = sSelectedTab === "Members" ? this.byId("Id_MyBookingMemberTable") : this.byId("Id_MyBookingTable");
+            var oTable = this._getActiveTable(sSelectedTab);
             var oBinding = oTable && oTable.getBinding("items");
 
             if (oBinding) {
@@ -418,6 +507,8 @@ sap.ui.define([
 
             if (sSelectedTab === "Members") {
                 await this._loadMembers();
+            } else if (sSelectedTab === "Payment") {
+                await this._loadPayments();
             } else {
                 await this._loadBookings();
             }
@@ -444,6 +535,18 @@ sap.ui.define([
                 new Filter("Relation", FilterOperator.Contains, sQuery),
                 new Filter("BookingID", FilterOperator.Contains, sQuery),
                 new Filter("DocumentType", FilterOperator.Contains, sQuery)
+            ];
+        },
+
+        _getPaymentSearchFilters: function (sQuery) {
+            return [
+                new Filter("BookingID", FilterOperator.Contains, sQuery),
+                new Filter("CustomerName", FilterOperator.Contains, sQuery),
+                new Filter("InvNo", FilterOperator.Contains, sQuery),
+                new Filter("InvoiceDate", FilterOperator.Contains, sQuery),
+                new Filter("TotalAmount", FilterOperator.Contains, sQuery),
+                new Filter("DueAmount", FilterOperator.Contains, sQuery),
+                new Filter("currency", FilterOperator.Contains, sQuery)
             ];
         },
 
