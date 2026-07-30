@@ -539,13 +539,16 @@ sap.ui.define([
         },
 
         _getPaymentSearchFilters: function (sQuery) {
+            var fnAmountContains = function (vValue) {
+                return String(vValue == null ? "" : vValue).toLowerCase().indexOf(sQuery) !== -1;
+            };
             return [
                 new Filter("BookingID", FilterOperator.Contains, sQuery),
                 new Filter("CustomerName", FilterOperator.Contains, sQuery),
                 new Filter("InvNo", FilterOperator.Contains, sQuery),
                 new Filter("InvoiceDate", FilterOperator.Contains, sQuery),
-                new Filter("TotalAmount", FilterOperator.Contains, sQuery),
-                new Filter("DueAmount", FilterOperator.Contains, sQuery),
+                new Filter({ path: "TotalAmount", test: fnAmountContains }),
+                new Filter({ path: "DueAmount", test: fnAmountContains }),
                 new Filter("currency", FilterOperator.Contains, sQuery)
             ];
         },
