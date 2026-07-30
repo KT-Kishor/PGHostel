@@ -702,16 +702,16 @@ sap.ui.define([
                     } else if (paymentType === "per month") {
                         const years = end.getFullYear() - start.getFullYear();
                         const months = end.getMonth() - start.getMonth();
+
                         let totalMonths = years * 12 + months;
 
-                        // If end day >= start day, add 1 month
-                        // if (end.getDate() >= start.getDate()) {
-                        //     totalMonths += 1;
+                        // If there are remaining days, count them as an additional month
+                        // if (end.getDate() > start.getDate()) {
+                        //     totalMonths++;
                         // }
 
                         Duration = totalMonths;
                         DurationUnit = Duration === 1 ? "Month" : "Months";
-
                     } else if (paymentType === "per year") {
                         let years = end.getFullYear() - start.getFullYear();
 
@@ -737,7 +737,7 @@ sap.ui.define([
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
                 await this.Facilitysearch(sBranchCode, Deposit)
-                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer,Branch);
+                const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer, Branch);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
                 }
@@ -755,7 +755,7 @@ sap.ui.define([
             }
         },
 
-        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer,Branch) {
+        calculateTotals: function (aPersons, roomRentPrice, sBranchCode, Discount, oCustomer, Branch) {
             var Facilitiesdata = this.getView().getModel("Facilities").getData()
 
             let totalFacilityPricePerDay = 0;
@@ -1404,28 +1404,25 @@ sap.ui.define([
             }
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
-            //   var oEndDatePicker = sap.ui.getCore().byId("editEndDate");
 
-            // if (oEndDatePicker) {
-            //     var oDate = new Date(sStartDate);
-            //      oDate.setDate(oDate.getDate() + 1);
-            //       oEndDatePicker.setMinDate(oDate);
-            // }
-            //     if (oEnd <= oStart) {
-            //         // Clear EndDate
-            //         oModel.setProperty("/EndDate", "");
-            //         if (oEndDatePicker) oEndDatePicker.setValue("");
-
-            //         return;
-            //     }
             let iDays = 0;
 
 
             if (sUnit === "Per Month" || sUnit === "monthly") {
-                oEnd = new Date(oStart);
-                oEnd.setMonth(oEnd.getMonth() + iCount);
-                oEnd.setDate(oEnd.getDate())
-            } else if (sUnit === "Per Year" || sUnit === "yearly") {
+
+                const startDay = oStart.getDate();
+                const targetMonth = oStart.getMonth() + iCount;
+                const targetYear = oStart.getFullYear();
+
+                // Last day of target month
+                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                // Use same day if available, otherwise last day
+                const endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
+
+            }  else if (sUnit === "Per Year" || sUnit === "yearly") {
 
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
@@ -1469,7 +1466,7 @@ sap.ui.define([
             }
 
             // Update model
-            oModel.setProperty("/EndDate", oEnd ? this.Formatter.formatDate(oEnd.toISOString().split("T")[0]) : "");
+            oModel.setProperty("/EndDate", oEnd ?  this.Formatter.formatDate(this._formatDate(oEnd)): "");
             oModel.setProperty("/TotalDays", iDays);
             oModel.setProperty("/CouponCode", "")
             oModel.setProperty("/CouponDiscount", "")
@@ -1499,23 +1496,43 @@ sap.ui.define([
                 // Already yyyy-mm-dd
                 oStart = new Date(sStartDate);
             }
-            let oEnd = new Date(oStart);
             let iDays = 0;
 
+            const startDay = oStart.getDate();
+            let oEnd;
+
             if (sUnit === "Per Month") {
-                oEnd.setMonth(oEnd.getMonth() + iCount);
-                oEnd.setDate(oEnd.getDate())
+
+                const targetMonth = oStart.getMonth() + iCount;
+                const targetYear = oStart.getFullYear();
+
+                // Last day of target month
+                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                // Use same day if available, otherwise last day
+                const endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
 
             } else if (sUnit === "Per Year") {
-                oEnd.setFullYear(oEnd.getFullYear() + iCount);
-                oEnd.setDate(oEnd.getDate())
+
+                const targetYear = oStart.getFullYear() + iCount;
+                const targetMonth = oStart.getMonth();
+
+                // Last day of target month (handles leap years)
+                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                // Use same day if available, otherwise last day
+                const endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
             }
             if (oEnd && iDays === 0) {
                 iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
             }
 
             // Format yyyy-MM-dd for DatePicker
-            const sFormatted = oEnd.toISOString().split("T")[0];
+            const sFormatted =  this._formatDate(oEnd);
 
             oModel.setProperty("/EndDate", this.Formatter.formatDate(sFormatted));
             oModel.setProperty("/TotalDays", iDays);
@@ -2186,7 +2203,7 @@ sap.ui.define([
             var oEndDatePicker = this.byId("editEndDate");
             if (oEndDatePicker) {
                 var oDate = new Date(sStart);
-                oDate.setDate(oDate.getDate() + 1);
+                oDate.setDate(oDate.getDate()+ 1);
                 oEndDatePicker.setMinDate(oDate);
             }
             var CustData = oCustomerModel.getData();
@@ -2216,44 +2233,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Duration", diffDays);
 
                 var fFacilityPrice = oCustomerModel.getProperty("/TotalFacilityPrice") || 0
-                // if (CustData.CouponCode || this.Code) {
-                //     var oCouponData = this.getView().getModel("CouponModel").getData();
-                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-                //     if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
-
-                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                //             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                //             }
-                //         } else {
-                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                //         }
-
-                //     }
-                // }
-                // var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice")) - Number(CustData.Discount)
-
-                // var SubTotal = SubTotal
-                //   var CGST = SubTotal * CustData.GSTValue / 100
-                // if(CustData.GSTType==="IGST"){
-                // oCustomerModel.setProperty("/IGST", CGST)
-                //    oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST);
-                // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST - CustData.PaymentPaid);
-
-                // }else{
-                // oCustomerModel.setProperty("/SGST", CGST)
-                // oCustomerModel.setProperty("/CGST", CGST)
-                //    oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST + CGST);
-                // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST + CGST - CustData.PaymentPaid);
-                // }
-
-
-                // oCustomerModel.setProperty("/SubTotal", SubTotal);
-                // oCustomerModel.setProperty("/Discount", CustData.Discount)
                 var SubTotal = diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))
 
                 var SubTotal = SubTotal - Number(CustData.Discount)
@@ -2267,27 +2247,7 @@ sap.ui.define([
                 } else {
                     TotalAmount = SubTotal
                 }
-                // if (CustData.CouponCode || this.Code) {
-                //     var oCouponData = this.getView().getModel("CouponModel").getData();
-                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-
-
-                //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
-
-                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                //             }
-                //         } else {
-                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                //         }
-
-                //     }
-                // }
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
@@ -2310,44 +2270,49 @@ sap.ui.define([
             }
 
             // MONTHLY CALCULATION
+            // MONTHLY CALCULATION
             if (sUnit === "monthly" || sUnit === "Per Month") {
-                // Reset EndDate to StartDate always
-                oEnd = new Date(oStart);
 
-                // Add selected duration months
-                oEnd.setMonth(oEnd.getMonth() + duration);
-                oEnd.setDate(oEnd.getDate());
-                var diffDays = oBookingModel.getProperty("/DurationUnit");
-                oCustomerModel.setProperty("/RentPrice", diffDays * originalRent);
+                var startDay = oStart.getDate();
 
-                var SubTotal = (diffDays * originalRent + (oCustomerModel.getProperty("/TotalFacilityPrice"))) - Number(CustData.Discount)
+                var targetMonth = oStart.getMonth() + duration;
+                var targetYear = oStart.getFullYear();
 
-                var CGST = SubTotal * CustData.GSTValue / 100
+                // Last day of target month
+                var lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                // Use same day if exists, else last day
+                var endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
+
+                var diffMonths = duration;
+
+                oCustomerModel.setProperty("/Duration", diffMonths);
+                oCustomerModel.setProperty("/RentPrice", diffMonths * originalRent);
+
+                var SubTotal = (diffMonths * originalRent +
+                    (oCustomerModel.getProperty("/TotalFacilityPrice") || 0))
+                    - Number(CustData.Discount);
+
+                var CGST = SubTotal * CustData.GSTValue / 100;
                 let TotalAmount;
 
                 if (CustData.GSTType === "IGST") {
                     TotalAmount = SubTotal + CGST;
+                    oCustomerModel.setProperty("/IGST", CGST);
                 } else if (CustData.GSTType === "CGST/SGST") {
-                    TotalAmount = SubTotal + CGST + CGST;
+                    TotalAmount = SubTotal + (CGST * 2);
+                    oCustomerModel.setProperty("/CGST", CGST);
+                    oCustomerModel.setProperty("/SGST", CGST);
                 } else {
-                    TotalAmount = SubTotal
-                }
-
-                if (CustData.GSTType === "IGST") {
-                    oCustomerModel.setProperty("/IGST", CGST)
-
-
-                } else {
-                    oCustomerModel.setProperty("/SGST", CGST)
-                    oCustomerModel.setProperty("/CGST", CGST)
-
+                    TotalAmount = SubTotal;
                 }
 
                 oCustomerModel.setProperty("/GrandTotal", TotalAmount);
                 oCustomerModel.setProperty("/DueAmount", TotalAmount - CustData.PaymentPaid);
                 oCustomerModel.setProperty("/SubTotal", SubTotal);
-                oCustomerModel.setProperty("/Discount", CustData.Discount)
-
+                oCustomerModel.setProperty("/Discount", CustData.Discount);
             }
 
             // YEARLY CALCULATION
@@ -2431,63 +2396,47 @@ sap.ui.define([
             }
 
             const oStart = new Date(sStartDate);
-            let oEnd = new Date(oStart);
+            const startDay = oStart.getDate();
+            let oEnd;
 
             if (sUnit === "monthly" || sUnit === "Per Month") {
-                oEnd.setMonth(oEnd.getMonth() + iCount); // add iCount months
-                oEnd.setDate(oEnd.getDate());
-                oCustomerData.setProperty("/RentPrice", iCount * originalRent); // use originalRent
+
+                const targetMonth = oStart.getMonth() + iCount;
+                const targetYear = oStart.getFullYear();
+
+                // Last day of target month
+                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                // Same day if available, otherwise last day
+                const endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
+
+                oCustomerData.setProperty("/RentPrice", iCount * originalRent);
+
             } else if (sUnit === "yearly" || sUnit === "Per Year") {
-                oEnd.setFullYear(oEnd.getFullYear() + iCount); // add iCount years
-                oEnd.setDate(oEnd.getDate())
-                oCustomerData.setProperty("/RentPrice", iCount * originalRent); // use originalRent
+
+                const targetYear = oStart.getFullYear() + iCount;
+                const targetMonth = oStart.getMonth();
+
+                // Last day of target month (handles leap years)
+                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+                const endDay = Math.min(startDay, lastDay);
+
+                oEnd = new Date(targetYear, targetMonth, endDay);
+
+                oCustomerData.setProperty("/RentPrice", iCount * originalRent);
             }
 
             // Format yyyy-MM-dd for DatePicker
-            const sFormatted = oEnd.toISOString().split("T")[0];
+            const sFormatted = this._formatDate(oEnd);
             oModel.setProperty("/EndDate", sFormatted);
             var fPrice = oCustomerData.getProperty("/RentPrice")
 
             var fFacilityPrice = parseFloat(oCustomerData.getProperty("/TotalFacilityPrice") || 0);
 
 
-
-            // if (CustData.CouponCode || this.Code) {
-            //     var oCouponData = this.getView().getModel("CouponModel").getData();
-            //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-            //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
-
-            //     if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
-
-            //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-            //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-            //             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-            //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-            //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-            //             }
-            //         } else {
-            //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-            //         }
-
-            //     }
-            // }
-            // var SubTotal = (fPrice + fFacilityPrice) - Number(CustData.Discount)
-            //   var CGST = SubTotal * CustData.GSTValue / 100
-            //     if(CustData.GSTType==="IGST"){
-            //     oCustomerData.setProperty("/IGST", CGST)
-            //           oCustomerData.setProperty("/GrandTotal", SubTotal + CGST);
-            // oCustomerData.setProperty("/DueAmount", SubTotal + CGST - CustData.PaymentPaid);
-
-            //     }else{
-            //     oCustomerData.setProperty("/SGST", CGST)
-            //     oCustomerData.setProperty("/CGST", CGST)
-            //        oCustomerData.setProperty("/GrandTotal", SubTotal + CGST + CGST);
-            //      oCustomerData.setProperty("/DueAmount", SubTotal + CGST + CGST - CustData.PaymentPaid);
-            //     }
-
-
-            // oCustomerData.setProperty("/SubTotal", SubTotal);
-            // oCustomerData.setProperty("/Discount", CustData.Discount)
             var SubTotal = (fPrice + fFacilityPrice) - Number(CustData.Discount)
             var CGST = SubTotal * CustData.GSTValue / 100
 
@@ -2500,28 +2449,7 @@ sap.ui.define([
             } else {
                 TotalAmount = SubTotal
             }
-            // if (CustData.CouponCode || this.Code) {
-            //     var oCouponData = this.getView().getModel("CouponModel").getData();
-            //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-            //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
 
-
-            //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
-
-
-
-            //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-            //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-            //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-            //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-            //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-            //             }
-            //         } else {
-            //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-            //         }
-
-            //     }
-            // }
 
             if (CustData.GSTType === "IGST") {
                 oCustomerData.setProperty("/IGST", CGST)
@@ -4586,7 +4514,7 @@ sap.ui.define([
                     "content": pdfBase64
                 },
                 "Booking": [{
-                    "BookingDate": new Date().toISOString().split('T')[0], // current date
+                    "BookingDate": this._formatDate(CustomerData.BookingDate), // current date
                     "RentPrice": CustomerData.GrandTotal,
                     "NoOfPersons": CustomerData.AllMembers.length,
                     "StartDate": Bookingdata.StartDate.split('/').reverse().join('-'),
@@ -4785,53 +4713,15 @@ sap.ui.define([
 
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
-                            BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                            RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
-                            RoomPrice: oData.RoomPrice || "0",
-                            NoOfPersons: oData.noofperson || 1,
-                            StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                            EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
                             Status: "Cancelled", // UPDATED
                             CancelDate: sCancelDate, // UPDATED
-                            PaymentType: oData.PaymentType || "",
-                            BedType: oData.BedType || ""
                         }];
 
-                        //------ Facility Payload ------
-                        const facilityData = [];
-                        if (oData.AllSelectedFacilities?.length > 0) {
-                            oData.AllSelectedFacilities.forEach(fac => {
-                                facilityData.push({
-                                    FacilityName: fac.FacilityName,
-                                    FacilitiPrice: fac.Price,
-                                    StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
-                                    EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
-                                    PaidStatus: "Cancelled" // UPDATED (optional)
-                                });
-                            });
-                        }
+
 
                         //------ Final Payload ------
                         const personData = [{
-                            Salutation: oData.Salutation || "",
-                            CustomerName: oData.FullName || "",
-                            UserID: oData.UserID || "",
-                            STDCode: oData.STDCode || "",
-                            MobileNo: oData.MobileNo || "",
-                            Gender: oData.Gender || "",
-                            DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
-                            CustomerEmail: oData.CustomerEmail || "",
-                            Country: oData.Country || "",
-                            State: oData.State || "",
-                            City: oData.City || "",
-                            PermanentAddress: oData.Address || "",
-                            Booking: bookingData, // Making sure included
-                            FacilityItems: facilityData,
-                            Area: oData.BranchName || "",
-                            PropertySTD: oData.PropertySTD || "",
-                            PropertyMobileNo: oData.PropertyMobileNo || "",
-                            PropertyEmail: oData.PropertyEmail || "",
-                            PropertyType: oData.PropertyType,
+                            Booking: bookingData
                         }];
 
                         that.getBusyDialog()
@@ -8056,7 +7946,7 @@ sap.ui.define([
                             sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
-                                this.qty = `(${item.quantity || 1} Qty)`
+                                this.qty = `(${item.quantity || 1} Qty / Entire Booking)`
                                 sUnitText = `${sUnitText}`;
                             } else {
                                 const dailyQty = Number(item.quantity) || 1;
@@ -8090,7 +7980,7 @@ sap.ui.define([
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? item.FacilityChargeType==="Entire Booking" ?`${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty} / Entire Stay` : ""}` : `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         item.StartDate,
                         item.EndDate,
@@ -9516,11 +9406,11 @@ sap.ui.define([
                 dash: "ManageInvoice"
             });
         },
-        onPressDeposit:function(){
+        onPressDeposit: function () {
             var oRouter = this.getOwnerComponent().getRouter()
-           oRouter.navTo("RouteDeposit", {
-        from: "Invoice"   // any identifier for the source page
-    });
+            oRouter.navTo("RouteDeposit", {
+                from: "Invoice"   // any identifier for the source page
+            });
         }
     });
 });

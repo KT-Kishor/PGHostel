@@ -1004,7 +1004,7 @@
                     <!-- Confirm -->
                     <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} === 'Assigned'}"/>
 
-                    <Button text="Confirm Booking" tooltip="Confirm Booking" press="HM_ConfirmRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected'}"/>
+                    <Button text="Confirm Booking" tooltip="Confirm Booking" press="HM_ConfirmRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected' || ${CustomerData>/Status} === 'Cancelled'}"/>
 
                     <!-- Reject -->
                     <Button text="Reject Booking" tooltip="Reject Booking" press="HM_RejectRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' }" />
