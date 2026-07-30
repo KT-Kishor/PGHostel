@@ -758,11 +758,9 @@
             if (sPlan === "Per Day") {
                 oBillingEndDate = oEndDate;
             } else if (sPlan === "Per Month") {
-                oBillingEndDate = new Date(oStartDate);
-                oBillingEndDate.setMonth(oBillingEndDate.getMonth() + iDuration);
+                oBillingEndDate = this._addMonthsClamped(oStartDate, iDuration);
             } else if (sPlan === "Per Year") {
-                oBillingEndDate = new Date(oStartDate);
-                oBillingEndDate.setFullYear(oBillingEndDate.getFullYear() + iDuration);
+                oBillingEndDate = this._addMonthsClamped(oStartDate, iDuration * 12);
             } else {
                 oBillingEndDate = oEndDate;
             }
@@ -5271,6 +5269,29 @@
             this._refreshCouponAndSummary({ checkDateWindow: true });
         },
 
+        // Date.setMonth() overflows into the following month when the target month
+        // is shorter than the start day: 31/07 + 4 months lands on 01/12 instead of
+        // 30/11. Build the target date explicitly and clamp the day to the last
+        // valid day of the target month.
+        _addMonthsClamped: function (oDate, iMonths) {
+            const oBaseDate = this._parseDate(oDate);
+            const iOffset = parseInt(iMonths, 10);
+
+            if (!oBaseDate || isNaN(iOffset)) {
+                return null;
+            }
+
+            const iAbsoluteMonth = oBaseDate.getMonth() + iOffset;
+            const iTargetYear = oBaseDate.getFullYear() + Math.floor(iAbsoluteMonth / 12);
+            const iTargetMonth = ((iAbsoluteMonth % 12) + 12) % 12;
+            // Day 0 of the next month resolves to the last day of the target month.
+            const iLastDayOfTargetMonth = new Date(iTargetYear, iTargetMonth + 1, 0).getDate();
+            const oResult = new Date(iTargetYear, iTargetMonth, Math.min(oBaseDate.getDate(), iLastDayOfTargetMonth));
+
+            oResult.setHours(0, 0, 0, 0);
+            return oResult;
+        },
+
         _updateAutoEndDate: function () {
             const oModel = this.getView().getModel("HostelModel");
             const oStartDate = this._parseDate(oModel.getProperty("/StartDate"));
@@ -5283,14 +5304,10 @@
                 return;
             }
 
-            oEndDate = new Date(oStartDate);
-
             if (sPlan === "Per Month") {
-                oEndDate.setMonth(oEndDate.getMonth() + iDuration);
-                // oEndDate.setDate(oEndDate.getDate() - 1);
+                oEndDate = this._addMonthsClamped(oStartDate, iDuration);
             } else if (sPlan === "Per Year") {
-                oEndDate.setFullYear(oEndDate.getFullYear() + iDuration);
-                // oEndDate.setDate(oEndDate.getDate() - 1);
+                oEndDate = this._addMonthsClamped(oStartDate, iDuration * 12);
             } else {
                 return;
             }
