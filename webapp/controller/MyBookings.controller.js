@@ -5,16 +5,20 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/core/Fragment",
     "../model/formatter",
     "../utils/validation"
-], function (BaseController, JSONModel, MessageToast, MessageBox, Filter, FilterOperator, Formatter, utils) {
+], function (BaseController, JSONModel, MessageToast, MessageBox, Filter, FilterOperator, Fragment, Formatter, utils) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.MyBookings", {
         Formatter: Formatter,
 
         onInit: function () {
-            this.getView().setModel(new JSONModel(this._getInitialData()), "myBookings");
+            var oMyBookingsModel = new JSONModel(this._getInitialData());
+            this.getView().setModel(oMyBookingsModel, "myBookings");
+            this.getView().setModel(oMyBookingsModel, "profileData");
+            this.getView().setModel(new JSONModel(this._getInitialComplaintData()), "complaintTemp");
             this.getView().setModel(new JSONModel({ mode: "CREATE" }), "viewModel");
             this.getView().setModel(new JSONModel({ visible: true }), "VisibleModel");
             this.getView().setModel(new JSONModel({}), "Member");
@@ -31,10 +35,35 @@ sap.ui.define([
                 bookings: [],
                 Members: [],
                 Payments: [],
+                complain: [],
+                damage: [],
                 bookingCount: 0,
                 memberCount: 0,
                 paymentCount: 0,
+                complainCount: 0,
+                damageCount: 0,
+                BranchCombo: [],
+                AsgnRoomNo: [],
+                hasAssignedBooking: false,
                 selectedTab: "Booking History"
+            };
+        },
+
+        _getInitialComplaintData: function () {
+            return {
+                ComplaintID: "",
+                ComplaintType: "",
+                RoomNo: "",
+                RoomCombo: [],
+                Description: "",
+                BranchCode: "",
+                FileName: "",
+                FileType: "",
+                FileContent: "",
+                Documents: [],
+                isEditMode: false,
+                BookingID: "",
+                CustomerName: ""
             };
         },
 
@@ -46,6 +75,7 @@ sap.ui.define([
 
             this.byId("idMyBookingsTabHeader").setSelectedKey("Booking History");
             this.getView().getModel("myBookings").setProperty("/selectedTab", "Booking History");
+            this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             await this._loadBookings();
         },
 
@@ -95,9 +125,17 @@ sap.ui.define([
 
                 oModel.setProperty("/bookings", aBookingData);
                 oModel.setProperty("/bookingCount", aBookingData.length);
+                oModel.setProperty("/BranchCombo", this._prepareBranchComboData(aBookings));
+                oModel.setProperty("/AsgnRoomNo", this._prepareAssignedRoomData(aBookings));
+                oModel.setProperty("/hasAssignedBooking", aBookings.some(function (oBooking) {
+                    return String(oBooking.Status || "").toLowerCase() === "assigned";
+                }));
             } catch (err) {
                 oModel.setProperty("/bookings", []);
                 oModel.setProperty("/bookingCount", 0);
+                oModel.setProperty("/BranchCombo", []);
+                oModel.setProperty("/AsgnRoomNo", []);
+                oModel.setProperty("/hasAssignedBooking", false);
                 MessageToast.show(err.message || err.responseText || "Unable to load booking history");
             } finally {
                 this.closeBusyDialog();
@@ -417,6 +455,10 @@ sap.ui.define([
                 await this._loadMembers();
             } else if (sKey === "Payment") {
                 await this._loadPayments();
+            } else if (sKey === "Complaints") {
+                await this._loadComplaints();
+            } else if (sKey === "Damage") {
+                await this._loadDamage();
             } else {
                 await this._loadBookings();
             }
@@ -435,6 +477,12 @@ sap.ui.define([
             if (sSelectedTab === "Payment") {
                 return this.byId("Id_PaymentTable1");
             }
+            if (sSelectedTab === "Complaints") {
+                return this.byId("Id_MyBookingComplaintTable");
+            }
+            if (sSelectedTab === "Damage") {
+                return this.byId("Id_MyBookingDamageTable");
+            }
             return this.byId("Id_MyBookingTable");
         },
 
@@ -445,6 +493,12 @@ sap.ui.define([
             if (sSelectedTab === "Payment") {
                 return "/paymentCount";
             }
+            if (sSelectedTab === "Complaints") {
+                return "/complainCount";
+            }
+            if (sSelectedTab === "Damage") {
+                return "/damageCount";
+            }
             return "/bookingCount";
         },
 
@@ -454,6 +508,12 @@ sap.ui.define([
             }
             if (sSelectedTab === "Payment") {
                 return this._getPaymentSearchFilters(sQuery);
+            }
+            if (sSelectedTab === "Complaints") {
+                return this._getComplaintSearchFilters(sQuery);
+            }
+            if (sSelectedTab === "Damage") {
+                return this._getDamageSearchFilters(sQuery);
             }
             return this._getBookingSearchFilters(sQuery);
         },
@@ -509,6 +569,10 @@ sap.ui.define([
                 await this._loadMembers();
             } else if (sSelectedTab === "Payment") {
                 await this._loadPayments();
+            } else if (sSelectedTab === "Complaints") {
+                await this._loadComplaints();
+            } else if (sSelectedTab === "Damage") {
+                await this._loadDamage();
             } else {
                 await this._loadBookings();
             }
@@ -550,6 +614,41 @@ sap.ui.define([
                 new Filter({ path: "TotalAmount", test: fnAmountContains }),
                 new Filter({ path: "DueAmount", test: fnAmountContains }),
                 new Filter("currency", FilterOperator.Contains, sQuery)
+            ];
+        },
+
+        _getComplaintSearchFilters: function (sQuery) {
+            return [
+                new Filter("CustomerName", FilterOperator.Contains, sQuery),
+                new Filter("BookingID", FilterOperator.Contains, sQuery),
+                new Filter("ComplaintID", FilterOperator.Contains, sQuery),
+                new Filter("ComplaintType", FilterOperator.Contains, sQuery),
+                new Filter("BranchName", FilterOperator.Contains, sQuery),
+                new Filter("RoomNo", FilterOperator.Contains, sQuery),
+                new Filter("ComplaintDescription", FilterOperator.Contains, sQuery),
+                new Filter("ComplaintStatus", FilterOperator.Contains, sQuery),
+                new Filter("ComplaintRaisedDate", FilterOperator.Contains, sQuery),
+                new Filter("ExpectedResolvedDate", FilterOperator.Contains, sQuery),
+                new Filter("AssignedTo", FilterOperator.Contains, sQuery)
+            ];
+        },
+
+        _getDamageSearchFilters: function (sQuery) {
+            var fnValueContains = function (vValue) {
+                return String(vValue == null ? "" : vValue).toLowerCase().indexOf(sQuery) !== -1;
+            };
+            return [
+                new Filter("DamageID", FilterOperator.Contains, sQuery),
+                new Filter("BookingID", FilterOperator.Contains, sQuery),
+                new Filter("CustomerName", FilterOperator.Contains, sQuery),
+                new Filter("BranchName", FilterOperator.Contains, sQuery),
+                new Filter("RoomNo", FilterOperator.Contains, sQuery),
+                new Filter("ItemName", FilterOperator.Contains, sQuery),
+                new Filter("Type", FilterOperator.Contains, sQuery),
+                new Filter("Description", FilterOperator.Contains, sQuery),
+                new Filter({ path: "Quantity", test: fnValueContains }),
+                new Filter({ path: "Cost", test: fnValueContains }),
+                new Filter("Status", FilterOperator.Contains, sQuery)
             ];
         },
 
@@ -1199,6 +1298,582 @@ sap.ui.define([
 
             if (this._oPreviewDialog) {
                 this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+        },
+
+        _prepareBranchComboData: function (aBookings) {
+            var oBranchModel = this.getOwnerComponent().getModel("sBRModel");
+            var aBranches = oBranchModel ? oBranchModel.getProperty("/") || [] : [];
+            var aCodes = Array.from(new Set((aBookings || []).filter(function (oBooking) {
+                return String(oBooking.Status || "").toLowerCase() === "assigned";
+            }).map(function (oBooking) {
+                return String(oBooking.BranchCode || "").trim();
+            }).filter(Boolean)));
+
+            return aCodes.map(function (sCode) {
+                var oBranch = aBranches.find(function (oItem) {
+                    return oItem.BranchID === sCode;
+                });
+                return {
+                    BranchCode: sCode,
+                    BranchName: oBranch && oBranch.Name || sCode
+                };
+            });
+        },
+
+        _prepareAssignedRoomData: function (aBookings) {
+            var mRooms = {};
+
+            return (aBookings || []).filter(function (oBooking) {
+                return String(oBooking.Status || "").toLowerCase() === "assigned" && oBooking.BranchCode && oBooking.RoomNo;
+            }).map(function (oBooking) {
+                return {
+                    BranchCode: String(oBooking.BranchCode).trim(),
+                    RoomNo: String(oBooking.RoomNo).trim()
+                };
+            }).filter(function (oRoom) {
+                var sKey = oRoom.BranchCode + "|" + oRoom.RoomNo;
+                if (mRooms[sKey]) {
+                    return false;
+                }
+                mRooms[sKey] = true;
+                return true;
+            });
+        },
+
+        _loadComplaints: async function (bSilent) {
+            var oModel = this.getView().getModel("myBookings");
+            var sUserID = this._getLoggedInUserId();
+
+            if (!sUserID) {
+                oModel.setProperty("/complain", []);
+                oModel.setProperty("/complainCount", 0);
+                if (!bSilent) {
+                    MessageToast.show("User details not found");
+                }
+                return;
+            }
+
+            if (!bSilent) {
+                this.getBusyDialog();
+            }
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_Complaint", { UserID: sUserID });
+                var aRaw = Array.isArray(oResponse && oResponse.data) ? oResponse.data :
+                    (oResponse && oResponse.data ? [oResponse.data] :
+                        (Array.isArray(oResponse && oResponse.ComplaintData) ? oResponse.ComplaintData :
+                            (Array.isArray(oResponse && oResponse.commentData) ? oResponse.commentData : [])));
+                var oBranchModel = this.getOwnerComponent().getModel("sBRModel");
+                var aBranches = oBranchModel ? oBranchModel.getProperty("/") || [] : [];
+                var aComplaints = aRaw.map(function (oComplaint) {
+                    var sBranchCode = oComplaint.BranchCode || "";
+                    var oBranch = aBranches.find(function (oItem) {
+                        return oItem.BranchID === sBranchCode;
+                    });
+                    return {
+                        BookingID: oComplaint.BookingID || "",
+                        CustomerName: oComplaint.CustomerName || "",
+                        ComplaintID: oComplaint.ComplaintID || oComplaint.ComplainID || oComplaint.ID || "",
+                        ComplaintType: oComplaint.ComplaintType || "",
+                        Description: oComplaint.Description || "",
+                        ComplaintDescription: oComplaint.Description || "",
+                        ComplaintRaisedDate: oComplaint.ComplaintRaisedDate || oComplaint.RaisedDate || "",
+                        ComplaintStatus: oComplaint.Status || oComplaint.ComplaintStatus || "",
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch && oBranch.Name || sBranchCode,
+                        RoomNo: oComplaint.RoomNo || "",
+                        FileName: oComplaint.FileName || "",
+                        FileType: oComplaint.FileType || "",
+                        File: oComplaint.File || "",
+                        ExpectedResolvedDate: oComplaint.EstimatDate || oComplaint.ExpectedResolvedDate || "",
+                        AssignedTo: oComplaint.AssignedBy || oComplaint.AssignedTo || ""
+                    };
+                });
+
+                oModel.setProperty("/complain", aComplaints);
+                oModel.setProperty("/complainCount", aComplaints.length);
+            } catch (oError) {
+                oModel.setProperty("/complain", []);
+                oModel.setProperty("/complainCount", 0);
+                if (!bSilent) {
+                    MessageToast.show(oError.message || oError.responseText || "Unable to load complaints");
+                }
+            } finally {
+                if (!bSilent) {
+                    this.closeBusyDialog();
+                }
+            }
+        },
+
+        _loadDamage: async function (bSilent) {
+            var oModel = this.getView().getModel("myBookings");
+            var sUserID = this._getLoggedInUserId();
+
+            if (!sUserID) {
+                oModel.setProperty("/damage", []);
+                oModel.setProperty("/damageCount", 0);
+                if (!bSilent) {
+                    MessageToast.show("User details not found");
+                }
+                return;
+            }
+
+            if (!bSilent) {
+                this.getBusyDialog();
+            }
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("getHM_DamageBoth", { UserID: sUserID });
+                var aHeaders = oResponse && oResponse.data && Array.isArray(oResponse.data.HM_Damage) ? oResponse.data.HM_Damage : [];
+                var aItems = oResponse && oResponse.data && Array.isArray(oResponse.data.HM_DamageItem) ? oResponse.data.HM_DamageItem : [];
+                var oBranchModel = this.getOwnerComponent().getModel("sBRModel");
+                var aBranches = oBranchModel ? oBranchModel.getProperty("/") || [] : [];
+                var mHeaders = new Map();
+                var mItems = new Map();
+                var aDamageRows = [];
+
+                aHeaders.forEach(function (oHeader) {
+                    var sDamageID = oHeader.DamageID || "";
+                    var sBranchCode;
+                    var oBranch;
+                    if (!sDamageID) {
+                        return;
+                    }
+                    sBranchCode = oHeader.BranchCode || "";
+                    oBranch = aBranches.find(function (oItem) {
+                        return oItem.BranchID === sBranchCode;
+                    });
+                    mHeaders.set(sDamageID, {
+                        DamageID: sDamageID,
+                        BookingID: oHeader.BookingID || "",
+                        UserID: oHeader.UserID || "",
+                        CustomerName: oHeader.CustomerName || "",
+                        CustomerEmail: oHeader.CustomerEmail || "",
+                        RoomNo: oHeader.RoomNo || "",
+                        Currency: String(oHeader.Currency || "").trim(),
+                        Status: oHeader.Status || "",
+                        BedTypeName: oHeader.BedTypeName || "",
+                        BranchCode: sBranchCode,
+                        BranchName: oBranch && oBranch.Name || sBranchCode,
+                        TotalCost: oHeader.TotalCost == null ? "" : oHeader.TotalCost,
+                        ReturnDamageAmount: oHeader.ReturnDamageAmount == null ? "" : oHeader.ReturnDamageAmount,
+                        ReturnDamageMode: oHeader.ReturnDamageMode == null ? "" : oHeader.ReturnDamageMode,
+                        ReturnDamageTransactionID: oHeader.ReturnDamageTransactionID == null ? "" : oHeader.ReturnDamageTransactionID,
+                        ReturnDamageDate: oHeader.ReturnDamageDate || null,
+                        ReturningEmployeeName: oHeader.ReturningEmployeeName || "",
+                        InvoiceDate: oHeader.InvoiceDate || null
+                    });
+                });
+
+                aItems.forEach(function (oItem) {
+                    var sDamageID = oItem.DamageID || "";
+                    if (!sDamageID) {
+                        return;
+                    }
+                    if (!mItems.has(sDamageID)) {
+                        mItems.set(sDamageID, []);
+                    }
+                    mItems.get(sDamageID).push(oItem);
+                });
+
+                mHeaders.forEach(function (oHeader, sDamageID) {
+                    var aDamageItems = mItems.get(sDamageID) || [];
+                    if (!aDamageItems.length) {
+                        aDamageRows.push(Object.assign({}, oHeader, {
+                            ItemID: "",
+                            ItemName: "",
+                            Type: "",
+                            Description: "",
+                            Quantity: "",
+                            Cost: "",
+                            ItemCurrency: ""
+                        }));
+                        return;
+                    }
+                    aDamageItems.forEach(function (oItem) {
+                        aDamageRows.push(Object.assign({}, oHeader, {
+                            ItemID: oItem.ItemID || "",
+                            ItemName: oItem.ItemName || "",
+                            Type: oItem.Type || "",
+                            Description: oItem.Description || "",
+                            Quantity: oItem.Quantity == null ? "" : oItem.Quantity,
+                            Cost: oItem.Cost == null ? "" : oItem.Cost,
+                            ItemCurrency: String(oItem.Currency || "").trim()
+                        }));
+                    });
+                });
+
+                aItems.forEach(function (oItem) {
+                    var sDamageID = oItem.DamageID || "";
+                    if (sDamageID && !mHeaders.has(sDamageID)) {
+                        aDamageRows.push({
+                            DamageID: sDamageID,
+                            BookingID: "",
+                            CustomerName: "",
+                            BranchCode: "",
+                            BranchName: "",
+                            RoomNo: "",
+                            Status: "",
+                            Currency: "",
+                            TotalCost: "",
+                            ItemID: oItem.ItemID || "",
+                            ItemName: oItem.ItemName || "",
+                            Type: oItem.Type || "",
+                            Description: oItem.Description || "",
+                            Quantity: oItem.Quantity == null ? "" : oItem.Quantity,
+                            Cost: oItem.Cost == null ? "" : oItem.Cost,
+                            ItemCurrency: String(oItem.Currency || "").trim()
+                        });
+                    }
+                });
+
+                oModel.setProperty("/damage", aDamageRows);
+                oModel.setProperty("/damageCount", aDamageRows.length);
+            } catch (oError) {
+                oModel.setProperty("/damage", []);
+                oModel.setProperty("/damageCount", 0);
+                if (!bSilent) {
+                    MessageToast.show(oError.message || oError.responseText || "Unable to load damage records");
+                }
+            } finally {
+                if (!bSilent) {
+                    this.closeBusyDialog();
+                }
+            }
+        },
+
+        _getComplaintControl: function (sId) {
+            return sap.ui.getCore().byId(sId) || this.byId(sId);
+        },
+
+        _setComplaintRoomComboData: function (sBranchCode, sSelectedRoomNo) {
+            var oModel = this.getView().getModel("myBookings");
+            var oTempModel = this.getView().getModel("complaintTemp");
+            var sBranch = String(sBranchCode || "").trim();
+            var sRoomNo = String(sSelectedRoomNo || "").trim();
+            var aRooms = (oModel.getProperty("/AsgnRoomNo") || []).filter(function (oRoom) {
+                return oRoom.BranchCode === sBranch;
+            }).map(function (oRoom) {
+                return { RoomNo: oRoom.RoomNo };
+            });
+
+            oTempModel.setProperty("/RoomCombo", aRooms);
+            if (aRooms.length === 1) {
+                sRoomNo = aRooms[0].RoomNo;
+            } else if (!aRooms.some(function (oRoom) { return oRoom.RoomNo === sRoomNo; })) {
+                sRoomNo = "";
+            }
+            oTempModel.setProperty("/RoomNo", sRoomNo);
+
+            var oRoomCombo = this._getComplaintControl("idComplaintRoom");
+            if (oRoomCombo) {
+                oRoomCombo.setEditable(aRooms.length !== 1);
+            }
+        },
+
+        onPressRaiseComplaint: function () {
+            this._openComplaintDialog();
+        },
+
+        _openComplaintDialog: function (oComplaint) {
+            var oView = this.getView();
+            var oModel = oView.getModel("myBookings");
+            var oTempModel = oView.getModel("complaintTemp");
+            var aBranches = oModel.getProperty("/BranchCombo") || [];
+            var sBranchCode = oComplaint ? String(oComplaint.BranchCode || "").trim() : (aBranches.length === 1 ? aBranches[0].BranchCode : "");
+            var sFile = oComplaint ? this._extractComplaintBase64(oComplaint.File) : "";
+            var sFileName = oComplaint && oComplaint.FileName || "";
+            var sFileType = oComplaint && oComplaint.FileType || "";
+
+            oTempModel.setData(Object.assign(this._getInitialComplaintData(), {
+                ComplaintID: oComplaint && oComplaint.ComplaintID || "",
+                ComplaintType: oComplaint && oComplaint.ComplaintType || "",
+                RoomNo: oComplaint && oComplaint.RoomNo || "",
+                Description: oComplaint && (oComplaint.Description || oComplaint.ComplaintDescription) || "",
+                BranchCode: sBranchCode,
+                CustomerName: oComplaint && oComplaint.CustomerName || "",
+                BookingID: oComplaint && oComplaint.BookingID || "",
+                FileName: sFileName,
+                FileType: sFileType,
+                FileContent: sFile,
+                Documents: sFileName ? [{ FileName: sFileName, DocumentType: sFileType, FileType: sFileType, File: sFile, Base64: sFile, size: Math.ceil(sFile.length * 0.75) }] : [],
+                isEditMode: !!oComplaint
+            }));
+            this.BranchCode = sBranchCode;
+            this._setComplaintRoomComboData(sBranchCode, oComplaint && oComplaint.RoomNo || "");
+
+            var fnOpen = function () {
+                this._oComplaintDialog.setTitle(oComplaint ? "Edit Complaint" : "Raise New Complaint");
+                this._oComplaintDialog.open();
+                this._resetComplaintValidationStates();
+                var oBranchCombo = this._getComplaintControl("idBranchCombo");
+                if (oBranchCombo) {
+                    oBranchCombo.setEditable(aBranches.length !== 1);
+                }
+            }.bind(this);
+
+            var pCustomerData = sBranchCode ? this.onSearch() : Promise.resolve([]);
+            pCustomerData.catch(function () {}).finally(function () {
+                if (!this._oComplaintDialog) {
+                    Fragment.load({
+                        name: "sap.ui.com.project1.fragment.Complaint",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this._oComplaintDialog = oDialog;
+                        oView.addDependent(oDialog);
+                        fnOpen();
+                    }.bind(this));
+                } else {
+                    fnOpen();
+                }
+            }.bind(this));
+        },
+
+        _extractComplaintBase64: function (vFile) {
+            var aBytes = vFile && vFile.data && Array.isArray(vFile.data) ? vFile.data : vFile;
+            if (!Array.isArray(aBytes)) {
+                return typeof aBytes === "string" ? aBytes : "";
+            }
+            return this._bufferToBase64(aBytes);
+        },
+
+        onCloseComplaintDialog: function () {
+            if (this._oComplaintDialog) {
+                this._oComplaintDialog.close();
+            }
+            this.getView().getModel("complaintTemp").setData(this._getInitialComplaintData());
+            this._resetComplaintValidationStates();
+        },
+
+        _resetComplaintValidationStates: function () {
+            ["idBranchCombo", "idComplaintType", "idComplaintRoom", "idComplaintDesc", "MP_id_AddCustComboBox", "MP_id_AddBooking"].forEach(function (sId) {
+                var oControl = this._getComplaintControl(sId);
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState("None");
+                }
+            }.bind(this));
+        },
+
+        onComplaintTypeChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onComplaintRoomChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+        },
+
+        onComplaintDescLiveChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onComBranch: async function (oEvent) {
+            var oCombo = oEvent.getSource();
+            var bValid = utils._LCstrictValidationComboBox(oCombo, "ID");
+            this.BranchCode = bValid ? oCombo.getSelectedKey() : "";
+            this._setComplaintRoomComboData(this.BranchCode, "");
+            this.getView().setModel(new JSONModel([]), "customerbookingdata");
+            if (this.BranchCode) {
+                await this.onSearch();
+            }
+        },
+
+        onSearch: async function () {
+            var sUserID = this._getLoggedInUserId();
+            this.getBusyDialog();
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_CustomerReadCall", {
+                    BranchCode: this.BranchCode,
+                    UserID: sUserID,
+                    Status: "Assigned"
+                });
+                var aData = Array.isArray(oResponse && oResponse.commentData) ? oResponse.commentData :
+                    (oResponse && oResponse.commentData ? [oResponse.commentData] : []);
+                aData = aData.map(function (oItem) {
+                    return Object.assign({}, oItem, {
+                        CustomerName: String(oItem.CustomerName || "").trim(),
+                        BookingID: String(oItem.BookingID || "").trim()
+                    });
+                });
+                this.getView().setModel(new JSONModel(aData), "customerbookingdata");
+                return aData;
+            } catch (oError) {
+                MessageToast.show(oError.responseText || "Failed to load customer data");
+                throw oError;
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onChangeAddCustomer: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            var sCustomer = oEvent.getSource().getSelectedKey();
+            var aData = this.getView().getModel("customerbookingdata").getData() || [];
+            var oSelected = aData.find(function (oItem) { return oItem.CustomerName === sCustomer; });
+            if (oSelected) {
+                this.getView().getModel("complaintTemp").setProperty("/CustomerName", oSelected.CustomerName);
+                this.getView().getModel("complaintTemp").setProperty("/BookingID", oSelected.BookingID);
+            }
+        },
+
+        onChangeBookingID: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            var sBookingID = oEvent.getSource().getSelectedKey();
+            var aData = this.getView().getModel("customerbookingdata").getData() || [];
+            var oSelected = aData.find(function (oItem) { return oItem.BookingID === sBookingID; });
+            if (oSelected) {
+                this.getView().getModel("complaintTemp").setProperty("/BookingID", oSelected.BookingID);
+                this.getView().getModel("complaintTemp").setProperty("/CustomerName", oSelected.CustomerName);
+            }
+        },
+
+        onComplaintFileChange: async function (oEvent) {
+            var oUploader = oEvent.getSource();
+            var oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
+            var aAllowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+            if (!oFile) {
+                return;
+            }
+            if (oFile.type && aAllowedTypes.indexOf(oFile.type) < 0) {
+                MessageToast.show("Only JPG, PNG & WEBP files are allowed.");
+                oUploader.clear();
+                return;
+            }
+
+            var oProcessedFile = oFile;
+            try {
+                if (oFile.size > 2 * 1024 * 1024) {
+                    if (typeof imageCompression === "undefined") {
+                        throw new Error("Compression library missing");
+                    }
+                    oProcessedFile = await imageCompression(oFile, { maxSizeMB: 1.9, maxWidthOrHeight: 1920, initialQuality: 0.95 });
+                }
+                var sBase64 = await new Promise(function (resolve, reject) {
+                    var oReader = new FileReader();
+                    oReader.onload = function () { resolve(String(oReader.result || "").split(",")[1] || ""); };
+                    oReader.onerror = reject;
+                    oReader.readAsDataURL(oProcessedFile);
+                });
+                var oType = this._getComplaintControl("idComplaintType");
+                var sType = oType && oType.getValue() || "Complaint";
+                var sExtension = oFile.name.indexOf(".") > -1 ? oFile.name.split(".").pop().toLowerCase() : "jpg";
+                var sFileName = sType + "." + sExtension;
+                var oTempModel = this.getView().getModel("complaintTemp");
+                oTempModel.setProperty("/Documents", [{ FileName: sFileName, DocumentType: oProcessedFile.type, FileType: oProcessedFile.type, File: sBase64, Base64: sBase64, size: oProcessedFile.size }]);
+                oTempModel.setProperty("/FileName", sFileName);
+                oTempModel.setProperty("/FileType", oProcessedFile.type);
+                oTempModel.setProperty("/FileContent", sBase64);
+            } catch (oError) {
+                MessageBox.error(oError.message || "Compression failed. Please try a smaller file.");
+            } finally {
+                oUploader.clear();
+            }
+        },
+
+        onComplaintDeleteDoc: function () {
+            var oTempModel = this.getView().getModel("complaintTemp");
+            oTempModel.setProperty("/Documents", []);
+            oTempModel.setProperty("/FileName", "");
+            oTempModel.setProperty("/FileType", "");
+            oTempModel.setProperty("/FileContent", "");
+        },
+
+        onComplaintPreviewDoc: function (oEvent) {
+            var oDocument = oEvent.getSource().getBindingContext("complaintTemp").getObject();
+            this._previewDocument({
+                File: oDocument.File || oDocument.Base64,
+                FileName: oDocument.FileName,
+                FileType: oDocument.FileType || oDocument.DocumentType
+            });
+        },
+
+        onSaveComplaint: async function () {
+            var oTempModel = this.getView().getModel("complaintTemp");
+            var oData = oTempModel.getData();
+            var oBranch = this._getComplaintControl("idBranchCombo");
+            var oRoom = this._getComplaintControl("idComplaintRoom");
+            var oCustomer = this._getComplaintControl("MP_id_AddCustComboBox");
+            var oBooking = this._getComplaintControl("MP_id_AddBooking");
+            var oType = this._getComplaintControl("idComplaintType");
+            var oDescription = this._getComplaintControl("idComplaintDesc");
+
+            if (!utils._LCstrictValidationComboBox(oBranch, "ID") ||
+                !utils._LCstrictValidationComboBox(oRoom, "ID") ||
+                !utils._LCstrictValidationComboBox(oCustomer, "ID") ||
+                !utils._LCstrictValidationComboBox(oBooking, "ID") ||
+                !utils._LCvalidateMandatoryField(oType, "ID") ||
+                !utils._LCvalidateMandatoryField(oDescription, "ID")) {
+                MessageToast.show("Please fill all required fields.");
+                return;
+            }
+
+            var oUser = this._getLoggedInUser();
+            var oComplaintData = {
+                UserID: this._getLoggedInUserId(),
+                RaisedBy: oUser.UserName || oUser.EmployeeName || "",
+                ComplaintType: oType.getValue(),
+                Description: oData.Description,
+                Status: "Pending",
+                ComplaintRaisedDate: new Date().toISOString().split("T")[0],
+                RoomNo: oData.RoomNo,
+                BranchCode: oBranch.getSelectedKey(),
+                FileName: oData.FileName || "",
+                FileType: oData.FileType || "",
+                File: oData.FileContent || "",
+                BookingID: oData.BookingID,
+                CustomerName: oData.CustomerName
+            };
+
+            this.getBusyDialog();
+            try {
+                if (oData.ComplaintID) {
+                    await this.ajaxUpdateWithJQuery("HM_Complaint", {
+                        data: {
+                            ComplaintType: oComplaintData.ComplaintType,
+                            Description: oComplaintData.Description,
+                            RoomNo: oComplaintData.RoomNo,
+                            BranchCode: oComplaintData.BranchCode,
+                            FileName: oComplaintData.FileName,
+                            FileType: oComplaintData.FileType,
+                            File: oComplaintData.File
+                        },
+                        filters: { ComplaintID: oData.ComplaintID }
+                    });
+                } else {
+                    await this.ajaxCreateWithJQuery("HM_Complaint", { data: oComplaintData });
+                }
+                this._oComplaintDialog.close();
+                MessageToast.show(oData.ComplaintID ? "Complaint updated successfully" : "Complaint saved successfully");
+                this.getView().getModel("myBookings").setProperty("/selectedTab", "Complaints");
+                this.byId("idMyBookingsTabHeader").setSelectedKey("Complaints");
+                await this._loadComplaints(true);
+            } catch (oError) {
+                MessageToast.show(oError.message || oError.responseText || "Error saving complaint");
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onPressComplaintRow: function (oEvent) {
+            var oComplaint = oEvent.getSource().getBindingContext("myBookings").getObject();
+            var sStatus = String(oComplaint.ComplaintStatus || "").trim().toLowerCase();
+            if (["in progress", "resolved"].indexOf(sStatus) > -1) {
+                MessageToast.show("Complaints with status 'In Progress' or 'Resolved' cannot be edited");
+                return;
+            }
+            this._openComplaintDialog(oComplaint);
+        },
+
+        onExit: function () {
+            if (this._oComplaintDialog) {
+                this._oComplaintDialog.destroy();
+                this._oComplaintDialog = null;
+            }
+            if (this.UD_Dialog) {
+                this.UD_Dialog.destroy();
+                this.UD_Dialog = null;
+            }
+            if (this._oPreviewDialog) {
                 this._oPreviewDialog.destroy();
                 this._oPreviewDialog = null;
             }
