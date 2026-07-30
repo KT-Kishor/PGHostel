@@ -86,10 +86,11 @@ sap.ui.define([
                     // IncomePerc: "10",
                     RoomNo: "",
                     BranchCode: "",
-                    RefundAmount: ""
+                    RefundAmount: "",
+                    TaxPercentageLabel: ""
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
-               
+
                 oView.setModel(new JSONModel({
                     BookingID: "",
                 }), "BookingModel");
@@ -338,20 +339,20 @@ sap.ui.define([
                     if (oFooterBar) {
                         oFooterBar.invalidate();
                     }
-                     const sBookingID = this.SelectedCustomerModel.getProperty("/BookingID");
+                    const sBookingID = this.SelectedCustomerModel.getProperty("/BookingID");
 
 
-    const oFilter = {
-        BookingID: [sBookingID]
-    };
+                    const oFilter = {
+                        BookingID: [sBookingID]
+                    };
 
-    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
-    this.getView().setModel(
-    new JSONModel(oBookingData.commentData[0]),
-    "BookinglocalModel"
-);
+                    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
+                    this.getView().setModel(
+                        new JSONModel(oBookingData.commentData[0]),
+                        "BookinglocalModel"
+                    );
 
-// this.getView().setModel(oBookingModel, "BookinglocalModel");
+                    // this.getView().setModel(oBookingModel, "BookinglocalModel");
                 } catch (error) {
                     MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
                 } finally {
@@ -1453,8 +1454,6 @@ sap.ui.define([
 
                 const balanceAmount = totalAmount - (paidAmount + allReceivedAmount);
 
-
-
                 let sFinalStatus = "Submitted";
 
                 if (balanceAmount === 0) {
@@ -1846,7 +1845,6 @@ sap.ui.define([
                             "ManageInvoiceItemModel"
                         );
 
-
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
@@ -2113,9 +2111,9 @@ sap.ui.define([
                     // invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     // ---- GST checkbox derived selection ----
-                    const igst = parseFloat(invoiceData.IGST) || 0;
-                    const cgst = parseFloat(invoiceData.CGST) || 0;
-                    const sgst = parseFloat(invoiceData.SGST) || 0;
+                    const igst = invoiceData.IGST || 0;
+                    const cgst = invoiceData.CGST || 0;
+                    const sgst = invoiceData.SGST || 0;
 
                     // reset first
                     invoiceData.IGSTSelected = false;
@@ -2126,11 +2124,18 @@ sap.ui.define([
                     } else if (cgst > 0 || sgst > 0) {
                         invoiceData.CGSTSelected = true;
                     }
-                  var oModel =  this.getView().setModel(new JSONModel(invoiceData), "SelectedCustomerModel");
-                     if (invoiceData.IGSTSelected === true) {
-                 oModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
-                    } else if (invoiceData.CGSTSelected === true) {
-                 oModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                    var oModel = this.getView().getModel("SelectedCustomerModel");
+
+                    if (oModel) {
+                        oModel.setData(invoiceData);
+
+                        if (invoiceData.IGSTSelected) {
+                            oModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+                        } else if (invoiceData.CGSTSelected) {
+                            oModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                        }
+
+                        oModel.refresh(true);
                     }
                     this.Status = invoiceData.Status;
                     this._previousInvoiceStatus = invoiceData.Status;
@@ -2157,18 +2162,17 @@ sap.ui.define([
 
                 // Sum of post-invoice payments
                 const totalReceivedAmount = validItems.reduce(
-                    (sum, item) => sum + (parseFloat(item.ReceivedAmount) || 0),
+                    (sum, item) => sum + (item.ReceivedAmount) || 0,
                     0
                 );
 
                 // Safe TotalAmount fetch
-                const totalAmount = parseFloat(
-                    validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0
-                );
+                const totalAmount =
+                    validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0;
 
                 // PaidAmount (advance)
                 const oNavigationModel = view.getModel("SelectedCustomerModel")?.getData() || {};
-                const paidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
+                const paidAmount = oNavigationModel.PaidAmount || 0;
 
                 // FINAL CALCULATION
                 const totalPaid = paidAmount + totalReceivedAmount;
@@ -2230,12 +2234,12 @@ sap.ui.define([
                     InvNo: String(paymentModel.InvNo),
                     TransactionId: String(paymentModel.TransactionId),
                     ReceivedDate: paymentModel.ReceivedDate ? paymentModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    ReceivedAmount: String(paymentModel.ReceivedAmount),
-                    TotalAmount: String(paymentModel.TotalAmount),
-                    DueAmount: String(paymentModel.DueAmount),
+                    ReceivedAmount: paymentModel.ReceivedAmount,
+                    TotalAmount: paymentModel.TotalAmount,
+                    DueAmount: paymentModel.DueAmount,
                     Currency: String(paymentModel.Currency),
-                    ConversionRate: paymentModel.Currency !== "INR" ? String(paymentModel.ConversionRate) : "",
-                    AmountInINR: paymentModel.Currency !== "INR" ? String(paymentModel.AmountInINR) : "",
+                    ConversionRate: paymentModel.Currency !== "INR" ? paymentModel.ConversionRate : "",
+                    AmountInINR: paymentModel.Currency !== "INR" ? paymentModel.AmountInINR : "",
                     CustomerName: paymentModel.CustomerName,
                     BookingID: paymentModel.BookingID,
                     BranchCode: paymentModel.BranchCode,
@@ -2275,7 +2279,6 @@ sap.ui.define([
                             this.oDialog = null;
                         }
                         this.onPressUpdateInvoice("Dont Show");
-                        // this.byId("CID_id_TableInvoiceItem").setMode("None");
                         MessageToast.show(this.i18nModel.getText("paymentMessage"));
                     }
                 } catch (error) {
@@ -3014,9 +3017,9 @@ sap.ui.define([
                         doc.text("Transaction History", margin, currentY);
 
                         currentY += 5;
-                          const aSortedPayments = paymentdata.commentData.sort(function (a, b) {
-                        return new Date(b.Date) - new Date(a.Date);
-                          });
+                        const aSortedPayments = paymentdata.commentData.sort(function (a, b) {
+                            return new Date(b.Date) - new Date(a.Date);
+                        });
                         const paymentBody = aSortedPayments.map((item, index) => ([
                             index + 1,
                             Formatter.formatDate(item.Date),

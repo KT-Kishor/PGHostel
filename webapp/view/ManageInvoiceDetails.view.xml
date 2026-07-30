@@ -809,7 +809,7 @@
                                                 />
 											</m:HBox>
 											<!-- Balance Amount -->
-											<m:HBox
+											<!-- <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{=
                                                     (
@@ -826,17 +826,19 @@
 												<m:Text class="amountText"
                                             text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
                                              textAlign="End"/>
-											</m:HBox>
+											</m:HBox> -->
 											<!-- Due Amount -->
 											<m:HBox
                                                 justifyContent="SpaceBetween"
-                                                visible="{=
+                                               visible="{=
+                                                    (
+                                                        Number(${FilteredSOWModel>/TotalAmount} || 0) -
                                                         (
-                                                            ${SelectedCustomerModel>/Status} === 'Payment Received' ||
-                                                            ${SelectedCustomerModel>/Status} === 'Payment Partially'
-                                                        ) &amp;&amp;
-                                                        Number(${InvoicePayment>/AllDueAmount}) > 0
-                                                    }"
+                                                            Number(${SelectedCustomerModel>/PaidAmount} || 0) +
+                                                            Number(${InvoicePayment>/AllReceivedAmount} || 0)
+                                                        )
+                                                    ) > 0
+                                                }"
                                             >
 												<m:Label
                                                     text="{i18n>invoiceDueAmount} ({FilteredSOWModel>/Currency}) :"
