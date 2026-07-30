@@ -134,7 +134,7 @@
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             id="CID_id_Date"
-                                            value="{path:'SelectedCustomerModel>/InvDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
+                                            value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onChangeDate" visible="{visiablityPlay>/createVisi}"
                                         />
 										<m:Label
@@ -149,7 +149,7 @@
                                             id="CID_id_NavInvDate"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
-                                            value="{SelectedCustomerModel>/InvDate}"
+                                            value="{SelectedCustomerModel>/InvoiceDate}"
                                             editable="{visiablityPlay>/editable}"
                                             change="onChangeDate"
                                         />
@@ -165,7 +165,7 @@
                                             id="CID_id_NavDate"
                                             displayFormat="dd/MM/yyyy"
                                             valueFormat="dd/MM/yyyy"
-                                            value="{SelectedCustomerModel>/InvDate}"
+                                            value="{SelectedCustomerModel>/InvoiceDate}"
                                             editable="{visiablityPlay>/editable}"
                                             change="CID_ValidateDate"
                                         />

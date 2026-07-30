@@ -131,7 +131,7 @@
 							<Text text="{ManageInvoiceModel>InvNo}" />
 							<Text text="{ManageInvoiceModel>CustomerName}" />
 							<Text text="{ManageInvoiceModel>BookingID}" />
-							<Text text="{path:'ManageInvoiceModel>InvDate',formatter: '.Formatter.formatDate'}"/>
+							<Text text="{path:'ManageInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}"/>
 							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="20"/>
 							<Text text="{path: 'ManageInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {ManageInvoiceModel>Currency}" textAlign="End"/>
 							<Text text="{path:'ManageInvoiceModel>PayByDate',formatter: '.Formatter.formatDate'}"/>

@@ -65,7 +65,7 @@ sap.ui.define([
                     BookingID: "",
                     CustomerName: "",
                     InvNo: "",
-                    InvDate: "",
+                    // InvDate: "",
                     InvoiceDate: "",
                     Name: "",
                     // PAN: "",
@@ -83,7 +83,7 @@ sap.ui.define([
                     SubTotalNotGST: "0",
                     SubTotalInGST: "0",
                     LUT: "",
-                    IncomePerc: "10",
+                    // IncomePerc: "10",
                     RoomNo: "",
                     BranchCode: "",
                     RefundAmount: ""
@@ -237,8 +237,8 @@ sap.ui.define([
                     oHeader.InvoiceDate = this.Formatter.DateFormat(oHeader.InvoiceDate);
                     var PayByDate = oHeader.PayByDate;
                     oHeader.PayByDate = this.Formatter.DateFormat(oHeader.PayByDate);
-                    var InvDate = oHeader.InvDate
-                    oHeader.InvDate = this.Formatter.formatDate(InvDate);
+                    // var InvDate = oHeader.InvoiceDate
+                    // oHeader.InvoiceDate = this.Formatter.formatDate(InvDate);
                     this.SelectedCustomerModel.setData(oHeader);
 
                     // ---- GST checkbox derived selection ----
@@ -621,7 +621,7 @@ sap.ui.define([
 
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
-                    mergedData.InvDate = new Date();
+                    // mergedData.InvDate = new Date();
                     mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate, startDate, endDate);
                     oModel.setData(mergedData);
 
@@ -1441,9 +1441,6 @@ sap.ui.define([
                     TotalAmount: oSelectedCustomerModel.TotalAmount
                 };
 
-
-
-
                 //    const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
                 // const totalAmount = Number(oSelectedCustomerModel.TotalAmount) || 0;
                 // const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
@@ -1471,7 +1468,7 @@ sap.ui.define([
                 }
 
                 const oPayload = {
-                    InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
+                    // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
                     CustomerName: oSelectedCustomerModel.CustomerName || "",
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
@@ -1497,14 +1494,14 @@ sap.ui.define([
                     SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
                     SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
                     LUT: oSelectedCustomerModel.LUT || "",
-                    IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
+                    // IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
                     BookingID: oSelectedCustomerModel.BookingID || "",
                     BranchCode: oSelectedCustomerModel.BranchCode || "",
                     RoomNo: oSelectedCustomerModel.RoomNo || "",
                     CouponDiscount: oSelectedCustomerModel.CouponDiscount || "",
                     UserID: oSelectedCustomerModel.UserID || "",
                     PaidAmount: oSelectedCustomerModel.PaidAmount || "",
-                    BalanceAmount: balanceAmount.toString() || "",
+                    // BalanceAmount: balanceAmount.toString() || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
                     CustomerGSTNO: oSelectedCustomerModel.CustomerGSTNO || "",
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
@@ -2113,7 +2110,7 @@ sap.ui.define([
                 if (entity === "HM_ManageInvoice") {
                     const invoiceData = oData.data?.[0] || {};
                     invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
-                    invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
+                    // invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
                     invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
                     // ---- GST checkbox derived selection ----
                     const igst = parseFloat(invoiceData.IGST) || 0;
@@ -2715,7 +2712,7 @@ sap.ui.define([
                     },
                     {
                         label: 'Date :',
-                        value: typeof oModel.InvDate === "string" ? oModel.InvDate : Formatter.formatDate(oModel.InvDate)
+                        value: typeof oModel.InvoiceDate === "string" ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)
                     },
                     {
                         label: 'Room No :',
@@ -3393,7 +3390,7 @@ sap.ui.define([
 
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
-                        ["Date :", oCustomerModel.InvDate.includes("-") ? Formatter.formatDate(oCustomerModel.InvDate) : oCustomerModel.InvDate],
+                        ["Date :", oCustomerModel.InvoiceDate.includes("-") ? Formatter.formatDate(oCustomerModel.InvoiceDate) : oCustomerModel.InvoiceDate],
                         ["Room No :", oCustomerModel.RoomNo]
                     ];
 
@@ -3722,7 +3719,7 @@ sap.ui.define([
                         },
                         {
                             label: "Date :",
-                            value: Formatter.formatDate(oModel.InvDate)
+                            value: Formatter.formatDate(oModel.InvoiceDate)
                         },
                         {
                             label: "Room No :",
