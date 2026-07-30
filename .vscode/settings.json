@@ -20,5 +20,8 @@
     "command": "npm run lint",
     "runOn": "folderOpen"
   },
-  "SAP HANA Database Explorer.ShowXsAdvancedConnections": true
+  "SAP HANA Database Explorer.ShowXsAdvancedConnections": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

@@ -91,6 +91,7 @@ sap.ui.define([
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
 
+
                 oView.setModel(new JSONModel({
                     BookingID: "",
                 }), "BookingModel");
@@ -133,14 +134,10 @@ sap.ui.define([
                     minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
-                oView.setModel(new JSONModel({
-                    AllReceivedAmount: 0,
-                    AllDueAmount: 0
-                }), "InvoicePayment");
+                oView.setModel(new JSONModel({AllReceivedAmount: 0,AllDueAmount: 0}), "InvoicePayment");
 
-                var SowDataModel = new JSONModel({
-                    items: []
-                });
+                var SowDataModel = new JSONModel({items: []});
+                
                 this.getView().setModel(SowDataModel, "CombinedData");
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);
@@ -1146,160 +1143,169 @@ sap.ui.define([
                 const oSOWModel = oView.getModel("FilteredSOWModel");
                 const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
                 const oCustomerModel = oView.getModel("SelectedCustomerModel");
+                const InvoicePayment = this.getView().getModel("InvoicePayment");
 
-                let aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+                try {
+                    let aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
 
-                let totalWithGST = 0;
-                let totalWithoutGST = 0;
+                    let totalWithGST = 0;
+                    let totalWithoutGST = 0;
 
-                //  GST MASTER CHECK 
-                const taxType = oCustomerModel.getProperty("/Type");
-                const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
-                const currency = oSOWModel.getProperty("/Currency");
+                    // ---------- GST MASTER CHECK ----------
+                    const taxType = oCustomerModel.getProperty("/Type");
+                    const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
+                    const currency = oSOWModel.getProperty("/Currency");
 
-                const isGSTEnabled = !!taxType &&
-                    taxRate > 0 &&
-                    currency === "INR";
+                    const isGSTEnabled = !!taxType && taxRate > 0 && currency === "INR";
 
-                this.visiablityPlay.setProperty("/GST", isGSTEnabled);
+                    this.visiablityPlay.setProperty("/GST", isGSTEnabled);
 
-                //  ITEM CALCULATION 
-                aItems.forEach((item) => {
+                    // ---------- ITEM CALCULATION ----------
+                    aItems.forEach((item) => {
+                        // Original amount
+                        const baseAmount = parseFloat(item.Total) || 0;
+                        // ---------- DISCOUNT ----------
+                        let discountAmount = 0;
+                        if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
+                            discountAmount = baseAmount * (parseFloat(item.Discount) / 100);
+                        } else {
+                            discountAmount = parseFloat(item.Discount) || 0;
+                        }
+                        // Validation
+                        if (discountAmount > baseAmount) discountAmount = 0;
+                        // Final amount after item discount
+                        const finalItemAmount = baseAmount - discountAmount;
+                        // Store values
+                        item.DiscountAmount = discountAmount.toFixed(2);
+                        item.FinalAmount = finalItemAmount.toFixed(2);
+                        item.Total = finalItemAmount.toFixed(2);
 
-                    // Original amount
-                    const baseAmount = parseFloat(item.Total) || 0;
+                        // ---------- GST LOGIC ----------
+                        const itemWantsGST = item.GSTCalculation === true || item.GSTCalculation === "YES" || item.GSTCalculation === "true";
 
-                    // ---------- DISCOUNT ----------
-                    let discountAmount = 0;
+                        if (!isGSTEnabled) {
+                            item.GSTCalculation = "NO";
+                        } else {
+                            item.GSTCalculation = itemWantsGST ? "YES" : "NO";
+                        }
 
-                    if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
-                        discountAmount = baseAmount * (parseFloat(item.Discount) / 100);
+                        const isGSTApplicable = isGSTEnabled && itemWantsGST;
+
+                        item.SAC = isGSTApplicable ? "996322" : "-";
+
+                        // GST applicable subtotal — ONLY items marked YES go here
+                        if (isGSTApplicable) {
+                            totalWithGST += finalItemAmount;
+                        } else {
+                            totalWithoutGST += finalItemAmount;
+                        }
+                    });
+
+                    // ---------- SUBTOTALS ----------
+                    const subTotal = totalWithGST + totalWithoutGST;
+
+                    oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
+                    oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
+                    oCustomerModel.setProperty("/SubTotal", subTotal.toFixed(2));
+
+                    // ---------- COUPON ----------
+                    let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
+
+                    oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
+
+                    // ---------- DISCOUNTED TOTAL (display / overall invoice level) ----------
+                    let discountedTotal = subTotal - couponDiscount;
+                    if (discountedTotal < 0) discountedTotal = 0;
+
+                    oCustomerModel.setProperty("/DiscountedTotal", discountedTotal.toFixed(2));
+
+                    // ---------- ALLOCATE COUPON DISCOUNT PROPORTIONALLY ----------
+                    let couponForGST = 0;
+                    let couponForNonGST = 0;
+
+                    if (subTotal > 0) {
+                        const gstShare = totalWithGST / subTotal;
+                        couponForGST = couponDiscount * gstShare;
+                        couponForNonGST = couponDiscount - couponForGST;
+                    }
+
+                    let netGSTAmount = totalWithGST - couponForGST;
+                    if (netGSTAmount < 0) netGSTAmount = 0;
+
+                    let netNonGSTAmount = totalWithoutGST - couponForNonGST;
+                    if (netNonGSTAmount < 0) netNonGSTAmount = 0;
+
+                    // ---------- GST CALCULATION ----------
+                    let gstAmount = 0;
+                    let finalAmount = netGSTAmount + netNonGSTAmount;
+
+                    if (isGSTEnabled) {
+                        const taxableAmount = netGSTAmount;
+
+                        if (taxType === "CGST/SGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+
+                            const cgst = gstAmount;
+                            const sgst = gstAmount;
+
+                            finalAmount += cgst + sgst;
+
+                            oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
+                            oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
+                            oCustomerModel.setProperty("/IGST", "0.00");
+                        } else if (taxType === "IGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            finalAmount += gstAmount;
+                            oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
+                            oCustomerModel.setProperty("/CGST", "0.00");
+                            oCustomerModel.setProperty("/SGST", "0.00");
+                        }
                     } else {
-                        discountAmount = parseFloat(item.Discount) || 0;
-                    }
-
-                    // Validation
-                    if (discountAmount > baseAmount) {
-                        discountAmount = 0;
-                    }
-
-                    // Final amount after item discount
-                    const finalAmount = baseAmount - discountAmount;
-
-                    // Store values
-                    item.DiscountAmount = discountAmount.toFixed(2);
-                    item.FinalAmount = finalAmount.toFixed(2);
-                    item.Total = finalAmount.toFixed(2);
-
-                    // ---------- GST LOGIC ----------
-                    if (!isGSTEnabled) {
-                        item.GSTCalculation = "NO";
-                    }
-
-                    const isGSTApplicable =
-                        isGSTEnabled &&
-                        item.GSTCalculation === "YES";
-
-                    item.SAC =
-                        isGSTApplicable ? "996322" : "-";
-
-                    // GST applicable subtotal
-                    if (isGSTApplicable) {
-                        totalWithGST += finalAmount;
-                    } else {
-                        totalWithoutGST += finalAmount;
-                    }
-                });
-
-                //  SUBTOTALS 
-                const subTotal = totalWithGST + totalWithoutGST;
-
-                oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
-                oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
-                oCustomerModel.setProperty("/SubTotal", subTotal.toFixed(2));
-
-                //  COUPON 
-                let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
-
-                oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
-
-                //  DISCOUNTED TOTAL 
-                let discountedTotal =
-                    subTotal - couponDiscount;
-
-                if (discountedTotal < 0) {
-                    discountedTotal = 0;
-                }
-
-                oCustomerModel.setProperty("/DiscountedTotal", discountedTotal.toFixed(2));
-
-                //  GST CALCULATION 
-                let gstAmount = 0;
-                let finalAmount = discountedTotal;
-
-                if (isGSTEnabled) {
-                    // GST should apply after coupon discount
-                    const taxableAmount = discountedTotal;
-
-                    if (taxType === "CGST/SGST") {
-                        gstAmount = (taxableAmount * taxRate) / 100;
-
-                        const cgst = gstAmount;
-                        const sgst = gstAmount;
-
-                        finalAmount += cgst + sgst;
-
-                        oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
-                        oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
-                        oCustomerModel.setProperty("/IGST", "0.00");
-                    } else if (taxType === "IGST") {
-                        gstAmount = (taxableAmount * taxRate) / 100;
-                        finalAmount += gstAmount;
-                        oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                         oCustomerModel.setProperty("/CGST", "0.00");
                         oCustomerModel.setProperty("/SGST", "0.00");
+                        oCustomerModel.setProperty("/IGST", "0.00");
                     }
-                } else {
-                    oCustomerModel.setProperty("/CGST", "0.00");
-                    oCustomerModel.setProperty("/SGST", "0.00");
-                    oCustomerModel.setProperty("/IGST", "0.00");
+
+                    oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
+                    oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+                    oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+
+                    // ---------- PAYMENT ----------
+                    let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
+
+                    const oInvoicePaymentModel = oView.getModel("InvoicePayment");
+                    let allReceivedAmount = 0;
+
+                    if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
+                        allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+                    }
+
+                    let totalPaid = paidAmount + allReceivedAmount;
+                    let balanceAmount = 0;
+                    let refundAmount = 0;
+
+                    if (totalPaid > finalAmount) {
+                        refundAmount = totalPaid - finalAmount;
+                        balanceAmount = 0;
+                    } else {
+                        balanceAmount = finalAmount - totalPaid;
+                        refundAmount = 0;
+                    }
+
+                    oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
+                    oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                    oCustomerModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
+
+                    oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                    InvoicePayment.setProperty("/AllDueAmount", balanceAmount.toFixed(2));
+                    oSOWModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
+
+                    oInvoiceModel.refresh(true);
+                    this.onChangeConversionRate();
+
+                } catch (oError) {
+                    sap.m.MessageToast.show("Unable to calculate invoice totals. Please check the invoice items and tax settings.");
                 }
-
-                oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
-                oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
-                oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
-
-                //  PAYMENT 
-                let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
-
-                const oInvoicePaymentModel = oView.getModel("InvoicePayment");
-                let allReceivedAmount = 0;
-
-                if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
-                    allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
-                }
-
-                let totalPaid = paidAmount + allReceivedAmount;
-                let balanceAmount = 0;
-                let refundAmount = 0;
-
-                if (totalPaid > finalAmount) {
-                    refundAmount = totalPaid - finalAmount;
-                    balanceAmount = 0;
-                } else {
-                    balanceAmount = finalAmount - totalPaid;
-                    refundAmount = 0;
-                }
-
-                oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
-                oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
-                oCustomerModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
-
-                oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
-                oSOWModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
-
-                oInvoiceModel.refresh(true);
-                this.onChangeConversionRate();
             },
 
             Comp_onChangeGSTCalculation: function (oEvent) {
@@ -1456,9 +1462,7 @@ sap.ui.define([
 
                 const totalAmount = Number(FilterModel.TotalAmount) || 0;
                 const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
-                const allReceivedAmount = Number(
-                    oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")
-                ) || 0;
+                const allReceivedAmount = Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0;
 
                 const balanceAmount = totalAmount - (paidAmount + allReceivedAmount);
 
@@ -2298,7 +2302,7 @@ sap.ui.define([
 
             onPressInvClose: function () {
                 var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
-                oSelectedModel.setProperty("/Status", this.OldStatus);
+                if(this.OldStatus !== "Payment Received") oSelectedModel.setProperty("/Status", this.OldStatus);
 
                 sap.ui.getCore().byId("MI_id_TransactionID").setValueState("None");
                 sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
@@ -2677,7 +2681,7 @@ sap.ui.define([
                     const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
 
                     let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
-                    const showSAC = oModel.GSTNO !== undefined && oModel.GSTNO !== "";
+                    const showSAC = oModel.GST !== undefined && oModel.GST !== "";
 
                     const margin = 15;
                     const doc = new jsPDF({
@@ -4272,6 +4276,30 @@ sap.ui.define([
                     // 3. Process new items list
                     const finalItems = this._prepareInvoiceItems(oData);
 
+                    const itemsToDelete = existingItems.filter(existing =>
+                        !finalItems.some(item => item.ItemID === existing.ItemID)
+                    );
+
+                    // Delete extra items
+                    for (const oObject of itemsToDelete) {
+                        try {
+                            await this.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
+                                filters: {
+                                    ItemID: oObject.ItemID
+                                }
+                            });
+
+                            // Optional: Remove from local model
+                            const index = existingItems.findIndex(item => item.ItemID === oObject.ItemID);
+                            if (index !== -1) {
+                                existingItems.splice(index, 1);
+                            }
+
+                        } catch (error) {
+                            MessageToast.show(error.responseText);
+                        }
+                    }
+
                     // 4. Update model with new items
                     oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
 
@@ -4336,6 +4364,7 @@ sap.ui.define([
 
                 const dbFacilitiesRaw = oData.commentData || [];
                 const processedFacilityItems = [];
+                const usedItemIds = new Set();
 
                 dbFacilitiesRaw.forEach((f) => {
                     let fStart = new Date(f.StartDate);
@@ -4385,9 +4414,18 @@ sap.ui.define([
 
                     if (facilityTotal <= 0 && invoiceIndex > 0) return;
 
+                    // const existingFacility = existingItems.find(i =>
+                    //     i.Particulars && i.Particulars.trim() === particulars.trim()
+                    // );
+
                     const existingFacility = existingItems.find(i =>
-                        i.Particulars && i.Particulars.trim() === particulars.trim()
+                        i.Particulars?.trim() === particulars.trim() &&
+                        !usedItemIds.has(i.ItemID)
                     );
+
+                    if (existingFacility) {
+                        usedItemIds.add(existingFacility.ItemID);
+                    }
 
                     processedFacilityItems.push({
                         ItemID: existingFacility ? existingFacility.ItemID : null,

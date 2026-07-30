@@ -831,14 +831,12 @@
 											<m:HBox
                                                 justifyContent="SpaceBetween"
                                                visible="{=
-                                                    (
-                                                        Number(${FilteredSOWModel>/TotalAmount} || 0) -
                                                         (
-                                                            Number(${SelectedCustomerModel>/PaidAmount} || 0) +
-                                                            Number(${InvoicePayment>/AllReceivedAmount} || 0)
-                                                        )
-                                                    ) > 0
-                                                }"
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Received' ||
+                                                            ${SelectedCustomerModel>/Status} === 'Payment Partially'
+                                                        ) &amp;&amp;
+                                                        Number(${InvoicePayment>/AllDueAmount}) > 0
+                                                    }"
                                             >
 												<m:Label
                                                     text="{i18n>invoiceDueAmount} ({FilteredSOWModel>/Currency}) :"
