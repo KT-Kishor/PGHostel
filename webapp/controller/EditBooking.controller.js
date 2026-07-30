@@ -4212,7 +4212,7 @@ sap.ui.define([
                         } else if(sUnitText === "Package Price"){
                             if(item.FacilityChargeType==="Entire Booking"){
                                 this.qty=`(${item.Quantity || 1} Qty)`
-                                sUnitText = `${sUnitText} / Entire Stay`;
+                                sUnitText = `${sUnitText}`;
                             }else{
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
@@ -4241,8 +4241,8 @@ sap.ui.define([
 
                     return [
                         (index + 1).toString(),
-                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
+                        item.MemberName
+                            ? item.FacilityChargeType==="Entire Booking" ?`${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty} / Entire Stay` : ""}` : `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
