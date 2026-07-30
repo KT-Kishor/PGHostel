@@ -4373,6 +4373,7 @@
         },
 
         _getFacilitiesBreakdownPopover: function () {
+            var that = this;
             if (!this._oFacilitiesBreakdownPopover) {
                 this._oFacilitiesBreakdownPopover = new ResponsivePopover({
                     showHeader: true,
@@ -4391,10 +4392,19 @@
                                                     { path: "HostelModel>FacilityName" },
                                                     { path: "HostelModel>BreakdownText" },
                                                     { path: "HostelModel>TotalAmount" },
-                                                    { path: "HostelModel>Currency" }
+                                                    { path: "HostelModel>Currency" },
+                                                    { path: "HostelModel>SelectionMode" },
+                                                    { path: "HostelModel>FacilityChargeType" }
                                                 ],
-                                                formatter: function (sName, sBreakdown, fTotal, sCurrency) {
+                                                formatter: function (sName, sBreakdown, fTotal, sCurrency, sSelectionMode, sChargeType) {
                                                     var sResult = sName || "Facility";
+                                                    // PERSON_QTY = package pricing: show whether the package is
+                                                    // charged Per Day or once for the Entire Booking.
+                                                    if (that._supportsFacilityChargeType(sSelectionMode)) {
+                                                        sResult += " (" + (that._normalizeFacilityChargeType(sChargeType) === "DAILY"
+                                                            ? "Per Day"
+                                                            : "Entire Booking") + ")";
+                                                    }
                                                     if (sBreakdown) {
                                                         sResult += ": " + sBreakdown;
                                                     }

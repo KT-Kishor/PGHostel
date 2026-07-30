@@ -893,7 +893,7 @@ sap.ui.define([
             this.FacilityPrice = totalFacilityPricePerDay + otherFacilitiesTotal;
 
             let DiscountAmount = Discount || 0;
-            const SubTotal = FacilityPrice + roomRentPrice - DiscountAmount;
+            const SubTotal = FacilityPrice + roomRentPrice - Number(DiscountAmount);
 
             let SGST = 0;
             let CGST = 0;
