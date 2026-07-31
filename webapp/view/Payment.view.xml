@@ -188,8 +188,8 @@
                         minScreenWidth="Tablet"
                     >
                         <Text
-                            text="{i18n>refundPaidAmount}"
-                            tooltip="{i18n>refundPaidAmount}"
+                            text="{i18n>refundPaidStatus}"
+                            tooltip="{i18n>refundPaidStatus}"
                         />
                     </Column>
 

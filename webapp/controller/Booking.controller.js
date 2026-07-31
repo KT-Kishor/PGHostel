@@ -2135,14 +2135,16 @@
                             return oLine.personName || fnGetPersonName(oLine.personId);
                         });
 
+                        // The charge type is already shown next to the facility name as
+                        // "(Per Day)" / "(Entire Booking)", so it is not repeated here.
                         if (sFacilityChargeType === "DAILY") {
                             fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
                             sBreakdown = "For: " + aNames.join(", ") +
-                                " | Daily x " + iChargeableDayCount + " day(s)";
+                                " " + fPackagePrice +
+                                " x " + iChargeableDayCount + " day(s)";
                         } else {
                             fTotal = fPackagePrice * iSelectedPersonCount;
-                            sBreakdown = "For: " + aNames.join(", ") +
-                                " | Once per booking";
+                            sBreakdown = "For: " + aNames.join(", ");
                         }
 
                         sAllocationDetails = JSON.stringify({

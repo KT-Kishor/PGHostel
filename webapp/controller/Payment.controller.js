@@ -282,7 +282,7 @@ sap.ui.define([
                 type: "string"
             },
             {
-                label: "Refund / Paid Amount",
+                label: "Refund / Paid Status",
                 property: "Payment",
                 type: "string"
             },
