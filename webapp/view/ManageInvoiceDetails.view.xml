@@ -437,7 +437,7 @@
                                                 />
 												<m:Button
                                                     id="AddItem"
-                                                    visible="{visiablityPlay>/addInvBtn}"
+                                                    visible="{= ${visiablityPlay>/addInvBtn} &amp;&amp; !${visiablityPlay>/fromMyBookings} }"
                                                     text="{i18n>addInvItems}"
                                                     tooltip="{i18n>addInvItems}"
                                                     class="myUnifiedBtn"
@@ -445,14 +445,14 @@
                                                 />
 												<m:Button
                                                    id="deleteItem"
-                                                    visible="{visiablityPlay>/addInvBtn}"
+                                                    visible="{= ${visiablityPlay>/addInvBtn} &amp;&amp; !${visiablityPlay>/fromMyBookings} }"
                                                     text="{i18n>MSdelete}"
                                                     tooltip="{i18n>MSdelete}"
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressDelete"
                                                 />
 												<m:Button text="Update Item" press="onRefreshInvoice"
-                                                visible="{visiablityPlay>/refresh}" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
+                                                visible="{= ${visiablityPlay>/refresh} &amp;&amp; !${visiablityPlay>/fromMyBookings} }" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
 												<!-- <m:ToolbarSeparator /> -->
 											</m:OverflowToolbar>
 										</m:headerToolbar>
@@ -874,10 +874,10 @@
                         visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
                             &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
                             &amp;&amp; (
-                                ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'SuperAdmin'
-                                || ${LoginModel>/Role} === 'Branch Manager'
-                                || ${LoginModel>/Role} === 'Front Office Employee'
+                                ${visiablityPlay>/effRole} === 'Admin'
+                                || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                                || ${visiablityPlay>/effRole} === 'Branch Manager'
+                                || ${visiablityPlay>/effRole} === 'Front Office Employee'
                             )
                             &amp;&amp; ${visiablityPlay>/merge}
                         }"
@@ -890,10 +890,10 @@
 					<m:Button
                         visible="{= ${visiablityPlay>/createVisi}
                             &amp;&amp; (
-                                ${LoginModel>/Role} === 'Admin'
-                                || ${LoginModel>/Role} === 'SuperAdmin'
-                                || ${LoginModel>/Role} === 'Branch Manager'
-                                || ${LoginModel>/Role} === 'Front Office Employee'
+                                ${visiablityPlay>/effRole} === 'Admin'
+                                || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                                || ${visiablityPlay>/effRole} === 'Branch Manager'
+                                || ${visiablityPlay>/effRole} === 'Front Office Employee'
                             )
                         }"
                         text="{i18n>submit}"
@@ -924,10 +924,10 @@
     <m:Button
         visible="{= ${visiablityPlay>/Edit}
             &amp;&amp; (
-                ${LoginModel>/Role} === 'Admin'
-                || ${LoginModel>/Role} === 'SuperAdmin'
-                || ${LoginModel>/Role} === 'Branch Manager'
-                || ${LoginModel>/Role} === 'Front Office Employee'
+                ${visiablityPlay>/effRole} === 'Admin'
+                || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                || ${visiablityPlay>/effRole} === 'Branch Manager'
+                || ${visiablityPlay>/effRole} === 'Front Office Employee'
             )
         }"
         text="{= ${visiablityPlay>/editable} ? 'Save' : 'Edit'}"
@@ -936,15 +936,15 @@
     />
 
     <m:MenuButton
-        visible="{= 
+        visible="{=
             ${visiablityPlay>/merge}
            &amp;&amp; (
-                ${LoginModel>/Role} === 'Admin'
-                || ${LoginModel>/Role} === 'SuperAdmin'
-                || ${LoginModel>/Role} === 'Branch Manager'
-                || ${LoginModel>/Role} === 'Front Office Employee'
+                ${visiablityPlay>/effRole} === 'Admin'
+                || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                || ${visiablityPlay>/effRole} === 'Branch Manager'
+                || ${visiablityPlay>/effRole} === 'Front Office Employee'
                 || (
-                    ${LoginModel>/Role} === 'Customer'
+                    ${visiablityPlay>/effRole} === 'Customer'
                     &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
                 )
             )
@@ -957,23 +957,26 @@
             <m:Menu>
                <m:MenuItem
                                     text="{i18n>GeneratePDF}"
-                                    press="CID_onPressGeneratePdf" visible="{= 
+                                    press="CID_onPressGeneratePdf" visible="{=
                                     (
-                                        ${LoginModel>/Role} === 'Admin'
-                                        || ${LoginModel>/Role} === 'SuperAdmin'
-                                        || ${LoginModel>/Role} === 'Branch Manager'
-                                        || ${LoginModel>/Role} === 'Front Office Employee'
+                                        ${visiablityPlay>/effRole} === 'Admin'
+                                        || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                                        || ${visiablityPlay>/effRole} === 'Branch Manager'
+                                        || ${visiablityPlay>/effRole} === 'Front Office Employee'
                                     )
                                     || (
-                                        ${LoginModel>/Role} === 'Customer'
+                                        ${visiablityPlay>/effRole} === 'Customer'
                                         &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
                                     )
                                 }" />
 								<m:MenuItem
                                     text="{i18n>printInvoice}"
-                                    press="CID_onPressGenerateSelectedPDF" 
-                                    visible="{= 
-                                        ${LoginModel>/Role} === 'Admin' ||  ${LoginModel>/Role} === 'Branch Manager' || ${LoginModel>/Role} === 'Front Office Employee'}" />
+                                    press="CID_onPressGenerateSelectedPDF"
+                                    visible="{=
+                                        ${visiablityPlay>/effRole} === 'Admin'
+                                        || ${visiablityPlay>/effRole} === 'Branch Manager'
+                                        || ${visiablityPlay>/effRole} === 'Front Office Employee'
+                                    }" />
 								<m:MenuItem
     text="{i18n>summaryInvoice}"
     press="CID_onPressGenerateSummaryPDF"
@@ -982,13 +985,13 @@
         &amp;&amp;
         (
             (
-                ${LoginModel>/Role} === 'Admin'
-                || ${LoginModel>/Role} === 'SuperAdmin'
-                || ${LoginModel>/Role} === 'Branch Manager'
-                || ${LoginModel>/Role} === 'Front Office Employee'
+                ${visiablityPlay>/effRole} === 'Admin'
+                || ${visiablityPlay>/effRole} === 'SuperAdmin'
+                || ${visiablityPlay>/effRole} === 'Branch Manager'
+                || ${visiablityPlay>/effRole} === 'Front Office Employee'
             )
             || (
-                ${LoginModel>/Role} === 'Customer'
+                ${visiablityPlay>/effRole} === 'Customer'
                &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
             )
         )

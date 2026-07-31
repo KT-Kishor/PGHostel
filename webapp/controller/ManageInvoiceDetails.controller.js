@@ -131,6 +131,7 @@ sap.ui.define([
                     MultiEmail: true,
                     Edit: true,
                     IncomeTax: true,
+                    fromMyBookings: false,
                     minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
@@ -140,6 +141,15 @@ sap.ui.define([
 
                 this.getView().setModel(SowDataModel, "CombinedData");
                 this.visiablityPlay = oView.getModel("visiablityPlay");
+                // Arriving from MyBookings the invoice page is read-only for everybody:
+                // Admin / SuperAdmin / Branch Manager / Front Office Employee must see
+                // exactly what a Customer sees. Instead of repeating that exception in
+                // every binding, hand the view an "effective role" that collapses to
+                // Customer on this route. Set once per route match, so the later flag
+                // toggles (edit / save / refresh) can never bring a button back.
+                var bFromMyBookings = this.sourceView === "MyBookings";
+                this.visiablityPlay.setProperty("/fromMyBookings", bFromMyBookings);
+                this.visiablityPlay.setProperty("/effRole", bFromMyBookings ? "Customer" : loginModel.getProperty("/Role"));
                 this.visiablityPlay.setProperty("/Edit", false);
                 this.visiablityPlay.setProperty("/MultiEmail", false);
                 this.visiablityPlay.setProperty("/merge", false);
