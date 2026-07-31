@@ -1553,7 +1553,7 @@
                                                     ? "per day"
                                                     : "once for the entire booking";
 
-                                                return "Package: " + iQty + " item(s) for ₹" + fPrice.toFixed(2) +
+                                                return "Package: " + iQty + " item(s) for " + fPrice.toFixed(2) + " INR" +
                                                     " per selected person, charged " + sChargeLabel + ".";
                                             }
                                         },
@@ -4321,7 +4321,7 @@
                                                     if (fDiscountAmount > 0) {
                                                         return "Discount: " + fDiscountAmount.toFixed(2) + " " + sCurrencySymbol;
                                                     } else {
-                                                        return "Complimentary offer (₹0)";
+                                                        return "Complimentary offer (0 " + sCurrencySymbol + ")";
                                                     }
                                                 }
                                             },

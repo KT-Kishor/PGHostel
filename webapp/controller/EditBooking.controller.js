@@ -1063,29 +1063,34 @@ sap.ui.define([
             var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
             var oCalcStart = this._parseDate(oCalcItem.StartDate);
             var oCalcEnd = this._parseDate(oCalcItem.EndDate);
+            var fPrice = this._toNumber(oCalcItem.BasicFacilityPrice);
+            var sCurrency = oCalcItem.Currency || "INR";
             var sPeriodPart = "";
 
             if (sUnitKey === "PERDAY") {
-                sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " Per Day";
+                sPeriodPart = this._formatFacilityUnitCount(Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1), "Day");
             } else if (sUnitKey === "PERMONTH") {
-                sPeriodPart = Math.max(this._getMonthCount(oCalcStart, oCalcEnd), 1) + " Per Month";
+                sPeriodPart = this._formatFacilityUnitCount(Math.max(this._getMonthCount(oCalcStart, oCalcEnd), 1), "Month");
             } else if (sUnitKey === "PERYEAR") {
-                sPeriodPart = Math.max(this._getYearCount(oCalcStart, oCalcEnd), 1) + " Per Year";
+                sPeriodPart = this._formatFacilityUnitCount(Math.max(this._getYearCount(oCalcStart, oCalcEnd), 1), "Year");
             } else if (sUnitKey === "PERHOUR") {
                 var iDays = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1);
                 var iHours = Math.max(this._getHourCount(oCalcItem.StartDate, oCalcItem.EndDate, oCalcItem.StartTime, oCalcItem.EndTime, oCalcItem.TotalHour), 1);
-                sPeriodPart = iDays + " day(s) x " + iHours + " hr(s)";
+                sPeriodPart = this._formatFacilityUnitCount(iDays, "Day") + " x " + this._formatFacilityUnitCount(iHours, "Hr");
             } else if (sUnitKey === "PACKAGEPRICE" || sUnitKey === "PACKAGE") {
                 var sChargeType = String(oCalcItem.FacilityChargeType || "").toUpperCase();
                 if (sChargeType === "DAILY") {
-                    sPeriodPart = Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1) + " day(s)";
+                    sPeriodPart = this._formatFacilityUnitCount(Math.max(this._getDayCount(oCalcStart, oCalcEnd), 1), "Day");
                 }
+            } else if (sUnitKey === "UNITPRICE" || sUnitKey === "UNIT") {
+                // For Unit Price, quantity IS the unit count, so fold them together.
+                return fPrice + " " + sCurrency + " x " + this._formatFacilityUnitCount(iQty, "Unit");
             }
 
-            if (iQty === 1) {
-                return sPeriodPart || "Qty (1)";
-            }
-            return "Qty (" + iQty + ")" + (sPeriodPart ? " x " + sPeriodPart : "");
+            // Qty is only a factor worth showing when more than one, otherwise "Qty 1 x" is noise.
+            return (iQty > 1 ? "Qty " + iQty + " x " : "") +
+                fPrice + " " + sCurrency +
+                (sPeriodPart ? " x " + sPeriodPart : "");
         },
 
         /**
@@ -2813,7 +2818,8 @@ sap.ui.define([
                         BasicFacilityPrice: this._getFirstAvailableNumber(oFacility.SelectedPrice, oFacility.CurrentPrice, oFacility.BasicFacilityPrice),
                         UnitText: sPriceType,
                         Quantity: oFacility.Quantity || 1,
-                        FacilityChargeType: sFacilityChargeType
+                        FacilityChargeType: sFacilityChargeType,
+                        Currency: sCurrency
                     };
 
                     // Booking dates as fallback when facility dates are null
@@ -2869,13 +2875,14 @@ sap.ui.define([
                         var aPersonLines = oPerPersonResult.personBreakdown.map(function (oPerson) {
                             var sUnitLabel = "";
                             var sUnitKey = (oPerson.priceType || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-                            if (sUnitKey === "PERDAY") { sUnitLabel = oPerson.dayCount + " day(s)"; }
-                            else if (sUnitKey === "PERMONTH") { sUnitLabel = oPerson.monthCount + " month(s)"; }
-                            else if (sUnitKey === "PERYEAR") { sUnitLabel = oPerson.yearCount + " year(s)"; }
-                            else if (sUnitKey === "PERHOUR") { sUnitLabel = oPerson.dayCount + " day(s) × " + oPerson.hourCount + " hr(s)"; }
-                            else { sUnitLabel = "flat"; }
-                            return oPerson.personName + " (" + sUnitLabel + " × ₹" + oPerson.price.toFixed(2) + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
-                        });
+                            if (sUnitKey === "PERDAY") { sUnitLabel = this._formatFacilityUnitCount(oPerson.dayCount, "Day"); }
+                            else if (sUnitKey === "PERMONTH") { sUnitLabel = this._formatFacilityUnitCount(oPerson.monthCount, "Month"); }
+                            else if (sUnitKey === "PERYEAR") { sUnitLabel = this._formatFacilityUnitCount(oPerson.yearCount, "Year"); }
+                            else if (sUnitKey === "PERHOUR") { sUnitLabel = this._formatFacilityUnitCount(oPerson.dayCount, "Day") + " x " + this._formatFacilityUnitCount(oPerson.hourCount, "Hr"); }
+                            return oPerson.personName + " (" + oPerson.price.toFixed(2) + " " + sCurrency +
+                                (sUnitLabel ? " x " + sUnitLabel : "") +
+                                " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
+                        }.bind(this));
                         sBreakdown = aPersonLines.join(", ");
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
@@ -2898,13 +2905,18 @@ sap.ui.define([
                         // Build breakdown showing each person's individual calculation
                         var aPersonLines = oPerPersonResult.personBreakdown.map(function (oPerson) {
                             if (oPerson.chargeType === "DAILY") {
-                                return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " day(s) = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                                return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                    " x " + this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day") +
+                                    " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
                             }
                             if (oPerson.chargeType === "Entire Booking") {
-                                return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
+                                // Package price already IS this person's total, so no "= total".
+                                return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency + ")";
                             }
-                            return oPerson.personName + " (₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity + " = ₹" + oPerson.personTotal.toFixed(2) + ")";
-                        });
+                            return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                " x " + this._formatFacilityUnitCount(oPerson.quantity, "Unit") +
+                                " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
+                        }.bind(this));
                         sBreakdown = aPersonLines.join(", ");
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
@@ -3615,11 +3627,11 @@ sap.ui.define([
          */
         _buildFacilityCalcBreakdown: function (oFacility) {
             if (!oFacility || !oFacility.Selected) {
-                return { hasBreakdown: false, items: [], grandTotal: "₹0.00", currency: "INR" };
+                return { hasBreakdown: false, items: [], grandTotal: "0.00 INR", currency: "INR" };
             }
 
             if (!this._shouldShowFacilityCalcBreakdown(oFacility)) {
-                return { hasBreakdown: false, items: [], grandTotal: "0.00", currency: oFacility.Currency || "INR" };
+                return { hasBreakdown: false, items: [], grandTotal: "0.00 " + (oFacility.Currency || "INR"), currency: oFacility.Currency || "INR" };
             }
 
             var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -3693,20 +3705,23 @@ sap.ui.define([
                         if (sSelectionMode === "PERSON") {
                             var sUnitLabel = "";
                             var sUnitKey = (oPerson.priceType || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-                            if (sUnitKey === "PERDAY") { sUnitLabel = Math.max(oPerson.dayCount, 1) + "Day(s)"; }
-                            else if (sUnitKey === "PERMONTH") { sUnitLabel = Math.max(oPerson.monthCount, 1) + "Mos"; }
-                            else if (sUnitKey === "PERYEAR") { sUnitLabel = Math.max(oPerson.yearCount, 1) + "Yrs"; }
-                            else if (sUnitKey === "PERHOUR") { sUnitLabel = Math.max(oPerson.dayCount, 1) + "Day(s) × " + Math.max(oPerson.hourCount, 1) + "Hr(s)"; }
-                            else { sUnitLabel = "× 1"; }
-                            sMath = "₹" + oPerson.price.toFixed(2) + " × " + sUnitLabel;
+                            if (sUnitKey === "PERDAY") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day"); }
+                            else if (sUnitKey === "PERMONTH") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.monthCount, 1), "Month"); }
+                            else if (sUnitKey === "PERYEAR") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.yearCount, 1), "Year"); }
+                            else if (sUnitKey === "PERHOUR") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day") + " × " + this._formatFacilityUnitCount(Math.max(oPerson.hourCount, 1), "Hr"); }
+                            sMath = oPerson.price.toFixed(2) + " " + sCurrency +
+                                (sUnitLabel ? " × " + sUnitLabel : "");
                         } else {
                             // PERSON_QTY
                             if (oPerson.chargeType === "DAILY") {
-                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + Math.max(oPerson.dayCount, 1) + " Days";
+                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                    " × " + this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day");
                             } else if (oPerson.chargeType === "Entire Booking") {
-                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × 1";
+                                // Package price already IS this person's subtotal.
+                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency;
                             } else {
-                                sMath = "₹" + oPerson.packagePrice.toFixed(2) + " × " + oPerson.quantity;
+                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                    " × " + this._formatFacilityUnitCount(oPerson.quantity, "Unit");
                             }
                         }
 
@@ -3715,7 +3730,7 @@ sap.ui.define([
                             tag: "",
                             dateRange: sPersonDateRange || sDateRange,
                             math: sMath,
-                            subtotal: "₹" + oPerson.personTotal.toFixed(2)
+                            subtotal: oPerson.personTotal.toFixed(2) + " " + sCurrency
                         });
                     }.bind(this));
                 }
@@ -3731,30 +3746,37 @@ sap.ui.define([
                 var iHourCount = this._getHourCount(sFacStart, sFacEnd, sFacStartTime, sFacEndTime, sFacTotalHour);
 
                 var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                var sPrice = fPrice.toFixed(2) + " " + sCurrency;
                 var sMath = "";
+                var bUnitPriceFold = false;
 
                 if (sUnitKey === "PERHOUR") {
-                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + "Day(s) × " + Math.max(iHourCount, 1) + "Hr(s)";
+                    sMath = sPrice + " × " + this._formatFacilityUnitCount(Math.max(iDayCount, 1), "Day") +
+                        " × " + this._formatFacilityUnitCount(Math.max(iHourCount, 1), "Hr");
                 } else if (sUnitKey === "PERDAY") {
-                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + " Days";
+                    sMath = sPrice + " × " + this._formatFacilityUnitCount(Math.max(iDayCount, 1), "Day");
                 } else if (sUnitKey === "PERMONTH") {
-                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iMonthCount, 1) + " Mos";
+                    sMath = sPrice + " × " + this._formatFacilityUnitCount(Math.max(iMonthCount, 1), "Month");
                 } else if (sUnitKey === "PERYEAR") {
-                    sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iYearCount, 1) + " Yrs";
+                    sMath = sPrice + " × " + this._formatFacilityUnitCount(Math.max(iYearCount, 1), "Year");
                 } else if (sUnitKey === "UNITPRICE" || sUnitKey === "UNIT") {
-                    sMath = "₹" + fPrice.toFixed(2);
+                    // For Unit Price, quantity IS the unit count, so fold them together.
+                    sMath = sPrice + " × " + this._formatFacilityUnitCount(iQuantity, "Unit");
+                    bUnitPriceFold = true;
                 } else if (sUnitKey === "PACKAGEPRICE" || sUnitKey === "PACKAGE") {
                     var sChargeType = String(oFacility.FacilityChargeType || "").toUpperCase();
                     if (sChargeType === "DAILY") {
-                        sMath = "₹" + fPrice.toFixed(2) + " × " + Math.max(iDayCount, 1) + " Days";
+                        sMath = sPrice + " × " + this._formatFacilityUnitCount(Math.max(iDayCount, 1), "Day");
                     } else {
-                        sMath = "₹" + fPrice.toFixed(2) + " (once)";
+                        sMath = sPrice;
                     }
                 } else {
-                    sMath = "₹" + fPrice.toFixed(2);
+                    sMath = sPrice;
                 }
 
-                if (iQuantity > 1) {
+                // Qty is only a factor worth showing when more than one, and never when
+                // it was already folded into the unit count above.
+                if (iQuantity > 1 && !bUnitPriceFold) {
                     sMath += " × " + iQuantity + " Qty";
                 }
 
@@ -3765,14 +3787,14 @@ sap.ui.define([
                     tag: sSelectionMode === "QTY" ? "×" + iQuantity : "",
                     dateRange: sDateRange,
                     math: sMath,
-                    subtotal: "₹" + fGrandTotal.toFixed(2)
+                    subtotal: fGrandTotal.toFixed(2) + " " + sCurrency
                 });
             }
 
             return {
                 hasBreakdown: aItems.length > 0,
                 items: aItems,
-                grandTotal: "₹" + fGrandTotal.toFixed(2),
+                grandTotal: fGrandTotal.toFixed(2) + " " + sCurrency,
                 currency: sCurrency
             };
         },
