@@ -2802,19 +2802,26 @@ sap.ui.define([
                     currentY += 5;
 
                     // ===== TABLE BODY =====
-                    const body = oCompanyItemModel.filter(item => item).map((item, index) => {
-                        const row = [
-                            index + 1,
-                            item.Particulars,
-                            (item.StartDate) || "",
-                            (item.EndDate) || "",
-                            Formatter.fromatNumber(item.GrossPrice) || "0.00",
-                            item.UnitText,
-                            Formatter.fromatNumber(item.Total) || "0.00"
-                        ];
-                        if (showSAC) row.splice(2, 0, item.SAC);
-                        return row;
-                    });
+                    const body = oCompanyItemModel
+                        .filter(item => item)
+                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                        .map((item, index) => {
+                            const row = [
+                                index + 1,
+                                item.Particulars,
+                                item.StartDate || "",
+                                item.EndDate || "",
+                                Formatter.fromatNumber(item.GrossPrice) || "0.00",
+                                item.UnitText,
+                                Formatter.fromatNumber(item.Total) || "0.00"
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
 
                     const head = showSAC ? [
                         ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Total']
@@ -3475,20 +3482,26 @@ sap.ui.define([
                         ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ];
 
-                    const body = aInvoiceItems.map((item, i) => {
-                        const row = [
-                            i + 1,
-                            item.Particulars,
-                            item.StartDate || "",
-                            item.EndDate || "",
-                            Formatter.fromatNumber(item.GrossPrice),
-                            item.UnitText,
-                            Formatter.fromatNumber(item.itemDiscountValue), // Injected Discount column value
-                            Formatter.fromatNumber(item.adjustedTotal)      // Adjusted Total column value
-                        ];
-                        if (showSAC) row.splice(2, 0, item.SAC);
-                        return row;
-                    });
+                    const body = [...aInvoiceItems]
+                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                        .map((item, i) => {
+                            const row = [
+                                i + 1,
+                                item.Particulars,
+                                item.StartDate || "",
+                                item.EndDate || "",
+                                Formatter.fromatNumber(item.GrossPrice),
+                                item.UnitText,
+                                Formatter.fromatNumber(item.itemDiscountValue), // Discount
+                                Formatter.fromatNumber(item.adjustedTotal)      // Adjusted Total
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
 
                     doc.autoTable({
                         startY: currentY,
@@ -3820,19 +3833,26 @@ sap.ui.define([
                             )
                         );
 
-                        const body = oCompanyItemModel.map((item, index) => {
-                            const row = [
-                                index + 1,
-                                item.Particulars,
-                                Formatter.formatDate(item.StartDate),
-                                Formatter.formatDate(item.EndDate),
-                                Formatter.fromatNumber(item.GrossPrice),
-                                item.UnitText,
-                                Formatter.fromatNumber(item.Total)
-                            ];
-                            if (showSAC) row.splice(2, 0, item.SAC);
-                            return row;
-                        });
+                        const body = oCompanyItemModel
+                            .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                            .map((item, index) => {
+                                const row = [
+                                    index + 1,
+                                    item.Particulars,
+                                    Formatter.formatDate(item.StartDate),
+                                    Formatter.formatDate(item.EndDate),
+                                    Formatter.fromatNumber(item.GrossPrice),
+                                    item.UnitText,
+                                    Formatter.fromatNumber(item.Total)
+                                ];
+
+                                if (showSAC) {
+                                    row.splice(2, 0, item.SAC);
+                                }
+
+                                return row;
+                            });
+
 
                         const head = showSAC ? [
                             ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
@@ -4494,6 +4514,24 @@ sap.ui.define([
             _parseDate: function (dateStr) {
                 const [day, month, year] = dateStr.split("/");
                 return new Date(`${year}-${month}-${day}`);
+            },
+            onPaymentModerefundChange: function (oEvent) {
+                var oComboBox = oEvent.getSource();
+                utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+                var sPaymentMode = oComboBox.getSelectedKey();
+
+                if (sPaymentMode === "Cash") {
+                    var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+
+
+                    this.getView().getModel("RefundModel").setProperty("/TransactionId", oLoginData.EmployeeName);
+                    sap.ui.getCore().byId("HM_id_TransactionID").setEditable(false)
+
+                } else {
+                    this.getView().getModel("RefundModel").setProperty("/TransactionId", "");
+                    sap.ui.getCore().byId("HM_id_TransactionID").setEditable(true)
+                }
             },
 
             _calculateFacilityTotal: function (item, cycleStart, cycleEnd, invoiceIndex = 0) {

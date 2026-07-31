@@ -100,24 +100,24 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column demandPopin="true">
-						<Text text="{i18n>invoiceNo}" tooltip="{i18n>invoiceNo}"/>
-					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>customerName}" tooltip="{i18n>customerName}"/>
-					</Column>
-					<Column demandPopin="true">
-						<Text text="{i18n>customer}" tooltip="{i18n>customer}"/>
-					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceDate}" tooltip="{i18n>invoiceDate}"/>
 					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>invoiceNo}" tooltip="{i18n>invoiceNo}"/>
+					</Column>
+						<Column demandPopin="true">
+						<Text text="{i18n>customer}" tooltip="{i18n>customer}"/>
+					</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>totalAmount}" tooltip="{i18n>totalAmount}"/>
+					</Column>
+				
+				
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>invoiceDescription}" tooltip="{i18n>invoiceDescription}"/>
 					</Column>
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>totalAmount}" tooltip="{i18n>totalAmount}"/>
-					</Column>
+				
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>PayByDate}" tooltip="{i18n>PayByDate}"/>
 					</Column>
@@ -128,12 +128,12 @@
 				<items>
 					<ColumnListItem type="Navigation" press="CI_onPressInvoiceRow">
 						<cells>
-							<Text text="{ManageInvoiceModel>InvNo}" />
-							<Text text="{ManageInvoiceModel>CustomerName}" />
-							<Text text="{ManageInvoiceModel>BookingID}" />
 							<Text text="{path:'ManageInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}"/>
-							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="20"/>
+
+							<Text text="{ManageInvoiceModel>InvNo}" />
+							<Text text="{= ${ManageInvoiceModel>BookingID} + ' (' + ${ManageInvoiceModel>CustomerName} + ')' }" />
 							<Text text="{path: 'ManageInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {ManageInvoiceModel>Currency}" textAlign="End"/>
+							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="40"/>
 							<Text text="{path:'ManageInvoiceModel>PayByDate',formatter: '.Formatter.formatDate'}"/>
 							<ObjectStatus text="{ManageInvoiceModel>Status}" inverted="false"
                             state="{path: 'ManageInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass"/>

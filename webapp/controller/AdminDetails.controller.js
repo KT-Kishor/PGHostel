@@ -250,6 +250,9 @@ sap.ui.define([
 
             // Update CustomerData model with edited dates
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
+
+             const pdfBase64 = await this.onGeneratePDF("Completed");
+
             // Refresh model to update UI bindings
 
             var Payload = {
@@ -260,7 +263,8 @@ sap.ui.define([
                     "CustomerName": oCustomerModel.CustomerName,
                     "CustomerEmail": oCustomerModel.CustomerEmail,
                     "BookingID": oCustomerModel.BookingID,
-                    "RoomNo": oCustomerModel.RoomNo
+                    "RoomNo": oCustomerModel.RoomNo,
+                    "Currency":oCustomerModel.Currency
                 }]
             };
 
@@ -269,7 +273,12 @@ sap.ui.define([
                 "PropertySTD": oCustomerModel.PropertySTD || "",
                 "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
                 "PropertyEmail": oCustomerModel.PropertyEmail || "",
-                "PropertyType": oCustomerModel.PropertyType || ""
+                "PropertyType": oCustomerModel.PropertyType || "",
+                 "pdfAttachment": {
+                    "fileName": "BookingVoucher.pdf",
+                    "mimeType": "application/pdf",
+                    "content": pdfBase64
+                },
             };
 
             // Merge both
@@ -3701,7 +3710,7 @@ sap.ui.define([
             // }
 
             this.getBusyDialog();
-            const pdfBase64 = await this.onGeneratePDF();
+            const pdfBase64 = await this.onGeneratePDF("Confirmed");
             this.closeBusyDialog();
             var Payload = {
                 Status: "Confirmed",
@@ -3720,6 +3729,7 @@ sap.ui.define([
                 PropertyMobileNo: ID.PropertyMobileNo || "",
                 PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
+                Currency:ID.Currency  || "",
                 pdfAttachment: {
                     fileName: "BookingVoucher.pdf",
                     mimeType: "application/pdf",
@@ -3785,12 +3795,12 @@ sap.ui.define([
                 return;
             }
 
-            var ID = this.ID;
+             var ID = this.ID;
+             const pdfBase64 = await this.onGeneratePDF("Rejected");
 
             var Payload = {
                 Status: "Rejected",
                 RejectDesc: rejectReason,
-
                 // Email Required Data
                 CustomerName: ID.CustomerName,
                 BookingID: ID.BookingID,
@@ -3806,7 +3816,13 @@ sap.ui.define([
                 PropertySTD: ID.PropertySTD || "",
                 PropertyMobileNo: ID.PropertyMobileNo || "",
                 PropertyEmail: ID.PropertyEmail || "",
-                PropertyType: ID.PropertyType
+                PropertyType: ID.PropertyType,
+                Currency:ID.Currency  || "",
+                 "pdfAttachment": {
+                    "fileName": "BookingVoucher.pdf",
+                    "mimeType": "application/pdf",
+                    "content": pdfBase64
+                },
             };
 
             var oBody = {
@@ -4712,6 +4728,9 @@ sap.ui.define([
                         var today = new Date();
                         var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
+                        const pdfBase64 = await that.onGeneratePDF("Cancelled");
+
+
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
                             BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
@@ -4723,7 +4742,9 @@ sap.ui.define([
                             Status: "Cancelled", // UPDATED
                             CancelDate: sCancelDate, // UPDATED
                             PaymentType: oData.PaymentType || "",
-                            BedType: oData.BedType || ""
+                            BedType: oData.BedType || "",
+                            Currency:oData.Currency  || ""
+
                         }];
 
                         //------ Facility Payload ------
@@ -4760,6 +4781,11 @@ sap.ui.define([
                             PropertyMobileNo: oData.PropertyMobileNo || "",
                             PropertyEmail: oData.PropertyEmail || "",
                             PropertyType: oData.PropertyType,
+                            "pdfAttachment": {
+                                "fileName": "BookingVoucher.pdf",
+                                "mimeType": "application/pdf",
+                                "content": pdfBase64
+                            },
                         }];
 
                         that.getBusyDialog()
@@ -7679,8 +7705,8 @@ sap.ui.define([
                     }
                 });
         },
-    
-          onGeneratePDF: async function () {
+
+        onGeneratePDF: async function (Status) {
             const data = this.getView().getModel("CustomerData").getData();
 
             let filter = { BranchID: [data.BranchCode] };
@@ -7732,9 +7758,12 @@ sap.ui.define([
             doc.roundedRect(140, 12, 55, 18, 3, 3, "FD");
 
             doc.setFontSize(9);
+            var Statushow=Status ? Status : data.Status 
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
             doc.text(`Booking ID: ${data.BookingID || "N/A"}`, 142, 19);
             doc.text(`Booked On: ${Formatter.formatDate(data.BookingDate) || "N/A"}`, 142, 24);
+            // doc.text(`Status: ${Statushow || "N/A"}`, 142, 28);
+
 
             currentY = 45;
 
@@ -7931,7 +7960,7 @@ sap.ui.define([
             doc.setTextColor(50, 50, 50);
             doc.text(`${data.BedType || "-"}`, 150, currentY + 22);
             doc.text(`${data.AllMembers.length || "-"}`, 150, currentY + 34);
-            doc.text(`${data.Status || "-"}`, 150, currentY + 46);
+            doc.text(`${Statushow || "-"}`, 150, currentY + 46);
 
             // CRITICAL FIX: Establish baseline spacing after the Stay Card
             currentY += stayCardHeight + 12;

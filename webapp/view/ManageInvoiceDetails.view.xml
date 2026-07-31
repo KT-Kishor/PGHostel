@@ -416,11 +416,19 @@
 						<ObjectPageSubSection>
 							<blocks>
 								<m:VBox>
-									<m:Table id="CID_id_TableInvoiceItem"
+									<m:Table
+                                        id="CID_id_TableInvoiceItem"
                                         sticky="ColumnHeaders,HeaderToolbar"
-                                        items="{ManageInvoiceItemModel>/ManageInvoiceItem}"
-                                        mode="MultiSelect" autoPopinMode="true"
-                                        contextualWidth="Auto">
+                                        mode="MultiSelect"
+                                        autoPopinMode="true"
+                                        contextualWidth="Auto"
+                                       items="{
+                                            path: 'ManageInvoiceItemModel>/ManageInvoiceItem',
+                                           sorter: {
+                                           path: 'StartDate',
+                                           descending: false
+                                               }
+                                           }">
 										<m:headerToolbar>
 											<m:OverflowToolbar>
 												<m:Title
