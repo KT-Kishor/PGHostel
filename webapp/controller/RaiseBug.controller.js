@@ -8,7 +8,7 @@ sap.ui.define([
     "sap/suite/ui/commons/Timeline",
     "sap/suite/ui/commons/TimelineItem"
 
-], function (BaseController, Formatter, JSONModel, MessageToast, utils, Spreadsheet,Timeline,TimelineItem) {
+], function (BaseController, Formatter, JSONModel, MessageToast, utils, Spreadsheet, Timeline, TimelineItem) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.RaiseBug", {
@@ -24,22 +24,28 @@ sap.ui.define([
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().byId("RB_id_RaisedBy1").setSelectedKey("")
             this.getView().byId("RB_id_Status").setSelectedKey("")
-             var oDateRange = this.byId("RB_id_Dates");
+            var oDateRange = this.byId("RB_id_Dates");
 
-                var oToday = new Date();
+            var oToday = new Date();
 
-                // First day of the month, 2 months back
-                var oStartDate = new Date(
-                    oToday.getFullYear(),
-                    oToday.getMonth() - 3,
-                    1
-                );
-                
-                // Today
-                var oEndDate = new Date();
+            // First day of the month, 2 months back
+            var oStartDate = new Date(
+                oToday.getFullYear(),
+                oToday.getMonth() - 3,
+                1
+            );
 
-                oDateRange.setDateValue(oStartDate);
-                oDateRange.setSecondDateValue(oEndDate);
+            // Today
+            var oEndDate = new Date();
+
+            oDateRange.setDateValue(oStartDate);
+            oDateRange.setSecondDateValue(oEndDate);
+            var oComboBox = this.byId("RB_id_RaisebugID");
+
+            oComboBox.setFilterFunction(function (sTerm, oItem) {
+                var sText = oItem.getText() || "";
+                return sText.toLowerCase().indexOf(sTerm.toLowerCase()) > -1;
+            });
             this.CD_read()
             this._loadAllFilterData()
         },
@@ -60,14 +66,14 @@ sap.ui.define([
             });
             var oStartDate = oDateRange.getDateValue();
             var oEndDate = oDateRange.getSecondDateValue();
-            
+
 
             let filters = {};
 
             if (SRaisedBy) filters.RaisedBy = SRaisedBy;
             if (SStatus) filters.Status = SStatus;
             if (BugID) filters.BugID = BugID;
-             if (oStartDate && oEndDate) {
+            if (oStartDate && oEndDate) {
                 filters.StartDate = oDateFormat.format(oStartDate);
                 filters.EndDate = oDateFormat.format(oEndDate);
             }
@@ -115,7 +121,7 @@ sap.ui.define([
 
             let oView = this.getView();
 
-            ["RB_id_RaisedBy1", "RB_id_Status","RB_id_RaisebugID"].forEach(field => {
+            ["RB_id_RaisedBy1", "RB_id_Status", "RB_id_RaisebugID"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -360,51 +366,51 @@ sap.ui.define([
 
         createTableSheet: function () {
             return [
-            {
-                label: "Bug ID",
-                property: "BugID",
-                type: "string"
-            },
-            {
-                label: "App Name",
-                property: "AppName",
-                type: "string"
-            },
-            {
-                label: "Bug Description",
-                property: "BugDescription",
-                type: "string"
-            },
-            {
-                label: "Raised By",
-                property: "RaisedBy",
-                type: "string"
-            },
-            {
-                label: "Email",
-                property: "Email",
-                type: "string"
-            },
-            {
-                label: "Created Date",
-                property: "CreatedDate",
-                type: "string"
-            },
-            {
-                label: "Resolved Date",
-                property: "ResolvedDate",
-                type: "string"
-            },
-            {
-                label: "Status",
-                property: "Status",
-                type: "string"
-            },
-            {
-                label: "Comments",
-                property: "Comment",
-                type: "string"
-            },
+                {
+                    label: "Bug ID",
+                    property: "BugID",
+                    type: "string"
+                },
+                {
+                    label: "App Name",
+                    property: "AppName",
+                    type: "string"
+                },
+                {
+                    label: "Bug Description",
+                    property: "BugDescription",
+                    type: "string"
+                },
+                {
+                    label: "Raised By",
+                    property: "RaisedBy",
+                    type: "string"
+                },
+                {
+                    label: "Email",
+                    property: "Email",
+                    type: "string"
+                },
+                {
+                    label: "Created Date",
+                    property: "CreatedDate",
+                    type: "string"
+                },
+                {
+                    label: "Resolved Date",
+                    property: "ResolvedDate",
+                    type: "string"
+                },
+                {
+                    label: "Status",
+                    property: "Status",
+                    type: "string"
+                },
+                {
+                    label: "Comments",
+                    property: "Comment",
+                    type: "string"
+                },
             ]
         },
 
@@ -458,10 +464,10 @@ sap.ui.define([
                 oSheet.destroy();
             });
         },
-        RB_edit:function(oEvent){
+        RB_edit: function (oEvent) {
             var oView = this.getView();
 
-             var table = this.byId("idBugTable");
+            var table = this.byId("idBugTable");
             var selected = table.getSelectedItem();
 
             if (!selected) {
@@ -471,14 +477,14 @@ sap.ui.define([
             var oContext = selected.getBindingContext("RaiseBugModel");
             var Data = oContext.getObject();
 
-            if(Data.Status==="Resolved"){
-                   sap.m.MessageToast.show(this.i18nModel.getText("resolvedBugCannotBeModified"));
+            if (Data.Status === "Resolved") {
+                sap.m.MessageToast.show(this.i18nModel.getText("resolvedBugCannotBeModified"));
                 return;
             }
 
 
-                //   if(Data.Status==="Resolved")
-              if (!this.ED_Dialog) {
+            //   if(Data.Status==="Resolved")
+            if (!this.ED_Dialog) {
                 this.ED_Dialog = sap.ui.xmlfragment(
                     oView.getId(),
                     "sap.ui.com.project1.fragment.RaiseBug",
@@ -486,68 +492,68 @@ sap.ui.define([
                 );
                 oView.addDependent(this.ED_Dialog);
             }
-                this.ED_Dialog.open();
-                this.byId("RB_id_appname").setValue(Data.AppName).setEditable(false);
-                this.byId("RB_id_bugDescription").setValue(Data.BugDescription).setEditable(false);
-                this.byId("RB_id_RaisedBy").setValue(Data.RaisedBy).setEditable(false);
-                this.byId("RB_id_Email").setValue(Data.Email).setEditable(false);
-                
-                this.byId("RB_id_FileUploader1").setVisible(false);
-                this.byId("idAddImageLabel").setVisible(false);
-                this.byId("RB_id_ImageBox").setVisible(false);
-                this.byId("RB_id_comments").setValue("").setVisible(true).setValueState("None");
+            this.ED_Dialog.open();
+            this.byId("RB_id_appname").setValue(Data.AppName).setEditable(false);
+            this.byId("RB_id_bugDescription").setValue(Data.BugDescription).setEditable(false);
+            this.byId("RB_id_RaisedBy").setValue(Data.RaisedBy).setEditable(false);
+            this.byId("RB_id_Email").setValue(Data.Email).setEditable(false);
 
-            },
-            onCommentsChange:function(oEvent){
-                utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
-            },
-           onBugTableSelectionChange: function () {
-    var oTable = this.byId("idBugTable");
-    var oSelectedItem = oTable.getSelectedItem();
-    var oButton = this.byId("ideditButton");
-    var oresolveButton = this.byId("idresolveButton");
+            this.byId("RB_id_FileUploader1").setVisible(false);
+            this.byId("idAddImageLabel").setVisible(false);
+            this.byId("RB_id_ImageBox").setVisible(false);
+            this.byId("RB_id_comments").setValue("").setVisible(true).setValueState("None");
+
+        },
+        onCommentsChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+        },
+        onBugTableSelectionChange: function () {
+            var oTable = this.byId("idBugTable");
+            var oSelectedItem = oTable.getSelectedItem();
+            var oButton = this.byId("ideditButton");
+            var oresolveButton = this.byId("idresolveButton");
 
 
-    if (!oSelectedItem) {
-        oButton.setEnabled(false);
-        return;
-    }
+            if (!oSelectedItem) {
+                oButton.setEnabled(false);
+                return;
+            }
 
-    var oData = oSelectedItem.getBindingContext("RaiseBugModel").getObject();
+            var oData = oSelectedItem.getBindingContext("RaiseBugModel").getObject();
 
-    oButton.setEnabled(oData.Status !== "Resolved");
-    oresolveButton.setEnabled(oData.Status !== "Resolved");
+            oButton.setEnabled(oData.Status !== "Resolved");
+            oresolveButton.setEnabled(oData.Status !== "Resolved");
 
-},
-            onBugSubmit:function(){
-                 var table = this.byId("idBugTable");
+        },
+        onBugSubmit: function () {
+            var table = this.byId("idBugTable");
             var selected = table.getSelectedItem();
             var oContext = selected.getBindingContext("RaiseBugModel");
             var Data = oContext.getObject();
 
-                      
-           if (
+
+            if (
                 !utils._LCvalidateMandatoryField(this.byId("RB_id_comments"), "ID")
-            ){
+            ) {
                 MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                 return;
+                return;
             }
 
-               this.getBusyDialog();
-            this.ajaxCreateWithJQuery("sendmailtoCustomer", 
+            this.getBusyDialog();
+            this.ajaxCreateWithJQuery("sendmailtoCustomer",
                 {
-                 "BugID": Data.BugID,
-                "Email": Data.Email,
-                "Name": Data.RaisedBy,
-                "Comment": this.byId("RB_id_comments").getValue(),
-                "Status": "Customer Action",
-                "CommentedBy":this.getView().getModel("LoginModel").getData().EmployeeName,
-                "CommentDateTime":new Date().toISOString(),
-                "ApplicationName":"HM_Raisebug"
+                    "BugID": Data.BugID,
+                    "Email": Data.Email,
+                    "Name": Data.RaisedBy,
+                    "Comment": this.byId("RB_id_comments").getValue(),
+                    "Status": "Customer Action",
+                    "CommentedBy": this.getView().getModel("LoginModel").getData().EmployeeName,
+                    "CommentDateTime": new Date().toISOString(),
+                    "ApplicationName": "HM_Raisebug"
 
-            })
+                })
                 .then((oData) => {
-                     this.CD_read();
+                    this.CD_read();
                     this.ED_Dialog.close();
                 })
                 .catch((oError) => {
@@ -559,7 +565,7 @@ sap.ui.define([
                     table.removeSelections()
                     this.ED_Dialog.close();
 
-                });   
+                });
         },
         RB_onCancelButtonPress: function () {
             this.byId("idBugTable").removeSelections()
@@ -567,95 +573,95 @@ sap.ui.define([
                 this.ED_Dialog.close();
             }
         },
-      HF_viewComments: async function (oEvent) {
-    var that = this;
+        HF_viewComments: async function (oEvent) {
+            var that = this;
 
-    var oContext = oEvent.getSource().getBindingContext("RaiseBugModel");
-    var oObject = oContext.getObject();
+            var oContext = oEvent.getSource().getBindingContext("RaiseBugModel");
+            var oObject = oContext.getObject();
 
-    var sBugID = oObject.BugID;
-    var sResolvedDescription = oObject.ResolvedDescription;
-    var sResolvedDate = oObject.ResolvedDate;
+            var sBugID = oObject.BugID;
+            var sResolvedDescription = oObject.ResolvedDescription;
+            var sResolvedDate = oObject.ResolvedDate;
 
 
-    var filters = {
-        BugID: sBugID
-    };
+            var filters = {
+                BugID: sBugID
+            };
 
-    try {
-        this.getBusyDialog();
+            try {
+                this.getBusyDialog();
 
-        var oData = await this.ajaxReadWithJQuery("HM_BugComment", filters);
+                var oData = await this.ajaxReadWithJQuery("HM_BugComment", filters);
 
-        var aComments = Array.isArray(oData.data) ? oData.data : [];
+                var aComments = Array.isArray(oData.data) ? oData.data : [];
 
-        // Add Resolved Description as the last timeline item
-        if (sResolvedDescription && sResolvedDescription.trim()) {
+                // Add Resolved Description as the last timeline item
+                if (sResolvedDescription && sResolvedDescription.trim()) {
 
-        
 
-            aComments.push({
-                CommentedBy: "Support Team", // Change if required
-                CommentDateTime: new Date(sResolvedDate),
-                Status: "Resolved",
-                Comment: sResolvedDescription
-            });
-        }
 
-        var oJsonModel = new sap.ui.model.json.JSONModel(aComments);
-
-        this.closeBusyDialog();
-
-        if (!that._oCommentDialog) {
-
-            var oTimeline = new sap.suite.ui.commons.Timeline({
-                enableScroll: true,
-                showHeaderBar: false,
-                content: {
-                    path: "/",
-                    template: new sap.suite.ui.commons.TimelineItem({
-                        userName: "{CommentedBy}",
-                        dateTime: "{CommentDateTime}",
-                        title: "{Status}",
-                        text: "{Comment}"
-                    })
+                    aComments.push({
+                        CommentedBy: "Support Team", // Change if required
+                        CommentDateTime: new Date(sResolvedDate),
+                        Status: "Resolved",
+                        Comment: sResolvedDescription
+                    });
                 }
-            });
 
-            oTimeline.setModel(oJsonModel);
+                var oJsonModel = new sap.ui.model.json.JSONModel(aComments);
 
-            that._oCommentDialog = new sap.m.Dialog({
-                title: "Bug Comments",
-                contentWidth: "25rem",
-                contentHeight: "15rem",
-                verticalScrolling: false,
-                horizontalScrolling: false,
-                draggable: true,
-                resizable: true,
-                content: [oTimeline],
-                endButton: new sap.m.Button({
-                    text: "Close",
-                    press: function () {
-                        that._oCommentDialog.close();
-                    }
-                })
-            });
+                this.closeBusyDialog();
 
-            that.getView().addDependent(that._oCommentDialog);
+                if (!that._oCommentDialog) {
 
-        } else {
-            that._oCommentDialog.getContent()[0].setModel(oJsonModel);
+                    var oTimeline = new sap.suite.ui.commons.Timeline({
+                        enableScroll: true,
+                        showHeaderBar: false,
+                        content: {
+                            path: "/",
+                            template: new sap.suite.ui.commons.TimelineItem({
+                                userName: "{CommentedBy}",
+                                dateTime: "{CommentDateTime}",
+                                title: "{Status}",
+                                text: "{Comment}"
+                            })
+                        }
+                    });
+
+                    oTimeline.setModel(oJsonModel);
+
+                    that._oCommentDialog = new sap.m.Dialog({
+                        title: "Bug Comments",
+                        contentWidth: "25rem",
+                        contentHeight: "15rem",
+                        verticalScrolling: false,
+                        horizontalScrolling: false,
+                        draggable: true,
+                        resizable: true,
+                        content: [oTimeline],
+                        endButton: new sap.m.Button({
+                            text: "Close",
+                            press: function () {
+                                that._oCommentDialog.close();
+                            }
+                        })
+                    });
+
+                    that.getView().addDependent(that._oCommentDialog);
+
+                } else {
+                    that._oCommentDialog.getContent()[0].setModel(oJsonModel);
+                }
+
+                that._oCommentDialog.open();
+
+            } catch (oError) {
+                this.closeBusyDialog();
+                console.error(oError);
+                sap.m.MessageToast.show("Failed to load comments.");
+            }
         }
 
-        that._oCommentDialog.open();
 
-    } catch (oError) {
-        this.closeBusyDialog();
-        console.error(oError);
-        sap.m.MessageToast.show("Failed to load comments.");
-    }
-}
-
-         
     });
 });

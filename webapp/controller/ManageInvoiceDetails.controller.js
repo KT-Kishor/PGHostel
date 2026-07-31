@@ -87,10 +87,9 @@ sap.ui.define([
                     RoomNo: "",
                     BranchCode: "",
                     RefundAmount: "",
-                    TaxPercentageLabel: ""
+                    TaxPercentageLabel: "Tax Percentage"
                 }), "SelectedCustomerModel");
                 this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
-
 
                 oView.setModel(new JSONModel({
                     BookingID: "",
@@ -134,7 +133,6 @@ sap.ui.define([
                     fromMyBookings: false,
                     minDate: LastInvoiceDate
                 }), "visiablityPlay");
-
                 oView.setModel(new JSONModel({ AllReceivedAmount: 0, AllDueAmount: 0 }), "InvoicePayment");
 
                 var SowDataModel = new JSONModel({ items: [] });
@@ -656,10 +654,12 @@ sap.ui.define([
                             oCustomerModel.setProperty("/Type", "CGST/SGST");
                             oCustomerModel.setProperty("/CGSTSelected", true);
                             oCustomerModel.setProperty("/IGSTSelected", false);
+                            oCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
                         } else if (mergedData.Type === "IGST") {
                             oCustomerModel.setProperty("/Type", "IGST");
                             oCustomerModel.setProperty("/CGSTSelected", false);
                             oCustomerModel.setProperty("/IGSTSelected", true);
+                            oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                         }
                     } else {
                         // Reset GST section if no GST from backend
@@ -2421,7 +2421,6 @@ sap.ui.define([
                 var oModel = this.getView().getModel("ManageInvoiceItemModel");
 
                 var aSelectedItems = oTable.getSelectedItems();
-
                 //  No selection
                 if (!aSelectedItems.length) {
                     MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
@@ -3704,7 +3703,6 @@ sap.ui.define([
                     const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
                         BookingID: [filterData.BookingID]
                     });
-
                     //  PDF INIT 
                     const doc = new jsPDF({
                         orientation: "portrait",
