@@ -241,9 +241,6 @@
                 <Column demandPopin="true">
                     <Text text="{i18n>bookingID}" />
                 </Column>
-                <Column demandPopin="true">
-                    <Text text="{i18n>customerName}" />
-                </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
@@ -255,6 +252,9 @@
                     minScreenWidth="Tablet"
                 >
                     <Text text="{i18n>invoiceNo}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>customerName}" />
                 </Column>
                 <Column
                     demandPopin="true"
@@ -277,11 +277,11 @@
                 >
                     <cells>
                         <Text text="{myBookings>BookingID}" />
-                        <Text text="{myBookings>CustomerName}" />
                         <Text
                             text="{path:'myBookings>InvoiceDate', formatter:'.Formatter.formatDate'}"
                         />
                         <Text text="{myBookings>InvNo}" />
+                        <Text text="{myBookings>CustomerName}" />
                         <Text
                             text="{path:'myBookings>TotalAmount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}"
                         />

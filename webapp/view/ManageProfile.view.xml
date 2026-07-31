@@ -549,9 +549,6 @@
                 <Column demandPopin="true">
                     <Text text="{i18n>bookingID}" />
                 </Column>
-                <Column demandPopin="true">
-                    <Text text="{i18n>customerName}" />
-                </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
@@ -563,6 +560,9 @@
                     minScreenWidth="Tablet"
                 >
                     <Text text="{i18n>invoiceNo}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="{i18n>customerName}" />
                 </Column>
                 <Column
                     demandPopin="true"
@@ -585,16 +585,16 @@
                 >
                     <cells>
                         <Text text="{profileData>BookingID}" />
-                        <Text text="{profileData>CustomerName}" />
                         <Text
                             text="{path:'profileData>InvoiceDate', formatter:'.Formatter.formatDate'}"
                         />
                         <Text text="{profileData>InvNo}" />
+                        <Text text="{profileData>CustomerName}" />
                         <Text
                             text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
                         />
                         <Text
-                            text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>curremcy}"
+                            text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
                         />
                     </cells>
                 </ColumnListItem>
