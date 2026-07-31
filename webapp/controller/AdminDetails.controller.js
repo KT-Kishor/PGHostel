@@ -1422,7 +1422,7 @@ sap.ui.define([
 
                 oEnd = new Date(targetYear, targetMonth, endDay);
 
-            }  else if (sUnit === "Per Year" || sUnit === "yearly") {
+            } else if (sUnit === "Per Year" || sUnit === "yearly") {
 
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
@@ -1466,7 +1466,7 @@ sap.ui.define([
             }
 
             // Update model
-            oModel.setProperty("/EndDate", oEnd ?  this.Formatter.formatDate(this._formatDate(oEnd)): "");
+            oModel.setProperty("/EndDate", oEnd ? this.Formatter.formatDate(this._formatDate(oEnd)) : "");
             oModel.setProperty("/TotalDays", iDays);
             oModel.setProperty("/CouponCode", "")
             oModel.setProperty("/CouponDiscount", "")
@@ -1532,7 +1532,7 @@ sap.ui.define([
             }
 
             // Format yyyy-MM-dd for DatePicker
-            const sFormatted =  this._formatDate(oEnd);
+            const sFormatted = this._formatDate(oEnd);
 
             oModel.setProperty("/EndDate", this.Formatter.formatDate(sFormatted));
             oModel.setProperty("/TotalDays", iDays);
@@ -2203,7 +2203,7 @@ sap.ui.define([
             var oEndDatePicker = this.byId("editEndDate");
             if (oEndDatePicker) {
                 var oDate = new Date(sStart);
-                oDate.setDate(oDate.getDate()+ 1);
+                oDate.setDate(oDate.getDate() + 1);
                 oEndDatePicker.setMinDate(oDate);
             }
             var CustData = oCustomerModel.getData();
@@ -4528,7 +4528,8 @@ sap.ui.define([
                     "MemberID": SelectedmemberIds,
                     "AdminUpdated": "YES",
                     "Status": CustomerData.Status,
-                    "BookingID": CustomerData.BookingID
+                    "BookingID": CustomerData.BookingID,
+                    "Currency": CustomerData.Currency
                 }],
                 "FacilityItems": CustomerData.AllSelectedFacilities.map(item => {
                     // Normalize UnitText for facility as well
@@ -4713,15 +4714,52 @@ sap.ui.define([
 
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
+                            BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
+                            RoomPrice: oData.RoomPrice || "0",
+                            NoOfPersons: oData.noofperson || 1,
+                            StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
                             Status: "Cancelled", // UPDATED
                             CancelDate: sCancelDate, // UPDATED
+                            PaymentType: oData.PaymentType || "",
+                            BedType: oData.BedType || ""
                         }];
 
-
+                        //------ Facility Payload ------
+                        const facilityData = [];
+                        if (oData.AllSelectedFacilities?.length > 0) {
+                            oData.AllSelectedFacilities.forEach(fac => {
+                                facilityData.push({
+                                    FacilityName: fac.FacilityName,
+                                    FacilitiPrice: fac.Price,
+                                    StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                                    EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
+                                });
+                            });
+                        }
 
                         //------ Final Payload ------
                         const personData = [{
-                            Booking: bookingData
+                            Salutation: oData.Salutation || "",
+                            CustomerName: oData.FullName || "",
+                            UserID: oData.UserID || "",
+                            STDCode: oData.STDCode || "",
+                            MobileNo: oData.MobileNo || "",
+                            Gender: oData.Gender || "",
+                            DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                            CustomerEmail: oData.CustomerEmail || "",
+                            Country: oData.Country || "",
+                            State: oData.State || "",
+                            City: oData.City || "",
+                            PermanentAddress: oData.Address || "",
+                            Booking: bookingData, // Making sure included
+                            FacilityItems: facilityData,
+                            Area: oData.BranchName || "",
+                            PropertySTD: oData.PropertySTD || "",
+                            PropertyMobileNo: oData.PropertyMobileNo || "",
+                            PropertyEmail: oData.PropertyEmail || "",
+                            PropertyType: oData.PropertyType,
                         }];
 
                         that.getBusyDialog()
@@ -7641,8 +7679,8 @@ sap.ui.define([
                     }
                 });
         },
-
-        onGeneratePDF: async function () {
+    
+          onGeneratePDF: async function () {
             const data = this.getView().getModel("CustomerData").getData();
 
             let filter = { BranchID: [data.BranchCode] };
@@ -8040,6 +8078,8 @@ sap.ui.define([
             const discount = parseFloat(data.Discount) || 0;
             let grandTotal = subTotal - discount;
 
+
+
             const hasCGST = data.GSTType === "CGST/SGST";
             const hasIGST = data.GSTType === "IGST";
 
@@ -8079,36 +8119,46 @@ sap.ui.define([
                 summaryY += 6.5;
             };
 
-            addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+            addLine("Room Rent", `${Formatter.fromatNumber(roomRent)} ${data.Currency}`);
 
-            // Render Facility Total row line only if there's actual value or entries
+            // Render Facility Total row only if there's actual value or entries
             if (facilityTotal > 0 || facilities.length > 0) {
-                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+                addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${data.Currency}`);
             }
 
             if (discount > 0) {
-                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${data.Currency}`);
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);
 
-
-            addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
+            addLine("Sub Total", `${Formatter.fromatNumber(finalSubTotal)} ${data.Currency}`);
 
             if (hasCGST) {
                 const cgst = parseFloat(data.CGST) || 0;
                 const sgst = parseFloat(data.SGST) || 0;
-                addLine(`CGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(cgst)}`);
-                addLine(`SGST (${data.GSTValue}%)`, ` ${Formatter.fromatNumber(sgst)}`);
+
+                addLine(
+                    `CGST (${data.GSTValue}%)`,
+                    `${Formatter.fromatNumber(cgst)} ${data.Currency}`
+                );
+
+                addLine(
+                    `SGST (${data.GSTValue}%)`,
+                    `${Formatter.fromatNumber(sgst)} ${data.Currency}`
+                );
+
                 grandTotal += cgst + sgst;
             } else if (hasIGST) {
                 const igst = parseFloat(data.IGST) || 0;
+
                 addLine(
                     data.GSTLabel === "Tax"
                         ? `Tax Amount (${data.GSTValue}%)`
                         : `IGST (${data.GSTValue}%)`,
-                    `${Formatter.fromatNumber(igst)}`
+                    `${Formatter.fromatNumber(igst)} ${data.Currency}`
                 );
+
                 grandTotal += igst;
             }
 
@@ -8120,7 +8170,7 @@ sap.ui.define([
             doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
 
             summaryY += 2;
-            addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
+            addLine("GRAND TOTAL", `${Formatter.fromatNumber(grandTotal)} ${data.Currency}`, true);
 
             const finalHeight = summaryY - startY + 2;
 

@@ -6984,24 +6984,26 @@
                 summaryY += 7;
             };
 
-            addLine("Room Rent", ` ${Formatter.fromatNumber(roomRent)}`);
+            addLine("Room Rent", `${Formatter.fromatNumber(roomRent)} ${data.Currency}`);
+
 
             // Render Facility Total row line only if there's actual value or entries
-            if (facilityTotal > 0 || facilities.length > 0) {
-                addLine("Facilities", ` ${Formatter.fromatNumber(facilityTotal)}`);
+                if (facilityTotal > 0 || facilities.length > 0) {
+                addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${data.Currency}`);
             }
 
-            if (discount > 0) {
-                addLine("Discount", `-  ${Formatter.fromatNumber(discount)}`);
+              if (discount > 0) {
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${data.Currency}`);
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);
 
 
-            addLine("Sub Total", ` ${Formatter.fromatNumber(finalSubTotal)}`);
+            addLine("Sub Total", `${Formatter.fromatNumber(finalSubTotal)} ${data.Currency}`);
+
 
             if (tax > 0) {
-                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)}`);
+                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)} ${data.Currency}`);
             }
 
 
@@ -7012,7 +7014,8 @@
             doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
 
             summaryY += 2;
-            addLine("GRAND TOTAL", ` ${Formatter.fromatNumber(grandTotal)}`, true);
+            addLine("GRAND TOTAL", `${Formatter.fromatNumber(grandTotal)} ${data.Currency}`, true);
+
 
             currentY = paymentStartY + paymentBoxHeight + 12;
 
