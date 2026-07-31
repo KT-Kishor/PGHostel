@@ -317,14 +317,6 @@
                                             maxLength="20"
                                             editable="{visiablityPlay>/editable}"
                                         />
-										<!-- <m:Label text="{i18n>panCardCommon}" /><m:Input
-                                            value="{SelectedCustomerModel>/PAN}"
-                                            id="CID_id_InputPAN"
-                                            liveChange="CID_onPressLiveChangePAN"
-                                            maxLength="10"
-                                            editable="{visiablityPlay>/editable}"
-                                            valueStateText="{i18n>enterPin}"
-                                        /> -->
 										<m:Label
                                             text="{i18n>gstNo}" 
                                         />
@@ -352,11 +344,12 @@
                                             editable="{visiablityPlay>/editable}"
                                         />
 										<m:Label text="{i18n>customerGSTNo}" />
-										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}"
-										    id="CI_id_InputCustomerGSTNO"
-											liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}"
-											editable="{visiablityPlay>/editable}"
-										/>
+										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}" id="CI_id_InputCustomerGSTNO" liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}" editable="{visiablityPlay>/editable}"/>
+										<m:Label text="{i18n>customerNameGST}" />
+										<m:Input value="{SelectedCustomerModel>/CustomerGSTName}" id="CI_id_InputCustomerGSTName" liveChange="CID_ValidateGstName" maxLength="50" valueStateText="{i18n>enterCustomerName}" editable="{visiablityPlay>/editable}"/>
+										<m:Label text="{i18n>customerNameAddress}" />
+										<m:TextArea value="{SelectedCustomerModel>/CustomerGSTAddress}" id="CI_id_InputCustomerGSTAddress" liveChange="CID_ValidateGstAddress" maxLength="200" valueStateText="{i18n>entervalidAddress}" editable="{visiablityPlay>/editable}"/>
+
 										<m:Label
                                             text="{i18n>emailId}"
                                             required="true"

@@ -134,10 +134,10 @@ sap.ui.define([
                     minDate: LastInvoiceDate
                 }), "visiablityPlay");
 
-                oView.setModel(new JSONModel({AllReceivedAmount: 0,AllDueAmount: 0}), "InvoicePayment");
+                oView.setModel(new JSONModel({ AllReceivedAmount: 0, AllDueAmount: 0 }), "InvoicePayment");
 
-                var SowDataModel = new JSONModel({items: []});
-                
+                var SowDataModel = new JSONModel({ items: [] });
+
                 this.getView().setModel(SowDataModel, "CombinedData");
                 this.visiablityPlay = oView.getModel("visiablityPlay");
                 this.visiablityPlay.setProperty("/Edit", false);
@@ -1292,6 +1292,20 @@ sap.ui.define([
                         refundAmount = 0;
                     }
 
+                    let sFinalStatus = "Submitted";
+                    if (balanceAmount === 0 && finalAmount > 0) {
+                        sFinalStatus = "Payment Received";
+                    } else if (balanceAmount === finalAmount) {
+                        sFinalStatus = "Submitted";
+                    } else if (totalPaid > 0 && totalPaid < finalAmount) {
+                        sFinalStatus = "Payment Partially";
+                    } else if (totalPaid >= finalAmount && finalAmount > 0) {
+                        sFinalStatus = "Payment Received";
+                    }
+
+                    // Apply the newly calculated status dynamically
+                    oCustomerModel.setProperty("/Status", sFinalStatus);
+
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                     oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                     oCustomerModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
@@ -1515,6 +1529,8 @@ sap.ui.define([
                     // BalanceAmount: balanceAmount.toString() || "",
                     CouponCode: oSelectedCustomerModel.CouponCode || "",
                     CustomerGSTNO: oSelectedCustomerModel.CustomerGSTNO || "",
+                    CustomerGSTName: oSelectedCustomerModel.CustomerGSTName || "",
+                    CustomerGSTAddress: oSelectedCustomerModel.CustomerGSTAddress || "",
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
                     DueAmount: oSelectedCustomerModel.BalanceAmount || ""
                 };
@@ -2257,7 +2273,8 @@ sap.ui.define([
                     BranchCode: paymentModel.BranchCode,
                     EntryDate: new Date(),
                     PaymentType: paymentModel.PaymentType,
-                    ReceivedBy: paymentModel.ReceivedBy
+                    ReceivedBy: paymentModel.ReceivedBy,
+                    Payment: "Paid Amount"
                 };
 
                 try {
@@ -2301,9 +2318,7 @@ sap.ui.define([
             },
 
             onPressInvClose: function () {
-                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
-                if(this.OldStatus !== "Payment Received") oSelectedModel.setProperty("/Status", this.OldStatus);
-
+                this.totalAmountCalculation();
                 sap.ui.getCore().byId("MI_id_TransactionID").setValueState("None");
                 sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
                 sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
@@ -4192,7 +4207,8 @@ sap.ui.define([
                     BranchCode: RefundModel.BranchCode,
                     PaymentType: RefundModel.PaymentMode,
                     BankName: RefundModel.PaymentMode,
-                    Used: "Y"
+                    Used: "Y",
+                    Payment: "Refund Amount"
                 };
 
                 try {
