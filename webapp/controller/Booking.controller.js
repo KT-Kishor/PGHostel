@@ -743,6 +743,14 @@
             return this._toNumber(fPrice) + " " + (sCurrency || "INR") + " / " + this._getFacilityRateUnitText(sPriceType);
         },
 
+        _formatFacilityUnitCount: function (iCount, sUnit) {
+            return iCount + " " + sUnit + (Math.abs(this._toNumber(iCount)) === 1 ? "" : "s");
+        },
+
+        _formatFacilityPeriodCount: function (iCount, sPriceType) {
+            return this._formatFacilityUnitCount(iCount, this._getFacilityRateUnitText(sPriceType));
+        },
+
         _getFacilityChargeableDayCount: function () {
             const oModel = this.getView().getModel("HostelModel");
             const sPlan = oModel.getProperty("/SelectedPriceType");
@@ -2088,7 +2096,8 @@
 
                     if (sSelectionMode === "SINGLE") {
                         fTotal = fPrice * fPeriodMultiplier;
-                        sBreakdown = "Room (1) x " + fPeriodMultiplier + " " + sPriceType;
+                        sBreakdown = fPrice + " " + sCurrency +
+                            " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
                             roomCount: 1
@@ -2096,7 +2105,19 @@
                     } else if (sSelectionMode === "QTY") {
                         const iQty = Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
                         fTotal = fPrice * fPeriodMultiplier * iQty;
-                        sBreakdown = "Qty (" + iQty + ") x " + fPeriodMultiplier + " " + sPriceType;
+                        // For Unit Price, quantity IS the unit count, so fold them together.
+                        // For time-based pricing (Per Day/Month/Year), quantity and period
+                        // are separate dimensions and both must appear.
+                        if (sPriceType === "Unit Price") {
+                            sBreakdown = fPrice + " " + sCurrency +
+                                " x " + this._formatFacilityUnitCount(iQty, "Unit");
+                        } else {
+                            // Qty is only a factor worth showing when more than one,
+                            // otherwise "Qty 1 x" is noise.
+                            sBreakdown = (iQty > 1 ? "Qty " + iQty + " x " : "") +
+                                fPrice + " " + sCurrency +
+                                " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
+                        }
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
                             quantity: iQty
@@ -2108,7 +2129,12 @@
                         const iPersonCount = aSelectedPersonIds.length;
 
                         fTotal = fPrice * fPeriodMultiplier * iPersonCount;
-                        sBreakdown = "For: " + aNames.join(", ") + " x " + fPeriodMultiplier + " " + sPriceType;
+                        // Person count is only a factor worth showing when more than one
+                        // person is selected, otherwise "1 person(s) x" is noise.
+                        sBreakdown = "For: " + aNames.join(", ") + " | " +
+                            (iPersonCount > 1 ? this._formatFacilityUnitCount(iPersonCount, "person") + " x " : "") +
+                            fPrice + " " + sCurrency +
+                            " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
                             selectedPersons: aSelectedPersonIds.map(function (sPersonId) {
@@ -2137,14 +2163,24 @@
 
                         // The charge type is already shown next to the facility name as
                         // "(Per Day)" / "(Entire Booking)", so it is not repeated here.
+                        const sPersonFactor = iSelectedPersonCount > 1
+                            ? this._formatFacilityUnitCount(iSelectedPersonCount, "person") + " x "
+                            : "";
+
                         if (sFacilityChargeType === "DAILY") {
                             fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
-                            sBreakdown = "For: " + aNames.join(", ") +
-                                " " + fPackagePrice +
-                                " x " + iChargeableDayCount + " day(s)";
+                            sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
+                                fPackagePrice + " " + sCurrency +
+                                " x " + this._formatFacilityUnitCount(iChargeableDayCount, "Day");
                         } else {
                             fTotal = fPackagePrice * iSelectedPersonCount;
-                            sBreakdown = "For: " + aNames.join(", ");
+                            sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
+                                fPackagePrice + " " + sCurrency;
+                            // With one person the package price already IS the total, so the
+                            // popover's trailing "= total" would just repeat it.
+                            if (iSelectedPersonCount > 1) {
+                                sBreakdown += " = " + Number(fTotal.toFixed(2)) + " " + sCurrency;
+                            }
                         }
 
                         sAllocationDetails = JSON.stringify({
@@ -2161,7 +2197,7 @@
                         });
                     } else {
                         fTotal = fPrice * fPeriodMultiplier;
-                        sBreakdown = "x " + fPeriodMultiplier + " " + sPriceType;
+                        sBreakdown = "x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: "SINGLE",
                             roomCount: 1
@@ -4410,7 +4446,9 @@
                                                     }
                                                     // Only append total for SINGLE/QTY modes (breakdown has no =).
                                                     // PERSON/PERSON_QTY modes already have per-person subtotals.
-                                                    if (fTotal !== undefined && fTotal !== null && (sBreakdown || "").indexOf("=") === -1) {
+                                                    var bEntireBookingPackage = sSelectionMode === "PERSON_QTY" &&
+                                                        that._normalizeFacilityChargeType(sChargeType) !== "DAILY";
+                                                    if (fTotal !== undefined && fTotal !== null && !bEntireBookingPackage && (sBreakdown || "").indexOf("=") === -1) {
                                                         sResult += " = " + fTotal + " " + (sCurrency || "");
                                                     }
                                                     return sResult;
