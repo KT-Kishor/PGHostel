@@ -32,11 +32,6 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
-
-
-
-
-
             if (performance.navigation && performance.navigation.type === 1) {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RouteHostel", {}, true);
@@ -134,6 +129,23 @@ sap.ui.define([
                     VisibleModel.setProperty("/showCancelButton", false);
                 }
             }
+            const oFilter = {
+                BookingID: oCustomerData.BookingID
+            };
+
+            const oResult = await this.ajaxReadWithJQuery("HM_Deposit", oFilter);
+
+            const oDeposit = oResult.commentData && oResult.commentData.length
+                ? oResult.commentData[0]
+                : {};
+
+            this.getView().setModel(
+                new JSONModel(oResult.commentData[0]),
+                "DepositModel"
+            );
+
+            // this.getView().setModel(oDepositModel, "DepositModel");
+
             this.getView().setModel(new JSONModel({
                 isOtpSelected: false,
                 isPasswordSelected: true,
@@ -7721,6 +7733,74 @@ sap.ui.define([
                 unit: "mm",
                 format: "a4"
             });
+            // Convert local image to Base64
+            const getBase64Image = (imagePath) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+
+                    img.onload = function () {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0);
+
+                        resolve(canvas.toDataURL("image/png"));
+                    };
+
+                    img.onerror = reject;
+                    img.src = imagePath;
+                });
+            };
+
+            // Load logo from webapp/images
+            const watermarkImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png")
+            );
+            const LogoImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png")
+            );
+
+            // Watermark function
+            const addWatermark = () => {
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                // Transparent watermark (works in newer jsPDF)
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({
+                        opacity: 0.08
+                    }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            };
+
+            // Add watermark to first page
+            addWatermark();
 
             const currency = (data.Currency || "INR").trim();
             let currentY = 15;
@@ -7734,6 +7814,7 @@ sap.ui.define([
             const checkNewPage = (requiredSpace = 20) => {
                 if (currentY + requiredSpace > 280) {
                     doc.addPage();
+                    addWatermark();
                     currentY = 20;
                     return true;
                 }
@@ -7747,10 +7828,34 @@ sap.ui.define([
             doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(0, 35, 210, 3, "F");
 
+            const circleX = 19;
+            const circleY = 20;      // Move the whole circle 1mm down
+            const radius = 12;
+
+            const logoSize = 19;
+
+            // White background
+            doc.setFillColor(255, 255, 255);
+            doc.circle(circleX, circleY, radius, "F");
+
+            // Grey border
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.8);
+            doc.circle(circleX, circleY, radius, "S");
+
+            // Logo
+            doc.addImage(
+                LogoImage,
+                "PNG",
+                circleX - (logoSize / 2),
+                circleY - (logoSize / 2), // Move logo 1mm down
+                logoSize,
+                logoSize
+            );
             doc.setFont("helvetica", "bold");
             doc.setFontSize(24);
             doc.setTextColor(255, 255, 255);
-            doc.text("BOOKING VOUCHER", 20, 22);
+            doc.text("BOOKING VOUCHER", 36, 22);
 
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(255, 255, 255);
@@ -8285,6 +8390,45 @@ sap.ui.define([
 
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
+
+            const totalPages = doc.getNumberOfPages();
+
+            for (let i = 1; i <= totalPages; i++) {
+
+                doc.setPage(i);
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({ opacity: 0.08 }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight,
+                    undefined,
+                    "FAST"
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            }
 
             return doc.output("datauristring").split(",")[1];
         },

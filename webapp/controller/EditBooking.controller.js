@@ -3958,6 +3958,73 @@ sap.ui.define([
                 unit: "mm",
                 format: "a4"
             });
+            const getBase64Image = (imagePath) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+
+                    img.onload = function () {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0);
+
+                        resolve(canvas.toDataURL("image/png"));
+                    };
+
+                    img.onerror = reject;
+                    img.src = imagePath;
+                });
+            };
+
+            // Load logo from webapp/images
+            const watermarkImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png")
+            );
+            const LogoImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png")
+            );
+
+            // Watermark function
+            const addWatermark = () => {
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                // Transparent watermark (works in newer jsPDF)
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({
+                        opacity: 0.08
+                    }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            };
+
+            // Add watermark to first page
+            addWatermark();
 
             const currency = (booking.Currency || "INR").trim();
             let currentY = 15;
@@ -3970,6 +4037,7 @@ sap.ui.define([
             const checkNewPage = (requiredSpace = 20) => {
                 if (currentY + requiredSpace > 280) {
                     doc.addPage();
+                    addWatermark();
                     currentY = 20;
                     return true;
                 }
@@ -3983,11 +4051,34 @@ sap.ui.define([
             doc.setFillColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.rect(0, 32, 210, 2.5, "F");
 
-            // Title
+            const circleX = 19;
+            const circleY = 20;      // Move the whole circle 1mm down
+            const radius = 12;
+
+            const logoSize = 19;
+
+            // White background
+            doc.setFillColor(255, 255, 255);
+            doc.circle(circleX, circleY, radius, "F");
+
+            // Grey border
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.8);
+            doc.circle(circleX, circleY, radius, "S");
+
+            // Logo
+            doc.addImage(
+                LogoImage,
+                "PNG",
+                circleX - (logoSize / 2),
+                circleY - (logoSize / 2), // Move logo 1mm down
+                logoSize,
+                logoSize
+            );
             doc.setFont("helvetica", "bold");
             doc.setFontSize(24);
             doc.setTextColor(255, 255, 255);
-            doc.text("BOOKING VOUCHER", 20, 20);
+            doc.text("BOOKING VOUCHER", 36, 20);
 
             // Compact Right Box
             doc.setFillColor(255, 255, 255);
@@ -4233,18 +4324,18 @@ sap.ui.define([
 
                         if (sUnitText === "Unit Price") {
                             sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
-                        } else if(sUnitText === "Package Price"){
-                            if(item.FacilityChargeType==="Entire Booking"){
-                                this.qty=`(${item.Quantity || 1} Qty / Entire Booking)`
+                        } else if (sUnitText === "Package Price") {
+                            if (item.FacilityChargeType === "Entire Booking") {
+                                this.qty = `(${item.Quantity || 1} Qty / Entire Booking)`
                                 sUnitText = `${sUnitText}`;
-                            }else{
+                            } else {
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-                                this.qty=`(${dailyQty} Qty / day)`
+                                this.qty = `(${dailyQty} Qty / day)`
                                 sUnitText = `${sUnitText}\n(${diffDays} days)`;
                             }
                         }
-                         else if (sUnitText === "Per Day") {
+                        else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText} (${diffDays} Days)`;
                         } else if (sUnitText === "Per Month") {
                             const months =
@@ -4259,13 +4350,13 @@ sap.ui.define([
                         }
                     }
 
-                       const showQty =
-                         item.FacilityChargeType === "Entire Booking" ||
-                           item.FacilityChargeType === "DAILY";
+                    const showQty =
+                        item.FacilityChargeType === "Entire Booking" ||
+                        item.FacilityChargeType === "DAILY";
 
                     return [
                         (index + 1).toString(),
-                         item.MemberName
+                        item.MemberName
                             ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
@@ -4360,16 +4451,16 @@ sap.ui.define([
                 summaryY += 7;
             };
 
-            
+
             addLine("Room Rent", `${Formatter.fromatNumber(roomRent)} ${oHostelModel.Currency}`);
 
 
             // Render Facility Total row line only if there's actual value or entries
-                if (facilityTotal > 0 || facilities.length > 0) {
+            if (facilityTotal > 0 || facilities.length > 0) {
                 addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${oHostelModel.Currency}`);
             }
 
-              if (discount > 0) {
+            if (discount > 0) {
                 addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${oHostelModel.Currency}`);
             }
 
@@ -4383,7 +4474,7 @@ sap.ui.define([
                 addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)} ${oHostelModel.Currency}`);
             }
 
-           
+
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
@@ -4470,6 +4561,44 @@ sap.ui.define([
 
             doc.setTextColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
             doc.text("Premium Hospitality Experience", 195, currentY + 5, { align: "right" });
+            const totalPages = doc.getNumberOfPages();
+
+            for (let i = 1; i <= totalPages; i++) {
+
+                doc.setPage(i);
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({ opacity: 0.08 }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight,
+                    undefined,
+                    "FAST"
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            }
 
             return doc.output("datauristring").split(",")[1];
         },
@@ -5455,22 +5584,22 @@ sap.ui.define([
             this._resetCouponState(true);
             this.onApplyCoupon();
         },
-SC_onVHDClose: function () {
-             this.EC_Dialog.close();
-         },
-         _updateEndDateMinDate: function () {
-             var oHostelModel = this.getView().getModel("HostelModel");
-             var sStartDate = oHostelModel.getProperty("/StartDate");
-             var oStartDate = this._parseDate(sStartDate);
-             var oMinEndDate;
-             if (oStartDate) {
-                 oMinEndDate = new Date(oStartDate);
-                 oMinEndDate.setDate(oMinEndDate.getDate() + 1);
-                 oMinEndDate.setHours(0, 0, 0, 0);
-             } else {
-                 oMinEndDate = oHostelModel.getProperty("/TodayDate");
-             }
-             oHostelModel.setProperty("/EndDateMinDate", oMinEndDate);
-         }
-     });
- });
+        SC_onVHDClose: function () {
+            this.EC_Dialog.close();
+        },
+        _updateEndDateMinDate: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sStartDate = oHostelModel.getProperty("/StartDate");
+            var oStartDate = this._parseDate(sStartDate);
+            var oMinEndDate;
+            if (oStartDate) {
+                oMinEndDate = new Date(oStartDate);
+                oMinEndDate.setDate(oMinEndDate.getDate() + 1);
+                oMinEndDate.setHours(0, 0, 0, 0);
+            } else {
+                oMinEndDate = oHostelModel.getProperty("/TodayDate");
+            }
+            oHostelModel.setProperty("/EndDateMinDate", oMinEndDate);
+        }
+    });
+});

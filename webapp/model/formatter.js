@@ -704,7 +704,10 @@ sap.ui.define([
             }
 
             return "Payment Partially";
-        }
+        },
+        showReturnDeposit: function (sStatus, sDepositAmount) {
+    return sStatus === "Completed" && Number(sDepositAmount) > 0;
+}
 
     }
 });

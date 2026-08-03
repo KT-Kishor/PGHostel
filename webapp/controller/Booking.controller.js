@@ -6600,6 +6600,7 @@
             }
         },
 
+
         onGeneratePDF: async function (data) {
             const booking = data.Booking?.[0] || data;
             const facilities = data.FacilityItems || [];
@@ -6612,11 +6613,82 @@
             const checkoutTime = company.CheckoutTime || "10:00 PM";
 
             const { jsPDF } = window.jspdf;
+
             const doc = new jsPDF({
                 orientation: "portrait",
                 unit: "mm",
-                format: "a4",
+                format: "a4"
             });
+
+            // Convert local image to Base64
+            const getBase64Image = (imagePath) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+
+                    img.onload = function () {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0);
+
+                        resolve(canvas.toDataURL("image/png"));
+                    };
+
+                    img.onerror = reject;
+                    img.src = imagePath;
+                });
+            };
+
+            // Load logo from webapp/images
+            const watermarkImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png")
+            );
+            const LogoImage = await getBase64Image(
+                sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png")
+            );
+
+            // Watermark function
+            const addWatermark = () => {
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                // Transparent watermark (works in newer jsPDF)
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({
+                        opacity: 0.08
+                    }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            };
+
+            // Add watermark to first page
+            addWatermark();
+
 
             const currency = (booking.Currency || "INR").trim();
             let currentY = 15;
@@ -6628,7 +6700,12 @@
 
             const checkNewPage = (requiredSpace = 20) => {
                 if (currentY + requiredSpace > 280) {
+
                     doc.addPage();
+
+                    // Watermark on every page
+                    addWatermark();
+
                     currentY = 20;
                     return true;
                 }
@@ -6643,10 +6720,35 @@
             doc.rect(0, 32, 210, 2.5, "F");
 
             // Title
+
+            const circleX = 19;
+            const circleY = 20;      // Move the whole circle 1mm down
+            const radius = 12;
+
+            const logoSize = 19;
+
+            // White background
+            doc.setFillColor(255, 255, 255);
+            doc.circle(circleX, circleY, radius, "F");
+
+            // Grey border
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.8);
+            doc.circle(circleX, circleY, radius, "S");
+
+            // Logo
+            doc.addImage(
+                LogoImage,
+                "PNG",
+                circleX - (logoSize / 2),
+                circleY - (logoSize / 2), // Move logo 1mm down
+                logoSize,
+                logoSize
+            );
             doc.setFont("helvetica", "bold");
             doc.setFontSize(24);
             doc.setTextColor(255, 255, 255);
-            doc.text("BOOKING VOUCHER", 20, 20);
+            doc.text("BOOKING VOUCHER", 36, 20);
 
             // Compact Right Box
             doc.setFillColor(255, 255, 255);
@@ -6900,14 +7002,14 @@
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
-                                this.qty=`(${item.Quantity || 1} Qty / Entire Booking)`
+                                this.qty = `(${item.Quantity || 1} Qty / Entire Booking)`
                                 sUnitText = `${sUnitText}`;
                             } else {
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-                                this.qty=`(${dailyQty} Qty / day)`
+                                this.qty = `(${dailyQty} Qty / day)`
                                 sUnitText = `${sUnitText}\n(${diffDays} days)`;
-                                 }
+                            }
                         }
                         else if (sUnitText === "Per Day") {
                             sUnitText = `${sUnitText}\n(${diffDays} Days)`;
@@ -6924,15 +7026,15 @@
                         }
                     }
                     const showQty =
-                         item.FacilityChargeType === "Entire Booking" ||
-                           item.FacilityChargeType === "DAILY";
+                        item.FacilityChargeType === "Entire Booking" ||
+                        item.FacilityChargeType === "DAILY";
 
                     return [
                         (index + 1).toString(),
                         item.MemberName
                             ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
-                            
+
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
@@ -6980,6 +7082,7 @@
             const roomRent = parseFloat(oHostelModel.RoomPrice) || 0;
             const facilityTotal = parseFloat(oHostelModel.TotalFacilityPrice) || 0;
             const subTotal = roomRent + facilityTotal;
+            const Currency = oHostelModel.Currency
             const discount = parseFloat(booking.Discount) || 0;
             const deposit = parseFloat(data.Deposit) || 0;
             let grandTotal = oHostelModel.GrandTotal;
@@ -7026,29 +7129,27 @@
                 summaryY += 7;
             };
 
-            addLine("Room Rent", `${Formatter.fromatNumber(roomRent)} ${oHostelModel.Currency}`);
+            addLine("Room Rent", `${Formatter.fromatNumber(roomRent)} ${Currency}`);
 
 
             // Render Facility Total row line only if there's actual value or entries
-                if (facilityTotal > 0 || facilities.length > 0) {
-                addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${oHostelModel.Currency}`);
+            if (facilityTotal > 0 || facilities.length > 0) {
+                addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${Currency}`);
             }
 
-              if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${oHostelModel.Currency}`);
+            if (discount > 0) {
+                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${Currency}`);
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);
 
 
-            addLine("Sub Total", `${Formatter.fromatNumber(finalSubTotal)} ${oHostelModel.Currency}`);
+            addLine("Sub Total", `${Formatter.fromatNumber(finalSubTotal)} ${Currency}`);
 
 
             if (tax > 0) {
-                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)} ${oHostelModel.Currency}`);
+                addLine(`Tax Amount (${oHostelModel.GSTValue}%)`, ` ${Formatter.fromatNumber(tax)} ${Currency}`);
             }
-
-
 
             summaryY += 1;
             doc.setDrawColor(200, 200, 200);
@@ -7056,7 +7157,7 @@
             doc.line(leftX, summaryY - 3, rightX, summaryY - 3);
 
             summaryY += 2;
-            addLine("GRAND TOTAL", `${Formatter.fromatNumber(grandTotal)} ${oHostelModel.Currency}`, true);
+            addLine("GRAND TOTAL", `${Formatter.fromatNumber(grandTotal)} ${Currency}`, true);
 
 
             currentY = paymentStartY + paymentBoxHeight + 12;
@@ -7145,6 +7246,44 @@
             doc.text("Premium Hospitality Experience", 195, currentY + 5, {
                 align: "right",
             });
+            const totalPages = doc.getNumberOfPages();
+
+            for (let i = 1; i <= totalPages; i++) {
+
+                doc.setPage(i);
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                const imgWidth = 90;
+                const imgHeight = 90;
+
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+
+                if (doc.saveGraphicsState) {
+                    doc.saveGraphicsState();
+                }
+
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({ opacity: 0.08 }));
+                }
+
+                doc.addImage(
+                    watermarkImage,
+                    "PNG",
+                    x,
+                    y,
+                    imgWidth,
+                    imgHeight,
+                    undefined,
+                    "FAST"
+                );
+
+                if (doc.restoreGraphicsState) {
+                    doc.restoreGraphicsState();
+                }
+            }
 
             // ✅ RETURN BASE64 (IMPORTANT CHANGE)
             return doc.output("datauristring").split(",")[1];

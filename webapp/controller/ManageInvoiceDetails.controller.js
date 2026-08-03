@@ -1781,7 +1781,7 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/Type", "CGST/SGST");
                 oCustomerModel.setProperty("/Value", Number(CustomerData.Value) / 2);
-                oCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                oCustomerModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
                 this.totalAmountCalculation();
             },
 
@@ -2170,7 +2170,7 @@ sap.ui.define([
                         if (invoiceData.IGSTSelected) {
                             oModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                         } else if (invoiceData.CGSTSelected) {
-                            oModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                            oModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
                         }
 
                         oModel.refresh(true);
@@ -3611,8 +3611,6 @@ sap.ui.define([
                     doc.setFont("times", "bold");
                     doc.text("Thank you for staying with us.", margin, currentY + 5);
 
-
-
                     // --------------------------------------------------
                     // Reserve space above footer
                     // --------------------------------------------------
@@ -3716,6 +3714,7 @@ sap.ui.define([
                     const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
                         BookingID: [filterData.BookingID]
                     });
+
                     //  PDF INIT 
                     const doc = new jsPDF({
                         orientation: "portrait",
@@ -3733,6 +3732,7 @@ sap.ui.define([
 
                         const oModel = invoices[invIndex];
                         const oCompanyItemModel = oModel.InvoicePaymentDetail || [];
+
 
                         if (invIndex > 0) {
                             doc.addPage();
@@ -3927,6 +3927,11 @@ sap.ui.define([
 
                         //  SUMMARY 
                         const summaryBody = [];
+                        const invoicePaymentRes = await this.ajaxReadWithJQuery("HM_invoicePaymentDetail", {
+                            InvNo: [oModel.InvNo]
+                        });
+
+                        const aInvoicePaymentDetails = invoicePaymentRes.data || [];
                         const subTotalGST = parseFloat(oModel.SubTotalInGST || 0);
                         const subTotalNoGST = parseFloat(oModel.SubTotalNotGST || 0);
                         const igst = parseFloat(oModel.IGST || 0);
@@ -3962,20 +3967,20 @@ sap.ui.define([
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
                         }
+                        
 
-                        const balanceAmount =
-                            (Number(oModel.TotalAmount) || 0) -
-                            (
-                                (Number(oModel.PaidAmount) || 0) +
-                                (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
-                            );
+                      // Get the latest payment record based on EntryDate (date + time)
+// Get the latest payment record based on EntryDate (date + time)
+const latestPayment = [...aInvoicePaymentDetails]
+    .filter(item => item.EntryDate)
+    .sort((a, b) => new Date(b.EntryDate) - new Date(a.EntryDate))[0];
 
-                        if (balanceAmount > 0) {
-                            summaryBody.push([
-                                "Due Amount :",
-                                Formatter.fromatNumber(balanceAmount)
-                            ]);
-                        }
+if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueAmount !== null &&  parseFloat(latestPayment.DueAmount) > 0) {
+    summaryBody.push([
+        "Due Amount :",
+        Formatter.fromatNumber(parseFloat(latestPayment.DueAmount))
+    ]);
+}
 
                         // Total
                         const totalRowIndex = summaryBody.length;
@@ -4036,16 +4041,21 @@ sap.ui.define([
 
                     //  Transaction History (ONCE) 
                     if (paymentRes?.commentData?.length) {
+
+                        const sortedPaymentData = [...paymentRes.commentData].sort((a, b) => {
+                            return new Date(b.Date) - new Date(a.Date);
+                        });
                         doc.addPage();
                         doc.setFont("times", "bold").setFontSize(11);
                         doc.text("Transaction History", margin, 20);
+
 
                         doc.autoTable({
                             startY: 25,
                             head: [
                                 ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
-                            body: paymentRes.commentData.map((p, i) => ([
+                            body: sortedPaymentData.map((p, i) => ([
                                 i + 1,
                                 Formatter.formatDate(p.Date),
                                 p.PaymentType,
