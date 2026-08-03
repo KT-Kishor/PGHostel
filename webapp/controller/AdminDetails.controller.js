@@ -7757,7 +7757,7 @@ sap.ui.define([
             };
 
           // Load logo from webapp/images
-            const watermarkPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png");
+            const watermarkPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KTL0.png");
             const logoPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png");
 
             // Print paths in browser console
