@@ -3973,18 +3973,24 @@ sap.ui.define([
                         resolve(canvas.toDataURL("image/png"));
                     };
 
-                    img.onerror = reject;
+                    img.onerror = function () {
+                        reject(new Error("Failed to load image: " + imagePath));
+                    };
                     img.src = imagePath;
                 });
             };
 
             // Load logo from webapp/images
-            const watermarkImage = await getBase64Image(
-                sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png")
-            );
-            const LogoImage = await getBase64Image(
-                sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png")
-            );
+            const watermarkPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KTl0.png");
+            const logoPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png");
+
+            // Print paths in browser console
+            console.log("Watermark Path:", watermarkPath);
+            console.log("Logo Path:", logoPath);
+
+            // Load images
+            const watermarkImage = await getBase64Image(watermarkPath);
+            const LogoImage = await getBase64Image(logoPath);
 
             // Watermark function
             const addWatermark = () => {
