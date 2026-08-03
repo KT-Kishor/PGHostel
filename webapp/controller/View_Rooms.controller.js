@@ -87,11 +87,23 @@ sap.ui.define([
             //        this.getView().addStyleClass("blurView")
             //        this._oBookingDateDialog.open();
 
-            this.sPath = oEvent.getParameter("arguments").sPath;
+            this.sPath = (oEvent.getParameter("arguments").sPath || "").trim();
+
+            // Deep link guard: an empty / malformed branch code never reaches the backend.
+            if (!this.sPath) {
+                return this._goToNotFound();
+            }
+
             this.getOwnerComponent().setModel(new JSONModel({Branch: this.sPath }), "sPathModel");
 
-            // Fetch branch data for the specific BranchID
-            await this._loadBranchData();
+            // Fetch branch data for the specific BranchID. A bookmarked link may point
+            // at a branch that has since been deleted / deactivated - show NotFound
+            // instead of rendering an empty rooms page.
+            const bBranchExists = await this._loadBranchData();
+            if (!bBranchExists) {
+                this.closeBusyDialog();
+                return this._goToNotFound();
+            }
 
             await this._loadFilteredData()
             this.closeBusyDialog()
@@ -181,6 +193,12 @@ sap.ui.define([
 
         },
 
+        _goToNotFound: function () {
+            this.getOwnerComponent().getRouter().navTo("NotFound", {}, true);
+        },
+
+        // Returns true when the requested BranchID resolves to a real branch,
+        // false when it does not exist (deleted / bad deep link) or cannot be read.
         _loadBranchData: async function () {
             const oView = this.getView();
             const sBranchID = this.sPath;
@@ -191,24 +209,40 @@ sap.ui.define([
 
             try {
                 // Fetch branch data filtered by BranchID from HM_Branch backend endpoint
-                const oResponse = await this.ajaxReadWithJQuery("HM_Branch", 
+                const oResponse = await this.ajaxReadWithJQuery("HM_Branch",
                     filter
                 );
 
-                // Set the filtered branch data to BranchModel
-                const aBranchData = oResponse?.data || [];
-                const oBranchModel = new JSONModel(aBranchData[0] || {});
+                // Normalize: the endpoint may answer with an array or a single object
+                const aBranchData = Array.isArray(oResponse?.data)
+                    ? oResponse.data
+                    : (oResponse?.data ? [oResponse.data] : []);
+
+                // Only accept a record that really belongs to the requested BranchID,
+                // so an unfiltered/fallback response cannot render another branch.
+                const oBranch = aBranchData.find(b =>
+                    (b?.BranchID || "").trim().toLowerCase() === sBranchID.toLowerCase()
+                );
+
+                if (!oBranch) {
+                    oView.setModel(new JSONModel({}), "BranchModel");
+                    return false;
+                }
+
+                const oBranchModel = new JSONModel(oBranch);
                 oView.setModel(oBranchModel, "BranchModel");
 
                 const oVisibilityModel = oView.getModel("VisibilityModel");
                 if (oVisibilityModel) {
-                    oVisibilityModel.setProperty("/AverageRating", aBranchData[0]?.AverageRating || 0);
-                    oVisibilityModel.setProperty("/TotalFeedbacks", aBranchData[0]?.TotalFeedbacks || 0);
+                    oVisibilityModel.setProperty("/AverageRating", oBranch.AverageRating || 0);
+                    oVisibilityModel.setProperty("/TotalFeedbacks", oBranch.TotalFeedbacks || 0);
                 }
+                return true;
             } catch (error) {
                 console.error("Error loading branch data:", error);
                 // Set empty model on error
                 oView.setModel(new JSONModel({}), "BranchModel");
+                return false;
             }
         },
 

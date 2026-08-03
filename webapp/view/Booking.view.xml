@@ -102,7 +102,13 @@
 
                             <Label text="Rent Price" />
                             <Input
-                                value="{= ${HostelModel>/FinalPrice} + ' ' + ${HostelModel>/Currency}}"
+                                value="{
+                                    parts: [
+                                        { path: 'HostelModel>/FinalPrice' },
+                                        { path: 'HostelModel>/Currency' }
+                                    ],
+                                    formatter: '._formatAmountToTwoDecimals'
+                                }"
                                 editable="false"
                             />
 

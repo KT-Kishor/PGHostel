@@ -739,8 +739,19 @@
             return mUnitLabels[sPriceType] || "Unit";
         },
 
+        _formatAmountToTwoDecimals: function (vValue, sCurrency) {
+            const fValue = Number(vValue);
+
+            if (!Number.isFinite(fValue)) {
+                return "";
+            }
+
+            const sFormattedValue = this.Formatter.fromatNumber(Number(fValue.toFixed(2)));
+            return sCurrency ? sFormattedValue + " " + sCurrency : sFormattedValue;
+        },
+
         _formatFacilityPriceWithUnit: function (fPrice, sCurrency, sPriceType) {
-            return this._toNumber(fPrice) + " " + (sCurrency || "INR") + " / " + this._getFacilityRateUnitText(sPriceType);
+            return this._formatAmountToTwoDecimals(this._toNumber(fPrice)) + " " + (sCurrency || "INR") + " / " + this._getFacilityRateUnitText(sPriceType);
         },
 
         _formatFacilityUnitCount: function (iCount, sUnit) {
@@ -1078,7 +1089,7 @@
                 return "";
             }
 
-            return "Total: " + this._getFacilityCardTotalAmount(oFacility) + " " + (oFacility.Currency || "INR");
+            return "Total: " + this._formatAmountToTwoDecimals(this._getFacilityCardTotalAmount(oFacility)) + " " + (oFacility.Currency || "INR");
         },
 
         _getFacilityCardActionText: function (oFacility) {
@@ -1384,6 +1395,7 @@
 
             oSelectionModel.setData({
                 title: oFacility.DisplayFacilityName || oFacility.FacilityName,
+                currency: oFacility.Currency || this.getView().getModel("HostelModel").getProperty("/Currency") || "INR",
                 DisplayPrice: this._formatFacilityPriceWithUnit(
                     fPrice,
                     oFacility.Currency || "INR",
@@ -1488,6 +1500,8 @@
                 return this._oFacilityDialog;
             }
 
+            const fnFormatAmount = this._formatAmountToTwoDecimals.bind(this);
+
             const oDialog = new ResponsivePopover({
                 contentWidth: sap.ui.Device.system.phone ? "95vw" : "30rem",
                 placement: sap.ui.Device.system.phone ? sap.m.PlacementType.VerticalPreferredBottom : sap.m.PlacementType.Auto,
@@ -1542,9 +1556,10 @@
                                             parts: [
                                                 { path: "FacilitySelection>/minimumQty" },
                                                 { path: "FacilitySelection>/minimumPrice" },
-                                                { path: "FacilitySelection>/facilityChargeType" }
+                                                { path: "FacilitySelection>/facilityChargeType" },
+                                                { path: "FacilitySelection>/currency" }
                                             ],
-                                            formatter: function (iMinimumQty, fMinimumPrice, sChargeType) {
+                                            formatter: function (iMinimumQty, fMinimumPrice, sChargeType, sCurrency) {
                                                 const iQty = parseInt(iMinimumQty, 10) || 0;
                                                 const fPrice = parseFloat(fMinimumPrice) || 0;
                                                 const sNormalizedChargeType = String(sChargeType || "").trim().toUpperCase();
@@ -1553,7 +1568,8 @@
                                                     ? "per day"
                                                     : "once for the entire booking";
 
-                                                return "Package: " + iQty + " item(s) for " + fPrice.toFixed(2) + " INR" +
+                                                return "Package: " + iQty + " item(s) for " +
+                                                    fnFormatAmount(fPrice) + " " + (sCurrency || "INR") +
                                                     " per selected person, charged " + sChargeLabel + ".";
                                             }
                                         },
@@ -2096,7 +2112,7 @@
 
                     if (sSelectionMode === "SINGLE") {
                         fTotal = fPrice * fPeriodMultiplier;
-                        sBreakdown = fPrice + " " + sCurrency +
+                        sBreakdown = this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                             " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
@@ -2109,13 +2125,13 @@
                         // For time-based pricing (Per Day/Month/Year), quantity and period
                         // are separate dimensions and both must appear.
                         if (sPriceType === "Unit Price") {
-                            sBreakdown = fPrice + " " + sCurrency +
+                            sBreakdown = this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                                 " x " + this._formatFacilityUnitCount(iQty, "Unit");
                         } else {
                             // Qty is only a factor worth showing when more than one,
                             // otherwise "Qty 1 x" is noise.
                             sBreakdown = (iQty > 1 ? "Qty " + iQty + " x " : "") +
-                                fPrice + " " + sCurrency +
+                                this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                                 " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         }
                         sAllocationDetails = JSON.stringify({
@@ -2133,7 +2149,7 @@
                         // person is selected, otherwise "1 person(s) x" is noise.
                         sBreakdown = "For: " + aNames.join(", ") + " | " +
                             (iPersonCount > 1 ? this._formatFacilityUnitCount(iPersonCount, "person") + " x " : "") +
-                            fPrice + " " + sCurrency +
+                            this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                             " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         sAllocationDetails = JSON.stringify({
                             selectionMode: sSelectionMode,
@@ -2170,16 +2186,16 @@
                         if (sFacilityChargeType === "DAILY") {
                             fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
                             sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
-                                fPackagePrice + " " + sCurrency +
+                                this._formatAmountToTwoDecimals(fPackagePrice) + " " + sCurrency +
                                 " x " + this._formatFacilityUnitCount(iChargeableDayCount, "Day");
                         } else {
                             fTotal = fPackagePrice * iSelectedPersonCount;
                             sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
-                                fPackagePrice + " " + sCurrency;
+                                this._formatAmountToTwoDecimals(fPackagePrice) + " " + sCurrency;
                             // With one person the package price already IS the total, so the
                             // popover's trailing "= total" would just repeat it.
                             if (iSelectedPersonCount > 1) {
-                                sBreakdown += " = " + Number(fTotal.toFixed(2)) + " " + sCurrency;
+                                sBreakdown += " = " + this._formatAmountToTwoDecimals(fTotal) + " " + sCurrency;
                             }
                         }
 
@@ -2398,6 +2414,7 @@
         _buildFacilityPriceOptions: function (oFacility) {
             const aOptions = [];
             const sSelectionMode = this._getFacilitySelectionMode(oFacility);
+            const fnFormatAmount = this._formatAmountToTwoDecimals.bind(this);
 
             const fUnitPrice = this._toNumber(oFacility.UnitPrice);
             const fMinimumPrice = this._toNumber(oFacility.MinimumPrice);
@@ -2410,7 +2427,7 @@
                 if (fPrice > 0 || (bAllowZero && fPrice === 0)) {
                     aOptions.push({
                         key: sKey,
-                        text: sLabel + " - " + fPrice + " " + (oFacility.Currency || "INR"),
+                        text: sLabel + " - " + fnFormatAmount(fPrice) + " " + (oFacility.Currency || "INR"),
                         price: fPrice
                     });
                 }
@@ -4319,11 +4336,11 @@
                                                 formatter: function (fDiscountAmount, sCurrency) {
                                                     const sCurrencySymbol = sCurrency || "INR";
                                                     if (fDiscountAmount > 0) {
-                                                        return "Discount: " + fDiscountAmount.toFixed(2) + " " + sCurrencySymbol;
+                                                        return "Discount: " + this._formatAmountToTwoDecimals(fDiscountAmount) + " " + sCurrencySymbol;
                                                     } else {
                                                         return "Complimentary offer (0 " + sCurrencySymbol + ")";
                                                     }
-                                                }
+                                                }.bind(this)
                                             },
                                             wrapping: true
                                         }).addStyleClass("sapUiTinyMarginBottom sapUiSmallMarginBegin")
@@ -4449,7 +4466,7 @@
                                                     var bEntireBookingPackage = sSelectionMode === "PERSON_QTY" &&
                                                         that._normalizeFacilityChargeType(sChargeType) !== "DAILY";
                                                     if (fTotal !== undefined && fTotal !== null && !bEntireBookingPackage && (sBreakdown || "").indexOf("=") === -1) {
-                                                        sResult += " = " + fTotal + " " + (sCurrency || "");
+                                                        sResult += " = " + that._formatAmountToTwoDecimals(fTotal) + " " + (sCurrency || "");
                                                     }
                                                     return sResult;
                                                 }
@@ -5492,7 +5509,7 @@
                 if (fCouponBaseAmount < Number(oMatchedCoupon.MinOrderValue || 0)) {
                     const fMinOrderValue = Number(oMatchedCoupon.MinOrderValue || 0);
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show(`Minimum order value ${this.Formatter.fromatNumber(fMinOrderValue)} is required to apply this coupon.`);
+                    MessageToast.show(`Minimum order value ${this._formatAmountToTwoDecimals(fMinOrderValue)} is required to apply this coupon.`);
                     return;
                 }
 
@@ -5789,7 +5806,7 @@
 
             // oModel.setProperty("/TotalDays", iDays);
             // oModel.setProperty("/RoomBreakdownText", sRoomBreakdown + " = " + Number(fRoomPrice.toFixed(2)) + " " + (oModel.getProperty("/Currency") || ""));
-            const formattedBasePrice = this.Formatter.fromatNumber(fBasePrice);
+            const formattedBasePrice = this._formatAmountToTwoDecimals(fBasePrice);
             let sRoomBreakdown = formattedBasePrice;
             let fSubTotal = 0;
             let fDiscountedSubTotal = 0;

@@ -90,6 +90,17 @@ sap.ui.define([
                 arguments
             );
         },
+
+        _formatAmountToTwoDecimals: function (vValue, sCurrency) {
+            const fValue = Number(vValue);
+
+            if (!Number.isFinite(fValue)) {
+                return "";
+            }
+
+            const sFormattedValue = this.Formatter.fromatNumber(Number(fValue.toFixed(2)));
+            return sCurrency ? sFormattedValue + " " + sCurrency : sFormattedValue;
+        },
         _updateTableColumnWidths: function () {
 
             var bMobile = sap.ui.Device.system.phone;
@@ -1084,12 +1095,12 @@ sap.ui.define([
                 }
             } else if (sUnitKey === "UNITPRICE" || sUnitKey === "UNIT") {
                 // For Unit Price, quantity IS the unit count, so fold them together.
-                return fPrice + " " + sCurrency + " x " + this._formatFacilityUnitCount(iQty, "Unit");
+                return this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency + " x " + this._formatFacilityUnitCount(iQty, "Unit");
             }
 
             // Qty is only a factor worth showing when more than one, otherwise "Qty 1 x" is noise.
             return (iQty > 1 ? "Qty " + iQty + " x " : "") +
-                fPrice + " " + sCurrency +
+                this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                 (sPeriodPart ? " x " + sPeriodPart : "");
         },
 
@@ -2879,9 +2890,9 @@ sap.ui.define([
                             else if (sUnitKey === "PERMONTH") { sUnitLabel = this._formatFacilityUnitCount(oPerson.monthCount, "Month"); }
                             else if (sUnitKey === "PERYEAR") { sUnitLabel = this._formatFacilityUnitCount(oPerson.yearCount, "Year"); }
                             else if (sUnitKey === "PERHOUR") { sUnitLabel = this._formatFacilityUnitCount(oPerson.dayCount, "Day") + " x " + this._formatFacilityUnitCount(oPerson.hourCount, "Hr"); }
-                            return oPerson.personName + " (" + oPerson.price.toFixed(2) + " " + sCurrency +
+                            return oPerson.personName + " (" + this._formatAmountToTwoDecimals(oPerson.price) + " " + sCurrency +
                                 (sUnitLabel ? " x " + sUnitLabel : "") +
-                                " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
+                                " = " + this._formatAmountToTwoDecimals(oPerson.personTotal) + " " + sCurrency + ")";
                         }.bind(this));
                         sBreakdown = aPersonLines.join(", ");
                         sAllocationDetails = JSON.stringify({
@@ -2905,17 +2916,17 @@ sap.ui.define([
                         // Build breakdown showing each person's individual calculation
                         var aPersonLines = oPerPersonResult.personBreakdown.map(function (oPerson) {
                             if (oPerson.chargeType === "DAILY") {
-                                return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                return oPerson.personName + " (" + this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency +
                                     " x " + this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day") +
-                                    " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
+                                    " = " + this._formatAmountToTwoDecimals(oPerson.personTotal) + " " + sCurrency + ")";
                             }
                             if (oPerson.chargeType === "Entire Booking") {
                                 // Package price already IS this person's total, so no "= total".
-                                return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency + ")";
+                                return oPerson.personName + " (" + this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency + ")";
                             }
-                            return oPerson.personName + " (" + oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                            return oPerson.personName + " (" + this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency +
                                 " x " + this._formatFacilityUnitCount(oPerson.quantity, "Unit") +
-                                " = " + oPerson.personTotal.toFixed(2) + " " + sCurrency + ")";
+                                " = " + this._formatAmountToTwoDecimals(oPerson.personTotal) + " " + sCurrency + ")";
                         }.bind(this));
                         sBreakdown = aPersonLines.join(", ");
                         sAllocationDetails = JSON.stringify({
@@ -3098,11 +3109,11 @@ sap.ui.define([
                 var sName = oFacility.DisplayFacilityName || oFacility.FacilityName || "Facility";
                 var sBreakdown = oFacility.BreakdownText || "";
                 var sTotal = oFacility.TotalAmount !== undefined && oFacility.TotalAmount !== null
-                    ? " = " + oFacility.TotalAmount + " " + (oFacility.Currency || "")
+                    ? " = " + this._formatAmountToTwoDecimals(oFacility.TotalAmount) + " " + (oFacility.Currency || "")
                     : "";
 
                 return sName + (sBreakdown ? ": " + sBreakdown : "") + sTotal;
-            }).join("\n");
+            }.bind(this)).join("\n");
         },
 
         /**
@@ -3626,12 +3637,15 @@ sap.ui.define([
          * Each item: { personName, tag, dateRange, math, subtotal }
          */
         _buildFacilityCalcBreakdown: function (oFacility) {
+            var oCurrencyModel = this.getView().getModel("HostelModel");
+            var sFallbackCurrency = (oCurrencyModel ? oCurrencyModel.getProperty("/Currency") : "") || "INR";
+
             if (!oFacility || !oFacility.Selected) {
-                return { hasBreakdown: false, items: [], grandTotal: "0.00 INR", currency: "INR" };
+                return { hasBreakdown: false, items: [], grandTotal: "0.00 " + sFallbackCurrency, currency: sFallbackCurrency };
             }
 
             if (!this._shouldShowFacilityCalcBreakdown(oFacility)) {
-                return { hasBreakdown: false, items: [], grandTotal: "0.00 " + (oFacility.Currency || "INR"), currency: oFacility.Currency || "INR" };
+                return { hasBreakdown: false, items: [], grandTotal: "0.00 " + (oFacility.Currency || sFallbackCurrency), currency: oFacility.Currency || sFallbackCurrency };
             }
 
             var sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
@@ -3709,18 +3723,18 @@ sap.ui.define([
                             else if (sUnitKey === "PERMONTH") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.monthCount, 1), "Month"); }
                             else if (sUnitKey === "PERYEAR") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.yearCount, 1), "Year"); }
                             else if (sUnitKey === "PERHOUR") { sUnitLabel = this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day") + " × " + this._formatFacilityUnitCount(Math.max(oPerson.hourCount, 1), "Hr"); }
-                            sMath = oPerson.price.toFixed(2) + " " + sCurrency +
+                            sMath = this._formatAmountToTwoDecimals(oPerson.price) + " " + sCurrency +
                                 (sUnitLabel ? " × " + sUnitLabel : "");
                         } else {
                             // PERSON_QTY
                             if (oPerson.chargeType === "DAILY") {
-                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                sMath = this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency +
                                     " × " + this._formatFacilityUnitCount(Math.max(oPerson.dayCount, 1), "Day");
                             } else if (oPerson.chargeType === "Entire Booking") {
                                 // Package price already IS this person's subtotal.
-                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency;
+                                sMath = this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency;
                             } else {
-                                sMath = oPerson.packagePrice.toFixed(2) + " " + sCurrency +
+                                sMath = this._formatAmountToTwoDecimals(oPerson.packagePrice) + " " + sCurrency +
                                     " × " + this._formatFacilityUnitCount(oPerson.quantity, "Unit");
                             }
                         }
@@ -3730,7 +3744,7 @@ sap.ui.define([
                             tag: "",
                             dateRange: sPersonDateRange || sDateRange,
                             math: sMath,
-                            subtotal: oPerson.personTotal.toFixed(2) + " " + sCurrency
+                            subtotal: this._formatAmountToTwoDecimals(oPerson.personTotal) + " " + sCurrency
                         });
                     }.bind(this));
                 }
@@ -3746,7 +3760,7 @@ sap.ui.define([
                 var iHourCount = this._getHourCount(sFacStart, sFacEnd, sFacStartTime, sFacEndTime, sFacTotalHour);
 
                 var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
-                var sPrice = fPrice.toFixed(2) + " " + sCurrency;
+                var sPrice = this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency;
                 var sMath = "";
                 var bUnitPriceFold = false;
 
@@ -3787,14 +3801,14 @@ sap.ui.define([
                     tag: sSelectionMode === "QTY" ? "×" + iQuantity : "",
                     dateRange: sDateRange,
                     math: sMath,
-                    subtotal: fGrandTotal.toFixed(2) + " " + sCurrency
+                    subtotal: this._formatAmountToTwoDecimals(fGrandTotal) + " " + sCurrency
                 });
             }
 
             return {
                 hasBreakdown: aItems.length > 0,
                 items: aItems,
-                grandTotal: fGrandTotal.toFixed(2) + " " + sCurrency,
+                grandTotal: this._formatAmountToTwoDecimals(fGrandTotal) + " " + sCurrency,
                 currency: sCurrency
             };
         },
