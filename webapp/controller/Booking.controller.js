@@ -6727,7 +6727,7 @@
             // Title
 
             const circleX = 19;
-            const circleY = 20;      // Move the whole circle 1mm down
+            const circleY = 17;      // Move the whole circle 1mm down
             const radius = 12;
 
             const logoSize = 19;
