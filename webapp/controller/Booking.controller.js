@@ -37,7 +37,10 @@
 
             // Resize observer to recalculate visible card count
             this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
-            sap.ui.core.ResizeHandler.register(this.getView(), this._fnFacilityResizeHandler);
+            this._sFacilityResizeHandlerId = sap.ui.core.ResizeHandler.register(
+                this.getView(),
+                this._fnFacilityResizeHandler
+            );
 
             this.getView().addEventDelegate({
                 onBeforeHide: function () {
@@ -79,8 +82,9 @@
             }
         },
         onExit: function () {
-            if (this._fnFacilityResizeHandler) {
-                sap.ui.core.ResizeHandler.deregister(this._fnFacilityResizeHandler);
+            if (this._sFacilityResizeHandlerId) {
+                sap.ui.core.ResizeHandler.deregister(this._sFacilityResizeHandlerId);
+                this._sFacilityResizeHandlerId = null;
                 this._fnFacilityResizeHandler = null;
             }
             if (this._adCarouselInterval) {
@@ -4677,13 +4681,15 @@
         },
 
         _onFacilityCarouselResize: function () {
-            if (!this.getView() || !this.getView().getDomRef()) {
+            var oView = this.getView();
+            var oFacilityModel = oView && oView.getModel("FacilityModel");
+            if (!oView || !oView.getDomRef() || !oFacilityModel) {
                 return;
             }
             var iNewPageSize = this._getVisibleCardCount();
             if (iNewPageSize !== this._iFacilityPageSize) {
                 this._iFacilityPageSize = iNewPageSize;
-                var aFacilities = this.getView().getModel("FacilityModel").getProperty("/Facilities") || [];
+                var aFacilities = oFacilityModel.getProperty("/Facilities") || [];
                 var iMaxStart = Math.max(aFacilities.length - 1, 0);
                 this._iFacilityStartIndex = Math.min(this._iFacilityStartIndex || 0, iMaxStart);
                 this._renderFacilityCards();

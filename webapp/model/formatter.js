@@ -2,6 +2,29 @@ sap.ui.define([
     "sap/ui/core/format/DateFormat"
 ], function (DateFormat) {
     "use strict";
+
+    // Grouped number output for the coupon amount formatters, same options as fromatNumber.
+    function formatGroupedNumber(vValue) {
+        if (vValue === "0" || vValue === 0) {
+            return "0.00";
+        }
+        var numericValue = parseFloat(vValue);
+        if (isNaN(numericValue)) {
+            return "";
+        }
+
+        var oFormatOptions = {
+            groupingBaseSize: 3,
+            groupingSize: 2,
+            minIntegerDigits: 1,
+            minFractionDigits: 2,
+            maxFractionDigits: 4
+        };
+
+        var oFloatFormat = sap.ui.core.format.NumberFormat.getFloatInstance(oFormatOptions);
+        return oFloatFormat.format(numericValue);
+    }
+
     function parseDDMMYYYY(sDate) {
         if (!sDate) return null;
         // Expected input: "19/11/2025"
@@ -261,7 +284,8 @@ sap.ui.define([
             if (sDiscountType === "Percentage") {
                 return vDiscountValue + " %";
             } else if (sDiscountType === "Fixed Amount") {
-                return vDiscountValue + " " + (sCurrency || "INR");
+                var sAmount = formatGroupedNumber(vDiscountValue);
+                return sCurrency ? sAmount + " " + sCurrency : sAmount;
             }
 
             return vDiscountValue;
@@ -271,7 +295,8 @@ sap.ui.define([
             if (vValue === null || vValue === undefined || vValue === "") {
                 return "";
             }
-            return vValue + " " + (sCurrency || "INR");
+            var sAmount = formatGroupedNumber(vValue);
+            return sCurrency ? sAmount + " " + sCurrency : sAmount;
         },
 
         formatStatusState: function (sStatus) {

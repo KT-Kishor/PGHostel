@@ -75,7 +75,13 @@
                                 text="{ShowCouponDetails>CouponCode}"
                             />
                             <Text
-                                text="{ShowCouponDetails>MinOrderValue}"
+                                text="{
+                                    parts: [
+                                        { path: 'ShowCouponDetails>MinOrderValue' },
+                                        { path: 'ShowCouponDetails>Currency' }
+                                    ],
+                                    formatter: '.Formatter.formatAmountINR'
+                                }"
                                 wrapping="true"
                                 class="couponTitleOpp"
                             />
@@ -87,8 +93,8 @@
                                 text="{
                                     parts: [
                                         { path: 'ShowCouponDetails>DiscountType' },
-                                        { path: 'ShowCouponDetails>DiscountValue' }
-                                        
+                                        { path: 'ShowCouponDetails>DiscountValue' },
+                                        { path: 'ShowCouponDetails>Currency' }
                                     ],
                                     formatter: '.Formatter.formatDiscount'
                                 } OFF"
@@ -97,7 +103,13 @@
                             />
                             <Title
                                 class="couponTitle"
-                                text="{ShowCouponDetails>UptoValue}"
+                                text="{
+                                    parts: [
+                                        { path: 'ShowCouponDetails>UptoValue' },
+                                        { path: 'ShowCouponDetails>Currency' }
+                                    ],
+                                    formatter: '.Formatter.formatAmountINR'
+                                }"
                                 wrapping="true"
                             />
 

@@ -235,7 +235,7 @@ sap.ui.define([
                         localStorage.removeItem("_mN72P");
                         localStorage.removeItem("activeTabs");
                     }
-                }, 4000); // Mateen have change original value 1500 to 4000
+                }, 14000); // Mateen have change original value 1500 to 4000
             },
 
             _onStorageChange: function (event) {
