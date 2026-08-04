@@ -263,7 +263,7 @@ sap.ui.define([
             // Update CustomerData model with edited dates
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
 
-             const pdfBase64 = await this.onGeneratePDF("Completed");
+            const pdfBase64 = await this.onGeneratePDF("Completed");
 
             // Refresh model to update UI bindings
 
@@ -276,7 +276,7 @@ sap.ui.define([
                     "CustomerEmail": oCustomerModel.CustomerEmail,
                     "BookingID": oCustomerModel.BookingID,
                     "RoomNo": oCustomerModel.RoomNo,
-                    "Currency":oCustomerModel.Currency
+                    "Currency": oCustomerModel.Currency
                 }]
             };
 
@@ -286,7 +286,7 @@ sap.ui.define([
                 "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
                 "PropertyEmail": oCustomerModel.PropertyEmail || "",
                 "PropertyType": oCustomerModel.PropertyType || "",
-                 "pdfAttachment": {
+                "pdfAttachment": {
                     "fileName": "BookingVoucher.pdf",
                     "mimeType": "application/pdf",
                     "content": pdfBase64
@@ -3741,7 +3741,7 @@ sap.ui.define([
                 PropertyMobileNo: ID.PropertyMobileNo || "",
                 PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
-                Currency:ID.Currency  || "",
+                Currency: ID.Currency || "",
                 pdfAttachment: {
                     fileName: "BookingVoucher.pdf",
                     mimeType: "application/pdf",
@@ -3807,8 +3807,8 @@ sap.ui.define([
                 return;
             }
 
-             var ID = this.ID;
-             const pdfBase64 = await this.onGeneratePDF("Rejected");
+            var ID = this.ID;
+            const pdfBase64 = await this.onGeneratePDF("Rejected");
 
             var Payload = {
                 Status: "Rejected",
@@ -3829,8 +3829,8 @@ sap.ui.define([
                 PropertyMobileNo: ID.PropertyMobileNo || "",
                 PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
-                Currency:ID.Currency  || "",
-                 "pdfAttachment": {
+                Currency: ID.Currency || "",
+                "pdfAttachment": {
                     "fileName": "BookingVoucher.pdf",
                     "mimeType": "application/pdf",
                     "content": pdfBase64
@@ -4755,7 +4755,7 @@ sap.ui.define([
                             CancelDate: sCancelDate, // UPDATED
                             PaymentType: oData.PaymentType || "",
                             BedType: oData.BedType || "",
-                            Currency:oData.Currency  || ""
+                            Currency: oData.Currency || ""
 
                         }];
 
@@ -7749,14 +7749,14 @@ sap.ui.define([
                         resolve(canvas.toDataURL("image/png"));
                     };
 
-                     img.onerror = function () {
+                    img.onerror = function () {
                         reject(new Error("Failed to load image: " + imagePath));
                     };
                     img.src = imagePath;
                 });
             };
 
-          // Load logo from webapp/images
+            // Load logo from webapp/images
             const watermarkPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KTL0.png");
             const logoPath = sap.ui.require.toUrl("sap/ui/com/project1/image/KT01Logo.png");
 
@@ -7869,7 +7869,7 @@ sap.ui.define([
             doc.roundedRect(140, 12, 55, 18, 3, 3, "FD");
 
             doc.setFontSize(9);
-            var Statushow=Status ? Status : data.Status 
+            var Statushow = Status ? Status : data.Status
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
             doc.text(`Booking ID: ${data.BookingID || "N/A"}`, 142, 19);
             doc.text(`Booked On: ${Formatter.formatDate(data.BookingDate) || "N/A"}`, 142, 24);
@@ -8162,13 +8162,13 @@ sap.ui.define([
                             : (item.FacilityName || "-"),
                         item.StartDate,
                         item.EndDate,
-                        Formatter.fromatNumber(
+                        `${Formatter.fromatNumber(
                             item.BasicFacilityPrice
                                 ? parseFloat(item.BasicFacilityPrice)
                                 : item.Price
-                        ),
+                        )} ${data.Currency}`,
                         sUnitText,
-                        Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)
+                        `${Formatter.fromatNumber(parseFloat(item.TotalAmount) || 0)} ${data.Currency}`
                     ];
                 });
 

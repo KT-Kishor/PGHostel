@@ -6783,8 +6783,6 @@
             doc.text(`Booked On: ${booking.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`, 148, 15,);
             // doc.text(`Status: ${booking.Status || "N/A"}`, 142, 24);
 
-
-
             currentY = 40;
 
             // ================= PROPERTY =================
@@ -7059,9 +7057,9 @@
 
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
-                        Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
-                        sUnitText,
-                        Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)
+                       `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)} ${Currency}`,
+sUnitText,
+`${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)} ${Currency}`
                     ];
                 });
 
