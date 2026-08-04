@@ -343,11 +343,11 @@
                                             liveChange="CID_onPressLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                         />
-										<m:Label text="{i18n>customerGSTNo}" />
+										<m:Label text="{i18n>customerGSTNo}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
 										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}" id="CI_id_InputCustomerGSTNO" liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}" editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>customerNameGST}" />
+										<m:Label text="{i18n>customerNameGST}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
 										<m:Input value="{SelectedCustomerModel>/CustomerGSTName}" id="CI_id_InputCustomerGSTName" liveChange="CID_ValidateGstName" maxLength="50" valueStateText="{i18n>enterCustomerName}" editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>customerNameAddress}" />
+										<m:Label text="{i18n>customerNameAddress}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
 										<m:TextArea value="{SelectedCustomerModel>/CustomerGSTAddress}" id="CI_id_InputCustomerGSTAddress" liveChange="CID_ValidateGstAddress" maxLength="200" valueStateText="{i18n>entervalidAddress}" editable="{visiablityPlay>/editable}"/>
 
 										<m:Label

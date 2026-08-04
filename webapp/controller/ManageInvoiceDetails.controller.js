@@ -629,7 +629,9 @@ sap.ui.define([
                             GST: bookingDetails.GSTIN || "",
                             Type: bookingDetails.GSTType || "",
                             Value: bookingDetails.GSTValue || "",
-                            CustomerGSTNO: bookingDetails.CustomerGSTIN || ""
+                            CustomerGSTNO: bookingDetails.CustomerGSTIN || "",
+                            CustomerGSTName: bookingDetails.CustCompanyName || "",
+                            CustomerGSTAddress: bookingDetails.CustCompanyAddress || ""
                         });
                     }
 
@@ -1454,6 +1456,14 @@ sap.ui.define([
                 if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
             },
 
+            CID_ValidateGstName: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent)
+            },
+
+            CID_ValidateGstAddress: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+
             CID_ValidateDatePayByDate: function (oEvent) {
                 utils._LCvalidateDate(oEvent)
                 var [day, month, year] = oEvent.getSource().getValue().split('/').map(Number);
@@ -1610,6 +1620,8 @@ sap.ui.define([
                 try {
                     var that = this;
                     var oModel = this.getView().getModel("FilteredSOWModel").getData();
+                    const oSelectedCustomerModel = that.getView().getModel("SelectedCustomerModel");
+
                     const bMandatoryValid =
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_AddBooking"), "ID") &&
@@ -1622,7 +1634,14 @@ sap.ui.define([
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
                     const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bOptionalValid && bConversionRateValid;
-                    if (!bIsValid) {
+
+                    let bIsValidTwo = true;
+
+                    if (oSelectedCustomerModel.getProperty("/CustomerGSTNO")) {
+                        bIsValidTwo = utils._LCvalidateGstNumber(this.byId("CI_id_InputCustomerGSTNO"), "ID") && utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTName"), "ID") && utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
+                    }
+
+                    if (!bIsValid || !bIsValidTwo) {
                         return MessageToast.show(that.i18nModel.getText("mandatoryFieldsError"));
                     }
                     this.getBusyDialog()
@@ -1636,7 +1655,6 @@ sap.ui.define([
                             data: oPayload.payload,
                             Items: oPayload.items
                         });
-                        const oSelectedCustomerModel = that.getView().getModel("SelectedCustomerModel");
                         oSelectedCustomerModel.setProperty("/InvNo", response.InvoiceNo);
                         var CustomerName = oSelectedCustomerModel.getProperty("/Customer") || oPayload.payload.CustomerName;
                         oSelectedCustomerModel.setProperty("/CustomerName", CustomerName)
@@ -1835,11 +1853,21 @@ sap.ui.define([
                     // var oModel = this.getView().getModel("FilteredSOWModel").getData();
                     const bIsValid =
                         utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") && this.mobileNo &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
+                        this.mobileNo &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
-                        (!!this.Discount && !!this.Particulars)
+                        (!!this.Discount && !!this.Particulars);
 
-                    if (!bIsValid) {
+                    let bIsValidTwo = true;
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/CustomerGSTNO")) {
+                        bIsValidTwo =
+                            utils._LCvalidateGstNumber(this.byId("CI_id_InputCustomerGSTNO"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTName"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
+                    }
+
+                    if (!bIsValid || !bIsValidTwo) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     }
 
@@ -2143,6 +2171,11 @@ sap.ui.define([
 
             Readcall: async function (entity, filterValue) {
                 const oData = await this.ajaxReadWithJQuery(entity, filterValue);
+
+                // if (entity === "HM_ManageInvoice") {
+                //     return oData.data;
+                // }
+
                 if (entity === "HM_ManageInvoice") {
                     const invoiceData = oData.data?.[0] || {};
                     invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
@@ -2284,7 +2317,7 @@ sap.ui.define([
                     EntryDate: new Date(),
                     PaymentType: paymentModel.PaymentType,
                     ReceivedBy: paymentModel.ReceivedBy,
-                    Payment: "Paid Amount"
+                    Payment: "Paid"
                 };
 
                 try {
@@ -3967,20 +4000,20 @@ sap.ui.define([
                                 summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
                             }
                         }
-                        
 
-                      // Get the latest payment record based on EntryDate (date + time)
-// Get the latest payment record based on EntryDate (date + time)
-const latestPayment = [...aInvoicePaymentDetails]
-    .filter(item => item.EntryDate)
-    .sort((a, b) => new Date(b.EntryDate) - new Date(a.EntryDate))[0];
 
-if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueAmount !== null &&  parseFloat(latestPayment.DueAmount) > 0) {
-    summaryBody.push([
-        "Due Amount :",
-        Formatter.fromatNumber(parseFloat(latestPayment.DueAmount))
-    ]);
-}
+                        // Get the latest payment record based on EntryDate (date + time)
+                        // Get the latest payment record based on EntryDate (date + time)
+                        const latestPayment = [...aInvoicePaymentDetails]
+                            .filter(item => item.EntryDate)
+                            .sort((a, b) => new Date(b.EntryDate) - new Date(a.EntryDate))[0];
+
+                        if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueAmount !== null && parseFloat(latestPayment.DueAmount) > 0) {
+                            summaryBody.push([
+                                "Due Amount :",
+                                Formatter.fromatNumber(parseFloat(latestPayment.DueAmount))
+                            ]);
+                        }
 
                         // Total
                         const totalRowIndex = summaryBody.length;
@@ -4246,7 +4279,7 @@ if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueA
                     PaymentType: RefundModel.PaymentMode,
                     BankName: RefundModel.PaymentMode,
                     Used: "Y",
-                    Payment: "Refund Amount"
+                    Payment: "Refund"
                 };
 
                 try {
@@ -4407,14 +4440,7 @@ if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueA
                 cycleStart.setHours(0, 0, 0, 0);
                 cycleEnd.setHours(0, 0, 0, 0);
 
-                const nonFacilityItems = existingItems.filter(i =>
-                    !i.Particulars.includes("Facility") &&
-                    !i.Particulars.includes("Meals") &&
-                    !i.Particulars.includes("Laundry") &&
-                    !i.Particulars.includes("Housekeeping") &&
-                    !i.Particulars.includes("Pillow") &&
-                    !i.Particulars.includes("Penalty")
-                );
+                const nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
 
                 const dbFacilitiesRaw = oData.commentData || [];
                 const processedFacilityItems = [];
@@ -4441,10 +4467,7 @@ if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueA
                     const unit = f.UnitText?.toLowerCase();
 
                     if (invoiceIndex > 0) {
-                        if (
-                            (selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING") ||
-                            (selectionMode === "QTY" && unit === "unit price")
-                        ) {
+                        if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING") || (selectionMode === "QTY" && unit === "unit price")) {
                             return;
                         }
                     }
