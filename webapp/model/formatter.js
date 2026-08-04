@@ -253,7 +253,7 @@ sap.ui.define([
             }
         },
 
-        formatDiscount: function (sDiscountType, vDiscountValue) {
+        formatDiscount: function (sDiscountType, vDiscountValue, sCurrency) {
             if (!sDiscountType) {
                 return "";
             }
@@ -261,17 +261,17 @@ sap.ui.define([
             if (sDiscountType === "Percentage") {
                 return vDiscountValue + " %";
             } else if (sDiscountType === "Fixed Amount") {
-                return vDiscountValue + " INR";
+                return vDiscountValue + " " + (sCurrency || "INR");
             }
 
             return vDiscountValue;
         },
 
-        formatAmountINR: function (vValue) {
+        formatAmountINR: function (vValue, sCurrency) {
             if (vValue === null || vValue === undefined || vValue === "") {
                 return "";
             }
-            return vValue + " INR";
+            return vValue + " " + (sCurrency || "INR");
         },
 
         formatStatusState: function (sStatus) {

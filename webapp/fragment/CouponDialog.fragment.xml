@@ -56,7 +56,7 @@
 
                     <Label
                         required="true"
-                        text="{i18n>CDDiscountType}"
+                        text="{i18n>CDDiscountTypeN}"
                     />
                     <ComboBox
                         id="cbDiscountType"
@@ -129,6 +129,26 @@
                         liveChange="onLiveChange_MinAmount"
                         valueStateText="{i18n>enterMinOrderValue}"
                     />
+                    <Label
+                        required="true"
+                        text="{i18n>currency}"
+                    />
+                    <ComboBox
+                        id="cbCurrency"
+                        width="100%"
+                        selectedKey="{CouponView>/CurrentCoupon/Currency}"
+                        items="{path:'CountryModel>/',length:1000}"
+                        placeholder="{i18n>selectCurrency}"
+                        valueStateText="{i18n>selectCurrency}"
+                        change="onChange_Currency"
+                        showSecondaryValues="true"
+                    >
+                        <core:ListItem
+                            key="{CountryModel>currency}"
+                            text="{CountryModel>currency}"
+                            additionalText="{CountryModel>countryName}"
+                        />
+                    </ComboBox>
                     <Label
                         text="{i18n>status}"
                         visible="{= ${CouponView>/DialogMode} === 'Edit' }"

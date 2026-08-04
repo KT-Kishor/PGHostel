@@ -307,13 +307,30 @@
     text="{
         parts: [
             { path: 'CouponModel>DiscountType' },
-            { path: 'CouponModel>DiscountValue' }
+            { path: 'CouponModel>DiscountValue' },
+            { path: 'CouponModel>Currency' }
         ],
         formatter: '.Formatter.formatDiscount'
     }"
-/>  
-<Text text="{path: 'CouponModel>MinOrderValue', formatter: '.Formatter.formatAmountINR'}" />
-                            <Text text="{path: 'CouponModel>UptoValue', formatter: '.Formatter.formatAmountINR'}" />
+/>
+<Text
+    text="{
+        parts: [
+            { path: 'CouponModel>MinOrderValue' },
+            { path: 'CouponModel>Currency' }
+        ],
+        formatter: '.Formatter.formatAmountINR'
+    }"
+/>
+                            <Text
+    text="{
+        parts: [
+            { path: 'CouponModel>UptoValue' },
+            { path: 'CouponModel>Currency' }
+        ],
+        formatter: '.Formatter.formatAmountINR'
+    }"
+/>
                             <Text text="{CouponModel>MaxUses}" />
                             <!-- <Text text="{CouponModel>UsedCount}" /> -->
                             <!-- <Text text="{CouponModel>PerUserLimit}" /> -->

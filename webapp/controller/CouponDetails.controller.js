@@ -356,6 +356,7 @@ sap.ui.define([
                 // UsedCount: "",
                 // PerUserLimit: "",
                 MinOrderValue: "",
+                Currency: "",
                 StartDate: "",
                 EndDate: "",
                 Status: "",
@@ -458,9 +459,9 @@ sap.ui.define([
 
             const aFormattedData = aData.map(item => ({
                 ...item,
-                DiscountValue: Formatter.formatDiscount(item.DiscountType, item.DiscountValue),
-                MinOrderValue: Formatter.formatAmountINR(item.MinOrderValue),
-                UptoValue: Formatter.formatAmountINR(item.UptoValue),
+                DiscountValue: Formatter.formatDiscount(item.DiscountType, item.DiscountValue, item.Currency),
+                MinOrderValue: Formatter.formatAmountINR(item.MinOrderValue, item.Currency),
+                UptoValue: Formatter.formatAmountINR(item.UptoValue, item.Currency),
                 StartDate: Formatter.formatDate(item.StartDate),
                 EndDate: Formatter.formatDate(item.EndDate),
                 CreatedAt: Formatter.formatDate(item.CreatedAt)
@@ -547,6 +548,14 @@ sap.ui.define([
                 if (oBranchCB) {
                     oBranchCB.setSelectedItem(null);
                     oBranchCB.setValue("");
+                }
+
+                const oCurrencyCB = sap.ui.getCore().byId(
+                    oView.createId("cbCurrency")
+                );
+                if (oCurrencyCB) {
+                    oCurrencyCB.setSelectedKey("");
+                    oCurrencyCB.setValue("");
                 }
             } else {
                 // Edit mode → restore branch selection
@@ -652,6 +661,7 @@ sap.ui.define([
                     sap.ui.getCore().byId(oView.createId("inUptoValue")), "ID")) &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inMaxUses")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inMinOrderValue")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("cbCurrency")), "ID") &&
                 (sMode === "Add" || utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("cbStatus")), "ID")) &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("inDescription")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("dpStartDate")), "ID") &&
@@ -762,6 +772,7 @@ sap.ui.define([
                             StartDate: oCoupon.StartDate,
                             EndDate: oCoupon.EndDate,
                             MinOrderValue: oCoupon.MinOrderValue,
+                            Currency: oCoupon.Currency,
                             Status: oCoupon.Status,
                             CreatedAt: oCoupon.CreatedAt,
                             CreatedBy: oView.getModel("LoginModel")?.getProperty("/EmployeeName") || oCoupon.CreatedBy
@@ -791,6 +802,7 @@ sap.ui.define([
                 Description: "",
                 MaxUses: "",
                 MinOrderValue: "",
+                Currency: "",
                 StartDate: "",
                 EndDate: "",
                 Status: "",
@@ -816,6 +828,7 @@ sap.ui.define([
                 "inDescription",
                 "inMaxUses",
                 "inMinOrderValue",
+                "cbCurrency",
                 "cbStatus",
                 "dpStartDate",
                 "dpEndDate",
@@ -1050,6 +1063,10 @@ sap.ui.define([
             utils._LCstrictValidationComboBox(oEvent);
         },
 
+        onChange_Currency: function(oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+        },
+
         onChange_Date: function(oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             const oView = this.getView();
@@ -1100,6 +1117,7 @@ sap.ui.define([
                 "inUptoValue",
                 "inMaxUses",
                 "inMinOrderValue",
+                "cbCurrency",
                 "cbStatus",
                 "inDescription",
                 "dpStartDate",
@@ -1122,6 +1140,7 @@ sap.ui.define([
                 UptoValue: "",
                 MaxUses: "",
                 MinOrderValue: "",
+                Currency: "",
                 Description: "",
                 StartDate: "",
                 EndDate: "",
