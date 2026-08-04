@@ -1037,7 +1037,7 @@
                             </Table>
 
                             <MessageStrip
-                                text="{= 'Security deposit to be paid at check-in: ' + ${HostelModel>/Deposit} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                text="{= 'Security deposit to be paid at check-in: ' + ${path: 'HostelModel>/Deposit', formatter: '.Formatter.fromatNumber'} + ' ' + ${HostelModel>/DepositCurrency}}"
                                 type="Success"
                                 showIcon="true"
                                 showCloseButton="false"
