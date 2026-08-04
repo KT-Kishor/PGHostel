@@ -3481,6 +3481,11 @@ sap.ui.define([
 
         // Cancel edit mode and revert to read-only
         onCancelEditPress: function () {
+            if (this._bCancelConfirmationOpen) {
+                return;
+            }
+
+            this._bCancelConfirmationOpen = true;
 
             MessageBox.confirm(
                 "Are you sure you want to cancel? All unsaved changes will be lost.",
@@ -3490,6 +3495,7 @@ sap.ui.define([
                     styleClass: "myUnifiedBtn",
 
                     onClose: function (sAction) {
+                        this._bCancelConfirmationOpen = false;
 
                         if (sAction !== MessageBox.Action.OK) {
                             return;
@@ -3508,25 +3514,33 @@ sap.ui.define([
             var oFacilityModel = this.getView().getModel("FacilityModel");
             var oFacilitySelection = this.getView().getModel("FacilitySelection");
 
+            // Leave edit mode immediately so later UI refresh work cannot leave the
+            // footer in its editable state if one of those operations fails.
+            oBookingView.setProperty("/editModeEnabled", false);
+
             // Restore original data from backup if it exists
             if (this._backupHostelModel) {
-                // JSON.stringify converts Date objects to strings; restore TodayDate as a real Date
-                // BEFORE calling setData so that DatePicker's minDate binding never sees a string
-                var oBackupData = Object.assign({}, this._backupHostelModel);
-                var vTodayDate = oBackupData.TodayDate;
-                if (vTodayDate && !(vTodayDate instanceof Date)) {
-                    oBackupData.TodayDate = new Date(vTodayDate);
-                }
+                var oBackupData = JSON.parse(JSON.stringify(this._backupHostelModel));
+
+                // DatePicker minDate bindings require Date instances. JSON snapshots
+                // serialize them as strings, which can interrupt the remaining restore.
+                ["TodayDate", "EndDateMinDate"].forEach(function (sProperty) {
+                    var vDate = oBackupData[sProperty];
+                    if (vDate && !(vDate instanceof Date)) {
+                        oBackupData[sProperty] = new Date(vDate);
+                    }
+                });
+
                 oHostelModel.setData(oBackupData);
             }
             if (this._backupBookingView) {
-                oBookingView.setData(Object.assign({}, this._backupBookingView));
+                oBookingView.setData(JSON.parse(JSON.stringify(this._backupBookingView)));
             }
             if (this._backupFacilityModel) {
-                oFacilityModel.setData(this._backupFacilityModel);
+                oFacilityModel.setData(JSON.parse(JSON.stringify(this._backupFacilityModel)));
             }
             if (this._backupFacilitySelection) {
-                oFacilitySelection.setData(this._backupFacilitySelection);
+                oFacilitySelection.setData(JSON.parse(JSON.stringify(this._backupFacilitySelection)));
             }
             // Restore _aAllFacilities array which contains selection state
             if (this._backupAllFacilities) {
@@ -3543,9 +3557,6 @@ sap.ui.define([
             // Re-render facility cards and sync with occupants
             this._renderFacilityCards();
             this._syncSelectedFacilityPersonsWithOccupants();
-
-            // Ensure edit mode is disabled
-            oBookingView.setProperty("/editModeEnabled", false);
 
             if (this._sReturnRouteAfterEdit === "RouteMyBookings") {
                 this._resetBookingPageModels();

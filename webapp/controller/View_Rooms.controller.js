@@ -2124,7 +2124,7 @@ sap.ui.define([
         },
         onConfirmBooking: async function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const oUser = oLoginModel?.getData?.() || {};
 
             // -------------------------

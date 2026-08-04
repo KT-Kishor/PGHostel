@@ -941,6 +941,11 @@ sap.ui.define([
 
             var oData = oContext.getObject();
 
+            // The table row may not carry UserID, fall back to the profile.
+            const sEditUserID = oData.UserID ||
+                this.getView().getModel("profileData").getProperty("/UserID") ||
+                "";
+
             this._existingFileData = {
                 FileName: oData.FileName,
                 FileType: oData.FileType,
@@ -949,11 +954,9 @@ sap.ui.define([
                 Gender: oData.Gender || "",
                 Relation: oData.Relation || "",
                 MemberID: oData.MemberID || "",
-                UserID: oData.UserID || "",
+                UserID: sEditUserID,
                 Salutation: oData.Salutation,
                 DocumentID: oData.DocumentID || "",
-                MemberID: oData.MemberID || "",
-                UserID: oData.UserID || "",
                 FileName: oData.FileName || "",
                 FileType: oData.FileType || "",
                 File: oData.Attachment || "",
@@ -962,7 +965,7 @@ sap.ui.define([
 
             const oMemberData = {
                 MemberID: oData.MemberID || "",
-                UserID: oData.UserID || "",
+                UserID: sEditUserID,
                 Salutation: oData.Salutation || "",
                 Name: oData.Name || "",
                 Relation: oData.Relation || "",
@@ -1002,6 +1005,15 @@ sap.ui.define([
         onNewMemberDocumentTypeChange: function (oEvent) {
             const oComboBox = oEvent.getSource();
             const sValue = String(oComboBox.getValue() || "").trim();
+
+            // Drop any previous "file missing" error on the uploader,
+            // savepress re-evaluates it.
+            const oFileUploader = sap.ui.getCore()
+                .byId("MM_id_FileUploader");
+
+            if (oFileUploader) {
+                oFileUploader.setValueState("None");
+            }
 
             if (!sValue) {
                 oComboBox.setSelectedKey("");
@@ -1146,6 +1158,8 @@ sap.ui.define([
                 oModel.setProperty("/File", base64);
                 oModel.setProperty("/FileType", processedFile.type || "");
                 oModel.refresh(true);
+
+                oFileUploader.setValueState("None");
 
             } catch (err) {
                 this.closeBusyDialog();
@@ -1681,9 +1695,71 @@ sap.ui.define([
 
             if (oFileUploader) {
                 oFileUploader.clear();
+                oFileUploader.setValueState("None");
             }
 
             this._selectedFile = null;
+        },
+
+        /**
+         * Validates the document block of the member dialog.
+         * Rule: if a File Type is selected in the ComboBox, an actual file
+         * must be present (freshly uploaded or already attached in UPDATE mode).
+         * Works for both CREATE and UPDATE flows.
+         *
+         * @param {object} oMember data of the "Member" model
+         * @returns {boolean} true when valid, false when execution must stop
+         */
+        _validateMemberDocument: function (oMember) {
+
+            const oFileUploader = sap.ui.getCore()
+                .byId("MM_id_FileUploader");
+
+            const sDocumentType = String(oMember.DocumentType || "").trim();
+
+            // A file is considered present if it was just uploaded
+            // (Document/File/DocumentName filled by onFacilityFileChange)
+            // or if it is the document already stored on the member.
+            const bHasFile = !!(
+                oMember.File ||
+                oMember.Document ||
+                oMember.DocumentName ||
+                this._selectedFile
+            );
+
+            // File Type selected but nothing uploaded -> block
+            if (sDocumentType && !bHasFile) {
+
+                if (oFileUploader) {
+                    oFileUploader.setValueState("Error");
+                    oFileUploader.setValueStateText(
+                        "Please upload a file for the selected document type"
+                    );
+                }
+
+                sap.m.MessageToast.show(
+                    "Please upload a file for the selected document type \"" +
+                    sDocumentType + "\"."
+                );
+
+                return false;
+            }
+
+            // File uploaded but no File Type selected -> block
+            if (!sDocumentType && bHasFile) {
+
+                sap.m.MessageToast.show(
+                    "Please select document type"
+                );
+
+                return false;
+            }
+
+            if (oFileUploader) {
+                oFileUploader.setValueState("None");
+            }
+
+            return true;
         },
 
         savepress: function () {
@@ -1692,7 +1768,7 @@ sap.ui.define([
             var oMember = this.getView().getModel("Member").getData();
 
             if (utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"), "ID") &&
+                utils._LCvalidateName(oView.byId("MM_id_MemberName"), "ID") &&
                 utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"), "ID") &&
                 (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"), "ID")) &&
@@ -1706,6 +1782,12 @@ sap.ui.define([
                     return;
                 }
 
+                // File Type selected -> a file must actually be uploaded.
+                // Applies to both CREATE and UPDATE.
+                if (!this._validateMemberDocument(oMember)) {
+                    return;
+                }
+
                 if (
                     this._mode === "CREATE" &&
                     !oMember.Document
@@ -1716,6 +1798,17 @@ sap.ui.define([
                     return;
                 }
 
+                // UserID is mandatory in the payload. In UPDATE mode the table
+                // row may not carry it, so fall back to the logged-in profile.
+                const sUserID = oMember.UserID ||
+                    (this._existingFileData && this._existingFileData.UserID) ||
+                    this.getView().getModel("profileData").getProperty("/UserID") ||
+                    "";
+
+                const sDocumentID = this._mode === "UPDATE" ?
+                    ((this._existingFileData && this._existingFileData.DocumentID) || "") :
+                    "";
+
                 const oPayload = {
                     Members: [{
                         MemberID: oMember.MemberID,
@@ -1723,15 +1816,12 @@ sap.ui.define([
                         Name: oMember.Name,
                         Relation: oMember.Relation,
                         Gender: oMember.Gender,
-                        UserID: oMember.UserID,
+                        UserID: sUserID,
                         DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
                         Documents: [{
-                            DocumentID: this._mode === "UPDATE" ?
-                                this._existingFileData.DocumentID :
-                                "",
-
+                            DocumentID: sDocumentID,
                             MemberID: oMember.MemberID,
-                            UserID: oMember.UserID,
+                            UserID: sUserID,
                             DocumentType: oMember.DocumentType,
                             FileName: oMember.DocumentName,
                             FileType: oMember.FileType,
@@ -1740,7 +1830,7 @@ sap.ui.define([
                     }]
                 };
 
-                this._uploadDocument(oPayload);
+                this._uploadDocument(oPayload, sDocumentID);
 
             } else {
 
@@ -1750,10 +1840,15 @@ sap.ui.define([
             }
         },
 
-        _uploadDocument: function (oDoc) {
+        _uploadDocument: function (oDoc, sDocumentID) {
             this.getBusyDialog();
 
             const isCreate = this._mode === "CREATE";
+
+            // Pass the DocumentID when one exists, otherwise an empty string.
+            const sFilterDocumentID = sDocumentID ||
+                (this._existingFileData && this._existingFileData.DocumentID) ||
+                "";
 
             const oPromise = isCreate ?
                 this.ajaxCreateWithJQuery("HM_MemberDocument", {
@@ -1762,7 +1857,7 @@ sap.ui.define([
                 this.ajaxUpdateWithJQuery("HM_MemberDocument", {
                     data: [oDoc],
                     filters: {
-                        DocumentID: this._existingFileData.DocumentID
+                        DocumentID: sFilterDocumentID
                     }
                 });
 
