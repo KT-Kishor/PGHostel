@@ -7057,9 +7057,9 @@
 
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
-                       `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)} ${Currency}`,
-sUnitText,
-`${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)} ${Currency}`
+                       Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
+                        sUnitText,
+                        Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)
                     ];
                 });
 
