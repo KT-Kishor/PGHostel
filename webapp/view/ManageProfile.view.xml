@@ -403,6 +403,7 @@
                 />
 
                 <SearchField
+                    id="idGlobalSearch"
                     width="auto"
                     liveChange="onGlobalSearch"
                     placeholder="{i18n>search}"

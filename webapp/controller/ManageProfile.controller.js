@@ -7,11 +7,11 @@ sap.ui.define([
     "sap/m/MessageBox",
     "../model/formatter",
     "../utils/validation",
-], function(BaseController, Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter, utils) {
+], function (BaseController, Controller, MessageToast, JSONModel, Fragment, MessageBox, Formatter, utils) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.ManageProfile", {
         Formatter: Formatter,
-        onInit: function() {
+        onInit: function () {
             const oView = this.getView();
             // Login form model
             oView.setModel(new JSONModel({
@@ -66,7 +66,7 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteManageProfile").attachPatternMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: async function() {
+        _onRouteMatched: async function () {
             this.getBusyDialog()
             await this.commonLoginFunction("ManageProfile");
             this.ManageData();
@@ -74,11 +74,11 @@ sap.ui.define([
             var model = new JSONModel({});
             this.getView().setModel(model, "Member")
         },
-            MPonAddressChange: function (oEvent) {
+        MPonAddressChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
-                      },
-                    
-                        onChangeSalutation: function(oEvent) {
+        },
+
+        onChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
 
@@ -109,28 +109,28 @@ sap.ui.define([
             utils._LCstrictValidationSelect(oSalutation);
         },
         clearProfileValueStates: function () {
-    const aControls = [
-        "id_Name1",
-        "id_mail1",
-        "id_dob1",
-        "id_country1",
-        "id_state1",
-        "id_city1",
-        "id_std1",
-        "id_phone1",
-        "id_gender1",
-        "id_address1"
-    ];
+            const aControls = [
+                "id_Name1",
+                "id_mail1",
+                "id_dob1",
+                "id_country1",
+                "id_state1",
+                "id_city1",
+                "id_std1",
+                "id_phone1",
+                "id_gender1",
+                "id_address1"
+            ];
 
-    aControls.forEach(function (sId) {
-        const oControl = this.byId(sId);
-        if (oControl && oControl.setValueState) {
-            oControl.setValueState(sap.ui.core.ValueState.None);
-            oControl.setValueStateText("");
-        }
-    }.bind(this));
-},
-        ManageData: async function() {
+            aControls.forEach(function (sId) {
+                const oControl = this.byId(sId);
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState(sap.ui.core.ValueState.None);
+                    oControl.setValueStateText("");
+                }
+            }.bind(this));
+        },
+        ManageData: async function () {
             // always read current user from models instead of relying solely on cached variable
             let oUser = this.getView().getModel("LoginModel")?.getData() ||
                 this.getOwnerComponent().getModel("UserModel")?.getData() ||
@@ -241,7 +241,7 @@ sap.ui.define([
             }
         },
 
-        _formatDisplayDate: function(sDate) {
+        _formatDisplayDate: function (sDate) {
             if (!sDate) {
                 return "";
             }
@@ -254,7 +254,7 @@ sap.ui.define([
             return oDate.toLocaleDateString("en-GB");
         },
 
-        _getBookingGroup: function(booking) {
+        _getBookingGroup: function (booking) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -294,7 +294,7 @@ sap.ui.define([
             return "Others";
         },
 
-        _loadBookingBranchGSTData: async function(aBookings) {
+        _loadBookingBranchGSTData: async function (aBookings) {
             const aBranchIDs = [...new Set((aBookings || []).map(booking =>
                 String(booking.BranchCode || "").trim()
             ).filter(Boolean))];
@@ -317,7 +317,7 @@ sap.ui.define([
             return Object.fromEntries(aBranchResponses);
         },
 
-        _calculateBookingAmount: function(booking, oBranchData) {
+        _calculateBookingAmount: function (booking, oBranchData) {
             let GSTValue = 0;
             const sGSTType = String(oBranchData?.Type || "").trim().toUpperCase();
             const fGSTValue = Number(oBranchData?.Value || 0);
@@ -337,7 +337,7 @@ sap.ui.define([
             return amount.toString();
         },
 
-        _normalizeBookingData: function(booking, mBranchGSTData) {
+        _normalizeBookingData: function (booking, mBranchGSTData) {
             const sCustomerName = [
                 booking.Salutation || "",
                 booking.CustomerName || ""
@@ -372,7 +372,7 @@ sap.ui.define([
             };
         },
 
-        _applyCountryStateCityFilters: function() {
+        _applyCountryStateCityFilters: function () {
 
             const oModel = this.getView().getModel("profileData");
             if (!oModel) return;
@@ -419,7 +419,7 @@ sap.ui.define([
             oSourceCB.setValue(sSource);
         },
 
-        onNavBack: function() {
+        onNavBack: function () {
             const oUser = this._oLoggedInUser;
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
 
@@ -429,11 +429,12 @@ sap.ui.define([
                 oUIModel.setProperty("/isLoggedIn", false);
             }
             this.clearProfileValueStates();
+            this.clearGlobalSearch();
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteHostel");
         },
 
-        onPreviewProfilePhoto: function() {
+        onPreviewProfilePhoto: function () {
             const oProfileModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             let sPhoto = oProfileModel.getProperty("/photo");
@@ -449,7 +450,7 @@ sap.ui.define([
             // 1) Update global model (this is the key line)
             oLoginModel.setProperty("/Photo", sPhoto);
 
-oProfileModel.setProperty("/photo", sPhoto);
+            oProfileModel.setProperty("/photo", sPhoto);
             if (!this._oProfilePreviewDialog) {
                 this._oProfilePreviewImage = new sap.m.Image({
                     id: this.getView().createId("previewProfileImage"),
@@ -475,7 +476,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._oProfilePreviewDialog.open();
         },
 
-        onPressAvatarEdit: function(oEvent) {
+        onPressAvatarEdit: function (oEvent) {
             this._oAvatarActionSheet = new sap.m.ActionSheet({
                 buttons: [
                     new sap.m.Button({
@@ -501,13 +502,13 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._oAvatarActionSheet.openBy(oEvent.getSource());
         },
 
-        onTakePhoto: function() {
+        onTakePhoto: function () {
             if (!this.oCameraDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.ui.com.project1.fragment.SelfieCam",
                     controller: this,
                 }).then(
-                    function(oDialog) {
+                    function (oDialog) {
                         this.oCameraDialog = oDialog;
                         this.getView().addDependent(this.oCameraDialog);
                         this.oCameraDialog.attachAfterOpen(this._StartCamera.bind(this));
@@ -520,7 +521,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onUploadPhoto: function() {
+        onUploadPhoto: function () {
             const uploader = this.byId("id_fileUploaderAvatar1");
             if (!uploader) return;
 
@@ -537,7 +538,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }, 200);
         },
 
-        onAvatarFileSelected: async function(oEvent) {
+        onAvatarFileSelected: async function (oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
 
@@ -600,7 +601,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             reader.readAsDataURL(processedFile);
         },
 
-        onRemovePhoto: async function() {
+        onRemovePhoto: async function () {
             const oModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const initials = oModel.getProperty("/initials");
@@ -616,7 +617,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        _StartCamera: function() {
+        _StartCamera: function () {
             var oVideo = document.getElementById("video");
             if (!oVideo) return;
 
@@ -652,7 +653,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.camera.start();
         },
 
-        _StopCamera: function() {
+        _StopCamera: function () {
             if (this.camera) {
                 this.camera.stop();
                 this.camera = null;
@@ -667,7 +668,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        IC_onCapturePress: function() {
+        IC_onCapturePress: function () {
             var oVideo = document.getElementById("video");
 
             if (!oVideo || !this.latestSegmentation) return;
@@ -719,14 +720,14 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.oCameraDialog.close();
         },
 
-        IC_onPressCloseCameraDialog: function() {
+        IC_onPressCloseCameraDialog: function () {
             this._StopCamera();
             if (this.oCameraDialog) {
                 this.oCameraDialog.close();
             }
         },
 
-        updateUserPhoto: async function({
+        updateUserPhoto: async function ({
             fileName,
             fileType,
             fileContent
@@ -765,15 +766,15 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onUserlivechange: function(oEvent) {
+        onUserlivechange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onEmailliveChange: function(oEvent) {
+        onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 
-        onChangeDOB: function(oEventOrControl) {
+        onChangeDOB: function (oEventOrControl) {
             const oDP = (typeof oEventOrControl.getSource === "function") ? oEventOrControl.getSource() : oEventOrControl;
             if (!oDP) return false;
             const v = oDP.getDateValue();
@@ -808,7 +809,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             return true;
         },
 
-        onAreaSelectionChange: function(oEvent) {
+        onAreaSelectionChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
             const oRoomType = this.byId("id_Roomtype");
@@ -821,7 +822,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onProfileDialogClose: function() {
+        onProfileDialogClose: function () {
             const oModel = this.getView().getModel("profileData");
 
             if (this._originalProfileData) {
@@ -834,7 +835,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._originalProfileData = null;
         },
 
-        _resetValidationStates: function() {
+        _resetValidationStates: function () {
             const aControls = [
                 "id_Name1",
                 "id_mail1",
@@ -860,7 +861,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        onPressAddMember: function() {
+        onPressAddMember: function () {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -917,7 +918,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.UD_Dialog.open();
         },
 
-        onEditMemberFromDialog: function(oEvent) {
+        onEditMemberFromDialog: function (oEvent) {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -994,11 +995,11 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.UD_Dialog.open();
         },
 
-        onCloseDialog: function() {
+        onCloseDialog: function () {
             this.UD_Dialog.close();
         },
 
-        onNewMemberDocumentTypeChange: function(oEvent) {
+        onNewMemberDocumentTypeChange: function (oEvent) {
             const oComboBox = oEvent.getSource();
             const sValue = String(oComboBox.getValue() || "").trim();
 
@@ -1044,7 +1045,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onFacilityFileChange: async function(oEvent) {
+        onFacilityFileChange: async function (oEvent) {
 
             const oFileUploader = oEvent.getSource();
             const oModel = this.getView().getModel("Member");
@@ -1158,7 +1159,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onMemberFileSizeExceed: function(oEvent) {
+        onMemberFileSizeExceed: function (oEvent) {
 
             const sFileName = oEvent.getParameter("fileName") || "File";
 
@@ -1169,7 +1170,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             oEvent.getSource().clear();
         },
 
-        onPreviewMemberDocument: function() {
+        onPreviewMemberDocument: function () {
             const oDoc = this.getView().getModel("Member").getData();
             this._previewDocument(oDoc);
         },
@@ -1662,7 +1663,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.onDownloadPreview();
             sap.m.MessageToast.show("Unsupported document format. Download started if supported.");
         },
-        onDeleteMemberDocument: function() {
+        onDeleteMemberDocument: function () {
 
             const oModel = this.getView().getModel("Member");
 
@@ -1685,15 +1686,15 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._selectedFile = null;
         },
 
-        savepress: function() {
+        savepress: function () {
 
             var oView = sap.ui.getCore();
             var oMember = this.getView().getModel("Member").getData();
 
             if (utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"),  "ID") &&
+                utils._LCvalidateMandatoryField(oView.byId("MM_id_MemberName"), "ID") &&
                 utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
-                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"),"ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"), "ID") &&
                 (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"), "ID")) &&
                 utils._LCstrictValidationComboBox(oView.byId("idDocumentType"), "ID")
             ) {
@@ -1749,7 +1750,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        _uploadDocument: function(oDoc) {
+        _uploadDocument: function (oDoc) {
             this.getBusyDialog();
 
             const isCreate = this._mode === "CREATE";
@@ -1776,12 +1777,12 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        _generateMemberID: function(oBookingView) {
+        _generateMemberID: function (oBookingView) {
             const sUserID = this.getView().getModel("profileData").getData().UserID || ""
             const aMasterMembers = this.getView().getModel("profileData").getData().Members || [];
 
             // Filter members that match the UserID pattern (e.g., "00013_XX")
-            const aUserMembers = aMasterMembers.filter(function(oMember) {
+            const aUserMembers = aMasterMembers.filter(function (oMember) {
                 if (!oMember.MemberID) return false;
                 return String(oMember.MemberID).startsWith(sUserID + "_");
             });
@@ -1790,7 +1791,7 @@ oProfileModel.setProperty("/photo", sPhoto);
 
             if (aUserMembers.length > 0) {
                 // Extract suffixes and find the maximum
-                aUserMembers.forEach(function(oMember) {
+                aUserMembers.forEach(function (oMember) {
                     const sMemberID = String(oMember.MemberID || "");
                     const aParts = sMemberID.split("_");
                     if (aParts.length === 2) {
@@ -1813,7 +1814,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             return sNewMemberID;
         },
 
-        onNewMemberSalutationChange: function(oEvent) {
+        onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
             const oGender = sap.ui.getCore().byId("MemberGenderCombo");
@@ -1836,30 +1837,30 @@ oProfileModel.setProperty("/photo", sPhoto);
             // Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
         },
-        onNewMemberNameChange: function(oEvent) {
+        onNewMemberNameChange: function (oEvent) {
             return utils._LCvalidateName(oEvent);
         },
-        onNewMemberDOBChange: function(oEvent) {
+        onNewMemberDOBChange: function (oEvent) {
             utils._LCvalidateDate(oEvent);
         },
-        onNewMemberGenderChange: function(oEvent) {
+        onNewMemberGenderChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
-        onNewMemberRelationChange: function(oEvent) {
+        onNewMemberRelationChange: function (oEvent) {
             return utils._LCstrictValidationComboBox(oEvent);
         },
 
-        onEditSaveProfile: async function() {
+        onEditSaveProfile: async function () {
             const oModel = this.getView().getModel("profileData");
             var data = oModel.getData()
             const isEditMode = oModel.getProperty("/isEditMode");
             if (!isEditMode) {
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
-                if(data.Salutation==="Dr."){
-                     this.getView().byId("id_gender1").setEnabled(true)
-                }else{
-                     this.getView().byId("id_gender1").setEnabled(false)
+                if (data.Salutation === "Dr.") {
+                    this.getView().byId("id_gender1").setEnabled(true)
+                } else {
+                    this.getView().byId("id_gender1").setEnabled(false)
                 }
                 return;
             }
@@ -1918,7 +1919,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onPressBookingRow: function(oEvent) {
+        onPressBookingRow: function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("profileData");
             var oBookingData = oContext.getObject();
             var sBookingID = btoa(oBookingData.BookingID.toString());
@@ -1936,14 +1937,14 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        onPressManageInvoice: function(oEvent) {
+        onPressManageInvoice: function (oEvent) {
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
                 sPath: encodeURIComponent(oEvent.getSource().getBindingContext("profileData").getObject().InvNo),
                 dash: "Customerinvoice"
             });
         },
 
-        calculateTotals: function(aPersons, sStartDate, sEndDate, RoomPrice) {
+        calculateTotals: function (aPersons, sStartDate, sEndDate, RoomPrice) {
             const oStartDate = this._parseDate(sStartDate);
             const oEndDate = this._parseDate(sEndDate);
 
@@ -1996,7 +1997,7 @@ oProfileModel.setProperty("/photo", sPhoto);
         },
 
         // 🗓️ Helper date parser
-        _parseDate: function(sDate) {
+        _parseDate: function (sDate) {
             if (!sDate) return null;
 
             // If it's already a Date object
@@ -2013,11 +2014,11 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onTableUpdateFinished: function() {
+        onTableUpdateFinished: function () {
             this._updateRowCount();
         },
 
-        _updateRowCount: function() {
+        _updateRowCount: function () {
             const oProfileModel = this.getView().getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
             let oTable;
@@ -2052,10 +2053,11 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onTableSelect: async function(oEvent) {
+        onTableSelect: async function (oEvent) {
             const sKey = oEvent ? oEvent.getParameter("key") : "Members";
             const oModel = this.getView().getModel("profileData");
             oModel.setProperty("/selectedTab", sKey);
+            this.clearGlobalSearch();
 
             // When Booking History tab selected, fetch fresh booking data
             if (sKey === "Booking History") {
@@ -2177,7 +2179,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        _loadBookings: async function() {
+        _loadBookings: async function () {
             const oModel = this.getView().getModel("profileData");
             const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -2241,7 +2243,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        _loadComplaints: async function(bSilent) {
+        _loadComplaints: async function (bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -2308,7 +2310,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        _loadDamage: async function(bSilent) {
+        _loadDamage: async function (bSilent) {
             const oProfileModel = this.getView().getModel("profileData");
             const sUserID = oProfileModel?.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
@@ -2448,7 +2450,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onlogout: function() {
+        onlogout: function () {
             // clear profile model and cached user info so next login starts fresh
             // remove any profile data both locally and globally
             this.getView().getModel("profileData").setData({});
@@ -2474,7 +2476,32 @@ oProfileModel.setProperty("/photo", sPhoto);
             this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },
-        onGlobalSearch: function(oEvent) {
+        clearGlobalSearch: function () {
+            const oSearchField = this.byId("idGlobalSearch");
+
+            if (oSearchField) {
+                oSearchField.setValue("");
+            }
+
+            const aTables = [
+                "Id_PaymentTable1",
+                "Id_ProfileaTable1",
+                "Id_CompmaintTable",
+                "Id_DamageTable",
+                "Id_MemberTable"
+            ];
+
+            aTables.forEach(function (sTableId) {
+                const oTable = this.byId(sTableId);
+                if (oTable) {
+                    const oBinding = oTable.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter([]);
+                    }
+                }
+            }.bind(this));
+        },
+        onGlobalSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("newValue")?.toLowerCase() || "";
 
             const oProfileModel = this.getView().getModel("profileData");
@@ -2488,7 +2515,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 oTable = this.byId("Id_ProfileaTable1");
             } else if (sSelectedTab === "Complaints") {
                 oTable = this.byId("Id_CompmaintTable");
-} else if (sSelectedTab === "Damage") {
+            } else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
             } else if (sSelectedTab === "Members") {
                 oTable = this.byId("Id_MemberTable");
@@ -2579,7 +2606,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                                 new sap.ui.model.Filter("Relation", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter({
                                     path: "DateOfBirth",
-                                    test: function(sDateOfBirth) {
+                                    test: function (sDateOfBirth) {
                                         if (!sDateOfBirth) return false;
                                         const today = new Date();
                                         const birth = new Date(sDateOfBirth);
@@ -2601,7 +2628,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._updateRowCount();
         },
 
-        onCountrySelectionChange: function(oEvent) {
+        onCountrySelectionChange: function (oEvent) {
             const oCountry = oEvent.getSource();
             const oModel = this.getView().getModel("profileData");
 
@@ -2667,7 +2694,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        CC_onChangeState: function(oEvent) {
+        CC_onChangeState: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("profileData");
@@ -2707,7 +2734,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             ]);
         },
 
-        CC_onChangeCity: function(oEvent) {
+        CC_onChangeCity: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
 
             const oModel = this.getView().getModel("profileData");
@@ -2727,7 +2754,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             // Save in model
             oModel.setProperty("/City", sCityName);
         },
-        _onProfileSTDChange: function() {
+        _onProfileSTDChange: function () {
             const oSTD = this.byId("id_std1");
             const oMobile = this.byId("id_phone1");
 
@@ -2742,7 +2769,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        MPonMobileLivechnage: function(oEvent) {
+        MPonMobileLivechnage: function (oEvent) {
             const oInput = oEvent.getSource();
             const oSTD = this.byId("id_std1");
             //const oMobile = this.byId("id_phone1"); // not needed here
@@ -2790,7 +2817,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        _prepareBranchComboData: function(aBookingData) {
+        _prepareBranchComboData: function (aBookingData) {
 
             if (!Array.isArray(aBookingData)) {
                 return [];
@@ -2802,8 +2829,8 @@ oProfileModel.setProperty("/photo", sPhoto);
             const aUniqueBranchCodes = [
                 ...new Set(
                     aAssigned
-                    .map(b => b.BranchCode)
-                    .filter(Boolean)
+                        .map(b => b.BranchCode)
+                        .filter(Boolean)
                 )
             ];
             // 3. Get Branch Master data from global model
@@ -2819,23 +2846,23 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
             return aFinal;
         },
-        _prepareAssignedRoomData: function(aBookingData) {
+        _prepareAssignedRoomData: function (aBookingData) {
             if (!Array.isArray(aBookingData)) {
                 return [];
             }
 
             const oUnique = new Set();
             return aBookingData
-                .filter(function(oBooking) {
+                .filter(function (oBooking) {
                     return oBooking.Status?.toLowerCase() === "assigned" && oBooking.BranchCode && oBooking.RoomNo;
                 })
-                .map(function(oBooking) {
+                .map(function (oBooking) {
                     return {
                         BranchCode: String(oBooking.BranchCode || "").trim(),
                         RoomNo: String(oBooking.RoomNo || "").trim()
                     };
                 })
-                .filter(function(oRoom) {
+                .filter(function (oRoom) {
                     if (!oRoom.BranchCode || !oRoom.RoomNo) {
                         return false;
                     }
@@ -2848,7 +2875,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 });
         },
 
-        _setComplaintRoomComboData: function(sBranchCode, sSelectedRoomNo) {
+        _setComplaintRoomComboData: function (sBranchCode, sSelectedRoomNo) {
             const oView = this.getView();
             const oProfileModel = oView.getModel("profileData");
             const oTempModel = oView.getModel("complaintTemp");
@@ -2861,10 +2888,10 @@ oProfileModel.setProperty("/photo", sPhoto);
             const sRoomNo = (sSelectedRoomNo || "").trim();
             const aAssignedRooms = oProfileModel.getProperty("/AsgnRoomNo") || [];
             const aRoomCombo = sBranch ? aAssignedRooms
-                .filter(function(oRoom) {
+                .filter(function (oRoom) {
                     return oRoom.BranchCode === sBranch;
                 })
-                .map(function(oRoom) {
+                .map(function (oRoom) {
                     return {
                         RoomNo: oRoom.RoomNo
                     };
@@ -2876,7 +2903,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             if (aRoomCombo.length === 1) {
                 sNewRoom = aRoomCombo[0].RoomNo;
             } else {
-                const bValidRoom = sRoomNo && aRoomCombo.some(function(oRoom) {
+                const bValidRoom = sRoomNo && aRoomCombo.some(function (oRoom) {
                     return oRoom.RoomNo === sRoomNo;
                 });
                 if (!bValidRoom) sNewRoom = "";
@@ -2891,11 +2918,11 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onPressRaiseComplaint: function() {
+        onPressRaiseComplaint: function () {
             this._openComplaintDialog(); // no data → create mode
         },
 
-        _openComplaintDialog: function(oComplaintData) {
+        _openComplaintDialog: function (oComplaintData) {
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oProfileModel = oView.getModel("profileData");
@@ -3028,8 +3055,8 @@ oProfileModel.setProperty("/photo", sPhoto);
 
                 const sDefaultBranchCode =
                     aBranches.length === 1 ?
-                    aBranches[0].BranchCode :
-                    "";
+                        aBranches[0].BranchCode :
+                        "";
 
                 // Reset for new complaint
                 oTempModel.setData({
@@ -3101,7 +3128,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 Fragment.load({
                     name: "sap.ui.com.project1.fragment.Complaint",
                     controller: this
-                }).then(function(oDialog) {
+                }).then(function (oDialog) {
 
                     this._oComplaintDialog = oDialog;
 
@@ -3122,7 +3149,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onCloseComplaintDialog: function() {
+        onCloseComplaintDialog: function () {
 
             if (this._oComplaintDialog) {
                 this._oComplaintDialog.close();
@@ -3171,10 +3198,10 @@ oProfileModel.setProperty("/photo", sPhoto);
 
             this._resetComplaintValidationStates();
         },
-        _getComplaintControl: function(sId) {
+        _getComplaintControl: function (sId) {
             return sap.ui.getCore().byId(sId) || this.byId(sId);
         },
-        _resetComplaintValidationStates: function() {
+        _resetComplaintValidationStates: function () {
 
             const aControls = [
                 this._getComplaintControl("idBranchCombo"), // ← Added
@@ -3186,7 +3213,7 @@ oProfileModel.setProperty("/photo", sPhoto);
 
             ];
 
-            aControls.forEach(function(oControl) {
+            aControls.forEach(function (oControl) {
                 if (oControl && oControl.setValueState) {
                     oControl.setValueState("None");
                     // oControl.setValueStateText("");
@@ -3194,7 +3221,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        onExit: function() {
+        onExit: function () {
             if (this._oComplaintDialog) {
                 this._oComplaintDialog.destroy();
                 this._oComplaintDialog = null;
@@ -3205,17 +3232,17 @@ oProfileModel.setProperty("/photo", sPhoto);
                 this._oComplaintPreviewDialog = null;
             }
         },
-        onComplaintTypeChange: function(oEvent) {
+        onComplaintTypeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
-        onComplaintRoomChange: function(oEvent) {
+        onComplaintRoomChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
         },
-        onComplaintDescLiveChange: function(oEvent) {
+        onComplaintDescLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
         },
 
-        onComplaintFileChange: async function(oEvent) {
+        onComplaintFileChange: async function (oEvent) {
             const oUploader = oEvent.getSource();
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
@@ -3271,9 +3298,9 @@ oProfileModel.setProperty("/photo", sPhoto);
                     throw new Error("Only images can be compressed");
                 }
 
-                const base64 = await new Promise(function(resolve, reject) {
+                const base64 = await new Promise(function (resolve, reject) {
                     const reader = new FileReader();
-                    reader.onload = function() { resolve(reader.result.split(",")[1]); };
+                    reader.onload = function () { resolve(reader.result.split(",")[1]); };
                     reader.onerror = reject;
                     reader.readAsDataURL(processedFile);
                 });
@@ -3309,7 +3336,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 oUploader.clear();
             }
         },
-        onComplaintDeleteDoc: function() {
+        onComplaintDeleteDoc: function () {
             const oTempModel = this.getView().getModel("complaintTemp");
             oTempModel.setProperty("/Documents", []);
             oTempModel.setProperty("/FileName", "");
@@ -3321,8 +3348,8 @@ oProfileModel.setProperty("/photo", sPhoto);
                 oUploader.clear();
             }
         },
-        onComplaintPreviewDoc: function(oEvent) {
-            const autoDecodeBase64 = function(sBase64) {
+        onComplaintPreviewDoc: function (oEvent) {
+            const autoDecodeBase64 = function (sBase64) {
                 if (!sBase64 || typeof sBase64 !== "string") {
                     return "";
                 }
@@ -3364,7 +3391,7 @@ oProfileModel.setProperty("/photo", sPhoto);
                 // Create a temporary image to detect orientation and dimensions
                 const oImg = new Image();
 
-                oImg.onload = function() {
+                oImg.onload = function () {
 
                     const viewportW = window.innerWidth * 0.8;
                     const viewportH = window.innerHeight * 0.8;
@@ -3420,7 +3447,7 @@ oProfileModel.setProperty("/photo", sPhoto);
 
             MessageToast.show("Preview not supported for this file type.");
         },
-        onSaveComplaint: async function() {
+        onSaveComplaint: async function () {
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oData = oTempModel.getData();
@@ -3520,12 +3547,12 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
         // Helper to refresh complaints table after save
-        _refreshComplaints: async function() {
+        _refreshComplaints: async function () {
             // Backward-compatible: keep existing call sites after save/update
             await this._loadComplaints(true);
         },
 
-        onPressComplaintRow: function(oEvent) {
+        onPressComplaintRow: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("profileData");
             const oComplaint = oContext.getObject();
 
@@ -3542,7 +3569,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             this._openComplaintDialog(oComplaint);
         },
 
-        onComBranch: async function(oEvent) {
+        onComBranch: async function (oEvent) {
             const oBranchCombo = oEvent.getSource();
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
             const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
@@ -3555,7 +3582,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onSearch: function() {
+        onSearch: function () {
 
             return new Promise((resolve, reject) => {
 
@@ -3610,7 +3637,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             });
         },
 
-        onChangeAddCustomer: function(oEvent) {
+        onChangeAddCustomer: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
             const oCombo = oEvent.getSource();
             const sCustomer = oCombo.getSelectedKey();
@@ -3627,7 +3654,7 @@ oProfileModel.setProperty("/photo", sPhoto);
             }
         },
 
-        onChangeBookingID: function(oEvent) {
+        onChangeBookingID: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
 
             const oCombo = oEvent.getSource();
