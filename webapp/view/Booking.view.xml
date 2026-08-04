@@ -161,7 +161,10 @@
                                 placeholder="Select start date"
                             />
 
-                            <Label text="End Date" />
+                            <Label
+                                text="End Date"
+                                required="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
+                            />
                             <DatePicker
                                 id="BookEnddate_ID"
                                 value="{HostelModel>/EndDate}"
@@ -670,7 +673,7 @@
                                 width="100%"
                                 change="onchangeConpanyAddress"
                                 liveChange="onchangeConpanyAddress"
-                                valueStateText="Please enter a valid company address (minimum 10 characters)"
+                                valueStateText="Please enter a valid company address"
                                 showValueStateMessage="true"
                                 id="BookconpanyAddress_ID"
                                 maxLength="500"

@@ -609,6 +609,9 @@
             oModel.setProperty("/IsBusinessTravel", bSelected);
             oBookingView.setProperty("/showBusinessGSTSection", bSelected && !!oBookingView.getProperty("/showBusinessTravelOption"));
 
+            // Always drop stale error states so the fields start clean in both directions.
+            this._clearBusinessGSTValueStates();
+
             if (!bSelected) {
                 this._resetBusinessTravelData();
             }
@@ -616,8 +619,27 @@
             this._recalculateSummary();
         },
 
+        _clearBusinessGSTValueStates: function () {
+            const oView = this.getView();
+
+            // Only reset the state, never the text: the fields declare their own
+            // valueStateText in the view (GSTIN binds it to i18n>gstError), and
+            // blanking it makes UI5 fall back to the generic "Invalid entry".
+            [
+                "BookGst_ID", "BookCompanyname_ID", "BookconpanyAddress_ID",
+                "EditBookGst_ID", "EditBookCompanyname_ID", "EditBookconpanyAddress_ID"
+            ].forEach(function (sId) {
+                const oField = oView.byId(sId);
+                if (oField && oField.setValueState) {
+                    oField.setValueState("None");
+                }
+            });
+        },
+
         _resetBusinessTravelData: function () {
             const oModel = this.getView().getModel("HostelModel");
+
+            this._clearBusinessGSTValueStates();
 
             oModel.setProperty("/IsBusinessTravel", false);
             oModel.setProperty("/CustomerGSTIN", "");
@@ -2932,11 +2954,27 @@
                     controller: this
                 }).then(function (oDialog) {
                     this.getView().addDependent(oDialog);
+                    // Clear the search field / table filter whenever the dialog closes
+                    // (Add Selected, Cancel, Esc or click outside).
+                    oDialog.attachAfterClose(this._resetMemberDialogSearch, this);
                     return oDialog;
                 }.bind(this));
             }
 
             return this._pMemberSelectionDialog;
+        },
+
+        _resetMemberDialogSearch: function () {
+            const oSearchField = this.byId("memberSearchField");
+            if (oSearchField) {
+                oSearchField.setValue("");
+            }
+
+            const oTable = this.byId("memberSelectTable");
+            const oBinding = oTable && oTable.getBinding("items");
+            if (oBinding) {
+                oBinding.filter([]);
+            }
         },
 
         _getNewMemberDialog: function () {
