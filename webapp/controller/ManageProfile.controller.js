@@ -108,6 +108,28 @@ sap.ui.define([
 
             utils._LCstrictValidationSelect(oSalutation);
         },
+        clearProfileValueStates: function () {
+    const aControls = [
+        "id_Name1",
+        "id_mail1",
+        "id_dob1",
+        "id_country1",
+        "id_state1",
+        "id_city1",
+        "id_std1",
+        "id_phone1",
+        "id_gender1",
+        "id_address1"
+    ];
+
+    aControls.forEach(function (sId) {
+        const oControl = this.byId(sId);
+        if (oControl && oControl.setValueState) {
+            oControl.setValueState(sap.ui.core.ValueState.None);
+            oControl.setValueStateText("");
+        }
+    }.bind(this));
+},
         ManageData: async function() {
             // always read current user from models instead of relying solely on cached variable
             let oUser = this.getView().getModel("LoginModel")?.getData() ||
@@ -406,6 +428,7 @@ sap.ui.define([
             } else {
                 oUIModel.setProperty("/isLoggedIn", false);
             }
+            this.clearProfileValueStates();
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             oRouter.navTo("RouteHostel");
         },

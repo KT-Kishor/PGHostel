@@ -7063,9 +7063,9 @@
 
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
-                       Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0),
+                        `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)} ${oHostelModel.Currency}`,
                         sUnitText,
-                        Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)
+                        `${Formatter.fromatNumber(parseFloat(item.FacilitiPrice) || 0)} ${oHostelModel.Currency}`
                     ];
                 });
 
