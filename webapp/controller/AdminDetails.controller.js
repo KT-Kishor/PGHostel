@@ -7866,13 +7866,13 @@ sap.ui.define([
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(255, 255, 255);
             doc.setLineWidth(0.2);
-            doc.roundedRect(140, 12, 55, 18, 3, 3, "FD");
+            doc.roundedRect(140, 10, 55, 18, 3, 3, "FD");
 
             doc.setFontSize(9);
             var Statushow = Status ? Status : data.Status
             doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-            doc.text(`Booking ID: ${data.BookingID || "N/A"}`, 142, 19);
-            doc.text(`Booked On: ${Formatter.formatDate(data.BookingDate) || "N/A"}`, 142, 24);
+            doc.text(`Booking ID: ${data.BookingID || "N/A"}`, 142, 17);
+            doc.text(`Booked On: ${Formatter.formatDate(data.BookingDate) || "N/A"}`, 142, 22);
             // doc.text(`Status: ${Statushow || "N/A"}`, 142, 28);
 
 

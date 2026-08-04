@@ -6781,12 +6781,12 @@
             // Compact Right Box
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(255, 255, 255);
-            doc.roundedRect(145, 9, 45, 10, 3, 3, "FD");
+            doc.roundedRect(145, 11, 45, 10, 3, 3, "FD");
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
-            doc.text(`Booked On: ${booking.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`, 148, 15,);
+            doc.text(`Booked On: ${booking.BookingDate ? Formatter.formatDate(booking.BookingDate) : "N/A"}`, 148, 17,);
             // doc.text(`Status: ${booking.Status || "N/A"}`, 142, 24);
 
             currentY = 40;
