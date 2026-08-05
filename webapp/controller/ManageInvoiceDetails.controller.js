@@ -2152,7 +2152,8 @@ sap.ui.define([
                     var sEventValue = oEvent.getParameter("value") || "";
                     var enteredAmount = parseAmount(sEventValue);
 
-                    var remainingDue = Math.max(0, round2(totalAmount - (paidAmount + totalReceivedAmount)));
+                   const effectivePaid = paidAmount - oNavigationModel.RefundProcessed;
+                    var remainingDue = Math.max(0, round2(totalAmount - (effectivePaid + totalReceivedAmount)));
 
                     this.ResivedAmount = true;
 
@@ -2246,7 +2247,7 @@ sap.ui.define([
                     return;
                 }
 
-                const validItems = items.filter(item => item.Used !== "X");
+                const validItems = items.filter(item => item.Used !== "X" && item.Used !== "Y");
 
                 // Sum of post-invoice payments
                 const totalReceivedAmount = validItems.reduce(
@@ -2263,7 +2264,7 @@ sap.ui.define([
                 const paidAmount = oNavigationModel.PaidAmount || 0;
 
                 // FINAL CALCULATION
-                const totalPaid = paidAmount + totalReceivedAmount;
+                const totalPaid = Number(paidAmount) + Number(totalReceivedAmount);
 
                 let totalDueAmount = totalAmount - totalPaid;
                 if (totalDueAmount < 0) {
