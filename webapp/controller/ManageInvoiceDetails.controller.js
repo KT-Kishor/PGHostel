@@ -2295,6 +2295,11 @@ sap.ui.define([
                 var receivedAmount = parseFloat((paymentModel.ReceivedAmount || "0").replaceAll(',', ''));
                 var isReceivedAmountInvalid = isNaN(receivedAmount) || receivedAmount <= 0;
 
+                if (!isMandatoryValid || !isCurrencyValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
                 if (isReceivedAmountInvalid) {
                     sap.ui.getCore().byId("idReceivedAmount")
                         .setValueState("Error")
@@ -2503,6 +2508,17 @@ sap.ui.define([
 
                     oModel.setProperty("/ManageInvoiceItem", aData);
                     oTable.removeSelections(true);
+
+                    oModel.refresh(true);
+
+                    // Clear ValueState of Particulars inputs
+                    oTable.getItems().forEach(function (oItem) {
+                        var oInput = oItem.getCells()[1]; // Particulars Input (2nd column)
+                        if (oInput && oInput.setValueState) {
+                            oInput.setValueState(sap.ui.core.ValueState.None);
+                            oInput.setValueStateText("");
+                        }
+                    });
 
                     that.SNoValue = aData.length;
                     that.totalAmountCalculation();
