@@ -1300,7 +1300,7 @@ sap.ui.define([
 
                     // 2. Calculate Effective Net Money Retained
                     let grossPaid = paidAmount + allReceivedAmount;
-                    let netPaid = grossPaid - refundProcessed; // Subtracts processed refund
+                    let netPaid = grossPaid ; // Subtracts processed refund
 
                     let balanceAmount = 0;
                     let pendingRefundAmount = 0;
@@ -1330,6 +1330,7 @@ sap.ui.define([
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                     oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                     oCustomerModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
+
 
                     oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                     InvoicePayment.setProperty("/AllDueAmount", balanceAmount.toFixed(2));
@@ -2156,7 +2157,7 @@ sap.ui.define([
                     var sEventValue = oEvent.getParameter("value") || "";
                     var enteredAmount = parseAmount(sEventValue);
 
-                   const effectivePaid = paidAmount - oNavigationModel.RefundProcessed;
+                    const effectivePaid = paidAmount - oNavigationModel.RefundProcessed;
                     var remainingDue = Math.max(0, round2(totalAmount - (effectivePaid + totalReceivedAmount)));
 
                     this.ResivedAmount = true;
@@ -2253,19 +2254,45 @@ sap.ui.define([
 
                 const validItems = items.filter(item => item.Used !== "X" && item.Used !== "Y");
 
-                // Sum of post-invoice payments
-                const totalReceivedAmount = validItems.reduce(
-                    (sum, item) => sum + (item.ReceivedAmount) || 0,
-                    0
-                );
+                 // Sum of post-invoice payments
+                // const totalReceivedAmount = validItems.reduce(
+                //     (sum, item) => sum + (item.ReceivedAmount) || 0,
+                //     0
+                // );
 
+
+                var oResult = await this.ajaxReadWithJQuery("HM_Payment", {
+                    InvNo: this.decodedPath
+                });
+
+                
+    //             const totalYAmount = oResult.commentData
+    // .filter(item => item.Used === "Y")
+    // .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
+
+                const totalReceivedAmount = (oResult || []).commentData.reduce((total, item) => {
+                    const amount = Number(item.Amount) || 0;
+
+                    if (item.Used === "X" || item.Used === "") {
+                        return total + amount;
+                    } else if (item.Used === "Y") {
+                        return total - amount;
+                    }
+
+                    return total;
+                }, 0);
+
+                       var totalDueAmount1 = validItems[0]?.TotalAmount - totalReceivedAmount;
                 // Safe TotalAmount fetch
-                const totalAmount =
-                    validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0;
+                // const totalAmount =
+                //     validItems[0]?.TotalAmount || items[0]?.TotalAmount - totalDueAmount1  || 0;
+
+                    const totalAmount =
+    (Number(validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0)) - Number(totalDueAmount1 || 0);
 
                 // PaidAmount (advance)
                 const oNavigationModel = view.getModel("SelectedCustomerModel")?.getData() || {};
-                const paidAmount = oNavigationModel.PaidAmount || 0;
+                const paidAmount = oNavigationModel.PaidAmount - oNavigationModel.RefundProcessed || 0;
 
                 // FINAL CALCULATION
                 const totalPaid = Number(paidAmount) + Number(totalReceivedAmount);
@@ -2277,7 +2304,9 @@ sap.ui.define([
 
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
-                invoiceModel.setProperty("/AllDueAmount", totalDueAmount.toFixed(2));
+                invoiceModel.setProperty("/AllDueAmount", totalDueAmount);
+                // oModel.setProperty("/RefundProcessed", totalYAmount);
+
                 invoiceModel.refresh(true);
             },
 
@@ -4347,6 +4376,7 @@ sap.ui.define([
 
                         // Set model
                         oSelectedModel.setData(oInvoice);
+                        this.totalAmountCalculation()
                         oSelectedModel.refresh(true);
                         oSelectedModel.refresh(true);
                         // this.visiablityPlay.setProperty("/Edit", false);
