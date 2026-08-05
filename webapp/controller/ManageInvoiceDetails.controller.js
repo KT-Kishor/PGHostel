@@ -1174,8 +1174,8 @@ sap.ui.define([
 
                     // ---------- ITEM CALCULATION ----------
                     aItems.forEach((item) => {
-                        // Original amount
                         const baseAmount = parseFloat(item.Total) || 0;
+
                         // ---------- DISCOUNT ----------
                         let discountAmount = 0;
                         if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
@@ -1183,17 +1183,21 @@ sap.ui.define([
                         } else {
                             discountAmount = parseFloat(item.Discount) || 0;
                         }
-                        // Validation
-                        if (discountAmount > baseAmount) discountAmount = 0;
-                        // Final amount after item discount
+
+                        if (baseAmount > 0 && discountAmount > baseAmount) discountAmount = 0;
+
                         const finalItemAmount = baseAmount - discountAmount;
-                        // Store values
+
                         item.DiscountAmount = discountAmount.toFixed(2);
                         item.FinalAmount = finalItemAmount.toFixed(2);
                         item.Total = finalItemAmount.toFixed(2);
 
                         // ---------- GST LOGIC ----------
-                        const itemWantsGST = item.GSTCalculation === true || item.GSTCalculation === "YES" || item.GSTCalculation === "true";
+                        let itemWantsGST = item.GSTCalculation === true || item.GSTCalculation === "YES" || item.GSTCalculation === "true";
+
+                        if (finalItemAmount < 0 && isGSTEnabled) {
+                            itemWantsGST = true;
+                        }
 
                         if (!isGSTEnabled) {
                             item.GSTCalculation = "NO";
@@ -1202,10 +1206,8 @@ sap.ui.define([
                         }
 
                         const isGSTApplicable = isGSTEnabled && itemWantsGST;
-
                         item.SAC = isGSTApplicable ? "996322" : "-";
 
-                        // GST applicable subtotal — ONLY items marked YES go here
                         if (isGSTApplicable) {
                             totalWithGST += finalItemAmount;
                         } else {
@@ -1222,10 +1224,9 @@ sap.ui.define([
 
                     // ---------- COUPON ----------
                     let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
-
                     oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
 
-                    // ---------- DISCOUNTED TOTAL (display / overall invoice level) ----------
+                    // ---------- DISCOUNTED TOTAL ----------
                     let discountedTotal = subTotal - couponDiscount;
                     if (discountedTotal < 0) discountedTotal = 0;
 
@@ -1255,12 +1256,12 @@ sap.ui.define([
                         const taxableAmount = netGSTAmount;
 
                         if (taxType === "CGST/SGST") {
-                            gstAmount = (taxableAmount * taxRate) / 100;
+                            const halfRate = taxRate / 2;
+                            const cgst = (taxableAmount * halfRate) / 100;
+                            const sgst = (taxableAmount * halfRate) / 100;
+                            gstAmount = cgst + sgst;
 
-                            const cgst = gstAmount;
-                            const sgst = gstAmount;
-
-                            finalAmount += cgst + sgst;
+                            finalAmount += gstAmount;
 
                             oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
                             oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
@@ -1268,6 +1269,7 @@ sap.ui.define([
                         } else if (taxType === "IGST") {
                             gstAmount = (taxableAmount * taxRate) / 100;
                             finalAmount += gstAmount;
+
                             oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
                             oCustomerModel.setProperty("/CGST", "0.00");
                             oCustomerModel.setProperty("/SGST", "0.00");
@@ -1278,11 +1280,12 @@ sap.ui.define([
                         oCustomerModel.setProperty("/IGST", "0.00");
                     }
 
+                    oCustomerModel.setProperty("/TaxableAmount", netGSTAmount.toFixed(2));
                     oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
                     oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
                     oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
 
-                    // ---------- PAYMENT ----------
+                    // ---------- PAYMENT & REFUND PROCESSED LOGIC ----------
                     let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
 
                     const oInvoicePaymentModel = oView.getModel("InvoicePayment");
@@ -1292,16 +1295,23 @@ sap.ui.define([
                         allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
                     }
 
-                    let totalPaid = paidAmount + allReceivedAmount;
-                    let balanceAmount = 0;
-                    let refundAmount = 0;
+                    // 1. Fetch RefundProcessed from SelectedCustomerModel
+                    let refundProcessed = parseFloat(oCustomerModel.getProperty("/RefundProcessed")) || 0;
 
-                    if (totalPaid > finalAmount) {
-                        refundAmount = totalPaid - finalAmount;
+                    // 2. Calculate Effective Net Money Retained
+                    let grossPaid = paidAmount + allReceivedAmount;
+                    let netPaid = grossPaid - refundProcessed; // Subtracts processed refund
+
+                    let balanceAmount = 0;
+                    let pendingRefundAmount = 0;
+
+                    // 3. Compare Total with Net Paid
+                    if (netPaid > finalAmount) {
+                        pendingRefundAmount = netPaid - finalAmount;
                         balanceAmount = 0;
                     } else {
-                        balanceAmount = finalAmount - totalPaid;
-                        refundAmount = 0;
+                        balanceAmount = finalAmount - netPaid; // 62,705.20 - 62,681.60 = 23.60
+                        pendingRefundAmount = 0;
                     }
 
                     let sFinalStatus = "Submitted";
@@ -1309,22 +1319,21 @@ sap.ui.define([
                         sFinalStatus = "Payment Received";
                     } else if (balanceAmount === finalAmount) {
                         sFinalStatus = "Submitted";
-                    } else if (totalPaid > 0 && totalPaid < finalAmount) {
+                    } else if (netPaid > 0 && netPaid < finalAmount) {
                         sFinalStatus = "Payment Partially";
-                    } else if (totalPaid >= finalAmount && finalAmount > 0) {
+                    } else if (netPaid >= finalAmount && finalAmount > 0) {
                         sFinalStatus = "Payment Received";
                     }
 
-                    // Apply the newly calculated status dynamically
+                    // Update Models
                     oCustomerModel.setProperty("/Status", sFinalStatus);
-
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                     oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
-                    oCustomerModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
+                    oCustomerModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
 
                     oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                     InvoicePayment.setProperty("/AllDueAmount", balanceAmount.toFixed(2));
-                    oSOWModel.setProperty("/RefundAmount", refundAmount.toFixed(2));
+                    oSOWModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
 
                     oInvoiceModel.refresh(true);
                     this.onChangeConversionRate();
@@ -1502,7 +1511,13 @@ sap.ui.define([
 
                 let sFinalStatus = "Submitted";
 
-                if (balanceAmount === 0) {
+                const refundAmount = Number(
+                    this.getView().getModel("SelectedCustomerModel").getProperty("/RefundAmount")
+                ) || 0;
+
+                if (refundAmount > 0) {
+                    sFinalStatus = "Payment Received";
+                } else if (balanceAmount === 0) {
                     sFinalStatus = "Payment Received";
                 } else if (balanceAmount === totalAmount) {
                     sFinalStatus = "Submitted";
@@ -1911,6 +1926,8 @@ sap.ui.define([
                             "ManageInvoiceItemModel"
                         );
 
+                        this.totalAmountCalculation();
+
                         this.visiablityPlay.setProperty("/editable", false);
                         this.visiablityPlay.setProperty("/CInvoice", false);
                         // this.byId("CID_id_TableInvoiceItem").setMode("None");
@@ -2172,9 +2189,9 @@ sap.ui.define([
             Readcall: async function (entity, filterValue) {
                 const oData = await this.ajaxReadWithJQuery(entity, filterValue);
 
-                // if (entity === "HM_ManageInvoice") {
-                //     return oData.data;
-                // }
+                if (entity === "HM_ManageInvoice") {
+                    return oData.data;
+                }
 
                 if (entity === "HM_ManageInvoice") {
                     const invoiceData = oData.data?.[0] || {};
@@ -4361,7 +4378,7 @@ sap.ui.define([
                     });
 
                     // 3. Process new items list
-                    const finalItems = this._prepareInvoiceItems(oData);
+                    const finalItems = await this._prepareInvoiceItems(oData);
 
                     const itemsToDelete = existingItems.filter(existing =>
                         !finalItems.some(item => item.ItemID === existing.ItemID)
@@ -4420,13 +4437,39 @@ sap.ui.define([
                 }
             },
 
-            _prepareInvoiceItems: function (oData) {
+            _prepareInvoiceItems: async function (oData) {
                 const oView = this.getView();
                 const existingItems = oView.getModel("ManageInvoiceItemModel")
                     .getProperty("/ManageInvoiceItem") || [];
 
                 const existingInvoices = oView.getModel("ManageInvoiceModel")?.getProperty("/ManageInvoice") || [];
-                const invoiceIndex = existingInvoices.length;
+                var invoiceIndex = existingInvoices.length;
+
+                var data = await this.Readcall("HM_ManageInvoice", {
+                    BookingID: this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID")
+                });
+
+                invoiceIndex = 0;
+
+                if (data && data.length > 0) {
+
+                    const currentInvNo = this.getView().getModel("SelectedCustomerModel").getProperty("/InvNo");
+
+                    // Sort invoices if required
+                    const sortedInvoices = [...data].sort((a, b) =>
+                        a.InvNo.localeCompare(b.InvNo)
+                    );
+
+                    const firstInvoiceNo = sortedInvoices[0].InvNo;
+
+                    if (currentInvNo && currentInvNo === firstInvoiceNo) {
+                        // Editing the first invoice
+                        invoiceIndex = 0;
+                    } else {
+                        // Second invoice onwards
+                        invoiceIndex = data.length;
+                    }
+                }
 
                 const roomRent = existingItems.find(i =>
                     i.Particulars && i.Particulars.includes("Room Rent")
