@@ -4,9 +4,11 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/m/MessageBox",
      "../utils/validation",
-], function (BaseController, JSONModel, MessageToast, MessageBox, utils) {
+    "../model/formatter",
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter) {
     "use strict";
     return BaseController.extend("sap.ui.com.project1.controller.TilePage", {
+        Formatter: Formatter,
         onInit: function () {
             this._initGuideStateModel();
             this.getOwnerComponent().getRouter().getRoute("TilePage").attachMatched(this._onRouteMatched, this);
@@ -1320,8 +1322,14 @@ sap.ui.define([
             else if (sPlan === "Per Month") { sRent = oRoom.MonthPrice; }
             else if (sPlan === "Per Year") { sRent = oRoom.YearPrice; }
 
-            var sCurrency = (oRoom.Currency || "").trim();
-            oModel.setProperty("/RentDisplay", sRent ? (sCurrency + " " + sRent + " / " + sPlan).trim() : "");
+            var sCurrency = (oRoom.Currency || "INR").trim();
+
+            // Fix: Call fromatNumber using the imported Formatter module
+            var sFormattedAmount = Formatter.fromatNumber(sRent);
+
+            var sFinalDisplayText = sFormattedAmount ? (sCurrency + " " + sFormattedAmount + " / " + sPlan).trim() : "";
+
+            oModel.setProperty("/RentDisplay", sFinalDisplayText);
         },
 
         // ─── Customer type (Self / New / Existing) ─────────────────────────────

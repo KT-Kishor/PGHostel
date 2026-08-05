@@ -1653,8 +1653,21 @@
                                     new sap.m.StepInput({
                                         width: "7rem",
                                         min: 1,
+                                        max: 10000,
                                         value: "{FacilitySelection>/quantity}",
-                                        enabled: "{FacilitySelection>/editModeEnabled}"
+                                        enabled: "{FacilitySelection>/editModeEnabled}",
+                                        change: function (oEvent) {
+                                            var oStepInput = oEvent.getSource();
+                                            var iValue = oEvent.getParameter("value");
+
+                                            if (iValue > 10000) {
+                                                oStepInput.setValue(10000);
+                                                sap.m.MessageToast.show("Maximum quantity allowed is 10,000");
+                                            } else if (iValue < 1 || isNaN(iValue)) {
+                                                oStepInput.setValue(1);
+                                                sap.m.MessageToast.show("Minimum quantity must be 1");
+                                            }
+                                        }
                                     }).addStyleClass("facilityQtyModeStepInput")
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
