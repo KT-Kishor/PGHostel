@@ -1256,7 +1256,59 @@ sap.ui.define([
                     oComboBox.setValueState("None");
                 }
 
-                return utils._LCstrictValidationComboBox(oComboBox, "ID");
+                const bValid = utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+                if (bValid) {
+                    // The attached file is named after the document type
+                    // (see onFileUpload). Read the key from the control rather
+                    // than the model, because selectionChange can fire before
+                    // the two-way binding has updated it.
+                    const sNewDocType = String(oComboBox.getSelectedKey() || "").trim();
+
+                    if (sNewDocType) {
+                        this._syncMemberDocumentName(sNewDocType);
+                    }
+                }
+
+                return bValid;
+            },
+
+            /**
+             * Renames the currently attached member document so its file name
+             * matches the selected document type, preserving the extension.
+             * Does nothing when no file is attached.
+             *
+             * @param {string} [sDocType] document type to use; falls back to
+             *                            the value stored in the draft
+             */
+            _syncMemberDocumentName: function (sDocType) {
+                const oModel = this.getView().getModel("BookingView");
+
+                if (!oModel) {
+                    return;
+                }
+
+                const sCurrentName = String(oModel.getProperty("/NewMemberDraft/Documents/0/FileName") || "").trim();
+                const sNewDocType = sDocType ||
+                    String(oModel.getProperty("/NewMemberDraft/Documents/0/DocumentType") || "").trim();
+
+                if (!sCurrentName || !sNewDocType || sCurrentName === "Compressing...") {
+                    return;
+                }
+
+                const sExt = sCurrentName.includes(".") ? sCurrentName.split(".").pop().toLowerCase() : "";
+                let sNewName = sNewDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+                if (sExt) {
+                    sNewName += "." + sExt;
+                }
+
+                if (sNewName === sCurrentName) {
+                    return;
+                }
+
+                oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
+                oModel.refresh(true);
             },
 
             _getMemberDialogControl: function (sId) {

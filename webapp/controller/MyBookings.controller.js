@@ -880,7 +880,58 @@ sap.ui.define([
                 return true;
             }
 
-            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+            var bValid = utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+            if (bValid) {
+                // The attached file is named after the document type
+                // (see onFacilityFileChange). Read the key from the control
+                // rather than the model, because selectionChange can fire
+                // before the two-way binding has updated it.
+                var sNewDocType = String(oComboBox.getSelectedKey() || "").trim();
+
+                if (sNewDocType) {
+                    this._syncMemberDocumentName(sNewDocType);
+                }
+            }
+
+            return bValid;
+        },
+
+        /**
+         * Renames the currently attached member document so its file name
+         * matches the selected document type, preserving the extension.
+         * Does nothing when no file is attached.
+         *
+         * @param {string} [sDocType] document type to use; falls back to the
+         *                            value stored in the "Member" model
+         */
+        _syncMemberDocumentName: function (sDocType) {
+            var oModel = this.getView().getModel("Member");
+
+            if (!oModel) {
+                return;
+            }
+
+            var sCurrentName = String(oModel.getProperty("/DocumentName") || "").trim();
+            var sNewDocType = sDocType || String(oModel.getProperty("/DocumentType") || "").trim();
+
+            if (!sCurrentName || !sNewDocType || sCurrentName === "Compressing...") {
+                return;
+            }
+
+            var sExt = sCurrentName.indexOf(".") > -1 ? sCurrentName.split(".").pop().toLowerCase() : "";
+            var sNewName = sNewDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+            if (sExt) {
+                sNewName += "." + sExt;
+            }
+
+            if (sNewName === sCurrentName) {
+                return;
+            }
+
+            oModel.setProperty("/DocumentName", sNewName);
+            oModel.refresh(true);
         },
 
         onFacilityFileChange: async function (oEvent) {

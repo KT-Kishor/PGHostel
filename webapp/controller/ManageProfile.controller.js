@@ -1022,7 +1022,65 @@ sap.ui.define([
                 return true;
             }
 
-            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+            const bValid = utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+            if (bValid) {
+                // Get the selected key directly from the control rather than
+                // waiting for binding to update the model. This handles the
+                // case where selectionChange fires before the two-way binding.
+                const sNewDocType = String(oComboBox.getSelectedKey() || "").trim();
+                
+                if (sNewDocType) {
+                    this._syncMemberDocumentName(sNewDocType);
+                }
+            }
+
+            return bValid;
+        },
+
+        /**
+         * Renames the currently attached member document so its file name
+         * matches the selected document type, preserving the extension.
+         * Does nothing when no file is attached.
+         * 
+         * @param {string} sDocType - The document type to use for the new name.
+         *                            If not provided, reads from the model.
+         */
+        _syncMemberDocumentName: function (sDocType) {
+
+            const oModel = this.getView().getModel("Member");
+
+            if (!oModel) {
+                return;
+            }
+
+            const sCurrentName = String(oModel.getProperty("/DocumentName") || "").trim();
+            
+            // Use the provided document type, or fall back to the model property
+            const sNewDocType = sDocType || String(oModel.getProperty("/DocumentType") || "").trim();
+
+            if (!sCurrentName || !sNewDocType || sCurrentName === "Compressing...") {
+                return;
+            }
+
+            const sExt = sCurrentName.includes(".") ?
+                sCurrentName.split(".").pop().toLowerCase() :
+                "";
+
+            let sNewName = sNewDocType
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, "_");
+
+            if (sExt) {
+                sNewName += "." + sExt;
+            }
+
+            if (sNewName === sCurrentName) {
+                return;
+            }
+
+            oModel.setProperty("/DocumentName", sNewName);
+            oModel.refresh(true);
         },
 
         _addBusyProcessingRow: function () {
