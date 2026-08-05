@@ -2950,9 +2950,29 @@
             oSelfRecord.Selected = bSelfSelected;
             oSelfRecord.IsPrimary = bSelfIsPrimary;
 
+            // Build the full member list from server data first so document fields are preserved,
+            // then apply selection state from the booking's selected occupants.
             const aCombined = this._mergeMembersById(
-                [oSelfRecord].concat(aMasterMembers, aServerMemberList, aSelectedMembers)
+                [oSelfRecord].concat(aMasterMembers, aServerMemberList)
             );
+
+            const aSelectedIds = new Set((aSelectedMembers || []).map(function (oMember) {
+                return oMember.id || oMember.MemberID;
+            }));
+
+            aCombined.forEach(function (oMember) {
+                if (aSelectedIds.has(oMember.id)) {
+                    oMember.Selected = true;
+                    const oSelected = (aSelectedMembers || []).find(function (oM) {
+                        return (oM.id || oM.MemberID) === oMember.id;
+                    });
+                    if (oSelected) {
+                        oMember.IsPrimary = !!oSelected.IsPrimary;
+                    }
+                } else {
+                    oMember.Selected = false;
+                }
+            });
 
             oBookingView.setProperty("/MasterMembers", aCombined);
             this._syncPrimaryMemberInFamilyMembers();
