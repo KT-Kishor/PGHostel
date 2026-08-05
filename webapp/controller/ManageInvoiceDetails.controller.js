@@ -1866,12 +1866,16 @@ sap.ui.define([
             onPressUpdateInvoice: async function (Value) {
                 try {
                     // var oModel = this.getView().getModel("FilteredSOWModel").getData();
+                    const aItems = this.getView()
+                        .getModel("ManageInvoiceItemModel")
+                        .getProperty("/ManageInvoiceItem") || [];
+
                     const bIsValid =
                         utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         this.mobileNo &&
                         utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
-                        (!!this.Discount && !!this.Particulars);
+                        aItems.every(item => item.Particulars && item.Particulars.trim() !== "");
 
                     let bIsValidTwo = true;
 
