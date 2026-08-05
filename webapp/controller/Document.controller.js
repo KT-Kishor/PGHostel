@@ -405,6 +405,7 @@ sap.ui.define([
                 sap.ui.getCore().byId("AD_id_MemberName").setValue(oCopyData.Name || "").setValueState("None");
                 sap.ui.getCore().byId("AD_idSelect").setSelectedKey(oCopyData.Salutation || "").setValueState("None");
 
+                sap.ui.getCore().byId("AD_id_UploadDocumentLabel").setRequired(true);
                 this.MM_Dialog.open();
             },
             onSaveNewMember: function () {
@@ -432,6 +433,7 @@ sap.ui.define([
                     (oMember.Relation === "Self" ||
                         utils._LCstrictValidationComboBox(oMemberRelation, "ID")
                     )
+                         && utils._LCstrictValidationComboBox(oDocumentTypeCombo, "ID")
                 ) {
 
                     // ================= DOCUMENT VALIDATION =================

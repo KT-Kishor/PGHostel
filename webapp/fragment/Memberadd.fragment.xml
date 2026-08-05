@@ -187,6 +187,7 @@
                 </ComboBox>
 
                 <Label
+                    id="AD_id_UploadDocumentLabel"
                     text="{i18n>uploadDocument}"
                 />
                 
