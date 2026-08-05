@@ -234,8 +234,8 @@
                 DocumentTypeOptions: [
                     { key: "Aadhaar Card", text: "Aadhaar Card" },
                     { key: "Passport", text: "Passport" },
+                    { key: "Pan Card", text: "Pan Card" },
                     { key: "Driving License", text: "Driving License" },
-                    { key: "Voter ID", text: "Voter ID" }
                 ],
                 GenderOptions: [
                     { key: "Male", text: "Male" },
