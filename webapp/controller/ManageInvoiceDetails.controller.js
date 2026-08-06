@@ -46,6 +46,7 @@ sap.ui.define([
                 this.byId("CID_id_AddCustComboBox").setValueState("None");
                 this.byId("CID_id_AddBooking").setValueState("None");
                 this.byId("CID_id_InvoiceDesc").setValueState("None");
+                this.byId("CID_id_InputGST").setValueState("None");
                 this.byId("CID_id_ConversionRate").setValueState("None");
                 this.byId("CID_id_InputMailID").setValueState("None");
                 this.byId("CID_id_InputMobileNo").setValueState("None");
@@ -276,7 +277,17 @@ sap.ui.define([
                             StartDateEditable: false,
                             EndDateEditable: false
                         }))
-                        .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate))
+                        .sort((a, b) => {
+                            const startDiff = this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+
+                            // If StartDate is different, sort by StartDate
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+
+                            // If StartDate is same, sort by EndDate
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
                         .map((item, index) => ({
                             ...item,
                             IndexNo: index + 1
@@ -786,7 +797,10 @@ sap.ui.define([
                         });
                     }
                     finalInvoiceItems.sort((a, b) => {
-                        return this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+                        return (
+                            this._parseDate(a.StartDate) - this._parseDate(b.StartDate) ||
+                            this._parseDate(a.EndDate) - this._parseDate(b.EndDate)
+                        );
                     });
 
                     // Assign sequential IndexNo
@@ -1269,12 +1283,12 @@ sap.ui.define([
                         const taxableAmount = netGSTAmount;
 
                         if (taxType === "CGST/SGST") {
-                            const halfRate = taxRate / 2;
+                            const halfRate = taxRate;
                             const cgst = (taxableAmount * halfRate) / 100;
                             const sgst = (taxableAmount * halfRate) / 100;
-                            gstAmount = cgst + sgst;
+                            gstAmount = cgst;
 
-                            finalAmount += gstAmount;
+                            finalAmount += cgst + sgst;
 
                             oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
                             oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
@@ -1787,14 +1801,14 @@ sap.ui.define([
 
                 if (stateCode === "29") {
                     // Karnataka → CGST + SGST
-                    oCustomerModel.setProperty("/Type", "CGST/SGST");
-                    oCustomerModel.setProperty("/CGSTSelected", true);
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
                     oCustomerModel.setProperty("/IGSTSelected", false);
                 } else {
                     // Other states → IGST
-                    oCustomerModel.setProperty("/Type", "IGST");
+                    oCustomerModel.setProperty("/Type", "");
                     oCustomerModel.setProperty("/CGSTSelected", false);
-                    oCustomerModel.setProperty("/IGSTSelected", true);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
                 }
 
                 // GST is valid → allow percentage entry
@@ -1937,7 +1951,7 @@ sap.ui.define([
                                 StartDateEditable: false,
                                 EndDateEditable: false
                             }))
-                            .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate))
+                            .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate))
                             .map((item, index) => ({
                                 ...item,
                                 IndexNo: index + 1
@@ -2923,7 +2937,7 @@ sap.ui.define([
                     // ===== TABLE BODY =====
                     const body = oCompanyItemModel
                         .filter(item => item)
-                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
                         .map((item, index) => {
                             const row = [
                                 index + 1,
@@ -3602,7 +3616,7 @@ sap.ui.define([
                     ];
 
                     const body = [...aInvoiceItems]
-                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
                         .map((item, i) => {
                             const row = [
                                 i + 1,
@@ -3953,7 +3967,7 @@ sap.ui.define([
                         );
 
                         const body = oCompanyItemModel
-                            .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate)) // Ascending by StartDate
+                            .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
                             .map((item, index) => {
                                 const row = [
                                     index + 1,
@@ -4651,7 +4665,10 @@ sap.ui.define([
                     ...processedFacilityItems
                 ];
                 finalItems.sort((a, b) => {
-                    return this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+                    return (
+                        this._parseDate(a.StartDate) - this._parseDate(b.StartDate) ||
+                        this._parseDate(a.EndDate) - this._parseDate(b.EndDate)
+                    );
                 });
 
                 finalItems.forEach((item, index) => {

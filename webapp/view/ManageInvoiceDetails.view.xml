@@ -1,28 +1,46 @@
-<mvc:View controllerName="sap.ui.com.project1.controller.ManageInvoiceDetails"
-	xmlns:mvc="sap.ui.core.mvc"
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.ManageInvoiceDetails"
+    xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
-	xmlns:core="sap.ui.core"
-	xmlns:m="sap.m"
-	xmlns="sap.uxap"
-	xmlns:f="sap.ui.layout.form">
-	<m:Page title="{i18n>invoiceDetails}" showNavButton="true" navButtonPress="onNavBack" id="CID_id_MyPageId">
-		<m:headerContent>
-			<m:Button press="onHome" icon="sap-icon://log" tooltip="{i18n>logoutTooltip}"
-            type="Transparent"/>
-		</m:headerContent>
-		<!-- <m:ScrollContainer > -->
-		<ObjectPageLayout id="CID_id_CmpInvObjectPageLayout"
+    xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
+    xmlns="sap.uxap"
+    xmlns:f="sap.ui.layout.form"
+>
+    <m:Page
+        title="{i18n>invoiceDetails}"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        id="CID_id_MyPageId"
+    >
+        <m:headerContent>
+            <m:Button
+                press="onHome"
+                icon="sap-icon://log"
+                tooltip="{i18n>logoutTooltip}"
+                type="Transparent"
+            />
+        </m:headerContent>
+        <!-- <m:ScrollContainer > -->
+        <ObjectPageLayout
+            id="CID_id_CmpInvObjectPageLayout"
             useIconTabBar="false"
-            class="sapUiSmallmarginResponsive">
-			<!-- Sections in the ObjectPage -->
-			<sections>
-				<!-- First section containing Customer details -->
-				<ObjectPageSection id="CID_id_CmpInvGoals" showTitle="false">
-					<subSections>
-						<ObjectPageSubSection id="CID_id_CmpInvGoalsSS1" 
-                        title="{i18n>invoiceBasicDetails}">
-							<blocks>
-								<f:SimpleForm
+            class="sapUiSmallmarginResponsive"
+        >
+            <!-- Sections in the ObjectPage -->
+            <sections>
+                <!-- First section containing Customer details -->
+                <ObjectPageSection
+                    id="CID_id_CmpInvGoals"
+                    showTitle="false"
+                >
+                    <subSections>
+                        <ObjectPageSubSection
+                            id="CID_id_CmpInvGoalsSS1"
+                            title="{i18n>invoiceBasicDetails}"
+                        >
+                            <blocks>
+                                <f:SimpleForm
                                     editable="true"
                                     layout="ColumnLayout"
                                     labelSpanXL="4"
@@ -36,14 +54,15 @@
                                     emptySpanS="0"
                                     columnsXL="2"
                                     columnsL="2"
-                                    columnsM="1">
-									<f:content>
-										<m:Label
+                                    columnsM="1"
+                                >
+                                    <f:content>
+                                        <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>customerName}"
                                             required="true"
                                         />
-										<m:ComboBox
+                                        <m:ComboBox
                                             change="onChangeAddCustomer"
                                             showClearIcon="true"
                                             id="CID_id_AddCustComboBox"
@@ -55,22 +74,20 @@
                                             showSecondaryValues="true"
                                             selectedKey="{SelectedCustomerModel>/CustomerName}"
                                         >
-											<core:ListItem
+                                            <core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
-                                               text="{= ${ManageCustomerModel>BranchName}
+                                                text="{= ${ManageCustomerModel>BranchName}
     ? ${ManageCustomerModel>BranchName} + ' - ' + ${ManageCustomerModel>CustomerName}
     : ${ManageCustomerModel>CustomerName} }"
                                                 additionalText="{ManageCustomerModel>BookingID}"
                                             />
-                                            
-                               
-										</m:ComboBox>
-										<m:Label
+                                        </m:ComboBox>
+                                        <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>bookingID}"
                                             required="true"
                                         />
-										<m:ComboBox
+                                        <m:ComboBox
                                             change="onChangeBookingID"
                                             showClearIcon="true"
                                             id="CID_id_AddBooking"
@@ -83,13 +100,13 @@
                                             selectedKey="{SelectedCustomerModel>/BookingID}"
                                             editable="false"
                                         >
-											<core:ListItem
+                                            <core:ListItem
                                                 key="{BookingModel>BookingID}"
                                                 text="{BookingModel>BookingID}"
                                                 additionalText="{BookingModel>Status}"
                                             />
-										</m:ComboBox>
-										<!-- <m:Label
+                                        </m:ComboBox>
+                                        <!-- <m:Label
                                             visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>customerName}"
                                         /><m:Input
@@ -97,52 +114,54 @@
                                             id="MI_id_Cname"
                                             value="{SelectedCustomerModel>/CustomerName}"
                                         /> -->
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>invoiceNo}"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{visiablityPlay>/editVisi}"
                                             id="CID_Id_NavInvoiceNo"
                                             value="{SelectedCustomerModel>/InvNo}"
                                             editable="false"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>customerName}"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{visiablityPlay>/editVisi}"
                                             id="CID_id_Custmer"
                                             value="{SelectedCustomerModel>/CustomerName}"
                                             editable="false"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>bookingID}"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{visiablityPlay>/editVisi}"
                                             value="{SelectedCustomerModel>/BookingID}"
                                             editable="false"
                                         />
-										<m:Label  visible="{visiablityPlay>/createVisi}"
+                                        <m:Label
+                                            visible="{visiablityPlay>/createVisi}"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             id="CID_id_Date"
                                             value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
-                                            change="onChangeDate" visible="{visiablityPlay>/createVisi}"
+                                            change="onChangeDate"
+                                            visible="{visiablityPlay>/createVisi}"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/editVisi}"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             visible="{visiablityPlay>/editVisi}"
@@ -153,12 +172,12 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="onChangeDate"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="false"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             visible="false"
@@ -169,12 +188,12 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="CID_ValidateDate"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="false"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             visible="false"
@@ -182,24 +201,24 @@
                                             value="{path:'SelectedCustomerModel>/InvoiceDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onChangeInvoiceDate"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="false"
                                             text="{i18n>PayByDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             visible="false"
                                             id="CID_id_Payby"
                                             value="{path:'SelectedCustomerModel>/PayByDate','type':'sap.ui.model.type.Date','formatOptions':{'pattern':'dd/MM/yyyy'}}"
                                             change="onPayByDateDatePickerChange"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="false"
                                             text="{i18n>invoiceDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             minDate="{visiablityPlay>/minDate}"
                                             visible="false"
@@ -210,12 +229,12 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="CID_ValidateDate"
                                         />
-										<m:Label
-                                             visible="false"
+                                        <m:Label
+                                            visible="false"
                                             text="{i18n>PayByDate}"
                                             required="true"
                                         />
-										<m:DatePicker
+                                        <m:DatePicker
                                             valueStateText="{i18n>dateValueState}"
                                             visible="false"
                                             id="CID_id_NavPayby"
@@ -225,11 +244,11 @@
                                             editable="{visiablityPlay>/editable}"
                                             change="CID_ValidateDatePayByDate"
                                         />
-										<m:Label
+                                        <m:Label
                                             text="{i18n>invoiceDescription}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             id="CID_id_InvoiceDesc"
                                             value="{SelectedCustomerModel>/InvoiceDescription}"
                                             placeholder="{i18n>companyInvoiceDescPlaceH}"
@@ -238,27 +257,27 @@
                                             maxLength="120"
                                             valueStateText="{i18n>companyInvoiceDescPlaceH}"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/GST}"
                                             text="{i18n>type}"
                                         />
-										<m:Text
+                                        <m:Text
                                             visible="{visiablityPlay>/GST}"
                                             text="{ parts: [{path: 'SelectedCustomerModel>/Type'}, {path: 'SelectedCustomerModel>/Value'}], formatter: '.Formatter.formatCustomerTypeValue'}"
                                             id="CID_id_Type"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{visiablityPlay>/gstVisiable}"
                                             text="{i18n>cgs}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{visiablityPlay>/gstVisiable}"
                                             value="{path:'SelectedCustomerModel>/CGST',formatter: '.Formatter.fromatNumber'}"
                                             editable="false"
                                             maxLength="15"
                                         />
-										<!-- <m:Label
+                                        <!-- <m:Label
                                             visible="{visiablityPlay>/igstVisi}"
                                             text="{i18n>igst}"
                                             required="true"
@@ -269,7 +288,7 @@
                                             editable="false"
                                             maxLength="15"
                                         /> -->
-										<!-- <m:Label
+                                        <!-- <m:Label
                                             visible="{visiablityPlay>/gstVisiable}"
                                             text="{i18n>sgst}"
                                             required="true"
@@ -280,12 +299,12 @@
                                             editable="false"
                                             maxLength="15"
                                         /> -->
-										<m:Label
+                                        <m:Label
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             text="{i18n>expConversionRate}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             id="CID_id_ConversionRate"
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             placeholder="{i18n>companyInvoiceConversionRatePlace}"
@@ -296,31 +315,29 @@
                                             editable="{visiablityPlay>/editable}"
                                             liveChange="onChnageConvertion"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             text="{i18n>amountInINR}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             value="{path:'SelectedCustomerModel>/AmountInFCurrency',formatter: '.Formatter.fromatNumber'}"
                                             maxLength="20"
                                             editable="false"
                                         />
-										<m:Label
+                                        <m:Label
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             text="{i18n>custLutVa}"
                                         />
-										<m:Input
+                                        <m:Input
                                             visible="{= ${FilteredSOWModel>/Currency} === 'INR'?false:true}"
                                             value="{SelectedCustomerModel>/LUT}"
                                             maxLength="20"
                                             editable="{visiablityPlay>/editable}"
                                         />
-										<m:Label
-                                            text="{i18n>gstNo}" 
-                                        />
-										<m:Input
+                                        <m:Label text="{i18n>gstNo}" />
+                                        <m:Input
                                             value="{SelectedCustomerModel>/GST}"
                                             id="CID_id_InputGST"
                                             liveChange="CID_onPressLiveChangeGST"
@@ -328,33 +345,87 @@
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>enterGST}"
                                         />
-										<m:Label text="{i18n>type}" required="{SelectedCustomerModel>/GSTValid}"/>
-										<m:CheckBox text="{i18n>cgst}" id="CID_id_CheckboxCGST" selected="{SelectedCustomerModel>/CGSTSelected}" select="CI_onSelectCGST"  editable="{visiablityPlay>/editable}" />
-										<m:CheckBox text="{i18n>igst}" id="CDI_id_CheckboxIGST" selected="{SelectedCustomerModel>/IGSTSelected}" select="CI_onSelectIGST"  editable="{visiablityPlay>/editable}"/>
-										<m:Label
-                                        text="{SelectedCustomerModel>/TaxPercentageLabel}"
-                                        required="{SelectedCustomerModel>/GSTValid}" />
-										<m:Input value="{SelectedCustomerModel>/Value}" liveChange="CI_onPercentageChange" editable="{visiablityPlay>/editable}" maxLength="10" />
-										<m:Label text="{i18n>address}" />
-										<m:TextArea
+                                        <m:Label
+                                            text="{i18n>type}"
+                                            required="{SelectedCustomerModel>/GSTValid}"
+                                        />
+                                        <m:CheckBox
+                                            text="{i18n>cgst}"
+                                            id="CID_id_CheckboxCGST"
+                                            selected="{SelectedCustomerModel>/CGSTSelected}"
+                                            select="CI_onSelectCGST"
+                                            editable="{visiablityPlay>/editable}"
+                                            visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
+                                        />
+                                        <m:CheckBox
+                                            text="{i18n>igst}"
+                                            id="CDI_id_CheckboxIGST"
+                                            selected="{SelectedCustomerModel>/IGSTSelected}"
+                                            select="CI_onSelectIGST"
+                                            editable="{visiablityPlay>/editable}"
+                                            visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
+                                        />
+                                        <m:Label
+                                            text="{SelectedCustomerModel>/TaxPercentageLabel}"
+                                            required="{SelectedCustomerModel>/GSTValid}"
+                                        />
+                                        <m:Input
+                                            value="{SelectedCustomerModel>/Value}"
+                                            liveChange="CI_onPercentageChange"
+                                            editable="{visiablityPlay>/editable}"
+                                            maxLength="10"
+                                            visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
+                                        />
+                                        <m:Label text="{i18n>address}" />
+                                        <m:TextArea
                                             id="CID_id_InputAddress"
                                             value="{SelectedCustomerModel>/PermanentAddress}"
                                             maxLength="120"
                                             liveChange="CID_onPressLiveChange"
                                             editable="{visiablityPlay>/editable}"
                                         />
-										<m:Label text="{i18n>customerGSTNo}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
-										<m:Input value="{SelectedCustomerModel>/CustomerGSTNO}" id="CI_id_InputCustomerGSTNO" liveChange="CID_ValidateGstNumber" maxLength="15" valueStateText="{i18n>gstError}" editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>customerNameGST}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
-										<m:Input value="{SelectedCustomerModel>/CustomerGSTName}" id="CI_id_InputCustomerGSTName" liveChange="CID_ValidateGstName" maxLength="50" valueStateText="{i18n>enterCustomerName}" editable="{visiablityPlay>/editable}"/>
-										<m:Label text="{i18n>customerNameAddress}" required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"/>
-										<m:TextArea value="{SelectedCustomerModel>/CustomerGSTAddress}" id="CI_id_InputCustomerGSTAddress" liveChange="CID_ValidateGstAddress" maxLength="200" valueStateText="{i18n>entervalidAddress}" editable="{visiablityPlay>/editable}"/>
+                                        <m:Label
+                                            text="{i18n>customerGSTNo}"
+                                            required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"
+                                        />
+                                        <m:Input
+                                            value="{SelectedCustomerModel>/CustomerGSTNO}"
+                                            id="CI_id_InputCustomerGSTNO"
+                                            liveChange="CID_ValidateGstNumber"
+                                            maxLength="15"
+                                            valueStateText="{i18n>gstError}"
+                                            editable="{visiablityPlay>/editable}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>customerNameGST}"
+                                            required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"
+                                        />
+                                        <m:Input
+                                            value="{SelectedCustomerModel>/CustomerGSTName}"
+                                            id="CI_id_InputCustomerGSTName"
+                                            liveChange="CID_ValidateGstName"
+                                            maxLength="50"
+                                            valueStateText="{i18n>enterCustomerName}"
+                                            editable="{visiablityPlay>/editable}"
+                                        />
+                                        <m:Label
+                                            text="{i18n>customerNameAddress}"
+                                            required="{= ${SelectedCustomerModel>/CustomerGSTNO} ? true : false }"
+                                        />
+                                        <m:TextArea
+                                            value="{SelectedCustomerModel>/CustomerGSTAddress}"
+                                            id="CI_id_InputCustomerGSTAddress"
+                                            liveChange="CID_ValidateGstAddress"
+                                            maxLength="200"
+                                            valueStateText="{i18n>entervalidAddress}"
+                                            editable="{visiablityPlay>/editable}"
+                                        />
 
-										<m:Label
+                                        <m:Label
                                             text="{i18n>emailId}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             value="{SelectedCustomerModel>/CustomerEmail}"
                                             id="CID_id_InputMailID"
                                             maxLength="500"
@@ -363,11 +434,11 @@
                                             change="onchangeEmail"
                                             valueStateText="{i18n>emailValueState}"
                                         />
-										<m:Label
+                                        <m:Label
                                             text="{i18n>mobileNo}"
                                             required="true"
                                         />
-										<m:Input
+                                        <m:Input
                                             value="{SelectedCustomerModel>/MobileNo}"
                                             id="CID_id_InputMobileNo"
                                             maxLength="10"
@@ -375,75 +446,72 @@
                                             editable="{visiablityPlay>/editable}"
                                             valueStateText="{i18n>mobileNoValueState}"
                                         />
-										<!-- <m:Label visible="{visiablityPlay>/TDS}" required="true" text="{i18n>TDS}" /><m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/><m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" /> -->
-										<m:Label
+                                        <!-- <m:Label visible="{visiablityPlay>/TDS}" required="true" text="{i18n>TDS}" /><m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomePerc}" id="CID_id_IncomeTaxPercentage" editable="{visiablityPlay>/editable}" maxLength="2" valueStateText="{i18n>incomeTaxValue}" liveChange="onIncomeTaxPercentageInputLiveChange"/><m:Input visible="{visiablityPlay>/TDS}" value="{SelectedCustomerModel>/IncomeTax}" id="CID_id_TDS" editable="false" /> -->
+                                        <m:Label
                                             text="{i18n>currency}"
                                             required="true"
                                         />
-										<m:ComboBox
+                                        <m:ComboBox
                                             items="{CurrencyModel>/}"
                                             value="{FilteredSOWModel>/Currency}"
                                             id="CID_id_CurrencySelect"
                                             change="CID_CurrencyChanges"
                                             valueStateText="{i18n>selectCurrency}"
                                         >
-											<core:Item
+                                            <core:Item
                                                 key="{CurrencyModel>currency}"
                                                 text="{CurrencyModel>currency}"
                                             />
-										</m:ComboBox>
-										<m:Label
+                                        </m:ComboBox>
+                                        <m:Label
                                             text="{i18n>invoiceStatus}"
                                             visible="{visiablityPlay>/editVisi}"
                                             required="true"
                                         />
-										<m:ComboBox
+                                        <m:ComboBox
                                             id="CI_Id_Status"
                                             visible="{visiablityPlay>/editVisi}"
                                             items="{CompanyInvoiceStatus>/}"
                                             value="{SelectedCustomerModel>/Status}"
                                             editable="{visiablityPlay>/CInvoice}"
-                                            change="onChangeInvoiceStatus">
-
+                                            change="onChangeInvoiceStatus"
+                                        >
                                             <core:Item
                                                 key="{CompanyInvoiceStatus>InvoiceStatus}"
-                                                text="{CompanyInvoiceStatus>InvoiceStatus}" />
+                                                text="{CompanyInvoiceStatus>InvoiceStatus}"
+                                            />
                                         </m:ComboBox>
-									</f:content>
-								</f:SimpleForm>
-							</blocks>
-						</ObjectPageSubSection>
-						<ObjectPageSubSection>
-							<blocks>
-								<m:VBox>
-									<m:Table
+                                    </f:content>
+                                </f:SimpleForm>
+                            </blocks>
+                        </ObjectPageSubSection>
+                        <ObjectPageSubSection>
+                            <blocks>
+                                <m:VBox>
+                                    <m:Table
                                         id="CID_id_TableInvoiceItem"
                                         sticky="ColumnHeaders,HeaderToolbar"
                                         mode="MultiSelect"
                                         autoPopinMode="true"
                                         contextualWidth="Auto"
-                                       items="{
-                                            path: 'ManageInvoiceItemModel>/ManageInvoiceItem',
-                                           sorter: {
-                                           path: 'StartDate',
-                                           descending: false
-                                               }
-                                           }">
-										<m:headerToolbar>
-											<m:OverflowToolbar>
-												<m:Title
-                                                    text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })" wrapping="true"
+                                        items="{path: 'ManageInvoiceItemModel>/ManageInvoiceItem'}"
+                                    >
+                                        <m:headerToolbar>
+                                            <m:OverflowToolbar>
+                                                <m:Title
+                                                    text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })"
+                                                    wrapping="true"
                                                 />
-												<m:ToolbarSeparator />
-												<m:ToolbarSpacer />
-												<m:Button
+                                                <m:ToolbarSeparator />
+                                                <m:ToolbarSpacer />
+                                                <m:Button
                                                     class="myUnifiedBtn"
                                                     tooltip="{i18n>btnTransaction}"
                                                     text="{i18n>btnTransaction}"
                                                     press="CID_onPressDisplayPaymentDetail"
                                                     visible="{= ${SelectedCustomerModel>/Status} === 'Payment Received' || ${SelectedCustomerModel>/Status} === 'Payment Partially' }"
                                                 />
-												<m:Button
+                                                <m:Button
                                                     id="AddItem"
                                                     visible="{= ${visiablityPlay>/addInvBtn} &amp;&amp; !${visiablityPlay>/fromMyBookings} }"
                                                     text="{i18n>addInvItems}"
@@ -451,119 +519,173 @@
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressAddInvoiceItems"
                                                 />
-												<m:Button
-                                                   id="deleteItem"
+                                                <m:Button
+                                                    id="deleteItem"
                                                     visible="{= ${visiablityPlay>/addInvBtn} &amp;&amp; !${visiablityPlay>/fromMyBookings} }"
                                                     text="{i18n>MSdelete}"
                                                     tooltip="{i18n>MSdelete}"
                                                     class="myUnifiedBtn"
                                                     press="CID_onPressDelete"
                                                 />
-												<m:Button text="Update Item" press="onRefreshInvoice"
-                                                visible="{= ${visiablityPlay>/refresh} &amp;&amp; !${visiablityPlay>/fromMyBookings} }" tooltip="{i18n>refresh}" class="myUnifiedBtn"/>
-												<!-- <m:ToolbarSeparator /> -->
-											</m:OverflowToolbar>
-										</m:headerToolbar>
-										<m:columns>
-											<m:Column width="3rem" demandPopin="true">
-												<m:Text
+                                                <m:Button
+                                                    text="Update Item"
+                                                    press="onRefreshInvoice"
+                                                    visible="{= ${visiablityPlay>/refresh} &amp;&amp; !${visiablityPlay>/fromMyBookings} }"
+                                                    tooltip="{i18n>refresh}"
+                                                    class="myUnifiedBtn"
+                                                />
+                                                <!-- <m:ToolbarSeparator /> -->
+                                            </m:OverflowToolbar>
+                                        </m:headerToolbar>
+                                        <m:columns>
+                                            <m:Column
+                                                width="3rem"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
                                                     text="{i18n>itemID}"
                                                     tooltip="{i18n>itemID}"
                                                 />
-											</m:Column>
-											<m:Column demandPopin="true" minScreenWidth="Tablet" width="12rem">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                demandPopin="true"
+                                                minScreenWidth="Tablet"
+                                                width="12rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>particulars}"
                                                     tooltip="{i18n>particulars}"
                                                 />
-											</m:Column>
-											<m:Column id="idSAC"  width="6rem" demandPopin="true">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                id="idSAC"
+                                                width="6rem"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
                                                     text="{i18n>SAC}"
                                                     tooltip="{i18n>SAC}"
                                                 />
-											</m:Column>
-											<m:Column id="idGSTCalculation" width="6rem" demandPopin="true">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                id="idGSTCalculation"
+                                                width="6rem"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
                                                     text="{i18n>GSTCalculation}"
                                                     tooltip="{i18n>GSTCalculation}"
                                                 />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="7rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>startDate}"
                                                     tooltip="{i18n>startDate}"
                                                 />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="7rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>endDate}"
                                                     tooltip="{i18n>endDate}"
                                                 />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true" width="7rem">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="7rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>grossPrice}"
                                                     tooltip="{i18n>grossPrice}"
                                                 />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true"  width="7rem" >
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="7rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>Unit}"
                                                     tooltip="{i18n>Unit}"
                                                 />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true" width="8rem">
-												<m:Text text="Duration" />
-											</m:Column>
-											<m:Column minScreenWidth="Tablet" demandPopin="true" width="8rem">
-												<m:Text
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="8rem"
+                                            >
+                                                <m:Text text="Duration" />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                                width="8rem"
+                                            >
+                                                <m:Text
                                                     text="{i18n>total}"
                                                     tooltip="{i18n>total}"
                                                 />
-											</m:Column>
-										</m:columns>
-										<m:items>
-											<m:ColumnListItem  type="Active">
-												<m:cells>
-													<m:Input
+                                            </m:Column>
+                                        </m:columns>
+                                        <m:items>
+                                            <m:ColumnListItem type="Active">
+                                                <m:cells>
+                                                    <m:Input
                                                         value="{ManageInvoiceItemModel>IndexNo}"
                                                         editable="false"
                                                     />
-												</m:cells>
-												<m:cells>
-													<m:Input
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
                                                         value="{ManageInvoiceItemModel>Particulars}"
                                                         valueStateText="{i18n>ParticularValueText}"
                                                         editable="{visiablityPlay>/editable}"
                                                         maxLength="60"
                                                         liveChange="onParticularsInputLiveChange"
                                                     />
-												</m:cells>
-												<m:cells>
-													<m:ComboBox
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:ComboBox
                                                         showSecondaryValues="true"
                                                         items="{InvoiceSAC>/}"
                                                         editable="{visiablityPlay>/editable}"
                                                         value="{ManageInvoiceItemModel>SAC}"
                                                         selectedKey="{ManageInvoiceItemModel>SAC}"
                                                     >
-														<core:ListItem key="{InvoiceSAC>SAC}" text="{InvoiceSAC>SAC}" additionalText="{InvoiceSAC>Description}"/>
-													</m:ComboBox>
-												</m:cells>
-												<m:cells>
-													<m:Select
+                                                        <core:ListItem
+                                                            key="{InvoiceSAC>SAC}"
+                                                            text="{InvoiceSAC>SAC}"
+                                                            additionalText="{InvoiceSAC>Description}"
+                                                        />
+                                                    </m:ComboBox>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Select
                                                         width="100%"
                                                         editable="{visiablityPlay>/editable}"
                                                         selectedKey="{ManageInvoiceItemModel>GSTCalculation}"
                                                         change="Comp_onChangeGSTCalculation"
                                                     >
-														<core:Item key="YES" text="{i18n>yes}" />
-														<core:Item key="NO" text="{i18n>no}" />
-													</m:Select>
-												</m:cells>
-												<m:cells>
-													<m:DatePicker
+                                                        <core:Item
+                                                            key="YES"
+                                                            text="{i18n>yes}"
+                                                        />
+                                                        <core:Item
+                                                            key="NO"
+                                                            text="{i18n>no}"
+                                                        />
+                                                    </m:Select>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:DatePicker
                                                         displayFormat="dd/MM/yyyy"
                                                         valueFormat="dd/MM/yyyy"
                                                         value="{ManageInvoiceItemModel>StartDate}"
@@ -571,9 +693,9 @@
                                                         valueStateText="{i18n>selectPaymentDate}"
                                                         editable="{ManageInvoiceItemModel>StartDateEditable}"
                                                     />
-												</m:cells>
-												<m:cells>
-													<m:DatePicker
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:DatePicker
                                                         displayFormat="dd/MM/yyyy"
                                                         valueFormat="dd/MM/yyyy"
                                                         value="{ManageInvoiceItemModel>EndDate}"
@@ -581,142 +703,146 @@
                                                         valueStateText="{i18n>selectPaymentDate}"
                                                         editable="{ManageInvoiceItemModel>EndDateEditable}"
                                                     />
-												</m:cells>
-												<m:cells>
-													<m:Input
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
                                                         value="{path:'ManageInvoiceItemModel>GrossPrice',formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="End"
                                                         editable="{ManageInvoiceItemModel>GrossPriceEditable}"
                                                     />
-												</m:cells>
-												<m:cells>
-													<m:ComboBox
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:ComboBox
                                                         items="{Rate>/}"
                                                         selectedKey="Per Day"
                                                         value="{ManageInvoiceItemModel>UnitText}"
                                                         change="onChangeUnitText"
                                                         editable="{ManageInvoiceItemModel>UnitEditable}"
-                                                        width="100%" 
+                                                        width="100%"
                                                     >
-														<core:Item
+                                                        <core:Item
                                                             key="{Rate>ID}"
                                                             text="{Rate>Rate}"
                                                         />
-													</m:ComboBox>
-												</m:cells>
-												<m:cells>
-													<m:Input value="{ManageInvoiceItemModel>DurationText}" editable="{ManageInvoiceItemModel>DurationEditable}"/>
-												</m:cells>
-												<m:cells>
-													<m:Input
+                                                    </m:ComboBox>
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{ManageInvoiceItemModel>DurationText}"
+                                                        editable="{ManageInvoiceItemModel>DurationEditable}"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
                                                         value="{path:'ManageInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}"
                                                         textAlign="End"
                                                         change="onChangeTotal"
                                                         editable="{visiablityPlay>/editable}"
                                                     />
-												</m:cells>
-											</m:ColumnListItem>
-										</m:items>
-									</m:Table>
-									<m:FlexBox
+                                                </m:cells>
+                                            </m:ColumnListItem>
+                                        </m:items>
+                                    </m:Table>
+                                    <m:FlexBox
                                         class="custom-flexbox sapUiContentPadding"
                                         direction="Column"
                                     >
-										<m:VBox class="custom-vbox">
-											<!-- Sub Total (Non-Taxable) -->
-											<m:HBox
+                                        <m:VBox class="custom-vbox">
+                                            <!-- Sub Total (Non-Taxable) -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/SubTotalNotGST} > 0 }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>subTotal} ({i18n>NonTaxable}) ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/SubTotalNotGST',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Sub Total (Taxable) -->
-											<m:HBox justifyContent="SpaceBetween"
+                                            </m:HBox>
+                                            <!-- Sub Total (Taxable) -->
+                                            <m:HBox
+                                                justifyContent="SpaceBetween"
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' 
                                                         &amp;&amp; ${SelectedCustomerModel>/SubTotalInGST} > 0 }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>subTotal} ({i18n>Taxable}) ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/SubTotalInGST',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Coupon Discount -->
-											<m:HBox
-                                                    justifyContent="SpaceBetween"
-                                                    visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
-                                                >
-												<m:Label
-                                                        text="{= 'Discount'
+                                            </m:HBox>
+                                            <!-- Coupon Discount -->
+                                            <m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
+                                            >
+                                                <m:Label
+                                                    text="{= 'Discount'
                                                             + (${SelectedCustomerModel>/CouponCode} ? ' (' + ${SelectedCustomerModel>/CouponCode} + ')' : '')
                                                             + ' :' }"
-                                                        class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
-                                                    />
-												<m:Text
-                                                        class="amountText"
-                                                        text="{path:'SelectedCustomerModel>/CouponDiscountValue', formatter: '.Formatter.fromatNumber'}"
-                                                        textAlign="End"
-                                                    />
-											</m:HBox>
-											<!-- CGST -->
-											<m:HBox
+                                                    class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
+                                                />
+                                                <m:Text
+                                                    class="amountText"
+                                                    text="{path:'SelectedCustomerModel>/CouponDiscountValue', formatter: '.Formatter.fromatNumber'}"
+                                                    textAlign="End"
+                                                />
+                                            </m:HBox>
+                                            <!-- CGST -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>CGST} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'FilteredSOWModel>/gstAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- SGST -->
-											<m:HBox
+                                            </m:HBox>
+                                            <!-- SGST -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>SGST} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'FilteredSOWModel>/gstAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- IGST -->
-											<m:HBox
+                                            </m:HBox>
+                                            <!-- IGST -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'IGST' }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>IGST} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path: 'FilteredSOWModel>/gstAmount', formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Round of -->
-											<!-- <m:HBox
+                                            </m:HBox>
+                                            <!-- Round of -->
+                                            <!-- <m:HBox
                                                 justifyContent="SpaceBetween"
                                             >
 												<m:Label
@@ -729,69 +855,69 @@
                                                     textAlign="End"
                                                 />
 											</m:HBox> -->
-											<!-- Total Amount -->
-											<m:HBox
+                                            <!-- Total Amount -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>total} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'FilteredSOWModel>/TotalAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Paid Amount -->
-											<m:HBox
+                                            </m:HBox>
+                                            <!-- Paid Amount -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/PaidAmount} > 0 }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>paidAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/PaidAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Refund Due -->
-											<m:HBox
+                                            </m:HBox>
+                                            <!-- Refund Due -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/RefundAmount} > 0 }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>refundDue} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/RefundAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Refund Processed -->
-											<m:HBox
+                                            </m:HBox>
+                                            <!-- Refund Processed -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{= ${SelectedCustomerModel>/RefundProcessed} > 0 }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>refundProcessed} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'SelectedCustomerModel>/RefundProcessed', formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Received Amount -->
-											<m:HBox
-                                                    justifyContent="SpaceBetween"
-                                                    visible="{=
+                                            </m:HBox>
+                                            <!-- Received Amount -->
+                                            <m:HBox
+                                                justifyContent="SpaceBetween"
+                                                visible="{=
                                                         (
                                                             ${SelectedCustomerModel>/Status} === 'Payment Received' ||
                                                             ${SelectedCustomerModel>/Status} === 'Payment Partially'
@@ -799,18 +925,18 @@
                                                         Number(${InvoicePayment>/AllReceivedAmount}) > 0
                                                     }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>invoiceReceivedAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'InvoicePayment>/AllReceivedAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-											<!-- Balance Amount -->
-											<!-- <m:HBox
+                                            </m:HBox>
+                                            <!-- Balance Amount -->
+                                            <!-- <m:HBox
                                                 justifyContent="SpaceBetween"
                                                 visible="{=
                                                     (
@@ -828,10 +954,10 @@
                                             text="{path:'SelectedCustomerModel>/BalanceAmount',formatter: '.Formatter.fromatNumber'}"
                                              textAlign="End"/>
 											</m:HBox> -->
-											<!-- Due Amount -->
-											<m:HBox
+                                            <!-- Due Amount -->
+                                            <m:HBox
                                                 justifyContent="SpaceBetween"
-                                               visible="{=
+                                                visible="{=
                                                         (
                                                             ${SelectedCustomerModel>/Status} === 'Payment Received' ||
                                                             ${SelectedCustomerModel>/Status} === 'Payment Partially'
@@ -839,46 +965,55 @@
                                                         Number(${InvoicePayment>/AllDueAmount}) > 0
                                                     }"
                                             >
-												<m:Label
+                                                <m:Label
                                                     text="{i18n>invoiceDueAmount} ({FilteredSOWModel>/Currency}) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
-												<m:Text
+                                                <m:Text
                                                     class="amountText"
                                                     text="{path:'InvoicePayment>/AllDueAmount',formatter: '.Formatter.fromatNumber'}"
                                                     textAlign="End"
                                                 />
-											</m:HBox>
-										</m:VBox>
-									</m:FlexBox>
-								</m:VBox>
-							</blocks>
-						</ObjectPageSubSection>
-					</subSections>
-				</ObjectPageSection>
-			</sections>
-		</ObjectPageLayout>
-		<m:footer >
-			<m:Bar id="invoicefooter">
-				<m:contentLeft>
-                <m:FlexBox class="profile-footer-scroll-text" alignItems="Center">
-                <m:items>
-                    <m:FlexBox class="profile-footer-marquee" alignItems="Center"> 
-
-					<m:Image src="../image/TransparentKTlogo.png" width="30px" height="30px" />
-					<m:Link
-                text="{i18n>devlopby}"
-                href="https://kalpavrikshatechnologies.com/"
-                target="_blank"
-                class="customLinkWhiteBg"
-            />
-                </m:FlexBox>
-                </m:items>
-                </m:FlexBox>
-				</m:contentLeft>
-				<m:contentRight>
-					<!-- Refund Amount -->
-					<m:Button
+                                            </m:HBox>
+                                        </m:VBox>
+                                    </m:FlexBox>
+                                </m:VBox>
+                            </blocks>
+                        </ObjectPageSubSection>
+                    </subSections>
+                </ObjectPageSection>
+            </sections>
+        </ObjectPageLayout>
+        <m:footer>
+            <m:Bar id="invoicefooter">
+                <m:contentLeft>
+                    <m:FlexBox
+                        class="profile-footer-scroll-text"
+                        alignItems="Center"
+                    >
+                        <m:items>
+                            <m:FlexBox
+                                class="profile-footer-marquee"
+                                alignItems="Center"
+                            >
+                                <m:Image
+                                    src="../image/TransparentKTlogo.png"
+                                    width="30px"
+                                    height="30px"
+                                />
+                                <m:Link
+                                    text="{i18n>devlopby}"
+                                    href="https://kalpavrikshatechnologies.com/"
+                                    target="_blank"
+                                    class="customLinkWhiteBg"
+                                />
+                            </m:FlexBox>
+                        </m:items>
+                    </m:FlexBox>
+                </m:contentLeft>
+                <m:contentRight>
+                    <!-- Refund Amount -->
+                    <m:Button
                         visible="{= ${SelectedCustomerModel>/RefundAmount} > 0
                             &amp;&amp; ${SelectedCustomerModel>/RefundAmount} !== ${SelectedCustomerModel>/RefundProcessed}
                             &amp;&amp; (
@@ -894,8 +1029,8 @@
                         press="CID_onPressrefundAmount"
                         class="myUnifiedBtn"
                     />
-					<!-- Submit -->
-					<m:Button
+                    <!-- Submit -->
+                    <m:Button
                         visible="{= ${visiablityPlay>/createVisi}
                             &amp;&amp; (
                                 ${visiablityPlay>/effRole} === 'Admin'
@@ -909,7 +1044,7 @@
                         press="CID_onPressSubmit"
                         class="sendMail myUnifiedBtn"
                     />
-					<!-- <m:Button
+                    <!-- <m:Button
                          visible="{= ${visiablityPlay>/Edit}
                             &amp;&amp; (
                                 ${LoginModel>/Role} === 'Admin'
@@ -923,14 +1058,14 @@
                         tooltip="{i18n>companyInvoiceSendEmail}"
                         class="myUnifiedBtn"
                     /> -->
-					<!-- Edit / Save -->
-						<m:HBox
-    justifyContent="End"
-    alignItems="Center"
-    renderType="Bare"
->
-    <m:Button
-        visible="{= ${visiablityPlay>/Edit}
+                    <!-- Edit / Save -->
+                    <m:HBox
+                        justifyContent="End"
+                        alignItems="Center"
+                        renderType="Bare"
+                    >
+                        <m:Button
+                            visible="{= ${visiablityPlay>/Edit}
             &amp;&amp; (
                 ${visiablityPlay>/effRole} === 'Admin'
                 || ${visiablityPlay>/effRole} === 'SuperAdmin'
@@ -938,13 +1073,13 @@
                 || ${visiablityPlay>/effRole} === 'Front Office Employee'
             )
         }"
-        text="{= ${visiablityPlay>/editable} ? 'Save' : 'Edit'}"
-        press="CID_onPressEdit"
-        class="sendMail myUnifiedBtn"
-    />
+                            text="{= ${visiablityPlay>/editable} ? 'Save' : 'Edit'}"
+                            press="CID_onPressEdit"
+                            class="sendMail myUnifiedBtn"
+                        />
 
-    <m:MenuButton
-        visible="{=
+                        <m:MenuButton
+                            visible="{=
             ${visiablityPlay>/merge}
            &amp;&amp; (
                 ${visiablityPlay>/effRole} === 'Admin'
@@ -957,15 +1092,16 @@
                 )
             )
         }"
-        text="{i18n>GeneratePDF}"
-        tooltip="{i18n>GeneratePDF}"
-        class="myUnifiedBtn">
-
-        <m:menu>
-            <m:Menu>
-               <m:MenuItem
-                                    text="{i18n>GeneratePDF}"
-                                    press="CID_onPressGeneratePdf" visible="{=
+                            text="{i18n>GeneratePDF}"
+                            tooltip="{i18n>GeneratePDF}"
+                            class="myUnifiedBtn"
+                        >
+                            <m:menu>
+                                <m:Menu>
+                                    <m:MenuItem
+                                        text="{i18n>GeneratePDF}"
+                                        press="CID_onPressGeneratePdf"
+                                        visible="{=
                                     (
                                         ${visiablityPlay>/effRole} === 'Admin'
                                         || ${visiablityPlay>/effRole} === 'SuperAdmin'
@@ -976,19 +1112,21 @@
                                         ${visiablityPlay>/effRole} === 'Customer'
                                         &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
                                     )
-                                }" />
-								<m:MenuItem
-                                    text="{i18n>printInvoice}"
-                                    press="CID_onPressGenerateSelectedPDF"
-                                    visible="{=
+                                }"
+                                    />
+                                    <m:MenuItem
+                                        text="{i18n>printInvoice}"
+                                        press="CID_onPressGenerateSelectedPDF"
+                                        visible="{=
                                         ${visiablityPlay>/effRole} === 'Admin'
                                         || ${visiablityPlay>/effRole} === 'Branch Manager'
                                         || ${visiablityPlay>/effRole} === 'Front Office Employee'
-                                    }" />
-								<m:MenuItem
-    text="{i18n>summaryInvoice}"
-    press="CID_onPressGenerateSummaryPDF"
-    visible="{=
+                                    }"
+                                    />
+                                    <m:MenuItem
+                                        text="{i18n>summaryInvoice}"
+                                        press="CID_onPressGenerateSummaryPDF"
+                                        visible="{=
         ${BookinglocalModel>/PaymentType} !== 'Per Day'
         &amp;&amp;
         (
@@ -1003,14 +1141,14 @@
                &amp;&amp; ${SelectedCustomerModel>/Status} === 'Payment Received'
             )
         )
-    }"/>
-            </m:Menu>
-        </m:menu>
-    </m:MenuButton>
-
-</m:HBox>
-				</m:contentRight>
-			</m:Bar>
-		</m:footer>
-	</m:Page>
+    }"
+                                    />
+                                </m:Menu>
+                            </m:menu>
+                        </m:MenuButton>
+                    </m:HBox>
+                </m:contentRight>
+            </m:Bar>
+        </m:footer>
+    </m:Page>
 </mvc:View>
