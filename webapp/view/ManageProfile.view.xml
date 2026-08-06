@@ -514,7 +514,8 @@
 
                         <Text text="{profileData>Relation}" />
                         <Link
-                            text="{i18n>view}"
+                            text="{= ${profileData>Attachment} ? 'View' : 'No Document' }"
+                            enabled="{= !!${profileData>Attachment} }"
                             press="HF_viewimage"
                         />
                         <Button
@@ -571,12 +572,12 @@
                 >
                     <Text text="{i18n>totalAmount}" />
                 </Column>
-                <Column
+                <!-- <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
                 >
                     <Text text="{i18n>invoiceDueAmount}" />
-                </Column>
+                </Column> -->
             </columns>
 
             <items>
@@ -594,9 +595,9 @@
                         <Text
                             text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
                         />
-                        <Text
+                        <!-- <Text
                             text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
-                        />
+                        /> -->
                     </cells>
                 </ColumnListItem>
             </items>
