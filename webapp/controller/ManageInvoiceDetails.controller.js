@@ -4339,6 +4339,7 @@ sap.ui.define([
                     InvNo: String(RefundModel.InvNo),
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     Amount: (RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
