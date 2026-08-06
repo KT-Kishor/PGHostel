@@ -53,7 +53,7 @@
                 >
                     <core:ListItem
                         key="UPI"
-                        text="UPI"
+                        text="UPI/Account pay"
                     />
                     <core:ListItem
                         key="Cash"

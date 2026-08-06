@@ -298,7 +298,11 @@ sap.ui.define([
             const oModel = this.byId("P_id_PaymentTable").getModel("mainModel").getData();
             if (!oModel || oModel.length === 0) return MessageToast.show(this.i18nModel.getText("MSnodata"));
 
-            const adjustedData = oModel.map(item => ({
+             const aSortedData = [...oModel].sort((a, b) => {
+        return new Date(b.Date) - new Date(a.Date);
+    });
+
+            const adjustedData = aSortedData.map(item => ({
                 ...item,
                 Date: Formatter.displayFormatDate(item.Date),
                 Amount: item.Amount + " " + item.Currency

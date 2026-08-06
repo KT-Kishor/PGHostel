@@ -2612,7 +2612,11 @@ sap.ui.define([
                                 that.closeBusyDialog();
                                 MessageToast.show(error.responseText);
                             });
-                        }
+                        },
+                         function () {
+            // Cancel
+            oTable.removeSelections(true);
+        }
                     );
                 }
                 //  Not saved yet → local delete only
@@ -3809,7 +3813,7 @@ sap.ui.define([
                     }
 
                     doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Invoice.pdf`);
-
+                    this.byId("CID_id_TableInvoiceItem").removeSelections(true);
                 } catch (e) {
                     MessageToast.show(e.message || "PDF generation failed");
                 } finally {
