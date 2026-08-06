@@ -1327,6 +1327,7 @@ sap.ui.define([
 
                     // Update Models
                     oCustomerModel.setProperty("/Status", sFinalStatus);
+                    this.getView().byId("CI_Id_Status").setValue(sFinalStatus);
                     oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
                     oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
                     oCustomerModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
@@ -1522,9 +1523,9 @@ sap.ui.define([
                     sFinalStatus = "Payment Received";
                 } else if (balanceAmount === totalAmount) {
                     sFinalStatus = "Submitted";
-                } else if (paidAmount < totalAmount) {
+                } else if (allReceivedAmount < totalAmount) {
                     sFinalStatus = "Payment Partially";
-                } else if (paidAmount > totalAmount) {
+                } else if (allReceivedAmount > totalAmount) {
                     sFinalStatus = "Payment Received";
                 }
 
@@ -2266,9 +2267,9 @@ sap.ui.define([
                 });
 
                 
-    //             const totalYAmount = oResult.commentData
-    // .filter(item => item.Used === "Y")
-    // .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
+                const totalYAmount = oResult.commentData
+    .filter(item => item.Used === "Y")
+    .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
 
                 const totalReceivedAmount = (oResult || []).commentData.reduce((total, item) => {
                     const amount = Number(item.Amount) || 0;
@@ -2305,7 +2306,7 @@ sap.ui.define([
                 const invoiceModel = view.getModel("InvoicePayment");
                 invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
                 invoiceModel.setProperty("/AllDueAmount", totalDueAmount);
-                // oModel.setProperty("/RefundProcessed", totalYAmount);
+                this.getView().getModel("SelectedCustomerModel").setProperty("/RefundProcessed", totalYAmount);
 
                 invoiceModel.refresh(true);
             },
