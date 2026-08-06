@@ -3808,6 +3808,9 @@ sap.ui.define([
             }
 
             var ID = this.ID;
+
+            this.getBusyDialog();
+
             const pdfBase64 = await this.onGeneratePDF("Rejected");
 
             var Payload = {
@@ -3844,7 +3847,6 @@ sap.ui.define([
                 }
             };
 
-            this.getBusyDialog();
 
             await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
 

@@ -428,8 +428,20 @@ sap.ui.define([
             var selected = table.getSelectedItem();
 
             if (!selected) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"));
-                return;
+              
+                 sap.m.MessageBox.show(
+    this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"),
+    {
+        icon: sap.m.MessageBox.Icon.Information,
+        title: this.i18nModel.getText("Information"),
+        actions: [sap.m.MessageBox.Action.OK],
+         onClose: function (oAction) {
+            if (oAction === sap.m.MessageBox.Action.OK) {
+                this.byId("idPOTable").removeSelections(true);
+            }
+        }.bind(this)
+    }
+);
             }
 
             var Model = selected.getBindingContext("HostelModel");
@@ -453,7 +465,19 @@ sap.ui.define([
                 this.data.Status === "Rejected" ||
                 this.data.Status === "New"
             ) {
-                sap.m.MessageToast.show(this.i18nModel.getText("thisCustomercantbeAssign"));
+                sap.m.MessageBox.show(
+    this.i18nModel.getText("thisCustomercantbeAssign"),
+    {
+        icon: sap.m.MessageBox.Icon.Information,
+        title: this.i18nModel.getText("Information"),
+        actions: [sap.m.MessageBox.Action.OK],
+         onClose: function (oAction) {
+            if (oAction === sap.m.MessageBox.Action.OK) {
+                this.byId("idPOTable").removeSelections(true);
+            }
+        }.bind(this)
+    }
+);
                 return;
             }
 
@@ -465,7 +489,19 @@ sap.ui.define([
             oToday.setHours(0, 0, 0, 0);
 
             if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
-                sap.m.MessageToast.show("Room can only be assigned on the booking start date");
+                   sap.m.MessageBox.show(
+    this.i18nModel.getText("Room can only be assigned on the booking start date"),
+    {
+        icon: sap.m.MessageBox.Icon.Information,
+        title: this.i18nModel.getText("Information"),
+        actions: [sap.m.MessageBox.Action.OK],
+         onClose: function (oAction) {
+            if (oAction === sap.m.MessageBox.Action.OK) {
+                this.byId("idPOTable").removeSelections(true);
+            }
+        }.bind(this)
+    }
+);
                 return;
             }
 

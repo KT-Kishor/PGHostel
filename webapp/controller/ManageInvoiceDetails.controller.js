@@ -265,18 +265,22 @@ sap.ui.define([
                         this.SelectedCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
                     }
 
-                    const aItems = oData.data.ManageInvoiceItem.map((item, index) => ({
-                        ...item,
-                        IndexNo: index + 1,
-                        StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
-                        EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
-                        GrossPriceEditable: false,
-                        UnitEditable: false,
-                        DurationEditable: false,
-                        StartDateEditable: false,
-                        EndDateEditable: false
-                        // editable :false
-                    }));
+                    const aItems = oData.data.ManageInvoiceItem
+                        .map(item => ({
+                            ...item,
+                            StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
+                            EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        }))
+                        .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate))
+                        .map((item, index) => ({
+                            ...item,
+                            IndexNo: index + 1
+                        }));
 
                     oView.setModel(new JSONModel({
                         ManageInvoiceItem: aItems
@@ -781,6 +785,15 @@ sap.ui.define([
                             EndDateEditable: false
                         });
                     }
+                    finalInvoiceItems.sort((a, b) => {
+                        return this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+                    });
+
+                    // Assign sequential IndexNo
+                    finalInvoiceItems.forEach((item, index) => {
+                        item.IndexNo = index + 1;
+                    });
+
 
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalInvoiceItems);
                     await this.totalAmountCalculation();
@@ -1300,7 +1313,7 @@ sap.ui.define([
 
                     // 2. Calculate Effective Net Money Retained
                     let grossPaid = paidAmount + allReceivedAmount;
-                    let netPaid = grossPaid ; // Subtracts processed refund
+                    let netPaid = grossPaid; // Subtracts processed refund
 
                     let balanceAmount = 0;
                     let pendingRefundAmount = 0;
@@ -1913,17 +1926,22 @@ sap.ui.define([
                             InvNo: this.decodedPath
                         });
 
-                        const aItems = oData.data.ManageInvoiceItem.map((item, index) => ({
-                            ...item,
-                            IndexNo: index + 1,
-                            StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
-                            EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
-                            GrossPriceEditable: false,
-                            UnitEditable: false,
-                            DurationEditable: false,
-                            StartDateEditable: false,
-                            EndDateEditable: false
-                        }));
+                        const aItems = oData.data.ManageInvoiceItem
+                            .map(item => ({
+                                ...item,
+                                StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
+                                EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                                GrossPriceEditable: false,
+                                UnitEditable: false,
+                                DurationEditable: false,
+                                StartDateEditable: false,
+                                EndDateEditable: false
+                            }))
+                            .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate))
+                            .map((item, index) => ({
+                                ...item,
+                                IndexNo: index + 1
+                            }));
 
                         this.getView().setModel(
                             new sap.ui.model.json.JSONModel({
@@ -2255,7 +2273,7 @@ sap.ui.define([
 
                 const validItems = items.filter(item => item.Used !== "X" && item.Used !== "Y");
 
-                 // Sum of post-invoice payments
+                // Sum of post-invoice payments
                 // const totalReceivedAmount = validItems.reduce(
                 //     (sum, item) => sum + (item.ReceivedAmount) || 0,
                 //     0
@@ -2266,10 +2284,10 @@ sap.ui.define([
                     InvNo: this.decodedPath
                 });
 
-                
+
                 const totalYAmount = oResult.commentData
-    .filter(item => item.Used === "Y")
-    .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
+                    .filter(item => item.Used === "Y")
+                    .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
 
                 const totalReceivedAmount = (oResult || []).commentData.reduce((total, item) => {
                     const amount = Number(item.Amount) || 0;
@@ -2283,13 +2301,13 @@ sap.ui.define([
                     return total;
                 }, 0);
 
-                       var totalDueAmount1 = validItems[0]?.TotalAmount - totalReceivedAmount;
+                var totalDueAmount1 = validItems[0]?.TotalAmount - totalReceivedAmount;
                 // Safe TotalAmount fetch
                 // const totalAmount =
                 //     validItems[0]?.TotalAmount || items[0]?.TotalAmount - totalDueAmount1  || 0;
 
-                    const totalAmount =
-    (Number(validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0)) - Number(totalDueAmount1 || 0);
+                const totalAmount =
+                    (Number(validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0)) - Number(totalDueAmount1 || 0);
 
                 // PaidAmount (advance)
                 const oNavigationModel = view.getModel("SelectedCustomerModel")?.getData() || {};
@@ -4632,6 +4650,9 @@ sap.ui.define([
                     ...nonFacilityItems,
                     ...processedFacilityItems
                 ];
+                finalItems.sort((a, b) => {
+                    return this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+                });
 
                 finalItems.forEach((item, index) => {
                     item.IndexNo = index + 1;
