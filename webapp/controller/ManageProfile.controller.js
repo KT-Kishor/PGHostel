@@ -361,6 +361,7 @@ sap.ui.define([
                 EndDate: this._formatDisplayDate(booking.EndDate),
 
                 room: booking.BedType || booking.RoomName || booking.RoomNumber || booking.RoomNo || "",
+                RoomNo: String(booking.RoomNo || "").trim(),
 
                 amount: this._calculateBookingAmount(booking, oBranchData),
                 currency: booking.Currency || "INR",
@@ -3069,6 +3070,148 @@ sap.ui.define([
                 oRoomCombo.setEditable(aRoomCombo.length !== 1);
                 // oRoomCombo.isEditMode(aRoomCombo.length !== 1);
             }
+
+            // Re-filter Customer Name / Booking ID for the resolved room
+            this._applyComplaintCustomerFilter(sNewRoom);
+        },
+
+        // Full (branch level) customer + booking list returned by the last search
+        _getComplaintCustomerData: function () {
+            return Array.isArray(this._aComplaintCustomerData) ?
+                this._aComplaintCustomerData : [];
+        },
+
+        // BookingIDs of the logged-in user's assigned bookings for one room
+        _getBookingIDsForRoom: function (sRoomNo) {
+            const oProfileModel = this.getView().getModel("profileData");
+            const aBookings = oProfileModel?.getProperty("/bookings") || [];
+            const sRoom = String(sRoomNo || "").trim();
+            const sBranch = String(this.BranchCode || "").trim();
+
+            return aBookings.filter(function (oBooking) {
+                return String(oBooking.RoomNo || "").trim() === sRoom &&
+                    (!sBranch || String(oBooking.BranchCode || "").trim() === sBranch) &&
+                    String(oBooking.status || "").toLowerCase() === "assigned";
+            }).map(function (oBooking) {
+                return String(oBooking.BookingID || "").trim();
+            }).filter(Boolean);
+        },
+
+        // Sets key + lock state of a complaint ComboBox
+        _syncComplaintCombo: function (sId, sKey, bLock) {
+            const oCombo = this._getComplaintControl(sId);
+            if (!oCombo) {
+                return;
+            }
+
+            oCombo.setSelectedKey(sKey);
+            oCombo.setValue(sKey);
+            oCombo.setEditable(!bLock);
+
+            if (sKey) {
+                oCombo.setValueState("None");
+            }
+        },
+
+        // Clears Customer Name / Booking ID and unlocks both ComboBoxes
+        _clearComplaintCustomerBooking: function () {
+            const oTempModel = this.getView().getModel("complaintTemp");
+            if (oTempModel) {
+                oTempModel.setProperty("/CustomerName", "");
+                oTempModel.setProperty("/BookingID", "");
+            }
+
+            ["MP_id_AddCustComboBox", "MP_id_AddBooking"].forEach(function (sId) {
+                const oCombo = this._getComplaintControl(sId);
+                if (oCombo) {
+                    oCombo.setSelectedKey("");
+                    oCombo.setValue("");
+                    oCombo.setEditable(true);
+                    oCombo.setValueState("None");
+                }
+            }, this);
+        },
+
+        /**
+         * Filters the Customer Name + Booking ID ComboBoxes by the selected room.
+         * When the filtered data leaves a single option, the field is auto filled
+         * and locked (non editable), same behaviour as Branch / Room No.
+         */
+        _applyComplaintCustomerFilter: function (sRoomNo) {
+            const oView = this.getView();
+            const oTempModel = oView.getModel("complaintTemp");
+            const aAll = this._getComplaintCustomerData();
+
+            // Customer data not loaded yet → nothing to filter
+            if (!oTempModel || !aAll.length) {
+                return;
+            }
+
+            const sRoom = String(sRoomNo || "").trim();
+
+            const bRoomInData = aAll.some(function (oItem) {
+                return String(oItem.RoomNo || "").trim() !== "";
+            });
+
+            let aFiltered;
+
+            if (!sRoom) {
+                aFiltered = aAll.slice();
+            } else if (bRoomInData) {
+                // Service already returns the room of every booking
+                aFiltered = aAll.filter(function (oItem) {
+                    return String(oItem.RoomNo || "").trim() === sRoom;
+                });
+            } else {
+                // Fallback: resolve the room via the profile's own booking list
+                const aRoomBookingIDs = this._getBookingIDsForRoom(sRoom);
+                aFiltered = aRoomBookingIDs.length ?
+                    aAll.filter(function (oItem) {
+                        return aRoomBookingIDs.indexOf(String(oItem.BookingID || "").trim()) > -1;
+                    }) : aAll.slice();
+            }
+
+            // Never leave the user with an empty dropdown
+            if (!aFiltered.length) {
+                aFiltered = aAll.slice();
+            }
+
+            let oCustomerModel = oView.getModel("customerbookingdata");
+            if (!oCustomerModel) {
+                oCustomerModel = new JSONModel([]);
+                oView.setModel(oCustomerModel, "customerbookingdata");
+            }
+            oCustomerModel.setData(aFiltered);
+
+            const aCustomers = [...new Set(aFiltered
+                .map(function (oItem) { return oItem.CustomerName; })
+                .filter(Boolean))];
+
+            const aBookingIDs = [...new Set(aFiltered
+                .map(function (oItem) { return oItem.BookingID; })
+                .filter(Boolean))];
+
+            let sCustomer = String(oTempModel.getProperty("/CustomerName") || "").trim();
+            let sBookingID = String(oTempModel.getProperty("/BookingID") || "").trim();
+
+            if (aFiltered.length === 1) {
+                sCustomer = aFiltered[0].CustomerName || "";
+                sBookingID = aFiltered[0].BookingID || "";
+            } else {
+                if (aCustomers.indexOf(sCustomer) < 0) {
+                    sCustomer = aCustomers.length === 1 ? aCustomers[0] : "";
+                }
+                if (aBookingIDs.indexOf(sBookingID) < 0) {
+                    sBookingID = aBookingIDs.length === 1 ? aBookingIDs[0] : "";
+                }
+            }
+
+            oTempModel.setProperty("/CustomerName", sCustomer);
+            oTempModel.setProperty("/BookingID", sBookingID);
+
+            // Lock when only one value is possible for the picked room
+            this._syncComplaintCombo("MP_id_AddCustComboBox", sCustomer, aCustomers.length === 1);
+            this._syncComplaintCombo("MP_id_AddBooking", sBookingID, aBookingIDs.length === 1);
         },
 
         onPressRaiseComplaint: function () {
@@ -3079,6 +3222,9 @@ sap.ui.define([
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oProfileModel = oView.getModel("profileData");
+
+            // Never reuse the previous dialog's customer/booking data
+            this._aComplaintCustomerData = [];
 
             if (oComplaintData) {
 
@@ -3179,6 +3325,11 @@ sap.ui.define([
                         oTempModel.setProperty("/CustomerName", sCustomerName);
                         oTempModel.setProperty("/BookingID", sBookingID);
 
+                        // Re-apply room based filter + lock for the saved room
+                        this._applyComplaintCustomerFilter(
+                            oTempModel.getProperty("/RoomNo")
+                        );
+
                         sap.ui.getCore().applyChanges();
 
                         // Get controls
@@ -3189,12 +3340,12 @@ sap.ui.define([
                             this._getComplaintControl("MP_id_AddBooking");
 
                         // Force selected keys
-                        if (oCustomerCombo) {
+                        if (oCustomerCombo && sCustomerName) {
                             oCustomerCombo.setSelectedKey(sCustomerName);
                             oCustomerCombo.setValue(sCustomerName);
                         }
 
-                        if (oBookingCombo) {
+                        if (oBookingCombo && sBookingID) {
                             oBookingCombo.setSelectedKey(sBookingID);
                             oBookingCombo.setValue(sBookingID);
                         }
@@ -3347,7 +3498,12 @@ sap.ui.define([
             if (oRoomCombo) {
                 oRoomCombo.setValue("");
                 oRoomCombo.setSelectedKey("");
+                oRoomCombo.setEditable(true);
             }
+
+            // Drop cached customer data and unlock Customer Name / Booking ID
+            this._aComplaintCustomerData = [];
+            this._clearComplaintCustomerBooking();
 
             this._resetComplaintValidationStates();
         },
@@ -3389,7 +3545,23 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent);
         },
         onComplaintRoomChange: function (oEvent) {
-            utils._LCstrictValidationComboBox(oEvent);
+            const oRoomCombo = oEvent.getSource();
+            const bValidRoom = utils._LCstrictValidationComboBox(oEvent);
+            const sRoomNo = bValidRoom ? oRoomCombo.getSelectedKey() : "";
+
+            const oTempModel = this.getView().getModel("complaintTemp");
+            if (oTempModel) {
+                oTempModel.setProperty("/RoomNo", sRoomNo);
+            }
+
+            if (!sRoomNo) {
+                // Invalid / cleared room → reset dependent fields
+                this._clearComplaintCustomerBooking();
+                return;
+            }
+
+            // Filter + lock Customer Name and Booking ID for this room
+            this._applyComplaintCustomerFilter(sRoomNo);
         },
         onComplaintDescLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -3727,6 +3899,11 @@ sap.ui.define([
             const bValidBranch = utils._LCstrictValidationComboBox(oBranchCombo, "ID");
             const sBranchCode = bValidBranch ? oBranchCombo.getSelectedKey() : "";
             this.BranchCode = sBranchCode; // Store globally if needed elsewhere
+
+            // New branch → drop cached customer/booking data and unlock dependents
+            this._aComplaintCustomerData = [];
+            this._clearComplaintCustomerBooking();
+
             this._setComplaintRoomComboData(sBranchCode, ""); // Store globally if needed elsewhere
             this.getView().setModel(new JSONModel([]), "customerbookingdata"); // Clear previous customer/booking data
 
@@ -3764,12 +3941,22 @@ sap.ui.define([
                             ...item,
                             CustomerName: (item.CustomerName || "").trim(),
 
-                            BookingID: (item.BookingID || "").trim()
+                            BookingID: (item.BookingID || "").trim(),
+                            RoomNo: String(item.RoomNo || "").trim()
                         }));
+
+                        // Keep the unfiltered branch list for room based filtering
+                        this._aComplaintCustomerData = aData;
 
                         this.getView().setModel(
                             new sap.ui.model.json.JSONModel(aData),
                             "customerbookingdata"
+                        );
+
+                        // Narrow Customer Name / Booking ID to the selected room
+                        const oTempModel = this.getView().getModel("complaintTemp");
+                        this._applyComplaintCustomerFilter(
+                            oTempModel ? oTempModel.getProperty("/RoomNo") : ""
                         );
 
                         sap.ui.getCore().applyChanges();
