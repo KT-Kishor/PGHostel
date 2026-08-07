@@ -572,12 +572,12 @@
                 >
                     <Text text="{i18n>totalAmount}" />
                 </Column>
-                <!-- <Column
+                <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
                 >
                     <Text text="{i18n>invoiceDueAmount}" />
-                </Column> -->
+                </Column>
             </columns>
 
             <items>
@@ -595,9 +595,9 @@
                         <Text
                             text="{path:'profileData>TotalAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
                         />
-                        <!-- <Text
+                        <Text
                             text="{path:'profileData>DueAmount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
-                        /> -->
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
