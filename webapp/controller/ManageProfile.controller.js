@@ -2614,19 +2614,7 @@ sap.ui.define([
             if (oUserModel) {
                 oUserModel.setData({});
             }
-
-            // const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-            // if (oLoginModel) {
-            //     oLoginModel.setProperty("/EmployeeID", "");
-            //     // oLoginModel.setProperty("/UserID", "");
-            //     oLoginModel.setProperty("/UserName", "");
-            //     oLoginModel.setProperty("/EmployeeName", "");
-            //     oLoginModel.setProperty("/EmailID", "");
-            // }
-
-            // // Reset Login State
-            // this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
-            // this.getOwnerComponent().getRouter().navTo("RouteHostel");
+           this._resetValidationStates()
             this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },

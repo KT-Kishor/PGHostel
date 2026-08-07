@@ -576,7 +576,7 @@
                     demandPopin="true"
                     minScreenWidth="Desktop"
                 >
-                    <Text text="{i18n>invoiceDueAmount}" />
+                    <Text text="{i18n>invoiceDueRefAmount}" />
                 </Column>
             </columns>
 
