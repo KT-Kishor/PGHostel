@@ -1596,7 +1596,7 @@ sap.ui.define([
                     CustomerGSTName: oSelectedCustomerModel.CustomerGSTName || "",
                     CustomerGSTAddress: oSelectedCustomerModel.CustomerGSTAddress || "",
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
-                    DueAmount: oSelectedCustomerModel.BalanceAmount || ""
+                    DueAmount: balanceAmount || ""
                 };
 
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
