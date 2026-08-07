@@ -4742,6 +4742,9 @@ sap.ui.define([
                         var today = new Date();
                         var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
+                        that.getBusyDialog()
+
+
                         const pdfBase64 = await that.onGeneratePDF("Cancelled");
 
 
@@ -4749,7 +4752,6 @@ sap.ui.define([
                         const bookingData = [{
                             BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
                             RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
-                            RoomPrice: oData.RoomPrice || "0",
                             NoOfPersons: oData.noofperson || 1,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
                             EndDate: oData.EndDate ? oData.EndDate.split("/").reverse().join("-") : "",
@@ -4802,7 +4804,6 @@ sap.ui.define([
                             },
                         }];
 
-                        that.getBusyDialog()
                         const custid = oData.BookingID; // FIXED
 
                         await that.ajaxUpdateWithJQuery("HM_Customer", {

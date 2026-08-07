@@ -378,19 +378,25 @@
                                             tooltip="{i18n>membername}"
                                         />
                                     </Column>
-                                      <Column demandPopin="true">
+                                      <Column demandPopin="true" 
+                                minScreenWidth="Tablet"
+                                      >
                                         <Text
                                             text="{i18n>age}"
                                             tooltip="{i18n>age}"
                                         />
                                     </Column>
-                                      <Column demandPopin="true">
+                                      <Column demandPopin="true" 
+                                minScreenWidth="Tablet"
+                                      >
                                         <Text
                                             text="{i18n>Gender}"
                                             tooltip="{i18n>Gender}"
                                         />
                                     </Column>
-                                       <Column demandPopin="true">
+                                       <Column demandPopin="true" 
+                                minScreenWidth="Tablet"
+                                       >
                                         <Text
                                             text="{i18n>Relationship}"
                                             tooltip="{i18n>Relationship}"
@@ -398,12 +404,13 @@
                                     </Column>
                                    
                                  
-                                    <Column demandPopin="true">
-                                        <Text
-                                            text="{i18n>MVDdocumenttype}"
-                                            tooltip="{i18n>MVDdocumenttype}"
-                                        />
-                                    </Column>
+                                   <Column demandPopin="true">
+    <Text
+        text="{i18n>MVDdocumenttype}"
+        tooltip="{i18n>MVDdocumenttype}"
+
+    />
+</Column>
                                   
                                        <Column demandPopin="true">
                                         <Text
@@ -436,14 +443,18 @@
                                                 text="{CustomerData>Relation}"
                                             />
                                            
-                                            <Text
-                                                text="{CustomerData>DocumentType}"
-                                            />
+                                          <HBox justifyContent="Center" width="40%">
+                                              <Text
+                                                  text="{CustomerData>DocumentType}"
+                                                  emptyIndicatorMode="On"
+                                               />
+                                          </HBox>
                                          
-                                             <Link
-                                                text="{CustomerData>FileName}"
-                                                press="onFileNameLinkPress"
-                                            />
+                                            <Link
+                                               text="{= ${CustomerData>FileName} ? ${CustomerData>FileName} : 'No Document' }"
+                                               enabled="{= !!${CustomerData>FileName} }"
+                                               press="onFileNameLinkPress"
+                                                   />
                                         </cells>
                                     </ColumnListItem>
                                 </items>
