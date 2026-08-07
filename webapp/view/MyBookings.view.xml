@@ -262,12 +262,12 @@
                 >
                     <Text text="{i18n>totalAmount}" />
                 </Column>
-                <Column
+                <!-- <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
                 >
                     <Text text="{i18n>invoiceDueAmount}" />
-                </Column>
+                </Column> -->
             </columns>
 
             <items>
@@ -285,9 +285,9 @@
                         <Text
                             text="{path:'myBookings>TotalAmount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}"
                         />
-                        <Text
+                        <!-- <Text
                             text="{path:'myBookings>DueAmount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}"
-                        />
+                        /> -->
                     </cells>
                 </ColumnListItem>
             </items>
