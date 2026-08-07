@@ -457,7 +457,9 @@ sap.ui.define([
                     );
                 }
 
-                if (bIsEditableStatus && bIsAdminUpdatedYes) {
+                    // AdminUpdated = YES always informs the user, regardless of booking
+                    // status or the EditBefore hours window.
+                    if (bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
                         "This booking has been updated as per your request. To make any further changes, please contact " + sBranchName + ". \n\nThank you for your cooperation!\n",
@@ -3564,6 +3566,88 @@ sap.ui.define([
             }
         },
 
+        onPressCancelBooking: async function (oEvent) {
+            var that = this;
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var oData = oHostelModel.getData();
+
+            sap.m.MessageBox.confirm(
+                "Are you sure you want to Cancel this Booking?", {
+                title: "Confirm Cancellation",
+                icon: sap.m.MessageBox.Icon.WARNING,
+                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
+                styleClass: "myUnifiedBtn",
+                onClose: async function (oAction) {
+                    if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return;
+                    }
+
+                    try {
+                        var today = new Date();
+                        var sCancelDate = today.toISOString().split("T")[0]; // YYYY-MM-DD
+
+                        // Build payload using EditBooking's HostelModel data
+                        var oPayloadData = that._buildBookingCreatePayload();
+                        var oMainData = oPayloadData.data[0];
+
+                        // Set Status to Cancelled and add CancelDate
+                        if (oMainData.Booking && oMainData.Booking.length > 0) {
+                            oMainData.Booking[0].Status = "Cancelled";
+                            oMainData.Booking[0].CancelDate = sCancelDate;
+                        }
+
+                        // Generate PDF for cancellation
+                        var pdfBase64 = await that.onGeneratePDF(oMainData);
+                        oMainData.pdfAttachment = {
+                            fileName: "BookingVoucher.pdf",
+                            mimeType: "application/pdf",
+                            content: pdfBase64
+                        };
+
+                        // Add property fields for email
+                        oMainData.Area = oData.Area || "";
+                        oMainData.PropertySTD = oData.PropertySTD || "";
+                        oMainData.PropertyMobileNo = oData.PropertyMobileNo || "";
+                        oMainData.PropertyEmail = oData.PropertyEmail || "";
+                        oMainData.PropertyType = oData.PropertyType || "";
+
+                        // Cancel flow does not create or change payments
+                        delete oMainData.Deposit;
+                        that._prepareEditUpdatePayments(oMainData, []);
+
+                        var sBookingID = oHostelModel.getProperty("/BookingID");
+
+                        // Build update payload with filters
+                        var oPayload = that._buildEditUpdatePayload(oPayloadData.data, sBookingID);
+
+                        that.getBusyDialog();
+                        await that.ajaxUpdateWithJQuery("HM_Customer", oPayload);
+
+                        // Reflect cancelled state and hide edit/cancel footer buttons
+                        oHostelModel.setProperty("/Status", "Cancelled");
+                        var oBookingView = that.getView().getModel("BookingView");
+                        if (oBookingView) {
+                            oBookingView.setProperty("/editModeEnabled", false);
+                            oBookingView.setProperty("/showEditButton", false);
+                        }
+
+                        that._clearEditBookingTransientState();
+
+                        sap.m.MessageToast.show(
+                            that.getView().getModel("i18n").getResourceBundle().getText("bookingCancelledSuccessfully")
+                        );
+
+                    } catch (err) {
+                        that.closeBusyDialog();
+                        sap.m.MessageToast.show(err.message || err.responseText);
+                    } finally {
+                        that.closeBusyDialog();
+                    }
+                }
+            }
+            );
+        },
+
         _hydrateAppliedCouponData: async function () {
             var oHostelModel = this.getView().getModel("HostelModel");
             var sCouponCode = String(oHostelModel.getProperty("/AppliedCouponCode") || "").trim();
@@ -4114,13 +4198,13 @@ sap.ui.define([
             // Compact Right Box
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(255, 255, 255);
-            doc.roundedRect(145, 11, 45, 10, 3, 3, "FD");
+            doc.roundedRect(140, 10, 55, 16, 3, 3, "FD");
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(8.5);
             doc.setTextColor(...PRIMARY_COLOR);
-            doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 148, 17);
-            // doc.text(`Status: ${booking.Status || "N/A"}`, 142, 24);
+            doc.text(`Booking ID: ${booking.BookingID || oHostelModel.BookingID || "N/A"}`, 143, 16);
+            doc.text(`Booked On: ${oHostelModel.BookingDate ? Formatter.formatDate(oHostelModel.BookingDate) : "N/A"}`, 143, 22);
 
 
             currentY = 40;
@@ -4282,9 +4366,10 @@ sap.ui.define([
             let titleOffset = 10;
             let row1Offset = 22;
             let row2Offset = 34;
+            let row3Offset = 46;
 
             // Calculate dynamic container boundary height based on the final row offset
-            let stayCardHeight = row2Offset + 8;
+            let stayCardHeight = row3Offset + 8;
 
             doc.setFillColor(...LIGHT_GRAY);
             doc.setDrawColor(...BORDER_LIGHT);
@@ -4320,6 +4405,43 @@ sap.ui.define([
             doc.setTextColor(50, 50, 50);
             doc.text(booking.EndDate ? Formatter.formatDate(booking.EndDate) : "-", 60, stayStartY + row2Offset);
             doc.text(String(booking.NoOfPersons || "-"), 150, stayStartY + row2Offset);
+
+            // Row 3 Fields
+            // Compute Duration from HostelModel
+            var oHostelData = oHostelModel;
+            var sStartDateRaw = oHostelData ? oHostelData.StartDate : "";
+            var sEndDateRaw = oHostelData ? oHostelData.EndDate : "";
+            var sPaymentType = (oHostelData ? oHostelData.SelectedPriceType : "") || "";
+            var sDurationText = "-";
+            if (sStartDateRaw && sEndDateRaw) {
+                var oStart = new Date(sStartDateRaw.split("/").reverse().join("-"));
+                var oEnd = new Date(sEndDateRaw.split("/").reverse().join("-"));
+                var sUnit = "";
+                if (sPaymentType.toLowerCase() === "per day") {
+                    var iDays = Math.ceil((oEnd - oStart) / (1000 * 60 * 60 * 24));
+                    sUnit = iDays === 1 ? "Day" : "Days";
+                    sDurationText = iDays + " " + sUnit;
+                } else if (sPaymentType.toLowerCase() === "per month") {
+                    var iMonths = (oEnd.getFullYear() - oStart.getFullYear()) * 12 + (oEnd.getMonth() - oStart.getMonth());
+                    sUnit = iMonths === 1 ? "Month" : "Months";
+                    sDurationText = iMonths + " " + sUnit;
+                } else if (sPaymentType.toLowerCase() === "per year") {
+                    var iYears = oEnd.getFullYear() - oStart.getFullYear();
+                    sUnit = iYears === 1 ? "Year" : "Years";
+                    sDurationText = iYears + " " + sUnit;
+                }
+            }
+            var sStatusDisplay = booking.Status || (oHostelData ? oHostelData.Status : "") || "-";
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(90, 90, 90);
+            doc.text("Duration", 24, stayStartY + row3Offset);
+            doc.text("Booking Status", 115, stayStartY + row3Offset);
+
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(50, 50, 50);
+            doc.text(sDurationText, 60, stayStartY + row3Offset);
+            doc.text(sStatusDisplay, 150, stayStartY + row3Offset);
 
             // Baseline spacing derived dynamically from computed layout card structure
             currentY = stayStartY + stayCardHeight + 12;

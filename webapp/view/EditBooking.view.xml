@@ -896,6 +896,12 @@
                     press="onCancelEditPress"
                     visible="{BookingView>/editModeEnabled}"
                 />
+                <Button
+                    text="{i18n>cancelBooking}"
+                    class="myUnifiedBtn"
+                    press="onPressCancelBooking"
+                    visible="{= ${BookingView>/showEditButton} &amp;&amp; !${BookingView>/editModeEnabled} }"
+                />
                   </contentRight>
 			</Bar>
         </footer>
