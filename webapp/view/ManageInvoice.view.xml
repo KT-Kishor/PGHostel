@@ -106,6 +106,9 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>invoiceNo}" tooltip="{i18n>invoiceNo}"/>
 					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>invoiceDescription}" tooltip="{i18n>invoiceDescription}"/>
+					</Column>
 						<Column demandPopin="true">
 						<Text text="{i18n>customer}" tooltip="{i18n>customer}"/>
 					</Column>
@@ -114,13 +117,11 @@
 					</Column>
 				
 				
-					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>invoiceDescription}" tooltip="{i18n>invoiceDescription}"/>
-					</Column>
+					
 				
-					<Column minScreenWidth="Tablet" demandPopin="true">
+					<!-- <Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>PayByDate}" tooltip="{i18n>PayByDate}"/>
-					</Column>
+					</Column> -->
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>status}" tooltip="{i18n>status}"/>
 					</Column>
@@ -131,10 +132,10 @@
 							<Text text="{path:'ManageInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}"/>
 
 							<Text text="{ManageInvoiceModel>InvNo}" />
+							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="40"/>
 							<Text text="{= ${ManageInvoiceModel>BookingID} + ' (' + ${ManageInvoiceModel>CustomerName} + ')' }" />
 							<Text text="{path: 'ManageInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {ManageInvoiceModel>Currency}" textAlign="End"/>
-							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="40"/>
-							<Text text="{path:'ManageInvoiceModel>PayByDate',formatter: '.Formatter.formatDate'}"/>
+							<!-- <Text text="{path:'ManageInvoiceModel>PayByDate',formatter: '.Formatter.formatDate'}"/> -->
 							<ObjectStatus text="{ManageInvoiceModel>Status}" inverted="false"
                             state="{path: 'ManageInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass"/>
 						</cells>

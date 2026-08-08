@@ -2878,7 +2878,7 @@ sap.ui.define([
                     const detailsStartY = 35;
                     const rowHeight = 6.5;
                     const columnWidths = [30, 30];
-                    const rightAlignX = pageWidth - 22 - columnWidths[0] - columnWidths[1];
+                    const rightAlignX = pageWidth - 17 - columnWidths[0] - columnWidths[1];
 
                     doc.setFontSize(12).setFont("times", "bold");
 
@@ -3077,12 +3077,7 @@ sap.ui.define([
                         }
                     }
 
-                    // if (parseFloat(oModel.BalanceAmount) > 0) {
-                    //     summaryBody.push([
-                    //         "Due Amount :",
-                    //         Formatter.fromatNumber(parseFloat(oModel.BalanceAmount))
-                    //     ]);
-                    // }
+                 
 
                     const balanceAmount =
                         (Number(data.TotalAmount) || 0) -
@@ -3098,29 +3093,7 @@ sap.ui.define([
                         ]);
                     }
 
-                    // if (parseFloat(oModel.RefundAmount) > 0) {
-                    //     summaryBody.push([
-                    //         `Refund Due (${data.Currency}) :`,
-                    //         Formatter.fromatNumber(parseFloat(oModel.RefundAmount))
-                    //     ]);
-                    // }
-
-                    // if (parseFloat(oModel.RefundProcessed) > 0) {
-                    //     summaryBody.push([
-                    //         `Refund Processed (${data.Currency}) :`,
-                    //         Formatter.fromatNumber(parseFloat(oModel.RefundProcessed))
-                    //     ]);
-                    // }
-
-                    // const roundOff = Number(data.RoundOf);
-                    // if (!isNaN(roundOff) && roundOff !== 0) {
-                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                    // }
-
-                    // if (data.RoundOf && data.RoundOf !== "0") {
-                    //     summaryBody.push([`Round Off (${data.Currency}) :`, data.RoundOf]);
-                    // }
-
+                 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
@@ -3149,7 +3122,8 @@ sap.ui.define([
                             }
                         },
                         margin: {
-                            left: 95
+                            left: 95,
+                             bottom: 40,
                         },
                         didParseCell: function (data) {
                             if (data.row.index === totalRowIndex) {
@@ -3309,6 +3283,12 @@ sap.ui.define([
                     doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
 
                     // --- Row 2: Created By ---
+                 const footerStartY = pageHeight - 40;
+
+if (currentY + 15 > footerStartY) {
+    doc.addPage();
+    currentY = 30;
+}
 
                     currentY += 10;
 
@@ -3515,7 +3495,7 @@ sap.ui.define([
 
                     // GST should calculate AFTER discount
                     let finalAmount = discountedTotal;
-
+ 
                     if (isGSTEnabled) {
                         // Proportional taxable amount after discount
                         let taxableAmount = totalWithGST; // Using totalWithGST since it already has item discounts subtracted
@@ -4079,10 +4059,11 @@ sap.ui.define([
                         // Sub Total (GST or NON-GST)
                         if (subTotalGST > 0) {
                             summaryBody.push([`Sub-Total ( Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
-                        } else if (subTotalNoGST > 0) {
+                            
+                        }
+                        if (subTotalNoGST > 0) {
                             summaryBody.push([`Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
                         }
-
                         if (parseFloat(oModel.CouponDiscount) > 0) {
                             summaryBody.push([
                                 `Discount (${oModel.CouponCode}) :`,
@@ -4148,7 +4129,9 @@ sap.ui.define([
                                 }
                             },
                             margin: {
-                                left: 95
+                                left: 95,
+                                 bottom: 40,
+
                             },
                             didParseCell: function (data) {
                                 if (data.row.index === totalRowIndex) {
@@ -4185,7 +4168,6 @@ sap.ui.define([
                         doc.addPage();
                         doc.setFont("times", "bold").setFontSize(11);
                         doc.text("Transaction History", margin, 20);
-
 
                         doc.autoTable({
                             startY: 25,
@@ -4297,9 +4279,6 @@ sap.ui.define([
                         const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
                         doc.text(createdByText, leftX, currentY);
                     }
-
-
-
 
                     //  FOOTER 
                     const totalPages = doc.internal.getNumberOfPages();
@@ -4510,7 +4489,7 @@ sap.ui.define([
                         // Automatically updates status to 'Payment Partially' and opens the ManageInvoice fragment
 
                         if (oModelData.Status === "Submitted") {
-                            MessageToast.show("New line items added.");
+                            MessageToast.show("Invoice items are refreshed");
                             this.onChangeInvoiceStatus("Submitted");
                         } else {
                             MessageToast.show("New line items added. Opening payment screen...");
