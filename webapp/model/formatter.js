@@ -143,12 +143,23 @@ sap.ui.define([
             return "Starting At " + formattedValue;
         },
 
-        formatCurrency: function (value, code) {
-            var n = parseFloat(value);
-            var fmt = sap.ui.core.format.NumberFormat.getCurrencyInstance({ currencyCode: false });
-            var formatted = fmt.format(n);
-            return code ? formatted + " " + code : formatted;
-        },
+      formatCurrency: function (value, code) {
+    var n = parseFloat(value);
+
+    if (isNaN(n)) {
+        return "";
+    }
+
+    var oFormat = sap.ui.core.format.NumberFormat.getFloatInstance({
+        groupingEnabled: true,
+        minFractionDigits: 2,
+        maxFractionDigits: 2
+    }, new sap.ui.core.Locale("en-IN"));
+
+    var formatted = oFormat.format(n);
+
+    return code ? formatted + " " + code : formatted;
+},
 
         getImageSrc: function (base64Str) {
             if (base64Str) {
@@ -270,6 +281,10 @@ sap.ui.define([
                     return "Indication06"
                 case "Confirmed":
                     return "Success"
+                case "Paid":
+                    return "Success"
+                case "Refund":
+                    return "Information"
                 default:
                     return "Indication01";
 

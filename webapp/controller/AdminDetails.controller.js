@@ -4750,7 +4750,7 @@ sap.ui.define([
 
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
-                            BookingDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
+                            BookingDate: new Date(oData.BookingDate).toISOString().split('T')[0],
                             RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
                             NoOfPersons: oData.noofperson || 1,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",

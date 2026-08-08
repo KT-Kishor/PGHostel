@@ -202,7 +202,7 @@
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
-                        <Text text="{i18n>invoiceReceivedRefundAmount}" />
+                        <Text text="{i18n>amount}" />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
@@ -236,7 +236,13 @@
                             <Text
                                 text="{path:'PaymentDetailModel>TotalAmount',formatter: '.Formatter.fromatNumber'}"
                             />
-                            <Text text="{PaymentDetailModel>Payment}" />
+                            <!-- <Text text="{PaymentDetailModel>Payment}" /> -->
+                            <ObjectStatus
+                                inverted="false"
+                                text="{PaymentDetailModel>Payment}"
+                                state="{ path: 'PaymentDetailModel>Payment', formatter: '.Formatter.formatObjectStatus'}"
+                                class="sapUiTinyMarginBottom"
+                            />
 
                             <Text
                                 text="{path:'PaymentDetailModel>ReceivedAmount',formatter: '.Formatter.fromatNumber'}"
