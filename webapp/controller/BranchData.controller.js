@@ -665,6 +665,13 @@ sap.ui.define([
                 sap.m.MessageToast.show("Please upload Home image");
                 return;
             }
+
+            // GST is applicable only when the user has entered a GSTIN.
+            // Without a GSTIN, Type and tax percentage must be sent empty (create and edit).
+            const oGstInput = sap.ui.getCore().byId(oView.createId("MC_id_CustomGst"));
+            const sGSTIN = ((oGstInput ? oGstInput.getValue() : Payload.GSTIN) || "").trim().toUpperCase();
+            const bHasGSTIN = !!sGSTIN;
+
             var oData = {
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
@@ -686,9 +693,9 @@ sap.ui.define([
                 Currency: Payload.Currency,
                 Photo1: oUpload.Photo1,
                 Attachment: oImage.Attachment,
-                GSTIN: Payload.GSTIN,
-                Type: "IGST",
-                Value: Payload.Value,
+                GSTIN: bHasGSTIN ? sGSTIN : "",
+                Type: bHasGSTIN ? "IGST" : "",
+                Value: bHasGSTIN ? Payload.Value : "",
                 Photo1Type: oUpload.Photo1Type,
                 Photo1Name: oUpload.Photo1Name,
                 AttachmentType: oImage.AttachmentType,
