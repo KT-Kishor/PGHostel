@@ -1873,19 +1873,31 @@ sap.ui.define([
                 this.totalAmountCalculation();
             },
             
-              CI_onPercentageChange: function (oEvent) {
+               CI_onPercentageChange: function (oEvent) {
                 const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
 
                 const oView = this.getView();
                 const oCustomerModel = oView.getModel("SelectedCustomerModel");
+                const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
 
-                // Update percentage value only
+                // Update GST percentage
                 oCustomerModel.setProperty("/Value", sPercentage);
+
+                // Get invoice items
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                // Update GSTCalculation for all items
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = sPercentage > 0 ? "YES" : "NO";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
 
                 // Recalculate totals
                 this.totalAmountCalculation();
             },
-
 
 
             CID_onPressLiveChangePAN: function (oEvent) {
