@@ -63,7 +63,7 @@
                                 <Text text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
-                                <Text text="{BookingView>DocumentType}" />
+                                <Text text="{BookingView>DocumentType}"  emptyIndicatorMode="On"/>
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
                                 text="{= ${BookingView>DocumentName} ? ${BookingView>DocumentName} : 'No Document' }"
