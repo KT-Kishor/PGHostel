@@ -263,6 +263,8 @@ sap.ui.define([
             // Update CustomerData model with edited dates
             var oCustomerModel = this.getView().getModel("CustomerData").getData();
 
+            this.getBusyDialog();
+
             const pdfBase64 = await this.onGeneratePDF("Completed");
 
             // Refresh model to update UI bindings
@@ -299,7 +301,6 @@ sap.ui.define([
                 ...payload2
             };
 
-            this.getBusyDialog();
             await this.ajaxUpdateWithJQuery("HM_Customer", {
                 data: [finalPayload],
                 filters: {
@@ -9633,10 +9634,20 @@ sap.ui.define([
         },
 
         onGenerateInvoice: function (oEvent) {
+            var CustomerData = this.getView().getModel("CustomerData").getData();
+
+
+            if(CustomerData.PaymentType==="Per Day"){
             this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
                 sPath: "X" + "," + encodeURIComponent(this.getView().getModel("CustomerData").getProperty("/BookingID")),
                 dash: "ManageInvoice"
             });
+        }else{
+               var oRouter = this.getOwnerComponent().getRouter();
+               oRouter.navTo("RouteManageInvoice",{
+                sPath:"BookingPage"
+            });
+        }
         },
         onPressDeposit: function () {
             var oRouter = this.getOwnerComponent().getRouter()

@@ -204,12 +204,12 @@
                     >
                         <Text text="{i18n>amount}" />
                     </Column>
-                    <Column
+                    <!-- <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
                     >
                         <Text text="{i18n>invoiceDueAmount}" />
-                    </Column>
+                    </Column> -->
                     
                     <Column
                         minScreenWidth="Tablet"
@@ -234,22 +234,33 @@
                                 text="{path:'PaymentDetailModel>ReceivedDate', formatter:'.Formatter.formatDate'}"
                             />
                             <Text
-                                text="{path:'PaymentDetailModel>TotalAmount',formatter: '.Formatter.fromatNumber'}"
+                                 text="{
+                            parts: [
+                                { path: 'PaymentDetailModel>TotalAmount' },
+                                { path: 'PaymentDetailModel>Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
                             />
                             <!-- <Text text="{PaymentDetailModel>Payment}" /> -->
                             <ObjectStatus
                                 inverted="false"
                                 text="{PaymentDetailModel>Payment}"
                                 state="{ path: 'PaymentDetailModel>Payment', formatter: '.Formatter.formatObjectStatus'}"
-                                class="sapUiTinyMarginBottom"
                             />
 
                             <Text
-                                text="{path:'PaymentDetailModel>ReceivedAmount',formatter: '.Formatter.fromatNumber'}"
+                                   text="{
+                            parts: [
+                                { path: 'PaymentDetailModel>ReceivedAmount' },
+                                { path: 'PaymentDetailModel>Currency' }
+                            ],
+                            formatter: '.Formatter.formatCurrency'
+                        }"
                             />
-                            <Text
+                            <!-- <Text
                                 text="{path:'PaymentDetailModel>DueAmount',formatter: '.Formatter.fromatNumber'}"
-                            />
+                            /> -->
                            
                             <Text
                                 text="{path:'PaymentDetailModel>ConversionRate',formatter: '.Formatter.fromatNumber'}"

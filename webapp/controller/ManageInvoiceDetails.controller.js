@@ -1872,8 +1872,8 @@ sap.ui.define([
                 oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                 this.totalAmountCalculation();
             },
-
-            CI_onPercentageChange: function (oEvent) {
+            
+              CI_onPercentageChange: function (oEvent) {
                 const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
 
                 const oView = this.getView();
@@ -1885,6 +1885,8 @@ sap.ui.define([
                 // Recalculate totals
                 this.totalAmountCalculation();
             },
+
+
 
             CID_onPressLiveChangePAN: function (oEvent) {
                 var oInput = oEvent.getSource();
@@ -2613,10 +2615,10 @@ sap.ui.define([
                                 MessageToast.show(error.responseText);
                             });
                         },
-                         function () {
-            // Cancel
-            oTable.removeSelections(true);
-        }
+                        function () {
+                            // Cancel
+                            oTable.removeSelections(true);
+                        }
                     );
                 }
                 //  Not saved yet → local delete only
@@ -3077,7 +3079,7 @@ sap.ui.define([
                         }
                     }
 
-                 
+
 
                     const balanceAmount =
                         (Number(data.TotalAmount) || 0) -
@@ -3093,7 +3095,7 @@ sap.ui.define([
                         ]);
                     }
 
-                 
+
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
 
@@ -3123,7 +3125,7 @@ sap.ui.define([
                         },
                         margin: {
                             left: 95,
-                             bottom: 40,
+                            bottom: 40,
                         },
                         didParseCell: function (data) {
                             if (data.row.index === totalRowIndex) {
@@ -3283,12 +3285,12 @@ sap.ui.define([
                     doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
 
                     // --- Row 2: Created By ---
-                 const footerStartY = pageHeight - 40;
+                    const footerStartY = pageHeight - 40;
 
-if (currentY + 15 > footerStartY) {
-    doc.addPage();
-    currentY = 30;
-}
+                    if (currentY + 15 > footerStartY) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
 
                     currentY += 10;
 
@@ -3495,7 +3497,7 @@ if (currentY + 15 > footerStartY) {
 
                     // GST should calculate AFTER discount
                     let finalAmount = discountedTotal;
- 
+
                     if (isGSTEnabled) {
                         // Proportional taxable amount after discount
                         let taxableAmount = totalWithGST; // Using totalWithGST since it already has item discounts subtracted
@@ -4058,7 +4060,7 @@ if (currentY + 15 > footerStartY) {
                         // Sub Total (GST or NON-GST)
                         if (subTotalGST > 0) {
                             summaryBody.push([`Sub-Total ( Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
-                            
+
                         }
                         if (subTotalNoGST > 0) {
                             summaryBody.push([`Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
@@ -4129,7 +4131,7 @@ if (currentY + 15 > footerStartY) {
                             },
                             margin: {
                                 left: 95,
-                                 bottom: 40,
+                                bottom: 40,
 
                             },
                             didParseCell: function (data) {
@@ -4562,6 +4564,11 @@ if (currentY + 15 > footerStartY) {
 
                     fStart.setHours(0, 0, 0, 0);
                     fEnd.setHours(0, 0, 0, 0);
+
+                    // First invoice should not include items starting on cycle end date
+                    if (fStart >= cycleEnd) {
+                        return;
+                    }
 
                     const bookingUnit = f.PaymentType?.toLowerCase() || "";
 

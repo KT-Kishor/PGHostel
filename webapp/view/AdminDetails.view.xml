@@ -1019,7 +1019,7 @@
         formatter: '.Formatter.showReturnDeposit'
     }"/>
                     <!-- Confirm -->
-                    <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} === 'Assigned'}"/>
+                    <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"/>
 
                     <Button text="Confirm Booking" tooltip="Confirm Booking" press="HM_ConfirmRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected' || ${CustomerData>/Status} === 'Cancelled'}"/>
 
