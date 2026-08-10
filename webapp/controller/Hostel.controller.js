@@ -1169,7 +1169,7 @@ sap.ui.define([
                     oModel = new JSONModel([]);
                     this.getOwnerComponent().setModel(oModel, "sBRModel");
                 }
-                 var BranchNewData=this.getOwnerComponent().getModel("branchModel1");
+                var BranchNewData = this.getOwnerComponent().getModel("branchModel1");
 
 
                 let aData = oModel.getData();
@@ -2742,16 +2742,16 @@ sap.ui.define([
             oPropertyType.setEnabled(true);
 
         },
-        onPropertyTypeChange:function(oEvent){
-              const oSelectedItem = oEvent.getParameter("selectedItem");
+        onPropertyTypeChange: function (oEvent) {
+            const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
             // 🔹 Selected Branch Name
             const sSelected = oSelectedItem.getText();
             const oModelData = this.getView().getModel("sBRModel").getData();
-            var Branch=this.byId("id_Branch").getValue()
+            var Branch = this.byId("id_Branch").getValue()
 
-           const aFiltered = oModelData.filter(function (item) {
-                return item.PropertyType === sSelected && item.City===Branch;
+            const aFiltered = oModelData.filter(function (item) {
+                return item.PropertyType === sSelected && item.City === Branch;
             });
             // 🔹 Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
@@ -2884,7 +2884,7 @@ sap.ui.define([
             const oContainer = this.byId("idViewMoreBusy")
             oContainer.setBusy(true)
             this.isInitialLoad = false;
-            this.isShowmore=false
+            this.isShowmore = false
 
 
             await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType);
@@ -2901,7 +2901,7 @@ sap.ui.define([
             let aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
-        Branchdata:async function(){
+        Branchdata: async function () {
             const response = await this.ajaxReadWithJQuery("HM_BranchData", "");
             let aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
@@ -2923,14 +2923,14 @@ sap.ui.define([
 
             oFooterModel.setProperty("/showRoomsFooter", false);
             try {
-                  
-                 var BranchNewData=this.getOwnerComponent().getModel("branchModel1");
 
-                 if(!BranchNewData){
-                var localdata=await this.Branchdata()
+                var BranchNewData = this.getOwnerComponent().getModel("branchModel1");
 
-               this.getOwnerComponent().getModel("sBRModel").setData(localdata)
-                 }
+                if (!BranchNewData) {
+                    var localdata = await this.Branchdata()
+
+                    this.getOwnerComponent().getModel("sBRModel").setData(localdata)
+                }
                 var data = this.getOwnerComponent().getModel("sBRModel").getData()
 
 
@@ -2958,7 +2958,7 @@ sap.ui.define([
 
                 this.closeBusyDialog()
                 this.isInitialLoad = true;
-                this.isShowmore=false
+                this.isShowmore = false
 
 
                 if (this.cityuse === false) {
@@ -3010,49 +3010,59 @@ sap.ui.define([
             }
         },
         _populateUniqueFilterValues: function (data) {
-    let uniqueValues = {
-        id_Roomtype: new Set(),
-        id_Area: new Set()
-    };
+            let uniqueValues = {
+                id_Roomtype: new Map(),
+                id_Area: new Map()
+            };
 
-    data.forEach(item => {
-        if (item.Name && item.Name.trim()) {
-            uniqueValues.id_Roomtype.add(
-                item.Name.trim().replace(/\s+/g, " ")
-            );
-        }
+            data.forEach(item => {
+                if (item.Name && item.Name.trim()) {
+                    let value = item.Name.trim().replace(/\s+/g, " ");
+                    let key = value.toLowerCase();
 
-        if (item.LandMark && item.LandMark.trim()) {
-            uniqueValues.id_Area.add(
-                item.LandMark.trim().replace(/\s+/g, " ")
-            );
-        }
-    });
+                    if (!uniqueValues.id_Roomtype.has(key)) {
+                        uniqueValues.id_Roomtype.set(key, value);
+                    }
+                }
 
-    let oView = this.getView();
+                if (item.LandMark && item.LandMark.trim()) {
+                    let value = item.LandMark.trim().replace(/\s+/g, " ");
+                    let key = value.toLowerCase();
 
-    ["id_Roomtype", "id_Area"].forEach(field => {
-        let oComboBox = oView.byId(field);
-        if (!oComboBox) return;
+                    if (!uniqueValues.id_Area.has(key)) {
+                        uniqueValues.id_Area.set(key, value);
+                    }
+                }
+            });
 
-        oComboBox.destroyItems();
+            let oView = this.getView();
 
-        Array.from(uniqueValues[field]).sort().forEach(value => {
-            oComboBox.addItem(
-                new sap.ui.core.Item({
-                    key: value,
-                    text: value
-                })
-            );
-        });
-    });
-},
+            ["id_Roomtype", "id_Area"].forEach(field => {
+                let oComboBox = oView.byId(field);
+                if (!oComboBox) return;
+
+                oComboBox.destroyItems();
+
+                Array.from(uniqueValues[field].values())
+                    .sort((a, b) => a.localeCompare(b, undefined, {
+                        sensitivity: "base"
+                    }))
+                    .forEach(value => {
+                        oComboBox.addItem(
+                            new sap.ui.core.Item({
+                                key: value,
+                                text: value
+                            })
+                        );
+                    });
+            });
+        },
         _loadFilteredData: async function (Scity, sBranchCode, BranchName, sPropertyType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
             var data = this.getOwnerComponent().getModel("sBRModel").getData()
-                var Branchdata = data.filter((item) => {
+            var Branchdata = data.filter((item) => {
                 return item.City === Scity
             })
             this.Branchlength = Branchdata.length
@@ -3071,27 +3081,27 @@ sap.ui.define([
                     });
                     aBranchesData = response?.data || [];
                     // this.Branchlength = aBranchesData.length || 0;
-                   
-                     if(this.getOwnerComponent().getModel("branchModel1")){
+
+                    if (this.getOwnerComponent().getModel("branchModel1")) {
                         let oBRModel = this.getOwnerComponent().getModel("sBRModel");
                         let existingBranchData = oBRModel.getData() || [];
-                           var Branchdata = existingBranchData.filter((item) => {
-                return item.City === Scity
-            })
+                        var Branchdata = existingBranchData.filter((item) => {
+                            return item.City === Scity
+                        })
                         this.Branchlength = Branchdata.length
 
-                     }
-                      if(this.isShowmore===true){
-             var data = this.getOwnerComponent().getModel("sBRModel").getData()
-                var Branchdata = data.filter((item) => {
-                return item.City === Scity
-            })
-          
-            this.Branchlength = Branchdata.length
-                     };
-                         if (sBranchCode || BranchName || sPropertyType) {
+                    }
+                    if (this.isShowmore === true) {
+                        var data = this.getOwnerComponent().getModel("sBRModel").getData()
+                        var Branchdata = data.filter((item) => {
+                            return item.City === Scity
+                        })
+
+                        this.Branchlength = Branchdata.length
+                    };
+                    if (sBranchCode || BranchName || sPropertyType) {
                         this.Branchlength = aBranchesData.length
-                     }
+                    }
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
 
@@ -3100,7 +3110,7 @@ sap.ui.define([
                             existingItem.Name === newItem.Name
                         );
                     });
-                    
+
 
                     let aUpdatedData = [...aExistingData, ...aFilteredData];
 
@@ -3113,7 +3123,7 @@ sap.ui.define([
 
                 } else {
                     const oBRModel = oView.getModel("BranchModel");
-                    aBranchesData = oBRModel?.getData() || [];  
+                    aBranchesData = oBRModel?.getData() || [];
                 }
                 let aFilteredBranches = [];
                 if (Scity && !sBranchCode) {
@@ -3200,7 +3210,7 @@ sap.ui.define([
 
             } catch (err) {
                 MessageToast.show("Failed to load branch data");
-            } 
+            }
         },
 
         onBookNow: function (oEvent) {
@@ -5186,54 +5196,54 @@ sap.ui.define([
             return aPayloadDocs;
         },
 
- onAdminDeleteDoc: function (oEvent) {
+        onAdminDeleteDoc: function (oEvent) {
 
-    const oView = this.getView();
-    const oModel = oView.getModel("AdminSignupModel");
-    const table = $C("adminAttachmentTable");
+            const oView = this.getView();
+            const oModel = oView.getModel("AdminSignupModel");
+            const table = $C("adminAttachmentTable");
 
-    // Get button
-    const oButton = oEvent.getSource();
+            // Get button
+            const oButton = oEvent.getSource();
 
-    // Get row item
-    const oItem = oButton.getParent();
+            // Get row item
+            const oItem = oButton.getParent();
 
-    // Get binding context
-    const oCtx = oItem.getBindingContext("AdminSignupModel");
+            // Get binding context
+            const oCtx = oItem.getBindingContext("AdminSignupModel");
 
-    if (!oCtx) {
-        return;
-    }
+            if (!oCtx) {
+                return;
+            }
 
-    const doc = oCtx.getObject();
+            const doc = oCtx.getObject();
 
-    // Cleanup preview blob
-    if (doc.PreviewUrl) {
-        URL.revokeObjectURL(doc.PreviewUrl);
-    }
+            // Cleanup preview blob
+            if (doc.PreviewUrl) {
+                URL.revokeObjectURL(doc.PreviewUrl);
+            }
 
-    // Get index from binding path
-    const iIndex = parseInt(
-        oCtx.getPath().split("/").pop(),
-        10
-    );
+            // Get index from binding path
+            const iIndex = parseInt(
+                oCtx.getPath().split("/").pop(),
+                10
+            );
 
-    // Get documents
-    const docs = oModel.getProperty("/Documents") || [];
+            // Get documents
+            const docs = oModel.getProperty("/Documents") || [];
 
-    // Remove only selected row
-    docs.splice(iIndex, 1);
+            // Remove only selected row
+            docs.splice(iIndex, 1);
 
-    // Update model
-    oModel.setProperty("/Documents", docs);
+            // Update model
+            oModel.setProperty("/Documents", docs);
 
-    oModel.setProperty("/DocTypeEnabled", true);
+            oModel.setProperty("/DocTypeEnabled", true);
 
-    // Highlight if empty
-    if (docs.length === 0) {
-        table?.addStyleClass("fileErrorHighlight");
-    }
-},
+            // Highlight if empty
+            if (docs.length === 0) {
+                table?.addStyleClass("fileErrorHighlight");
+            }
+        },
 
         onAdminDocTypeSelected: function () {
             const uploader = $C("hiddenAdminUploader");
@@ -5242,39 +5252,39 @@ sap.ui.define([
 
         onAdminPreviewDoc: async function (oEvent) {
             function autoDecodeBase64(b64) {
-            if (!b64) {
-                return "";
-            }
-
-            b64 = b64.replace(/\s/g, "");
-
-            let last = b64;
-
-            for (let i = 0; i < 5; i++) {
-                try {
-                if (
-                    last.startsWith("iVB") || // PNG
-                    last.startsWith("/9j") || // JPG
-                    last.startsWith("JVBER") // PDF
-                ) {
-                    return last;
+                if (!b64) {
+                    return "";
                 }
 
-                last = atob(last);
-                } catch (e) {
-                break;
-                }
-            }
+                b64 = b64.replace(/\s/g, "");
 
-            return last;
+                let last = b64;
+
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        if (
+                            last.startsWith("iVB") || // PNG
+                            last.startsWith("/9j") || // JPG
+                            last.startsWith("JVBER") // PDF
+                        ) {
+                            return last;
+                        }
+
+                        last = atob(last);
+                    } catch (e) {
+                        break;
+                    }
+                }
+
+                return last;
             }
 
             const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel")?.getObject();
 
             if (!oDoc || !oDoc.File) {
-            sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
+                sap.m.MessageBox.error(this.i18nModel.getText("nodocfound"));
 
-            return;
+                return;
             }
 
             let sBase64 = autoDecodeBase64(oDoc.File);
@@ -5282,11 +5292,11 @@ sap.ui.define([
             let sMimeType = "application/octet-stream";
 
             if (sBase64.startsWith("iVB")) {
-            sMimeType = "image/png";
+                sMimeType = "image/png";
             } else if (sBase64.startsWith("/9j")) {
-            sMimeType = "image/jpeg";
+                sMimeType = "image/jpeg";
             } else if (sBase64.startsWith("JVBER")) {
-            sMimeType = "application/pdf";
+                sMimeType = "application/pdf";
             }
 
             const sFileName = oDoc.FileName || "Document Preview";
@@ -5297,36 +5307,36 @@ sap.ui.define([
 
             // Destroy old dialog
             if (this._oPreviewDialog) {
-            this._oPreviewDialog.destroy();
-            this._oPreviewDialog = null;
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
             }
 
             // Load Fragment
             if (!this._oPreviewDialog) {
-            this._oPreviewDialog = await sap.ui.core.Fragment.load({
-                id: this.getView().getId(),
+                this._oPreviewDialog = await sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
 
-                name: "sap.ui.com.project1.fragment.DocumentPreview",
+                    name: "sap.ui.com.project1.fragment.DocumentPreview",
 
-                controller: this,
-            });
+                    controller: this,
+                });
 
-            this.getView().addDependent(this._oPreviewDialog);
+                this.getView().addDependent(this._oPreviewDialog);
             }
 
             const oDialog = sap.ui.core.Fragment.byId(
-            this.getView().getId(),
-            "previewDialog",
+                this.getView().getId(),
+                "previewDialog",
             );
 
             const oImage = sap.ui.core.Fragment.byId(
-            this.getView().getId(),
-            "previewImage",
+                this.getView().getId(),
+                "previewImage",
             );
 
             const oHtml = sap.ui.core.Fragment.byId(
-            this.getView().getId(),
-            "previewHtml",
+                this.getView().getId(),
+                "previewHtml",
             );
 
             oDialog.setTitle(sFileName);
@@ -5337,82 +5347,82 @@ sap.ui.define([
 
             // cleanup old blob
             if (this._pdfBlobUrl) {
-            URL.revokeObjectURL(this._pdfBlobUrl);
+                URL.revokeObjectURL(this._pdfBlobUrl);
 
-            this._pdfBlobUrl = null;
+                this._pdfBlobUrl = null;
             }
 
             // IMAGE PREVIEW
             if (sMimeType.startsWith("image/")) {
-            const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
+                const sImageSrc = `data:${sMimeType};base64,${sBase64}`;
 
-            const oImg = new Image();
+                const oImg = new Image();
 
-            oImg.onload = function () {
-                const viewportW = window.innerWidth * 0.8;
-                const viewportH = window.innerHeight * 0.8;
-                const imgRatio = oImg.width / oImg.height;
+                oImg.onload = function () {
+                    const viewportW = window.innerWidth * 0.8;
+                    const viewportH = window.innerHeight * 0.8;
+                    const imgRatio = oImg.width / oImg.height;
 
-                let finalWidth = viewportW;
-                let finalHeight = viewportW / imgRatio;
+                    let finalWidth = viewportW;
+                    let finalHeight = viewportW / imgRatio;
 
-                if (finalHeight > viewportH) {
-                finalHeight = viewportH;
-                finalWidth = viewportH * imgRatio;
-                }
+                    if (finalHeight > viewportH) {
+                        finalHeight = viewportH;
+                        finalWidth = viewportH * imgRatio;
+                    }
 
-                oDialog.setContentWidth(finalWidth + "px");
-                oDialog.setContentHeight(finalHeight + "px");
-                oImage.setSrc(sImageSrc);
-                oImage.setVisible(true);
-                oDialog.open();
-            }.bind(this);
+                    oDialog.setContentWidth(finalWidth + "px");
+                    oDialog.setContentHeight(finalHeight + "px");
+                    oImage.setSrc(sImageSrc);
+                    oImage.setVisible(true);
+                    oDialog.open();
+                }.bind(this);
 
-            oImg.src = sImageSrc;
+                oImg.src = sImageSrc;
 
-            return;
-            }
-        
-            // PDF PREVIEW
-            if (sMimeType === "application/pdf") {
-            const byteCharacters = atob(sBase64);
-
-            const byteArrays = [];
-
-            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-                const slice = byteCharacters.slice(offset, offset + 512);
-
-                const byteNumbers = new Array(slice.length);
-
-                for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-                }
-
-                byteArrays.push(new Uint8Array(byteNumbers));
-            }
-
-            const blob = new Blob(byteArrays, {
-                type: "application/pdf",
-            });
-
-            const sBlobUrl = URL.createObjectURL(blob);
-
-            this._pdfBlobUrl = sBlobUrl;
-
-            // Mobile Download
-            if (sap.ui.Device.system.phone) {
-                const oLink = document.createElement("a");
-
-                oLink.href = sBlobUrl;
-                oLink.download = sFileName;
-                document.body.appendChild(oLink);
-                oLink.click();
-                document.body.removeChild(oLink);
-                sap.m.MessageToast.show("File downloaded successfully");
                 return;
             }
 
-            const sIframe = `
+            // PDF PREVIEW
+            if (sMimeType === "application/pdf") {
+                const byteCharacters = atob(sBase64);
+
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+
+                    const byteNumbers = new Array(slice.length);
+
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    byteArrays.push(new Uint8Array(byteNumbers));
+                }
+
+                const blob = new Blob(byteArrays, {
+                    type: "application/pdf",
+                });
+
+                const sBlobUrl = URL.createObjectURL(blob);
+
+                this._pdfBlobUrl = sBlobUrl;
+
+                // Mobile Download
+                if (sap.ui.Device.system.phone) {
+                    const oLink = document.createElement("a");
+
+                    oLink.href = sBlobUrl;
+                    oLink.download = sFileName;
+                    document.body.appendChild(oLink);
+                    oLink.click();
+                    document.body.removeChild(oLink);
+                    sap.m.MessageToast.show("File downloaded successfully");
+                    return;
+                }
+
+                const sIframe = `
             <div style="
                 width:100%;
                 height:100%;
@@ -5438,12 +5448,12 @@ sap.ui.define([
             </div>
             `;
 
-            oDialog.setContentWidth("85%");
-            oDialog.setContentHeight("90%");
-            oHtml.setContent(sIframe);
-            oHtml.setVisible(true);
-            oDialog.open();
-            return;
+                oDialog.setContentWidth("85%");
+                oDialog.setContentHeight("90%");
+                oHtml.setContent(sIframe);
+                oHtml.setVisible(true);
+                oDialog.open();
+                return;
             }
 
             this.onDownloadPreview();
@@ -5453,26 +5463,26 @@ sap.ui.define([
 
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-            MessageToast.show("No file available for download.");
+                MessageToast.show("No file available for download.");
 
-            return;
+                return;
             }
 
             let sDownloadUrl = "";
 
             // PDF
             if (this._sPreviewMimeType === "application/pdf") {
-            sDownloadUrl = this._pdfBlobUrl;
+                sDownloadUrl = this._pdfBlobUrl;
             }
 
             // IMAGE
             else if (this._sPreviewMimeType.startsWith("image/")) {
-            sDownloadUrl = `data:${this._sPreviewMimeType};base64,${this._sPreviewBase64}`;
+                sDownloadUrl = `data:${this._sPreviewMimeType};base64,${this._sPreviewBase64}`;
             }
 
             if (!sDownloadUrl) {
-            MessageToast.show("Download not supported.");
-            return;
+                MessageToast.show("Download not supported.");
+                return;
             }
 
             const oLink = document.createElement("a");
@@ -5485,9 +5495,9 @@ sap.ui.define([
 
         onClosePreview: function () {
             if (this._pdfBlobUrl) {
-            URL.revokeObjectURL(this._pdfBlobUrl);
+                URL.revokeObjectURL(this._pdfBlobUrl);
 
-            this._pdfBlobUrl = null;
+                this._pdfBlobUrl = null;
             }
 
             this._sPreviewBase64 = null;
@@ -5495,9 +5505,9 @@ sap.ui.define([
             this._sPreviewFileName = null;
 
             if (this._oPreviewDialog) {
-            this._oPreviewDialog.close();
-            this._oPreviewDialog.destroy();
-            this._oPreviewDialog = null;
+                this._oPreviewDialog.close();
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
             }
         },
 
@@ -5825,7 +5835,7 @@ sap.ui.define([
             }
 
             // IMAGE VALIDATION
-           
+
 
             // if (aAttachments.length > 3) {
             //     MessageToast.show("You can upload maximum 3 images only.");
@@ -5867,11 +5877,11 @@ sap.ui.define([
         onEmailchange: function (oEvent) {
             utils._LCvalidateEmail(oEvent)
         },
-        ondoc:function(){
+        ondoc: function () {
             this.getOwnerComponent().getRouter().navTo("RouteUploadDocs", {
-    EncodedCustomerID: "R09MS0s0XzIwMjYvMjctMDEx",
-    MemberID: "MDAwMDM="
-});
+                EncodedCustomerID: "R09MS0s0XzIwMjYvMjctMDEx",
+                MemberID: "MDAwMDM="
+            });
         }
     });
 });
