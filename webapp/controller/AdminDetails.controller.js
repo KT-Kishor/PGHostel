@@ -3728,6 +3728,7 @@ sap.ui.define([
             var Payload = {
                 Status: "Confirmed",
                 CustomerName: ID.CustomerName,
+                Salutation: ID.Salutation,
                 BookingID: ID.BookingID,
                 CustomerEmail: ID.CustomerEmail || "",
                 BedType: ID.BedType || "",
@@ -3819,6 +3820,7 @@ sap.ui.define([
                 RejectDesc: rejectReason,
                 // Email Required Data
                 CustomerName: ID.CustomerName,
+                Salutation: ID.Salutation,
                 BookingID: ID.BookingID,
                 CustomerEmail: ID.CustomerEmail || "",
                 BedType: ID.BedType || "",
