@@ -213,9 +213,13 @@
                             />
                             <Text text="{mainModel>BankTransactionID}" />
                              <Text text="{mainModel>PaymentType}" />
-                            <!-- <Text text="{mainModel>BankName}" /> -->
-                            <Text text="{mainModel>Payment}" />
-
+                            <!-- <Text text="{mainModel>BankName}" /> 
+                            <Text  /> -->
+                            <ObjectStatus
+                                inverted="false"
+                                text="{mainModel>Payment}"
+                                state="{ path: 'mainModel>Payment', formatter: '.Formatter.formatObjectStatus'}"
+                            />
                             <Text
                                 text="{parts:['mainModel>Amount', 'mainModel>Currency'], formatter: '.Formatter.formatCurrency'}"
                             />
