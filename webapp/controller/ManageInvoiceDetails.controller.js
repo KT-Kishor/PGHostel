@@ -2877,8 +2877,8 @@ sap.ui.define([
                     // Invoice Details
                     const detailsStartY = 35;
                     const rowHeight = 6.5;
-                    const columnWidths = [30, 30];
-                    const rightAlignX = pageWidth - 17 - columnWidths[0] - columnWidths[1];
+                    const columnWidths = [40, 40];
+                    const rightAlignX = pageWidth - 23 - columnWidths[0] - columnWidths[1];
 
                     doc.setFontSize(12).setFont("times", "bold");
 
@@ -3178,7 +3178,7 @@ sap.ui.define([
                             index + 1,
                             Formatter.formatDate(item.Date),
                             item.PaymentType || "",
-                            item.BankName || "",
+                            item.Payment || "",
                             item.BankTransactionID || "-",
                             Formatter.fromatNumber(item.Amount),
                             item.Currency || ""
@@ -3187,7 +3187,7 @@ sap.ui.define([
                         doc.autoTable({
                             startY: currentY,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: paymentBody,
                             theme: 'grid',
@@ -3741,7 +3741,6 @@ if (currentY + 15 > footerStartY) {
                         currentY = 30;
                     }
 
-                    // ================= SIGNATURES =================
 
                     // ================= SIGNATURES =================
 
@@ -3876,8 +3875,8 @@ if (currentY + 15 > footerStartY) {
                         //  INVOICE DETAILS 
                         const detailsStartY = 35;
                         const rowHeight = 6.5;
-                        const columnWidths = [30, 30];
-                        const rightAlignX = pageWidth - 22 - columnWidths[0] - columnWidths[1];
+                        const columnWidths = [40, 40];
+                        const rightAlignX = pageWidth - 24 - columnWidths[0] - columnWidths[1];
 
                         doc.setFontSize(12).setFont("times", "bold");
 
@@ -4172,13 +4171,13 @@ if (currentY + 15 > footerStartY) {
                         doc.autoTable({
                             startY: 25,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Bank / Mode', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid ', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: sortedPaymentData.map((p, i) => ([
                                 i + 1,
                                 Formatter.formatDate(p.Date),
                                 p.PaymentType,
-                                p.BankName,
+                                p.Payment || "-",
                                 p.BankTransactionID || "-",
                                 Formatter.fromatNumber(p.Amount),
                                 p.Currency

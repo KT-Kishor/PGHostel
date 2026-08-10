@@ -103,7 +103,7 @@
                             class="myUnifiedBtn"
                         />
                         <Button
-                            text="{i18n>resolve}"
+                            text="{i18n>resolved}"
                             tooltip="{i18n>resolve}"
                             press="CD_resolve"
                             class="myUnifiedBtn"
@@ -210,7 +210,14 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{ComplaintModel>RaisedBy}" />
+                            <!-- <Text text="{ComplaintModel>RaisedBy}" /> -->
+                            <VBox>
+								<Text
+                                    text="{ComplaintModel>RaisedBy}"
+                                    class="sapUiTinyMarginBottom"
+                                />
+								<Text text="{ComplaintModel>BookingID}" />
+							</VBox>
                             <Text text="{ComplaintModel>ComplaintType}" />
                             <ExpandableText
                                 maxCharacters="20"

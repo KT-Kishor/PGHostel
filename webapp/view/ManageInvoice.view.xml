@@ -119,9 +119,9 @@
 				
 					
 				
-					<!-- <Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>PayByDate}" tooltip="{i18n>PayByDate}"/>
-					</Column> -->
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>gstAmount}" tooltip="{i18n>gstAmount}"/>
+					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>status}" tooltip="{i18n>status}"/>
 					</Column>
@@ -135,7 +135,16 @@
 							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="40"/>
 							<Text text="{= ${ManageInvoiceModel>BookingID} + ' (' + ${ManageInvoiceModel>CustomerName} + ')' }" />
 							<Text text="{path: 'ManageInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {ManageInvoiceModel>Currency}" textAlign="End"/>
-							<!-- <Text text="{path:'ManageInvoiceModel>PayByDate',formatter: '.Formatter.formatDate'}"/> -->
+						<Text
+    text="{
+        parts: [
+            'ManageInvoiceModel>IGST',
+            'ManageInvoiceModel>CGST',
+            'ManageInvoiceModel>SGST',
+            'ManageInvoiceModel>Currency'
+        ],
+        formatter: '.Formatter.formatTaxAmount'
+    }" />
 							<ObjectStatus text="{ManageInvoiceModel>Status}" inverted="false"
                             state="{path: 'ManageInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass"/>
 						</cells>

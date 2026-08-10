@@ -747,6 +747,37 @@ sap.ui.define([
         },
         showReturnDeposit: function (sStatus, sDepositAmount) {
     return sStatus === "Completed" && Number(sDepositAmount) > 0;
+},
+formatTaxAmount: function (sIGST, sCGST, sSGST, sCurrency) {
+
+    var format = function (v) {
+        if (!v && v !== 0) {
+            return "";
+        }
+
+        return sap.ui.core.format.NumberFormat.getFloatInstance({
+            groupingBaseSize: 3,
+            groupingSize: 2,
+            minFractionDigits: 2,
+            maxFractionDigits: 4
+        }).format(parseFloat(v));
+    };
+
+    if (sIGST) {
+        return "IGST: " + format(sIGST) + " " + sCurrency;
+    }
+
+    var aTaxes = [];
+
+    if (sCGST) {
+        aTaxes.push("CGST: " + format(sCGST) + " " + sCurrency);
+    }
+
+    if (sSGST) {
+        aTaxes.push("SGST: " + format(sSGST) + " " + sCurrency);
+    }
+
+    return aTaxes.join(" | ");
 }
 
     }
