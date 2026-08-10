@@ -2742,6 +2742,22 @@ sap.ui.define([
             oPropertyType.setEnabled(true);
 
         },
+        onPropertyTypeChange:function(oEvent){
+              const oSelectedItem = oEvent.getParameter("selectedItem");
+            if (!oSelectedItem) return;
+            // 🔹 Selected Branch Name
+            const sSelected = oSelectedItem.getText();
+            const oModelData = this.getView().getModel("sBRModel").getData();
+            var Branch=this.byId("id_Branch").getValue()
+
+           const aFiltered = oModelData.filter(function (item) {
+                return item.PropertyType === sSelected && item.City===Branch;
+            });
+            // 🔹 Update Area model dynamically
+            const oAreaModel = new JSONModel(aFiltered);
+            this.getView().setModel(oAreaModel, "AreaModel");
+            this._populateUniqueFilterValues(aFiltered)
+        },
 
         // 🔹 When Area is selected, enable Room Type combo
         onAreaSelectionChange: function (oEvent) {
@@ -2952,6 +2968,8 @@ sap.ui.define([
                 }
 
                 const aFiltered = oModelData.filter(item => item.City === sCity);
+                const aFilteredproperdata = data.filter(item => item.City === sCity);
+
 
 
 
@@ -2963,10 +2981,11 @@ sap.ui.define([
                     await this._loadFilteredData(this.City, "", "", "");
                 }
                 const aUnique = aFiltered.filter((item, index, self) =>
-                    index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
+                    index === self.findIndex(t => t.Name === item.Name)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
-                this._populateUniqueFilterValues(data)
+
+                this._populateUniqueFilterValues(aFilteredproperdata)
                 this._populateUniqueFilterValuesBranch(data)
 
 
@@ -2990,43 +3009,44 @@ sap.ui.define([
 
             }
         },
-          _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                id_Roomtype: new Set(),
-                id_Area: new Set(),
-                // id_Branch: new Set()
-            
-            };
+        _populateUniqueFilterValues: function (data) {
+    let uniqueValues = {
+        id_Roomtype: new Set(),
+        id_Area: new Set()
+    };
 
-            data.forEach(item => {
-                if (item.Name && item.Name.trim()) {
-                    uniqueValues.id_Roomtype.add(item.Name.trim());
-                }
-                if (item.LandMark && item.LandMark.trim()) {
-                    uniqueValues.id_Area.add(item.LandMark.trim());
-                }
-                // if (item.City && item.City.trim()) {
-                //     uniqueValues.id_Branch.add(item.City.trim());
-                // }
-            });
+    data.forEach(item => {
+        if (item.Name && item.Name.trim()) {
+            uniqueValues.id_Roomtype.add(
+                item.Name.trim().replace(/\s+/g, " ")
+            );
+        }
 
-            let oView = this.getView();
+        if (item.LandMark && item.LandMark.trim()) {
+            uniqueValues.id_Area.add(
+                item.LandMark.trim().replace(/\s+/g, " ")
+            );
+        }
+    });
 
-            ["id_Roomtype", "id_Area"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                if (!oComboBox) return;
+    let oView = this.getView();
 
-                oComboBox.destroyItems();
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(
-                        new sap.ui.core.Item({
-                            key: value,
-                            text: value
-                        })
-                    );
-                });
-            });
-        },
+    ["id_Roomtype", "id_Area"].forEach(field => {
+        let oComboBox = oView.byId(field);
+        if (!oComboBox) return;
+
+        oComboBox.destroyItems();
+
+        Array.from(uniqueValues[field]).sort().forEach(value => {
+            oComboBox.addItem(
+                new sap.ui.core.Item({
+                    key: value,
+                    text: value
+                })
+            );
+        });
+    });
+},
         _loadFilteredData: async function (Scity, sBranchCode, BranchName, sPropertyType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
@@ -3080,10 +3100,13 @@ sap.ui.define([
                             existingItem.Name === newItem.Name
                         );
                     });
+                    
 
                     let aUpdatedData = [...aExistingData, ...aFilteredData];
 
+
                     this.getView().getModel("AreaModel").setData(aUpdatedData);
+
                     this._populateUniqueFilterValues(aUpdatedData)
                     this._populateUniqueFilterValuesBranch(this.getOwnerComponent().getModel("sBRModel").getData())
 

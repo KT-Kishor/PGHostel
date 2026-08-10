@@ -222,6 +222,7 @@
                                                                         showClearIcon="true"
                                                                         busyIndicatorDelay="0"
                                                                         items="{PropertyType>/}"
+                                                                        selectionChange=".onPropertyTypeChange"
                                                                     >
                                                                         <core:ListItem
                                                                             key="{PropertyType>PropertyType}"
