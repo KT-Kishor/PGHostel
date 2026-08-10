@@ -208,9 +208,31 @@
                                                                     </ComboBox>
                                                                 </fb:control>
                                                             </fb:FilterGroupItem>
+                                                            <!--  Property Type -->
                                                             <fb:FilterGroupItem
-                                                                name="Hostel Name"
-                                                                label="Hostel Name"
+                                                                name="PropertyType"
+                                                                label="{i18n>propertyType}"
+                                                                groupName="Group1"
+                                                                visibleInFilterBar="true"
+                                                            >
+                                                                <fb:control>
+                                                                    <ComboBox
+                                                                        id="id_PropertyType"
+                                                                        placeholder="{i18n>selectPropertyType}"
+                                                                        showClearIcon="true"
+                                                                        busyIndicatorDelay="0"
+                                                                        items="{PropertyType>/}"
+                                                                    >
+                                                                        <core:ListItem
+                                                                            key="{PropertyType>PropertyType}"
+                                                                            text="{PropertyType>PropertyType}"
+                                                                        />
+                                                                    </ComboBox>
+                                                                </fb:control>
+                                                            </fb:FilterGroupItem>
+                                                            <fb:FilterGroupItem
+                                                                name="Property Name"
+                                                                label="Property Name"
                                                                 groupName="Group1"
                                                                 visibleInFilterBar="true"
                                                             >

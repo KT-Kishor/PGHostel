@@ -156,6 +156,7 @@ sap.ui.define([
             this.byId("id_Branch").setEnabled(true);
             this.byId("id_Area").setEnabled(true);
             this.byId("id_Roomtype").setEnabled(true);
+            this.byId("id_PropertyType").setEnabled(true);
 
             //  Create all static local models
             oView.setModel(new JSONModel({ CustomerName: "", MobileNo: "", Gender: "", DateOfBirth: "", CustomerEmail: "", RoomType: "" }), "HostelModel");
@@ -1177,6 +1178,7 @@ sap.ui.define([
                     this.byId("id_Branch").setBusy(true).setValueState("None");
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
+                    this.byId("id_PropertyType").setBusy(true)
 
 
                     try {
@@ -2552,13 +2554,16 @@ sap.ui.define([
             const oBranchCombo = oView.byId("id_Branch");
             const oAreaTypeCombo = oView.byId("id_Area");
             const oRoomTypeCombo = oView.byId("id_Roomtype");
+            const oPropertyTypeCombo = oView.byId("id_PropertyType");
             // 🔹 Reset all selected keys
             if (oBranchCombo) oBranchCombo.setSelectedKey("");
             if (oAreaTypeCombo) oAreaTypeCombo.setSelectedKey("");
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
-            // 🔹 Make Area and Room Type non-editable
+            if (oPropertyTypeCombo) oPropertyTypeCombo.setSelectedKey("").setValueState("None");
+            // 🔹 Make Area, Room Type and Property Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
+            if (oPropertyTypeCombo) oPropertyTypeCombo.setEnabled(false);
         },
 
         onPressBookingRow: function (oEvent) {
@@ -2711,9 +2716,11 @@ sap.ui.define([
             const oView = this.getView();
             const oAreaCombo = oView.byId("id_Area");
             const oRoomType = oView.byId("id_Roomtype");
+            const oPropertyType = oView.byId("id_PropertyType");
             // Reset previous selections
             oAreaCombo.setSelectedKey("").setEnabled(false);
             oRoomType.setSelectedKey("").setEnabled(false);
+            oPropertyType.setSelectedKey("").setValueState("None").setEnabled(false);
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
             // 🔹 Selected Branch Name
@@ -2732,6 +2739,7 @@ sap.ui.define([
             // 🔹 Enable the Area dropdown now that data is ready
             oAreaCombo.setEnabled(true);
             oRoomType.setEnabled(true);
+            oPropertyType.setEnabled(true);
 
         },
 
@@ -2820,13 +2828,30 @@ sap.ui.define([
             // If locality is empty, keep it empty (search by city only)
             var finalBranch = validArea ? validArea.LandMark : "";
             if (finalBranch === "") this.byId("id_Area").setValueState("None");
+
+            // Property Type ComboBox
+            var oPropertyTypeCB = this.byId("id_PropertyType");
+            var sSelectedPropertyType = oPropertyTypeCB.getSelectedKey() || oPropertyTypeCB.getValue();
+            if (sSelectedPropertyType) {
+                var aPropertyTypes = this.getOwnerComponent().getModel("PropertyType")?.getData() || [];
+                var validPropertyType = aPropertyTypes.find(item => item.PropertyType === sSelectedPropertyType);
+                if (!validPropertyType) {
+                    // User typed something, but it does not match the list
+                    MessageToast.show(this.i18nModel.getText("pleaseSelectValidPropertyType"));
+                    oPropertyTypeCB.setValueState("Error");
+                    return;
+                }
+                sSelectedPropertyType = validPropertyType.PropertyType;
+            }
+            oPropertyTypeCB.setValueState("None");
+
             this.isInitialLoad = false;
             this.isShowmore = true;
 
 
             try {
                 this.getBusyDialog()
-                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType);
+                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType, sSelectedPropertyType);
                 this.closeBusyDialog()
 
             } catch (e) {
@@ -2846,7 +2871,7 @@ sap.ui.define([
             this.isShowmore=false
 
 
-            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType);
+            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType);
             oContainer.setBusy(false);
         },
 
@@ -2876,6 +2901,7 @@ sap.ui.define([
             this.byId("id_Branch").setBusy(true).setValueState("None");;
             this.byId("id_Area").setBusy(true);
             this.byId("id_Roomtype").setBusy(true);
+            this.byId("id_PropertyType").setBusy(true);
 
             const oFooterModel = this.getView().getModel("FooterModel");
 
@@ -2932,9 +2958,9 @@ sap.ui.define([
 
                 if (aFiltered.length === 0 || sCity) {
 
-                    await this._loadFilteredData(sCity, "", "");
+                    await this._loadFilteredData(sCity, "", "", "");
                 } else {
-                    await this._loadFilteredData(this.City, "", "");
+                    await this._loadFilteredData(this.City, "", "", "");
                 }
                 const aUnique = aFiltered.filter((item, index, self) =>
                     index === self.findIndex(t => t.Name === item.Name && t.LandMark === item.LandMark)
@@ -2947,6 +2973,7 @@ sap.ui.define([
 
                 // Default selections
                 this.byId("id_Branch").setSelectedKey(sCity);
+                this.byId("id_PropertyType").setSelectedKey("").setValueState("None").setEnabled(true);
                 this.byId("id_Area").setEnabled(true).setSelectedKey("");
                 if (this.roomtype !== true) this.byId("id_Roomtype").setEnabled(true).setSelectedKey("");
             } catch (error) {
@@ -2956,6 +2983,7 @@ sap.ui.define([
                 this.byId("id_Branch").setBusy(false);
                 this.byId("id_Area").setBusy(false);
                 this.byId("id_Roomtype").setBusy(false);
+                this.byId("id_PropertyType").setBusy(false);
                 // ✅ show ROOMS footer after success OR failure
                 oFooterModel.setProperty("/showRoomsFooter", true);
                 oFooterModel.setProperty("/showGlobalFooter", false);
@@ -2999,7 +3027,7 @@ sap.ui.define([
                 });
             });
         },
-        _loadFilteredData: async function (Scity, sBranchCode, BranchName) {
+        _loadFilteredData: async function (Scity, sBranchCode, BranchName, sPropertyType) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
@@ -3008,7 +3036,7 @@ sap.ui.define([
                 return item.City === Scity
             })
             this.Branchlength = Branchdata.length
-         
+
             try {
                 let aBranchesData;
                 if (!this.isInitialLoad) {
@@ -3016,6 +3044,7 @@ sap.ui.define([
                         City: Scity,
                         LandMark: sBranchCode,
                         Name: BranchName,
+                        PropertyType: sPropertyType || "",
                         top: this.iTop,
                         skip: this.iSkip,
                         flag: "true"
@@ -3040,7 +3069,7 @@ sap.ui.define([
           
             this.Branchlength = Branchdata.length
                      };
-                         if (sBranchCode || BranchName) {
+                         if (sBranchCode || BranchName || sPropertyType) {
                         this.Branchlength = aBranchesData.length
                      }
                     let oAreaModel = this.getView().getModel("AreaModel");
@@ -3074,6 +3103,14 @@ sap.ui.define([
                     );
                 } else {
                     aFilteredBranches = aBranchesData;
+                }
+                // Property Type narrows whatever City / LandMark already matched.
+                // Applied client-side too because the cached BranchModel used on the
+                // initial load was fetched without a PropertyType.
+                if (sPropertyType) {
+                    aFilteredBranches = aFilteredBranches.filter(branch =>
+                        branch.PropertyType === sPropertyType
+                    );
                 }
                 if (aFilteredBranches.length === 0) {
                     oVisibilityModel.setProperty("/Branches", []);
@@ -3123,6 +3160,7 @@ sap.ui.define([
                 this.Scity = Scity
                 this.sBranchCode = sBranchCode
                 this.sACType = BranchName
+                this.sPropertyType = sPropertyType
                 if (this.iSkip === 0) {
                     oVisibilityModel.setProperty("/Branches", aBranches);
                 } else {
