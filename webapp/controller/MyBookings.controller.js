@@ -1,4 +1,4 @@
-sap.ui.define([
+﻿sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
@@ -27,6 +27,11 @@ sap.ui.define([
                 minDate: new Date(1950, 0, 1),
                 maxdate: new Date()
             }), "controller");
+
+            // Cache of member documents fetched on demand from
+            // HM_Documentonly, keyed by MemberID.
+            this._mMemberDocumentCache = {};
+
             this.getOwnerComponent().getRouter().getRoute("RouteMyBookings").attachMatched(this._onRouteMatched, this);
         },
 
@@ -158,13 +163,17 @@ sap.ui.define([
             }
 
             try {
-                var oResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID });
+                var oResponse = await this.ajaxReadWithJQuery("HM_Memberonly", { UserID: sUserID });
                 var aMembers = this._normalizeMemberData(oResponse);
 
                 oModel.setProperty("/Members", aMembers);
                 oModel.setProperty("/memberCount", aMembers.length);
+
+                // Document attachments are now loaded on demand, so the cache
+                // is reset whenever the lightweight list is (re)loaded.
+                this._mMemberDocumentCache = {};
             } catch (err) {
-                var aSelfMember = this._createSelfMemberRow([], null);
+                var aSelfMember = this._createSelfMemberRow(null);
                 oModel.setProperty("/Members", aSelfMember ? [aSelfMember] : []);
                 oModel.setProperty("/memberCount", aSelfMember ? 1 : 0);
                 MessageToast.show(err.message || err.responseText || "Unable to load member details");
@@ -232,14 +241,13 @@ sap.ui.define([
 
         _normalizeMemberData: function (oResponse) {
             var aMemberData = Array.isArray(oResponse && oResponse.data) ? oResponse.data : ((oResponse && oResponse.data) ? [oResponse.data] : []);
-            var aUserDocuments = aMemberData[0] && Array.isArray(aMemberData[0].Documents) ? aMemberData[0].Documents : [];
             var aMembers = aMemberData.map(function (oMember) {
-                return this._createMemberRow(oMember, aUserDocuments);
+                return this._createMemberRow(oMember);
             }.bind(this));
             var bHasSelf = aMembers.some(function (oMember) {
                 return this._isSelfRelation(oMember.Relation);
             }.bind(this));
-            var oSelfMember = bHasSelf ? null : this._createSelfMemberRow(aUserDocuments, aMemberData[0]);
+            var oSelfMember = bHasSelf ? null : this._createSelfMemberRow(aMemberData[0]);
 
             if (oSelfMember) {
                 aMembers.unshift(oSelfMember);
@@ -248,24 +256,7 @@ sap.ui.define([
             return aMembers;
         },
 
-        _createMemberRow: function (oMember, aUserDocuments) {
-            var oDoc = {};
-            var sAttachment = "";
-
-            if (oMember.Documents && oMember.Documents.length > 0) {
-                oDoc = oMember.Documents[0];
-            } else if (this._isSelfRelation(oMember.Relation) && aUserDocuments.length > 0) {
-                oDoc = aUserDocuments[0];
-            }
-
-            if (oDoc.File) {
-                if (oDoc.File.type === "Buffer" && Array.isArray(oDoc.File.data)) {
-                    sAttachment = this._bufferToBase64(oDoc.File.data);
-                } else if (typeof oDoc.File === "string") {
-                    sAttachment = oDoc.File;
-                }
-            }
-
+        _createMemberRow: function (oMember) {
             return {
                 Salutation: oMember.Salutation || "",
                 Name: oMember.Name || "",
@@ -273,34 +264,18 @@ sap.ui.define([
                 Gender: oMember.Gender || "",
                 Relation: this._normalizeRelation(oMember.Relation),
                 BookingID: oMember.BookingID || "",
-                DocumentType: oDoc.DocumentType || "",
                 MemberID: oMember.MemberID || "",
-                DocumentID: oDoc.DocumentID || "",
-                UserID: oDoc.UserID || "",
-                Attachment: sAttachment,
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || ""
+                UserID: oMember.UserID || ""
             };
         },
 
-        _createSelfMemberRow: function (aUserDocuments, oFallbackMember) {
+        _createSelfMemberRow: function (oFallbackMember) {
             var oUser = this._getLoggedInUser();
-            var oDoc = Array.isArray(aUserDocuments) && aUserDocuments.length > 0 ? aUserDocuments[0] : {};
             var sName = oUser.UserName || oUser.EmployeeName || oUser.name || (oFallbackMember && oFallbackMember.Name) || "";
-            var sAttachment = "";
+            var sUserID = oUser.UserID || oUser.EmployeeID || "";
 
-            if (!sName && !oUser.UserID && !oUser.EmployeeID) {
+            if (!sName && !sUserID) {
                 return null;
-            }
-
-            if (oDoc.File) {
-                if (oDoc.File.type === "Buffer" && Array.isArray(oDoc.File.data)) {
-                    sAttachment = this._bufferToBase64(oDoc.File.data);
-                } else if (typeof oDoc.File === "string") {
-                    sAttachment = oDoc.File;
-                }
-            } else if (oUser.FileContent) {
-                sAttachment = oUser.FileContent;
             }
 
             return {
@@ -310,22 +285,103 @@ sap.ui.define([
                 Gender: oUser.Gender || (oFallbackMember && oFallbackMember.Gender) || "",
                 Relation: "Self",
                 BookingID: oFallbackMember && oFallbackMember.BookingID || "",
-                DocumentType: oDoc.DocumentType || "",
-                MemberID: oUser.MemberID || "SELF",
-                DocumentID: oDoc.DocumentID || "",
-                UserID: oUser.UserID || oUser.EmployeeID || "",
-                Attachment: sAttachment,
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || ""
+                MemberID: oUser.MemberID || sUserID,
+                UserID: sUserID
             };
         },
 
-        _bufferToBase64: function (aBytes) {
-            var sBinary = "";
-            var aByteArray = new Uint8Array(aBytes);
+        /**
+         * Fetches the document of a single member on demand from
+         * HM_Documentonly (filtered by MemberID). Responses are cached
+         * per MemberID so repeat views/edits do not re-download the file.
+         *
+         * Only the MemberID of the pressed row is queried. There is no
+         * UserID fallback: a member without a document must resolve to
+         * "no document", never to the logged-in user's document.
+         *
+         * @param {string} sMemberID MemberID of the row (e.g. "00008_01")
+         * @returns {Promise<object>} normalized document, or {} when none
+         */
+        _fetchMemberDocument: async function (sMemberID) {
+            var sCacheKey = sMemberID || "";
 
-            for (var i = 0; i < aByteArray.length; i++) {
-                sBinary += String.fromCharCode(aByteArray[i]);
+            if (!sCacheKey) {
+                return {};
+            }
+
+            if (!this._mMemberDocumentCache) {
+                this._mMemberDocumentCache = {};
+            }
+
+            if (this._mMemberDocumentCache[sCacheKey]) {
+                return this._mMemberDocumentCache[sCacheKey];
+            }
+
+            var oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", {
+                MemberID: sMemberID
+            });
+
+            var aDocuments = Array.isArray(oResponse && oResponse.Documents) ?
+                oResponse.Documents :
+                (Array.isArray(oResponse && oResponse.data) ? oResponse.data : []);
+
+            // Guard against a backend that ignores/loosens the filter and
+            // returns documents belonging to another member.
+            var oDoc = (aDocuments || []).filter(function (oCandidate) {
+                return !oCandidate.MemberID ||
+                    String(oCandidate.MemberID) === String(sMemberID);
+            })[0] || null;
+
+            if (!oDoc) {
+                // Cache the "no document" result as well so repeated clicks
+                // on a member without an attachment do not re-hit the backend.
+                this._mMemberDocumentCache[sCacheKey] = {};
+                return {};
+            }
+
+            var oNormalized = {
+                DocumentID: oDoc.DocumentID || "",
+                DocumentType: oDoc.DocumentType || "",
+                FileName: oDoc.FileName || "",
+                FileType: oDoc.FileType || "",
+                MemberID: oDoc.MemberID || sMemberID || "",
+                UserID: oDoc.UserID || "",
+                Attachment: this._fileToBase64(oDoc.File)
+            };
+
+            this._mMemberDocumentCache[sCacheKey] = oNormalized;
+
+            return oNormalized;
+        },
+
+        /**
+         * Converts a file payload coming from the backend (Node Buffer or
+         * already base64 string) into plain base64.
+         */
+        _fileToBase64: function (oFile) {
+            if (!oFile) {
+                return "";
+            }
+
+            if (oFile.type === "Buffer" && Array.isArray(oFile.data)) {
+                return this._bufferToBase64(oFile.data);
+            }
+
+            if (typeof oFile === "string") {
+                return oFile;
+            }
+
+            return "";
+        },
+
+        _bufferToBase64: function (aBytes) {
+            var aByteArray = new Uint8Array(aBytes);
+            var iChunkSize = 8192;
+            var sBinary = "";
+
+            // Chunked so large attachments do not overflow the call stack.
+            for (var i = 0; i < aByteArray.length; i += iChunkSize) {
+                sBinary += String.fromCharCode.apply(null, aByteArray.subarray(i, i + iChunkSize));
             }
 
             return btoa(sBinary);
@@ -594,12 +650,13 @@ sap.ui.define([
         },
 
         _getMemberSearchFilters: function (sQuery) {
+            // DocumentType is no longer part of the member list data, it is
+            // fetched on demand, so it cannot be searched here.
             return [
                 new Filter("Salutation", FilterOperator.Contains, sQuery),
                 new Filter("Name", FilterOperator.Contains, sQuery),
                 new Filter("Relation", FilterOperator.Contains, sQuery),
-                new Filter("BookingID", FilterOperator.Contains, sQuery),
-                new Filter("DocumentType", FilterOperator.Contains, sQuery)
+                new Filter("BookingID", FilterOperator.Contains, sQuery)
             ];
         },
 
@@ -671,16 +728,35 @@ sap.ui.define([
             });
         },
 
-        onViewMemberDocument: function (oEvent) {
+        onViewMemberDocument: async function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("myBookings");
             var oMember = oContext && oContext.getObject();
 
-            if (!oMember || !oMember.Attachment) {
+            if (!oMember || !oMember.MemberID) {
                 MessageToast.show("No document available");
                 return;
             }
 
-            this._previewDocument(oMember);
+            // The member list is loaded without attachments, so the document
+            // of this row is fetched here, on demand, strictly by its MemberID.
+            var oDoc = {};
+
+            this.getBusyDialog();
+            try {
+                oDoc = await this._fetchMemberDocument(oMember.MemberID);
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText || "No document available");
+                return;
+            } finally {
+                this.closeBusyDialog();
+            }
+
+            if (!oDoc || !oDoc.Attachment) {
+                MessageToast.show("No document available");
+                return;
+            }
+
+            this._previewDocument(oDoc);
         },
 
         onPressAddMember: function () {
@@ -712,7 +788,7 @@ sap.ui.define([
             this.UD_Dialog.open();
         },
 
-        onEditMemberFromDialog: function (oEvent) {
+        onEditMemberFromDialog: async function (oEvent) {
             this._ensureMemberDialog();
             this._mode = "UPDATE";
             this.getView().getModel("viewModel").setProperty("/mode", "UPDATE");
@@ -728,14 +804,27 @@ sap.ui.define([
             // The table row may not carry UserID, fall back to the profile.
             var sEditUserID = oData.UserID || this._getLoggedInUserId() || "";
 
+            // The member list is loaded without attachments, so the document
+            // is fetched here, on demand, to keep UPDATE payloads intact.
+            var oDoc = {};
+
+            this.getBusyDialog();
+            try {
+                oDoc = await this._fetchMemberDocument(oData.MemberID);
+            } catch (err) {
+                // Dialog still opens; the document block is simply empty.
+            } finally {
+                this.closeBusyDialog();
+            }
+
             this._existingFileData = {
-                DocumentID: oData.DocumentID || "",
+                DocumentID: oDoc.DocumentID || "",
                 MemberID: oData.MemberID || "",
                 UserID: sEditUserID,
-                FileName: oData.FileName || "",
-                FileType: oData.FileType || "",
-                File: oData.Attachment || "",
-                DocumentType: oData.DocumentType || ""
+                FileName: oDoc.FileName || "",
+                FileType: oDoc.FileType || "",
+                File: oDoc.Attachment || "",
+                DocumentType: oDoc.DocumentType || ""
             };
 
             this.getView().setModel(new JSONModel({
@@ -746,15 +835,18 @@ sap.ui.define([
                 Relation: this._normalizeRelation(oData.Relation),
                 Gender: oData.Gender || "",
                 DateOfBirth: this._formatDateForDialog(oData.DateOfBirth),
-                DocumentType: oData.DocumentType || "",
-                DocumentName: oData.FileName || "",
-                Document: oData.Attachment || "",
-                File: oData.Attachment || "",
-                FileType: oData.FileType || "",
+                DocumentType: oDoc.DocumentType || "",
+                DocumentName: oDoc.FileName || "",
+                Document: oDoc.Attachment || "",
+                File: oDoc.Attachment || "",
+                FileType: oDoc.FileType || "",
                 DocumentFile: null
             }), "Member");
 
-            this._resetMemberDialogControls(oData);
+            this._resetMemberDialogControls(Object.assign({}, oData, {
+                DocumentType: oDoc.DocumentType || "",
+                FileName: oDoc.FileName || ""
+            }));
             this.UD_Dialog.open();
         },
 
@@ -1189,6 +1281,14 @@ sap.ui.define([
                 if (this.UD_Dialog) {
                     this.UD_Dialog.close();
                 }
+
+                // The stored document changed, so drop the cached copy for
+                // this member to force a fresh HM_Documentonly fetch.
+                var sMemberID = oDoc.Members && oDoc.Members[0] && oDoc.Members[0].MemberID;
+                if (sMemberID && this._mMemberDocumentCache) {
+                    delete this._mMemberDocumentCache[sMemberID];
+                }
+
                 this._selectedFile = null;
                 this._existingFileData = null;
                 MessageToast.show("Document uploaded successfully");
@@ -1783,7 +1883,7 @@ sap.ui.define([
             var oTempModel = oView.getModel("complaintTemp");
             var aAll = this._getComplaintCustomerData();
 
-            // Customer data not loaded yet → nothing to filter
+            // Customer data not loaded yet â†’ nothing to filter
             if (!oTempModel || !aAll.length) {
                 return;
             }
@@ -2011,7 +2111,7 @@ sap.ui.define([
                 oTempModel.setProperty("/RoomNo", sRoomNo);
             }
 
-            // Room cleared or invalid → release the dependent fields
+            // Room cleared or invalid â†’ release the dependent fields
             if (!sRoomNo) {
                 this._clearComplaintCustomerBooking();
                 return;
@@ -2031,7 +2131,7 @@ sap.ui.define([
             var bValid = utils._LCstrictValidationComboBox(oCombo, "ID");
             this.BranchCode = bValid ? oCombo.getSelectedKey() : "";
 
-            // New branch → drop cached customer/booking data and unlock dependents
+            // New branch â†’ drop cached customer/booking data and unlock dependents
             this._aComplaintCustomerData = [];
             this._clearComplaintCustomerBooking();
 

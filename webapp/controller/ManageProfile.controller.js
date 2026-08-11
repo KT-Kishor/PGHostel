@@ -51,6 +51,10 @@ sap.ui.define([
                 mode: "CREATE"
             }), "viewModel");
 
+            // Cache of member documents fetched on demand from
+            // HM_Documentonly, keyed by MemberID.
+            this._mMemberDocumentCache = {};
+
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -919,7 +923,7 @@ sap.ui.define([
             this.UD_Dialog.open();
         },
 
-        onEditMemberFromDialog: function (oEvent) {
+        onEditMemberFromDialog: async function (oEvent) {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
@@ -947,21 +951,33 @@ sap.ui.define([
                 this.getView().getModel("profileData").getProperty("/UserID") ||
                 "";
 
+            // The member list is loaded without attachments, so the document
+            // is fetched here, on demand, to keep UPDATE payloads intact.
+            let oDoc = {};
+
+            this.getBusyDialog();
+            try {
+                oDoc = await this._fetchMemberDocument(oData.MemberID);
+            } catch (err) {
+                // Dialog still opens; the document block is simply empty.
+            } finally {
+                this.closeBusyDialog();
+            }
+
+            const sDateOfBirth = String(oData.DateOfBirth || "");
+
             this._existingFileData = {
-                FileName: oData.FileName,
-                FileType: oData.FileType,
-                File: oData.Attachment, // already base64
-                DateOfBirth: oData.DateOfBirth || "",
+                DateOfBirth: sDateOfBirth || "",
                 Gender: oData.Gender || "",
                 Relation: oData.Relation || "",
                 MemberID: oData.MemberID || "",
                 UserID: sEditUserID,
                 Salutation: oData.Salutation,
-                DocumentID: oData.DocumentID || "",
-                FileName: oData.FileName || "",
-                FileType: oData.FileType || "",
-                File: oData.Attachment || "",
-                DocumentType: oData.DocumentType || ""
+                DocumentID: oDoc.DocumentID || "",
+                FileName: oDoc.FileName || "",
+                FileType: oDoc.FileType || "",
+                File: oDoc.Attachment || "",
+                DocumentType: oDoc.DocumentType || ""
             };
 
             const oMemberData = {
@@ -971,14 +987,14 @@ sap.ui.define([
                 Name: oData.Name || "",
                 Relation: oData.Relation || "",
                 Gender: oData.Gender || "",
-                DateOfBirth: oData.DateOfBirth ?
-                    oData.DateOfBirth.split("-").reverse().join("/") :
+                DateOfBirth: sDateOfBirth ?
+                    sDateOfBirth.split("-").reverse().join("/") :
                     "",
-                DocumentType: oData.DocumentType || "",
-                DocumentName: oData.FileName || "",
-                Document: oData.Attachment || "",
-                File: oData.Attachment || "",
-                FileType: oData.FileType || "",
+                DocumentType: oDoc.DocumentType || "",
+                DocumentName: oDoc.FileName || "",
+                Document: oDoc.Attachment || "",
+                File: oDoc.Attachment || "",
+                FileType: oDoc.FileType || "",
                 DocumentFile: null
             };
 
@@ -987,9 +1003,9 @@ sap.ui.define([
                 "Member"
             );
 
-            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oData.DocumentType || "").setValueState("None");
-            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oData.FileName || "").setValueState("None");
-            sap.ui.getCore().byId("MemberDOB").setValue(oData.DateOfBirth.split('-').reverse().join('/') || "").setValueState("None");
+            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oDoc.DocumentType || "").setValueState("None");
+            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oDoc.FileName || "").setValueState("None");
+            sap.ui.getCore().byId("MemberDOB").setValue(sDateOfBirth.split('-').reverse().join('/') || "").setValueState("None");
 
             sap.ui.getCore().byId("MemberGenderCombo").setValue(oData.Gender || "").setValueState("None");
 
@@ -1922,6 +1938,14 @@ sap.ui.define([
 
             oPromise.then(() => {
                 this.onTableSelect();
+
+                // The stored document changed, so drop the cached copy for
+                // this member to force a fresh HM_Documentonly fetch.
+                const sMemberID = oDoc.Members && oDoc.Members[0] && oDoc.Members[0].MemberID;
+                if (sMemberID && this._mMemberDocumentCache) {
+                    delete this._mMemberDocumentCache[sMemberID];
+                }
+
                 this.UD_Dialog.close();
                 this._selectedFile = null;
                 this._existingFileData = null;
@@ -2263,74 +2287,150 @@ sap.ui.define([
             else if (sKey === "Damage") {
                 await this._loadDamage();
             } else if (sKey === "Members") {
-                // await this._loadMembers();
-                this.getBusyDialog();
+                await this._loadMembers();
+            }
+        },
+
+        /**
+         * Loads member master data (without file attachments) from HM_Memberonly
+         * for the logged-in user. File content is NOT loaded here - it is
+         * fetched lazily per member via HM_Documentonly (see
+         * _fetchMemberDocument) when the user views/edits the document.
+         */
+        _loadMembers: async function () {
+            const oModel = this.getView().getModel("profileData");
+            this.getBusyDialog();
+            try {
                 const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
                 if (!sUserID) {
                     MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
                     return;
                 }
 
-                const resp = await this.ajaxReadWithJQuery("HM_MemberDocument", {
+                const resp = await this.ajaxReadWithJQuery("HM_Memberonly", {
                     UserID: sUserID
                 });
-                // New structure: { success: true, data: [...], UserDocuments: [...] }
+
                 const aMemberData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
-                const aUserDocuments = resp.data[0].Documents;
 
-                const aMembers = aMemberData.map(mem => {
-                    // Handle Documents array - could be empty
-                    let oDoc = {};
-                    let sAttachment = "";
-
-                    // First check member's own documents
-                    if (mem.Documents && mem.Documents.length > 0) {
-                        // Take first document
-                        oDoc = mem.Documents[0];
-                    }
-                    // If member is SELF and has no documents, check user documents
-                    else if ((mem.Relation || "").toUpperCase() === "SELF" && aUserDocuments.length > 0) {
-                        // Take first user document
-                        oDoc = aUserDocuments[0];
-                    }
-
-                    // Convert Buffer to base64 if needed
-                    if (oDoc.File) {
-                        if (oDoc.File.type === "Buffer" && Array.isArray(oDoc.File.data)) {
-                            // Convert byte array to base64
-                            const byteArray = new Uint8Array(oDoc.File.data);
-                            let binary = "";
-                            for (let i = 0; i < byteArray.length; i++) {
-                                binary += String.fromCharCode(byteArray[i]);
-                            }
-                            sAttachment = btoa(binary);
-                        } else if (typeof oDoc.File === "string") {
-                            sAttachment = oDoc.File;
-                        }
-                    }
-
-                    return {
-                        Salutation: mem.Salutation || "",
-                        Name: mem.Name || "",
-                        DateOfBirth: mem.DateOfBirth || "",
-                        Gender: mem.Gender || "",
-                        Relation: mem.Relation || "",
-                        BookingID: mem.BookingID || "",
-                        DocumentType: oDoc.DocumentType || "",
-                        MemberID: mem.MemberID || "",
-                        DocumentID: oDoc.DocumentID || "",
-                        UserID: oDoc.UserID || "",
-                        Attachment: sAttachment,
-                        FileName: oDoc.FileName || "",
-                        Salutation: mem.Salutation || "",
-                        FileType: oDoc.FileType || ""
-                    };
-                });
+                const aMembers = aMemberData.map(mem => ({
+                    Salutation: mem.Salutation || "",
+                    Name: mem.Name || "",
+                    DateOfBirth: mem.DateOfBirth || "",
+                    Gender: mem.Gender || "",
+                    Relation: mem.Relation || "",
+                    BookingID: mem.BookingID || "",
+                    MemberID: mem.MemberID || "",
+                    UserID: mem.UserID || sUserID
+                }));
 
                 oModel.setProperty("/Members", aMembers);
+
+                // Document attachments are now loaded on demand, so the cache
+                // is reset whenever the lightweight list is (re)loaded.
+                this._mMemberDocumentCache = {};
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText || "Error loading members");
+            } finally {
                 this._updateRowCount();
-                this.closeBusyDialog()
+                this.closeBusyDialog();
             }
+        },
+
+        /**
+         * Fetches the document of a single member on demand from
+         * HM_Documentonly (filtered by MemberID). Responses are cached
+         * per MemberID so repeat views/edits do not re-download the file.
+         *
+         * Only the MemberID of the pressed row is queried. There is no
+         * UserID fallback: a member without a document must resolve to
+         * "no document", never to the logged-in user's document.
+         *
+         * @param {string} sMemberID MemberID of the row (e.g. "00008_01")
+         * @returns {Promise<object>} { DocumentID, DocumentType, FileName,
+         *                            FileType, Attachment, MemberID, UserID }
+         *                            or {} when the member has no document
+         */
+        _fetchMemberDocument: async function (sMemberID) {
+            const sCacheKey = sMemberID || "";
+
+            if (!sCacheKey) {
+                return {};
+            }
+
+            if (this._mMemberDocumentCache && this._mMemberDocumentCache[sCacheKey]) {
+                return this._mMemberDocumentCache[sCacheKey];
+            }
+
+            let oDoc = null;
+
+            const resp = await this.ajaxReadWithJQuery("HM_Documentonly", {
+                MemberID: sMemberID
+            });
+
+            const aDocuments = Array.isArray(resp?.Documents) ?
+                resp.Documents :
+                (Array.isArray(resp?.data) ? resp.data : []);
+
+            // Guard against a backend that ignores/loosens the filter and
+            // returns documents belonging to another member.
+            oDoc = (aDocuments || []).find(function (oCandidate) {
+                return !oCandidate.MemberID ||
+                    String(oCandidate.MemberID) === String(sMemberID);
+            }) || null;
+
+            if (!oDoc) {
+                // Cache the "no document" result as well so repeated clicks
+                // on a member without an attachment do not re-hit the backend.
+                if (this._mMemberDocumentCache) {
+                    this._mMemberDocumentCache[sCacheKey] = {};
+                }
+                return {};
+            }
+
+            const oNormalized = {
+                DocumentID: oDoc.DocumentID || "",
+                DocumentType: oDoc.DocumentType || "",
+                FileName: oDoc.FileName || "",
+                FileType: oDoc.FileType || "",
+                MemberID: oDoc.MemberID || sMemberID || "",
+                UserID: oDoc.UserID || "",
+                Attachment: this._fileToBase64(oDoc.File)
+            };
+
+            if (this._mMemberDocumentCache) {
+                this._mMemberDocumentCache[sCacheKey] = oNormalized;
+            }
+
+            return oNormalized;
+        },
+
+        /**
+         * Converts a file payload coming from the backend (Node Buffer or
+         * already base64 string) into plain base64. Uses chunked encoding so
+         * large attachments convert without freezing the UI thread.
+         */
+        _fileToBase64: function (oFile) {
+            if (!oFile) {
+                return "";
+            }
+
+            if (oFile.type === "Buffer" && Array.isArray(oFile.data)) {
+                const aBytes = new Uint8Array(oFile.data);
+                const iChunkSize = 8192;
+                let sBinary = "";
+                for (let i = 0; i < aBytes.length; i += iChunkSize) {
+                    const aChunk = aBytes.subarray(i, i + iChunkSize);
+                    sBinary += String.fromCharCode.apply(null, aChunk);
+                }
+                return btoa(sBinary);
+            }
+
+            if (typeof oFile === "string") {
+                return oFile;
+            }
+
+            return "";
         },
 
         _loadBookings: async function () {
@@ -4014,6 +4114,7 @@ sap.ui.define([
                         if (
                             last.startsWith("iVB") ||   // PNG
                             last.startsWith("/9j") ||   // JPG / JPEG
+                            last.startsWith("UklGR") || // WEBP
                             last.startsWith("JVBER")    // PDF
                         ) {
                             return last;
@@ -4028,24 +4129,49 @@ sap.ui.define([
                 return last;
             }
 
-            const oData = oEvent
+            const oRow = oEvent
                 .getSource()
                 .getBindingContext("profileData")
                 ?.getObject();
 
+            if (!oRow || !oRow.MemberID) {
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("noDocumentFoundforthismember") || "No document available"
+                );
+                return;
+            }
+
+            // The member list is loaded without attachments, so the document
+            // of this row is fetched here, on demand, strictly by its MemberID.
+            let oData = {};
+
+            this.getBusyDialog();
+            try {
+                oData = await this._fetchMemberDocument(oRow.MemberID);
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText || "No document found");
+                return;
+            } finally {
+                this.closeBusyDialog();
+            }
+
             if (!oData || !oData.Attachment) {
-                sap.m.MessageToast.show("No document found");
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("noDocumentFoundforthismember") || "No document found"
+                );
                 return;
             }
 
             const sBase64 = autoDecodeBase64(oData.Attachment);
 
-            let sMimeType = "application/octet-stream";
+            let sMimeType = oData.FileType || "application/octet-stream";
 
             if (sBase64.startsWith("iVB")) {
                 sMimeType = "image/png";
             } else if (sBase64.startsWith("/9j")) {
                 sMimeType = "image/jpeg";
+            } else if (sBase64.startsWith("UklGR")) {
+                sMimeType = "image/webp";
             } else if (sBase64.startsWith("JVBER")) {
                 sMimeType = "application/pdf";
             }
