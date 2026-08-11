@@ -114,7 +114,8 @@
                 path: 'myBookings>/bookings',
                 sorter: [
                     { path: 'bookingGroup', descending: false, group: true },
-                    { path: 'BookingDateSort', descending: true }
+                    { path: 'BookingDateSort', descending: true },
+                    { path: 'BookingID', descending: true  }
                 ]
             }"
             width="auto"
@@ -122,13 +123,13 @@
         >
             <columns>
                 <Column demandPopin="true">
+                    <Text text="{i18n>bookingDate}" />
+                </Column>
+                <Column demandPopin="true">
                     <Text text="{i18n>bookingID}" />
                 </Column>
                 <Column demandPopin="true">
                     <Text text="{i18n>customerName}" />
-                </Column>
-                <Column demandPopin="true">
-                    <Text text="{i18n>bookingDate}" />
                 </Column>
                 <Column
                     demandPopin="true"
@@ -155,9 +156,9 @@
                     press="onPressBookingRow"
                 >
                     <cells>
+                        <Text text="{myBookings>BookingDate}" />        
                         <Text text="{myBookings>BookingID}" />
                         <Text text="{myBookings>customerName}" />
-                        <Text text="{myBookings>BookingDate}" />
                         <Text text="{myBookings>room}" />
                         <Text text="{path:'myBookings>amount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}" />
                         <ObjectStatus
