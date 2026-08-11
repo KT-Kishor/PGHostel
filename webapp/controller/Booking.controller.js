@@ -5353,6 +5353,7 @@
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
                     styleClass: "myUnifiedBtn",
+                    contentWidth: "400px",
                     onClose: function (sAction) {
                         if (sAction !== MessageBox.Action.YES) {
                             this._restoreRoomPlanSelection(oComboBox, sPreviousPlan);
