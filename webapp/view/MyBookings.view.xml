@@ -230,7 +230,6 @@
             visible="{= ${myBookings>/selectedTab} === 'Payment' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No payments found"
             items="{
                 path:'myBookings>/Payments',
                 sorter:[{ path:'PaymentGroup', group:true }]
