@@ -118,7 +118,7 @@
 				</headerToolbar>
 				<columns>
 					<Column demandPopin="true">
-						<Text text="{i18n>BookingID}" tooltip="{i18n>customer}"/>
+						<Text text="{i18n>BCustomerID}" tooltip="{i18n>customer}"/>
 					</Column>
 					<Column demandPopin="true">
 						<Text text="{i18n>customerName}" tooltip="{i18n>customerName}"/>

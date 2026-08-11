@@ -2843,6 +2843,7 @@ sap.ui.define([
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
                     const oCompanyItemModel = oManageInvoiceItemModel.ManageInvoiceItem || [];
                     var data = this.getView().getModel("FilteredSOWModel").getData();
@@ -2906,7 +2907,7 @@ sap.ui.define([
                     },
                     {
                         label: 'Room No :',
-                        value: oModel.RoomNo
+                        value: oModel1.RoomNo
                     }
                     ];
 
@@ -3414,6 +3415,7 @@ sap.ui.define([
 
                     //  MODELS 
                     const oCustomerModel = oView.getModel("SelectedCustomerModel").getData();
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
                     const oSOWModel = oView.getModel("FilteredSOWModel").getData();
 
                     //  GST MASTER CHECK (SAME AS UI) 
@@ -3568,12 +3570,12 @@ sap.ui.define([
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
                         ["Date :", oCustomerModel.InvoiceDate.includes("-") ? Formatter.formatDate(oCustomerModel.InvoiceDate) : oCustomerModel.InvoiceDate],
-                        ["Room No :", oCustomerModel.RoomNo]
+                        ["Room No :", oModel1.RoomNo]
                     ];
 
                     details.forEach(row => {
                         doc.text(row[0], pageWidth - 80, currentY);
-                        doc.text(String(row[1] || ""), pageWidth - 45, currentY);
+                        doc.text(String(row[1] || ""), pageWidth - 53, currentY);
                         currentY += 6;
                     });
 
@@ -3822,6 +3824,7 @@ sap.ui.define([
 
                     //  FETCH OVERALL INVOICE DATA 
                     const filterData = oView.getModel("SelectedCustomerModel").getData();
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
 
                     const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
                         BookingID: [filterData.BookingID]
@@ -3904,7 +3907,7 @@ sap.ui.define([
                         },
                         {
                             label: "Room No :",
-                            value: oModel.RoomNo
+                            value: oModel1.RoomNo
                         }
                         ];
 
