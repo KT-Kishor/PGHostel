@@ -35,9 +35,20 @@
                     id="HM_id_RefundAmount"
                     placeholder="Enter refund amount"
                     value="{RefundModel>/RefundAmount}"
-                    maxLength="6"
+                    maxLength="7"
                     valueStateText="Enter refund amount"
                     editable="false"
+                />
+                 <Label text="Refund Payment" 
+                    required="true"
+                 />
+                <Input
+                    id="HM_id_Refundpay"
+                    placeholder="Enter refund payment"
+                    value="{RefundModel>/RefundPayment}"
+                    maxLength="7"
+                    valueStateText="Enter refund payment"
+                    liveChange="onLiveRefundpay"
                 />
 
                 <Label
@@ -72,7 +83,7 @@
                 />
 
                 <Label
-                    text="{i18n>invoiceReceivedDate}"
+                    text="{i18n>invoiceRefunddDate}"
                     required="true"
                 />
                 <DatePicker

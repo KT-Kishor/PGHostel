@@ -1596,7 +1596,7 @@ sap.ui.define([
                     CustomerGSTName: oSelectedCustomerModel.CustomerGSTName || "",
                     CustomerGSTAddress: oSelectedCustomerModel.CustomerGSTAddress || "",
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
-                    DueAmount: Math.max(0, balanceAmount || "")
+                    DueAmount: balanceAmount
                 };
 
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
@@ -1872,8 +1872,8 @@ sap.ui.define([
                 oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                 this.totalAmountCalculation();
             },
-            
-               CI_onPercentageChange: function (oEvent) {
+
+            CI_onPercentageChange: function (oEvent) {
                 const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
 
                 const oView = this.getView();
@@ -2478,6 +2478,9 @@ sap.ui.define([
 
             onLiveTransactionID: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
+            },
+            onLiveRefundpay: function (oEvent) {
+                utils.onNumber(oEvent.getSource(), "ID");
             },
 
             onPaymentModeChange: function (oEvent) {
@@ -4355,6 +4358,7 @@ sap.ui.define([
             HM_onPressRefundAmount: async function () {
                 var RefundModel = this.getView().getModel("RefundModel").getData();
                 const isMandatoryValid =
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("HM_id_PaymentMode"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("HM_id_ReceivedDate"), "ID");
@@ -4371,7 +4375,7 @@ sap.ui.define([
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    Amount: (RefundModel.RefundAmount),
+                    Amount: Number(RefundModel.RefundPayment).toFixed(2),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
                     BookingID: RefundModel.BookingID,
@@ -4399,6 +4403,23 @@ sap.ui.define([
                         var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
                             InvNo: this.decodedPath
                         });
+
+                        const invoiceModel = this.getView().getModel("InvoicePayment");
+
+
+                        var balanceAmount = Number(RefundModel.RefundPayment).toFixed(2) - invoiceModel.getProperty("/AllDueAmount").toFixed(2)
+
+                        var Payload = {
+                            DueAmount: balanceAmount,
+                        }
+
+                        await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                            data: Payload,
+                            filtres: {
+                                InvNo: String(RefundModel.InvNo)
+                            }
+                        });
+
 
                         const oInvoice = oResult.data.ManageInvoice[0];
                         const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
