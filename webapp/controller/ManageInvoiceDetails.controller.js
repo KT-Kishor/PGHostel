@@ -4358,7 +4358,7 @@ sap.ui.define([
             HM_onPressRefundAmount: async function () {
                 var RefundModel = this.getView().getModel("RefundModel").getData();
                 const isMandatoryValid =
-                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
+                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
                     utils._LCstrictValidationComboBox(sap.ui.getCore().byId("HM_id_PaymentMode"), "ID") &&
                     utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
                     utils._LCvalidateDate(sap.ui.getCore().byId("HM_id_ReceivedDate"), "ID");
@@ -4375,7 +4375,7 @@ sap.ui.define([
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    Amount: Number(RefundModel.RefundPayment).toFixed(2),
+                    Amount: Number(RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
                     BookingID: RefundModel.BookingID,
@@ -4393,6 +4393,13 @@ sap.ui.define([
 
                     if (oData && oData.success) {
                         this.oDialog.close();
+
+                          await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                            data: Payload,
+                            filtres: {
+                                InvNo: String(RefundModel.InvNo)
+                            }
+                        });
 
                         await this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
@@ -4413,12 +4420,7 @@ sap.ui.define([
                             DueAmount: balanceAmount,
                         }
 
-                        await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
-                            data: Payload,
-                            filtres: {
-                                InvNo: String(RefundModel.InvNo)
-                            }
-                        });
+                      
 
 
                         const oInvoice = oResult.data.ManageInvoice[0];
