@@ -5091,6 +5091,8 @@
                 oModel.setProperty("/SelectedPriceType", aPaymentMethods[0].key);
             }
 
+            this._sConfirmedRoomPlan = oModel.getProperty("/SelectedPriceType") || "";
+
             oModel.setProperty("/SelectedPerson", String(oData.SelectedPerson || "1"));
 
             // Load saved members from backend-provided booking data.
@@ -5298,10 +5300,10 @@
             };
         },
 
-        onRoomPlanChange: function (oEvent) {
+        _applyRoomPlanChange: function (sSelectedPlan) {
             const oModel = this.getView().getModel("HostelModel");
 
-            oModel.setProperty("/SelectedPriceType", oEvent.getSource().getSelectedKey());
+            oModel.setProperty("/SelectedPriceType", sSelectedPlan);
             oModel.setProperty("/SelectedMonths", "1");
             oModel.setProperty("/StartDate", "");
             oModel.setProperty("/EndDate", "");
@@ -5311,6 +5313,80 @@
             this._syncPlanState();
             this._applyFacilityPriceFilter();
             this._refreshCouponAndSummary({ checkDateWindow: true });
+        },
+
+        _handleRoomPlanChange: function (oEvent) {
+            const oComboBox = oEvent.getSource();
+            const oModel = this.getView().getModel("HostelModel");
+            const sSelectedPlan = oComboBox.getSelectedKey();
+            const sPreviousPlan = this._sConfirmedRoomPlan || "";
+            const aSelectedFacilities = oModel.getProperty("/AllSelectedFacilities") || [];
+            const oFacilityModel = this.getView().getModel("FacilityModel");
+            const aVisibleFacilities = oFacilityModel ? oFacilityModel.getProperty("/Facilities") || [] : [];
+            const bHasSelectedFacilities = aSelectedFacilities.length > 0 ||
+                aVisibleFacilities.some(function (oFacility) {
+                    return !!oFacility.Selected;
+                }) ||
+                (this._aAllFacilities || []).some(function (oFacility) {
+                    return !!oFacility.Selected;
+                });
+
+            if (!sSelectedPlan || sSelectedPlan === sPreviousPlan) {
+                return;
+            }
+
+            if (!bHasSelectedFacilities) {
+                this._sConfirmedRoomPlan = sSelectedPlan;
+                this._applyRoomPlanChange(sSelectedPlan);
+                return;
+            }
+
+            // Keep the current booking unchanged until the user confirms.
+            oComboBox.setSelectedKey(sPreviousPlan);
+            oModel.setProperty("/SelectedPriceType", sPreviousPlan);
+
+            MessageBox.confirm(
+                "Changing the room plan will remove all selected facilities. Do you want to continue?",
+                {
+                    title: "Confirm Room Plan Change",
+                    icon: MessageBox.Icon.WARNING,
+                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                    emphasizedAction: MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
+                    onClose: function (sAction) {
+                        if (sAction !== MessageBox.Action.YES) {
+                            this._restoreRoomPlanSelection(oComboBox, sPreviousPlan);
+                            return;
+                        }
+
+                        oComboBox.setSelectedKey(sSelectedPlan);
+                        this._sConfirmedRoomPlan = sSelectedPlan;
+                        this._applyRoomPlanChange(sSelectedPlan);
+                    }.bind(this)
+                }
+            );
+        },
+
+        _restoreRoomPlanSelection: function (oComboBox, sRoomPlan) {
+            const oModel = this.getView().getModel("HostelModel");
+
+            oModel.setProperty("/SelectedPriceType", sRoomPlan);
+            oModel.refresh(true);
+            oComboBox.setSelectedKey(sRoomPlan);
+
+            // The ComboBox binding can finish its update after MessageBox closes.
+            // Apply the same value once more after that binding cycle.
+            setTimeout(function () {
+                if (oComboBox && !oComboBox.bIsDestroyed) {
+                    oModel.setProperty("/SelectedPriceType", sRoomPlan);
+                    oModel.refresh(true);
+                    oComboBox.setSelectedKey(sRoomPlan);
+                }
+            }, 0);
+        },
+
+        onRoomPlanChange: function (oEvent) {
+            this._handleRoomPlanChange(oEvent);
         },
 
         onDurationChange: function (oEvent) {
