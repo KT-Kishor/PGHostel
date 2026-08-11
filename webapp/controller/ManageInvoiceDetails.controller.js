@@ -4375,7 +4375,7 @@ sap.ui.define([
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    Amount: Number(RefundModel.RefundAmount),
+                    Amount:(RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
                     BookingID: RefundModel.BookingID,
@@ -4394,13 +4394,7 @@ sap.ui.define([
                     if (oData && oData.success) {
                         this.oDialog.close();
 
-                          await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
-                            data: Payload,
-                            filtres: {
-                                InvNo: String(RefundModel.InvNo)
-                            }
-                        });
-
+            
                         await this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
@@ -4411,6 +4405,9 @@ sap.ui.define([
                             InvNo: this.decodedPath
                         });
 
+                        
+
+
                         const invoiceModel = this.getView().getModel("InvoicePayment");
 
 
@@ -4419,6 +4416,13 @@ sap.ui.define([
                         var Payload = {
                             DueAmount: balanceAmount,
                         }
+
+                         await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                            data: Payload,
+                            filtres: {
+                                InvNo: String(RefundModel.InvNo)
+                            }
+                        });
 
                       
 

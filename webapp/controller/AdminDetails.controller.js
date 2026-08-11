@@ -2732,6 +2732,7 @@ sap.ui.define([
             oRateTypeModel.setData(aFilteredRateTypes);
 
             sap.ui.getCore().byId("idUnitType").setValueState("None")
+            sap.ui.getCore().byId("editquantity").setValueState("None")
             sap.ui.getCore().byId("editStartTime").setValueState("None")
             sap.ui.getCore().byId("editEndTime").setValueState("None")
             sap.ui.getCore().byId("editHours").setValueState("None")
