@@ -6688,7 +6688,17 @@
                     sErrorMessage = oError.message;
                 }
 
-                MessageBox.error(sErrorMessage);
+                let sErrorTitle = "Error";
+
+                // Lowercase string ke saath lowercase match karo
+                if (sErrorMessage.toLowerCase().includes("this property are fully booked.")) {
+                    sErrorTitle = "No Rooms Available";
+                }
+
+                MessageBox.error(sErrorMessage, {
+                    title: sErrorTitle,
+                    styleClass: "myUnifiedBtn"
+                });
             } finally {
                 this.closeBusyDialog();
             }
