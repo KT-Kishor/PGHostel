@@ -226,6 +226,7 @@
         <!-- ================= PAYMENT TABLE ================= -->
         <Table
             id="Id_PaymentTable1"
+            noDataText="No Payment history found"
             visible="{= ${myBookings>/selectedTab} === 'Payment' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
@@ -299,7 +300,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Complaints' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No complaints found"
+            noDataText="No complaints history found"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -370,7 +371,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No damage records found"
+            noDataText="No damage history found"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{

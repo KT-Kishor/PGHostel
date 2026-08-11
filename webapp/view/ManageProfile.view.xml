@@ -538,6 +538,7 @@
 
         <Table
             id="Id_PaymentTable1"
+            noDataText="No Payment history found"
             visible="{= ${profileData>/selectedTab} === 'Payment' }"
             updateFinished="onTableUpdateFinished"
             items="{
@@ -607,7 +608,7 @@
             visible="{= ${profileData>/selectedTab} === 'Complaints' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No complaints found"
+            noDataText="No complaints history found"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -714,6 +715,7 @@
             id="Id_DamageTable"
             visible="{= ${profileData>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
+            noDataText="No damage history found"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
