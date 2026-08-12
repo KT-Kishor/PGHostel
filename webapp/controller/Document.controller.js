@@ -256,30 +256,34 @@ sap.ui.define([
                 this._showBusyOnUploader(true);
 
                 let processedFile = file;
-                const MAX_SIZE_MB = 2;
-                const fileSizeMB = file.size / (1024 * 1024);
-                const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
+                const MAX_SIZE_KB = 400;
+                const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+                const isImage = ["jpg", "jpeg", "png", "webp"].includes(sExt);
 
                 try {
-                    if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                    if (file.size > iMaxSizeBytes && isImage) {
                         if (typeof imageCompression === "undefined") {
                             throw new Error("Compression library missing");
                         }
                         this.getBusyDialog();
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(file, options);
                         this.closeBusyDialog();
-                    } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                        sap.m.MessageToast.show(file.name + " exceeds the 2 MB size limit.");
+
+                        if (processedFile.size > iMaxSizeBytes) {
+                            sap.m.MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                            this._removeProcessingRow(sTempId);
+                            return;
+                        }
+                    } else if (file.size > iMaxSizeBytes && !isImage) {
+                        sap.m.MessageToast.show(file.name + " exceeds the 400 KB size limit.");
                         if (oUploader) oUploader.clear();
                         this._removeProcessingRow(sTempId);
-                        this._showBusyOnUploader(false);
-                        oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
                         return;
                     }
 

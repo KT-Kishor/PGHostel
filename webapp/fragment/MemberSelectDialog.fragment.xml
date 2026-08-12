@@ -29,7 +29,7 @@
                 <SearchField
                     id="memberSearchField"
                     width="100%"
-                    placeholder="Search by name / relationship / document"
+                    placeholder="Search by name / relationship"
                     liveChange="onMemberSearch"
                     search="onMemberSearch"
                     class="sapUiTinyMarginBottom"
