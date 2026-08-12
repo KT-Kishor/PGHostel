@@ -216,7 +216,7 @@
                                                                 visibleInFilterBar="true"
                                                             >
                                                                 <fb:control>
-                                                                    <ComboBox
+                                                                    <MultiComboBox
                                                                         id="id_PropertyType"
                                                                         placeholder="{i18n>selectPropertyType}"
                                                                         showClearIcon="true"
@@ -228,7 +228,7 @@
                                                                             key="{PropertyType>PropertyType}"
                                                                             text="{PropertyType>PropertyType}"
                                                                         />
-                                                                    </ComboBox>
+                                                                    </MultiComboBox>
                                                                 </fb:control>
                                                             </fb:FilterGroupItem>
                                                             <fb:FilterGroupItem

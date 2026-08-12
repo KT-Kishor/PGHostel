@@ -2559,7 +2559,7 @@ sap.ui.define([
             if (oBranchCombo) oBranchCombo.setSelectedKey("");
             if (oAreaTypeCombo) oAreaTypeCombo.setSelectedKey("");
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
-            if (oPropertyTypeCombo) oPropertyTypeCombo.setSelectedKey("").setValueState("None");
+            if (oPropertyTypeCombo) oPropertyTypeCombo.setSelectedKeys([]).setValueState("None");
             // 🔹 Make Area, Room Type and Property Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
@@ -2720,7 +2720,7 @@ sap.ui.define([
             // Reset previous selections
             oAreaCombo.setSelectedKey("").setEnabled(false);
             oRoomType.setSelectedKey("").setEnabled(false);
-            oPropertyType.setSelectedKey("").setValueState("None").setEnabled(false);
+            oPropertyType.setSelectedKeys([]).setValueState("None").setEnabled(false);
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
             // 🔹 Selected Branch Name
@@ -2743,20 +2743,24 @@ sap.ui.define([
 
         },
         onPropertyTypeChange: function (oEvent) {
-            const oSelectedItem = oEvent.getParameter("selectedItem");
-            if (!oSelectedItem) return;
-            // 🔹 Selected Branch Name
-            const sSelected = oSelectedItem.getText();
+            const aSelectedPropertyTypes = this._getSelectedPropertyTypes(oEvent.getSource());
             const oModelData = this.getView().getModel("sBRModel").getData();
-            var Branch = this.byId("id_Branch").getValue()
+            var Branch = this.byId("id_Branch").getValue();
 
             const aFiltered = oModelData.filter(function (item) {
-                return item.PropertyType === sSelected && item.City === Branch;
+                return (!aSelectedPropertyTypes.length || aSelectedPropertyTypes.includes(item.PropertyType)) &&
+                    item.City === Branch;
             });
             // 🔹 Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
             this.getView().setModel(oAreaModel, "AreaModel");
             this._populateUniqueFilterValues(aFiltered)
+        },
+
+        _getSelectedPropertyTypes: function (oMultiComboBox) {
+            return (oMultiComboBox.getSelectedItems() || [])
+                .map(oItem => oItem.getText().trim())
+                .filter(Boolean);
         },
 
         // 🔹 When Area is selected, enable Room Type combo
@@ -2845,20 +2849,9 @@ sap.ui.define([
             var finalBranch = validArea ? validArea.LandMark : "";
             if (finalBranch === "") this.byId("id_Area").setValueState("None");
 
-            // Property Type ComboBox
+            // Property Type MultiComboBox. The API expects one comma-separated value.
             var oPropertyTypeCB = this.byId("id_PropertyType");
-            var sSelectedPropertyType = oPropertyTypeCB.getSelectedKey() || oPropertyTypeCB.getValue();
-            if (sSelectedPropertyType) {
-                var aPropertyTypes = this.getOwnerComponent().getModel("PropertyType")?.getData() || [];
-                var validPropertyType = aPropertyTypes.find(item => item.PropertyType === sSelectedPropertyType);
-                if (!validPropertyType) {
-                    // User typed something, but it does not match the list
-                    MessageToast.show(this.i18nModel.getText("pleaseSelectValidPropertyType"));
-                    oPropertyTypeCB.setValueState("Error");
-                    return;
-                }
-                sSelectedPropertyType = validPropertyType.PropertyType;
-            }
+            var sSelectedPropertyType = this._getSelectedPropertyTypes(oPropertyTypeCB).join(",");
             oPropertyTypeCB.setValueState("None");
 
             this.isInitialLoad = false;
@@ -2992,7 +2985,7 @@ sap.ui.define([
 
                 // Default selections
                 this.byId("id_Branch").setSelectedKey(sCity);
-                this.byId("id_PropertyType").setSelectedKey("").setValueState("None").setEnabled(true);
+                this.byId("id_PropertyType").setSelectedKeys([]).setValueState("None").setEnabled(true);
                 this.byId("id_Area").setEnabled(true).setSelectedKey("");
                 if (this.roomtype !== true) this.byId("id_Roomtype").setEnabled(true).setSelectedKey("");
             } catch (error) {
@@ -3141,8 +3134,9 @@ sap.ui.define([
                 // Applied client-side too because the cached BranchModel used on the
                 // initial load was fetched without a PropertyType.
                 if (sPropertyType) {
+                    const aPropertyTypes = sPropertyType.split(",").map(sType => sType.trim()).filter(Boolean);
                     aFilteredBranches = aFilteredBranches.filter(branch =>
-                        branch.PropertyType === sPropertyType
+                        aPropertyTypes.includes(branch.PropertyType)
                     );
                 }
                 if (aFilteredBranches.length === 0) {
