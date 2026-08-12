@@ -3883,86 +3883,111 @@ sap.ui.define([
             oModel.refresh(true);
         },
         onSaveBooking: async function () {
-            const oModel = this.getView().getModel("CustomerData");
-            const CustomerData = oModel.getData();
+    const oModel = this.getView().getModel("CustomerData");
+    const CustomerData = oModel.getData();
 
-            const facilityItems = CustomerData.AllSelectedFacilities || [];
-            const documents = CustomerData.Documents || [];
+    const facilityItems = CustomerData.AllSelectedFacilities || [];
+    const documents = CustomerData.Documents || [];
 
-            // valid MemberIDs
-            const validMemberIds = new Set(CustomerData.Documents.map(d => d.MemberID));
+    // Valid MemberIDs
+    const validMemberIds = new Set(
+        documents.map(d => d.MemberID).filter(Boolean)
+    );
 
-            if (validMemberIds.size === 0) {
-                sap.m.MessageToast.show("Please select at least one member");
-                return;
-            }
+    if (validMemberIds.size === 0) {
+        sap.m.MessageToast.show("Please select at least one member");
+        return;
+    }
 
-            if (documents.length > 1) {
-                const hasPrimaryMember = documents.some(doc => doc.IsPrimary === true);
+    if (documents.length > 1) {
+        const hasPrimaryMember = documents.some(
+            doc => doc.IsPrimary === true
+        );
 
-                if (!hasPrimaryMember) {
-                    sap.m.MessageToast.show("Please select a primary member.");
+        if (!hasPrimaryMember) {
+            sap.m.MessageToast.show("Please select a primary member.");
+            return;
+        }
+    }
+
+    // Get primary member
+    const primaryMember =
+        documents.find(doc => doc.IsPrimary === true) || documents[0];
+
+    // Find facilities whose member is no longer valid
+    const toUpdate = [];
+
+    facilityItems.forEach(f => {
+        if (
+            f.MemberID &&
+            !validMemberIds.has(f.MemberID)
+        ) {
+            toUpdate.push(f);
+        }
+    });
+
+    if (toUpdate.length === 0) {
+        this.onSaveBooking1();
+        return;
+    }
+
+    const propertyType = CustomerData.PropertyType;
+
+let sMessage;
+
+if (propertyType === "Hostel" || propertyType === "PG") {
+    sMessage =
+        "Some facilities are assigned to different members. Do you want to assign them to the selected member?";
+} else {
+    sMessage =
+        "Some facilities are assigned to different members. Do you want to assign them to the primary member?";
+}
+
+    sap.m.MessageBox.confirm(
+        sMessage,
+        {
+            actions: [
+                sap.m.MessageBox.Action.YES,
+                sap.m.MessageBox.Action.NO
+            ],
+            emphasizedAction: sap.m.MessageBox.Action.YES,
+            styleClass: "myUnifiedBtn",
+
+            onClose: async function (oAction) {
+
+                if (oAction !== sap.m.MessageBox.Action.YES) {
                     return;
                 }
-            }
-            // split invalid vs valid
-            const toDelete = [];
-            const toKeep = [];
 
-            facilityItems.forEach(f => {
+                // 1. Update UI
+                const updatedFacilities = facilityItems.map(f => {
 
-                if (!validMemberIds.has(f.MemberID) && f.MemberID !== "") {
-                    toDelete.push(f);
-                } else if (!f.MemberID) {
-                    toKeep.push(f);
-                } else {
-                    toKeep.push(f);
-                }
-            });
+                    const isInvalid = toUpdate.some(
+                        u => u.FacilityID === f.FacilityID
+                    );
 
-            if (toDelete.length === 0) {
-                // nothing to delete → directly proceed
-                // onSaveBooking
-                this.onSaveBooking1();
-
-                return;
-            }
-
-            // confirmation
-            sap.m.MessageBox.confirm(
-                "Some facilities are assigned to different members and will be removed. Do you want to continue?", {
-                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                emphasizedAction: sap.m.MessageBox.Action.YES,
-                styleClass: "myUnifiedBtn",
-                onClose: async function (oAction) {
-                    if (oAction !== sap.m.MessageBox.Action.YES) {
-                        return;
+                    if (isInvalid) {
+                        return {
+                            ...f,
+                            MemberID: primaryMember.MemberID,
+                            MemberName: primaryMember.MemberName
+                        };
                     }
 
-                    // 1. update UI first
-                    oModel.setProperty("/AllSelectedFacilities", toKeep);
+                    return f;
+                });
 
-                    // 2. delete backend records sequentially or parallel
+                oModel.setProperty(
+                    "/AllSelectedFacilities",
+                    updatedFacilities
+                );
 
-                    const deletePromises = toDelete.map(f => {
-                        if (f.FacilityID) {
-                            return this.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
-                                filters: {
-                                    FacilityID: f.FacilityID
-                                }
-                            });
-                        }
-                    });
+                this.onSaveBooking1();
 
-                    await Promise.all(deletePromises);
-
-                    // 3. NOW proceed to next step
-                    this.onSaveBooking1();
-
-                }.bind(this)
-            }
-            );
-        },
+            }.bind(this)
+        }
+    );
+},
 
         onSaveBooking1: async function () {
 
@@ -4521,13 +4546,11 @@ sap.ui.define([
 
             const pdfBase64 = await this.onGeneratePDF();
 
-
-
             var Payload = {
-                "CustomerName": Bookingdata.CustomerName,
+                "CustomerName": primaryMember ?  primaryMember.MemberName : otherMembers[0].MemberName ? otherMembers[0].MemberName : Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
                 "MobileNo": Bookingdata.MobileNo,
-                "Gender": Bookingdata.Gender,
+                "Gender": primaryMember ? primaryMember.Gender : otherMembers[0].Gender ? otherMembers[0].Gender : Bookingdata.Gender,
                 "DateOfBirth": Bookingdata.DateOfBirth.split('/').reverse().join('-'),
                 "CustomerEmail": Bookingdata.CustomerEmail,
                 "Country": Bookingdata.Country,
@@ -9588,23 +9611,25 @@ sap.ui.define([
                         DocumentID: doc.DocumentID,
                         DocumentType: doc.DocumentType,
                         MemberID: oData.MemberID,
-                        MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
+                        MemberName: oData.Name,
+                        Salutation: oData.Salutation,
                         FileName: doc.FileName,
                         FileType: doc.FileType,
                         File: doc.File,
                         Relation: oData.Relation,
                         Gender: oData.Gender,
-                        DateOfBirth: oData.Gender,
+                        DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
                         IsPrimary: oData.MemberID === primaryMemberID
 
                     });
                 } else {
                     aDocs.push({
                         MemberID: oData.MemberID,
-                        MemberName: oData.Name || (oData.Salutation + " " + oData.Name),
+                        MemberName: oData.Name,
+                        Salutation: oData.Salutation,
                         Relation: oData.Relation,
                         Gender: oData.Gender,
-                        DateOfBirth: oData.Gender,
+                        DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
                         IsPrimary: oData.MemberID === primaryMemberID
 
                     });
