@@ -4625,7 +4625,7 @@ sap.ui.define([
                     const unit = f.UnitText?.toLowerCase();
 
                     if (invoiceIndex > 0) {
-                        if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING") || (selectionMode === "QTY" && unit === "unit price")) {
+                        if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING")) {
                             return;
                         }
                     }
