@@ -46,9 +46,21 @@
                         key="UPI"
                         text="UPI"
                     />
+                    <core:ListItem
+                        key="Card"
+                        text="Card"
+                    />
+                    <core:ListItem
+                        key="Online"
+                        text="Online"
+                    />
                       <core:ListItem
                         key="Cash"
                         text="Cash"
+                    />
+                      <core:ListItem
+                        key="Other"
+                        text="Other"
                     />
                 </ComboBox>
 
@@ -180,10 +192,10 @@
             >
                 <columns>
                     <Column minScreenWidth="Tablet">
-                        <Text text="{i18n>invoiceTransactionIDpersonname}" />
+                        <Text text="{i18n>date}" />
                     </Column>
                     <Column minScreenWidth="Tablet">
-                        <Text text="{i18n>invoiceReceivedDate}" />
+                        <Text text="{i18n>invoiceTransactionIDpersonname}" />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
@@ -229,10 +241,10 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Text text="{= ${PaymentDetailModel>TransactionId}? ${PaymentDetailModel>TransactionId} : ${PaymentDetailModel>ReceivedBy} }" />
                             <Text
                                 text="{path:'PaymentDetailModel>ReceivedDate', formatter:'.Formatter.formatDate'}"
                             />
+                            <Text text="{= ${PaymentDetailModel>TransactionId}? ${PaymentDetailModel>TransactionId} : ${PaymentDetailModel>ReceivedBy} }" />
                             <Text
                                  text="{
                             parts: [

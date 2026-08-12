@@ -64,11 +64,23 @@
                 >
                     <core:ListItem
                         key="UPI"
-                        text="UPI/Account pay"
+                        text="UPI"
                     />
                     <core:ListItem
+                        key="Card"
+                        text="Card"
+                    />
+                    <core:ListItem
+                        key="Online"
+                        text="Online"
+                    />
+                      <core:ListItem
                         key="Cash"
                         text="Cash"
+                    />
+                      <core:ListItem
+                        key="Other"
+                        text="Other"
                     />
                 </ComboBox>
 

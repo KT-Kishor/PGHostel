@@ -218,6 +218,11 @@ sap.ui.define([
                 label: "Resolution Date",
                 property: "ResolutionDate",
                 type: "string"
+            },
+            {
+                label: "Comments",
+                property: "Comment",
+                type: "string"
             }
             ]
         },
@@ -243,7 +248,8 @@ sap.ui.define([
                 ...item,
                 ComplaintRaisedDate: safeDate(item.ComplaintRaisedDate),
                 EstimatDate: safeDate(item.EstimatDate),
-                ResolutionDate: safeDate(item.ResolutionDate)
+                ResolutionDate: safeDate(item.ResolutionDate),
+                Comment: item.Comment || "" 
             }));
             const aCols = this.createTableSheet();
             const oSettings = {
@@ -310,6 +316,7 @@ sap.ui.define([
             }
             this.CD_Dialog.open();
             this.byId("CD_id_ResolutionDate").setVisible(false);
+            this.byId("CD_id_Comments").setVisible(false);
 
             if (data.Status === "Pending") {
                 this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("").setValueState("None");
@@ -409,8 +416,7 @@ sap.ui.define([
             var Assignedto = this.byId("CD_id_Assignedto").getValue()
             var EstimatDate = this.byId("CD_id_EstimatedDate").getValue()
             var ResolutionDate = this.byId("CD_id_ResolutionDate").getValue()
-
-
+            var Comments = this.byId("CD_id_Comments").getValue()
 
             var table = this.byId("idPOTable1");
             var selected = table.getSelectedItem();
@@ -442,7 +448,8 @@ sap.ui.define([
 
             if (Complaint.Status === "In Progress" && this.flag === true) {
                 if (
-                    !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_ResolutionDate"), "ID")
+                    !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_ResolutionDate"), "ID")||
+                    !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_Comments"), "ID")
                 ) {
                     sap.m.MessageToast.show(
                         this.i18nModel.getText(
@@ -462,6 +469,7 @@ sap.ui.define([
             if ((Complaint.Status === "In Progress" || Complaint.Status === "Resolved") && this.flag === true) {
                 var payload = {
                     ResolutionDate: ResolutionDate.split("/").reverse().join("-") || "",
+                    Comment: Comments,
                     Status: "Resolved"
                 };
             }
@@ -488,6 +496,9 @@ sap.ui.define([
 
         },
         onNoOfPersonInputLiveChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
+        },
+        onCommentsLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
         CD_resolve: function () {
@@ -522,6 +533,7 @@ sap.ui.define([
                 this.byId("CD_id_ResolutionDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             } else {
                 this.byId("CD_id_ResolutionDate").setVisible(true).setValue(Formatter.formatDate(data.ResolutionDate)).setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
+                this.byId("CD_id_Comments").setVisible(true).setValue((data.Comment)).setValueState("None");
             }
 
 

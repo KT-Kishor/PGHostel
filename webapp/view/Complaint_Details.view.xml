@@ -206,6 +206,12 @@
                             tooltip="{i18n>Image}"
                         />
                     </Column>
+                    <Column demandPopin="true">
+                        <Text
+                            text="{i18n>comments}"
+                            tooltip="{i18n>comments}"
+                        />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -250,6 +256,9 @@
                             <Link
                                 text="{i18n>view}"
                                 press="CD_viewimage"
+                            />
+                             <ExpandableText
+                                text="{ComplaintModel>Comment}"
                             />
                         </cells>
                     </ColumnListItem>

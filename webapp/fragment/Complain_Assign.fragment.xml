@@ -74,8 +74,22 @@
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNoOfPersonInputLiveChange"
-                        valueStateText="{i18n>plaeseSelectDate}"
+                    valueStateText="{i18n>plaeseSelectDate}"
                 />
+
+                <Label
+                    text="{i18n>comments}"
+                    required="true"
+                />
+                <TextArea
+                    id="CD_id_Comments"
+                    value=""
+                    maxLength="200"
+                    placeholder="Enter Comments"
+                    liveChange="onCommentsLiveChange"
+                    valueStateText="{i18n>pleaseEnterComments}"
+                />
+                   
             </f:content>
         </f:SimpleForm>
 
