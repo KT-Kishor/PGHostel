@@ -18,6 +18,7 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({
                 mode: "CREATE"
             }), "viewModel");
+            this._mMemberDocumentCache = {};
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -8550,7 +8551,7 @@ sap.ui.define([
             this.MM_Dialog.open();
         },
 
-        onEditMemberFromDialog: function (oEvent) {
+        onEditMemberFromDialog: async function (oEvent) {
 
             if (!this.MM_Dialog) {
 
@@ -8577,6 +8578,17 @@ sap.ui.define([
 
             // Deep Copy
             var oCopyData = JSON.parse(JSON.stringify(oData));
+
+            this.getBusyDialog();
+            try {
+                var oDocument = await this._fetchMemberDocument(oCopyData.MemberID);
+                oCopyData.Documents = oDocument.DocumentID ? [oDocument] : [];
+            } catch (oError) {
+                MessageToast.show(oError.message || oError.responseText || "Unable to load member document");
+                return;
+            } finally {
+                this.closeBusyDialog();
+            }
 
             // Ensure Documents array exists
             if (!oCopyData.Documents || !oCopyData.Documents.length) {
@@ -8631,7 +8643,52 @@ sap.ui.define([
                 return true;
             }
 
-            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+            const bValid = utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+            if (bValid) {
+                const sNewDocType = String(oComboBox.getSelectedKey() || "").trim();
+
+                if (sNewDocType) {
+                    this._syncMemberDocumentName(sNewDocType);
+                }
+            }
+
+            return bValid;
+        },
+
+        _syncMemberDocumentName: function (sDocType) {
+            const oModel = this.getView().getModel("BookingView");
+
+            if (!oModel) {
+                return;
+            }
+
+            const sCurrentName = String(
+                oModel.getProperty("/NewMemberDraft/Documents/0/FileName") || ""
+            ).trim();
+            const sNewDocType = sDocType || String(
+                oModel.getProperty("/NewMemberDraft/Documents/0/DocumentType") || ""
+            ).trim();
+
+            if (!sCurrentName || !sNewDocType || sCurrentName === "Compressing...") {
+                return;
+            }
+
+            const sExt = sCurrentName.includes(".")
+                ? sCurrentName.split(".").pop().toLowerCase()
+                : "";
+            let sNewName = sNewDocType.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+            if (sExt) {
+                sNewName += "." + sExt;
+            }
+
+            if (sNewName === sCurrentName) {
+                return;
+            }
+
+            oModel.setProperty("/NewMemberDraft/Documents/0/FileName", sNewName);
+            oModel.refresh(true);
         },
 
         onFileUpload: async function (oEvent) {
@@ -8661,31 +8718,34 @@ sap.ui.define([
             this._showBusyOnUploader(true);
 
             let processedFile = file;
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = file.size / (1024 * 1024);
-            const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(file.type);
 
             try {
-                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                if (file.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
                     this.getBusyDialog();
                     const options = {
-                        maxSizeMB: 1.9,
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(file, options);
                     this.closeBusyDialog();
-                    // sap.m.MessageToast.show("Compressed to " + (processedFile.size / 1024).toFixed(2) + " KB");
-                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    sap.m.MessageToast.show(file.name + " exceeds the 2 MB size limit.");
+
+                    if (processedFile.size > iMaxSizeBytes) {
+                        sap.m.MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                        this._removeProcessingRow(sTempId);
+                        return;
+                    }
+                } else if (file.size > iMaxSizeBytes && !isImage) {
+                    sap.m.MessageToast.show(file.name + " exceeds the 400 KB size limit.");
                     if (oUploader) oUploader.clear();
                     this._removeProcessingRow(sTempId);
-                    this._showBusyOnUploader(false);
-                    oModel.setProperty("/NewMemberDraft/Documents/0/ProcessingActive", false);
                     return;
                 }
 
@@ -8890,36 +8950,9 @@ sap.ui.define([
                 );
 
             oPromise.then(() => {
-
-                // ================= CREATE =================
-
-                if (isCreate) {
-
-                    var aMembers =
-                        oModel.getProperty("/Members") || [];
-
-                    var oNewMember =
-                        JSON.parse(JSON.stringify(oDraft));
-
-                    aMembers.push(oNewMember);
-
-                    oModel.setProperty(
-                        "/Members",
-                        aMembers
-                    );
-                }
-                // ================= UPDATE =================
-                else {
-                    if (this._sEditPath) {
-
-                        oModel.setProperty(
-                            this._sEditPath,
-                            oDraft
-                        );
-                    }
-                }
-
-                oModel.refresh(true);
+                delete this._mMemberDocumentCache[oDraft.MemberID];
+                return this._refreshMemberList();
+            }).then(() => {
 
                 this.MM_Dialog.close();
 
@@ -9036,21 +9069,41 @@ sap.ui.define([
             return utils._LCstrictValidationComboBox(oEvent);
         },
 
-        MS_viewimagetable: function (oEvent) {
+        MS_viewimagetable: async function (oEvent) {
             this.tableview = true
-            this.MS_viewimage(oEvent)
+            await this.MS_viewimage(oEvent)
         },
         MS_viewimagefragment: function (oEvent) {
             this.tableview = false
             this.MS_viewimage(oEvent)
         },
 
-        MS_viewimage: function (oEvent) {
+        MS_viewimage: async function (oEvent) {
             let oDraft;
             if (this.tableview === true) {
                 oDraft = oEvent.getSource()
                     .getBindingContext("BookingView")
                     ?.getObject();
+
+                if (!oDraft?.MemberID) {
+                    MessageToast.show("No document available");
+                    return;
+                }
+
+                this.getBusyDialog();
+                try {
+                    const oDocument = await this._fetchMemberDocument(oDraft.MemberID);
+                    if (!oDocument.File) {
+                        MessageToast.show("No document available");
+                        return;
+                    }
+                    this._previewDocument(oDocument);
+                } catch (oError) {
+                    MessageToast.show(oError.message || oError.responseText || "Unable to load member document");
+                } finally {
+                    this.closeBusyDialog();
+                }
+                return;
             } else {
                 oDraft = this.getView().getModel("BookingView").getProperty("/NewMemberDraft")
             }
@@ -9071,6 +9124,65 @@ sap.ui.define([
                 FileName: oDocument.FileName || "",
                 DocumentName: oDocument.FileName || ""
             });
+        },
+
+        _bufferToBase64: function (oFileBuffer) {
+            if (!(oFileBuffer && oFileBuffer.type === "Buffer" && Array.isArray(oFileBuffer.data))) {
+                return oFileBuffer || "";
+            }
+
+            var sBinary = "";
+            for (var i = 0; i < oFileBuffer.data.length; i += 0x8000) {
+                sBinary += String.fromCharCode.apply(null, oFileBuffer.data.slice(i, i + 0x8000));
+            }
+            return btoa(sBinary);
+        },
+
+        _fetchMemberDocument: async function (sMemberID) {
+            var sCacheKey = String(sMemberID || "").trim();
+            if (!sCacheKey) {
+                return {};
+            }
+
+            if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
+                return this._mMemberDocumentCache[sCacheKey];
+            }
+
+            var oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", {
+                MemberID: sCacheKey
+            });
+            var aDocuments = Array.isArray(oResponse) ? oResponse :
+                (Array.isArray(oResponse?.HM_Documentonly) ? oResponse.HM_Documentonly :
+                    (Array.isArray(oResponse?.Documents) ? oResponse.Documents :
+                        (Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []))));
+            var oDocument = aDocuments[0];
+
+            if (!oDocument) {
+                this._mMemberDocumentCache[sCacheKey] = {};
+                return {};
+            }
+
+            var oNormalized = Object.assign({}, oDocument, {
+                File: this._bufferToBase64(oDocument.File),
+                MemberID: oDocument.MemberID || sCacheKey
+            });
+            this._mMemberDocumentCache[sCacheKey] = oNormalized;
+            return oNormalized;
+        },
+
+        _refreshMemberList: async function () {
+            var sUserID = this.UserID || this.getView().getModel("CustomerData").getProperty("/UserID");
+            var oResponse = await this.ajaxReadWithJQuery("HM_Memberonly", { UserID: sUserID });
+            var aMembers = Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []);
+            var oMemberModel = this.getView().getModel("BookingView");
+
+            if (!oMemberModel) {
+                oMemberModel = new JSONModel({});
+                this.getView().setModel(oMemberModel, "BookingView");
+            }
+            oMemberModel.setProperty("/Members", aMembers);
+            oMemberModel.refresh(true);
+            return aMembers;
         },
 
         _previewDocument: async function (oDoc) {
@@ -9496,7 +9608,7 @@ sap.ui.define([
 
             try {
 
-                var item = await this.ajaxReadWithJQuery("HM_Member", filter);
+                var item = await this.ajaxReadWithJQuery("HM_Memberonly", filter);
 
                 var aMember = Array.isArray(item.data) ? item.data : [item.data];
 
@@ -9574,9 +9686,7 @@ sap.ui.define([
                     filters: [
                         new Filter("Name", FilterOperator.Contains, sValue),
                         new Filter("Relation", FilterOperator.Contains, sValue),
-                        new Filter("Gender", FilterOperator.Contains, sValue),
-                        new Filter("DocumentType", FilterOperator.Contains, sValue),
-                        new Filter("DocumentName", FilterOperator.Contains, sValue)
+                        new Filter("Gender", FilterOperator.Contains, sValue)
                     ],
                     and: false
                 })];
@@ -9585,9 +9695,8 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        onConfirmMemberSelection: function () {
+        onConfirmMemberSelection: async function () {
 
-            var oView = this.getView();
             var oTable = sap.ui.getCore().byId("abmemberSelectTable");
 
             var aSelectedItems = oTable.getSelectedItems();
@@ -9597,12 +9706,9 @@ sap.ui.define([
                 return;
             }
 
-            var oCustomerModel = this.getView().getModel("BookingView");
-            var aDocs = oCustomerModel.getProperty("/Documents") || [];
-
-
             var oModel = this.getView().getModel("CustomerData");
             var oData = oModel.getData();
+            var aDocs = [];
 
             const primaryMemberID = (oData.MemberID || "")
                 .split(",")[0]
@@ -9625,16 +9731,17 @@ sap.ui.define([
             //     }
             // }
 
-            // push documents
-            aSelectedItems.forEach(function (oItem) {
+            this.getBusyDialog();
+            try {
+                await Promise.all(aSelectedItems.map(async function (oItem) {
 
-                var oContext = oItem.getBindingContext("BookingView");
-                var oData = oContext.getObject();
+                    var oContext = oItem.getBindingContext("BookingView");
+                    var oData = oContext.getObject();
 
-                var doc = oData.Documents[0];
+                    var doc = await this._fetchMemberDocument(oData.MemberID);
 
 
-                if (doc) {
+                    if (doc.DocumentID) {
                     aDocs.push({
                         DocumentID: doc.DocumentID,
                         DocumentType: doc.DocumentType,
@@ -9661,14 +9768,18 @@ sap.ui.define([
                         IsPrimary: oData.MemberID === primaryMemberID
 
                     });
-                }
-            });
+                    }
+                }.bind(this)));
+            } catch (oError) {
+                MessageToast.show(oError.message || oError.responseText || "Unable to load member documents");
+                return;
+            } finally {
+                this.closeBusyDialog();
+            }
 
             this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
 
 
-
-            var aDocs = oData.Documents || [];
 
             // keep only valid docs
             var allMembers = aDocs

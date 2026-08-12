@@ -28,7 +28,7 @@
             <VBox class="sapUiSmallMargin">
                 <SearchField
                     width="100%"
-                    placeholder="Search by name / relationship / document"
+                    placeholder="Search by name / relationship"
                     liveChange="onMemberSearch"
                     class="sapUiTinyMarginBottom"
                 />
@@ -44,34 +44,56 @@
                     selectionChange="onMemberSelectionChange"
                 >
                     <columns>
-                        <Column><Text text="Full Name" /></Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Age" /></Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Relationship" /></Column>
-                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
-                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
-                        <Column width="5rem"><Text text="" /></Column>
+                        <Column>
+                            <Text text="Full Name" />
+                        </Column>
+                        <Column
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                        >
+                            <Text text="Age" />
+                        </Column>
+                        <Column
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                        >
+                            <Text text="Gender" />
+                        </Column>
+                        <Column
+                            minScreenWidth="Tablet"
+                            demandPopin="true"
+                        >
+                            <Text text="Relationship" />
+                        </Column>
+                        <!-- <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column> -->
+                        <Column
+                            minScreenWidth="Desktop"
+                            demandPopin="true"
+                        >
+                            <Text text="Document" />
+                        </Column>
+                        <Column width="5rem">
+                            <Text text="" />
+                        </Column>
                     </columns>
                     <items>
                         <ColumnListItem>
                             <cells>
-                                <Text text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}" />
-                                <Text text="{path: 'BookingView>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
+                                <Text
+                                    text="{= (${BookingView>Salutation} ? ${BookingView>Salutation} + ' ' : '') + (${BookingView>Name} || '')}"
+                                />
+                                <Text
+                                    text="{path: 'BookingView>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                                />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
-                                   <HBox justifyContent="Start" >
-                                              <Text
-                                                  text="{BookingView>Documents/0/DocumentType}"
-                                                  emptyIndicatorMode="On"
-                                               />
-                                          </HBox>
-                                <!-- <Text text="{BookingView>DocumentName}" /> -->
+                                <!-- <Text text="{BookingView>Documents/0/DocumentType}" /> -->
                                 <Link
-                                text="{= ${BookingView>Documents/0/FileName} ? ${BookingView>Documents/0/FileName} : 'No Document' }"
-                                press="MS_viewimagetable"
-                                class="documentLink"
-                                enabled="{= !!${BookingView>Documents/0/FileName} }"
-                            />
+                                    text="View"
+                                    press="MS_viewimagetable"
+                                    class="documentLink"
+                                />
+
                                 <Button
                                     icon="sap-icon://edit"
                                     type="Transparent"
@@ -79,7 +101,6 @@
                                     press="onEditMemberFromDialog"
                                     class="myUnifiedBtn"
                                 />
-
                             </cells>
                         </ColumnListItem>
                     </items>
