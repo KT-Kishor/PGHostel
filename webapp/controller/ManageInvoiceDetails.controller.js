@@ -4355,7 +4355,7 @@ sap.ui.define([
                 this.getView().setModel(oModel, "RefundModel");
             },
 
-              HM_onPressRefundAmount: async function () {
+            HM_onPressRefundAmount: async function () {
                 var RefundModel = this.getView().getModel("RefundModel").getData();
                 const isMandatoryValid =
                     // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
@@ -4611,7 +4611,7 @@ sap.ui.define([
                         return;
                     }
 
-                    const bookingUnit = f.PaymentType?.toLowerCase() || "";
+                    const bookingUnit = f.PaymentType?.toLowerCase()
 
                     if (bookingUnit !== "per day") {
                         if (fEnd < cycleStart || fStart > cycleEnd) return;
@@ -4623,6 +4623,19 @@ sap.ui.define([
                     const selectionMode = f.SelectionMode?.toUpperCase();
                     const chargeType = f.FacilityChargeType?.toUpperCase();
                     const unit = f.UnitText?.toLowerCase();
+
+
+                    if (unit === "unit price") {
+
+                        const startWithinCycle =
+                            fStart >= cycleStart &&
+                            fStart <= cycleEnd;
+
+                        if (!startWithinCycle) {
+                            return;
+                        }
+                    }
+
 
                     if (invoiceIndex > 0) {
                         if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING")) {
@@ -4742,7 +4755,7 @@ sap.ui.define([
                 const unit = item.UnitText?.toLowerCase();
                 const selectionMode = item.SelectionMode?.toUpperCase();
                 const chargeType = item.FacilityChargeType?.toUpperCase();
-                const bookingUnit = item.PaymentType?.toLowerCase();
+                const bookingUnit = item.PaymentType?.toLowerCase() || item.UnitText?.toLowerCase();
 
                 const qty = parseFloat(item.Quantity ?? 1) || 1;
                 const unitPrice = parseFloat(item.UnitPrice ?? 0) || 0;
@@ -4883,6 +4896,7 @@ sap.ui.define([
                             // }
 
                             facilityAmount = this._truncate2(qty * price);
+
                             break;
 
                         case "per day":
