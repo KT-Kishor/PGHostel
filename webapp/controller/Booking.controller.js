@@ -3191,6 +3191,43 @@
                 return;
             }
 
+            const aSelectedOccupantIds = aSelectedMembers.map(function (oMember) {
+                return String(oMember.id || oMember.MemberID || "").trim();
+            }).filter(Boolean).sort();
+            const bOccupantsChanged = aPreviousOccupantIds.length !== aSelectedOccupantIds.length ||
+                aPreviousOccupantIds.some(function (sId, iIndex) {
+                    return sId !== aSelectedOccupantIds[iIndex];
+                });
+
+            if (bOccupantsChanged && this._hasSelectedFacilities()) {
+                MessageBox.confirm(
+                    "Changing the occupants will reset all selected facilities. Do you want to continue?",
+                    {
+                        title: "Confirm Occupant Change",
+                        icon: MessageBox.Icon.WARNING,
+                        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                        emphasizedAction: MessageBox.Action.NO,
+                        styleClass: "myUnifiedBtn",
+                        contentWidth: "400px",
+                        onClose: function (sAction) {
+                            if (sAction !== MessageBox.Action.YES) {
+                                this._syncMemberDialogSelections();
+                                return;
+                            }
+
+                            this._applyMemberSelection(aSelectedMembers, aPreviousOccupantIds);
+                        }.bind(this)
+                    }
+                );
+                return;
+            }
+
+            this._applyMemberSelection(aSelectedMembers, aPreviousOccupantIds);
+        },
+
+        _applyMemberSelection: function (aSelectedMembers, aPreviousOccupantIds) {
+            const oBookingView = this.getView().getModel("BookingView");
+
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
             this._syncPrimaryMemberInFamilyMembers();
             if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
@@ -5320,16 +5357,7 @@
             const oModel = this.getView().getModel("HostelModel");
             const sSelectedPlan = oComboBox.getSelectedKey();
             const sPreviousPlan = this._sConfirmedRoomPlan || "";
-            const aSelectedFacilities = oModel.getProperty("/AllSelectedFacilities") || [];
-            const oFacilityModel = this.getView().getModel("FacilityModel");
-            const aVisibleFacilities = oFacilityModel ? oFacilityModel.getProperty("/Facilities") || [] : [];
-            const bHasSelectedFacilities = aSelectedFacilities.length > 0 ||
-                aVisibleFacilities.some(function (oFacility) {
-                    return !!oFacility.Selected;
-                }) ||
-                (this._aAllFacilities || []).some(function (oFacility) {
-                    return !!oFacility.Selected;
-                });
+            const bHasSelectedFacilities = this._hasSelectedFacilities();
 
             if (!sSelectedPlan || sSelectedPlan === sPreviousPlan) {
                 return;
@@ -5346,7 +5374,7 @@
             oModel.setProperty("/SelectedPriceType", sPreviousPlan);
 
             MessageBox.confirm(
-                "Changing the room plan will remove all selected facilities. Do you want to continue?",
+                "Changing the room plan will reset all selected facilities. Do you want to continue?",
                 {
                     title: "Confirm Room Plan Change",
                     icon: MessageBox.Icon.WARNING,
@@ -5366,6 +5394,21 @@
                     }.bind(this)
                 }
             );
+        },
+
+        _hasSelectedFacilities: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const oFacilityModel = this.getView().getModel("FacilityModel");
+            const aSelectedFacilities = oModel ? oModel.getProperty("/AllSelectedFacilities") || [] : [];
+            const aVisibleFacilities = oFacilityModel ? oFacilityModel.getProperty("/Facilities") || [] : [];
+
+            return aSelectedFacilities.length > 0 ||
+                aVisibleFacilities.some(function (oFacility) {
+                    return !!oFacility.Selected;
+                }) ||
+                (this._aAllFacilities || []).some(function (oFacility) {
+                    return !!oFacility.Selected;
+                });
         },
 
         _restoreRoomPlanSelection: function (oComboBox, sRoomPlan) {
@@ -5552,19 +5595,46 @@
             const iIndex = parseInt(sPath.split("/").pop(), 10);
 
             if (!isNaN(iIndex) && iIndex > -1) {
-                aMembers.splice(iIndex, 1);
-                oModel.setProperty("/FamilyMembers", aMembers);
-                this._syncPrimaryMemberInFamilyMembers();
-                if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
-                    this._clearSelectedFacilities();
+                if (this._hasSelectedFacilities()) {
+                    MessageBox.confirm(
+                        "Deleting the occupant will reset all selected facilities. Do you want to continue?",
+                        {
+                            title: "Confirm Occupant Delete",
+                            icon: MessageBox.Icon.WARNING,
+                            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                            emphasizedAction: MessageBox.Action.NO,
+                            styleClass: "myUnifiedBtn",
+                            contentWidth: "400px",
+                            onClose: function (sAction) {
+                                if (sAction === MessageBox.Action.YES) {
+                                    this._deleteFamilyMemberAtIndex(iIndex, aPreviousOccupantIds);
+                                }
+                            }.bind(this)
+                        }
+                    );
+                    return;
                 }
-                oModel.refresh(true);
-                this._updateSelectedPersonsFromFamily();
-                this._syncSelectedFacilityPersonsWithOccupants();
-                this._rebuildSelectedFacilities();
-                this._refreshCouponAndSummary({ checkDateWindow: false });
-                MessageToast.show("Row deleted.");
+
+                this._deleteFamilyMemberAtIndex(iIndex, aPreviousOccupantIds);
             }
+        },
+
+        _deleteFamilyMemberAtIndex: function (iIndex, aPreviousOccupantIds) {
+            const oModel = this.getView().getModel("BookingView");
+            const aMembers = (oModel.getProperty("/FamilyMembers") || []).slice();
+
+            aMembers.splice(iIndex, 1);
+            oModel.setProperty("/FamilyMembers", aMembers);
+            this._syncPrimaryMemberInFamilyMembers();
+            if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
+                this._clearSelectedFacilities();
+            }
+            oModel.refresh(true);
+            this._updateSelectedPersonsFromFamily();
+            this._syncSelectedFacilityPersonsWithOccupants();
+            this._rebuildSelectedFacilities();
+            this._refreshCouponAndSummary({ checkDateWindow: false });
+            MessageToast.show("Occupant deleted.");
         },
 
 

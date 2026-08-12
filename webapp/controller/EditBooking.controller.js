@@ -130,6 +130,14 @@ sap.ui.define([
             this._handleRoomPlanChange(oEvent);
         },
 
+        onConfirmMemberSelection: function () {
+            BookingController.prototype.onConfirmMemberSelection.apply(this, arguments);
+        },
+
+        onDeleteFamilyMemberRow: function (oEvent) {
+            BookingController.prototype.onDeleteFamilyMemberRow.call(this, oEvent);
+        },
+
         /**
          * Decode a base64 route parameter that may arrive single- OR double-URL-encoded.
          * navTo with a query object (e.g. the FromMyBookings flag) makes UI5 re-encode the
