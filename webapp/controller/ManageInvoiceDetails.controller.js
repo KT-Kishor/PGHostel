@@ -401,17 +401,17 @@ sap.ui.define([
                                     return true;
                                 }
 
-                                if (item.Status === "Completed") {
-                                    const endDate = new Date(item.EndDate);
-                                    endDate.setHours(0, 0, 0, 0);
+                                // if (item.Status === "Completed") {
+                                //     const endDate = new Date(item.EndDate);
+                                //     endDate.setHours(0, 0, 0, 0);
 
-                                    const diffDays = Math.floor(
-                                        (today - endDate) / (1000 * 60 * 60 * 24)
-                                    );
+                                //     const diffDays = Math.floor(
+                                //         (today - endDate) / (1000 * 60 * 60 * 24)
+                                //     );
 
-                                    // Show Completed records only for 5 days after EndDate
-                                    return diffDays <= 5;
-                                }
+                                //     // Show Completed records only for 5 days after EndDate
+                                //     return diffDays <= 5;
+                                // }
 
                                 return false;
                             });
@@ -4355,7 +4355,7 @@ sap.ui.define([
                 this.getView().setModel(oModel, "RefundModel");
             },
 
-            HM_onPressRefundAmount: async function () {
+              HM_onPressRefundAmount: async function () {
                 var RefundModel = this.getView().getModel("RefundModel").getData();
                 const isMandatoryValid =
                     // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
@@ -4457,7 +4457,6 @@ sap.ui.define([
                     this.closeBusyDialog()
                 }
             },
-
             HM_onPressClose: function () {
                 sap.ui.getCore().byId("HM_id_PaymentMode").setValueState("None");
                 sap.ui.getCore().byId("HM_id_TransactionID").setValueState("None");
@@ -4879,9 +4878,9 @@ sap.ui.define([
 
                     switch (unit) {
                         case "unit price":
-                            if (invoiceIndex > 0) {
-                                return 0;
-                            }
+                            // if (invoiceIndex > 0) {
+                            //     return 0;
+                            // }
 
                             facilityAmount = this._truncate2(qty * price);
                             break;

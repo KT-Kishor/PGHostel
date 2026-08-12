@@ -59,12 +59,18 @@
                                 <Text text="{path: 'BookingView>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
-                                <Text text="{BookingView>Documents/0/DocumentType}" />
+                                   <HBox justifyContent="Start" >
+                                              <Text
+                                                  text="{BookingView>Documents/0/DocumentType}"
+                                                  emptyIndicatorMode="On"
+                                               />
+                                          </HBox>
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
-                                text="{BookingView>Documents/0/FileName}"
+                                text="{= ${BookingView>Documents/0/FileName} ? ${BookingView>Documents/0/FileName} : 'No Document' }"
                                 press="MS_viewimagetable"
                                 class="documentLink"
+                                enabled="{= !!${BookingView>Documents/0/FileName} }"
                             />
                                 <Button
                                     icon="sap-icon://edit"
@@ -73,6 +79,7 @@
                                     press="onEditMemberFromDialog"
                                     class="myUnifiedBtn"
                                 />
+
                             </cells>
                         </ColumnListItem>
                     </items>

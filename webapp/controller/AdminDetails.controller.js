@@ -1415,14 +1415,21 @@ sap.ui.define([
             sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
 
             if (sStartDate !== "" && sEndDate !== "") {
-                if (sEndDate <= sStartDate) {
+                 if(sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")){
+                      sap.m.MessageToast.show("Please select a valid date");
+                    oModel.setProperty("/EndDate", "");
+                    if (sUnit === "Unit Price") {
+                        oModel.setProperty("/UnitText", sUnit);
+                    }
+                    return;
+                }else if(sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")){
                     sap.m.MessageToast.show("Please select a valid date");
                     oModel.setProperty("/EndDate", "");
                     if (sUnit === "Unit Price") {
                         oModel.setProperty("/UnitText", sUnit);
                     }
                     return;
-                }
+            }
             }
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
@@ -1706,6 +1713,26 @@ sap.ui.define([
             if (oCustomerData.minEndDate <= new Date(this._parseDate(oPayload.EndDate))) {
                 sap.m.MessageToast.show(this.i18nModel.getText("facilityEndDateExceedsBookingEndDate"));
                 return;
+            }
+
+            if (oPayload.UnitText === "Per Month" || oPayload.UnitText === "Per Year"){
+                var oStartDate = new Date(oPayload.StartDate);
+                var oBookingStartDate = oCustomerData.minStartDate;
+                var oBookingEndDate = oCustomerData.minEndDate;
+
+                oStartDate.setHours(0, 0, 0, 0);
+                oBookingStartDate.setHours(0, 0, 0, 0);
+                oBookingEndDate.setHours(0, 0, 0, 0);
+
+                var bookingStartDay = oBookingStartDate.getDate();
+                var selectedStartDay = oStartDate.getDate();
+
+                if (selectedStartDay !== bookingStartDay) {
+                    sap.m.MessageToast.show(
+                        "Please select the monthly start date based on the booking start date."
+                    );
+                    return;
+                }
             }
 
             if (oPayload.CouponDiscount === "" && oPayload.CouponCode) {
@@ -3883,111 +3910,111 @@ sap.ui.define([
             oModel.refresh(true);
         },
         onSaveBooking: async function () {
-    const oModel = this.getView().getModel("CustomerData");
-    const CustomerData = oModel.getData();
+            const oModel = this.getView().getModel("CustomerData");
+            const CustomerData = oModel.getData();
 
-    const facilityItems = CustomerData.AllSelectedFacilities || [];
-    const documents = CustomerData.Documents || [];
+            const facilityItems = CustomerData.AllSelectedFacilities || [];
+            const documents = CustomerData.Documents || [];
 
-    // Valid MemberIDs
-    const validMemberIds = new Set(
-        documents.map(d => d.MemberID).filter(Boolean)
-    );
+            // Valid MemberIDs
+            const validMemberIds = new Set(
+                documents.map(d => d.MemberID).filter(Boolean)
+            );
 
-    if (validMemberIds.size === 0) {
-        sap.m.MessageToast.show("Please select at least one member");
-        return;
-    }
+            if (validMemberIds.size === 0) {
+                sap.m.MessageToast.show("Please select at least one member");
+                return;
+            }
 
-    if (documents.length > 1) {
-        const hasPrimaryMember = documents.some(
-            doc => doc.IsPrimary === true
-        );
-
-        if (!hasPrimaryMember) {
-            sap.m.MessageToast.show("Please select a primary member.");
-            return;
-        }
-    }
-
-    // Get primary member
-    const primaryMember =
-        documents.find(doc => doc.IsPrimary === true) || documents[0];
-
-    // Find facilities whose member is no longer valid
-    const toUpdate = [];
-
-    facilityItems.forEach(f => {
-        if (
-            f.MemberID &&
-            !validMemberIds.has(f.MemberID)
-        ) {
-            toUpdate.push(f);
-        }
-    });
-
-    if (toUpdate.length === 0) {
-        this.onSaveBooking1();
-        return;
-    }
-
-    const propertyType = CustomerData.PropertyType;
-
-let sMessage;
-
-if (propertyType === "Hostel" || propertyType === "PG") {
-    sMessage =
-        "Some facilities are assigned to different members. Do you want to assign them to the selected member?";
-} else {
-    sMessage =
-        "Some facilities are assigned to different members. Do you want to assign them to the primary member?";
-}
-
-    sap.m.MessageBox.confirm(
-        sMessage,
-        {
-            actions: [
-                sap.m.MessageBox.Action.YES,
-                sap.m.MessageBox.Action.NO
-            ],
-            emphasizedAction: sap.m.MessageBox.Action.YES,
-            styleClass: "myUnifiedBtn",
-
-            onClose: async function (oAction) {
-
-                if (oAction !== sap.m.MessageBox.Action.YES) {
-                    return;
-                }
-
-                // 1. Update UI
-                const updatedFacilities = facilityItems.map(f => {
-
-                    const isInvalid = toUpdate.some(
-                        u => u.FacilityID === f.FacilityID
-                    );
-
-                    if (isInvalid) {
-                        return {
-                            ...f,
-                            MemberID: primaryMember.MemberID,
-                            MemberName: primaryMember.MemberName
-                        };
-                    }
-
-                    return f;
-                });
-
-                oModel.setProperty(
-                    "/AllSelectedFacilities",
-                    updatedFacilities
+            if (documents.length > 1) {
+                const hasPrimaryMember = documents.some(
+                    doc => doc.IsPrimary === true
                 );
 
-                this.onSaveBooking1();
+                if (!hasPrimaryMember) {
+                    sap.m.MessageToast.show("Please select a primary member.");
+                    return;
+                }
+            }
 
-            }.bind(this)
-        }
-    );
-},
+            // Get primary member
+            const primaryMember =
+                documents.find(doc => doc.IsPrimary === true) || documents[0];
+
+            // Find facilities whose member is no longer valid
+            const toUpdate = [];
+
+            facilityItems.forEach(f => {
+                if (
+                    f.MemberID &&
+                    !validMemberIds.has(f.MemberID)
+                ) {
+                    toUpdate.push(f);
+                }
+            });
+
+            if (toUpdate.length === 0) {
+                this.onSaveBooking1();
+                return;
+            }
+
+            const propertyType = CustomerData.PropertyType;
+
+            let sMessage;
+
+            if (propertyType === "Hostel" || propertyType === "PG") {
+                sMessage =
+                    "Some facilities are assigned to different members. Do you want to assign them to the selected member?";
+            } else {
+                sMessage =
+                    "Some facilities are assigned to different members. Do you want to assign them to the primary member?";
+            }
+
+            sap.m.MessageBox.confirm(
+                sMessage,
+                {
+                    actions: [
+                        sap.m.MessageBox.Action.YES,
+                        sap.m.MessageBox.Action.NO
+                    ],
+                    emphasizedAction: sap.m.MessageBox.Action.YES,
+                    styleClass: "myUnifiedBtn",
+
+                    onClose: async function (oAction) {
+
+                        if (oAction !== sap.m.MessageBox.Action.YES) {
+                            return;
+                        }
+
+                        // 1. Update UI
+                        const updatedFacilities = facilityItems.map(f => {
+
+                            const isInvalid = toUpdate.some(
+                                u => u.FacilityID === f.FacilityID
+                            );
+
+                            if (isInvalid) {
+                                return {
+                                    ...f,
+                                    MemberID: primaryMember.MemberID,
+                                    MemberName: primaryMember.MemberName
+                                };
+                            }
+
+                            return f;
+                        });
+
+                        oModel.setProperty(
+                            "/AllSelectedFacilities",
+                            updatedFacilities
+                        );
+
+                        this.onSaveBooking1();
+
+                    }.bind(this)
+                }
+            );
+        },
 
         onSaveBooking1: async function () {
 
@@ -4547,7 +4574,7 @@ if (propertyType === "Hostel" || propertyType === "PG") {
             const pdfBase64 = await this.onGeneratePDF();
 
             var Payload = {
-                "CustomerName": primaryMember ?  primaryMember.MemberName : otherMembers[0].MemberName ? otherMembers[0].MemberName : Bookingdata.CustomerName,
+                "CustomerName": primaryMember ? primaryMember.MemberName : otherMembers[0].MemberName ? otherMembers[0].MemberName : Bookingdata.CustomerName,
                 "UserID": CustomerData.UserID,
                 "MobileNo": Bookingdata.MobileNo,
                 "Gender": primaryMember ? primaryMember.Gender : otherMembers[0].Gender ? otherMembers[0].Gender : Bookingdata.Gender,
@@ -7750,6 +7777,7 @@ if (propertyType === "Hostel" || propertyType === "PG") {
 
         onGeneratePDF: async function (Status) {
             const data = this.getView().getModel("CustomerData").getData();
+            var oBookingModel = this.getView().getModel("Bookingmodel").getData();
 
             let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
@@ -8086,8 +8114,8 @@ if (propertyType === "Hostel" || propertyType === "PG") {
 
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
-            doc.text(`${data.StartDate || "-"}`, 60, currentY + 22);
-            doc.text(`${data.EndDate || "-"}`, 60, currentY + 34);
+            doc.text(`${oBookingModel.StartDate ? oBookingModel.StartDate : data.StartDate || "-"}`, 60, currentY + 22);
+            doc.text(`${oBookingModel.EndDate ? oBookingModel.EndDate : data.StartDate || "-"}`, 60, currentY + 34);
             doc.text(`${data.Duration || "0"} ${data.DurationUnit || ""}`, 60, currentY + 46);
 
             // Right Columns
@@ -9665,17 +9693,17 @@ if (propertyType === "Hostel" || propertyType === "PG") {
             var CustomerData = this.getView().getModel("CustomerData").getData();
 
 
-            if(CustomerData.PaymentType==="Per Day"){
-            this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
-                sPath: "X" + "," + encodeURIComponent(this.getView().getModel("CustomerData").getProperty("/BookingID")),
-                dash: "ManageInvoice"
-            });
-        }else{
-               var oRouter = this.getOwnerComponent().getRouter();
-               oRouter.navTo("RouteManageInvoice",{
-                sPath:"BookingPage"
-            });
-        }
+            if (CustomerData.PaymentType === "Per Day") {
+                this.getOwnerComponent().getRouter().navTo("RouteManageInvoiceDetails", {
+                    sPath: "X" + "," + encodeURIComponent(this.getView().getModel("CustomerData").getProperty("/BookingID")),
+                    dash: "ManageInvoice"
+                });
+            } else {
+                var oRouter = this.getOwnerComponent().getRouter();
+                oRouter.navTo("RouteManageInvoice", {
+                    sPath: "BookingPage"
+                });
+            }
         },
         onPressDeposit: function () {
             var oRouter = this.getOwnerComponent().getRouter()
