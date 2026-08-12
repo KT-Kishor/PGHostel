@@ -50,7 +50,7 @@
                         <Column ><Text text="Age" /></Column>
                         <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Relationship" /></Column>
-                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column>
+                        <!-- <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column> -->
                         <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
 <Column
 >
@@ -63,11 +63,10 @@
                                 <Text text="{path: 'BookingView>Age', formatter: '.Formatter.formatAgeFromDOBOrAge'}" />
                                 <Text text="{BookingView>Gender}" />
                                 <Text text="{BookingView>Relation}" />
-                                <Text text="{BookingView>DocumentType}"  emptyIndicatorMode="On"/>
+                                <!-- <Text text="{BookingView>DocumentType}"  emptyIndicatorMode="On"/> -->
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
-                                text="{= ${BookingView>DocumentName} ? ${BookingView>DocumentName} : 'No Document' }"
-                                enabled="{= !!${BookingView>DocumentName} }"
+                                text="View"
                                 press="MS_viewimage"
                                 class="documentLink"
                             />

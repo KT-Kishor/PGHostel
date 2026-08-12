@@ -28,6 +28,7 @@ sap.ui.define([
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+            this._mMemberDocumentCache = {};
 
             // Resize observer to recalculate visible card count
             this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
@@ -619,7 +620,7 @@ sap.ui.define([
         },
 
         /**
-         * Override to merge member documents with existing API members in edit mode
+         * Override to load lightweight member master data in edit mode.
          */
         _loadMemberDataInBackground: function () {
             // Prevent multiple simultaneous loads
@@ -642,17 +643,13 @@ sap.ui.define([
 
             // Load member data in background with a small delay to prioritize UI rendering
             setTimeout(() => {
-                this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID })
+                this.ajaxReadWithJQuery("HM_Memberonly", { UserID: sUserID })
                     .then(oResponse => {
                         if (oResponse && oResponse.data) {
-                            const aMemberDocs = Array.isArray(oResponse.data) ? oResponse.data : [];
-                            // Get existing MemberList from HostelModel (contains API members from HM_Customer)
-                            const aExistingMembers = oHostelModel.getProperty("/MemberList") || [];
-
-                            // Use lightweight merge for better performance
-                            const aUpdatedMembers = this._lightweightMergeMemberDocuments(aExistingMembers, aMemberDocs);
-                            oHostelModel.setProperty("/MemberList", aUpdatedMembers);
+                            const aMembers = Array.isArray(oResponse.data) ? oResponse.data : [oResponse.data];
+                            oHostelModel.setProperty("/MemberList", aMembers);
                         }
+                        this._mMemberDocumentCache = {};
                         this._bMemberDataLoaded = true;
                         this._bMemberDataLoading = false;
                     })

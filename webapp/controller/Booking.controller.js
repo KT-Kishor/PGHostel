@@ -34,6 +34,7 @@
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
+            this._mMemberDocumentCache = {};
 
             // Resize observer to recalculate visible card count
             this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
@@ -175,8 +176,7 @@
         },
 
         /**
-         * Load HM_MemberDocument data in background for F4 help
-         * This runs async without await so it doesn't block the UI
+         * Load member master data without attachments for F4 help.
          */
         _loadMemberDataInBackground: function () {
             // Prevent multiple simultaneous loads
@@ -198,17 +198,17 @@
                 return;
             }
 
-            // Load member data in background
-            this.ajaxReadWithJQuery("HM_MemberDocument", { UserID: sUserID })
+            this.ajaxReadWithJQuery("HM_Memberonly", { UserID: sUserID })
                 .then(oResponse => {
                     if (oHostelModel.getProperty("/UserID") !== sUserID) {
                         return;
                     }
 
                     if (oResponse && oResponse.data) {
-                        const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [];
+                        const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [oResponse.data];
                         oHostelModel.setProperty("/MemberList", aMemberList)
                     }
+                    this._mMemberDocumentCache = {};
                     this._bMemberDataLoaded = true;
                     this._bMemberDataLoading = false;
                 })
@@ -329,6 +329,7 @@
 
             this._aAllFacilities = [];
             this._iFacilityStartIndex = 0;
+            this._mMemberDocumentCache = {};
 
             if (oHostelModel) {
                 oHostelModel.setData({});
@@ -2533,6 +2534,61 @@
             }
         },
 
+        _fetchMemberDocument: async function (sMemberID) {
+            const sCacheKey = String(sMemberID || "").trim();
+
+            if (!sCacheKey) {
+                return {};
+            }
+
+            if (!this._mMemberDocumentCache) {
+                this._mMemberDocumentCache = {};
+            }
+
+            if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
+                return this._mMemberDocumentCache[sCacheKey];
+            }
+
+            const oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", {
+                MemberID: sMemberID
+            });
+            const aDocuments = Array.isArray(oResponse)
+                ? oResponse
+                : (Array.isArray(oResponse && oResponse.HM_Documentonly)
+                    ? oResponse.HM_Documentonly
+                    : (Array.isArray(oResponse && oResponse.Documents)
+                    ? oResponse.Documents
+                    : (Array.isArray(oResponse && oResponse.data)
+                        ? oResponse.data
+                        : (oResponse && oResponse.data ? [oResponse.data] : []))));
+            const oDocument = aDocuments.find(function (oCandidate) {
+                return !oCandidate.MemberID || String(oCandidate.MemberID) === sCacheKey;
+            });
+
+            if (!oDocument) {
+                this._mMemberDocumentCache[sCacheKey] = {};
+                return {};
+            }
+
+            const sFile = this._bufferToBase64(oDocument.File || "");
+            const oNormalized = {
+                DocumentID: oDocument.DocumentID || "",
+                DocumentType: oDocument.DocumentType || "",
+                DocumentName: oDocument.FileName || "",
+                FileName: oDocument.FileName || "",
+                FileType: oDocument.FileType || "",
+                MemberID: oDocument.MemberID || sMemberID,
+                UserID: oDocument.UserID || "",
+                Document: sFile,
+                File: sFile,
+                Attachment: sFile,
+                Documents: [Object.assign({}, oDocument, { File: sFile })]
+            };
+
+            this._mMemberDocumentCache[sCacheKey] = oNormalized;
+            return oNormalized;
+        },
+
         _normalizeMemberRecord: function (oMember, iIndex) {
             const oMemberDocument = Array.isArray(oMember && oMember.Documents) && oMember.Documents.length > 0 ? oMember.Documents[0] : {};
             const aDocuments = Array.isArray(oMember && oMember.Documents) ? oMember.Documents.map(function (oDocument) {
@@ -2634,7 +2690,7 @@
             const oHostelModel = this.getView().getModel("HostelModel");
             const aMemberList = Array.isArray(oHostelModel.getProperty("/MemberList")) ? oHostelModel.getProperty("/MemberList") : [];
 
-            // Try to find a member with Relation "Self" (case-insensitive) in MemberList (from HM_MemberDocuments)
+            // Try to find a member with Relation "Self" (case-insensitive) in MemberList.
             let oSelfMember = null;
             for (let i = 0; i < aMemberList.length; i++) {
                 const oMember = aMemberList[i];
@@ -2651,7 +2707,7 @@
             let sAgeOrDOB = "";
 
             if (oSelfMember) {
-                // Use the member's details from HM_MemberDocuments
+                // Use the member's details from the lightweight member endpoint.
                 sName = String(oSelfMember.Name || oSelfMember.FullName || "").trim();
                 sSalutation = String(oSelfMember.Salutation || "").trim();
                 sGender = String(oSelfMember.Gender || "").trim();
@@ -2929,7 +2985,7 @@
             });
 
             // Filter out any member with Relation "Self" from all lists to avoid duplication
-            // because we will inject a fresh SELF record based on HM_MemberDocuments
+            // because we will inject a fresh SELF record based on HM_Memberonly
             aMasterMembers = aMasterMembers.filter(function (oMember) {
                 return !isSelfMember(oMember);
             });
@@ -2950,8 +3006,8 @@
             oSelfRecord.Selected = bSelfSelected;
             oSelfRecord.IsPrimary = bSelfIsPrimary;
 
-            // Build the full member list from server data first so document fields are preserved,
-            // then apply selection state from the booking's selected occupants.
+            // Build the full lightweight member list, then apply selection state
+            // from the booking's selected occupants.
             const aCombined = this._mergeMembersById(
                 [oSelfRecord].concat(aMasterMembers, aServerMemberList)
             );
@@ -3083,13 +3139,27 @@
                 waitForData();
             }
         },
-        MS_viewimage: function (oEvent) {
+        MS_viewimage: async function (oEvent) {
             const oPreviewData = oEvent.getSource().getBindingContext("BookingView")?.getObject();
-            if (!oPreviewData || !oPreviewData.Document) {
+
+            if (!oPreviewData || !oPreviewData.MemberID) {
                 sap.m.MessageToast.show("No document found");
                 return;
             }
-            this._openDocumentPreview(oPreviewData);
+
+            this.getBusyDialog();
+            try {
+                const oDocument = await this._fetchMemberDocument(oPreviewData.MemberID);
+                if (!oDocument.File) {
+                    MessageToast.show("No document found");
+                    return;
+                }
+                await this._openDocumentPreview(oDocument);
+            } catch (oError) {
+                MessageToast.show(oError.message || oError.responseText || "No document found");
+            } finally {
+                this.closeBusyDialog();
+            }
         },
 
         onMemberDialogTableUpdateFinished: function () {
@@ -3111,9 +3181,7 @@
                     filters: [
                         new Filter("Name", FilterOperator.Contains, sValue),
                         new Filter("Relation", FilterOperator.Contains, sValue),
-                        new Filter("Gender", FilterOperator.Contains, sValue),
-                        new Filter("DocumentType", FilterOperator.Contains, sValue),
-                        new Filter("DocumentName", FilterOperator.Contains, sValue)
+                        new Filter("Gender", FilterOperator.Contains, sValue)
                     ],
                     and: false
                 })];
@@ -3279,14 +3347,29 @@
             const oBookingView = this.getView().getModel("BookingView");
             const oContext = oEvent.getSource().getBindingContext("BookingView");
             const oMember = oContext ? oContext.getObject() : null;
-            const oDialog = await this._getNewMemberDialog();
 
             if (!oMember) {
                 return;
             }
 
+            let oDocument = {};
+            if (oMember.MemberID) {
+                this.getBusyDialog();
+                try {
+                    oDocument = await this._fetchMemberDocument(oMember.MemberID);
+                } catch (oError) {
+                    MessageToast.show(oError.message || oError.responseText || "Unable to load member document");
+                    return;
+                } finally {
+                    this.closeBusyDialog();
+                }
+            }
 
-            oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(oMember), {
+            const oDialog = await this._getNewMemberDialog();
+
+            oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(
+                Object.assign({}, oMember, oDocument)
+            ), {
                 IsEditMode: true,
             }));
             oBookingView.setProperty("/NewMemberDialogTitle", "Edit Member");
@@ -3387,25 +3470,36 @@
             this._showBusyOnUploader(true);
 
             let processedFile = oFile;
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = oFile.size / (1024 * 1024);
-            const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            const isImage = ["image/jpeg", "image/jpg", "image/png", "image/webp"].includes(oFile.type);
 
             try {
-                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                if (oFile.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
                     this.getBusyDialog();
                     const options = {
-                        maxSizeMB: 1.9,
+                        // keep a small headroom below the hard limit
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(oFile, options);
                     this.closeBusyDialog();
-                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+
+                    // compression cannot always reach the target (very large / noisy images)
+                    if (processedFile.size > iMaxSizeBytes) {
+                        this._showDocumentUploadSizeError();
+                        if (oFileUploader) oFileUploader.clear();
+                        this._removeProcessingRow(sTempId);
+                        this._showBusyOnUploader(false);
+                        oModel.setProperty("/NewMemberDraft/ProcessingActive", false);
+                        return;
+                    }
+                } else if (oFile.size > iMaxSizeBytes && !isImage) {
                     this._showDocumentUploadSizeError();
                     if (oFileUploader) oFileUploader.clear();
                     this._removeProcessingRow(sTempId);
@@ -3482,7 +3576,7 @@
 
         onNewMemberFileSizeExceed: function (oEvent) {
             const sFileName = oEvent.getParameter("fileName") || "File";
-            sap.m.MessageToast.show(sFileName + " exceeds the 2 MB size limit. Please choose a smaller file.");
+            sap.m.MessageToast.show(sFileName + " exceeds the 400 KB size limit. Please choose a smaller file.");
             oEvent.getSource().clear();
         },
 
@@ -4165,15 +4259,19 @@
                     ? await this.ajaxUpdateWithJQuery(sEndpoint, oPayload)
                     : await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
 
-                // Fetch member documents from backend after create/update
-                const oDocumentsResponse = await this.ajaxReadWithJQuery("HM_MemberDocument", {
+                if (this._mMemberDocumentCache) {
+                    delete this._mMemberDocumentCache[sMemberID];
+                }
+
+                // Refresh the lightweight member list after create/update.
+                const oMembersResponse = await this.ajaxReadWithJQuery("HM_Memberonly", {
                     UserID: sUserID
                 });
 
-                if (oDocumentsResponse && oDocumentsResponse.data) {
-                    const aMemberList = Array.isArray(oDocumentsResponse.data)
-                        ? oDocumentsResponse.data
-                        : [];
+                if (oMembersResponse && oMembersResponse.data) {
+                    const aMemberList = Array.isArray(oMembersResponse.data)
+                        ? oMembersResponse.data
+                        : [oMembersResponse.data];
 
                     const oHostelModel = this.getView().getModel("HostelModel");
                     const oBookingView = this.getView().getModel("BookingView");
@@ -4309,7 +4407,7 @@
                     contentWidth: sap.ui.Device.system.phone ? "95vw" : "18rem",
                     content: [
                         new Text({
-                            text: "Choose a document & upload clear image or PDF up to 2 MB",
+                            text: "Choose a document & upload clear image or PDF up to 400 KB",
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
@@ -4664,7 +4762,7 @@
         },
 
         _showDocumentUploadSizeError: function () {
-            MessageToast.show("Maximum file size allowed is 2 MB.");
+            MessageToast.show("Maximum file size allowed is 400 KB.");
         },
 
         onDocumentUploadTypeMismatch: function (oEvent) {
@@ -4695,7 +4793,7 @@
             const oModel = this.getView().getModel("BookingView");
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             const oReader = new FileReader();
-            const iMaxSize = 2 * 1024 * 1024;
+            const iMaxSize = 400 * 1024;
             const sFileName = String(oFile && oFile.name || "");
             const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
             const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
