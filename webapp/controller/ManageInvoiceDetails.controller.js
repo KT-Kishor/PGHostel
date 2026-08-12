@@ -4108,17 +4108,17 @@ sap.ui.define([
 
                         // Get the latest payment record based on EntryDate (date + time)
                         // Get the latest payment record based on EntryDate (date + time)
-                        const latestPayment = [...aInvoicePaymentDetails]
-                            .filter(item => item.EntryDate)
-                            .sort((a, b) => new Date(b.EntryDate) - new Date(a.EntryDate))[0];
 
-                        if (latestPayment && latestPayment.DueAmount !== undefined && latestPayment.DueAmount !== null && parseFloat(latestPayment.DueAmount) > 0) {
+                        // Remove any old Due Amount rows first
+                        // Add Due Amount only for the current invoice
+                        const dueAmount = Number(oModel.DueAmount || 0);
+
+                        if (dueAmount > 0) {
                             summaryBody.push([
                                 "Due Amount :",
-                                Formatter.fromatNumber(parseFloat(latestPayment.DueAmount))
+                                Formatter.fromatNumber(dueAmount)
                             ]);
                         }
-
                         // Total
                         const totalRowIndex = summaryBody.length;
                         summaryBody.push([
@@ -4375,7 +4375,7 @@ sap.ui.define([
                     BankTransactionID: String(RefundModel.TransactionId),
                     Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
                     EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
-                    Amount:(RefundModel.RefundAmount),
+                    Amount: (RefundModel.RefundAmount),
                     Currency: String(RefundModel.Currency),
                     CustomerName: RefundModel.CustomerName,
                     BookingID: RefundModel.BookingID,
@@ -4394,7 +4394,7 @@ sap.ui.define([
                     if (oData && oData.success) {
                         this.oDialog.close();
 
-            
+
                         await this.Readcall("HM_InvoicePaymentDetail", {
                             InvNo: this.decodedPath
                         });
@@ -4405,7 +4405,7 @@ sap.ui.define([
                             InvNo: this.decodedPath
                         });
 
-                        
+
 
 
                         const invoiceModel = this.getView().getModel("InvoicePayment");
@@ -4417,14 +4417,14 @@ sap.ui.define([
                             DueAmount: balanceAmount,
                         }
 
-                         await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                        await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
                             data: Payload,
                             filtres: {
                                 InvNo: String(RefundModel.InvNo)
                             }
                         });
 
-                      
+
 
 
                         const oInvoice = oResult.data.ManageInvoice[0];
