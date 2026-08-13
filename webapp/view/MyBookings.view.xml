@@ -157,7 +157,7 @@
                 >
                     <cells>
                         <Text text="{myBookings>BookingDate}" />        
-                        <Text text="{myBookings>mam}" />
+                        <Text text="{myBookings>BookingID}" />
                         <Text text="{myBookings>customerName}" />
                         <Text text="{myBookings>room}" />
                         <Text text="{path:'myBookings>amount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}" />

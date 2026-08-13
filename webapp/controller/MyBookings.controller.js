@@ -1033,8 +1033,8 @@
             var oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             var sDocType = oModel.getProperty("/DocumentType");
             var oProcessedFile;
-            var nMaxSizeMB = 2;
-            var nFileSizeMB;
+            var nMaxSizeKB = 400;
+            var nMaxSizeBytes = nMaxSizeKB * 1024;
             var bIsImage;
             var sExt;
 
@@ -1055,11 +1055,10 @@
             }
 
             oProcessedFile = oFile;
-            nFileSizeMB = oFile.size / (1024 * 1024);
-            bIsImage = oFile.type.indexOf("image/") === 0;
+            bIsImage = ["jpg", "jpeg", "png", "webp"].indexOf(sExt) >= 0;
 
             try {
-                if (nFileSizeMB > nMaxSizeMB && bIsImage) {
+                if (oFile.size > nMaxSizeBytes && bIsImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
@@ -1073,14 +1072,26 @@
 
                     this.getBusyDialog();
                     oProcessedFile = await imageCompression(oFile, {
-                        maxSizeMB: 1.9,
+                        maxSizeMB: (nMaxSizeKB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     });
                     this.closeBusyDialog();
-                } else if (nFileSizeMB > nMaxSizeMB && !bIsImage) {
-                    MessageToast.show("Please upload a file under 2 MB.");
+
+                    if (oProcessedFile.size > nMaxSizeBytes) {
+                        oModel.setProperty("/DocumentName", "");
+                        oModel.setProperty("/Document", "");
+                        oModel.setProperty("/File", "");
+                        oModel.setProperty("/FileType", "");
+                        oModel.setProperty("/ProcessingActive", false);
+                        oModel.refresh(true);
+                        MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        oFileUploader.clear();
+                        return;
+                    }
+                } else if (oFile.size > nMaxSizeBytes && !bIsImage) {
+                    MessageToast.show("Please upload a file under 400 KB.");
                     oFileUploader.clear();
                     return;
                 }
@@ -1120,7 +1131,7 @@
         },
 
         onMemberFileSizeExceed: function (oEvent) {
-            MessageToast.show((oEvent.getParameter("fileName") || "File") + " exceeds the 2 MB size limit.");
+            MessageToast.show((oEvent.getParameter("fileName") || "File") + " exceeds the 400 KB size limit.");
             oEvent.getSource().clear();
         },
 
@@ -2205,6 +2216,8 @@
             var oUploader = oEvent.getSource();
             var oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             var aAllowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+            var nMaxSizeKB = 400;
+            var nMaxSizeBytes = nMaxSizeKB * 1024;
             if (!oFile) {
                 return;
             }
@@ -2216,11 +2229,21 @@
 
             var oProcessedFile = oFile;
             try {
-                if (oFile.size > 2 * 1024 * 1024) {
+                if (oFile.size > nMaxSizeBytes) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
-                    oProcessedFile = await imageCompression(oFile, { maxSizeMB: 1.9, maxWidthOrHeight: 1920, initialQuality: 0.95 });
+                    oProcessedFile = await imageCompression(oFile, {
+                        maxSizeMB: (nMaxSizeKB - 10) / 1024,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    });
+
+                    if (oProcessedFile.size > nMaxSizeBytes) {
+                        MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        return;
+                    }
                 }
                 var sBase64 = await new Promise(function (resolve, reject) {
                     var oReader = new FileReader();
