@@ -94,16 +94,17 @@
                     valueStateText="Select payment mode"
                     change="onPaymentModeChange"
                     visible="{Visiblemodel>/Visible}"
+                    items="{PaymentMode>/}"
 
                 >
                     <core:ListItem
-                        key="UPI"
-                        text="UPI"
+                        key="{PaymentMode>Mode}"
+                        text="{PaymentMode>Mode}"
                     />
-                      <core:ListItem
+                      <!-- <core:ListItem
                         key="Cash"
                         text="Cash"
-                    />
+                    /> -->
                 </ComboBox>
 
                   <Label

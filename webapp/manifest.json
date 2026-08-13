@@ -123,6 +123,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/vendorstatus.json",
         "preload": true
+      },
+      "PaymentMode": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/PaymentMode.json",
+        "preload": true
       }
     },
     "resources": {

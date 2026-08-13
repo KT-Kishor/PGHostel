@@ -339,10 +339,10 @@ sap.ui.define(
                     var table = this.byId("CI_id_InvoiceTable");
                     const oModelData = table.getModel("ManageInvoiceModel").getData();
                     const aFormattedData = oModelData.map(item => {
-                        return {
+                        return {    
                             ...item,
                             InvoiceDate: Formatter.formatDate(item.InvoiceDate),
-                            PayByDate: Formatter.formatDate(item.PayByDate),
+                            // PayByDate: Formatter.formatDate(item.PayByDate),
                             TotalAmountCurrency: item.TotalAmount + " " + item.Currency
 
                         };
@@ -354,6 +354,11 @@ sap.ui.define(
                     const aCols = [{
                             label: this.i18nModel.getText("sheetBranchName"),
                             property: "BranchName",
+                            type: "string"
+                        },
+                        {
+                            label: this.i18nModel.getText("invoiceDate"),
+                            property: "InvoiceDate",
                             type: "string"
                         },
                         {
@@ -371,11 +376,7 @@ sap.ui.define(
                             property: "BookingID",
                             type: "string"
                         },
-                        {
-                            label: this.i18nModel.getText("invoiceDate"),
-                            property: "InvoiceDate",
-                            type: "string"
-                        },
+                        
                         {
                             label: this.i18nModel.getText("invoiceDescription"),
                             property: "InvoiceDescription",
@@ -386,11 +387,11 @@ sap.ui.define(
                             property: "TotalAmountCurrency",
                             type: "string"
                         },
-                        {
-                            label: this.i18nModel.getText("PayByDate"),
-                            property: "PayByDate",
-                            type: "string "
-                        },
+                        // {
+                        //     label: this.i18nModel.getText("PayByDate"),
+                        //     property: "PayByDate",
+                        //     type: "string "
+                        // },
                         {
                             label: this.i18nModel.getText("status"),
                             property: "Status",
@@ -410,12 +411,12 @@ sap.ui.define(
                             label: this.i18nModel.getText("igst"),
                             property: "IGST",
                             type: "string "
-                        },
-                        {
-                            label: this.i18nModel.getText("amountInINR"),
-                            property: "AmountInINR",
-                            type: "string"
-                        },
+                        }
+                        // {
+                        //     label: this.i18nModel.getText("amountInINR"),
+                        //     property: "AmountInINR",
+                        //     type: "string"
+                        // },
                     ];
                     const oSettings = {
                         workbook: {

@@ -40,28 +40,13 @@
                     selectedKey="{PaymentModel>/PaymentType}"
                     valueStateText="Select payment mode"
                     change="onPaymentModeChange"
-
+items="{PaymentMode>/}"
                 >
                     <core:ListItem
-                        key="UPI"
-                        text="UPI"
+                        key="{PaymentMode>Mode}"
+                        text="{PaymentMode>Mode}"
                     />
-                    <core:ListItem
-                        key="Card"
-                        text="Card"
-                    />
-                    <core:ListItem
-                        key="Online"
-                        text="Online"
-                    />
-                      <core:ListItem
-                        key="Cash"
-                        text="Cash"
-                    />
-                      <core:ListItem
-                        key="Other"
-                        text="Other"
-                    />
+                    
                 </ComboBox>
 
                  <Label

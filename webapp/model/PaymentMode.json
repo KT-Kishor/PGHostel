@@ -1,0 +1,22 @@
+[
+    {
+      "ID": 1,
+      "Mode": "UPI"
+    },
+    {
+      "ID": 2,
+      "Mode": "Card"
+    },
+    {
+      "ID": 3,
+      "Mode": "Online"
+    },
+    {
+      "ID": 4,
+      "Mode": "Cash"
+    },
+     {
+      "ID": 5,
+      "Mode": "Other"
+    }
+  ]
