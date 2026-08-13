@@ -4636,6 +4636,12 @@ sap.ui.define([
                         }
                     }
 
+                    if (unit === "per month") {
+                        if (fEnd.getTime() === cycleStart.getTime()) {
+                            return;
+                        }   
+                    }
+
 
                     if (invoiceIndex > 0) {
                         if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING")) {
