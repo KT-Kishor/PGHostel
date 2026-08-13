@@ -135,19 +135,26 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table
-                id="idPOTable"
-                sticky="ColumnHeaders,HeaderToolbar"
-                mode="SingleSelectLeft"
-                width="auto"
-                busyIndicatorDelay="0"
-                updateFinished="onTableUpdateFinished"
-                items="{path: 'HostelModel>/',  sorter: [{
-                    path: 'BranchName', group: true },
-					    { path: 'BookingID', descending: true },
-						 { path: 'BookingDate', descending: true }],
-                    groupHeaderFactory: '.getGroupHeader'}"
-            >
+			<Table 
+    id="idPOTable"
+    sticky="ColumnHeaders,HeaderToolbar"
+    mode="SingleSelectLeft"
+    width="auto"
+    busyIndicatorDelay="0"
+    growing="true"
+    growingThreshold="20"
+    growingScrollToLoad="true"
+    updateFinished="onTableUpdateFinished"
+    items="{
+        path: 'HostelModel>/',
+        sorter: [
+            { path: 'BranchName', group: true },
+            { path: 'BookingID', descending: true },
+            { path: 'BookingDate', descending: true }
+        ],
+        groupHeaderFactory: '.getGroupHeader'
+    }"
+>
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>bookingList} ({HostelModel>/count})" />

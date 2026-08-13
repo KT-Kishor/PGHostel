@@ -256,6 +256,7 @@
                     valueFormat="HH"
                     valueStateText="{i18n>pleaseselectTime}"
                     visible="{= ${edit>/UnitText} === 'Per Hour'}"
+                    class="Time"
                 />
                 <Label
                     text="{i18n>endTime}"

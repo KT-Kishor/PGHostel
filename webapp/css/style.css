@@ -7268,3 +7268,7 @@ html.sap-desktop .memberSelectDialog .memberDialogHeader .sapMToggleBtnPressed,
 .sapMITBFilter .sapMITBText .sapMITHTextContent { 
 text-transform: none !important;
 }
+
+.Time.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX {
+    width: 350px !important;
+}

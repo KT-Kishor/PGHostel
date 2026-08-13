@@ -1416,21 +1416,21 @@ sap.ui.define([
             sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
 
             if (sStartDate !== "" && sEndDate !== "") {
-                 if(sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")){
-                      sap.m.MessageToast.show("Please select a valid date");
-                    oModel.setProperty("/EndDate", "");
-                    if (sUnit === "Unit Price") {
-                        oModel.setProperty("/UnitText", sUnit);
-                    }
-                    return;
-                }else if(sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")){
+                if (sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")) {
                     sap.m.MessageToast.show("Please select a valid date");
                     oModel.setProperty("/EndDate", "");
                     if (sUnit === "Unit Price") {
                         oModel.setProperty("/UnitText", sUnit);
                     }
                     return;
-            }
+                } else if (sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")) {
+                    sap.m.MessageToast.show("Please select a valid date");
+                    oModel.setProperty("/EndDate", "");
+                    if (sUnit === "Unit Price") {
+                        oModel.setProperty("/UnitText", sUnit);
+                    }
+                    return;
+                }
             }
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
@@ -1716,7 +1716,7 @@ sap.ui.define([
                 return;
             }
 
-            if (oPayload.UnitText === "Per Month" || oPayload.UnitText === "Per Year"){
+            if (oPayload.UnitText === "Per Month" || oPayload.UnitText === "Per Year") {
                 var oStartDate = new Date(oPayload.StartDate.includes("/") ? oPayload.StartDate.split("/").reverse().join("-") : oPayload.StartDate);
                 var oBookingStartDate = oCustomerData.minStartDate;
                 var oBookingEndDate = oCustomerData.minEndDate;
@@ -4091,6 +4091,7 @@ sap.ui.define([
                 }
             }
 
+
             const invalidFacilities = [];
 
             for (let i = 0; i < facilityItems.length; i++) {
@@ -4245,17 +4246,25 @@ sap.ui.define([
                             //  Update totals
                             CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice - Number(CustomerData.Discount);
 
                             if (CustomerData.GSTType === "CGST/SGST") {
 
-                                CustomerData.GrandTotal =
-                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+                                const gstRate = Number(CustomerData.GSTValue) || 0;
+                                const totalGST = baseAmount * gstRate / 100;
+                                const halfGST = totalGST / 2;
+
+                                CustomerData.CGST = halfGST;
+                                CustomerData.SGST = halfGST;
+                                CustomerData.GrandTotal = baseAmount + totalGST;
 
                             } else if (CustomerData.GSTType === "IGST") {
 
-                                CustomerData.GrandTotal =
-                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
+                                const gstRate = Number(CustomerData.GSTValue) || 0;
+                                const igst = baseAmount * gstRate / 100;
+
+                                CustomerData.IGST = igst;
+                                CustomerData.GrandTotal = baseAmount + igst;
 
                             } else {
 
@@ -4427,17 +4436,25 @@ sap.ui.define([
                             //  Update totals
                             CustomerData.TotalFacilityPrice = totalFacilityPrice;
 
-                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice;
+                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice - Number(CustomerData.Discount);
 
                             if (CustomerData.GSTType === "CGST/SGST") {
 
-                                CustomerData.GrandTotal =
-                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100) * 2;
+                                const gstRate = Number(CustomerData.GSTValue) || 0;
+                                const totalGST = baseAmount * gstRate / 100;
+                                const halfGST = totalGST / 2;
+
+                                CustomerData.CGST = halfGST;
+                                CustomerData.SGST = halfGST;
+                                CustomerData.GrandTotal = baseAmount + totalGST;
 
                             } else if (CustomerData.GSTType === "IGST") {
 
-                                CustomerData.GrandTotal =
-                                    baseAmount + (baseAmount * Number(CustomerData.GSTValue) / 100);
+                                const gstRate = Number(CustomerData.GSTValue) || 0;
+                                const igst = baseAmount * gstRate / 100;
+
+                                CustomerData.IGST = igst;
+                                CustomerData.GrandTotal = baseAmount + igst;
 
                             } else {
 
@@ -9742,32 +9759,32 @@ sap.ui.define([
 
 
                     if (doc.DocumentID) {
-                    aDocs.push({
-                        DocumentID: doc.DocumentID,
-                        DocumentType: doc.DocumentType,
-                        MemberID: oData.MemberID,
-                        MemberName: oData.Name,
-                        Salutation: oData.Salutation,
-                        FileName: doc.FileName,
-                        FileType: doc.FileType,
-                        File: doc.File,
-                        Relation: oData.Relation,
-                        Gender: oData.Gender,
-                        DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
-                        IsPrimary: oData.MemberID === primaryMemberID
+                        aDocs.push({
+                            DocumentID: doc.DocumentID,
+                            DocumentType: doc.DocumentType,
+                            MemberID: oData.MemberID,
+                            MemberName: oData.Name,
+                            Salutation: oData.Salutation,
+                            FileName: doc.FileName,
+                            FileType: doc.FileType,
+                            File: doc.File,
+                            Relation: oData.Relation,
+                            Gender: oData.Gender,
+                            DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
+                            IsPrimary: oData.MemberID === primaryMemberID
 
-                    });
-                } else {
-                    aDocs.push({
-                        MemberID: oData.MemberID,
-                        MemberName: oData.Name,
-                        Salutation: oData.Salutation,
-                        Relation: oData.Relation,
-                        Gender: oData.Gender,
-                        DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
-                        IsPrimary: oData.MemberID === primaryMemberID
+                        });
+                    } else {
+                        aDocs.push({
+                            MemberID: oData.MemberID,
+                            MemberName: oData.Name,
+                            Salutation: oData.Salutation,
+                            Relation: oData.Relation,
+                            Gender: oData.Gender,
+                            DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
+                            IsPrimary: oData.MemberID === primaryMemberID
 
-                    });
+                        });
                     }
                 }.bind(this)));
             } catch (oError) {
