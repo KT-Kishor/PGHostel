@@ -550,7 +550,7 @@ sap.ui.define([
             });
 
             if (BranchData.PropertyType === "Rented Properties" || BranchData.PropertyType === "Hotel" || BranchData.PropertyType === "Service Apartments") {
-                let hostelData = this.getView().getModel("HostelModel").getData();
+                let hostelData = this.getView().getModel("HostelModel").getData().filter(item=> item.BranchCode === customerBranchCode);
 
                 availableRoomNos = availableRoomNos.filter(roomNo => {
                     return (
