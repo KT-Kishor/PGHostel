@@ -428,20 +428,20 @@ sap.ui.define([
             var selected = table.getSelectedItem();
 
             if (!selected) {
-              
-                 sap.m.MessageBox.show(
-    this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"),
-    {
-        icon: sap.m.MessageBox.Icon.Information,
-        title: this.i18nModel.getText("Information"),
-        actions: [sap.m.MessageBox.Action.OK],
-         onClose: function (oAction) {
-            if (oAction === sap.m.MessageBox.Action.OK) {
-                this.byId("idPOTable").removeSelections(true);
-            }
-        }.bind(this)
-    }
-);
+
+                sap.m.MessageBox.show(
+                    this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"),
+                    {
+                        icon: sap.m.MessageBox.Icon.Information,
+                        title: this.i18nModel.getText("Information"),
+                        actions: [sap.m.MessageBox.Action.OK],
+                        onClose: function (oAction) {
+                            if (oAction === sap.m.MessageBox.Action.OK) {
+                                this.byId("idPOTable").removeSelections(true);
+                            }
+                        }.bind(this)
+                    }
+                );
             }
 
             var Model = selected.getBindingContext("HostelModel");
@@ -466,18 +466,18 @@ sap.ui.define([
                 this.data.Status === "New"
             ) {
                 sap.m.MessageBox.show(
-    this.i18nModel.getText("thisCustomercantbeAssign"),
-    {
-        icon: sap.m.MessageBox.Icon.Information,
-        title: this.i18nModel.getText("Information"),
-        actions: [sap.m.MessageBox.Action.OK],
-         onClose: function (oAction) {
-            if (oAction === sap.m.MessageBox.Action.OK) {
-                this.byId("idPOTable").removeSelections(true);
-            }
-        }.bind(this)
-    }
-);
+                    this.i18nModel.getText("thisCustomercantbeAssign"),
+                    {
+                        icon: sap.m.MessageBox.Icon.Information,
+                        title: this.i18nModel.getText("Information"),
+                        actions: [sap.m.MessageBox.Action.OK],
+                        onClose: function (oAction) {
+                            if (oAction === sap.m.MessageBox.Action.OK) {
+                                this.byId("idPOTable").removeSelections(true);
+                            }
+                        }.bind(this)
+                    }
+                );
                 return;
             }
 
@@ -489,19 +489,19 @@ sap.ui.define([
             oToday.setHours(0, 0, 0, 0);
 
             if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
-                   sap.m.MessageBox.show(
-    this.i18nModel.getText("Room can only be assigned on the booking start date"),
-    {
-        icon: sap.m.MessageBox.Icon.Information,
-        title: this.i18nModel.getText("Information"),
-        actions: [sap.m.MessageBox.Action.OK],
-         onClose: function (oAction) {
-            if (oAction === sap.m.MessageBox.Action.OK) {
-                this.byId("idPOTable").removeSelections(true);
-            }
-        }.bind(this)
-    }
-);
+                sap.m.MessageBox.show(
+                    this.i18nModel.getText("Room can only be assigned on the booking start date"),
+                    {
+                        icon: sap.m.MessageBox.Icon.Information,
+                        title: this.i18nModel.getText("Information"),
+                        actions: [sap.m.MessageBox.Action.OK],
+                        onClose: function (oAction) {
+                            if (oAction === sap.m.MessageBox.Action.OK) {
+                                this.byId("idPOTable").removeSelections(true);
+                            }
+                        }.bind(this)
+                    }
+                );
                 return;
             }
 
@@ -512,14 +512,32 @@ sap.ui.define([
             var customerBranchCode = this.data.BranchCode;
             var customerBedType = this.data.BedType;
 
+             var oHostelModel = this.getView().getModel("HostelModel");
+            var aCustomers = oHostelModel.getData();
             // 🔹 SHOW ALL ROOMS (NO CAPACITY CHECK)
             var availableRoomNos = aRooms.filter(function (room) {
 
+                // Branch match
                 if (room.BranchCode !== customerBranchCode) {
                     return false;
                 }
 
+                // Bed type match
                 if (room.BedTypeName !== customerBedType) {
+                    return false;
+                }
+
+                // Count already assigned customers in this room
+                var assignedCount = aCustomers.filter(function (customer) {
+                    return (
+                        customer.RoomNo === room.RoomNo &&
+                        customer.BedType === room.BedTypeName &&
+                        customer.Status === "Assigned"
+                    );
+                }).length;
+
+                // Room is available only if capacity is not reached
+                if (assignedCount >= Number(room.NoofPerson)) {
                     return false;
                 }
 
@@ -531,20 +549,20 @@ sap.ui.define([
                 };
             });
 
-            if(BranchData.PropertyType==="Rented Properties" || BranchData.PropertyType==="Hotel" || BranchData.PropertyType==="Service Apartments"){
-            let hostelData = this.getView().getModel("HostelModel").getData();
+            if (BranchData.PropertyType === "Rented Properties" || BranchData.PropertyType === "Hotel" || BranchData.PropertyType === "Service Apartments") {
+                let hostelData = this.getView().getModel("HostelModel").getData();
 
-            availableRoomNos = availableRoomNos.filter(roomNo => {
-                return (
-                    roomNo.RoomNo === this.data.RoomNo ||
-                    !hostelData.some(item =>
-                        item.RoomNo === roomNo.RoomNo &&
-                        item.Status === "Assigned"
-                    )
-                );
-            });
+                availableRoomNos = availableRoomNos.filter(roomNo => {
+                    return (
+                        roomNo.RoomNo === this.data.RoomNo ||
+                        !hostelData.some(item =>
+                            item.RoomNo === roomNo.RoomNo &&
+                            item.Status === "Assigned"
+                        )
+                    );
+                });
 
-        }
+            }
 
             var oAvailableRoomsModel = new sap.ui.model.json.JSONModel(availableRoomNos);
             this.getView().setModel(oAvailableRoomsModel, "AvailableRoomsModel");
@@ -937,39 +955,39 @@ sap.ui.define([
                     }),
                     "InvoiceNavContext"
                 );
-                
-                 if(ID.Status==="Confirmed"){
+
+                if (ID.Status === "Confirmed") {
 
 
-                sap.m.MessageBox.confirm(
-                    "Are you sure you want to proceed to the invoice?",
-                    {
-                        title: "Confirm Navigation",
-                        icon: sap.m.MessageBox.Icon.INFORMATION,
-                        actions: [
-                            sap.m.MessageBox.Action.OK,
-                            sap.m.MessageBox.Action.CANCEL,
-                        ],
+                    sap.m.MessageBox.confirm(
+                        "Are you sure you want to proceed to the invoice?",
+                        {
+                            title: "Confirm Navigation",
+                            icon: sap.m.MessageBox.Icon.INFORMATION,
+                            actions: [
+                                sap.m.MessageBox.Action.OK,
+                                sap.m.MessageBox.Action.CANCEL,
+                            ],
 
-                        styleClass: "myUnifiedBtn",
-                        onClose: (sAction) => {
-                            if (sAction === sap.m.MessageBox.Action.OK) {
-                                this.getOwnerComponent()
-                                    .getRouter()
-                                    .navTo("RouteManageInvoiceDetails", {
-                                        sPath: "X",
-                                        dash: "AdminPage"
-                                    });
-                            } else {
-                                sap.m.MessageToast.show(
-                                    this.i18nModel.getText("recordUpdatedSuccessfully")
-                                );
-                                this.getOwnerComponent().getModel("InvoiceNavContext").setData({});
+                            styleClass: "myUnifiedBtn",
+                            onClose: (sAction) => {
+                                if (sAction === sap.m.MessageBox.Action.OK) {
+                                    this.getOwnerComponent()
+                                        .getRouter()
+                                        .navTo("RouteManageInvoiceDetails", {
+                                            sPath: "X",
+                                            dash: "AdminPage"
+                                        });
+                                } else {
+                                    sap.m.MessageToast.show(
+                                        this.i18nModel.getText("recordUpdatedSuccessfully")
+                                    );
+                                    this.getOwnerComponent().getModel("InvoiceNavContext").setData({});
+                                }
                             }
                         }
-                    }
-                );
-            }
+                    );
+                }
 
             } catch (oError) {
 
