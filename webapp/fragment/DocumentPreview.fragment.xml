@@ -33,7 +33,6 @@
         <beginButton>
             <Button
                 text="Download"
-                type="Transparent"
                 press=".onDownloadPreview" class="myUnifiedBtn"/>
         </beginButton>
 

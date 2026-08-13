@@ -547,14 +547,14 @@ sap.ui.define([
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
 
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = file.size / 1024 / 1024;
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
             const isImage = file.type.startsWith("image/");
             let processedFile = file;
 
-            if (fileSizeMB >= MAX_SIZE_MB) {
+            if (file.size > iMaxSizeBytes) {
                 if (!isImage) {
-                    sap.m.MessageToast.show("Please upload a file under 2 MB.");
+                    sap.m.MessageToast.show("Please upload a file under 400 KB.");
                     oEvent.getSource().clear();
                     return;
                 }
@@ -574,12 +574,18 @@ sap.ui.define([
 
                 try {
                     const options = {
-                        maxSizeMB: 1.9,
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(file, options);
+
+                    if (processedFile.size > iMaxSizeBytes) {
+                        sap.m.MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                        oEvent.getSource().clear();
+                        return;
+                    }
                 } finally {
                     this.closeBusyDialog();
                     if (oAvatar) {
@@ -1185,30 +1191,34 @@ sap.ui.define([
             this._showBusyOnUploader(true);
 
             let processedFile = oFile;
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = oFile.size / (1024 * 1024);
-            const isImage = oFile.type.startsWith("image/");
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            const isImage = ["jpg", "jpeg", "png", "webp"].includes(sExt);
 
             try {
-                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                if (oFile.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
                     this.getBusyDialog();
                     const options = {
-                        maxSizeMB: 1.9,
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(oFile, options);
                     this.closeBusyDialog();
-                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    sap.m.MessageToast.show("Please upload a file under 2 MB.");
+
+                    if (processedFile.size > iMaxSizeBytes) {
+                        sap.m.MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        this._removeProcessingRow(sTempId);
+                        return;
+                    }
+                } else if (oFile.size > iMaxSizeBytes && !isImage) {
+                    sap.m.MessageToast.show("Please upload a file under 400 KB.");
                     oFileUploader.clear();
                     this._removeProcessingRow(sTempId);
-                    this._showBusyOnUploader(false);
-                    oModel.setProperty("/ProcessingActive", false);
                     return;
                 }
 
@@ -1253,7 +1263,7 @@ sap.ui.define([
             const sFileName = oEvent.getParameter("fileName") || "File";
 
             sap.m.MessageToast.show(
-                sFileName + " exceeds the 2 MB size limit."
+                sFileName + " exceeds the 400 KB size limit."
             );
 
             oEvent.getSource().clear();
@@ -3687,27 +3697,32 @@ sap.ui.define([
             }]);
 
             let processedFile = file;
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = file.size / (1024 * 1024);
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
             const isImage = file.type.startsWith("image/");
 
             try {
-                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                if (file.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
                     this.getBusyDialog();
                     try {
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                             maxWidthOrHeight: 1920,
+                            useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(file, options);
                     } finally {
                         this.closeBusyDialog();
                     }
-                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
+
+                    if (processedFile.size > iMaxSizeBytes) {
+                        throw new Error(file.name + " could not be compressed below 400 KB.");
+                    }
+                } else if (file.size > iMaxSizeBytes && !isImage) {
                     throw new Error("Only images can be compressed");
                 }
 

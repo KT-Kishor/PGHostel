@@ -778,20 +778,25 @@ sap.ui.define([
                     const oFile = oFiles[i];
 
                     let processedFile = oFile;
-                    const fileSizeMB = oFile.size / (1024 * 1024);
+                    const MAX_SIZE_KB = 400;
+                    const iMaxSizeBytes = MAX_SIZE_KB * 1024;
                     const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-                    if (fileSizeMB > 2 && isImage) {
+                    if (oFile.size > iMaxSizeBytes && isImage) {
                         if (typeof imageCompression === "undefined") {
                             throw new Error("Compression library missing");
                         }
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(oFile, options);
+
+                        if (processedFile.size > iMaxSizeBytes) {
+                            throw new Error(oFile.name + " could not be compressed below 400 KB.");
+                        }
                     }
 
                     const base64 = await new Promise((resolve, reject) => {

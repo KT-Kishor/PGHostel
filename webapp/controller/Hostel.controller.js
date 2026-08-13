@@ -3876,15 +3876,41 @@ sap.ui.define([
             }, 200);
         },
 
-        onAvatarFileSelected: function (oEvent) {
+        onAvatarFileSelected: async function (oEvent) {
             const file = oEvent.getParameter("files")[0];
             if (!file) return;
-            const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-            if (file.size > MAX_SIZE) {
-                MessageToast.show("File size must be less than 2 MB.\nSelected file size: " + (file.size / 1024 / 1024).toFixed(2) + " MB");
-                // reset uploader field
-                oEvent.getSource().clear();
-                return;
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            let processedFile = file;
+
+            if (file.size > iMaxSizeBytes) {
+                if (typeof imageCompression === "undefined") {
+                    MessageToast.show("Compression library not available.");
+                    oEvent.getSource().clear();
+                    return;
+                }
+
+                this.getBusyDialog();
+                try {
+                    processedFile = await imageCompression(file, {
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                        initialQuality: 0.95
+                    });
+                } catch (err) {
+                    MessageBox.error(err.message || "Compression failed. Please try a smaller image.");
+                    oEvent.getSource().clear();
+                    return;
+                } finally {
+                    this.closeBusyDialog();
+                }
+
+                if (processedFile.size > iMaxSizeBytes) {
+                    MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                    oEvent.getSource().clear();
+                    return;
+                }
             }
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -3894,12 +3920,12 @@ sap.ui.define([
                 const oModel = this._oProfileDialog.getModel("profileData");
                 oModel.setProperty("/photo", fullDataURL);
                 await this.updateUserPhoto({
-                    fileName: file.name,
-                    fileType: file.type,
+                    fileName: processedFile.name || file.name,
+                    fileType: processedFile.type || file.type,
                     fileContent: base64
                 });
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(processedFile);
         },
 
         onRemovePhoto: async function () {
@@ -4873,25 +4899,28 @@ sap.ui.define([
             oModel.setProperty("/DocTypeEnabled", false);
 
             let processedFile = file;
-            const MAX_SIZE_MB = 2;
-            const fileSizeMB = file.size / (1024 * 1024);
-            const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
+            const MAX_SIZE_KB = 400;
+            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            const isImage = ["image/jpeg", "image/jpg", "image/png"].includes(file.type);
 
             try {
-                if (fileSizeMB > MAX_SIZE_MB && isImage) {
+                if (file.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
                         throw new Error("Compression library missing");
                     }
                     const options = {
-                        maxSizeMB: 1.9,
+                        maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         initialQuality: 0.95
                     };
                     processedFile = await imageCompression(file, options);
-                    // MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
-                } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    throw new Error("Only images can be compressed");
+
+                    if (processedFile.size > iMaxSizeBytes) {
+                        throw new Error(file.name + " could not be compressed below 400 KB.");
+                    }
+                } else if (file.size > iMaxSizeBytes && !isImage) {
+                    throw new Error(file.name + " exceeds the 400 KB size limit.");
                 }
 
                 // Convert to Base64
@@ -5651,7 +5680,7 @@ sap.ui.define([
             const oFileUploader = oEvent.getSource();
             const sFileName = oEvent.getParameter("fileName");
 
-            sap.m.MessageToast.show(`${sFileName} exceeds 2 MB size limit.`);
+            sap.m.MessageToast.show(`${sFileName} exceeds the 400 KB size limit.`);
         },
         onSupportrequestChange: async function (oEvent) {
             const oFiles = oEvent.getParameter("files");
@@ -5702,20 +5731,25 @@ sap.ui.define([
                     const oFile = oFiles[i];
 
                     let processedFile = oFile;
-                    const fileSizeMB = oFile.size / (1024 * 1024);
+                    const MAX_SIZE_KB = 400;
+                    const iMaxSizeBytes = MAX_SIZE_KB * 1024;
                     const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
-                    if (fileSizeMB > 2 && isImage) {
+                    if (oFile.size > iMaxSizeBytes && isImage) {
                         if (typeof imageCompression === "undefined") {
                             throw new Error("Compression library missing");
                         }
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(oFile, options);
+
+                        if (processedFile.size > iMaxSizeBytes) {
+                            throw new Error(oFile.name + " could not be compressed below 400 KB.");
+                        }
                     }
 
                     const base64 = await new Promise((resolve, reject) => {

@@ -349,7 +349,7 @@ sap.ui.define([
             }
         },
 
-        onAdminFileSelect: function (oEvent) {
+        onAdminFileSelect: async function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             const oModel = this.getView().getModel("AdminSignupModel");
             const sDocType = oModel.getProperty("/CurrentDocType");
@@ -370,43 +370,35 @@ sap.ui.define([
                 this.byId("V_id_adminFileUploader").clear();
                 return;
             }
-            const reader = new FileReader();
-            const that = this;
-            reader.onload = async function (e) {
-                try {
-                    const sBase64 = e.target.result.split(",")[1];
-                    const oPayload = {
-                        data: {
-                            UserID: oModel.getProperty("/UserID"),
-                            DocumentType: sDocType,
-                            File: sBase64,
-                            FileName: oFile.name,
-                            FileType: oFile.type,
-                            MemberID : oModel.getProperty("/UserID")
-                        }
-                    };
-                    this.getBusyDialog()
-                    await that.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
-                    await that._loadVendorDetails(oModel.getProperty("/UserID"));
-                    oModel.setProperty("/CurrentDocType", "");
-                    that.byId("V_id_adminFileUploader").clear();
-                } catch (err) {
-                    MessageToast.show(that.i18nModel.getText("docUploadError"));
-                } finally {
-                    this.closeBusyDialog()
-                    MessageToast.show(that.i18nModel.getText("docUploadSuccess"));
-                }
-            };
-            reader.readAsDataURL(oFile);
+            try {
+                this.getBusyDialog();
+                const oProcessedFile = await this._processVendorDocument(oFile);
+                const sBase64 = await this._fileToBase64(oProcessedFile);
+                const oPayload = {
+                    data: {
+                        UserID: oModel.getProperty("/UserID"),
+                        DocumentType: sDocType,
+                        File: sBase64,
+                        FileName: oProcessedFile.name || oFile.name,
+                        FileType: oProcessedFile.type || oFile.type,
+                        MemberID: oModel.getProperty("/UserID")
+                    }
+                };
+
+                await this.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
+                await this._loadVendorDetails(oModel.getProperty("/UserID"));
+                oModel.setProperty("/CurrentDocType", "");
+                this.byId("V_id_adminFileUploader").clear();
+                MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
+            } catch (err) {
+                MessageToast.show(err.message || this.i18nModel.getText("docUploadError"));
+            } finally {
+                this.closeBusyDialog();
+            }
         },
 
          onFileSizeExceeds: function () {
-            var oUploader = sap.ui.getCore().byId("VN_id_FileUploader");
-            var iMaxSize = oUploader.getMaximumFileSize();
-
-            sap.m.MessageToast.show(
-                "File size exceeds " + iMaxSize + " MB. Please upload a smaller file."
-            );
+            sap.m.MessageToast.show("File size exceeds the 400 KB limit. Please upload a smaller file.");
         },
 
         BI_onEditButtonPress: function () {
@@ -1151,9 +1143,9 @@ sap.ui.define([
             const bIsPdf = oFile.type === "application/pdf" ||
                 oFile.name.toLowerCase().endsWith(".pdf");
 
-            if (bIsPdf && oFile.size > (2 * 1024 * 1024)) {
+            if (bIsPdf && oFile.size > (400 * 1024)) {
                 sap.m.MessageToast.show(
-                    "PDF file size should not exceed 2 MB."
+                    "PDF file size should not exceed 400 KB."
                 );
                 oFileUploader.clear();
                 return;
@@ -1179,9 +1171,10 @@ sap.ui.define([
             reader.onload = async function(e) {
                 try {
 
-                    const sBase64 = await that._compressImageTo2MB(oFile);
+                    const oProcessedFile = await that._processVendorDocument(oFile);
+                    const sBase64 = await that._fileToBase64(oProcessedFile);
 
-                    const sExt = "jpg"; // compressed output is jpeg
+                    const sExt = oProcessedFile.type === "application/pdf" ? "pdf" : "jpg";
 
                     const sNewFileName = sDocType
                         .toLowerCase()
@@ -1194,7 +1187,7 @@ sap.ui.define([
                             DocumentType: sDocType,
                             File: sBase64,
                             FileName: sNewFileName, // <-- custom file name
-                            FileType: oFile.type,
+                            FileType: oProcessedFile.type || oFile.type,
                             MemberID: oAdminModel.getProperty("/UserID")
                         }
                     };
@@ -1229,71 +1222,44 @@ sap.ui.define([
             this.UD_Dialog.close();
         },
 
-        _compressImageTo2MB: function (oFile) {
-            return new Promise((resolve, reject) => {
+        _processVendorDocument: async function (oFile) {
+            const iMaxSizeBytes = 400 * 1024;
 
-                // Non-image files
-                if (!oFile.type.startsWith("image/")) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        resolve(e.target.result.split(",")[1]);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(oFile);
-                    return;
+            if (!oFile.type.startsWith("image/")) {
+                if (oFile.size > iMaxSizeBytes) {
+                    throw new Error(oFile.name + " exceeds the 400 KB size limit.");
                 }
+                return oFile;
+            }
 
-                const img = new Image();
-                const reader = new FileReader();
+            if (oFile.size <= iMaxSizeBytes) {
+                return oFile;
+            }
+            if (typeof imageCompression === "undefined") {
+                throw new Error("Compression library missing");
+            }
 
-                reader.onload = function (e) {
-                    img.src = e.target.result;
+            const oProcessedFile = await imageCompression(oFile, {
+                maxSizeMB: 390 / 1024,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+                initialQuality: 0.95
+            });
+
+            if (oProcessedFile.size > iMaxSizeBytes) {
+                throw new Error(oFile.name + " could not be compressed below 400 KB.");
+            }
+            return oProcessedFile;
+        },
+
+        _fileToBase64: function (oFile) {
+            return new Promise(function (resolve, reject) {
+                const oReader = new FileReader();
+                oReader.onload = function () {
+                    resolve(String(oReader.result || "").split(",")[1] || "");
                 };
-
-                img.onload = function () {
-
-                    let canvas = document.createElement("canvas");
-                    let ctx = canvas.getContext("2d");
-
-                    let width = img.width;
-                    let height = img.height;
-
-                    // Resize large images
-                    const maxDimension = 1920;
-
-                    if (width > maxDimension || height > maxDimension) {
-                        const ratio = Math.min(
-                            maxDimension / width,
-                            maxDimension / height
-                        );
-                        width *= ratio;
-                        height *= ratio;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    let quality = 0.9;
-                    let dataUrl = canvas.toDataURL("image/jpeg", quality);
-
-                    // Keep reducing quality until under 2MB
-                    while (
-                        dataUrl.length * 0.75 > 2 * 1024 * 1024 &&
-                        quality > 0.1
-                    ) {
-                        quality -= 0.1;
-                        dataUrl = canvas.toDataURL("image/jpeg", quality);
-                    }
-
-                    resolve(dataUrl.split(",")[1]);
-                };
-
-                img.onerror = reject;
-                reader.onerror = reject;
-
-                reader.readAsDataURL(oFile);
+                oReader.onerror = reject;
+                oReader.readAsDataURL(oFile);
             });
         },
 
