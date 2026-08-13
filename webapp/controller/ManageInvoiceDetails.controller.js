@@ -4636,7 +4636,7 @@ sap.ui.define([
                         }
                     }
 
-                    if (unit === "per month") {
+                    if (unit === "per month" || unit === "per year") {
                         if (fEnd.getTime() === cycleStart.getTime()) {
                             return;
                         }   

@@ -1717,7 +1717,7 @@ sap.ui.define([
             }
 
             if (oPayload.UnitText === "Per Month" || oPayload.UnitText === "Per Year"){
-                var oStartDate = new Date(oPayload.StartDate);
+                var oStartDate = new Date(oPayload.StartDate.includes("/") ? oPayload.StartDate.split("/").reverse().join("-") : oPayload.StartDate);
                 var oBookingStartDate = oCustomerData.minStartDate;
                 var oBookingEndDate = oCustomerData.minEndDate;
 
