@@ -289,7 +289,7 @@ sap.ui.define([
             }
 
             let processedFile = oFile;
-            const MAX_SIZE_MB = 2;
+            const MAX_SIZE_MB = 1;
             const fileSizeMB = oFile.size / (1024 * 1024);
             const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
@@ -302,7 +302,7 @@ sap.ui.define([
                     this._addBusyProcessingRow();
                     try {
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: 0.95,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
@@ -312,9 +312,13 @@ sap.ui.define([
                         this.closeBusyDialog();
                     }
                 } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    sap.m.MessageToast.show("File exceeds 2 MB. Please choose a smaller file.");
+                    sap.m.MessageToast.show("File exceeds 1 MB. Please choose a smaller file.");
                     if (oFileUploader) oFileUploader.clear();
                     return;
+                }
+
+                if (processedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+                    throw new Error("Image size must be 1 MB or less after compression");
                 }
 
                 const base64 = await new Promise(function (resolve, reject) {

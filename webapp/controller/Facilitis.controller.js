@@ -730,7 +730,7 @@ sap.ui.define([
                     aAttachments = oUploaderData.getProperty("/attachments") || [];
 
                     let processedFile = oFile;
-                    const MAX_SIZE_MB = 2;
+                    const MAX_SIZE_MB = 1;
                     const fileSizeMB = oFile.size / (1024 * 1024);
 
                     if (fileSizeMB > MAX_SIZE_MB) {
@@ -738,12 +738,16 @@ sap.ui.define([
                             throw new Error("Compression library missing");
                         }
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: 0.95,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(oFile, options);
+                    }
+
+                    if (processedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+                        throw new Error("Image size must be 1 MB or less after compression");
                     }
 
                     const sBase64 = await new Promise((resolve, reject) => {

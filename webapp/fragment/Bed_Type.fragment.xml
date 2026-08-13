@@ -163,7 +163,7 @@
         
             <!-- Informational Message Strip -->
             <MessageStrip
-                text="Please add at least one image. Only JPG, JPEG, or PNG files up to 2 MB are allowed."
+                text="Please add at least one image. Only JPG, JPEG, or PNG files up to 1 MB are allowed."
                 showIcon="true"
                 type="Warning"
                 class="sapUiSmallMargin"

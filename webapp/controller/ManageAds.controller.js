@@ -305,7 +305,7 @@ sap.ui.define([
                 }
             }
 
-            const MAX_SIZE_MB = 2;
+            const MAX_SIZE_MB = 1;
             let bNeedsCompression = false;
 
             for (const oFile of aFiles) {
@@ -335,14 +335,18 @@ sap.ui.define([
                             throw new Error("Compression library missing");
                         }
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: 0.95,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
                         };
                         processedFile = await imageCompression(oFile, options);
                     } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                        throw new Error("File exceeds 2 MB. Please choose a smaller file.");
+                        throw new Error("File exceeds 1 MB. Please choose a smaller file.");
+                    }
+
+                    if (processedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+                        throw new Error("Image size must be 1 MB or less after compression");
                     }
 
                     const base64 = await new Promise(function(resolve, reject) {

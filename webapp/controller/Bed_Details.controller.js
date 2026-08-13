@@ -387,7 +387,7 @@ sap.ui.define([
                 }
 
                 let processedFile = oFile;
-                const MAX_SIZE_MB = 2;
+                const MAX_SIZE_MB = 1;
                 const fileSizeMB = oFile.size / (1024 * 1024);
                 const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
 
@@ -400,7 +400,7 @@ sap.ui.define([
                         }
                         this.getBusyDialog();
                         const options = {
-                            maxSizeMB: 1.9,
+                            maxSizeMB: 0.95,
                             maxWidthOrHeight: 1920,
                             useWebWorker: true,
                             initialQuality: 0.95
@@ -408,6 +408,10 @@ sap.ui.define([
                         processedFile = await imageCompression(oFile, options);
                     } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
                         throw new Error("Only images can be compressed");
+                    }
+
+                    if (processedFile.size > MAX_SIZE_MB * 1024 * 1024) {
+                        throw new Error("Image size must be 1 MB or less after compression");
                     }
 
                     this.closeBusyDialog();
