@@ -3180,6 +3180,9 @@ sap.ui.define([
             var sCatalogMode = String(oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility) || "")
                 .trim()
                 .toUpperCase();
+            var sCatalogChargeType = sCatalogMode === "PERSON_QTY"
+                ? this._normalizeFacilityChargeType(oFacility.FacilityChargeType)
+                : "";
 
             var fnStripUnitSuffix = function (sValue) {
                 // Handles display names like "AC (Per Month)"
@@ -3214,6 +3217,18 @@ sap.ui.define([
                 // If it has SelectionMode, it must match the catalog mode.
                 return !sSelectedMode || !sCatalogMode || sSelectedMode === sCatalogMode;
             };
+
+            var fnChargeTypeMatches = function (oSelected) {
+                if (sCatalogMode !== "PERSON_QTY") {
+                    return true;
+                }
+
+                var sSelectedChargeType = this._normalizeFacilityChargeType(
+                    oSelected.FacilityChargeType || oSelected.ApiFacilityChargeType
+                );
+
+                return !sSelectedChargeType || !sCatalogChargeType || sSelectedChargeType === sCatalogChargeType;
+            }.bind(this);
 
             var fnNameMatchesExactly = function (oSelected) {
                 var aSelectedNameKeys = fnGetSelectedNameKeys(oSelected);
@@ -3254,7 +3269,7 @@ sap.ui.define([
             // No substring matching, because "AC" is inside "Laundry package".
             if (aMatches.length === 0 && aCatalogNameKeys.length > 0) {
                 aSelectedFacilities.forEach(function (oSelected) {
-                    if (fnModeMatches(oSelected) && fnNameMatchesExactly(oSelected)) {
+                    if (fnModeMatches(oSelected) && fnChargeTypeMatches(oSelected) && fnNameMatchesExactly(oSelected)) {
                         fnAddMatch(oSelected);
                     }
                 });
@@ -3362,6 +3377,7 @@ sap.ui.define([
             var iExtraBed = this._toNumber(oHostelModel.getProperty("/ExtraBed"));
             var aSelectedFacilities = oHostelModel.getProperty("/AllSelectedFacilities") || [];
             var aFacilities = this._aAllFacilities || [];
+            var aConsumedSelectedFacilities = [];
 
             // Filter and process facilities — use reduce to allow 1:N mapping
             // when a catalog facility has multiple UnitText variants in the booking
@@ -3374,7 +3390,10 @@ sap.ui.define([
                 })
                 .reduce(function (aResult, oFacility) {
                     // Find ALL matching selected facilities for this catalog facility
-                    var aMatches = this._findAllSelectedFacilitiesForEdit(oFacility, aSelectedFacilities);
+                    var aMatches = this._findAllSelectedFacilitiesForEdit(oFacility, aSelectedFacilities)
+                        .filter(function (oSelectedFacility) {
+                            return aConsumedSelectedFacilities.indexOf(oSelectedFacility) < 0;
+                        });
 
                     if (aMatches.length === 0) {
                         // No selected facilities — create one unselected card
@@ -3397,6 +3416,7 @@ sap.ui.define([
                     // Create one processed entry per matching selected facility
                     aMatches.forEach(function (oSelectedFacility) {
                         aResult.push(this._buildProcessedFacilityEntry(oFacility, oSelectedFacility, true, bShowSuffix));
+                        aConsumedSelectedFacilities.push(oSelectedFacility);
                     }.bind(this));
 
                     return aResult;
