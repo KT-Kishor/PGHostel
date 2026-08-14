@@ -560,6 +560,23 @@ sap.ui.define([
                     this.byId("CID_id_AddBooking").setSelectedKey("");
 
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingList[0].BookingID);
+                    const sBookingID = bookingList[0].BookingID;
+
+                    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", {
+                        BookingID: [sBookingID]
+                    });
+
+                    if (oBookingData?.commentData?.length) {
+                        this.getView().setModel(
+                            new sap.ui.model.json.JSONModel(oBookingData.commentData[0]),
+                            "BookinglocalModel"
+                        );
+
+                        console.log(
+                            "BookinglocalModel Set:",
+                            this.getView().getModel("BookinglocalModel").getData()
+                        );
+                    }
                     this.byId("CID_id_AddBooking").setValue(bookingList[0].BookingID);
                     this.onChangeBookingID();
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
@@ -4635,7 +4652,7 @@ sap.ui.define([
                 const cycleEnd = this._parseDate(RoomRent[0].EndDate);
 
                 const oModel = this.getView().getModel("SelectedCustomerModel");
-              oModel.setProperty(
+                oModel.setProperty(
                     "/InvoiceDescription",
                     this._getInvoiceDescription(RoomRent[0].PaymentType, cycleStart, cycleEnd)
                 );
