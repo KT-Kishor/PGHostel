@@ -42,8 +42,8 @@ sap.ui.define([
             var sPath = oEvent.getParameter("arguments").sPath;
             this.sPath = oEvent.getParameter("arguments").sPath;
 
-            if(sPath==="TilePage"){
-            this.onClearAndSearch("HD_id_FilterbarEmployee");
+            if (sPath === "TilePage") {
+                this.onClearAndSearch("HD_id_FilterbarEmployee");
             }
             var loginModel = this.getOwnerComponent().getModel("LoginModel");
             this.BranchCode = loginModel.getProperty("/BranchCode");
@@ -51,9 +51,9 @@ sap.ui.define([
             await this.Onsearch("true")
             this.readCustomerData();
         },
-         getGroupHeader: function (oGroup) {
-                    return this.getStyledGroupHeader(oGroup);
-                },
+        getGroupHeader: function (oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
         HM_GenearteDamage: function () {
 
             this.getOwnerComponent().getRouter().navTo("RouteDamageDetails", { sPath: "Damage" });
@@ -329,13 +329,13 @@ sap.ui.define([
             }
         },
         DamageOnsearch: function () {
-              if(!this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey()  && !this.byId("DM_id_Status").getSelectedKey()){
+            if (!this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey() && !this.byId("DM_id_Status").getSelectedKey()) {
 
-             this.Onsearch("true");
-            }else{
+                this.Onsearch("true");
+            } else {
                 this.Onsearch("false")
             }
-        
+
         },
 
         onLiveChangeItemName: function (oEvent) {
@@ -479,7 +479,7 @@ sap.ui.define([
                     };
                 });
 
-                if (flag === "true" &&  this.sPath==="TilePage") {
+                if (flag === "true" && this.sPath === "TilePage") {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
                 } else if (!this._originalRoomdata || this._originalRoomdata.length === 0) {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
@@ -679,18 +679,26 @@ sap.ui.define([
         onSaveReturn: async function () {
             const oView = this.getView();
             const oDamage = oView.getModel("DamageModel").getData();
-
-
-
             const oAmountInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount"));
             const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
             const oTxnInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
 
-            var isMandatoryValid = (
-                utils.onNumber(sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount")), "ID") &&
-                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID")), "ID")
-            );
+            const sReturnMode = oModeInput.getSelectedKey();
+
+            let isMandatoryValid =
+                utils.onNumber(oAmountInput, "ID") &&
+                utils._LCstrictValidationComboBox(oModeInput, "ID");
+
+            // Validate Transaction ID only when mode is NOT Cash
+            if (sReturnMode !== "Cash") {
+                isMandatoryValid =
+                    isMandatoryValid &&
+                    utils._LCvalidateMandatoryField(oTxnInput, "ID");
+            } else {
+                // Clear any previous error state
+                oTxnInput.setValueState("None");
+            }
+
 
             if (!isMandatoryValid) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
@@ -800,6 +808,23 @@ sap.ui.define([
 
         _onReturnModeChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent);
+            var sMode = oEvent.getSource().getSelectedKey();
+            var oModel = this.getView().getModel("DamageModel");
+            const oTInput = sap.ui.getCore().byId(this.getView().createId("DT_id_ReturnTransactionID"));
+
+            // Disable when Cash is selected
+            oModel.setProperty(
+                "/ReturnTransactionEnabled",
+                sMode !== "Cash"
+            );
+
+            // Optional: Clear value when Cash is selected
+            if (sMode === "Cash") {
+                oModel.setProperty("/ReturnDamageTransactionID", "");
+                // oModel.setValueState("None");
+                oTInput.setValueState("None");
+
+            }
             const oView = this.getView();
             const oTxn = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
             oTxn.setValue("");

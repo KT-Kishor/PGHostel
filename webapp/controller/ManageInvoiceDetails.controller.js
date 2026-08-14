@@ -361,7 +361,6 @@ sap.ui.define([
                     }
                     const sBookingID = this.SelectedCustomerModel.getProperty("/BookingID");
 
-
                     const oFilter = {
                         BookingID: [sBookingID]
                     };
@@ -562,21 +561,6 @@ sap.ui.define([
                     this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingList[0].BookingID);
                     const sBookingID = bookingList[0].BookingID;
 
-                    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", {
-                        BookingID: [sBookingID]
-                    });
-
-                    if (oBookingData?.commentData?.length) {
-                        this.getView().setModel(
-                            new sap.ui.model.json.JSONModel(oBookingData.commentData[0]),
-                            "BookinglocalModel"
-                        );
-
-                        console.log(
-                            "BookinglocalModel Set:",
-                            this.getView().getModel("BookinglocalModel").getData()
-                        );
-                    }
                     this.byId("CID_id_AddBooking").setValue(bookingList[0].BookingID);
                     this.onChangeBookingID();
                     this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
@@ -603,6 +587,12 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
+
+
+                    this.getView().setModel(
+                        new sap.ui.model.json.JSONModel(bookingDetails),
+                        "BookinglocalModel"
+                    );
 
                     if (!bookingDetails) {
                         sap.m.MessageBox.information(

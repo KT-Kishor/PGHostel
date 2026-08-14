@@ -55,10 +55,9 @@
                     id="DT_id_ReturnMode"
                     selectedKey="{DamageModel>/ReturnDamageMode}"
                     placeholder="Select return mode"
-                    change="_onReturnModeChange" valueStateText="Select return mode">
-                    <core:Item key="CASH" text="Cash"/>
-                    <core:Item key="UPI" text="UPI"/>
-                    <core:Item key="CARD" text="Card"/>
+                    change="_onReturnModeChange" valueStateText="Select return mode" items="{PaymentMode>/}">
+                    <core:ListItem key="{PaymentMode>Mode}" text="{PaymentMode>Mode}"/>
+                   
                 </ComboBox>
 
                 <!-- Transaction ID -->
@@ -67,7 +66,7 @@
                     id="DT_id_ReturnTransactionID"
                     value="{DamageModel>/ReturnDamageTransactionID}"
                     placeholder="Enter transaction / person name"
-                    liveChange="_validateTransactionID" valueStateText="Enter transaction / person name"/>
+                    liveChange="_validateTransactionID" valueStateText="Enter transaction / person name"   enabled="{DamageModel>/ReturnTransactionEnabled}" />
 
                 <!-- Returning Employee -->
                 <Label text="Returning To"/>
