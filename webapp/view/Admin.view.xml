@@ -30,6 +30,29 @@
                 showFilterConfiguration="false"
                 class="filterBarTheme"
             >
+<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="propertyName"
+                        label="{i18n>propertyName}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+						<fb:control>
+							<ComboBox
+                                id="PO_id_PropertyName"
+                                items="{BranchFilterModel>/}"
+                                showClearIcon="true"
+                            >
+								<core:ListItem
+                                    key="{BranchFilterModel>BranchCode}"
+                                    text="{BranchFilterModel>BranchName}"
+                                />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				
+            
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Booking ID"

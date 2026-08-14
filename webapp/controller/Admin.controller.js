@@ -47,6 +47,8 @@ sap.ui.define([
                 this.getView().byId("PO_id_Status").setSelectedKey("")
                 this.getView().byId("PO_id_BookingId").setSelectedKey("")
                 this.getView().byId("PO_id_CustomerName").setSelectedKey("")
+                this.getView().byId("PO_id_PropertyName").setSelectedKey("")
+
             }
 
 
@@ -182,6 +184,9 @@ sap.ui.define([
                 const sCustomerName = this.byId("PO_id_CustomerName").getSelectedKey()
                     || this.byId("PO_id_CustomerName").getValue();
 
+
+                const sBranchName = this.byId("PO_id_PropertyName").getSelectedKey()
+
                 const oDateRange = this.byId("PO_id_Date");
                 const oStartDate = oDateRange.getDateValue();
                 const oEndDate = oDateRange.getSecondDateValue();
@@ -233,6 +238,7 @@ sap.ui.define([
                 if (sRoomNo) filters.RoomNo = sRoomNo;
                 if (sStatus) filters.Status = sStatus;
                 if (sCustomerName) filters.CustomerName = sCustomerName;
+                if (sBranchName) filters.BranchCode = sBranchName;
 
 
                 // ================= Date Handling (Same as Invoice) =================
@@ -276,6 +282,26 @@ sap.ui.define([
                         this._originalRoomdata = mappedData;
                     }
 
+
+
+                    if (!this.getView().getModel("BranchFilterModel")) {
+
+                        const uniqueBranches = [
+                            ...new Map(
+                                mappedData.map(item => [
+                                    item.BranchCode,
+                                    {
+                                        BranchCode: item.BranchCode,
+                                        BranchName: item.BranchName
+                                    }
+                                ])
+                            ).values()
+                        ];
+
+                        const oBranchModel = new sap.ui.model.json.JSONModel(uniqueBranches);
+                        this.getView().setModel(oBranchModel, "BranchFilterModel");
+                    }
+
                     const oModel = new sap.ui.model.json.JSONModel(mappedData);
                     this.getView().setModel(oModel, "HostelModel");
                     this.getOwnerComponent().setModel(oModel, "HostelModelcheckrooms");
@@ -317,6 +343,7 @@ sap.ui.define([
                 PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
                 PO_id_CustomerName: new Set()
+
             };
 
             data.forEach(item => {
@@ -330,6 +357,7 @@ sap.ui.define([
                 if (item.CustomerName) {
                     uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
                 }
+
             });
 
             let oView = this.getView();
@@ -512,7 +540,7 @@ sap.ui.define([
             var customerBranchCode = this.data.BranchCode;
             var customerBedType = this.data.BedType;
 
-             var oHostelModel = this.getView().getModel("HostelModel");
+            var oHostelModel = this.getView().getModel("HostelModel");
             var aCustomers = oHostelModel.getData();
             // 🔹 SHOW ALL ROOMS (NO CAPACITY CHECK)
             var availableRoomNos = aRooms.filter(function (room) {
@@ -550,7 +578,7 @@ sap.ui.define([
             });
 
             if (BranchData.PropertyType === "Rented Properties" || BranchData.PropertyType === "Hotel" || BranchData.PropertyType === "Service Apartments") {
-                let hostelData = this.getView().getModel("HostelModel").getData().filter(item=> item.BranchCode === customerBranchCode);
+                let hostelData = this.getView().getModel("HostelModel").getData().filter(item => item.BranchCode === customerBranchCode);
 
                 availableRoomNos = availableRoomNos.filter(roomNo => {
                     return (
@@ -1224,6 +1252,8 @@ sap.ui.define([
             this.getView().byId("PO_id_Status").setSelectedKey("")
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
+            this.getView().byId("PO_id_PropertyName").setSelectedKey("")
+
             this.byId("PO_id_Date").setValue("");
         },
         onPaymentModeChange: function (oEvent) {

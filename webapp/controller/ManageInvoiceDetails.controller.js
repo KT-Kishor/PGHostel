@@ -4483,7 +4483,7 @@ sap.ui.define([
                     this.getBusyDialog();
 
                     // 2. Fetch updated facility items
-                    const oData = await this.ajaxReadWithJQuery("HM_BookingFacilityItems", {
+                    const oData = await this.ajaxReadWithJQuery("HM_BookingandFacilityItems", {
                         BookingID: oModelData.BookingID,
                     });
 
@@ -4581,21 +4581,72 @@ sap.ui.define([
                     }
                 }
 
+
+
                 const roomRent = existingItems.find(i =>
                     i.Particulars && i.Particulars.includes("Room Rent")
                 );
 
+
+
+                let RoomRent = roomRent ? [{ ...roomRent }] : [];
+
+                if (RoomRent.length && oData?.commentData?.length) {
+
+                    const bookingDetails = oData.commentData.find(item =>
+                        item.BedType
+                    );
+
+                    if (bookingDetails) {
+
+                        const bookingDuration = this._getDurationText(
+                            bookingDetails.PaymentType,
+                            bookingDetails.StartDate,
+                            bookingDetails.EndDate
+                        );
+
+                        RoomRent[0] = {
+                            ...RoomRent[0],
+                            Particulars: `${bookingDetails.BedType} - Room Rent`,
+                            UnitText: bookingDetails.PaymentType,
+                            DurationText: bookingDuration,
+                            GrossPrice: bookingDetails.RoomPrice,
+                            Total: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                            FinalAmount: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                            StartDate: this.Formatter.DateFormat(
+                                bookingDetails.StartDate
+                            ),
+                            EndDate: this.Formatter.DateFormat(
+                                bookingDetails.EndDate
+                            ),
+                            Currency: bookingDetails.Currency,
+                            SAC: "996322",
+                            GSTCalculation: "YES",
+                            Discount: "0.00"
+                        };
+                    }
+                }
+
+
+
                 if (!roomRent) return existingItems;
 
-                const cycleStart = this._parseDate(roomRent.StartDate);
-                const cycleEnd = this._parseDate(roomRent.EndDate);
+                const cycleStart = this._parseDate(RoomRent[0].StartDate);
+                const cycleEnd = this._parseDate(RoomRent[0].EndDate);
+
+                const oModel = this.getView().getModel("SelectedCustomerModel");
+              oModel.setProperty(
+                    "/InvoiceDescription",
+                    this._getInvoiceDescription(RoomRent[0].PaymentType, cycleStart, cycleEnd)
+                );
 
                 cycleStart.setHours(0, 0, 0, 0);
                 cycleEnd.setHours(0, 0, 0, 0);
 
-                const nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
+                // const nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
+                const nonFacilityItems = RoomRent
 
-                const dbFacilitiesRaw = oData.commentData || [];
+                const dbFacilitiesRaw = (oData.commentData || []).filter(item => !item.BedType);
                 const processedFacilityItems = [];
                 const usedItemIds = new Set();
 
@@ -4639,7 +4690,7 @@ sap.ui.define([
                     if (unit === "per month" || unit === "per year") {
                         if (fEnd.getTime() === cycleStart.getTime()) {
                             return;
-                        }   
+                        }
                     }
 
 
