@@ -1566,7 +1566,7 @@ sap.ui.define([
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    CustomerName: oSelectedCustomerModel.CustomerName || "",
+                    CustomerName: this.byId("CID_id_AddCustComboBox").getValue() || "",
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
                     MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',

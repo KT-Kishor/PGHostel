@@ -1306,6 +1306,7 @@ sap.ui.define([
             if (Duration === "Per Month") {
                 editdata.setProperty("/Price", FPrice.PerMonthPrice)
                 sap.ui.getCore().byId("editEndDate").setEditable(false).setValue("")
+                sap.ui.getCore().byId("idMonthYearSelectFragment").setVisible(true)
             }
             if (Duration === "Per Year") {
                 editdata.setProperty("/Price", FPrice.PerYearPrice)
@@ -4588,6 +4589,7 @@ sap.ui.define([
 
             this.getBusyDialog()
 
+
             const pdfBase64 = await this.onGeneratePDF();
 
             var Payload = {
@@ -7796,6 +7798,16 @@ sap.ui.define([
             const data = this.getView().getModel("CustomerData").getData();
             var oBookingModel = this.getView().getModel("Bookingmodel").getData();
 
+             const aMembers = data.Documents || [];
+
+            // Primary member first
+            const primaryMember = aMembers.find(m => m.IsPrimary);
+
+            const otherMembers = aMembers.filter(m => !m.IsPrimary);
+
+
+            // Remaining members
+
             let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];
@@ -7960,7 +7972,7 @@ sap.ui.define([
             const sCustGSTIN = String(data.CustomerGSTIN || "").trim();
             const sCustCompanyName = String(data.CustCompanyName || "").trim();
             const sCustCompanyAddress = String(data.CustCompanyAddress || "").trim();
-            const sPrimaryOccupantName = String(data.CustomerName || "").trim();
+            const sPrimaryOccupantName = String(primaryMember ? primaryMember.MemberName : otherMembers.MemberName || "").trim();
             const bShowCustomerGST = !!sCustGSTIN;
 
             const sBranchGSTIN = String(company.GSTIN || "").trim();

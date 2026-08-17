@@ -74,7 +74,7 @@
             </form:SimpleForm>
         </content>
         <buttons>
-            <Button text="Return Damage" press="onSaveReturn" class="marginRight myUnifiedBtn"/>
+            <Button text="Recover Damage" press="onSaveReturn" class="marginRight myUnifiedBtn"/>
             <Button text="Cancel" press="onDialogClose" class="marginRight myUnifiedBtn"/>
         </buttons>
     </Dialog>
