@@ -8296,9 +8296,9 @@ sap.ui.define([
             const sCustGSTIN = String(data.CustomerGSTIN || "").trim();
             const sCustCompanyName = String(data.CustCompanyName || "").trim();
             const sCustCompanyAddress = String(data.CustCompanyAddress || "").trim();
-            const sPrimaryOccupantName = String(primaryMember ? primaryMember.MemberName : otherMembers.MemberName || "").trim();
+            const sPrimaryOccupantName = String(primaryMember ? primaryMember.MemberName : otherMembers[0].MemberName || "").trim();
             const bShowCustomerGST = !!sCustGSTIN;
-
+            
             const sBranchGSTIN = String(company.GSTIN || "").trim();
             const iLeftWidth = bShowCustomerGST ? 80 : 130;
             const iRightX = 110;
