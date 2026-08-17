@@ -450,6 +450,55 @@ sap.ui.define([
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
                 const sBranchCode = oSelected.BranchCode || "";
+
+                 const filter = {
+                    BranchCode: sBranchCode,
+                    ACType: oSelected.ACType || "",
+                    Name: oSelected.Name || "",
+                    PropertyType: oSelected.PropertyType || ""
+                };
+
+                this.getBusyDialog();
+
+                try {
+                    const filter = {
+                        BranchCode: sBranchCode,
+                        ACType: oSelected.ACType || "",
+                        Name: oSelected.Name || "",
+                        PropertyType: oSelected.PropertyType || ""
+                    };
+
+                    const response = await this.ajaxReadWithJQuery(
+                        "HM_AvailableRooms",
+                        filter
+                    );
+
+                    // API returned an error response
+                    if (response?.success === false) {
+                        sap.m.MessageBox.error(
+                            response.message || "Something went wrong."
+                        );
+
+                        return; // STOP HERE
+                    }
+
+
+                } catch (error) {
+
+                    const message =
+                        error?.responseJSON?.message ||
+                        error?.response?.data?.message ||
+                        error?.message ||
+                        "Something went wrong.";
+
+                    sap.m.MessageBox.error(message);
+
+                    return; // STOP HERE
+
+                } finally {
+
+                    this.closeBusyDialog();
+                }
                 const oFullDetails = {
                     RoomNo: oSelected.RoomNo || "",
                     BedType: oSelected.Name || "",
