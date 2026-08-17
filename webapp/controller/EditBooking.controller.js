@@ -4317,7 +4317,7 @@ sap.ui.define([
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(8.5);
                 doc.setTextColor(80, 80, 80);
-                doc.text(`Name: ${sPrimaryOccupantName || "-"}`, iRightX, currentY + 18);
+                doc.text(`Customer Name: ${sPrimaryOccupantName || "-"}`, iRightX, currentY + 18);
                 doc.text(`GST: ${sCustGSTIN}`, iRightX, currentY + 23);
                 doc.text(`Company Name: ${sCustCompanyName || "-"}`, iRightX, currentY + 28);
                 doc.text(custAddressLines, iRightX, currentY + 33);
