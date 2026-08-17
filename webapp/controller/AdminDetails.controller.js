@@ -4095,18 +4095,40 @@ sap.ui.define([
 
             const invalidFacilities = [];
 
+            const bookingStartDate = this._parseDate(
+                Bookingdata.StartDate
+            );
+
+            const bookingEndDate = this._parseDate(
+                Bookingdata.EndDate
+            );
+
             for (let i = 0; i < facilityItems.length; i++) {
+
                 const item = facilityItems[i];
 
-                const facilityStart = this._parseDate(item.StartDate);
-                const facilityEnd = this._parseDate(item.EndDate);
+                const facilityStart = this._parseDate(
+                    item.StartDate
+                );
 
-                // Validation: must be inside booking period
-                if (
-                    facilityStart < this._parseDate(Bookingdata.StartDate) ||
-                    facilityEnd > BookingdataEndDate
-                ) {
-                    invalidFacilities.push(item.FacilityName);
+                const facilityEnd = this._parseDate(
+                    item.EndDate
+                );
+
+                const startInvalid =
+                    facilityStart < bookingStartDate;
+
+                const endInvalid =
+                    facilityEnd > bookingEndDate;
+
+                // Store only facilities having invalid dates
+                if (startInvalid || endInvalid) {
+
+                    invalidFacilities.push({
+                        item: item,
+                        startInvalid: startInvalid,
+                        endInvalid: endInvalid
+                    });
                 }
             }
 
@@ -4116,178 +4138,484 @@ sap.ui.define([
 
                 sap.m.MessageBox.show(
                     "The following facilities have dates outside the booking period:\n\n" +
-                    invalidFacilities.map(name => `• ${name}`).join("\n") +
-                    `\n\nDo you want to auto-adjust facility dates to match booking period?`, {
-                    icon: sap.m.MessageBox.Icon.WARNING,
-                    title: "Date Mismatch",
-                    actions: ["Change", "Cancel"],
-                    emphasizedAction: "Change",
-                    styleClass: "myUnifiedBtn",
-                    onClose: function (oAction) {
+                    invalidFacilities
+                        .map(x => {
 
-                        if (oAction === "Change") {
+                            let message = `• ${x.item.FacilityName}`;
 
-                            let bookingStart = that._parseDate(Bookingdata.StartDate);
-                            let bookingEnd = that._parseDate(Bookingdata.EndDate);
+                            // if (x.startInvalid && x.endInvalid) {
+                            //     message += " (Start & End Date)";
+                            // } else if (x.startInvalid) {
+                            //     message += " (Start Date)";
+                            // } else if (x.endInvalid) {
+                            //     message += " (End Date)";
+                            // }
 
-                            //  Safety: prevent negative dates
-                            if (bookingEnd < bookingStart) {
-                                sap.m.MessageToast.show("End date cannot be before start date");
+                            return message;
+                        })
+                        .join("\n") +
+                    "\n\nDo you want to auto-adjust the invalid dates to match the booking period?",
+
+                    {
+                        icon: sap.m.MessageBox.Icon.WARNING,
+                        title: "Date Mismatch",
+                        actions: ["Change", "Cancel"],
+                        emphasizedAction: "Change",
+                        styleClass: "myUnifiedBtn",
+
+                        onClose: function (oAction) {
+
+                            if (oAction !== "Change") {
                                 return;
                             }
 
-                            //  IMPORTANT: make sure this is LET (not const)
-                            let facilityItems = CustomerData.AllSelectedFacilities || [];
+                            let bookingStart =that._parseDate(Bookingdata.StartDate);
 
-                            //  Remove duplicate Package Price items
-                            facilityItems = facilityItems.filter((item, index, self) => {
+                            let bookingEnd =that._parseDate(Bookingdata.EndDate );
 
-                                if (item.UnitText?.toLowerCase() !== "package price") {
-                                    return true;
-                                }
+                            // Safety check
+                            if (bookingEnd < bookingStart) {
 
-                                const firstIndex = self.findIndex(x =>
-                                    x.FacilityName === item.FacilityName &&
-                                    x.MemberName === item.MemberName &&
-                                    x.UnitText?.toLowerCase() === "package price"
+                                sap.m.MessageToast.show(
+                                    "End date cannot be before start date"
                                 );
 
-                                return index === firstIndex;
-                            });
+                                return;
+                            }
 
-                            let totalFacilityPrice = 0;
+                            let facilityItems =
+                                CustomerData.AllSelectedFacilities || [];
+
+                            /*
+                             * Remove duplicate Package Price items
+                             */
+                            facilityItems =
+                                facilityItems.filter(
+                                    (item, index, self) => {
+
+                                        if (
+                                            item.UnitText?.toLowerCase() !==
+                                            "package price"
+                                        ) {
+                                            return true;
+                                        }
+
+                                        const firstIndex =
+                                            self.findIndex(x =>
+                                                x.FacilityName ===
+                                                item.FacilityName &&
+                                                x.MemberName ===
+                                                item.MemberName &&
+                                                x.UnitText?.toLowerCase() ===
+                                                "package price"
+                                            );
+
+                                        return index === firstIndex;
+                                    }
+                                );
+
+                            /*
+                             * Correct ONLY the invalid date
+                             */
+                            invalidFacilities.forEach(
+                                invalid => {
+
+                                    const item = invalid.item;
+
+                                    /*
+                                     * Start date is invalid
+                                     * → change ONLY StartDate
+                                     */
+                                    if (invalid.startInvalid) {
+
+                                        item.StartDate =
+                                            Bookingdata.StartDate;
+                                    }
+
+                                    /*
+                                     * End date is invalid
+                                     * → change ONLY EndDate
+                                     */
+                                    if (invalid.endInvalid) {
+
+                                        item.EndDate =
+                                            Bookingdata.EndDate;
+                                    }
+                                }
+                            );
+
+                            /*
+                             * Recalculate only facilities that
+                             * originally had invalid dates.
+                             */
+                            const invalidItems =
+                                new Set(
+                                    invalidFacilities.map(
+                                        x => x.item
+                                    )
+                                );
 
                             facilityItems.forEach(item => {
 
-                                let oSelectedFacility = aFacilities.find(f =>
-                                    f.FacilityName === item.FacilityName
-                                );
+                                // Valid facility → don't touch amount
+                                if (!invalidItems.has(item)) {
+                                    return;
+                                }
 
-                                //  Update dates
-                                item.StartDate = Bookingdata.StartDate;
-                                item.EndDate = Bookingdata.EndDate;
+                                const facilityStart =
+                                    that._parseDate(
+                                        item.StartDate
+                                    );
 
-                                let diffTime = bookingEnd - bookingStart;
+                                const facilityEnd =
+                                    that._parseDate(
+                                        item.EndDate
+                                    );
 
-                                //  Always at least 1 day
-                                let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                                /*
+                                 * Calculate duration based on
+                                 * THIS facility's corrected dates.
+                                 */
+                                const diffTime =
+                                    facilityEnd -
+                                    facilityStart;
 
-                                let unit = item.UnitText?.toLowerCase();
-                                let price = Number(item.Price || 0);
+                                const diffDays =
+                                    Math.max(
+                                        1,
+                                        Math.ceil(
+                                            diffTime /
+                                            (1000 * 60 * 60 * 24)
+                                        )
+                                    );
+
+                                let oSelectedFacility =
+                                    aFacilities.find(
+                                        f =>
+                                            f.FacilityName ===
+                                            item.FacilityName
+                                    );
+
+                                let unit =
+                                    item.UnitText?.toLowerCase();
+
+                                let price =
+                                    Number(item.Price || 0);
+
                                 let total = 0;
 
+                                /*
+                                 * PER DAY
+                                 */
                                 if (unit === "per day") {
 
-                                    total = item.quantity ?
-                                        item.quantity * diffDays * price :
-                                        diffDays * price;
+                                    total = item.quantity
+                                        ? Number(item.quantity) *
+                                        diffDays *
+                                        price
+                                        : diffDays * price;
 
-                                    item.TotalDays = diffDays;
+                                    item.TotalDays =
+                                        diffDays;
+                                }
 
-                                } else if (unit === "per hour") {
+                                /*
+                                 * PER HOUR
+                                 */
+                                else if (unit === "per hour") {
 
+                                    const totalHour =
+                                        Number(
+                                            item.TotalHour || 0
+                                        );
 
-                                    total = item.quantity ?
-                                        item.quantity * Number(item.TotalHour) * price * diffDays :
-                                        Number(item.TotalHour) * price * diffDays;
+                                    total = item.quantity
+                                        ? Number(item.quantity) *
+                                        totalHour *
+                                        price *
+                                        diffDays
+                                        : totalHour *
+                                        price *
+                                        diffDays;
+                                }
 
-                                } else if (unit === "per month") {
+                                /*
+                                 * PER MONTH
+                                 */
+                                else if (unit === "per month") {
 
-                                    let months = CustomerData.PaymentType === "yearly" ?
-                                        CustomerData.Duration * 12 :
-                                        CustomerData.Duration;
+                                    let months =
+                                        CustomerData.PaymentType ===
+                                            "yearly"
+                                            ? Number(
+                                                CustomerData.Duration ||
+                                                0
+                                            ) * 12
+                                            : Number(
+                                                CustomerData.Duration ||
+                                                0
+                                            );
 
-                                    total = item.quantity ?
-                                        item.quantity * months * price :
-                                        months * price;
+                                    total = item.quantity
+                                        ? Number(item.quantity) *
+                                        months *
+                                        price
+                                        : months * price;
 
-                                    item.TotalMonths = months;
+                                    item.TotalMonths =
+                                        months;
+                                }
 
-                                } else if (unit === "per year") {
+                                /*
+                                 * PER YEAR
+                                 */
+                                else if (unit === "per year") {
 
-                                    let years = CustomerData.Duration;
+                                    let years =
+                                        Number(
+                                            CustomerData.Duration || 0
+                                        );
 
-                                    total = item.quantity ?
-                                        item.quantity * years * price :
-                                        years * price;
+                                    total = item.quantity
+                                        ? Number(item.quantity) *
+                                        years *
+                                        price
+                                        : years * price;
 
-                                    item.TotalYears = years;
+                                    item.TotalYears =
+                                        years;
+                                }
 
-                                } else if (unit === "unit price" || unit === "package price") {
+                                /*
+                                 * UNIT PRICE / PACKAGE PRICE
+                                 */
+                                else if (
+                                    unit === "unit price" ||
+                                    unit === "package price"
+                                ) {
 
-                                    if (item.FacilityChargeType === "Entire Booking") {
+                                    /*
+                                     * Entire Booking
+                                     */
+                                    if (
+                                        item.FacilityChargeType ===
+                                        "Entire Booking"
+                                    ) {
 
                                         total = price;
+                                    }
 
-                                    } else {
+                                    /*
+                                     * PERSON_QTY
+                                     */
+                                    else if (
+                                        oSelectedFacility?.MinimumQty &&
+                                        item.SelectionMode ===
+                                        "PERSON_QTY"
+                                    ) {
 
-                                        if (oSelectedFacility?.MinimumQty &&
-                                            item.SelectionMode === "PERSON_QTY") {
+                                        total =
+                                            price *
+                                            diffDays;
+                                    }
 
-                                            total = price * diffDays;
+                                    /*
+                                     * QTY
+                                     */
+                                    else if (
+                                        oSelectedFacility?.SelectionMode ===
+                                        "QTY" &&
+                                        oSelectedFacility?.UnitPrice !==
+                                        "0"
+                                    ) {
 
-                                        } else if (oSelectedFacility.SelectionMode === "QTY" && oSelectedFacility.UnitPrice !== "0") {
-                                            total = price * Number(item.quantity || 1);
+                                        total =
+                                            price *
+                                            Number(
+                                                item.quantity || 1
+                                            );
+                                    }
 
-                                        } else {
+                                    /*
+                                     * Normal calculation
+                                     */
+                                    else {
 
-                                            total = price * Number(item.quantity || 1) * diffDays;
-                                        }
+                                        total =
+                                            price *
+                                            Number(
+                                                item.quantity || 1
+                                            ) *
+                                            diffDays;
                                     }
                                 }
 
-                                //  Fixed coupon logic
-                                item.TotalAmount = (item.CouponDiscount && item.CouponDiscount !== "0.00") ?
-                                    total - Number(item.CouponDiscount) :
-                                    total;
+                                /*
+                                 * Coupon Discount
+                                 */
+                                if (
+                                    item.CouponDiscount &&
+                                    item.CouponDiscount !== "0.00"
+                                ) {
 
-                                totalFacilityPrice += item.TotalAmount;
+                                    item.TotalAmount =
+                                        total -
+                                        Number(
+                                            item.CouponDiscount
+                                        );
+
+                                } else {
+
+                                    item.TotalAmount =
+                                        total;
+                                }
                             });
 
-                            //  Update totals
-                            CustomerData.TotalFacilityPrice = totalFacilityPrice;
+                            /*
+                             * Calculate total facility price.
+                             *
+                             * Valid facilities retain their
+                             * existing TotalAmount.
+                             */
+                            const totalFacilityPrice =
+                                facilityItems.reduce(
+                                    (sum, item) =>
+                                        sum +
+                                        Number(
+                                            item.TotalAmount || 0
+                                        ),
+                                    0
+                                );
 
-                            let baseAmount = Number(CustomerData.RentPrice || 0) + totalFacilityPrice - Number(CustomerData.Discount);
+                            CustomerData.TotalFacilityPrice =
+                                totalFacilityPrice;
 
-                            if (CustomerData.GSTType === "CGST/SGST") {
+                            /*
+                             * Base amount
+                             */
+                            const rentPrice =
+                                Number(
+                                    CustomerData.RentPrice || 0
+                                );
 
-                                const gstRate = Number(CustomerData.GSTValue) || 0;
-                                const totalGST = baseAmount * gstRate / 100;
-                                const halfGST = totalGST / 2;
+                            const discount =
+                                Number(
+                                    CustomerData.Discount || 0
+                                );
 
-                                CustomerData.CGST = halfGST;
-                                CustomerData.SGST = halfGST;
-                                CustomerData.GrandTotal = baseAmount + totalGST;
+                            const baseAmount =
+                                rentPrice +
+                                totalFacilityPrice -
+                                discount;
 
-                            } else if (CustomerData.GSTType === "IGST") {
+                            /*
+                             * Reset GST
+                             */
+                            CustomerData.CGST = 0;
+                            CustomerData.SGST = 0;
+                            CustomerData.IGST = 0;
 
-                                const gstRate = Number(CustomerData.GSTValue) || 0;
-                                const igst = baseAmount * gstRate / 100;
+                            /*
+                             * CGST / SGST
+                             */
+                            if (
+                                CustomerData.GSTType ===
+                                "CGST/SGST"
+                            ) {
 
-                                CustomerData.IGST = igst;
-                                CustomerData.GrandTotal = baseAmount + igst;
+                                const gstRate =
+                                    Number(
+                                        CustomerData.GSTValue || 0
+                                    );
 
-                            } else {
+                                const totalGST =
+                                    baseAmount *
+                                    gstRate /
+                                    100;
 
-                                CustomerData.GrandTotal = baseAmount;
+                                const halfGST =
+                                    totalGST / 2;
+
+                                CustomerData.CGST =
+                                    halfGST;
+
+                                CustomerData.SGST =
+                                    halfGST;
+
+                                CustomerData.GrandTotal =
+                                    baseAmount +
+                                    totalGST;
                             }
 
-                            //  Due amount
-                            CustomerData.DueAmount = CustomerData.PaymentPaid ?
-                                CustomerData.GrandTotal - CustomerData.PaymentPaid :
-                                CustomerData.GrandTotal;
+                            /*
+                             * IGST
+                             */
+                            else if (
+                                CustomerData.GSTType ===
+                                "IGST"
+                            ) {
 
-                            //  Assign back (important)
-                            CustomerData.AllSelectedFacilities = facilityItems;
+                                const gstRate =
+                                    Number(
+                                        CustomerData.GSTValue || 0
+                                    );
 
-                            //  Refresh model
-                            that.getView().getModel("CustomerData").refresh(true);
+                                const igst =
+                                    baseAmount *
+                                    gstRate /
+                                    100;
 
-                            //  Save
+                                CustomerData.IGST =
+                                    igst;
+
+                                CustomerData.GrandTotal =
+                                    baseAmount +
+                                    igst;
+                            }
+
+                            /*
+                             * No GST
+                             */
+                            else {
+
+                                CustomerData.GrandTotal =
+                                    baseAmount;
+                            }
+
+                            /*
+                             * Due Amount
+                             */
+                            const paymentPaid =
+                                Number(
+                                    CustomerData.PaymentPaid || 0
+                                );
+
+                            CustomerData.DueAmount =
+                                CustomerData.PaymentPaid
+                                    ? CustomerData.GrandTotal -
+                                    paymentPaid
+                                    : CustomerData.GrandTotal;
+
+                            /*
+                             * Assign facilities back
+                             */
+                            CustomerData.AllSelectedFacilities =
+                                facilityItems;
+
+                            /*
+                             * Refresh model
+                             */
+                            that
+                                .getView()
+                                .getModel("CustomerData")
+                                .refresh(true);
+
+                            /*
+                             * Save
+                             */
                             that.onSaveBooking();
                         }
                     }
-                }
                 );
 
                 return;
@@ -4301,7 +4629,6 @@ sap.ui.define([
                 return;
             }
             const customerEndDate = this._parseDate(CustomerData.EndDate);
-            const bookingEndDate = this._parseDate(Bookingdata.EndDate);
 
             let isAnyFacilityMatchingBookingEnd = true;
 
@@ -7798,16 +8125,13 @@ sap.ui.define([
             const data = this.getView().getModel("CustomerData").getData();
             var oBookingModel = this.getView().getModel("Bookingmodel").getData();
 
-             const aMembers = data.Documents || [];
+            const aMembers = data.Documents || [];
 
             // Primary member first
             const primaryMember = aMembers.find(m => m.IsPrimary);
 
             const otherMembers = aMembers.filter(m => !m.IsPrimary);
-
-
             // Remaining members
-
             let filter = { BranchID: [data.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
             const company = oCompanyDetailsModel.data[0];

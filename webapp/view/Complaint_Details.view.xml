@@ -219,7 +219,7 @@
                             <!-- <Text text="{ComplaintModel>RaisedBy}" /> -->
                             <VBox>
 								<Text
-                                    text="{ComplaintModel>RaisedBy}"
+                                    text="{ComplaintModel>CustomerName}"
                                     class="sapUiTinyMarginBottom"
                                 />
 								<Text text="{ComplaintModel>BookingID}" />
