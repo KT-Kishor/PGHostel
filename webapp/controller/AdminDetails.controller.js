@@ -4586,7 +4586,6 @@ sap.ui.define([
                 ...otherMembers.map(m => m.MemberID)
             ].join(",");
 
-
             this.getBusyDialog()
 
             const pdfBase64 = await this.onGeneratePDF();
@@ -8032,7 +8031,7 @@ sap.ui.define([
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(8.5);
                 doc.setTextColor(80, 80, 80);
-                doc.text(`Name: ${sPrimaryOccupantName || "-"}`, iRightX, currentY + 18);
+                doc.text(`Customer Name: ${sPrimaryOccupantName || "-"}`, iRightX, currentY + 18);
                 doc.text(`GST: ${sCustGSTIN}`, iRightX, currentY + 23);
                 doc.text(`Company Name: ${sCustCompanyName || "-"}`, iRightX, currentY + 28);
                 doc.text(custAddressLines, iRightX, currentY + 33);
@@ -8343,7 +8342,10 @@ sap.ui.define([
             }
 
             if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${data.Currency}`);
+                addLine(
+                    `Discount (Coupon: ${data.CouponCode})`,
+                    `- ${Formatter.fromatNumber(discount)} ${data.Currency} `
+                );
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);

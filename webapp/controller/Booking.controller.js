@@ -2557,10 +2557,10 @@
                 : (Array.isArray(oResponse && oResponse.HM_Documentonly)
                     ? oResponse.HM_Documentonly
                     : (Array.isArray(oResponse && oResponse.Documents)
-                    ? oResponse.Documents
-                    : (Array.isArray(oResponse && oResponse.data)
-                        ? oResponse.data
-                        : (oResponse && oResponse.data ? [oResponse.data] : []))));
+                        ? oResponse.Documents
+                        : (Array.isArray(oResponse && oResponse.data)
+                            ? oResponse.data
+                            : (oResponse && oResponse.data ? [oResponse.data] : []))));
             const oDocument = aDocuments.find(function (oCandidate) {
                 return !oCandidate.MemberID || String(oCandidate.MemberID) === sCacheKey;
             });
@@ -7436,6 +7436,7 @@
             const subTotal = roomRent + facilityTotal;
             const Currency = oHostelModel.Currency
             const discount = parseFloat(booking.Discount) || 0;
+            const CouponCode = booking.CouponCode;
             const deposit = parseFloat(data.Deposit) || 0;
             let grandTotal = oHostelModel.GrandTotal;
             const tax = parseFloat(oHostelModel.Tax) || 0;
@@ -7488,9 +7489,11 @@
             if (facilityTotal > 0 || facilities.length > 0) {
                 addLine("Facilities", `${Formatter.fromatNumber(facilityTotal)} ${Currency}`);
             }
-
             if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${Currency}`);
+                addLine(
+                    `Discount (Coupon: ${CouponCode})`,
+                    `- ${Formatter.fromatNumber(discount)} ${Currency} `
+                );
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);

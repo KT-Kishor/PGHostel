@@ -4644,7 +4644,10 @@ sap.ui.define([
             }
 
             if (discount > 0) {
-                addLine("Discount", `- ${Formatter.fromatNumber(discount)} ${oHostelModel.Currency}`);
+                addLine(
+                    `Discount (Coupon: ${oHostelModel.CouponCode})`,
+                    `- ${Formatter.fromatNumber(discount)} ${oHostelModel.Currency} `
+                );
             }
 
             const finalSubTotal = Number(subTotal) - Number(discount);

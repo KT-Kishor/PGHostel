@@ -459,7 +459,7 @@
                         <Text text="{profileData>BookingDate}" />
                         <Text text="{profileData>BookingID}" />
                         <Text text="{profileData>customerName}" />
-                        <Text text="{profileData>room}" />
+                       <Text text="{= ${profileData>room} + (${profileData>RoomNo} ? ' (' + ${profileData>RoomNo} + ')' : '') }" />
                         <Text text="{path:'profileData>amount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
                         <ObjectStatus text="{profileData>status}"
                          state="{ path:'profileData>status', formatter:'.Formatter.formatObjectStatus'}"/>
