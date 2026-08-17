@@ -8468,7 +8468,7 @@ sap.ui.define([
             doc.setFont("helvetica", "normal");
             doc.setTextColor(50, 50, 50);
             doc.text(`${oBookingModel.StartDate ? oBookingModel.StartDate : data.StartDate || "-"}`, 60, currentY + 22);
-            doc.text(`${oBookingModel.EndDate ? oBookingModel.EndDate : data.StartDate || "-"}`, 60, currentY + 34);
+            doc.text(`${oBookingModel.EndDate ? oBookingModel.EndDate : data.EndDate || "-"}`, 60, currentY + 34);
             doc.text(`${data.Duration || "0"} ${data.DurationUnit || ""}`, 60, currentY + 46);
 
             // Right Columns
