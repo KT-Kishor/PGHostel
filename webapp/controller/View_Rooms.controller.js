@@ -445,7 +445,7 @@ sap.ui.define([
                 BaseController.prototype.onExit.apply(this, arguments);
             }
         },
-        viewDetails: function (oEvent) {
+        viewDetails:async function (oEvent) {
             try {
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
