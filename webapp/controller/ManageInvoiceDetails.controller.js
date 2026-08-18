@@ -4594,64 +4594,85 @@ sap.ui.define([
                     i.Particulars && i.Particulars.includes("Room Rent")
                 );
 
-
-
-                let RoomRent = roomRent ? [{ ...roomRent }] : [];
-
-                if (RoomRent.length && oData?.commentData?.length) {
-
-                    const bookingDetails = oData.commentData.find(item =>
-                        item.BedType
-                    );
-
-                    if (bookingDetails) {
-
-                        const bookingDuration = this._getDurationText(
-                            bookingDetails.PaymentType,
-                            bookingDetails.StartDate,
-                            bookingDetails.EndDate
-                        );
-
-                        RoomRent[0] = {
-                            ...RoomRent[0],
-                            Particulars: `${bookingDetails.BedType} - Room Rent`,
-                            UnitText: bookingDetails.PaymentType,
-                            DurationText: bookingDuration,
-                            GrossPrice: bookingDetails.RoomPrice,
-                            Total: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
-                            FinalAmount: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
-                            StartDate: this.Formatter.DateFormat(
-                                bookingDetails.StartDate
-                            ),
-                            EndDate: this.Formatter.DateFormat(
-                                bookingDetails.EndDate
-                            ),
-                            Currency: bookingDetails.Currency,
-                            SAC: "996322",
-                            GSTCalculation: "YES",
-                            Discount: "0.00"
-                        };
-                    }
-                }
-
-
-
                 if (!roomRent) return existingItems;
 
-                const cycleStart = this._parseDate(RoomRent[0].StartDate);
-                const cycleEnd = this._parseDate(RoomRent[0].EndDate);
 
-                const oModel = this.getView().getModel("SelectedCustomerModel");
-                oModel.setProperty(
-                    "/InvoiceDescription",
-                    this._getInvoiceDescription(RoomRent[0].PaymentType, cycleStart, cycleEnd)
-                );
+                let cycleStart
+                let cycleEnd
+                let nonFacilityItems = [];
 
-                cycleStart.setHours(0, 0, 0, 0);
-                cycleEnd.setHours(0, 0, 0, 0);
 
-                // const nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
-                const nonFacilityItems = RoomRent
+                if (roomRent && roomRent.UnitText === "Per Day") {
+                    let RoomRent = roomRent ? [{ ...roomRent }] : [];
+
+                    if (RoomRent.length && oData?.commentData?.length) {
+
+                        const bookingDetails = oData.commentData.find(item =>
+                            item.BedType
+                        );
+
+                        if (bookingDetails) {
+
+                            const bookingDuration = this._getDurationText(
+                                bookingDetails.PaymentType,
+                                bookingDetails.StartDate,
+                                bookingDetails.EndDate
+                            );
+
+                            RoomRent[0] = {
+                                ...RoomRent[0],
+                                Particulars: `${bookingDetails.BedType} - Room Rent`,
+                                UnitText: bookingDetails.PaymentType,
+                                DurationText: bookingDuration,
+                                GrossPrice: bookingDetails.RoomPrice,
+                                Total: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                                FinalAmount: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                                StartDate: this.Formatter.DateFormat(
+                                    bookingDetails.StartDate
+                                ),
+                                EndDate: this.Formatter.DateFormat(
+                                    bookingDetails.EndDate
+                                ),
+                                Currency: bookingDetails.Currency,
+                                SAC: "996322",
+                                GSTCalculation: "YES",
+                                Discount: "0.00"
+                            };
+                        }
+
+                    }
+
+
+                    cycleStart = this._parseDate(RoomRent[0].StartDate);
+                    cycleEnd = this._parseDate(RoomRent[0].EndDate);
+
+                    const oModel = this.getView().getModel("SelectedCustomerModel");
+                    oModel.setProperty(
+                        "/InvoiceDescription",
+                        this._getInvoiceDescription(RoomRent[0].UnitText, cycleStart, cycleEnd)
+                    );
+
+
+                    cycleStart.setHours(0, 0, 0, 0);
+                    cycleEnd.setHours(0, 0, 0, 0);
+
+                    nonFacilityItems = RoomRent
+
+                } else {
+                    cycleStart = this._parseDate(roomRent.StartDate);
+                    cycleEnd = this._parseDate(roomRent.EndDate);
+
+                    const oModel = this.getView().getModel("SelectedCustomerModel");
+                    oModel.setProperty(
+                        "/InvoiceDescription",
+                        this._getInvoiceDescription(roomRent.UnitText, cycleStart, cycleEnd)
+                    );
+
+                    cycleStart.setHours(0, 0, 0, 0);
+                    cycleEnd.setHours(0, 0, 0, 0);
+
+                    nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
+                }
 
                 const dbFacilitiesRaw = (oData.commentData || []).filter(item => !item.BedType);
                 const processedFacilityItems = [];
