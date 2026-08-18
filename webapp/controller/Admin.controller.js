@@ -938,6 +938,10 @@ sap.ui.define([
                     BranchCode: ID.BranchCode,
                     DepositTakenBy: oExistingModel.EmployeeName,
                     RoomNo: selectedRoomNo,
+                    BranchName: ID.BranchName,
+                    STDCode: oExistingModel.STDCode,
+                    MobileNo: oExistingModel.MobileNo,
+                    AdminEmail: oExistingModel.EmailID,
                     Status: "Assigned"
                 };
 
@@ -955,6 +959,10 @@ sap.ui.define([
                     CustomerName: ID.CustomerName,
                     UserID: ID.UserID,
                     MemberID: ID.MemberID,
+                    BranchName: ID.BranchName,
+                    STDCode: oExistingModel.STDCode,
+                    MobileNo: oExistingModel.MobileNo,
+                    AdminEmail: oExistingModel.EmailID,
                     Status: "Assigned"
                 };
 
