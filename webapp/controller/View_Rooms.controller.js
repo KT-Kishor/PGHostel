@@ -34,15 +34,6 @@ sap.ui.define([
             }
         },
         _onRouteMatched: async function (oEvent) {
-            // this.getBusyDialog()
-            // if (performance.navigation && performance.navigation.type === 1) {
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RouteHostel", {}, true);
-            // }
-            // this._ViewDatePickersReadOnly(["idBookingDate"], sap.ui.getCore());
-
-            // Restore login state on entry so the booking flow does not
-            // prompt for login when localStorage / UIModel briefly disagree.
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const oCoreLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oLoggedUser = oCoreLoginModel?.getData?.() || {};
@@ -2134,20 +2125,6 @@ sap.ui.define([
             }
         },
 
-        /**
-         * R    esilient login check for the booking flow.
-         *
-         * Login state lives in three places that can briefly fall out of sync:
-         *   - UIModel > /isLoggedIn  (component-level, stable across views)
-         *   - localStorage.isLoggedIn (can be transiently cleared by the
-         *     cross-tab storage sync in Component.js or the inactivity timer)
-         *   - core LoginModel > /UserID (populated after a successful login)
-         *
-         * If ANY source says the user is logged in, we treat them as logged in
-         * and re-sync the other sources so later checks stay consistent. This
-         * prevents the intermittent "please log in" prompt when localStorage is
-         * momentarily wiped by another tab.
-         */
         _isUserLoggedIn: function () {
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const oLoginModel = sap.ui.getCore().getModel("LoginModel");

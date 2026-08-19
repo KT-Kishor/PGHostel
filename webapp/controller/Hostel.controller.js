@@ -550,138 +550,6 @@ sap.ui.define([
             oTile.removeStyleClass("defaultTile");
             oTile.addStyleClass("selectedTile");
         },
-
-        onConfirmBooking: function () {
-            const oUIModel = this.getOwnerComponent().getModel("UIModel");
-            const bLoggedIn = oUIModel?.getProperty("/isLoggedIn");
-
-            if (!bLoggedIn) {
-                MessageBox.information("Please log in to continue booking.", {
-                    title: "Login Required",
-                    styleClass: "myUnifiedBtn",
-                    actions: [MessageBox.Action.OK],
-                    emphasizedAction: MessageBox.Action.OK,
-                    onClose: function () {
-                        this.onpressLogin();
-                        sessionStorage.setItem("homePageReturnTab", "idRooms");
-                    }.bind(this)
-                });
-
-                return;
-            }
-            const oView = this.getView();
-            const oLocalModel = this.oHostelModel;
-            const oData = oLocalModel?.getData?.() || {};
-
-            // -------------------------
-            // BASIC VALIDATIONS
-            // -------------------------
-            if (!oData.Visible) {
-                MessageToast.show(this.i18nModel.getText("thisroomcurrentlyoccupiedPleaseselectanotherroom"));
-                return;
-            }
-
-            if (!oData.SelectedPriceType || !oData.SelectedPriceValue) {
-                MessageToast.show(this.i18nModel.getText("pleaseselectpricingplanbeforebooking"));
-                return;
-            }
-
-            // -------------------------
-            // GET / CREATE GLOBAL MODEL
-            // -------------------------
-            let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
-            if (!oGlobalModel) {
-                oGlobalModel = new JSONModel({});
-                sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
-            }
-
-            // -------------------------
-            // BUILD BOOKING DATA
-            // -------------------------
-            const oBookingData = {
-                BookingDate: new Date().toISOString(),
-                RoomNo: oData.RoomNo || "",
-                BedType: oData.BedType || "",
-                ACType: oData.ACType || "",
-                PropertyType: oData.PropertyType || "Hostel",
-                Capacity: parseInt(oData.Capacity, 10) || 1,
-                Address: oData.Address || "",
-                Area: oData.Area || "",
-                Description: oData.Description || "",
-                BranchCode: oData.BranchCode || "",
-                SelectedPriceType: oData.SelectedPriceType,
-                FinalPrice: oData.SelectedPriceValue,
-                Currency: oData.Currency || "INR",
-                Source: "UI5_HostelApp",
-                Status: "Pending",
-                Country: oData.Country,
-                AvailbleBeds: parseInt(oData.AvailbleBeds, 10) || 0,
-                Price: oData.Price,
-                MonthPrice: oData.MonthPrice,
-                YearPrice: oData.YearPrice,
-                CheckInTime: oData.CheckInTime,
-                CheckOutTime: oData.CheckOutTime,
-                Deposit: oData.Deposit,
-                DepositCurrency: oData.DepositCurrency,
-                GSTValue: oData.GSTValue,
-                GSTType: oData.GSTType,
-                GSTIN: oData.GSTIN || "",
-
-
-            };
-
-            // -------------------------
-            // MERGE WITH GLOBAL MODEL
-            // -------------------------
-            const oMergedData = {
-                ...oGlobalModel.getData(),
-                ...oBookingData
-            };
-
-            // -------------------------
-            // ✅ FIX: NO OF PERSONS BASED ON AVAILABLE BEDS
-            // -------------------------
-            const iAvailableBeds = parseInt(oMergedData.AvailbleBeds, 10) || 0;
-
-            if (iAvailableBeds <= 0) {
-                MessageToast.show(this.i18nModel.getText("nobedsavailableforbooking"));
-                return;
-            }
-
-            const aPersonsList = [];
-            for (let i = 1; i <= iAvailableBeds; i++) {
-                aPersonsList.push({
-                    key: i.toString(),
-                    text: i.toString()
-                });
-            }
-
-            oMergedData.NoOfPersonsList = aPersonsList;
-
-            // Optional: auto-select max available persons
-            oMergedData.SelectedPerson = aPersonsList[aPersonsList.length - 1].key;
-
-            // -------------------------
-            // UPDATE GLOBAL MODEL
-            // -------------------------
-            oGlobalModel.setData(oMergedData, true);
-
-            // -------------------------
-            // CLOSE ROOM DETAIL DIALOG
-            // -------------------------
-            if (this._oRoomDetailFragment) {
-                this._oRoomDetailFragment.close();
-            }
-
-            this._clearRoomDetailDialog();
-
-            // -------------------------
-            // NAVIGATE TO BOOKING PAGE
-            // -------------------------
-            const oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteBookRoom");
-        },
-
         _clearRoomDetailDialog: function () {
             if (!this._oRoomDetailFragment) return;
 
@@ -791,7 +659,6 @@ sap.ui.define([
                 this._carouselInterval = null;
             }
         },
-
         _convertFacilities: function (list) {
             const defaultImages = {
                 "High-Speed Wi-Fi": "../image/High-Speed Wi-Fi.jpg",
@@ -1928,67 +1795,7 @@ sap.ui.define([
                 oModel.setProperty("/City", sCitySearch);
             }
         },
-        // onChangeState: function (oEvent) {
-        //     const oState = oEvent.getSource();
-        //     const oModel = this.getView().getModel("LoginMode");
-
-        //     // sanitize free typing
-        //     oState.setValue(oState.getValue().replace(/[^a-zA-Z\s]/g, ""));
-
-        //     utils._LCvalidateMandatoryField(oEvent);
-
-        //     // ✅ ALWAYS WRITE TO MODEL
-        //     const sStateText =
-        //         oState.getSelectedItem()?.getText() ||
-        //         oState.getValue() ||
-        //         "";
-
-        //     oModel.setProperty("/State", sStateText);
-
-        //     // reset city whenever state changes
-        //     const oCity = $C("signUpCity");
-        //     oModel.setProperty("/City", "");
-        //     oCity.setValue("").setSelectedKey("");
-
-        //     oCity.getBinding("items")?.filter([
-        //         new Filter("cityName", "EQ", "__NONE__")
-        //     ]);
-
-        //     // release cities only if country is valid
-        //     const oCountry = $C("signUpCountry");
-        //     const sCountryCode =
-        //         oCountry.getSelectedItem()?.getAdditionalText()?.trim();
-
-        //     if (!sCountryCode || !sStateText) return;
-
-        //     oCity.getBinding("items")?.filter([
-        //         new Filter("stateName", "EQ", sStateText),
-        //         new Filter("countryCode", "EQ", sCountryCode)
-        //     ]);
-        // },
-        // onChangeCity: function (oEvent) {
-        //     const oCity = oEvent.getSource();
-        //     const oModel = this.getView().getModel("LoginMode");
-        //     // sanitize manual typing
-        //     oCity.setValue(oCity.getValue().replace(/[^a-zA-Z\s]/g, ""));
-        //     const oCountry = $C("signUpCountry");
-        //     const oState = $C("signUpState");
-        //     const hasCountry = !!oCountry.getSelectedItem();
-        //     const hasState = !!oState.getSelectedItem() || !!oState.getValue();
-        //     // parent missing → block
-        //     if (!hasCountry || !hasState) {
-        //         oCity.setValue("");
-        //         oCity.setSelectedKey("");
-        //         oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
-        //         oCity.setValueState("None");
-        //         return;
-        //     }
-        //     utils._LCvalidateMandatoryField(oEvent);
-        //     // ✅ ALWAYS WRITE TO MODEL
-        //     const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
-
-        //     oModel.setProperty("/City", sCityText);
-        // },
+       
 
         onChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
@@ -2020,18 +1827,6 @@ sap.ui.define([
                 return false;
             }
 
-            // // Age validation (10–100)
-            // const today = new Date();
-            // let age = today.getFullYear() - v.getFullYear();
-            // const m = today.getMonth() - v.getMonth();
-
-            // if (m < 0 || (m === 0 && today.getDate() < v.getDate())) age--;
-
-            // if (age < 10 || age > 100) {
-            //     oDP.setValueState("Error");
-            //     oDP.setValueStateText(this.i18nModel.getText("agemustbebetween10and100years"));
-            //     return false;
-            // }
             oDP.setValueState("None");
 
             const sDob =
@@ -2106,47 +1901,6 @@ sap.ui.define([
             utils._LCvalidateAddress($C("signUpAddress"))
         },
 
-        // onChangeCountry: function (oEvent) {
-        //     const oCountry = oEvent.getSource();
-        //     oCountry.setValue(oCountry.getValue().replace(/[^a-zA-Z\s]/g, ""));
-        //     if (!utils._LCvalidateMandatoryField(oEvent)) {
-        //         return;
-        //     }
-
-        //     const oModel = this.getView().getModel("LoginMode");
-        //     const oState = $C("signUpState");
-        //     const oCity = $C("signUpCity");
-        //     const oSTD = $C("signUpSTD");
-
-        //     ["State", "City", "Mobileno", "STDCode"].forEach(p => oModel.setProperty("/" + p, ""));
-        //     oState.setSelectedKey("");
-        //     oCity.setSelectedKey("");
-        //     oSTD.setSelectedKey("");
-        //     oState.getBinding("items")?.filter([new Filter("stateName", "EQ", "__NONE__")]);
-
-        //     oCity.getBinding("items")?.filter([new Filter("cityName", "EQ", "__NONE__")]);
-
-        //     const oItem = oCountry.getSelectedItem();
-        //     if (!oItem) return;
-
-        //     const sCountryName = oItem.getText();
-        //     const sCountryCode = oItem.getAdditionalText()?.trim();
-
-        //     oModel.setProperty("/Country", sCountryName);
-        //     const aCountries = this.getOwnerComponent().getModel("CountryModel").getProperty("/");
-
-        //     const oMatch = aCountries?.find(c => c.countryName === sCountryName);
-
-        //     if (oMatch?.stdCode) {
-        //         oModel.setProperty("/STDCode", oMatch.stdCode);
-        //         oSTD.setSelectedKey(oMatch.stdCode); //  correct
-        //         this.onSTDChange();
-        //     }
-
-        //     if (sCountryCode) {
-        //         oState.getBinding("items")?.filter([new Filter("countryCode", FilterOperator.EQ, sCountryCode)]);
-        //     }
-        // },
         // --- Refactored Country Change ---
         onChangeCountry: function (oEvent) {
             const oCountry = oEvent ? oEvent.getSource() : $C("signUpCountry");
@@ -2233,14 +1987,6 @@ sap.ui.define([
 
         _LCvalidateName: function (oEvent) {
             utils._LCvalidateName(oEvent);
-        },
-
-        onCloseManageProfile: function () {
-            if (this._oProfileDialog) {
-                this._oProfileDialog.destroy();
-                this._oProfileDialog = null;
-            }
-            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
         },
 
         onPressAvatar: async function (oEvent) {
@@ -2363,29 +2109,6 @@ sap.ui.define([
                 this._oProfileDialog.close();
             }
         },
-
-        onLogout: function () {
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            if (oLoginModel) {
-                oLoginModel.setData({
-                    EmployeeID: "",
-                    EmployeeName: "",
-                    EmailID: "",
-                    Role: "",
-                    BranchCode: "",
-                    MobileNo: "",
-                    DateofBirth: "",
-                    Photo: ""
-                });
-            }
-            this._oLoggedInUser = null;
-            if (this._oProfileDialog) {
-                this._oProfileDialog.destroy();
-                this._oProfileDialog = null;
-            }
-            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
-        },
-
         _onEnterProfile: async function () {
             this._oProfileActionSheet.close();
             this._isProfileRequested = true;
@@ -2396,53 +2119,6 @@ sap.ui.define([
             this.onPressAvatar({
                 getSource: this.byId("ProfileAvatar")
             });
-        },
-
-        _onLogout: function () {
-            if (this._oProfileActionSheet) {
-                this._oProfileActionSheet.close();
-                this._oProfileActionSheet.destroy();
-                this._oProfileActionSheet = null;
-            }
-            if (this._oProfileDialog) {
-                this._oProfileDialog.destroy();
-                this._oProfileDialog = null;
-            }
-            sap.ui.getCore().setModel(null, "profileData");
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            if (oLoginModel) {
-                oLoginModel.setData({});
-            }
-            MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
-            this.CommonLogoutFunction();
-            this._oLoggedInUser = null;
-            this._isProfileRequested = false;
-
-            // Reset Login State
-            this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", false);
-            this.getOwnerComponent().getRouter().navTo("RouteHostel");
-        },
-
-        createAvatarActionSheet: function () {
-            if (!this._oProfileActionSheet) {
-                this._oProfileActionSheet = new sap.m.ActionSheet({
-                    placement: sap.m.PlacementType.Bottom,
-                    buttons: [
-                        new sap.m.Button({
-                            text: "View Profile",
-                            icon: "sap-icon://customer",
-                            press: this._onEnterProfile.bind(this)
-                        }).addStyleClass("myUnifiedBtn"),
-
-                        new sap.m.Button({
-                            text: "Logout",
-                            icon: "sap-icon://log",
-                            press: this._onLogout.bind(this)
-                        }).addStyleClass("myUnifiedBtn")
-                    ]
-                }).addStyleClass("profileActionSheet");
-                this.getView().addDependent(this._oProfileActionSheet);
-            }
         },
 
         Bookfragment: function () {
@@ -4118,6 +3794,7 @@ sap.ui.define([
                     }
                     sap.ui.getCore().setModel(oUserModel, "LoginModel");
                     this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
+                    // localStorage.setItem("isLoggedIn", "true");
                 } else {
                     this.getOwnerComponent().getRouter().navTo("TilePage");
                 }

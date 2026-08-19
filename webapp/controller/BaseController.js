@@ -791,7 +791,7 @@ sap.ui.define([
         localStorage.removeItem("_k7LmQ");
         localStorage.removeItem("_aB39X");
         localStorage.removeItem("_mN72P");
-        localStorage.removeItem("activeTabs");
+        // localStorage.removeItem("activeTabs");
       }
       this.getOwnerComponent().getRouter().navTo("RouteHostel");
     },
