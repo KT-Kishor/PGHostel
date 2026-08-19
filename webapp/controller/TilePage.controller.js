@@ -1276,11 +1276,60 @@ sap.ui.define([
         },
 
         // Room changed → build the available plan options from the room's prices
-        onAdminBookingRoomChange: function (oEvent) {
+        onAdminBookingRoomChange:async function (oEvent) {
             var oModel = this.getView().getModel("AdminBookingModel");
             var oRoomCtrl = this.byId("AB_id_Room");
             var sRoomKey = oEvent.getParameter("selectedItem") ?
                 oEvent.getParameter("selectedItem").getKey() : "";
+
+               var sBranchCode=oModel.getProperty("/Branches").find((item)=>{ return item.BranchID===oModel.getProperty("/BranchCode")})
+               const bedName = sRoomKey.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                const acType = sRoomKey.includes("NON-AC") ? "NON-AC" : "AC";
+                
+                this.getBusyDialog();
+
+                try {
+                    const filter = {
+                        BranchCode: oModel.getProperty("/BranchCode") || "",
+                        ACType: acType || "",
+                        Name: bedName || "",
+                        PropertyType: sBranchCode.PropertyType || ""
+                    };
+
+                    const response = await this.ajaxReadWithJQuery(
+                        "HM_AvailableRooms",
+                        filter
+                    );
+
+                    // API returned an error response
+                    if (response?.success === false) {
+                        sap.m.MessageBox.error(
+                            response.message || "Something went wrong."
+                        );
+
+                        return; // STOP HERE
+                    }
+
+
+                } catch (error) {
+
+                    const message =
+                        error?.responseJSON?.message ||
+                        error?.response?.data?.message ||
+                        error?.message ||
+                        "Something went wrong.";
+
+                    sap.m.MessageBox.error(message);
+
+                      oRoomCtrl.setSelectedKey("");
+                      oRoomCtrl.setValue("");
+
+                    return; // STOP HERE
+
+                } finally {
+
+                    this.closeBusyDialog();
+                }
 
             oModel.setProperty("/RoomKey", sRoomKey);
             oModel.setProperty("/SelectedPlan", "");
