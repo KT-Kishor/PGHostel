@@ -176,6 +176,7 @@ sap.ui.define([
                         localStorage.removeItem("_aB39X");
                         localStorage.removeItem("_mN72P");
                         localStorage.removeItem("activeTabs");
+                        localStorage.removeItem("lastActivity");
                     }
 
                     sessionStorage.setItem(
@@ -234,6 +235,7 @@ sap.ui.define([
                         localStorage.removeItem("_aB39X");
                         localStorage.removeItem("_mN72P");
                         localStorage.removeItem("activeTabs");
+                        localStorage.removeItem("lastActivity");
                     }
                 }, 14000); // Mateen have change original value 1500 to 4000
             },

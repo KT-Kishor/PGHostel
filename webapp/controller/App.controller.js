@@ -6,8 +6,12 @@ sap.ui.define([
 
   return Controller.extend("sap.ui.com.project1.controller.App", {
 
-    TIMEOUT_DURATION: 10 * 60 * 1000, // 15 minutes
-    logoutTimer: null,
+    TIMEOUT_DURATION: 10 * 60 * 1000, // 10 minutes
+    LAST_ACTIVITY_KEY: "lastActivity",
+
+    _activityCheckInterval: null,
+    _lastWriteTime: 0,
+    _fnBoundResetTimer: null,
 
     onInit: function () {
       var oLoginModel = this.getView().getModel("LoginModel");
@@ -17,23 +21,43 @@ sap.ui.define([
       }
     },
 
+    onExit: function () {
+      this._stopActivityChecker();
+      this._detachEventHandlers();
+    },
+
     _startSessionTracking: function () {
-      this.resetLogoutTimer();
+      if (!localStorage.getItem(this.LAST_ACTIVITY_KEY)) {
+        localStorage.setItem(this.LAST_ACTIVITY_KEY, Date.now().toString());
+      }
+
+      this._fnBoundResetTimer = this.resetLogoutTimer.bind(this);
       this._attachEventHandlers();
+      this._startActivityChecker();
     },
 
     _attachEventHandlers: function () {
-      // Avoid multiple bindings
       if (this._bEventsAttached) {
         return;
       }
       this._bEventsAttached = true;
 
-      // Attach to document (IMPORTANT)
-      document.addEventListener("mousemove", this.resetLogoutTimer.bind(this));
-      document.addEventListener("keydown", this.resetLogoutTimer.bind(this));
-      document.addEventListener("click", this.resetLogoutTimer.bind(this));
-      document.addEventListener("touchstart", this.resetLogoutTimer.bind(this));
+      var aEvents = ["mousemove", "keydown", "click", "touchstart"];
+      aEvents.forEach(function (sEvent) {
+        document.addEventListener(sEvent, this._fnBoundResetTimer, { passive: true });
+      }.bind(this));
+    },
+
+    _detachEventHandlers: function () {
+      if (!this._bEventsAttached) {
+        return;
+      }
+      this._bEventsAttached = false;
+
+      var aEvents = ["mousemove", "keydown", "click", "touchstart"];
+      aEvents.forEach(function (sEvent) {
+        document.removeEventListener(sEvent, this._fnBoundResetTimer);
+      }.bind(this));
     },
 
     resetLogoutTimer: function () {
@@ -43,27 +67,68 @@ sap.ui.define([
         return;
       }
 
-      if (this.logoutTimer) {
-        clearTimeout(this.logoutTimer);
+      var now = Date.now();
+      // Throttle localStorage updates to at most once every 5 seconds (or 1/10th of timeout)
+      var writeThrottle = Math.min(5000, this.TIMEOUT_DURATION / 10);
+
+      if (now - this._lastWriteTime < writeThrottle) {
+        return;
       }
 
-      this.logoutTimer = setTimeout(
-        this.logoutUser.bind(this),
-        this.TIMEOUT_DURATION
-      );
+      this._lastWriteTime = now;
+      localStorage.setItem(this.LAST_ACTIVITY_KEY, now.toString());
+    },
+
+    _startActivityChecker: function () {
+      this._stopActivityChecker();
+      // Check inactivity state periodically (between 3 and 15 seconds)
+      var checkInterval = Math.min(15000, Math.max(3000, this.TIMEOUT_DURATION / 4));
+      this._activityCheckInterval = setInterval(this._checkInactivity.bind(this), checkInterval);
+    },
+
+    _stopActivityChecker: function () {
+      if (this._activityCheckInterval) {
+        clearInterval(this._activityCheckInterval);
+        this._activityCheckInterval = null;
+      }
+    },
+
+    _checkInactivity: function () {
+      var sLastActivity = localStorage.getItem(this.LAST_ACTIVITY_KEY);
+      if (!sLastActivity) {
+        return;
+      }
+
+      var elapsed = Date.now() - parseInt(sLastActivity, 10);
+      if (elapsed >= this.TIMEOUT_DURATION) {
+        this.logoutUser();
+      }
     },
 
     logoutUser: function () {
-      var oLoginModel = this.getView().getModel("LoginModel");
+      // Cross-check latest activity across all tabs before firing logout
+      var sLastActivity = localStorage.getItem(this.LAST_ACTIVITY_KEY);
+      if (sLastActivity) {
+        var elapsed = Date.now() - parseInt(sLastActivity, 10);
+        if (elapsed < this.TIMEOUT_DURATION) {
+          return; // Active in another tab
+        }
+      }
 
-      if (!oLoginModel || !oLoginModel.getProperty("/isLoggedIn")) {
+      if (window._sessionLogoutRunning) {
         return;
       }
-      localStorage.clear();
-      clearTimeout(this.logoutTimer);
-      this.logoutTimer = null;
+      window._sessionLogoutRunning = true;
 
-      oLoginModel.setProperty("/isLoggedIn", false);
+      this._stopActivityChecker();
+      this._detachEventHandlers();
+
+      var oLoginModel = this.getView().getModel("LoginModel");
+      if (oLoginModel) {
+        oLoginModel.setProperty("/isLoggedIn", false);
+      }
+
+      localStorage.clear();
 
       MessageBox.information(
         "Your session has expired due to inactivity. Please log in again to continue.",
@@ -74,11 +139,9 @@ sap.ui.define([
           styleClass: "myUnifiedBtn",
           dependentOn: this.getView(),
           onClose: function () {
-            localStorage.clear();
-            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            window._sessionLogoutRunning = false;
             window.location.reload();
-          }.bind(this)
-
+          }
         }
       );
     }
