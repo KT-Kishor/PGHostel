@@ -3912,6 +3912,7 @@ sap.ui.define([
             oModel.refresh(true);
         },
         onSaveBooking: async function () {
+            this.continue=true
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -4019,7 +4020,6 @@ sap.ui.define([
         },
 
         onSaveBooking1: async function () {
-
             var Bookingdata = this.getView().getModel("Bookingmodel").getData();
             var CustomerData = this.getView().getModel("CustomerData").getData();
             var LoginModel = this.getView().getModel("LoginModel").getData();
@@ -4094,6 +4094,8 @@ sap.ui.define([
 
 
             const invalidFacilities = [];
+            const facilitiesNotFullBooking = [];
+            
 
             const bookingStartDate = this._parseDate(
                 Bookingdata.StartDate
@@ -4107,11 +4109,11 @@ sap.ui.define([
 
                 const item = facilityItems[i];
 
-                const facilityStart = this._parseDate(
+                let facilityStart = this._parseDate(
                     item.StartDate
                 );
 
-                const facilityEnd = this._parseDate(
+                let facilityEnd = this._parseDate(
                     item.EndDate
                 );
 
@@ -4120,6 +4122,8 @@ sap.ui.define([
 
                 const endInvalid =
                     facilityEnd > bookingEndDate;
+
+                  
 
                 // Store only facilities having invalid dates
                 if (startInvalid || endInvalid) {
@@ -4130,7 +4134,19 @@ sap.ui.define([
                         endInvalid: endInvalid
                     });
                 }
+                   const startNotMatching =
+        facilityStart.getTime() !== bookingStartDate.getTime();
+
+    const endNotMatching =
+        facilityEnd.getTime() !== bookingEndDate.getTime();
+
+    if (startNotMatching || endNotMatching) {
+
+        facilitiesNotFullBooking.push(item);
+    }
             }
+
+         
 
             if (invalidFacilities.length > 0) {
 
@@ -4142,14 +4158,6 @@ sap.ui.define([
                         .map(x => {
 
                             let message = `• ${x.item.FacilityName}`;
-
-                            // if (x.startInvalid && x.endInvalid) {
-                            //     message += " (Start & End Date)";
-                            // } else if (x.startInvalid) {
-                            //     message += " (Start Date)";
-                            // } else if (x.endInvalid) {
-                            //     message += " (End Date)";
-                            // }
 
                             return message;
                         })
@@ -4620,6 +4628,8 @@ sap.ui.define([
 
                 return;
             }
+            // Show MessageBox
+
 
             // Normalize UnitText: trim and lowercase
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
@@ -4815,78 +4825,44 @@ sap.ui.define([
 
                 return;
             }
-            if (LoginModel.Role === "Customer" || this._fromRoute === "ManageProfile") {
-                if (paymentMap[unit] === "Per Day" &&
-                    (CustomerData.Duration * Number(CustomerData.RentPrice) > this.RentPrice || CustomerData.TotalFacilityPrice > this.FacilityPrice) &&
-                    this.flag !== true && CustomerData.DueAmount > 0) {
-                    if (!this.PP_Dialog) {
-                        if (this.PP_Dialog) {
-                            this.PP_Dialog.destroy();
-                            this.PP_Dialog = null;
-                        }
-                        var oView = this.getView();
-                        this.PP_Dialog = sap.ui.xmlfragment(
-                            "sap.ui.com.project1.fragment.Payment_Edit",
-                            this
-                        );
-                        oView.addDependent(this.PP_Dialog);
-                    }
 
-                    this.PP_Dialog.open();
+         if (facilitiesNotFullBooking.length > 0 && this.continue===true) {
 
-                    // set grand total
-                    oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
+            var that=this
 
-                    // default payment UI state
-                    setTimeout(() => {
-                        const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup1");
+    const facilityNames = facilitiesNotFullBooking
+        .map(item => item.FacilityName || item.Name || "Facility")
+        .join(", ");
 
-                        if (oGroup) {
-                            oGroup.setSelectedIndex(0); // Pay On CheckIn
+    sap.m.MessageBox.information(
+        `These facilities are not full on the booking dates:\n\n${facilityNames}\n\nDo you want to continue?`,
+        {
+            actions: [
+                "Continue",
+                sap.m.MessageBox.Action.CANCEL
+            ],
 
-                            this.onPaymentTypeSelect({
-                                getSource: () => oGroup
-                            });
-                        }
-                    }, 100);
+            emphasizedAction: "Continue",
+            styleClass: "myUnifiedBtn",
+            onClose: function (oAction) {
+
+                if (oAction === "Continue") {
+                    // Continue your remaining code here
+                    that.continue=false
+                    that.onSaveBooking1();
+
+
+                } else if (oAction === sap.m.MessageBox.Action.CANCEL) {
+                    // Stop here
                     return;
-                } else if (
-                    (paymentMap[unit] === "Per Month" || paymentMap[unit] === "Per Year") && (CustomerData.TotalFacilityPrice > this.FacilityPrice || Number(CustomerData.RentPrice) > this.RentPrice) &&
-                    this.flag !== true && CustomerData.DueAmount > 0
-                ) {
-                    if (Number(CustomerData.RentPrice) > this.RentPrice && CustomerData.TotalFacilityPrice === this.FacilityPrice && CustomerData.PaymentPaid !== "0.00") {
-
-                    } else {
-                        if (!this.PP_Dialog) {
-                            var oView = this.getView();
-                            this.PP_Dialog = sap.ui.xmlfragment(
-                                "sap.ui.com.project1.fragment.Payment_Edit",
-                                this
-                            );
-                            oView.addDependent(this.PP_Dialog);
-                        }
-
-                        this.PP_Dialog.open();
-
-                        // set grand total
-                        oHostelModel.setProperty("/GrandTotal", CustomerData.GrandTotal);
-
-                        // default payment UI state
-                        setTimeout(() => {
-                            const oGroup = sap.ui.getCore().byId("idPaymentTypeGroup1");
-
-                            if (oGroup) {
-                                oGroup.setSelectedIndex(0); // Pay On CheckIn
-
-                                this.onPaymentTypeSelect({
-                                    getSource: () => oGroup
-                                });
-                            }
-                        }, 100);
-                        return;
-                    }
                 }
             }
+        }
+    );
+
+    return;
+}
+           
 
             var aDraftData = this.getView().getModel("DraftModel") ? this.getView().getModel("DraftModel").getData() : "";
 
@@ -5008,13 +4984,9 @@ sap.ui.define([
             };
 
 
-            // var memberIds = CustomerData.AllMembers
-            //     .map(doc => doc.MemberID)
-            //     .join(",");
-
+    
             this.MemberID = SelectedmemberIds
 
-            // Payload.Booking[0].MemberID = memberIds;
 
             if (this.flag === true && this.index !== 0) {
                 var PaymentPayload = {

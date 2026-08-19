@@ -1566,7 +1566,7 @@ sap.ui.define([
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    CustomerName: this.byId("CID_id_AddCustComboBox").getValue() || "",
+                    CustomerName: this.byId("CID_id_AddCustComboBox").getValue() || this.byId("CID_id_AddCustComboBox").getSelectedKey(),
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
                     MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
@@ -1851,7 +1851,22 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Type", "CGST/SGST");
                 oCustomerModel.setProperty("/Value", Number(CustomerData.Value) / 2);
                 oCustomerModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
+
+                
                 this.totalAmountCalculation();
+
+                const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = "YES";
+                    item.SAC = "996322";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
+             
             },
 
             CI_onSelectIGST: function (oEvent) {
@@ -1878,6 +1893,17 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Value", Number(Branch.Value));
                 oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
                 this.totalAmountCalculation();
+                const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = "YES";
+                    item.SAC = "996322";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
             },
 
             CI_onPercentageChange: function (oEvent) {
@@ -4459,7 +4485,7 @@ sap.ui.define([
                         var balanceAmount = Number(RefundModel.RefundPayment).toFixed(2) - invoiceModel.getProperty("/AllDueAmount").toFixed(2)
 
                         var Payload = {
-                            DueAmount: balanceAmount,
+                            DueAmount: balanceAmount
                         }
 
                         await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
@@ -4468,9 +4494,6 @@ sap.ui.define([
                                 InvNo: String(RefundModel.InvNo)
                             }
                         });
-
-
-
 
                         const oInvoice = oResult.data.ManageInvoice[0];
                         const oSelectedModel = this.getView().getModel("SelectedCustomerModel");

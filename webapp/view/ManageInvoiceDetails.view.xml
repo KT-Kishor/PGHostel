@@ -73,6 +73,7 @@
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
                                             selectedKey="{SelectedCustomerModel>/CustomerName}"
+
                                         >
                                             <core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
@@ -132,7 +133,7 @@
                                             visible="{visiablityPlay>/editVisi}"
                                             id="CID_id_Custmer"
                                             value="{SelectedCustomerModel>/CustomerName}"
-                                            editable="false"
+                                            editable="{visiablityPlay>/editable}"
                                         />
                                         <m:Label
                                             visible="{visiablityPlay>/editVisi}"
