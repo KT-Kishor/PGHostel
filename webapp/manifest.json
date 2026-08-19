@@ -251,7 +251,7 @@
         },
         {
           "name": "RouteEditBooking",
-          "pattern": "editBooking/{BookingID}/{MemberID}:?query:",
+          "pattern": "editBooking/{BookingID}/{MemberID}/{flag}:?query:",
           "target": [
             "TargetEditBookingView"
           ]

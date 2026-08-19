@@ -517,7 +517,7 @@ sap.ui.define([
                 this.CommonLogoutFunction();
             },
 
-            onChangeAddCustomer: async function (oEvent, sBookingID) {
+            onChangeAddCustomer: async function (oEvent) {
                 try {
                     let bookingID = "";
 
@@ -534,7 +534,7 @@ sap.ui.define([
                     }
                     // Called manually
                     else {
-                        bookingID = sBookingID || oEvent;
+                        bookingID = oEvent;
                     }
 
                     this.SelectKey = bookingID;
@@ -2966,7 +2966,16 @@ sap.ui.define([
                     // ===== TABLE BODY =====
                     const body = oCompanyItemModel
                         .filter(item => item)
-                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
+                        .sort((a, b) => {
+                            const startDiff =
+                                this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
                         .map((item, index) => {
                             const row = [
                                 index + 1,
@@ -3626,7 +3635,15 @@ sap.ui.define([
                     ];
 
                     const body = [...aInvoiceItems]
-                        .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
+                        .sort((a, b) => {
+                            const startDiff = this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
                         .map((item, i) => {
                             const row = [
                                 i + 1,
@@ -3965,8 +3982,12 @@ sap.ui.define([
                         currentY += 5;
 
                         //  ITEM TABLE 
+                        // const showSAC = !!oModel.GST;
+
+                        // ITEM TABLE
                         const showSAC = !!oModel.GST;
 
+                        // Remove duplicate items first
                         const uniqueItems = oCompanyItemModel.filter((item, index, self) =>
                             index === self.findIndex(x =>
                                 x.Particulars === item.Particulars &&
@@ -3976,25 +3997,42 @@ sap.ui.define([
                             )
                         );
 
-                        const body = oCompanyItemModel
-                            .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate)) // Ascending by StartDate
-                            .map((item, index) => {
-                                const row = [
-                                    index + 1,
-                                    item.Particulars,
-                                    Formatter.formatDate(item.StartDate),
-                                    Formatter.formatDate(item.EndDate),
-                                    Formatter.fromatNumber(item.GrossPrice),
-                                    item.UnitText,
-                                    Formatter.fromatNumber(item.Total)
-                                ];
+                        // Sort by StartDate ASC, then EndDate ASC
+                        const sortedItems = [...uniqueItems].sort((a, b) => {
 
-                                if (showSAC) {
-                                    row.splice(2, 0, item.SAC);
-                                }
+                            const startA = this._parseDate(a.StartDate);
+                            const startB = this._parseDate(b.StartDate);
 
-                                return row;
-                            });
+                            // Start Date ascending
+                            if (startA.getTime() !== startB.getTime()) {
+                                return startA.getTime() - startB.getTime();
+                            }
+
+                            // End Date ascending when Start Date is same
+                            const endA = this._parseDate(a.EndDate);
+                            const endB = this._parseDate(b.EndDate);
+
+                            return endA.getTime() - endB.getTime();
+                        });
+
+                        const body = sortedItems.map((item, index) => {
+
+                            const row = [
+                                index + 1,
+                                item.Particulars,
+                                Formatter.formatDate(item.StartDate),
+                                Formatter.formatDate(item.EndDate),
+                                Formatter.fromatNumber(item.GrossPrice),
+                                item.UnitText,
+                                Formatter.fromatNumber(item.Total)
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
 
 
                         const head = showSAC ? [
@@ -4807,8 +4845,25 @@ sap.ui.define([
             },
 
             _parseDate: function (dateStr) {
-                const [day, month, year] = dateStr.split("/");
-                return new Date(`${year}-${month}-${day}`);
+
+                if (!dateStr) {
+                    return new Date(0);
+                }
+
+                // If date is DD/MM/YYYY
+                if (typeof dateStr === "string" && dateStr.includes("/")) {
+
+                    const [day, month, year] = dateStr.split("/");
+
+                    return new Date(
+                        Number(year),
+                        Number(month) - 1,
+                        Number(day)
+                    );
+                }
+
+                // If backend sends ISO date
+                return new Date(dateStr);
             },
             onPaymentModerefundChange: function (oEvent) {
                 var oComboBox = oEvent.getSource();
