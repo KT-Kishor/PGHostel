@@ -1052,7 +1052,7 @@ sap.ui.define([
                 // waiting for binding to update the model. This handles the
                 // case where selectionChange fires before the two-way binding.
                 const sNewDocType = String(oComboBox.getSelectedKey() || "").trim();
-                
+
                 if (sNewDocType) {
                     this._syncMemberDocumentName(sNewDocType);
                 }
@@ -1078,7 +1078,7 @@ sap.ui.define([
             }
 
             const sCurrentName = String(oModel.getProperty("/DocumentName") || "").trim();
-            
+
             // Use the provided document type, or fall back to the model property
             const sNewDocType = sDocType || String(oModel.getProperty("/DocumentType") || "").trim();
 
@@ -2725,7 +2725,7 @@ sap.ui.define([
             if (oUserModel) {
                 oUserModel.setData({});
             }
-           this._resetValidationStates()
+            this._resetValidationStates()
             this.CommonLogoutFunction();
             MessageToast.show(this.i18nModel.getText("logoutSuccessful"));
         },
@@ -3886,6 +3886,9 @@ sap.ui.define([
             const oBranchCombo = this._getComplaintControl("idBranchCombo");
             const oBookingID = this._getComplaintControl("MP_id_AddBooking");
             const oCustomerName = this._getComplaintControl("MP_id_AddCustComboBox");
+            var oComboBox = sap.ui.getCore().byId("idBranchCombo");
+
+            var sBranchName = oComboBox.getSelectedItem()?.getText();
 
 
             if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID") ||
@@ -3905,6 +3908,16 @@ sap.ui.define([
             const sComplaintType = oComplaintType.getValue();
             const sBranchCode = oBranchCombo.getSelectedKey();
 
+            this.getBusyDialog();
+
+            var loginResponse = await this.ajaxReadWithJQuery("HM_StaffEmailIDs", {
+                BranchCode: sBranchCode
+            });
+
+            const emailIds = (loginResponse.data || [])
+                .map(item => item.EmailID?.trim())
+                .filter(Boolean)
+                .join(",");
 
             const payloadData = {
                 UserID: sUserID,
@@ -3919,7 +3932,9 @@ sap.ui.define([
                 FileType: oData.FileType || "",
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
-                CustomerName: oData.CustomerName
+                CustomerName: oData.CustomerName,
+                emailIds: emailIds,
+                BranchName: sBranchName
             };
 
             let payload;
@@ -3928,11 +3943,15 @@ sap.ui.define([
                     data: {
                         ComplaintType: sComplaintType,
                         Description: oData.Description,
+                        CustomerName: oData.CustomerName,
+                        BookingID: oData.BookingID,
                         RoomNo: oData.RoomNo,
                         BranchCode: sBranchCode, // ← also here
                         FileName: oData.FileName || "",
                         FileType: oData.FileType || "",
-                        File: oData.FileContent || ""
+                        File: oData.FileContent || "",
+                        emailIds: emailIds,
+                        BranchName: sBranchName
                     },
                     filters: {
                         ComplaintID: oData.ComplaintID
@@ -3945,7 +3964,6 @@ sap.ui.define([
             }
 
             try {
-                this.getBusyDialog();
 
                 let response;
                 if (oData.ComplaintID) {

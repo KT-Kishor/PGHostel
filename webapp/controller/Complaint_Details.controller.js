@@ -136,8 +136,6 @@ sap.ui.define([
             let uniqueValues = {
                 PCD_id_RoomNo: new Set(),
                 CD_id_Status: new Set(),
-
-
             };
 
             data.forEach(item => {
@@ -470,7 +468,11 @@ sap.ui.define([
                 var payload = {
                     ResolutionDate: ResolutionDate.split("/").reverse().join("-") || "",
                     Comment: Comments,
-                    Status: "Resolved"
+                    Status: "Resolved",
+                    ComplaintID: Complaint.ComplaintID,
+                    ComplaintType: Complaint.ComplaintType,
+                    CustomerName: Complaint.CustomerName,
+                    emailIds: Complaint.CustomerEmail
                 };
             }
             this.getBusyDialog()
@@ -531,6 +533,7 @@ sap.ui.define([
             this.byId("CD_id_EstimatedDate").setVisible(false);
             if (data.Status === "In Progress") {
                 this.byId("CD_id_ResolutionDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
+                this.byId("CD_id_Comments").setVisible(true).setValue("").setValueState("None");
             } else {
                 this.byId("CD_id_ResolutionDate").setVisible(true).setValue(Formatter.formatDate(data.ResolutionDate)).setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
                 this.byId("CD_id_Comments").setVisible(true).setValue((data.Comment)).setValueState("None");
