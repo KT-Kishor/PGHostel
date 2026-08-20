@@ -448,7 +448,7 @@ sap.ui.define([
 
             if (Complaint.Status === "In Progress" && this.flag === true) {
                 if (
-                    !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_ResolutionDate"), "ID")||
+                    !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_ResolutionDate"), "ID") &&
                     !utils._LCvalidateMandatoryField(this.getView().byId("CD_id_Comments"), "ID")
                 ) {
                     sap.m.MessageToast.show(

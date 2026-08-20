@@ -150,12 +150,14 @@
                                 <Label text=""/>
                                 <Button
                         text="Submit Feedback"
+                        class="myUnifiedBtn"
                         type="Emphasized"
                         press="onSubmitFeedback"
                     />
                                 <Button
                         text="Cancel"
                         press="BI_onButtonPress"
+                        class="myUnifiedBtn"
                     />
                             </f:content>
                         </f:SimpleForm>

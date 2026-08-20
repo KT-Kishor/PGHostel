@@ -182,6 +182,7 @@
                             id="id_mail1"
                             placeholder="{i18n>enterEmailId}"
                             value="{profileData>/email}"
+                            editable="false"
                             type="Email"
                             maxLength="30"
                             valueStateText="{i18n>enterEmailId}"
