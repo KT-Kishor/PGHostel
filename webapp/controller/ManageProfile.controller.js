@@ -2121,8 +2121,7 @@ sap.ui.define([
             // Navigate to EditBooking page with BookingID and MemberID
             this.getOwnerComponent().getRouter().navTo("RouteEditBooking", {
                 BookingID: encodeURIComponent(sBookingID),
-                MemberID: encodeURIComponent(sMemberID),
-                flag: "profile"
+                MemberID: encodeURIComponent(sMemberID)
             });
         },
 

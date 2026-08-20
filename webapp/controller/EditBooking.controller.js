@@ -183,7 +183,6 @@ sap.ui.define([
 
             // now safely use oArgs
             this._processEditArgs = oArgs;
-            this._sEditFlag = oArgs.flag || "";
             this.BookingID = this._decodeRouteBase64(oArgs.BookingID);
             var oRouteQuery = oArgs["?query"] || oArgs.query || {};
             this._sReturnRouteAfterEdit = oRouteQuery.FromMyBookings === "true" || oRouteQuery.FromMyBookings === true ? "RouteMyBookings" : "RouteManageProfile";
@@ -3661,15 +3660,15 @@ sap.ui.define([
                             oBookingView.setProperty("/editModeEnabled", false);
                             oBookingView.setProperty("/showEditButton", false);
                         }
-                        var sEditFlag = String(that._sEditFlag || "").trim().toLowerCase();
+                       
 
                         that._clearEditBookingTransientState();
                         MessageToast.show(
                             that.getView().getModel("i18n").getResourceBundle().getText("bookingCancelledSuccessfully")
                         );
-                        if (sEditFlag === "profile") {
+                      
                             that.getRouter().navTo("RouteManageProfile");
-                        }
+                        
                        
                     } catch (err) {
                         that.closeBusyDialog();
