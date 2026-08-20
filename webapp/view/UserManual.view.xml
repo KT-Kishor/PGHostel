@@ -1,0 +1,241 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.UserManual"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:g="sap.f"
+    displayBlock="true">
+
+    <Page
+        id="userManualPage"
+        title="{i18n>userManualTitle}"
+        showNavButton="true"
+        navButtonPress="onNavBack">
+
+        <content>
+
+            <VBox
+                width="100%"
+                class="">
+
+                <Title
+                    level="H1"
+                    text="{i18n>Productsmanual}"
+                    class="ProductDemoSection"
+                    wrapping="true" />
+
+                <l:Grid
+                    defaultSpan="XL6 L6 M6 S12"
+                    class="grid-container">
+
+                    <!-- CustomerSignup -->
+                    <VBox
+                        class="ProductSoluction sapUiSmallMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_CustomerSignup">
+
+                            <core:HTML
+                                id="videoFrameHtml_CustomerSignup"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/Workzone.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Customer SignUp" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>SignUptour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="CustomerSignup.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                    <!-- Set/Forgot Password -->
+                    <VBox
+                        class="ProductSoluction sapUiSmallMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_setpass">
+
+                            <core:HTML
+                                id="videoFrameHtml_setpass"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/Shah%20H.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Set/Forgot Password" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>setForgotPasswordtour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="branch.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                    <!-- Create Booking -->
+                    <VBox
+                        class="ProductSoluction sapUiSmallMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_Customer">
+
+                            <core:HTML
+                                id="videoFrameHtml_Customer"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/Kvriksha%20Customer.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Create Booking" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>createBooking}" />
+ <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="branch.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+                    </VBox>
+
+                    <!-- Manage Booking -->
+                    <VBox
+                        class="ProductSoluction sapUiSmallMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_ManageBooking">
+
+                            <core:HTML
+                                id="videoFrameHtml_ManageBooking"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls autoplay muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/Kvriksha%20ManageBooking.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Manage Booking" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>managebooking}" />
+  <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container myUnifiedBtn" >
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="ManageBooking.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+                    </VBox>
+
+                </l:Grid>
+
+            </VBox>
+
+        </content>
+    </Page>
+
+</mvc:View>

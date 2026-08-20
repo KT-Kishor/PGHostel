@@ -28,6 +28,12 @@
 
             <!-- Desktop Terms -->
             <Link
+                id="usermanualLink"
+                text="User Manual"
+                class="_link desktopFooterItem"
+                press="onUsermanualPress" />
+                
+            <Link
                 id="desktopTermsLink"
                 text="Terms and Conditions"
                 class="_link desktopFooterItem"

@@ -1,109 +1,38 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout">
+    xmlns:core="sap.ui.core">
 
     <Dialog
         id="termsDialog"
-        showHeader="true"
+        title="Terms and Conditions"
         contentWidth="80%"
-       
-        verticalScrolling="false"
+        draggable="true"
+        resizable="true"
         class="termsDialog">
 
-        <customHeader>
-            <Bar>
-
-                <contentMiddle>
-                    <Title
-                        text="Terms and conditions"
-                        level="H4"
-                        titleStyle="H4" />
-                </contentMiddle>
-
-                <contentRight>
-                    <Button
-                        icon="sap-icon://decline"
-                        type="Transparent"
-                        press="onTermsDialogClose" />
-                </contentRight>
-
-            </Bar>
-        </customHeader>
-
         <content>
-
-            <l:Grid
-                defaultSpan="L12 M12 S12"
-                width="100%"
-                class="termsGrid">
-
-                <l:content>
-
-                    <ScrollContainer
-                        height="100%"
-                        width="100%"
-                        vertical="true"
-                        horizontal="false"
-                        class="termsScroll">
-
-                        <VBox
-                            width="100%"
-                            class="termsContent">
-
-                            <Title
-                                text="Terms and conditions"
-                                level="H2"
-                                class="sapUiTinyMarginTopBottom termsTitle"
-                                width="100%" />
-
-                            <Text
-                                text="Last updated: 19 August 2026"
-                                class="termsMuted sapUiSmallMarginBottom termsText"
-                                width="100%" />
-
-                            <Title
-                                text="1. Introduction"
-                                level="H4"
-                                class="sapUiTinyMarginTop termsTitle"
-                                width="100%" />
-
-                            <Text
-                                text="By using this application, you agree to be bound by the terms described here."
-                                class="sapUiSmallMarginBottom termsText"
-                                width="100%" />
-
-                            <Title
-                                text="2. Usage"
-                                level="H4"
-                                class="termsTitle"
-                                width="100%" />
-
-                            <Text
-                                text="The service may only be used for its intended business purpose and in accordance with company policy."
-                                class="sapUiSmallMarginBottom termsText"
-                                width="100%" />
-
-                            <Title
-                                text="3. Data privacy"
-                                level="H4"
-                                class="termsTitle"
-                                width="100%" />
-
-                            <Text
-                                text="Your data is processed in line with applicable data protection regulations."
-                                class="sapUiSmallMarginBottom termsText"
-                                width="100%" />
-
-                        </VBox>
-
-                    </ScrollContainer>
-
-                </l:content>
-
-            </l:Grid>
-
+            <core:HTML
+                id="termsPdfFrame"
+                content="&lt;iframe
+                    class='terms-pdf-iframe'
+                    title='Terms and Conditions'
+                    src='Documents/TermsAndConditions.pdf'
+                    frameborder='0'
+                    allow='fullscreen'&gt;
+                &lt;/iframe&gt;" />
         </content>
+
+        <buttons>
+            <Button
+                text="Download"
+                icon="sap-icon://download"
+                type="Emphasized"
+                press="onDownloadTerms" class="myUnifiedBtn" />
+
+            <Button
+                text="Close"
+                press="onTermsDialogClose" class="myUnifiedBtn" />
+        </buttons>
 
     </Dialog>
 

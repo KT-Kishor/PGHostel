@@ -463,6 +463,14 @@
           "target": [
             "targetManageAds"
           ]
+        
+        },
+           {
+          "name": "RouteUserManual",
+          "pattern": "UserManual",
+          "target": [
+            "targetUserManual"
+          ]
         }
       ],
       "targets": {
@@ -773,6 +781,13 @@
           "clearControlAggregation": false,
           "viewId": "ManageAds",
           "viewName": "ManageAds"
+        },
+         "targetUserManual": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "UserManual",
+          "viewName": "UserManual"
         }
       }
     },

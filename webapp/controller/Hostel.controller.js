@@ -248,42 +248,6 @@ sap.ui.define([
                 "tokenModel"
             );
 
-            // -----------------------------
-            // HANDLE POST LOGIN REDIRECTION
-            // -----------------------------
-            // const sRedirectFlag = sessionStorage.getItem("redirectAfterLogin");
-
-            // if (sRedirectFlag === "bookingFlow") {
-
-            //     // Clear flag
-            //     sessionStorage.removeItem("redirectAfterLogin");
-
-            //     // Restore booking data
-            //     const sData = sessionStorage.getItem("pendingBookingData");
-            //     if (sData) {
-            //         const oData = JSON.parse(sData);
-
-            //         let oGlobalModel = sap.ui.getCore().getModel("HostelModel");
-            //         if (!oGlobalModel) {
-            //             oGlobalModel = new JSONModel({});
-            //             sap.ui.getCore().setModel(oGlobalModel, "HostelModel");
-            //         }
-
-            //         oGlobalModel.setData(oData, true);
-
-            //         // Also restore local model if needed
-            //         if (this.oHostelModel) {
-            //             this.oHostelModel.setData(oData, true);
-            //         }
-            //         sessionStorage.removeItem("pendingBookingData");
-            //     }
-
-            //     // Reopen room detail fragment automatically
-            //     setTimeout(() => {
-            //         this._reopenRoomDetailAfterLogin();
-            //     }, 300);
-            // }
-
             this.onAfterAnimate()
 
             // Fallback: ensure the booking busy dialog is closed even if the home
@@ -1303,54 +1267,6 @@ sap.ui.define([
                 ?.setText("Sign In");
         },
 
-        // onSwitchToSignUp: function () {
-        //     const oSignInPanel = $C("signInPanel");
-        //     const oSignUpPanel = $C("signUpPanel");
-
-        //     // 🔒 MAKE DOB READ-ONLY (calendar-only)
-        //     this._FragmentDatePickersReadOnly(["signUpDOB"]);
-
-        //     oSignInPanel?.setVisible(false);
-        //     oSignUpPanel?.setVisible(true);
-
-        //     this.oViewModel.setProperty("/authFlow", "signup");
-        //     this.oViewModel.setProperty("/dialogTitle", "Hostel Access Portal");
-
-        //     // DOB Limits Logic
-        //     const oDOBpicker = $C("signUpDOB");
-        //     if (oDOBpicker) {
-        //         const oToday = new Date();
-        //         const oMaxDate = new Date(oToday.getFullYear() - 10, oToday.getMonth(), oToday.getDate());
-        //         oDOBpicker.setMaxDate(oMaxDate);
-        //         const oMinDate = new Date(oToday.getFullYear() - 100, oToday.getMonth(), oToday.getDate());
-        //         oDOBpicker.setMinDate(oMinDate);
-        //     }
-
-        //     // 🔥 AUTO-POPULATE LOCATION DATA
-        //     const oLoginModel = this.getView().getModel("LoginMode");
-        //     if (this.Country) {
-        //         oLoginModel.setProperty("/Country", this.Country);
-        //         this.onChangeCountry(null); // Manual trigger (Safe call)
-
-        //         if (this.State) {
-        //             // Delay is important for binding filters to react
-        //             setTimeout(() => {
-        //                 oLoginModel.setProperty("/State", this.State);
-        //                 this.onChangeState(null);
-
-        //                 if (this.City) {
-        //                     setTimeout(() => {
-        //                         oLoginModel.setProperty("/City", this.City);
-        //                         this.onChangeCity(null);
-        //                     }, 200);
-        //                 }
-        //             }, 200);
-        //         }
-        //     }
-
-        //     this._resetOtpState();
-        //     this._addPasswordGenerateIcon();
-        // },
         onSwitchToSignUp: function () {
             const oSignInPanel = $C("signInPanel");
             const oSignUpPanel = $C("signUpPanel");
@@ -4645,112 +4561,7 @@ sap.ui.define([
                 oModel.setProperty("/ProcessingActive", false);
             }
         },
-        // onAdminFileSelect: async function (oEvent) {
-        //     const oUploader = $C("adminFileUploader");
-        //     const oDocType = $C("adminDocType");
-        //     const oModel = this.getView().getModel("AdminSignupModel");
-
-        //     const file = oEvent.getParameter("files")?.[0];
-        //     if (!file) return;
-
-        //     // 1. Document type selected?
-        //     const selectedDocType = oDocType ? oDocType.getSelectedKey() : null;
-        //     if (!selectedDocType) {
-        //         MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst") || "Select document type first");
-        //         if (oUploader) oUploader.clear();
-        //         return;
-        //     }
-
-        //     // 2. Duplicate check
-        //     // 2. Duplicate check by original filename
-        //     if (this._isDuplicateFile(file.name)) {
-        //         MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded") || "File already uploaded");
-        //         if (oUploader) oUploader.clear();
-        //         return;
-        //     }
-
-        //     // 3. Compression logic
-        //     const MAX_SIZE_MB = 2;
-        //     const fileSizeMB = file.size / (1024 * 1024);
-        //     const isImage = file.type === "image/jpeg" || file.type === "image/jpg" || file.type === "image/png";
-        //     let processedFile = file;
-
-        //     if (fileSizeMB > MAX_SIZE_MB) {
-        //         if (isImage) {
-        //             if (typeof imageCompression === "undefined") {
-        //                 MessageBox.error("Compression library missing. Refresh the page.");
-        //                 if (oUploader) oUploader.clear();
-        //                 return;
-        //             }
-        //             // Show global busy dialog during compression
-        //             this.getBusyDialog();
-        //             try {
-        //                 MessageToast.show("Compressing image, please wait...");
-        //                 const options = {
-        //                     maxSizeMB: 1.96,
-        //                     maxWidthOrHeight: 1920,
-        //                     useWebWorker: true,
-        //                     initialQuality: 0.95
-        //                 };
-        //                 processedFile = await imageCompression(file, options);
-        //                 MessageToast.show(`Compressed to ${(processedFile.size / 1024).toFixed(2)} KB`);
-        //             } catch (err) {
-        //                 console.error(err);
-        //                 MessageBox.error("Compression failed. Use a smaller image.");
-        //                 if (oUploader) oUploader.clear();
-        //                 return;
-        //             } finally {
-        //                 this.closeBusyDialog();   // always close busy dialog
-        //             }
-        //         } else {
-        //             MessageToast.show("Only images can be compressed. File exceeds 2 MB.");
-        //             if (oUploader) oUploader.clear();
-        //             return;
-        //         }
-        //     }
-
-        //     // 4. Convert to Base64
-        //     let base64 = "";
-        //     try {
-        //         base64 = await new Promise((resolve, reject) => {
-        //             const reader = new FileReader();
-        //             reader.onload = () => resolve(reader.result.split(",")[1]);
-        //             reader.onerror = reject;
-        //             reader.readAsDataURL(processedFile);
-        //         });
-        //     } catch (err) {
-        //         MessageBox.error("Failed to read file.");
-        //         if (oUploader) oUploader.clear();
-        //         return;
-        //     }
-
-        //     // 5. Add to model
-        //     const previewUrl = URL.createObjectURL(processedFile);
-        //     const newDoc = {
-        //         FileName: selectedDocType,          // display name = doc type
-        //         DocumentType: processedFile.type,
-        //         VdocType: selectedDocType,
-        //         File: base64,
-        //         Base64: base64,
-        //         PreviewUrl: previewUrl,
-        //         size: processedFile.size,
-        //         originalName: file.name             // ✅ needed for duplicate check
-        //     };
-
-        //     const docs = oModel.getProperty("/Documents") || [];
-        //     docs.push(newDoc);
-        //     oModel.setProperty("/Documents", docs);
-
-        //     // 6. Clean up UI
-        //     const table = $C("adminAttachmentTable");
-        //     if (table) table.removeStyleClass("fileErrorHighlight");
-        //     oModel.setProperty("/CurrentDocType", "");
-        //     if (oUploader) oUploader.clear();
-        //     oModel.setProperty("/DocTypeEnabled", true);
-        //     oModel.setProperty("/UploadEnabled", false);
-
-        //     MessageToast.show("Document added successfully");
-        // },
+    
         // Helper to show/hide busy indicator on the uploader button (optional)
         _showBusyOnUploader: function (bBusy) {
             const oUploader = this.byId("adminFileUploader");
@@ -5590,30 +5401,88 @@ sap.ui.define([
             });
         },
         
- onPrivacyPolicyPress: function (oEvent) {
-            var oView = this.getView();
+ onPrivacyPolicyPress: function () {
+                var oView = this.getView();
 
-            if (!this._pTermsDialog) {
-                this._pTermsDialog = Fragment.load({
-                    id: oView.getId(),
-                    name: "sap.ui.com.project1.fragment.TermsandCondition",
-                    controller: this
-                }).then(function (oDialog) {
-                    oView.addDependent(oDialog);
-                    return oDialog;
+                if (!this._pTermsDialog) {
+                    this._pTermsDialog = Fragment.load({
+                        id: oView.getId(),
+                        name: "sap.ui.com.project1.fragment.TermsandCondition",
+                        controller: this
+                    }).then(function (oDialog) {
+                        oView.addDependent(oDialog);
+
+                        var oHtml = Fragment.byId(
+                            oView.getId(),
+                            "termsPdfFrame"
+                        );
+
+                        if (!oHtml) {
+                            throw new Error(
+                                "termsPdfFrame was not found."
+                            );
+                        }
+
+                        oHtml.addEventDelegate({
+                            onAfterRendering: function () {
+                                var oIframe = oHtml
+                                    .getDomRef()
+                                    .querySelector("iframe");
+
+                                if (!oIframe) {
+                                    return;
+                                }
+
+                                oIframe.src = sap.ui.require.toUrl(
+                                    "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
+                                );
+                            }
+                        });
+
+                        return oDialog;
+                    }.bind(this));
+                }
+
+                this._pTermsDialog.then(function (oDialog) {
+                    oDialog.open();
                 });
-            }
+            },
 
-            this._pTermsDialog.then(function (oDialog) {
-                oDialog.open();
-            });
-        },
-        onTermsDialogClose: function () {
-            this._pTermsDialog.then(function (oDialog) {
-                oDialog.close();
-            });
-        },
+            onTermsDialogClose: function () {
+                var oDialog = Fragment.byId(
+                    this.getView().getId(),
+                    "termsDialog"
+                );
 
+                if (oDialog) {
+                    oDialog.close();
+                }
+            },
+
+            onDownloadTerms: function () {
+                var sPdfUrl = sap.ui.require.toUrl(
+                    "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
+                );
+
+                var oLink = document.createElement("a");
+                oLink.href = sPdfUrl;
+                oLink.download = "TermsAndConditions.pdf";
+
+                document.body.appendChild(oLink);
+                oLink.click();
+                document.body.removeChild(oLink);
+            },
+
+            onTermsDialogClose: function () {
+                this.byId("termsDialog").close();
+            },
+
+        
+onUsermanualPress: function () {
+    this.getOwnerComponent()
+        .getRouter()
+        .navTo("RouteUserManual");
+},
 
         // for 3dot on mobile device footer menu
       onFooterMenuPress: function (oEvent) {
@@ -5623,6 +5492,11 @@ sap.ui.define([
         this._oFooterMenu = new sap.m.Menu({
             items: [
 
+                new sap.m.MenuItem({
+                    text: "User Manual",
+                    icon: "sap-icon://visits",
+                    press: this.onUsermanualPress.bind(this)
+                }),
                 new sap.m.MenuItem({
                     text: "Terms and Conditions",
                     icon: "sap-icon://document-text",
@@ -5642,6 +5516,7 @@ sap.ui.define([
     }
 
     this._oFooterMenu.openBy(oEvent.getSource());
-}
+},
+ 
     });
 });
