@@ -7,7 +7,8 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator) {
+    "sap/ui/core/Fragment"
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
@@ -5587,6 +5588,60 @@ sap.ui.define([
                 EncodedCustomerID: "R09MS0s0XzIwMjYvMjctMDEx",
                 MemberID: "MDAwMDM="
             });
-        }
+        },
+        
+ onPrivacyPolicyPress: function (oEvent) {
+            var oView = this.getView();
+
+            if (!this._pTermsDialog) {
+                this._pTermsDialog = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.ui.com.project1.fragment.TermsandCondition",
+                    controller: this
+                }).then(function (oDialog) {
+                    oView.addDependent(oDialog);
+                    return oDialog;
+                });
+            }
+
+            this._pTermsDialog.then(function (oDialog) {
+                oDialog.open();
+            });
+        },
+        onTermsDialogClose: function () {
+            this._pTermsDialog.then(function (oDialog) {
+                oDialog.close();
+            });
+        },
+
+
+        // for 3dot on mobile device footer menu
+      onFooterMenuPress: function (oEvent) {
+
+    if (!this._oFooterMenu) {
+
+        this._oFooterMenu = new sap.m.Menu({
+            items: [
+
+                new sap.m.MenuItem({
+                    text: "Terms and Conditions",
+                    icon: "sap-icon://document-text",
+                    press: this.onPrivacyPolicyPress.bind(this)
+                }),
+
+                new sap.m.MenuItem({
+                    text: "Vendor Registration",
+                    icon: "sap-icon://employee",
+                    press: this.onAdminSIGNUP.bind(this)
+                })
+
+            ]
+        });
+
+        this.getView().addDependent(this._oFooterMenu);
+    }
+
+    this._oFooterMenu.openBy(oEvent.getSource());
+}
     });
 });

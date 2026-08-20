@@ -7272,3 +7272,77 @@ text-transform: none !important;
 .Time.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX {
     width: 350px !important;
 }
+._link{
+  color: #fff !important;
+}
+.termsDialog .sapMDialogTitle,
+.termsDialog .sapMBar {
+    background-color: #354a5f;
+}
+.termsDialog .sapMTitle,
+.termsDialog .sapMBtnInner .sapMBtnIcon {
+    color: #ffffff;
+}
+.termsMuted {
+    color: #6a6d70;
+}
+.termsTitle {
+    color: #000 !important;
+}
+.termsTitle,
+.termsMuted {
+    white-space: normal !important;
+}
+
+/* Desktop */
+.mobileFooterMenu {
+    display: none !important;
+    color: #fff !important;
+}
+
+.desktopFooterItem {
+    display: inline-flex !important;
+}
+
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+
+    /* Hide Terms and Vendor from the actual footer */
+    .desktopFooterItem {
+        display: none !important;
+    }
+
+    /* Show only the 3-dot button */
+    .mobileFooterMenu {
+        display: inline-flex !important;
+        margin-left: 8px;
+    }
+
+    /* Keep developer text from pushing the menu out */
+    .footer-scroll-text {
+        min-width: 0 !important;
+        max-width: calc(100% - 45px) !important;
+        overflow: hidden !important;
+    }
+
+    .footer-marquee {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .footer-shell {
+        width: 100%;
+    }
+}
+/* .sapUiIcon::before {
+    content: attr(data-sap-ui-icon-content);
+    speak: none;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    color: white;
+} */
+ .mobileFooterMenu .sapMBtnIcon {
+    color: #ffffff !important;
+}
