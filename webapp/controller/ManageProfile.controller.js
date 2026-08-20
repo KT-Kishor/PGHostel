@@ -3933,6 +3933,7 @@ sap.ui.define([
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
                 CustomerName: oData.CustomerName,
+                CustomerEmail:this._oLoggedInUser.EmailID,
                 emailIds: emailIds,
                 BranchName: sBranchName
             };
