@@ -1712,7 +1712,7 @@ sap.ui.define([
                 }
             }
 
-            if (oCustomerData.minEndDate <= new Date(this._parseDate(oPayload.EndDate))) {
+            if (oCustomerData.minEndDate < new Date(this._parseDate(oPayload.EndDate))) {
                 sap.m.MessageToast.show(this.i18nModel.getText("facilityEndDateExceedsBookingEndDate"));
                 return;
             }
