@@ -465,6 +465,17 @@ sap.ui.define([
                 };
             }
             if ((Complaint.Status === "In Progress" || Complaint.Status === "Resolved") && this.flag === true) {
+                this.getBusyDialog()
+                    
+            var loginResponse = await this.ajaxReadWithJQuery("HM_StaffEmailIDs", {
+                BranchCode: Complaint.BranchCode
+            });
+
+            const ccemailIds = (loginResponse.data || [])
+                .map(item => item.EmailID?.trim())
+                .filter(Boolean)
+                .join(",");
+
                 var payload = {
                     ResolutionDate: ResolutionDate.split("/").reverse().join("-") || "",
                     Comment: Comments,
@@ -472,7 +483,10 @@ sap.ui.define([
                     ComplaintID: Complaint.ComplaintID,
                     ComplaintType: Complaint.ComplaintType,
                     CustomerName: Complaint.CustomerName,
-                    emailIds: Complaint.CustomerEmail
+                    emailIds: Complaint.CustomerEmail,
+                    RoomNo: Complaint.RoomNo,
+                    BranchName: Complaint.BranchName,
+                    ccmailids:ccemailIds
                 };
             }
             this.getBusyDialog()

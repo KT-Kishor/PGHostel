@@ -3934,7 +3934,8 @@ sap.ui.define([
                 CustomerName: oData.CustomerName,
                 CustomerEmail:this._oLoggedInUser.EmailID,
                 emailIds: emailIds,
-                BranchName: sBranchName
+                BranchName: sBranchName,
+                ccmailids :this._oLoggedInUser.EmailID
             };
 
             let payload;
@@ -3951,7 +3952,8 @@ sap.ui.define([
                         FileType: oData.FileType || "",
                         File: oData.FileContent || "",
                         emailIds: emailIds,
-                        BranchName: sBranchName
+                        BranchName: sBranchName,
+                        ccmailids :this._oLoggedInUser.EmailID
                     },
                     filters: {
                         ComplaintID: oData.ComplaintID

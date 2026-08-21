@@ -3912,6 +3912,7 @@ sap.ui.define([
             oModel.refresh(true);
         },
         onSaveBooking: async function () {
+            this.call = false
             this.continue=true
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
@@ -4095,7 +4096,7 @@ sap.ui.define([
 
             const invalidFacilities = [];
             const facilitiesNotFullBooking = [];
-            
+
 
             const bookingStartDate = this._parseDate(
                 Bookingdata.StartDate
@@ -4123,7 +4124,7 @@ sap.ui.define([
                 const endInvalid =
                     facilityEnd > bookingEndDate;
 
-                  
+
 
                 // Store only facilities having invalid dates
                 if (startInvalid || endInvalid) {
@@ -4134,19 +4135,19 @@ sap.ui.define([
                         endInvalid: endInvalid
                     });
                 }
-                   const startNotMatching =
-        facilityStart.getTime() !== bookingStartDate.getTime();
+                const startNotMatching =
+                    facilityStart.getTime() !== bookingStartDate.getTime();
 
-    const endNotMatching =
-        facilityEnd.getTime() !== bookingEndDate.getTime();
+                const endNotMatching =
+                    facilityEnd.getTime() !== bookingEndDate.getTime();
 
-    if (startNotMatching || endNotMatching) {
+                if (startNotMatching || endNotMatching) {
 
-        facilitiesNotFullBooking.push(item);
-    }
+                    facilitiesNotFullBooking.push(item);
+                }
             }
 
-         
+
 
             if (invalidFacilities.length > 0) {
 
@@ -4177,9 +4178,9 @@ sap.ui.define([
                                 return;
                             }
 
-                            let bookingStart =that._parseDate(Bookingdata.StartDate);
+                            let bookingStart = that._parseDate(Bookingdata.StartDate);
 
-                            let bookingEnd =that._parseDate(Bookingdata.EndDate );
+                            let bookingEnd = that._parseDate(Bookingdata.EndDate);
 
                             // Safety check
                             if (bookingEnd < bookingStart) {
@@ -4201,10 +4202,8 @@ sap.ui.define([
                                 facilityItems.filter(
                                     (item, index, self) => {
 
-                                        if (
-                                            item.UnitText?.toLowerCase() !==
-                                            "package price"
-                                        ) {
+                                        if (item.UnitText?.toLowerCase() !=="package price") 
+                                            {
                                             return true;
                                         }
 
@@ -4230,38 +4229,26 @@ sap.ui.define([
 
                                     const item = invalid.item;
 
-                                    /*
-                                     * Start date is invalid
-                                     * → change ONLY StartDate
-                                     */
-                                    if (invalid.startInvalid) {
 
-                                        item.StartDate =
-                                            Bookingdata.StartDate;
-                                    }
+                                    if (invalid.startInvalid) 
+                                        {
+                                            item.StartDate =Bookingdata.StartDate;
+                                        }
 
-                                    /*
-                                     * End date is invalid
-                                     * → change ONLY EndDate
-                                     */
+
                                     if (invalid.endInvalid) {
 
-                                        item.EndDate =
-                                            Bookingdata.EndDate;
+                                        item.EndDate = Bookingdata.EndDate;
+                                    }
+                                    if(item.UnitText==="Per Month" || item.UnitText==="Per Year" || item.FacilityChargeType==="Entire Booking"){
+                                        item.EndDate = Bookingdata.EndDate;
+                                        item.StartDate =Bookingdata.StartDate;
                                     }
                                 }
                             );
 
-                            /*
-                             * Recalculate only facilities that
-                             * originally had invalid dates.
-                             */
-                            const invalidItems =
-                                new Set(
-                                    invalidFacilities.map(
-                                        x => x.item
-                                    )
-                                );
+
+                            const invalidItems =new Set(invalidFacilities.map(  x => x.item));
 
                             facilityItems.forEach(item => {
 
@@ -4270,23 +4257,15 @@ sap.ui.define([
                                     return;
                                 }
 
-                                const facilityStart =
-                                    that._parseDate(
-                                        item.StartDate
-                                    );
+                                const facilityStart =that._parseDate(item.StartDate);
 
-                                const facilityEnd =
-                                    that._parseDate(
-                                        item.EndDate
-                                    );
+                                const facilityEnd =that._parseDate(item.EndDate);
 
                                 /*
                                  * Calculate duration based on
                                  * THIS facility's corrected dates.
                                  */
-                                const diffTime =
-                                    facilityEnd -
-                                    facilityStart;
+                                const diffTime =facilityEnd -facilityStart;
 
                                 const diffDays =
                                     Math.max(
@@ -4299,16 +4278,13 @@ sap.ui.define([
 
                                 let oSelectedFacility =
                                     aFacilities.find(
-                                        f =>
-                                            f.FacilityName ===
-                                            item.FacilityName
+                                     f =>
+                                            f.FacilityName ===  item.FacilityName
                                     );
 
-                                let unit =
-                                    item.UnitText?.toLowerCase();
+                                let unit = item.UnitText?.toLowerCase();
 
-                                let price =
-                                    Number(item.Price || 0);
+                                let price =Number(item.Price || 0);
 
                                 let total = 0;
 
@@ -4812,12 +4788,12 @@ sap.ui.define([
 
                             that.call = false;
 
-                            that.onSaveBooking();
+                            that.onSaveBooking1();
 
                         } else {
 
                             that.call = true;
-                            that.onSaveBooking();
+                            that.onSaveBooking1();
                         }
                     }
                 }
@@ -4826,43 +4802,39 @@ sap.ui.define([
                 return;
             }
 
-         if (facilitiesNotFullBooking.length > 0 && this.continue===true) {
+            if (facilitiesNotFullBooking.length > 0 && this.continue === true) {
 
-            var that=this
+                var that = this
 
-    const facilityNames = facilitiesNotFullBooking
-        .map(item => item.FacilityName || item.Name || "Facility")
-        .join(", ");
+                const facilityNames = facilitiesNotFullBooking
+                    .map(item => item.FacilityName || item.Name || "Facility")
+                    .join(", ");
 
-    sap.m.MessageBox.information(
-        `These facilities are not full on the booking dates:\n\n${facilityNames}\n\nDo you want to continue?`,
-        {
-            actions: [
-                "Continue",
-                sap.m.MessageBox.Action.CANCEL
-            ],
+                sap.m.MessageBox.information(
+                    `These facilities are not full on the booking dates:\n\n${facilityNames}`,
+                    {
+                        actions: [
+                            "OK"
+                        ],
 
-            emphasizedAction: "Continue",
-            styleClass: "myUnifiedBtn",
-            onClose: function (oAction) {
+                        emphasizedAction: "Continue",
+                        styleClass: "myUnifiedBtn",
+                        onClose: function (oAction) {
 
-                if (oAction === "Continue") {
-                    // Continue your remaining code here
-                    that.continue=false
-                    that.onSaveBooking1();
+                            if (oAction === "OK") {
+                                // Continue your remaining code here
+                                that.continue = false
+                                that.onSaveBooking1();
 
 
-                } else if (oAction === sap.m.MessageBox.Action.CANCEL) {
-                    // Stop here
-                    return;
-                }
+                            }
+                        }
+                    }
+                );
+
+                return;
             }
-        }
-    );
 
-    return;
-}
-           
 
             var aDraftData = this.getView().getModel("DraftModel") ? this.getView().getModel("DraftModel").getData() : "";
 
@@ -4984,7 +4956,7 @@ sap.ui.define([
             };
 
 
-    
+
             this.MemberID = SelectedmemberIds
 
 
@@ -8270,7 +8242,7 @@ sap.ui.define([
             const sCustCompanyAddress = String(data.CustCompanyAddress || "").trim();
             const sPrimaryOccupantName = String(primaryMember ? primaryMember.MemberName : otherMembers[0].MemberName || "").trim();
             const bShowCustomerGST = !!sCustGSTIN;
-            
+
             const sBranchGSTIN = String(company.GSTIN || "").trim();
             const iLeftWidth = bShowCustomerGST ? 80 : 130;
             const iRightX = 110;

@@ -1,216 +1,85 @@
-<mvc:View
-    controllerName="sap.ui.com.project1.controller.Complaint_Details"
+<mvc:View controllerName="sap.ui.com.project1.controller.Complaint_Details"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:m="sap.m"
     xmlns:c="sap.ui.core"
     xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core"
-    displayBlock="true"
-    height="100%"
-    busyIndicatorDelay="0"
->
+    xmlns:core="sap.ui.core" displayBlock="true" height="100%" busyIndicatorDelay="0">
     <Page showHeader="true">
         <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
+            <core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML" />
         </headerContent>
         <content>
-            <fb:FilterBar
-                id="CD_id_Filterbar"
-                persistencyKey="myPersKey"
-                useToolbar="false"
-                clear="CD_onPressClear"
-                showClearOnFB="true"
-                search="CD_Search"
-                filterChange="IA_.onFilterChange"
-                afterVariantLoad="IA_.onAfterVariantLoad"
-                showFilterConfiguration="false"
-                filterContainerWidth="auto"
-                class="filterBarTheme"
-            >
-            
+            <fb:FilterBar id="CD_id_Filterbar" persistencyKey="myPersKey" useToolbar="false" clear="CD_onPressClear" showClearOnFB="true" search="CD_Search" filterChange="IA_.onFilterChange" afterVariantLoad="IA_.onAfterVariantLoad" showFilterConfiguration="false" filterContainerWidth="auto" class="filterBarTheme">
+
                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="Room No"
-                        label="{i18n>roomNo}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
+                    <fb:FilterGroupItem name="Room No" label="{i18n>roomNo}" groupName="Group" visibleInFilterBar="true">
                         <fb:control>
-                            <ComboBox
-                                id="PCD_id_RoomNo"
-                                items="{ComplaintModel>/}"
-                                showClearIcon="true"
-                                showSecondaryValues="true"
-                            >
-                                <core:ListItem
-                                    key="{ComplaintModel>RoomNo}"
-                                    text="{ComplaintModel>RoomNo}"
-                                />
+                            <ComboBox id="PCD_id_RoomNo" items="{ComplaintModel>/}" showClearIcon="true" showSecondaryValues="true">
+                                <core:ListItem key="{ComplaintModel>RoomNo}" text="{ComplaintModel>RoomNo}" />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
 
                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem
-                        name="Status"
-                        label="{i18n>status}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
+                    <fb:FilterGroupItem name="Status" label="{i18n>status}" groupName="Group" visibleInFilterBar="true">
                         <fb:control>
-                            <ComboBox
-                                id="CD_id_Status"
-                                items="{ComplaintModel>/}"
-                                showClearIcon="true"
-                                showSecondaryValues="true"
-                            >
-                                <core:ListItem
-                                    key="{ComplaintModel>Status}"
-                                    text="{ComplaintModel>Status}"
-                                />
+                            <ComboBox id="CD_id_Status" items="{ComplaintModel>/}" showClearIcon="true" showSecondaryValues="true">
+                                <core:ListItem key="{ComplaintModel>Status}" text="{ComplaintModel>Status}" />
                             </ComboBox>
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>
             </fb:FilterBar>
-            <Table
-                id="idPOTable1"
-                sticky="ColumnHeaders,HeaderToolbar"
-                mode="SingleSelectLeft"
-                width="auto"
-                busyIndicatorDelay="0"
-                updateFinished="onTableUpdateFinished"
-                items="{path: 'ComplaintModel>/',  sorter: [{
+            <Table id="idPOTable1" sticky="ColumnHeaders,HeaderToolbar" mode="SingleSelectLeft" width="auto" busyIndicatorDelay="0" updateFinished="onTableUpdateFinished" items="{path: 'ComplaintModel>/',  sorter: [{
                     path: 'BranchName', group: true },
 					    { path: 'BookingDate', descending: true },
-						 { path: 'CustomerID', descending: true }],groupHeaderFactory: '.getGroupHeader'}"
-            >
+						 { path: 'CustomerID', descending: true }],groupHeaderFactory: '.getGroupHeader'}">
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title
-                            text="{i18n>Complaints}({= ${ComplaintModel>/}.length})"
-                        />
+                        <Title text="{i18n>Complaints}({= ${ComplaintModel>/}.length})" />
                         <ToolbarSpacer />
-                        <Button
-                            text="{i18n>assignComplain}"
-                            tooltip="{i18n>assignComplain}"
-                            press="CD_Assign"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>resolved}"
-                            tooltip="{i18n>resolve}"
-                            press="CD_resolve"
-                            class="myUnifiedBtn"
-                        />
-                          <Button
-                            text="{i18n>Dashboard}"
-                            tooltip="{i18n>Dashboard}"
-                            press="CD_Dashboard"
-                            class="myUnifiedBtn"
-                        />
-                        <Button
-                            text="{i18n>download}"
-                            icon="sap-icon://excel-attachment"
-                            tooltip="{i18n>downloadAdminData}"
-                            press="CD_onDownload"
-                            class="myUnifiedBtn"
-                        />
+                        <Button text="{i18n>assignComplain}" tooltip="{i18n>assignComplain}" press="CD_Assign" class="myUnifiedBtn" />
+                        <Button text="{i18n>resolved}" tooltip="{i18n>resolve}" press="CD_resolve" class="myUnifiedBtn" />
+                        <Button text="{i18n>Dashboard}" tooltip="{i18n>Dashboard}" press="CD_Dashboard" class="myUnifiedBtn" />
+                        <Button text="{i18n>download}" icon="sap-icon://excel-attachment" tooltip="{i18n>downloadAdminData}" press="CD_onDownload" class="myUnifiedBtn" />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
                     <Column demandPopin="true">
-                        <Text
-                            text="{i18n>Studentname}"
-                            tooltip="{i18n>Studentname}"
-                        />
+                        <Text text="{i18n>Studentname}" tooltip="{i18n>Studentname}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>ComplaintType}"
-                            tooltip="{i18n>ComplaintType}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>ComplaintType}" tooltip="{i18n>ComplaintType}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>Description}"
-                            tooltip="{i18n>Description}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>Description}" tooltip="{i18n>Description}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>ComplaintRaisedDate}"
-                            tooltip="{i18n>ComplaintRaisedDate}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>ComplaintRaisedDate}" tooltip="{i18n>ComplaintRaisedDate}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>RoomNo}"
-                            tooltip="{i18n>RoomNo}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>RoomNo}" tooltip="{i18n>RoomNo}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>estimatedate}"
-                            tooltip="{i18n>estimatedate}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>estimatedate}" tooltip="{i18n>estimatedate}" />
                     </Column>
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>Status}"
-                            tooltip="{i18n>Status}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>Status}" tooltip="{i18n>Status}" />
                     </Column>
 
-                    <Column
-                        demandPopin="true"
-                        minScreenWidth="Tablet"
-                    >
-                        <Text
-                            text="{i18n>AssignedBy}"
-                            tooltip="{i18n>AssignedBy}"
-                        />
+                    <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Text text="{i18n>AssignedBy}" tooltip="{i18n>AssignedBy}" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text
-                            text="{i18n>ResolutionDate}"
-                            tooltip="{i18n>ResolutionDate}"
-                        />
+                        <Text text="{i18n>ResolutionDate}" tooltip="{i18n>ResolutionDate}" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text
-                            text="{i18n>Image}"
-                            tooltip="{i18n>Image}"
-                        />
+                        <Text text="{i18n>Image}" tooltip="{i18n>Image}" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text
-                            text="{i18n>comments}"
-                            tooltip="{i18n>comments}"
-                        />
+                        <Text text="{i18n>comments}" tooltip="{i18n>comments}" />
                     </Column>
                 </columns>
                 <items>
@@ -218,58 +87,34 @@
                         <cells>
                             <!-- <Text text="{ComplaintModel>RaisedBy}" /> -->
                             <VBox>
-								<Text
-                                    text="{ComplaintModel>CustomerName}"
-                                    class="sapUiTinyMarginBottom"
-                                />
-								<Text text="{ComplaintModel>BookingID}" />
-							</VBox>
+                                <Text text="{ComplaintModel>CustomerName}" class="sapUiTinyMarginBottom" />
+                                <Text text="{ComplaintModel>BookingID}" />
+                            </VBox>
                             <Text text="{ComplaintModel>ComplaintType}" />
-                            <ExpandableText
-                                maxCharacters="20"
-                                text="{ComplaintModel>Description}"
-                            />
-                            <Text
-                                text="{path:'ComplaintModel>ComplaintRaisedDate',formatter: '.Formatter.formatDate'}"
-                            />
+                            <ExpandableText maxCharacters="20" text="{ComplaintModel>Description}" />
+                            <Text text="{path:'ComplaintModel>ComplaintRaisedDate',formatter: '.Formatter.formatDate'}" />
                             <Text text="{ComplaintModel>RoomNo}" />
 
-                            <Text
-                                text="{= ${ComplaintModel>EstimatDate} === '1899-11-30T00:00:00.000Z'  ? '' : ${
+                            <Text text="{= ${ComplaintModel>EstimatDate} === '1899-11-30T00:00:00.000Z'  ? '' : ${
                                 path: 'ComplaintModel>EstimatDate',
                                 formatter: '.Formatter.formatDate'
-                            }}"
-                            />
+                            }}" />
 
-                            <ObjectStatus
-                                inverted="false"
-                                text="{ComplaintModel>Status}"
-                                state="{ path: 'ComplaintModel>Status', formatter: '.Formatter.formatObjectStatus'}"
-                            />
+                            <ObjectStatus inverted="false" text="{ComplaintModel>Status}" state="{ path: 'ComplaintModel>Status', formatter: '.Formatter.formatObjectStatus'}" />
                             <Text text="{ComplaintModel>AssignedBy}" />
-                             <Text
-                                text="{= ${ComplaintModel>ResolutionDate} === '1899-11-30T00:00:00.000Z' || ${ComplaintModel>ResolutionDate} === null ? '' : ${
-                                path: 'ComplaintModel>ResolutionDate',
-                                formatter: '.Formatter.formatDate'
-                            }}"
-                            />
-                            <Link
-                                text="{i18n>view}"
-                                press="CD_viewimage"
-                            />
-                             <ExpandableText
-                                text="{ComplaintModel>Comment}"
-                            />
+                            <Text text="{= !${ComplaintModel>ResolutionDate}
+                                      || ${ComplaintModel>ResolutionDate}.toString().startsWith('1899-11-30')
+                                          ? ''
+                                     : ${path: 'ComplaintModel>ResolutionDate', formatter: '.Formatter.formatDate'}}" />
+                            <Link text="{i18n>view}" press="CD_viewimage" />
+                            <ExpandableText text="{ComplaintModel>Comment}" />
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </content>
         <footer>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.AppFooter"
-                type="XML"
-            />
+            <core:Fragment fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML" />
         </footer>
     </Page>
 </mvc:View>

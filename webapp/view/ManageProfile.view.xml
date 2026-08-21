@@ -140,8 +140,11 @@
                             text="{i18n>fullname}"
                             required="{profileData>/isEditMode}"
                         />
-                      
-                        <Select selectedKey="{profileData>/Salutation}" change="onChangeSalutation">
+
+                        <Select
+                            selectedKey="{profileData>/Salutation}"
+                            change="onChangeSalutation"
+                        >
                             <core:Item
                                 key="Mr."
                                 text="Mr."
@@ -154,15 +157,14 @@
                                 key="Mrs."
                                 text="Mrs."
                             />
-                              <core:Item
+                            <core:Item
                                 key="Dr."
                                 text="Dr."
                             />
-                              <core:Item
+                            <core:Item
                                 key="Other."
                                 text="Other."
                             />
-                            
                         </Select>
 
                         <Input
@@ -441,13 +443,22 @@
                 <Column demandPopin="true">
                     <Text text="{i18n>customerName}" />
                 </Column>
-                <Column demandPopin="true" minScreenWidth="Tablet">
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
                     <Text text="{i18n>room}" />
                 </Column>
-                 <Column demandPopin="true" minScreenWidth="Tablet">
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
                     <Text text="{i18n>amount}" />
                 </Column>
-                 <Column demandPopin="true" minScreenWidth="Tablet">
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
                     <Text text="{i18n>status}" />
                 </Column>
             </columns>
@@ -460,10 +471,16 @@
                         <Text text="{profileData>BookingDate}" />
                         <Text text="{profileData>BookingID}" />
                         <Text text="{profileData>customerName}" />
-                       <Text text="{= ${profileData>room} + (${profileData>RoomNo} ? ' (' + ${profileData>RoomNo} + ')' : '') }" />
-                        <Text text="{path:'profileData>amount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"/>
-                        <ObjectStatus text="{profileData>status}"
-                         state="{ path:'profileData>status', formatter:'.Formatter.formatObjectStatus'}"/>
+                        <Text
+                            text="{= ${profileData>room} + (${profileData>RoomNo} ? ' (' + ${profileData>RoomNo} + ')' : '') }"
+                        />
+                        <Text
+                            text="{path:'profileData>amount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"
+                        />
+                        <ObjectStatus
+                            text="{profileData>status}"
+                            state="{ path:'profileData>status', formatter:'.Formatter.formatObjectStatus'}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>
@@ -526,9 +543,7 @@
                             press="onEditMemberFromDialog"
                             class="myUnifiedBtn"
                         />
-                        <!--  <ObjectStatus
-                            text="{profileData>status}"
-                            state="{ path:'profileData>status',
+                        <!--  <ObjectStatus text="{profileData>status}" state="{ path:'profileData>status',
                                      formatter:'.Formatter.formatObjectStatus'}"/> -->
                     </cells>
                 </ColumnListItem>
@@ -696,9 +711,12 @@
                         <Text
                             text="{path:'profileData>ComplaintRaisedDate', formatter:'.Formatter.formatDate'}"
                         />
+
                         <Text
-                            text="{= ${profileData>ExpectedResolvedDate} === '1899-11-30T00:00:00.000Z' || ${profileData>ExpectedResolvedDate} === null ? '' : ${path: 'profileData>ExpectedResolvedDate', 
-                        formatter: '.Formatter.formatDate'}}"
+                            text="{= !${profileData>ExpectedResolvedDate}
+        || ${profileData>ExpectedResolvedDate}.toString().startsWith('1899-11-30')
+        ? ''
+        : ${path: 'profileData>ExpectedResolvedDate', formatter: '.Formatter.formatDate'}}"
                         />
                         <Text text="{profileData>AssignedTo}" />
                         <Button
@@ -791,23 +809,29 @@
                 </ColumnListItem>
             </items>
         </Table>
-         <footer>
+        <footer>
             <Bar>
                 <contentLeft>
-                    <FlexBox class="profile-footer-scroll-text" alignItems="Center">
+                    <FlexBox
+                        class="profile-footer-scroll-text"
+                        alignItems="Center"
+                    >
                         <items>
-                            <FlexBox class="profile-footer-marquee" alignItems="Center">
-                    <Image
-                        src="../image/TransparentKTlogo.png"
-                        width="30px"
-                        height="30px"
-                    />
-                    <Link
-                        text="{i18n>devlopby}"
-                        href="https://kalpavrikshatechnologies.com/"
-                        target="_blank"
-                        class="customLinkWhiteBg"
-                    />
+                            <FlexBox
+                                class="profile-footer-marquee"
+                                alignItems="Center"
+                            >
+                                <Image
+                                    src="../image/TransparentKTlogo.png"
+                                    width="30px"
+                                    height="30px"
+                                />
+                                <Link
+                                    text="{i18n>devlopby}"
+                                    href="https://kalpavrikshatechnologies.com/"
+                                    target="_blank"
+                                    class="customLinkWhiteBg"
+                                />
                             </FlexBox>
                         </items>
                     </FlexBox>
