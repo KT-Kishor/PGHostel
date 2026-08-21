@@ -1820,8 +1820,10 @@ sap.ui.define([
             var oCb = this.byId("AB_id_EC_Email");
             if (!oCb || !oCb.setFilterFunction) return;
             oCb.setFilterFunction(function (sTerm, oItem) {
-                return String(oItem.getText() || "").toLowerCase()
-                    .indexOf(String(sTerm || "").toLowerCase()) !== -1;
+                var sNeedle = String(sTerm || "").toLowerCase();
+                var sEmail = String(oItem.getText() || "").toLowerCase();
+                var sName = String(oItem.getAdditionalText() || "").toLowerCase();
+                return sEmail.indexOf(sNeedle) !== -1 || sName.indexOf(sNeedle) !== -1;
             });
         },
 

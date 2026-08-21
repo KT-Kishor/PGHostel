@@ -43,7 +43,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls autoplay muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/Workzone.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -94,7 +94,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls autoplay muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/Shah%20H.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/ResetPassword.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -145,7 +145,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls autoplay muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/Kvriksha%20Customer.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Booking.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -195,7 +195,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls autoplay muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/Kvriksha%20ManageBooking.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/EditBooking.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
