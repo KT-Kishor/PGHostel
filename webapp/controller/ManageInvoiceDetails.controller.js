@@ -4934,7 +4934,7 @@ sap.ui.define([
                 let effectiveEnd = eDate;
                 let facilityAmount = 0;
 
-                if (bookingUnit !== "per day") {
+                // if (bookingUnit !== "per day") {
 
                     const overlaps =
                         !(eDate < cycleStart || sDate > cycleEnd);
@@ -4948,16 +4948,16 @@ sap.ui.define([
 
                     effectiveEnd =
                         eDate < cycleEnd ? eDate : cycleEnd;
-                }
+                // }
 
                 const calcStart =
                     bookingUnit === "per day"
-                        ? sDate
+                        ? effectiveStart
                         : effectiveStart;
 
                 const calcEnd =
                     bookingUnit === "per day"
-                        ? eDate
+                        ? effectiveEnd
                         : effectiveEnd;
 
                 const usedDays =
