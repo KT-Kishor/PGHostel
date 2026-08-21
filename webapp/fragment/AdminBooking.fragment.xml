@@ -287,12 +287,16 @@
 				<ComboBox
 					id="AB_id_EC_Email"
 					placeholder="{i18n>adminBookingECEmailPlaceholder}"
+					showSecondaryValues="true"
 					items="{AdminBookingModel>/ECSuggestions}"
 					selectedKey="{AdminBookingModel>/EC/EmailID}"
 					selectionChange="onAdminBookingECSelectionChange"
 					change="onAdminBookingECEmailChange"
 					valueStateText="{i18n>MSenterValidEmail}">
-					<c:ListItem key="{AdminBookingModel>EmailID}" text="{AdminBookingModel>EmailID}"/>
+					<c:ListItem
+						key="{AdminBookingModel>EmailID}"
+						text="{AdminBookingModel>EmailID}"
+						additionalText="{AdminBookingModel>UserName}"/>
 				</ComboBox>
 
 				<!-- Read-only details of the selected existing customer -->

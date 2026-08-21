@@ -1805,7 +1805,11 @@ sap.ui.define([
         _buildAdminBookingECSuggestions: function () {
             var aCustomers = this.getView().getModel("AdminBookingModel").getProperty("/ECAllCustomers") || [];
             return aCustomers.map(function (oRow) {
-                return { EmailID: oRow.EmailID, UserID: oRow.UserID || "" };
+                return {
+                    EmailID: oRow.EmailID,
+                    UserID: oRow.UserID || "",
+                    UserName: oRow.UserName || ""
+                };
             });
         },
 
