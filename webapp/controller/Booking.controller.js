@@ -6859,10 +6859,10 @@
                 delete oPayloadData.data[0].Deposit;
 
                 const oHostelData = oHostelModel.getData();
-                oPayloadData.data[0].Area = oHostelData.Area || "";
-                oPayloadData.data[0].PropertySTD = oHostelData.PropertySTD || "";
-                oPayloadData.data[0].PropertyMobileNo = oHostelData.PropertyMobileNo || "";
-                oPayloadData.data[0].PropertyEmail = oHostelData.PropertyEmail || "";
+                oPayloadData.data[0].Area = oHostelData.Area || this.Branchdata.Name;
+                oPayloadData.data[0].PropertySTD = oHostelData.PropertySTD || this.Branchdata.STD;
+                oPayloadData.data[0].PropertyMobileNo = oHostelData.PropertyMobileNo || this.Branchdata.Contact;
+                oPayloadData.data[0].PropertyEmail = oHostelData.PropertyEmail || this.Branchdata.EmailID;
                 const oPayload = {
                     data: oPayloadData.data,
                     pdfAttachment: {
@@ -6958,6 +6958,8 @@
             let filter = { BranchID: [booking.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter,);
             const company = oCompanyDetailsModel.data[0] || {};
+            this.Branchdata = oCompanyDetailsModel.data[0] || {};
+
             const checkinTime = company.CheckinTime || "11:00 AM";
             const checkoutTime = company.CheckoutTime || "10:00 PM";
 
