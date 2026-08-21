@@ -3913,7 +3913,7 @@ sap.ui.define([
         },
         onSaveBooking: async function () {
             this.call = false
-            this.continue=true
+            this.continue = true
             const oModel = this.getView().getModel("CustomerData");
             const CustomerData = oModel.getData();
 
@@ -4202,8 +4202,7 @@ sap.ui.define([
                                 facilityItems.filter(
                                     (item, index, self) => {
 
-                                        if (item.UnitText?.toLowerCase() !=="package price") 
-                                            {
+                                        if (item.UnitText?.toLowerCase() !== "package price") {
                                             return true;
                                         }
 
@@ -4230,25 +4229,24 @@ sap.ui.define([
                                     const item = invalid.item;
 
 
-                                    if (invalid.startInvalid) 
-                                        {
-                                            item.StartDate =Bookingdata.StartDate;
-                                        }
+                                    if (invalid.startInvalid) {
+                                        item.StartDate = Bookingdata.StartDate;
+                                    }
 
 
                                     if (invalid.endInvalid) {
 
                                         item.EndDate = Bookingdata.EndDate;
                                     }
-                                    if(item.UnitText==="Per Month" || item.UnitText==="Per Year" || item.FacilityChargeType==="Entire Booking"){
+                                    if (item.UnitText === "Per Month" || item.UnitText === "Per Year" || item.FacilityChargeType === "Entire Booking") {
                                         item.EndDate = Bookingdata.EndDate;
-                                        item.StartDate =Bookingdata.StartDate;
+                                        item.StartDate = Bookingdata.StartDate;
                                     }
                                 }
                             );
 
 
-                            const invalidItems =new Set(invalidFacilities.map(  x => x.item));
+                            const invalidItems = new Set(invalidFacilities.map(x => x.item));
 
                             facilityItems.forEach(item => {
 
@@ -4257,15 +4255,15 @@ sap.ui.define([
                                     return;
                                 }
 
-                                const facilityStart =that._parseDate(item.StartDate);
+                                const facilityStart = that._parseDate(item.StartDate);
 
-                                const facilityEnd =that._parseDate(item.EndDate);
+                                const facilityEnd = that._parseDate(item.EndDate);
 
                                 /*
                                  * Calculate duration based on
                                  * THIS facility's corrected dates.
                                  */
-                                const diffTime =facilityEnd -facilityStart;
+                                const diffTime = facilityEnd - facilityStart;
 
                                 const diffDays =
                                     Math.max(
@@ -4278,13 +4276,13 @@ sap.ui.define([
 
                                 let oSelectedFacility =
                                     aFacilities.find(
-                                     f =>
-                                            f.FacilityName ===  item.FacilityName
+                                        f =>
+                                            f.FacilityName === item.FacilityName
                                     );
 
                                 let unit = item.UnitText?.toLowerCase();
 
-                                let price =Number(item.Price || 0);
+                                let price = Number(item.Price || 0);
 
                                 let total = 0;
 
@@ -4806,12 +4804,17 @@ sap.ui.define([
 
                 var that = this
 
-                const facilityNames = facilitiesNotFullBooking
-                    .map(item => item.FacilityName || item.Name || "Facility")
-                    .join(", ");
+
+                const facilityNames = [
+                    ...new Set(
+                        facilitiesNotFullBooking
+                            .map(item => item.FacilityName || item.Name || "Facility")
+                            .filter(Boolean)
+                    )
+                ].join(", ");
 
                 sap.m.MessageBox.information(
-                    `These facilities are not full on the booking dates:\n\n${facilityNames}`,
+                    `These facilities are not available for all days of the booking period:\n\n${facilityNames}`,
                     {
                         actions: [
                             "OK"

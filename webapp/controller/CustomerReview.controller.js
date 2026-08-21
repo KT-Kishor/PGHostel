@@ -116,7 +116,7 @@ sap.ui.define([
 
             const dFrom = oDRS.getDateValue();
             const dTo = oDRS.getSecondDateValue();
-            const sRating = oRatingCB.getSelectedKey();
+            const sRating = oRatingCB.getSelectedKeys();
             const sSortKey = oSortCB.getSelectedKey();
 
             var filters = {};
@@ -297,7 +297,7 @@ sap.ui.define([
         },
 
         CR_onPressClear: function () {
-            this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_Rating").setSelectedKeys("");
             this.byId("CR_id_Branch").setSelectedKey("");
             this.byId("CR_id_Branch").setValue("");
             this.byId("CR_id_BranchCode").setDateValue(null);
@@ -309,7 +309,7 @@ sap.ui.define([
 
         _resetFiltersOnEntry: function () {
             const oFilterBar = this.byId("CR_id_Filterbar");
-            this.byId("CR_id_Rating").setSelectedKey("");
+            this.byId("CR_id_Rating").setSelectedKeys("");
             this.byId("CR_id_Branch").setSelectedKey("");
             this.byId("CR_id_Sort").setSelectedKey("");
 

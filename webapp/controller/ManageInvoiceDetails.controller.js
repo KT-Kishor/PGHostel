@@ -1947,6 +1947,7 @@ sap.ui.define([
                         .getProperty("/ManageInvoiceItem") || [];
 
                     const bIsValid =
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_Custmer"), "ID") &&
                         utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         this.mobileNo &&
@@ -4601,7 +4602,7 @@ sap.ui.define([
                         if (oModelData.Status === "Submitted") {
                             MessageToast.show("Invoice items are refreshed");
                             this.onChangeInvoiceStatus("Submitted");
-                        } else {
+                        } else if(balanceAmount > 0){
                             MessageToast.show("New line items added. Opening payment screen...");
                             this.onChangeInvoiceStatus("Payment Partially");
 

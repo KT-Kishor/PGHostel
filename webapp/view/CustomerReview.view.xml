@@ -83,7 +83,7 @@
                             visibleInFilterBar="true"
                         >
                             <fb:control>
-                                <ComboBox
+                                <MultiComboBox
                                     id="CR_id_Rating"
                                     showClearIcon="true"
                                 >
@@ -107,7 +107,7 @@
                                         key="5"
                                         text="5 Stars"
                                     />
-                                </ComboBox>
+                                </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
                     </fb:filterGroupItems>

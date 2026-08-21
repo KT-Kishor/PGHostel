@@ -134,6 +134,10 @@
                                             id="CID_id_Custmer"
                                             value="{SelectedCustomerModel>/CustomerName}"
                                             editable="{visiablityPlay>/editable}"
+                                            valueStateText="Enter the name"
+                                            liveChange="CID_ValidateCommonFields"
+                                            maxLength="60"
+
                                         />
                                         <m:Label
                                             visible="{visiablityPlay>/editVisi}"
