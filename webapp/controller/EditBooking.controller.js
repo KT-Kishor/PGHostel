@@ -1753,19 +1753,22 @@ sap.ui.define([
                 var sFacilityId = "";
                 var sMemberId = String(oRow.MemberID || "").trim();
                 var sMemberName = String(oRow.MemberName || "").trim();
+                var sSalutation = String(oRow.Salutation || "").trim();
 
                 if (iRawIndex >= 0) {
                     aUsedIndexes.push(iRawIndex);
                     sFacilityId = String(aRawItems[iRawIndex].FacilityID || aRawItems[iRawIndex].ID || "").trim();
                     sMemberId = sMemberId || String(aRawItems[iRawIndex].MemberID || "").trim();
                     sMemberName = sMemberName || String(aRawItems[iRawIndex].MemberName || aRawItems[iRawIndex].PersonName || "").trim();
+                    sSalutation = sSalutation || String(aRawItems[iRawIndex].Salutation || "").trim();
                 }
 
                 return Object.assign({}, oRow, {
                     BookingID: sBookingID,
                     FacilityID: sFacilityId,
                     MemberID: sMemberId,
-                    MemberName: sMemberName
+                    MemberName: sMemberName,
+                    Salutation: sSalutation
                 });
             }.bind(this));
         },

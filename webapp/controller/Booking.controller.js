@@ -6502,17 +6502,23 @@
         _getFacilityMemberIdentity: function (sPersonId, sFallbackName) {
             const oHostelModel = this.getView().getModel("HostelModel");
             const oMember = this._getFacilityMemberRecord(sPersonId);
+            const aFamilyMembers = this.getView().getModel("BookingView").getProperty("/FamilyMembers") || [];
 
             if (sPersonId === "SELF") {
+                const oSelfMember = aFamilyMembers.find(function (oFamilyMember) {
+                    return oFamilyMember && (oFamilyMember.id === "SELF" || oFamilyMember.Relation === "Self");
+                });
                 return {
                     MemberID: String(oHostelModel.getProperty("/UserID") || "").trim(),
-                    MemberName: String(oHostelModel.getProperty("/FullName") || sFallbackName || "Primary Guest").trim()
+                    MemberName: String(oSelfMember && oSelfMember.Name || oHostelModel.getProperty("/FullName") || sFallbackName || "Primary Guest").trim(),
+                    Salutation: String(oSelfMember && oSelfMember.Salutation || "").trim()
                 };
             }
 
             return {
                 MemberID: String(oMember && oMember.MemberID || "").trim(),
-                MemberName: String(oMember && oMember.Name || sFallbackName || "").trim()
+                MemberName: String(oMember && oMember.Name || sFallbackName || "").trim(),
+                Salutation: String(oMember && oMember.Salutation || "").trim()
             };
         },
 
@@ -6552,6 +6558,7 @@
                     // CustomerID: sCustomerID,
                     MemberID: "",
                     MemberName: "",
+                    Salutation: "",
                     SelectionMode: oFacility.SelectionMode || "",
                     FacilityChargeType: sChargeType,
                     Quantity: "",
@@ -6570,6 +6577,7 @@
 
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
+                    oRow.Salutation = oIdentity.Salutation;
                     oRow.FacilitiPrice = (fUnitPrice * fPeriodMultiplier).toFixed(2);
                     return oRow;
                 }.bind(this));
@@ -6595,6 +6603,7 @@
 
                     oRow.MemberID = oIdentity.MemberID;
                     oRow.MemberName = oIdentity.MemberName;
+                    oRow.Salutation = oIdentity.Salutation;
                     oRow.Quantity = iQty;
                     oRow.BasicFacilityPrice = fPackagePrice.toFixed(2);
                     oRow.FacilitiPrice = fRowTotal.toFixed(2);
@@ -6687,17 +6696,23 @@
             const oUser = oLoginModel ? oLoginModel.getData() || {} : {};
             const sLoggedInUserName = oUser.UserName || oHostelModel.getProperty("/FullName") || "";
             const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
+            const oPrimaryOccupant = aFamilyMembers.find(function (oMember) {
+                return oMember && oMember.IsPrimary === true;
+            });
+            const sPrimarySalutation = oPrimaryOccupant && oPrimaryOccupant.Salutation || "";
 
 
             return {
                 data: [{
-                    Salutation: oHostelModel.getProperty("/Salutation") || "Mr.",
+                    Salutation: sPrimarySalutation,
                     CustomerName: sPrimaryOccupantName,
                     UserID: oHostelModel.getProperty("/UserID") || "",
                     STDCode: oHostelModel.getProperty("/STDCode") || "+91",
                     MobileNo: oHostelModel.getProperty("/MobileNo") || "",
-                    Gender: oHostelModel.getProperty("/Gender") || "",
-                    DateOfBirth: this._formatDateToISO(oHostelModel.getProperty("/DateOfBirth")),
+                    Gender: oPrimaryOccupant && oPrimaryOccupant.Gender || "",
+                    DateOfBirth: this._formatDateToISO(
+                        oPrimaryOccupant && (oPrimaryOccupant.DateOfBirth || oPrimaryOccupant.Age) || ""
+                    ),
                     CustomerEmail: oHostelModel.getProperty("/CustomerEmail") || "",
                     Country: oHostelModel.getProperty("/Country") || "",
                     State: oHostelModel.getProperty("/State") || "",
