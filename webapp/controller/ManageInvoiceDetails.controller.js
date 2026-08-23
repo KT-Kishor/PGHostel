@@ -1566,7 +1566,7 @@ sap.ui.define([
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    CustomerName: this.byId("CID_id_AddCustComboBox").getValue() || this.byId("CID_id_AddCustComboBox").getSelectedKey(),
+                    CustomerName: this.byId("CID_id_AddCustComboBox").getSelectedKey(),
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
                     MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
@@ -1849,7 +1849,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/IGSTSelected", false);
 
                 oCustomerModel.setProperty("/Type", "CGST/SGST");
-                oCustomerModel.setProperty("/Value", Number(CustomerData.Value) / 2);
+                oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
                 oCustomerModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
 
                 

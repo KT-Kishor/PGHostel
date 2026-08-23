@@ -77,9 +77,7 @@
                                         >
                                             <core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
-                                                text="{= ${ManageCustomerModel>BranchName}
-    ? ${ManageCustomerModel>BranchName} + ' - ' + ${ManageCustomerModel>CustomerName}
-    : ${ManageCustomerModel>CustomerName} }"
+                                                text="{ManageCustomerModel>CustomerName}"
                                                 additionalText="{ManageCustomerModel>BookingID}"
                                             />
                                         </m:ComboBox>
@@ -375,11 +373,13 @@
                                             required="{SelectedCustomerModel>/GSTValid}"
                                         />
                                         <m:Input
+                                        id="GSTValue"
                                             value="{SelectedCustomerModel>/Value}"
                                             liveChange="CI_onPercentageChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                             visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
+
                                         />
                                         <m:Label text="{i18n>address}" />
                                         <m:TextArea

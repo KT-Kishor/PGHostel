@@ -4896,6 +4896,7 @@ sap.ui.define([
                 },
                 "Booking": [{
                     "BookingDate": this._formatDate(CustomerData.BookingDate), // current date
+                    "CustomerName": primaryMember ? primaryMember.MemberName : otherMembers[0].MemberName ? otherMembers[0].MemberName : Bookingdata.CustomerName,
                     "RentPrice": CustomerData.GrandTotal,
                     "NoOfPersons": CustomerData.AllMembers.length,
                     "StartDate": Bookingdata.StartDate.split('/').reverse().join('-'),
