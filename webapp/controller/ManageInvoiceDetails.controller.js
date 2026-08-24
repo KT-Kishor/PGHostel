@@ -735,7 +735,8 @@ sap.ui.define([
                             item.EndDate,
                             item.TotalHour,
                             item.SelectionMode,
-                            item.Quantity
+                            item.Quantity,
+                            item.FacilityChargeType
                         );
 
                         let particulars = "";
@@ -826,11 +827,13 @@ sap.ui.define([
                 }
             },
 
-            _getDurationText: function (sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity) {
+            _getDurationText: function (sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity,FacilityChargeType) {
 
                 const qty = Number(quantity) || 1;
                 const mode = selectionMode?.toUpperCase();
                 const unit = sUnit?.toLowerCase();
+                const ChargeType = FacilityChargeType?.toLowerCase();
+
 
                 // ---------
                 // VALIDATE DATES
@@ -976,6 +979,12 @@ sap.ui.define([
                 }
 
                 if (mode === "PERSON_QTY") {
+
+                    if(unit === "package price" && ChargeType==="daily"){
+                         const totalUnits = qty * diffDays;
+
+                        return `${qty} Unit × ${diffDays} Days (${totalUnits}Units)`;
+                    }
 
                     if (unit === "unit price" || unit === "package price") {
                         return `${qty} Units`;
@@ -4837,7 +4846,8 @@ sap.ui.define([
                             effectiveEnd,
                             f.TotalHour,
                             f.SelectionMode,
-                            f.Quantity
+                            f.Quantity,
+                            f.FacilityChargeType
                         ),
                         GrossPrice: Number(f.BasicFacilityPrice) || 0,
                         Total: facilityTotal,

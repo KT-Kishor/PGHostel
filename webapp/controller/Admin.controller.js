@@ -518,7 +518,7 @@ sap.ui.define([
 
             if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
                 sap.m.MessageBox.show(
-                    this.i18nModel.getText("Room can only be assigned on the booking start date"),
+                    this.i18nModel.getText("Room cannot be assigned for a future date"),
                     {
                         icon: sap.m.MessageBox.Icon.Information,
                         title: this.i18nModel.getText("Information"),

@@ -31,6 +31,23 @@ sap.ui.define([
             this.getView().setModel(oDateModel, "controller");
             this.getOwnerComponent().getRouter().getRoute("RouteAdminDetails").attachMatched(this._onRouteMatched, this);
         },
+        fnDateComparator: function (a, b) {
+    if (!a && !b) return 0;
+    if (!a) return -1;
+    if (!b) return 1;
+
+    // Helper to parse DD/MM/YYYY into JS Date (Year, Month - 1, Day)
+    var parseDate = function (dateStr) {
+        if (dateStr instanceof Date) return dateStr;
+        var parts = dateStr.split("/");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    };
+
+    var dateA = parseDate(a);
+    var dateB = parseDate(b);
+
+    return dateA - dateB; // Sorts properly by Year -> Month -> Day
+},
 
         _onRouteMatched: async function (oEvent) {
             if (performance.navigation && performance.navigation.type === 1) {
@@ -266,7 +283,7 @@ sap.ui.define([
 
             this.getBusyDialog();
 
-            const pdfBase64 = await this.onGeneratePDF("Completed");
+            // const pdfBase64 = await this.onGeneratePDF("Completed");
 
             // Refresh model to update UI bindings
 
@@ -288,12 +305,7 @@ sap.ui.define([
                 "PropertySTD": oCustomerModel.PropertySTD || "",
                 "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
                 "PropertyEmail": oCustomerModel.PropertyEmail || "",
-                "PropertyType": oCustomerModel.PropertyType || "",
-                "pdfAttachment": {
-                    "fileName": "BookingVoucher.pdf",
-                    "mimeType": "application/pdf",
-                    "content": pdfBase64
-                },
+                "PropertyType": oCustomerModel.PropertyType || ""
             };
 
             // Merge both
@@ -4881,7 +4893,7 @@ sap.ui.define([
                 "State": Bookingdata.State,
                 "City": Bookingdata.City,
                 "STDCode": Bookingdata.STDCode,
-                "Salutation": Bookingdata.Salutation || "Mr.",
+                "Salutation": primaryMember ? primaryMember.Salutation : otherMembers[0].Salutation ? otherMembers[0].Salutation : Bookingdata.Salutation,
                 "PermanentAddress": Bookingdata.Address,
                 "Area": CustomerData.BranchName,
                 "PropertyType": CustomerData.PropertyType,
@@ -5099,6 +5111,7 @@ sap.ui.define([
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
                             BookingDate: new Date(oData.BookingDate).toISOString().split('T')[0],
+                            BookingID:oData.BookingID,
                             RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
                             NoOfPersons: oData.noofperson || 1,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
@@ -5127,7 +5140,7 @@ sap.ui.define([
                         //------ Final Payload ------
                         const personData = [{
                             Salutation: oData.Salutation || "",
-                            CustomerName: oData.FullName || "",
+                            CustomerName: oData.CustomerName || "",
                             UserID: oData.UserID || "",
                             STDCode: oData.STDCode || "",
                             MobileNo: oData.MobileNo || "",

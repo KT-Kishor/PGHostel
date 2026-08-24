@@ -154,7 +154,6 @@
                             />
 
                             <!-- Price -->
-                        
 
                             <!-- Payment -->
                             <Label
@@ -317,7 +316,7 @@
                                 text="{= ${CustomerData>/Duration} + ' ' + ${CustomerData>/DurationUnit} }"
                                 visible="{= !${VisibleModel>/visible} }"
                             />
-                              <Label text="{i18n>placePrice}" />
+                            <Label text="{i18n>placePrice}" />
                             <Text
                                 id="Ad_id_idPrice4"
                                 text="{=${CustomerData>/OrginalRentPrice} +' ' + ${CustomerData>/Currency}}"
@@ -327,258 +326,251 @@
                 </Panel>
             </VBox>
 
-           
-
-                    <VBox class="sapUiMediumMarginBottom">
-                        <Panel
-                            headerText="{i18n>customerDocuments}"
-                            expandable="false"
-                            class="customPanelHeader"
-                        >
-                            <Table
-                                id="Ad_id_idFacilityRoomTableDetails1"
-                                class="sapUiSmallMarginTop"
-                                items="{path: 'CustomerData>/Documents'}"
-                                mode="{= ${VisibleModel>/visible} ? 'Delete' : 'None' }"
-                                delete="onDocumentDelete"
-                                busyIndicatorDelay="0"
-                                inset="false"
-                                selectionChange="onTableSelection"
-                                growing="true"
-                                growingScrollToLoad="true"
-                            >
-                                <headerToolbar>
-                                    <Toolbar>
-                                        <Title
-                                            text="{i18n>documentDetails} ({= ${CustomerData>/Documents}.length})"
-                                        />
-                                        <ToolbarSpacer />
-                                        <Button
-                                            text="{i18n>Manage Member}"
-                                            tooltip="{i18n>Manage Member}"
-                                            press="onUploadDocumentFile"
-                                            class="myUnifiedBtn"
-                                            visible="{VisibleModel>/visible}"
-                                        />
-                                    </Toolbar>
-                                </headerToolbar>
-                                <columns>
-                                  <Column
-                                            id="primaryColumn"
-                                            width="6rem"
-                                            visible="{= ${CustomerData>/Documents}.length > 1 }"
-
-
-                                    >
-                                        <Text text="Primary" />
-                                    </Column>
-                                    <Column demandPopin="true">
-                                        <Text
-                                            text="{i18n>membername}"
-                                            tooltip="{i18n>membername}"
-                                        />
-                                    </Column>
-                                      <Column demandPopin="true" 
-                                minScreenWidth="Tablet"
-                                      >
-                                        <Text
-                                            text="{i18n>age}"
-                                            tooltip="{i18n>age}"
-                                        />
-                                    </Column>
-                                      <Column demandPopin="true" 
-                                minScreenWidth="Tablet"
-                                      >
-                                        <Text
-                                            text="{i18n>Gender}"
-                                            tooltip="{i18n>Gender}"
-                                        />
-                                    </Column>
-                                       <Column demandPopin="true" 
-                                minScreenWidth="Tablet"
-                                       >
-                                        <Text
-                                            text="{i18n>Relationship}"
-                                            tooltip="{i18n>Relationship}"
-                                        />
-                                    </Column>
-                                   
-                                 
-                                   <Column demandPopin="true">
-    <Text
-        text="{i18n>MVDdocumenttype}"
-        tooltip="{i18n>MVDdocumenttype}"
-
-    />
-</Column>
-                                  
-                                       <Column demandPopin="true">
-                                        <Text
-                                            text="{i18n>Document}"
-                                            tooltip="{i18n>Document}"
-                                        />
-                                    </Column>
-                                </columns>
-                                <items>
-                                    <ColumnListItem>
-                                        <cells>
-                                         <RadioButton
-                                                groupName="primaryOccupantGroup"
-                                                selected="{CustomerData>IsPrimary}"
-                                                select="onPrimaryOccupantRadioSelect"
-                                                enabled="{VisibleModel>/visible}"
-                                          visible="{= ${CustomerData>/Documents}.length > 1 }"
-                                            />
-                                            <Text
-                                                text="{CustomerData>MemberName}"
-                                            />
-                                          
-                                                  <Text 
-                                                text="{path: 'CustomerData>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
-                                            />
-                                             <Text
-                                                text="{CustomerData>Gender}"
-                                            />
-                                              <Text
-                                                text="{CustomerData>Relation}"
-                                            />
-                                           
-                                          <HBox justifyContent="Center" width="40%">
-                                              <Text
-                                                  text="{CustomerData>DocumentType}"
-                                                  emptyIndicatorMode="On"
-                                               />
-                                          </HBox>
-                                         
-                                            <Link
-                                               text="{= ${CustomerData>FileName} ? ${CustomerData>FileName} : 'No Document' }"
-                                               enabled="{= !!${CustomerData>FileName} }"
-                                               press="onFileNameLinkPress"
-                                                   />
-                                        </cells>
-                                    </ColumnListItem>
-                                </items>
-                            </Table>
-                        </Panel>
-                    </VBox>
+            <VBox class="sapUiMediumMarginBottom">
+                <Panel
+                    headerText="{i18n>customerDocuments}"
+                    expandable="false"
+                    class="customPanelHeader"
+                >
                     <Table
-                        id="Ad_id_idFacilityRoomTableDetails"
+                        id="Ad_id_idFacilityRoomTableDetails1"
                         class="sapUiSmallMarginTop"
-                        items="{
-    path: 'CustomerData>/AllSelectedFacilities',
-    sorter: {
-        path: 'StartDate',
-        descending: false
-    }
-}"
-                        mode="{= ${VisibleModel>/visible} === true ? 'SingleSelectLeft' : 'None' }"
+                        items="{path: 'CustomerData>/Documents'}"
+                        mode="{= ${VisibleModel>/visible} &amp;&amp;
+    !(${CustomerData>/Status} === 'Assigned' &amp;&amp;
+    (${CustomerData>/PropertyType} === 'Hostel' ||
+     ${CustomerData>/PropertyType} === 'PG')) ? 'Delete' : 'None' }"
+                        delete="onDocumentDelete"
                         busyIndicatorDelay="0"
                         inset="false"
                         selectionChange="onTableSelection"
-                        width="100%"
+                        growing="true"
+                        growingScrollToLoad="true"
                     >
                         <headerToolbar>
                             <Toolbar>
                                 <Title
-                                    text="{i18n>facilityDetails} ({=${CustomerData>/AllSelectedFacilities}.length})"
+                                    text="{i18n>documentDetails} ({= ${CustomerData>/Documents}.length})"
                                 />
                                 <ToolbarSpacer />
                                 <Button
-                                    text="{i18n>MSadd}"
-                                    tooltip="{i18n>addFacility}"
-                                    press="onAddFacilityDetails"
+                                    text="{i18n>Manage Member}"
+                                    tooltip="{i18n>Manage Member}"
+                                    press="onUploadDocumentFile"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
-                                />
-                                <Button
-                                    text="{i18n>MSedit}"
-                                    tooltip="{i18n>editFacility}"
-                                    press="onEditFacilityDetails"
-                                    class="myUnifiedBtn"
-                                    visible="{VisibleModel>/visible}"
-                                />
-                                <Button
-                                    text="{i18n>MSdelete}"
-                                    tooltip="{i18n>deleteFacility}"
-                                    press="onDeleteFacilityDetails"
-                                    class="myUnifiedBtn"
-                                    visible="{VisibleModel>/visible}"
+                                    enabled="{= !(${CustomerData>/Status} === 'Assigned' &amp;&amp;
+    (${CustomerData>/PropertyType} === 'Hostel' ||
+     ${CustomerData>/PropertyType} === 'PG'))}"
                                 />
                             </Toolbar>
                         </headerToolbar>
                         <columns>
+                            <Column
+                                id="primaryColumn"
+                                width="6rem"
+                                visible="{= ${CustomerData>/Documents}.length > 1 }"
+                            >
+                                <Text text="Primary" />
+                            </Column>
                             <Column demandPopin="true">
                                 <Text
-                                    text="{i18n>facilityname}"
-                                    tooltip="{i18n>facilityname}"
+                                    text="{i18n>membername}"
+                                    tooltip="{i18n>membername}"
                                 />
                             </Column>
+                            <Column
+                                demandPopin="true"
+                                minScreenWidth="Tablet"
+                            >
+                                <Text
+                                    text="{i18n>age}"
+                                    tooltip="{i18n>age}"
+                                />
+                            </Column>
+                            <Column
+                                demandPopin="true"
+                                minScreenWidth="Tablet"
+                            >
+                                <Text
+                                    text="{i18n>Gender}"
+                                    tooltip="{i18n>Gender}"
+                                />
+                            </Column>
+                            <Column
+                                demandPopin="true"
+                                minScreenWidth="Tablet"
+                            >
+                                <Text
+                                    text="{i18n>Relationship}"
+                                    tooltip="{i18n>Relationship}"
+                                />
+                            </Column>
+
                             <Column demandPopin="true">
                                 <Text
-                                    text="{i18n>faciltyprice}"
-                                    tooltip="{i18n>faciltyprice}"
+                                    text="{i18n>MVDdocumenttype}"
+                                    tooltip="{i18n>MVDdocumenttype}"
                                 />
                             </Column>
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
+
+                            <Column demandPopin="true">
                                 <Text
-                                    text="{i18n>startDate}"
-                                    tooltip="{i18n>startDate}"
-                                />
-                            </Column>
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="{i18n>endDate}"
-                                    tooltip="{i18n>endDate}"
-                                />
-                            </Column>
-                            <!-- <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="{i18n>unit}"
-                                    tooltip="{i18n>unit}"
-                                />
-                            </Column> -->
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="Period"
-                                    tooltip="Period"
-                                />
-                            </Column>
-                            <!-- <Column minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="Coupon Code" tooltip="Coupon Code" />
-                            </Column>
-                            <Column minScreenWidth="Tablet" demandPopin="true">
-                                <Text text="Discount" tooltip="Discount" />
-                            </Column> -->
-                            <Column
-                                minScreenWidth="Tablet"
-                                demandPopin="true"
-                            >
-                                <Text
-                                    text="{i18n>totalPrice}"
-                                    tooltip="{i18n>totalPrice}"
+                                    text="{i18n>Document}"
+                                    tooltip="{i18n>Document}"
                                 />
                             </Column>
                         </columns>
                         <items>
                             <ColumnListItem>
                                 <cells>
-                                    <!-- <Text
-                                        text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }"
-                                    /> -->
+                                    <RadioButton
+                                        groupName="primaryOccupantGroup"
+                                        selected="{CustomerData>IsPrimary}"
+                                        select="onPrimaryOccupantRadioSelect"
+                                        enabled="{VisibleModel>/visible}"
+                                        visible="{= ${CustomerData>/Documents}.length > 1 }"
+                                    />
+                                    <Text text="{CustomerData>MemberName}" />
+
                                     <Text
-    text="{=
+                                        text="{path: 'CustomerData>DateOfBirth', formatter: '.Formatter.formatAgeFromDOBOrAge'}"
+                                    />
+                                    <Text text="{CustomerData>Gender}" />
+                                    <Text text="{CustomerData>Relation}" />
+
+                                    <HBox
+                                        justifyContent="Center"
+                                        width="40%"
+                                    >
+                                        <Text
+                                            text="{CustomerData>DocumentType}"
+                                            emptyIndicatorMode="On"
+                                        />
+                                    </HBox>
+
+                                    <Link
+                                        text="{= ${CustomerData>FileName} ? ${CustomerData>FileName} : 'No Document' }"
+                                        enabled="{= !!${CustomerData>FileName} }"
+                                        press="onFileNameLinkPress"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </Panel>
+            </VBox>
+            <Table
+                id="Ad_id_idFacilityRoomTableDetails"
+                class="sapUiSmallMarginTop"
+                items="{
+    path: 'CustomerData>/AllSelectedFacilities',
+    sorter: {
+        path: 'StartDate',
+        descending: false,
+        comparator: '.fnDateComparator'
+    }
+}"
+                mode="{= ${VisibleModel>/visible} === true ? 'SingleSelectLeft' : 'None' }"
+                busyIndicatorDelay="0"
+                inset="false"
+                selectionChange="onTableSelection"
+                width="100%"
+            >
+                <headerToolbar>
+                    <Toolbar>
+                        <Title
+                            text="{i18n>facilityDetails} ({=${CustomerData>/AllSelectedFacilities}.length})"
+                        />
+                        <ToolbarSpacer />
+                        <Button
+                            text="{i18n>MSadd}"
+                            tooltip="{i18n>addFacility}"
+                            press="onAddFacilityDetails"
+                            class="myUnifiedBtn"
+                            visible="{VisibleModel>/visible}"
+                        />
+                        <Button
+                            text="{i18n>MSedit}"
+                            tooltip="{i18n>editFacility}"
+                            press="onEditFacilityDetails"
+                            class="myUnifiedBtn"
+                            visible="{VisibleModel>/visible}"
+                        />
+                        <Button
+                            text="{i18n>MSdelete}"
+                            tooltip="{i18n>deleteFacility}"
+                            press="onDeleteFacilityDetails"
+                            class="myUnifiedBtn"
+                            visible="{VisibleModel>/visible}"
+                        />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column demandPopin="true">
+                        <Text
+                            text="{i18n>facilityname}"
+                            tooltip="{i18n>facilityname}"
+                        />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text
+                            text="{i18n>faciltyprice}"
+                            tooltip="{i18n>faciltyprice}"
+                        />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text
+                            text="{i18n>startDate}"
+                            tooltip="{i18n>startDate}"
+                        />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text
+                            text="{i18n>endDate}"
+                            tooltip="{i18n>endDate}"
+                        />
+                    </Column>
+                    <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>unit}" tooltip="{i18n>unit}" />
+                            </Column> -->
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text
+                            text="Period"
+                            tooltip="Period"
+                        />
+                    </Column>
+                    <!-- <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="Coupon Code" tooltip="Coupon Code" />
+                            </Column>
+                            <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="Discount" tooltip="Discount" />
+                            </Column> -->
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text
+                            text="{i18n>totalPrice}"
+                            tooltip="{i18n>totalPrice}"
+                        />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <!-- <Text text="{= ${CustomerData>FacilityName} + (${CustomerData>MemberName} ? ' (' + ${CustomerData>MemberName} + ')' : '') }" /> -->
+                            <Text
+                                text="{=
         ${CustomerData>FacilityName}
         + (${CustomerData>MemberName}
             ? ' (' + ${CustomerData>MemberName} + ')'
@@ -596,25 +588,21 @@
                     : ''
         )
     }"
-/>
-                                    <Text
-                                        text="{
+                            />
+                            <Text
+                                text="{
                                                 parts: [
                                                     { path: 'CustomerData>Price' },
                                                     { path: 'CustomerData>Currency' }
                                                 ],
                                                 formatter: '.Formatter.formatCurrency'
                                             }"
-                                    />
-                                    <Text
-                                        text="{path:'CustomerData>StartDate'}"
-                                    />
-                                    <Text
-                                        text="{path:'CustomerData>EndDate'}"
-                                    />
-                                    <!-- <Text text="{CustomerData>UnitText}" /> -->
-       <Text
-    text="{=
+                            />
+                            <Text text="{path:'CustomerData>StartDate'}" />
+                            <Text text="{path:'CustomerData>EndDate'}" />
+                            <!-- <Text text="{CustomerData>UnitText}" /> -->
+                            <Text
+                                text="{=
         ${CustomerData>UnitText} === 'Package Price' &amp;&amp;
         ${CustomerData>FacilityChargeType} === 'DAILY'
             ? 'Package Price (' +
@@ -651,142 +639,142 @@
                 : Number(${CustomerData>quantity}) + ' Qty'
             ) + ')'
     }"
-    wrapping="true"
-/>
+                                wrapping="true"
+                            />
 
-                                    <!-- <Text text="{CustomerData>CouponCode}" /> -->
+                            <!-- <Text text="{CustomerData>CouponCode}" /> -->
 
-                                    <!-- <Text text="{CustomerData>CouponDiscount}" /> -->
+                            <!-- <Text text="{CustomerData>CouponDiscount}" /> -->
 
-                                    <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
-                                    <Text
-                                        text="{
+                            <!-- <Text text="{= ${CustomerData>TotalAmount} +' ' +  ${CustomerData>Currency}}" /> -->
+                            <Text
+                                text="{
                                                     parts: [
                                                         { path: 'CustomerData>TotalAmount' },
                                                         { path: 'CustomerData>Currency' }
                                                     ],
                                                     formatter: '.Formatter.formatCurrency'
                                                 }"
-                                    />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                    <FlexBox
-                        class="custom-flexbox sapUiContentPadding"
-                        direction="Column"
-                    >
-                        <VBox
-                            class="custom-vbox"
-                            width="100%"
-                            alignItems="End"
-                        >
-                            <!-- Coupon Code Row -->
-                            <!-- Total Facility Cost -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="{i18n>totalfacilitycost}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+            <FlexBox
+                class="custom-flexbox sapUiContentPadding"
+                direction="Column"
+            >
+                <VBox
+                    class="custom-vbox"
+                    width="100%"
+                    alignItems="End"
+                >
+                    <!-- Coupon Code Row -->
+                    <!-- Total Facility Cost -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="{i18n>totalfacilitycost}"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/TotalFacilityPrice' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- Room Rent -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="{i18n>roomRent}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- Room Rent -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="{i18n>roomRent}"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/RentPrice' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
+                            textAlign="End"
+                        />
+                    </HBox>
 
-                            <!-- Discount -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+                    <!-- Discount -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
     ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
     : 'Discount:' }"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/Discount' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- visible="{VisibleModel>/visible}" This is coupon code First HBox -->
 
-                            <FlexBox
-                                width="100%"
-                                justifyContent="End"
-                                alignItems="Center"
-                                wrap="Wrap"
-                                renderType="Div"
-                                class="sapUiSmallMarginBottom"
-                                visible="{VisibleModel>/visible}"
-                            >
-                                <!-- Coupon Label -->
-                                <Label
-                                    text="{i18n>couponCode}"
-                                    class="totalColumnBold1 sapUiTinyMarginEnd"
-                                    width="120px"
-                                />
-                                <!-- Coupon Input -->
-                                <Input
-                                    id="couponInput"
-                                    value="{Bookingmodel>/CouponCode}"
-                                    placeholder="{i18n>enterCoupon}"
-                                    width="150px"
-                                    class="sapUiTinyMarginEnd"
-                                    showValueHelp="true"
-                                    valueHelpIconSrc="sap-icon://decline"
-                                    valueHelpRequest="oncancelCoupon"
-                                    liveChange="onCouponLiveChange"
-                                />
-                                <!-- Apply Now Button -->
-                                <Button
-                                    id="idApplyNowButton"
-                                    text="{i18n>applyNow}"
-                                    tooltip="{i18n>applyCoupon}"
-                                    press=".onApplyCoupon"
-                                    class="sapUiTinyMarginEnd myUnifiedBtn"
-                                    visible="{= !${VisibleModel>/IsCouponApplied} }"
-                                />
-                            </FlexBox>
-                            <!-- <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CouponCode} ? true : false }">
+                    <FlexBox
+                        width="100%"
+                        justifyContent="End"
+                        alignItems="Center"
+                        wrap="Wrap"
+                        renderType="Div"
+                        class="sapUiSmallMarginBottom"
+                        visible="{VisibleModel>/visible}"
+                    >
+                        <!-- Coupon Label -->
+                        <Label
+                            text="{i18n>couponCode}"
+                            class="totalColumnBold1 sapUiTinyMarginEnd"
+                            width="120px"
+                        />
+                        <!-- Coupon Input -->
+                        <Input
+                            id="couponInput"
+                            value="{Bookingmodel>/CouponCode}"
+                            placeholder="{i18n>enterCoupon}"
+                            width="150px"
+                            class="sapUiTinyMarginEnd"
+                            showValueHelp="true"
+                            valueHelpIconSrc="sap-icon://decline"
+                            valueHelpRequest="oncancelCoupon"
+                            liveChange="onCouponLiveChange"
+                        />
+                        <!-- Apply Now Button -->
+                        <Button
+                            id="idApplyNowButton"
+                            text="{i18n>applyNow}"
+                            tooltip="{i18n>applyCoupon}"
+                            press=".onApplyCoupon"
+                            class="sapUiTinyMarginEnd myUnifiedBtn"
+                            visible="{= !${VisibleModel>/IsCouponApplied} }"
+                        />
+                    </FlexBox>
+                    <!-- <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CouponCode} ? true : false }">
                                 <Label text="{i18n>couponCode}" class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel" />
                                 <Text class="amountText totalColumnBold1" text="{
                             parts: [{ path: 'CustomerData>/CouponCode' }]
                         }" textAlign="End" />
                             </HBox> -->
 
-                            <!-- Discount -->
-                            <!-- <HBox justifyContent="SpaceBetween">
+                    <!-- Discount -->
+                    <!-- <HBox justifyContent="SpaceBetween">
                                 <Label text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
     ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
     : 'Discount:' }" class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel" />
@@ -798,188 +786,187 @@
                             formatter: '.Formatter.formatCurrency'
                         }" textAlign="End" />
                             </HBox> -->
-                            <!-- Sub Total -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="Sub Total:"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                    <!-- Sub Total -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="Sub Total:"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/SubTotal' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- CGST -->
-                            <HBox
-                                justifyContent="SpaceBetween"
-                                visible="{= ${CustomerData>/CGST} > 0 }"
-                            >
-                                <Label
-                                    text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- CGST -->
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        visible="{= ${CustomerData>/CGST} > 0 }"
+                    >
+                        <Label
+                            text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/CGST' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- SGST -->
-                            <HBox
-                                justifyContent="SpaceBetween"
-                                visible="{= ${CustomerData>/SGST} > 0 }"
-                            >
-                                <Label
-                                    text="{= 'SGST (' + ${CustomerData>/GSTValue} + '%):'}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- SGST -->
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        visible="{= ${CustomerData>/SGST} > 0 }"
+                    >
+                        <Label
+                            text="{= 'SGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/SGST' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- IGST -->
-                            <HBox
-                                justifyContent="SpaceBetween"
-                                visible="{= ${CustomerData>/IGST} > 0 }"
-                            >
-                                <Label
-                                text="{=
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- IGST -->
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        visible="{= ${CustomerData>/IGST} > 0 }"
+                    >
+                        <Label
+                            text="{=
     ${CustomerData>/GSTLabel} === 'Tax'
         ? 'Tax Amount (' + ${CustomerData>/GSTValue} + '%):'
         : 'IGST (' + ${CustomerData>/GSTValue} + '%):'
 }"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/IGST' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
+                            textAlign="End"
+                        />
+                    </HBox>
 
-                            <!-- Grand Total -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="Grand Total:"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                    <!-- Grand Total -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="Grand Total:"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/GrandTotal' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                                <!-- Deposit -->
-                            </HBox>
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="Security Deposit:"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                        <!-- Deposit -->
+                    </HBox>
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="Security Deposit:"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/Deposit' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- Paid -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="Paid Amount:"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- Paid -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="Paid Amount:"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/PaymentPaid' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- Refund -->
-                            <HBox
-                                justifyContent="SpaceBetween"
-                                visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }"
-                            >
-                                <Label
-                                    text="Refund credited:"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- Refund -->
+                    <HBox
+                        justifyContent="SpaceBetween"
+                        visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }"
+                    >
+                        <Label
+                            text="Refund credited:"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/RefundPaymentpaid' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                            <!-- Due Amount -->
-                            <HBox justifyContent="SpaceBetween">
-                                <Label
-                                    text="{= ${CustomerData>/DueAmount} >= 0 ? 'Due Amount:' : 'Refund Amount:'}"
-                                    class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
-                                />
-                                <Text
-                                    class="amountText totalColumnBold1"
-                                    text="{
+                            textAlign="End"
+                        />
+                    </HBox>
+                    <!-- Due Amount -->
+                    <HBox justifyContent="SpaceBetween">
+                        <Label
+                            text="{= ${CustomerData>/DueAmount} >= 0 ? 'Due Amount:' : 'Refund Amount:'}"
+                            class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
+                        />
+                        <Text
+                            class="amountText totalColumnBold1"
+                            text="{
                             parts: [
                                 { path: 'CustomerData>/DueAmount' },
                                 { path: 'CustomerData>/AllSelectedFacilities/0/Currency' }
                             ],
                             formatter: '.Formatter.formatCurrency'
                         }"
-                                    textAlign="End"
-                                />
-                            </HBox>
-                        </VBox>
-                    </FlexBox>
-              
+                            textAlign="End"
+                        />
+                    </HBox>
+                </VBox>
+            </FlexBox>
         </ScrollContainer>
         <!-- <footer>
         
@@ -987,46 +974,83 @@
         </footer> -->
 
         <footer>
-            <Bar id="idFooterBar" class="footerBtnBar">
+            <Bar
+                id="idFooterBar"
+                class="footerBtnBar"
+            >
                 <contentLeft>
-                <FlexBox class="profile-footer-scroll-text" alignItems="Center">
-                <items>
-                    <FlexBox class="profile-footer-marquee" alignItems="Center"> 
-
-
-                    <Image
-                        src="../image/TransparentKTlogo.png"
-                        width="30px"
-                        height="30px"
-                    />
-                    <Link
-                        text="{i18n>devlopby}"
-                        href="https://kalpavrikshatechnologies.com/"
-                        target="_blank"
-                        class="customLinkWhiteBg"
-                    />
-                            
+                    <FlexBox
+                        class="profile-footer-scroll-text"
+                        alignItems="Center"
+                    >
+                        <items>
+                            <FlexBox
+                                class="profile-footer-marquee"
+                                alignItems="Center"
+                            >
+                                <Image
+                                    src="../image/TransparentKTlogo.png"
+                                    width="30px"
+                                    height="30px"
+                                />
+                                <Link
+                                    text="{i18n>devlopby}"
+                                    href="https://kalpavrikshatechnologies.com/"
+                                    target="_blank"
+                                    class="customLinkWhiteBg"
+                                />
+                            </FlexBox>
+                        </items>
                     </FlexBox>
-                </items>
-                </FlexBox>
                 </contentLeft>
                 <contentRight>
-                <Button id="" text="{i18n>returnDeposit}" class="myUnifiedBtn" press="onPressDeposit"   visible="{
+                    <Button
+                        id=""
+                        text="{i18n>returnDeposit}"
+                        class="myUnifiedBtn"
+                        press="onPressDeposit"
+                        visible="{
         parts: [
             'CustomerData>/Status',
             'DepositModel>/DepositAmount'
         ],
         formatter: '.Formatter.showReturnDeposit'
-    }"/>
+    }"
+                    />
                     <!-- Confirm -->
-                    <Button id="btnGenerateInvoice" text="Generate Invoice" class="myUnifiedBtn" press="onGenerateInvoice" visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"/>
+                    <Button
+                        id="btnGenerateInvoice"
+                        text="Generate Invoice"
+                        class="myUnifiedBtn"
+                        press="onGenerateInvoice"
+                        visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"
+                    />
 
-                    <Button text="Confirm Booking" tooltip="Confirm Booking" press="HM_ConfirmRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected' || ${CustomerData>/Status} === 'Cancelled'}"/>
+                    <Button
+                        text="Confirm Booking"
+                        tooltip="Confirm Booking"
+                        press="HM_ConfirmRoom"
+                        class="myUnifiedBtn"
+                        visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected' || ${CustomerData>/Status} === 'Cancelled'}"
+                    />
 
                     <!-- Reject -->
-                    <Button text="Reject Booking" tooltip="Reject Booking" press="HM_RejectRoom" class="myUnifiedBtn" visible="{= ${CustomerData>/Status} === 'New' }" />
+                    <Button
+                        text="Reject Booking"
+                        tooltip="Reject Booking"
+                        press="HM_RejectRoom"
+                        class="myUnifiedBtn"
+                        visible="{= ${CustomerData>/Status} === 'New' }"
+                    />
                     <!-- Refund Amount -->
-                    <Button text="ADD Customer GST" id="idGST" tooltip="GST Setup" press="onGSTBooking" visible="{= !${VisibleModel>/visible} &amp;&amp;  !!${CustomerData>/GSTIN}  &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }" class="myUnifiedBtn" />  
+                    <Button
+                        text="ADD Customer GST"
+                        id="idGST"
+                        tooltip="GST Setup"
+                        press="onGSTBooking"
+                        visible="{= !${VisibleModel>/visible} &amp;&amp;  !!${CustomerData>/GSTIN}  &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
+                        class="myUnifiedBtn"
+                    />
                     <Button
                         text="{i18n>MSedit}"
                         id="idedit"
