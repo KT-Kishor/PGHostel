@@ -618,6 +618,7 @@ sap.ui.define([
                             MemberName: member.Name,
                             DateOfBirth: this.Formatter.formatAgeFromDOBOrAge(member.DateOfBirth),
                             Relation: member.Relation,
+                            Salutation:member.Salutation,
                             Gender: member.Gender,
                             IsPrimary: member.MemberID.trim() === primaryMemberID
                         }));
