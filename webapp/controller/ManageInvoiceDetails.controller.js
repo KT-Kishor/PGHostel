@@ -1852,9 +1852,6 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
                 oCustomerModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
 
-                
-                this.totalAmountCalculation();
-
                 const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
                 const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
 
@@ -1866,6 +1863,11 @@ sap.ui.define([
                 // Update model
                 oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
                 oInvoiceModel.refresh(true);
+
+                
+                this.totalAmountCalculation();
+
+            
              
             },
 
@@ -1892,7 +1894,7 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Type", "IGST");
                 oCustomerModel.setProperty("/Value", Number(Branch.Value));
                 oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
-                this.totalAmountCalculation();
+
                 const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
                 const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
 
@@ -1904,6 +1906,8 @@ sap.ui.define([
                 // Update model
                 oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
                 oInvoiceModel.refresh(true);
+                this.totalAmountCalculation();
+              
             },
 
             CI_onPercentageChange: function (oEvent) {
