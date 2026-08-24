@@ -625,7 +625,7 @@ sap.ui.define([
                     const paymentType = bookingDetails.PaymentType;
                     const startDate = new Date(bookingDetails.StartDate);
                     const endDate = new Date(bookingDetails.EndDate);
-
+        
                     let invoiceDate, payByDate;
 
                     if (paymentType === "Per Day") {
@@ -1080,7 +1080,7 @@ sap.ui.define([
                     DurationText: this._getDurationText(unitText, startDate, endDate, 1),
                     Currency: currency,
                     Discount: "0.00",
-                    GrossPrice: "0.00",
+                    GrossPrice: "",
                     Total: "",
                     GrossPriceEditable: true,
                     UnitEditable: true,
@@ -5303,5 +5303,136 @@ sap.ui.define([
 
                 return `${y}-${m}-${day}`;
             },
+            onPaymentDateChange: function (oEvent) {
+    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+    const oData = oContext.getObject();
+
+    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+},
+
+GrossPriceChange: function (oEvent) {
+    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+    const oData = oContext.getObject();
+
+    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+},
+
+onChangeUnitText: function (oEvent) {
+    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+    const oData = oContext.getObject();
+
+    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+},
+_validateAndCalculateInvoiceItem: function (oData, oSource) {
+
+    const oModel = this.getView().getModel("ManageInvoiceItemModel");
+    const oCtx = oSource.getBindingContext("ManageInvoiceItemModel");
+
+    if (!oCtx) {
+        return;
+    }
+
+    const startDate = this._parseDate(oData.StartDate);
+    const endDate = this._parseDate(oData.EndDate);
+
+    const unit = (oData.UnitText || "").trim();
+
+    const grossPrice = Number(
+        String(oData.GrossPrice || "0").replace(/,/g, "")
+    );
+
+    // Validate dates
+    if (oData.StartDate && oData.EndDate) {
+
+        if (!startDate || !endDate) {
+            oSource.setValueState("Error");
+            oSource.setValueStateText("Please enter valid dates.");
+            return;
+        }
+
+        if (startDate > endDate) {
+            oSource.setValueState("Error");
+            oSource.setValueStateText(
+                "End Date cannot be earlier than Start Date."
+            );
+
+            oModel.setProperty(
+                oCtx.getPath() + "/DurationText",
+                ""
+            );
+
+            return;
+        }
+
+        oSource.setValueState("None");
+    }
+
+    // Validate Gross Price
+    if (isNaN(grossPrice) || grossPrice < 0) {
+
+        oSource.setValueState("Error");
+        oSource.setValueStateText(
+            "Gross Price must be a valid amount."
+        );
+
+        return;
+    }
+
+    let totalAmount = 0;
+    let durationText = "";
+
+    // Per Day
+    if (unit === "Per Day") {
+
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        const millisecondsPerDay = 24 * 60 * 60 * 1000;
+
+        const duration =
+            Math.floor(
+                (endDate.getTime() - startDate.getTime()) /
+                millisecondsPerDay
+            );
+
+        durationText =
+            duration + " Day" +
+            (duration > 1 ? "s" : "");
+
+        totalAmount = Number(
+            (grossPrice * duration).toFixed(2)
+        );
+    }
+
+    // Fix
+    else if (unit === "Fix") {
+
+        durationText = "1";
+
+        totalAmount = Number(
+            grossPrice.toFixed(2)
+        );
+    }
+
+    // Set values in CURRENT ROW
+    oModel.setProperty(
+        oCtx.getPath() + "/GrossPrice",
+        grossPrice
+    );
+
+    oModel.setProperty(
+        oCtx.getPath() + "/DurationText",
+        durationText
+    );
+
+    oModel.setProperty(
+        oCtx.getPath() + "/Total",
+        totalAmount
+    );
+
+    // Recalculate invoice overall total
+    this.totalAmountCalculation();
+},
         });
     });

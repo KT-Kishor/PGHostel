@@ -711,9 +711,10 @@
                                                 </m:cells>
                                                 <m:cells>
                                                     <m:Input
-                                                        value="{path:'ManageInvoiceItemModel>GrossPrice',formatter: '.Formatter.fromatNumber'}"
+                                                        value="{ManageInvoiceItemModel>GrossPrice}"
                                                         textAlign="End"
                                                         editable="{ManageInvoiceItemModel>GrossPriceEditable}"
+                                                        change="GrossPriceChange"
                                                     />
                                                 </m:cells>
                                                 <m:cells>
@@ -734,12 +735,12 @@
                                                 <m:cells>
                                                     <m:Input
                                                         value="{ManageInvoiceItemModel>DurationText}"
-                                                        editable="{ManageInvoiceItemModel>DurationEditable}"
+                                                        editable="false"
                                                     />
                                                 </m:cells>
                                                 <m:cells>
                                                     <m:Input
-                                                        value="{path:'ManageInvoiceItemModel>Total',formatter: '.Formatter.fromatNumber'}"
+                                                        value="{ManageInvoiceItemModel>Total}"
                                                         textAlign="End"
                                                         change="onChangeTotal"
                                                         editable="{visiablityPlay>/editable}"

@@ -5,18 +5,6 @@
     },
     {
       "ID": 2,
-      "Rate": "Per Hour"
-    },
-    {
-      "ID": 3,
-      "Rate": "Per Month"
-    },
-    {
-      "ID": 4,
-      "Rate": "Per Year"
-    },
-    {
-      "ID": 5,
       "Rate": "Fix"
     }
   ]
