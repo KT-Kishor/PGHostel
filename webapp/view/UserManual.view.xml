@@ -37,11 +37,11 @@
                         <VBox
                             justifyContent="Center"
                             id="videoFrametour_CustomerSignup">
-
+<!-- &lt;video controls autoplay muted playsinline  -->
                             <core:HTML
                                 id="videoFrameHtml_CustomerSignup"
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
-                                    &lt;video controls autoplay muted playsinline 
+                                    &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
                                         &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
@@ -92,7 +92,7 @@
                             <core:HTML
                                 id="videoFrameHtml_setpass"
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
-                                    &lt;video controls autoplay muted playsinline 
+                                    &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
                                         &lt;source src='../Videos/ResetPassword.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
@@ -143,7 +143,7 @@
                             <core:HTML
                                 id="videoFrameHtml_Customer"
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
-                                    &lt;video controls autoplay muted playsinline 
+                                    &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
                                         &lt;source src='../Videos/Booking.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
@@ -193,7 +193,7 @@
                             <core:HTML
                                 id="videoFrameHtml_ManageBooking"
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
-                                    &lt;video controls autoplay muted playsinline 
+                                    &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
                                         &lt;source src='../Videos/EditBooking.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
