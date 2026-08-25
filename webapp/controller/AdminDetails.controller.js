@@ -32,22 +32,22 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteAdminDetails").attachMatched(this._onRouteMatched, this);
         },
         fnDateComparator: function (a, b) {
-    if (!a && !b) return 0;
-    if (!a) return -1;
-    if (!b) return 1;
+            if (!a && !b) return 0;
+            if (!a) return -1;
+            if (!b) return 1;
 
-    // Helper to parse DD/MM/YYYY into JS Date (Year, Month - 1, Day)
-    var parseDate = function (dateStr) {
-        if (dateStr instanceof Date) return dateStr;
-        var parts = dateStr.split("/");
-        return new Date(parts[2], parts[1] - 1, parts[0]);
-    };
+            // Helper to parse DD/MM/YYYY into JS Date (Year, Month - 1, Day)
+            var parseDate = function (dateStr) {
+                if (dateStr instanceof Date) return dateStr;
+                var parts = dateStr.split("/");
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            };
 
-    var dateA = parseDate(a);
-    var dateB = parseDate(b);
+            var dateA = parseDate(a);
+            var dateB = parseDate(b);
 
-    return dateA - dateB; // Sorts properly by Year -> Month -> Day
-},
+            return dateA - dateB; // Sorts properly by Year -> Month -> Day
+        },
 
         _onRouteMatched: async function (oEvent) {
             if (performance.navigation && performance.navigation.type === 1) {
@@ -124,11 +124,13 @@ sap.ui.define([
             var sPath = oEvent.getParameter("arguments").sPath;
             this.decodedPath = atob(decodeURIComponent(sPath));
             var xPath = oEvent.getParameter("arguments").xPath;
+            var PBranchCode = oEvent.getParameter("arguments").BranchCode;
+
             this.MemberID = xPath
             this.valuestate()
             this.getBusyDialog()
 
-            await this.OnRoom();
+            await this.OnRoom(PBranchCode);
 
             await this.AD_onSearch("true")
             var oCustomerData = this.getView().getModel("CustomerData").getData();
@@ -216,9 +218,9 @@ sap.ui.define([
             // this.getView().byId("CD_ID_idPhone").setValueState("None")
         },
 
-        OnRoom: function () {
+        OnRoom: function (PBranchCode) {
             return new Promise((resolve, reject) => {
-                this.ajaxReadWithJQuery("HM_Rooms", "")
+                this.ajaxReadWithJQuery("HM_Rooms", {BranchCode : PBranchCode})
                     .then(oData => {
                         var aRooms = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
                         this.getView().setModel(new JSONModel(aRooms), "Availablebeds");
@@ -507,8 +509,8 @@ sap.ui.define([
                     BranchCode: oCustomer.Bookings?.[0]?.BranchCode,
                     BranchID: oCustomer.Bookings?.[0]?.BranchCode
                 };
-                if(flag==="true"){
-                await this.getBranchHotelData(filterData)
+                if (flag === "true") {
+                    await this.getBranchHotelData(filterData)
                 }
                 var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
                 var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
@@ -621,7 +623,7 @@ sap.ui.define([
                             MemberName: member.Name,
                             DateOfBirth: this.Formatter.formatAgeFromDOBOrAge(member.DateOfBirth),
                             Relation: member.Relation,
-                            Salutation:member.Salutation,
+                            Salutation: member.Salutation,
                             Gender: member.Gender,
                             IsPrimary: member.MemberID.trim() === primaryMemberID
                         }));
@@ -775,8 +777,8 @@ sap.ui.define([
                 oCustomerData.Duration = Duration;
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
-                if(flag==="true"){
-                await this.Facilitysearch(sBranchCode, Deposit)
+                if (flag === "true") {
+                    await this.Facilitysearch(sBranchCode, Deposit)
                 }
                 const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer, Branch);
                 if (totals) {
@@ -1279,6 +1281,7 @@ sap.ui.define([
 
                     oEditModel.setProperty("/StartDate", Bookingdata.StartDate);
                     oEditModel.setProperty("/EndDate", Bookingdata.EndDate);
+                    oEditModel.refresh(true)
                     sap.ui.getCore().byId("editDays").setVisible(false)
 
                 } else {
@@ -3817,7 +3820,7 @@ sap.ui.define([
                     if (oAction === sap.m.MessageBox.Action.YES) {
                         that.getBusyDialog();
                         await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
-                        that.getView().getModel("CustomerData").setProperty("/Status","Confirmed")
+                        that.getView().getModel("CustomerData").setProperty("/Status", "Confirmed")
                         that.closeBusyDialog()
                         // that.AD_onSearch();
                     }
@@ -3904,7 +3907,7 @@ sap.ui.define([
             await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
 
             // this.AD_onSearch();
-            this.getView().getModel("CustomerData").setProperty("/Status","Rejected")
+            this.getView().getModel("CustomerData").setProperty("/Status", "Rejected")
 
             this.closeBusyDialog();
 
@@ -4348,28 +4351,53 @@ sap.ui.define([
                                 /*
                                  * PER MONTH
                                  */
+                                // else if (unit === "per month") {
+
+                                //     let months =
+                                //         CustomerData.PaymentType ===
+                                //             "yearly"
+                                //             ? Number(
+                                //                 CustomerData.Duration ||
+                                //                 0
+                                //             ) * 12
+                                //             : Number(
+                                //                 CustomerData.Duration ||
+                                //                 0
+                                //             );
+
+                                //     total = item.quantity
+                                //         ? Number(item.quantity) *
+                                //         months *
+                                //         price
+                                //         : months * price;
+
+                                //     item.TotalMonths =
+                                //         months;
+                                // }
                                 else if (unit === "per month") {
 
+                                    const startYear = facilityStart.getFullYear();
+                                    const startMonth = facilityStart.getMonth();
+
+                                    const endYear = facilityEnd.getFullYear();
+                                    const endMonth = facilityEnd.getMonth();
+
                                     let months =
-                                        CustomerData.PaymentType ===
-                                            "yearly"
-                                            ? Number(
-                                                CustomerData.Duration ||
-                                                0
-                                            ) * 12
-                                            : Number(
-                                                CustomerData.Duration ||
-                                                0
-                                            );
+                                        (endYear - startYear) * 12 +
+                                        (endMonth - startMonth);
 
-                                    total = item.quantity
-                                        ? Number(item.quantity) *
-                                        months *
-                                        price
-                                        : months * price;
+                                    // If there are remaining days, count as another month
+                                    if (facilityEnd.getDate() > facilityStart.getDate()) {
+                                        months++;
+                                    }
 
-                                    item.TotalMonths =
-                                        months;
+                                    // Minimum 1 month
+                                    months = Math.max(1, months);
+
+
+                                    total = item.quantity ? Number(item.quantity) * months * price : months * price;
+
+                                    item.TotalMonths = months;
                                 }
 
                                 /*
@@ -4717,17 +4745,32 @@ sap.ui.define([
 
                                 } else if (unit === "per month") {
 
-                                    let months = CustomerData.PaymentType === "yearly" ?
-                                        CustomerData.Duration * 12 :
-                                        CustomerData.Duration;
+                                    let startYear = startDate.getFullYear();
+                                    let startMonth = startDate.getMonth();
 
-                                    total = item.quantity ?
-                                        item.quantity * months * price :
-                                        months * price;
+                                    let endYear = bookingEndDate.getFullYear();
+                                    let endMonth = bookingEndDate.getMonth();
+
+                                    let months =
+                                        (endYear - startYear) * 12 +
+                                        (endMonth - startMonth);
+
+                                    // If remaining days exist, count them as another month
+                                    if (bookingEndDate.getDate() > startDate.getDate()) {
+                                        months++;
+                                    }
+
+                                    // Minimum 1 month
+                                    months = Math.max(1, months);
+
+                                    total = item.quantity
+                                        ? Number(item.quantity) * months * price
+                                        : months * price;
 
                                     item.TotalMonths = months;
+                                }
 
-                                } else if (unit === "per year") {
+                                else if (unit === "per year") {
 
                                     let years = CustomerData.Duration;
 
@@ -5123,7 +5166,7 @@ sap.ui.define([
                         //------ Booking Payload including Status and CancelDate ------
                         const bookingData = [{
                             BookingDate: new Date(oData.BookingDate).toISOString().split('T')[0],
-                            BookingID:oData.BookingID,
+                            BookingID: oData.BookingID,
                             RentPrice: oData.GrandTotal ? oData.GrandTotal.toString() : "0",
                             NoOfPersons: oData.noofperson || 1,
                             StartDate: oData.StartDate ? oData.StartDate.split("/").reverse().join("-") : "",
@@ -5187,7 +5230,7 @@ sap.ui.define([
                         });
 
                         // await that.AD_onSearch();
-                        that.getView().getModel("CustomerData").setProperty("/Status","Cancelled")
+                        that.getView().getModel("CustomerData").setProperty("/Status", "Cancelled")
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
                         sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));

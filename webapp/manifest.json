@@ -200,7 +200,7 @@
         },
         {
           "name": "RouteAdminDetails",
-          "pattern": "AdminDetails/{sPath}/{xPath}/{from}",
+          "pattern": "AdminDetails/{sPath}/{xPath}/{from}/{BranchCode}",
           "target": [
             "TargetAdminDetails"
           ]

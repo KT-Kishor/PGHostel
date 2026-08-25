@@ -1298,11 +1298,14 @@ sap.ui.define([
             var sCustomerID = oEvent.getSource().getBindingContext("HostelModel").getObject().BookingID;
             var sEncodedID = btoa(sCustomerID.toString());
             var sMemberID = oEvent.getSource().getBindingContext("HostelModel").getObject().MemberID;
+            var sBranchCode = oEvent.getSource().getBindingContext("HostelModel").getObject().BranchCode;
+
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
                 xPath: sMemberID,
-                from: "Customerdetails"
+                from: "Customerdetails",
+                BranchCode:sBranchCode
             });
         },
 
