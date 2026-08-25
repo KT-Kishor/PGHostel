@@ -69,6 +69,11 @@
         "uri": "model/FacilityType.json",
         "preload": true
       },
+      "MonthYear": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/MonthYear.json",
+        "preload": true
+      },
       "AmenitiType": {
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/AmenitiType.json",

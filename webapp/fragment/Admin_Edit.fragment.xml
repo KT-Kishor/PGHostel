@@ -165,8 +165,23 @@
                     text="{i18n>howmany}"
                     visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' }"
                 />
-
-                <Select
+<Select
+    id="idMonthYearSelectFragment"
+    width="100%"
+    visible="{= ${edit>/UnitText} !== 'Per Day'
+        &amp;&amp; ${edit>/UnitText} !== 'Per Hour'
+        &amp;&amp; ${edit>/UnitText} !== 'Unit Price'
+        &amp;&amp; ${edit>/SelectionMode} !== 'PERSON_QTY'}"
+    selectedKey="{edit>/TotalUnits}"
+    change=".onMonthYearChange"
+    items="{MonthYear>/values}"
+>
+    <core:Item
+        key="{MonthYear>key}"
+        text="{MonthYear>text}"
+    />
+</Select>
+                <!-- <Select
                     id="idMonthYearSelectFragment"
                     width="100%"
                     visible="{= ${edit>/UnitText} !== 'Per Day' &amp;&amp; ${edit>/UnitText} !== 'Per Hour' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' 
@@ -218,7 +233,204 @@
                         key="11"
                         text="11"
                     />
-                </Select>
+                      <core:Item
+                        key="12"
+                        text="12"
+                    />
+                  
+                    <core:Item
+                        key="13"
+                        text="13"
+                    />
+                    <core:Item
+                        key="14"
+                        text="14"
+                    />
+                    <core:Item
+                        key="15"
+                        text="15"
+                    />
+                    <core:Item
+                        key="16"
+                        text="16"
+                    />
+                    <core:Item
+                        key="17"
+                        text="17"
+                    />
+                    <core:Item
+                        key="18"
+                        text="18"
+                    />
+                    <core:Item
+                        key="19"
+                        text="19"
+                    />
+                    <core:Item
+                        key="20"
+                        text="20"
+                    />
+                    <core:Item
+                        key="21"
+                        text="21"
+                    />
+                     <core:Item
+                        key="22"
+                        text="22"
+                    />
+                    <core:Item
+                        key="23"
+                        text="23"
+                    />
+                    <core:Item
+                        key="24"
+                        text="24"
+                    />
+                    <core:Item
+                        key="25"
+                        text="25"
+                    />
+                    <core:Item
+                        key="26"
+                        text="26"
+                    />
+                    <core:Item
+                        key="27"
+                        text="27"
+                    />
+                    <core:Item
+                        key="28"
+                        text="28"
+                    />
+                    <core:Item
+                        key="29"
+                        text="29"
+                    />
+                    <core:Item
+                        key="30"
+                        text="30"
+                    />
+                      <core:Item
+                        key="31"
+                        text="31"
+                    />
+                    <core:Item
+                        key="32"
+                        text="32"
+                    />
+                    <core:Item
+                        key="33"
+                        text="33"
+                    />
+                    <core:Item
+                        key="34"
+                        text="34"
+                    />
+                    <core:Item
+                        key="35"
+                        text="35"
+                    />
+                    <core:Item
+                        key="36"
+                        text="36"
+                    />
+                    <core:Item
+                        key="37"
+                        text="37"
+                    />
+                    <core:Item
+                        key="38"
+                        text="38"
+                    />
+                    <core:Item
+                        key="39"
+                        text="39"
+                    />
+                    <core:Item
+                        key="40"
+                        text="40"
+                    />
+                     <core:Item
+                        key="41"
+                        text="41"
+                    />
+                    <core:Item
+                        key="42"
+                        text="42"
+                    />
+                    <core:Item
+                        key="43"
+                        text="43"
+                    />
+                    <core:Item
+                        key="44"
+                        text="44"
+                    />
+                    <core:Item
+                        key="45"
+                        text="45"
+                    />
+                    <core:Item
+                        key="46"
+                        text="46"
+                    />
+                    <core:Item
+                        key="47"
+                        text="47"
+                    />
+                    <core:Item
+                        key="48"
+                        text="48"
+                    />
+                    <core:Item
+                        key="49"
+                        text="49"
+                    />
+                    <core:Item
+                        key="50"
+                        text="50"
+                    />
+                      <core:Item
+                        key="51"
+                        text="51"
+                    />
+                    <core:Item
+                        key="52"
+                        text="52"
+                    />
+                    <core:Item
+                        key="53"
+                        text="53"
+                    />
+                    <core:Item
+                        key="54"
+                        text="54"
+                    />
+                    <core:Item
+                        key="55"
+                        text="55"
+                    />
+                    <core:Item
+                        key="56"
+                        text="56"
+                    />
+                    <core:Item
+                        key="57"
+                        text="57"
+                    />
+                    <core:Item
+                        key="58"
+                        text="58"
+                    />
+                    <core:Item
+                        key="59"
+                        text="59"
+                    />
+                    <core:Item
+                        key="60"
+                        text="60"
+                    />
+                </Select> -->
 
                 <!-- End Date -->
                 <Label

@@ -130,7 +130,7 @@ sap.ui.define([
 
             await this.OnRoom();
 
-            await this.AD_onSearch()
+            await this.AD_onSearch("true")
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var VisibleModel = this.getView().getModel("VisibleModel")
             if (this._oLoggedInUser.Role === "Customer") {
@@ -324,7 +324,7 @@ sap.ui.define([
             });
 
             // Refresh models
-            this.AD_onSearch();
+            this.AD_onSearch("false");
 
             // Close dialog
             this.CK_Dialog.close();
@@ -493,7 +493,7 @@ sap.ui.define([
             oRouter.navTo("RouteHostel")
         },
 
-        AD_onSearch: async function () {
+        AD_onSearch: async function (flag) {
             try {
                 this.getBusyDialog()
                 const filter = {
@@ -507,11 +507,14 @@ sap.ui.define([
                     BranchCode: oCustomer.Bookings?.[0]?.BranchCode,
                     BranchID: oCustomer.Bookings?.[0]?.BranchCode
                 };
-
+                if(flag==="true"){
                 await this.getBranchHotelData(filterData)
+                }
                 var abeds = this.getView().getModel("Beddetails").getData().HM_BedType
                 var aPayment = this.getView().getModel("Beddetails").getData().HM_Payment
                 var aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
+                this.aBranch = this.getView().getModel("Beddetails").getData().HM_Branch
+
 
 
                 var Paymentpaid = aPayment
@@ -772,7 +775,9 @@ sap.ui.define([
                 oCustomerData.Duration = Duration;
                 oCustomerData.DurationUnit = DurationUnit;
                 var sBranchCode = oCustomer.Bookings?.[0]?.BranchCode
+                if(flag==="true"){
                 await this.Facilitysearch(sBranchCode, Deposit)
+                }
                 const totals = this.calculateTotals(aPersons, oCustomerData.RentPrice, sBranchCode, oCustomerData.Discount, oCustomer, Branch);
                 if (totals) {
                     Object.assign(oCustomerData, totals);
@@ -3812,7 +3817,9 @@ sap.ui.define([
                     if (oAction === sap.m.MessageBox.Action.YES) {
                         that.getBusyDialog();
                         await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
-                        that.AD_onSearch();
+                        that.getView().getModel("CustomerData").setProperty("/Status","Confirmed")
+                        that.closeBusyDialog()
+                        // that.AD_onSearch();
                     }
                 }
             }
@@ -3896,7 +3903,11 @@ sap.ui.define([
 
             await this.ajaxUpdateWithJQuery("HM_Booking", oBody);
 
-            this.AD_onSearch();
+            // this.AD_onSearch();
+            this.getView().getModel("CustomerData").setProperty("/Status","Rejected")
+
+            this.closeBusyDialog();
+
 
             this.RB_Dialog.close();
 
@@ -5010,7 +5021,7 @@ sap.ui.define([
                 .then(async () => {
 
                     // Refresh models
-                    await this.AD_onSearch();
+                    await this.AD_onSearch("false");
                     if (this.PP_Dialog) {
                         this.PP_Dialog.close();
                     }
@@ -5175,7 +5186,8 @@ sap.ui.define([
                             }
                         });
 
-                        await that.AD_onSearch();
+                        // await that.AD_onSearch();
+                        that.getView().getModel("CustomerData").setProperty("/Status","Cancelled")
                         that.getView().getModel("VisibleModel").setProperty("/visible", false);
                         that.byId("idMonthYearSelect").setVisible(false);
                         sap.m.MessageToast.show(that.i18nModel.getText("bookingCancelledSuccessfully"));
@@ -5183,6 +5195,8 @@ sap.ui.define([
                         // Hide Extra Buttons after Cancel
                         that.byId("idedit")?.setVisible(false);
                         that.byId("idcancel")?.setVisible(false);
+                        that.closeBusyDialog()
+
 
                     } catch (err) {
                         that.closeBusyDialog()
@@ -8094,9 +8108,9 @@ sap.ui.define([
 
             const otherMembers = aMembers.filter(m => !m.IsPrimary);
             // Remaining members
-            let filter = { BranchID: [data.BranchCode] };
-            const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
-            const company = oCompanyDetailsModel.data[0];
+            // let filter = { BranchID: [data.BranchCode] };
+            // const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+            const company = this.aBranch[0];
             const checkinTime = company.CheckinTime || "11:00 AM";
             const checkoutTime = company.CheckoutTime || "10:00 PM";
 
