@@ -1107,6 +1107,7 @@ sap.ui.define([
             this.SelectionModeedit = oSelectedFacility.SelectionMode
 
             // 5. Get booking unitText
+            this.getView().getModel("edit").setProperty("/UnitText", "")
             var oBookingModel = this.getView().getModel("edit");
             var sUnitText = oBookingModel.getProperty("/UnitText") || this.byId("idPaymentMethod1").getSelectedKey(); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
