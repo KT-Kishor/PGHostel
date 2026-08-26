@@ -4512,6 +4512,12 @@ sap.ui.define([
                         const oInvoice = oResult.data.ManageInvoice[0];
                         const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
 
+                            if (oInvoice.IGST > 0) {
+                                oInvoice.IGSTSelected=true
+                    } else if (oInvoice.SGST > 0 || oInvoice.CGST > 0) {
+                                oInvoice.CGSTSelected=true
+                              }
+
                         // Format dates
                         oInvoice.InvoiceDate = this.Formatter.formatDate(oInvoice.InvoiceDate);
                         oInvoice.PayByDate = this.Formatter.formatDate(oInvoice.PayByDate);

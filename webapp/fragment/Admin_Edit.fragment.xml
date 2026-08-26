@@ -190,7 +190,7 @@
                 />
                 <DatePicker
                     id="editEndDate"
-                    editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' &amp;&amp; ${edit>/UnitText} !== 'Unit Price' }"
+                    editable="{= ${edit>/UnitText} !== 'Per Month' &amp;&amp; ${edit>/UnitText} !== 'Per Year' &amp;&amp; ${edit>/FacilityChargeType} !== 'Entire Booking'}"
                     value="{path:'edit>/EndDate'}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"

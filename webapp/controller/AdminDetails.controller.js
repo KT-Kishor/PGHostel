@@ -1108,6 +1108,8 @@ sap.ui.define([
 
             // 5. Get booking unitText
             this.getView().getModel("edit").setProperty("/UnitText", "")
+            this.getView().getModel("edit").setProperty("/FacilityChargeType", oSelectedFacility.FacilityChargeType)
+
             var oBookingModel = this.getView().getModel("edit");
             var sUnitText = oBookingModel.getProperty("/UnitText") || this.byId("idPaymentMethod1").getSelectedKey(); // assuming the field is unitText
             var OrginalRentPrice = this.getView().getModel("CustomerData").getProperty("/OrginalRentPrice")
@@ -1155,6 +1157,14 @@ sap.ui.define([
                 aAllowedRateTypes = ["Unit Price"];
                 sap.ui.getCore().byId("idUnitType").setVisible(false).setSelectedKey("")
                 sap.ui.getCore().byId("editquantity").setEditable(false)
+
+                if(oSelectedFacility.FacilityChargeType==="Entire Booking"){
+                    sap.ui.getCore().byId("editEndDate").setEditable(false)
+                }else{
+                    sap.ui.getCore().byId("editEndDate").setEditable(true)
+
+                }
+
 
                 this.getView().getModel("edit").setProperty("/UnitText", "Unit Price")
                 this.UnitTextChange()
@@ -4138,13 +4148,16 @@ sap.ui.define([
 
                 const item = facilityItems[i];
 
-                let facilityStart = this._parseDate(
-                    item.StartDate
-                );
+            let facilityStart =
+    typeof item.StartDate === "string"
+        ? this._parseDate(item.StartDate)
+        : item.StartDate;
 
-                let facilityEnd = this._parseDate(
-                    item.EndDate
-                );
+        let facilityEnd =
+    typeof item.EndDate === "string"
+        ? this._parseDate(item.EndDate)
+        : item.EndDate;
+
 
                 const startInvalid =
                     facilityStart < bookingStartDate;
@@ -4170,6 +4183,19 @@ sap.ui.define([
                     facilityEnd.getTime() !== bookingEndDate.getTime();
 
                 if (startNotMatching || endNotMatching) {
+
+                if ((item.UnitText || "").toLowerCase() === "per month" || (item.UnitText || "").toLowerCase() === "per year") {
+
+    // Change facility start day to booking start day
+    facilityStart.setDate(bookingStartDate.getDate());
+
+    // Change facility end day to booking end day
+    facilityEnd.setDate(bookingEndDate.getDate());
+
+    // Update the item
+    item.StartDate = this.Formatter.formatDate(facilityStart);
+    item.EndDate = this.Formatter.formatDate(facilityEnd);
+}
 
                     facilitiesNotFullBooking.push(item);
                 }
@@ -4857,6 +4883,19 @@ sap.ui.define([
                             that.onSaveBooking1();
 
                         } else {
+
+                                 facilityItems.forEach(item => {
+                            if (item.UnitText === "Unit Price" || item.UnitText === "Package Price") {
+                            if (item.FacilityChargeType === "Entire Booking") 
+                            {
+                                item.EndDate = Bookingdata.EndDate;
+                                       
+                            }
+                           CustomerData.AllSelectedFacilities = facilityItems;
+                            //  Refresh
+                            that.getView().getModel("CustomerData").refresh(true);
+                           }
+                            })
 
                             that.call = true;
                             that.onSaveBooking1();
