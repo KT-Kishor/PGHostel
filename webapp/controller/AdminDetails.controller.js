@@ -1448,15 +1448,7 @@ sap.ui.define([
             }
             sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
 
-            if (sStartDate !== "" && sEndDate !== "") {
-                if (sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")) {
-                    sap.m.MessageToast.show("Please select a valid date");
-                    oModel.setProperty("/EndDate", "");
-                    if (sUnit === "Unit Price") {
-                        oModel.setProperty("/UnitText", sUnit);
-                    }
-                    return;
-                } else if (sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")) {
+            if (sEndDate &&sStartDate && sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")) {
                     sap.m.MessageToast.show("Please select a valid date");
                     oModel.setProperty("/EndDate", "");
                     if (sUnit === "Unit Price") {
@@ -1464,7 +1456,8 @@ sap.ui.define([
                     }
                     return;
                 }
-            }
+
+        
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
 
@@ -1485,11 +1478,18 @@ sap.ui.define([
 
                 oEnd = new Date(targetYear, targetMonth, endDay);
 
+                 
+              sEndDate=this.Formatter.formatDate(oEnd).split('/').reverse().join('-')
+
+
+
             } else if (sUnit === "Per Year" || sUnit === "yearly") {
 
                 oEnd = new Date(oStart);
                 oEnd.setFullYear(oEnd.getFullYear() + iCount);
                 oEnd.setDate(oEnd.getDate())
+             sEndDate=this.Formatter.formatDate(oEnd).split('/').reverse().join('-')
+
 
             } else if (sUnit === "Per Day" || sUnit === "daily" || sUnit === "Per Hour") {
                 if (!oEnd) {
@@ -1527,7 +1527,17 @@ sap.ui.define([
             if (oEnd && iDays === 0) {
                 iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
             }
-
+               
+                if (sStartDate !== "" && sEndDate !== "") {
+                if (sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")) {
+                    sap.m.MessageToast.show("Please select a valid date");
+                    oModel.setProperty("/EndDate", "");
+                    if (sUnit === "Unit Price") {
+                        oModel.setProperty("/UnitText", sUnit);
+                    }
+                    return;
+                }
+            }
             // Update model
             oModel.setProperty("/EndDate", oEnd ? this.Formatter.formatDate(this._formatDate(oEnd)) : "");
             oModel.setProperty("/TotalDays", iDays);
@@ -4720,6 +4730,7 @@ sap.ui.define([
 
                             let bookingEndDate = that._parseDate(Bookingdata.EndDate);
 
+
                             if (!bookingEndDate) {
                                 sap.m.MessageToast.show("Invalid End Date");
                                 return;
@@ -4889,6 +4900,8 @@ sap.ui.define([
                             if (item.FacilityChargeType === "Entire Booking") 
                             {
                                 item.EndDate = Bookingdata.EndDate;
+                                item.StartDate = Bookingdata.StartDate;
+
                                        
                             }
                            CustomerData.AllSelectedFacilities = facilityItems;
