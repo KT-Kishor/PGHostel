@@ -84,6 +84,7 @@
                     placeholder="{i18n>selectUnitType}"
                     items="{RateType>/}"
                     value="{edit>/UnitText}"
+                    selectedKey="{edit>/UnitText}"
                     change="onUnitTextChange"
                     width="100%"
 

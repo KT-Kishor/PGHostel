@@ -1457,7 +1457,7 @@ sap.ui.define([
                     return;
                 }
 
-        
+    
             let oStart = new Date(sStartDate);
             let oEnd = sEndDate ? new Date(sEndDate) : null;
 
@@ -2655,6 +2655,7 @@ sap.ui.define([
             this.getView().getModel("edit").setProperty("/TotalUnits", iMonths)
             this.getView().getModel("edit").setProperty("/TotalDays", Duration)
 
+
             this.iCount = iMonths
             // Open dialog
             if (!this.HM_Dialog) {
@@ -2663,6 +2664,10 @@ sap.ui.define([
                 oView.addDependent(this.HM_Dialog);
             }
             this.HM_Dialog.open();
+
+                 this.getView().getModel("edit").setProperty("/UnitText", oSelectedData.UnitText)
+
+
             this.getView().getModel("CustomerData").setProperty("/minStartDate", new Date(data.StartDate.split("/").reverse().join("-")));
             this.getView().getModel("CustomerData").setProperty("/minEndDate", new Date(data.EndDate.split("/").reverse().join("-")));
 
@@ -2810,6 +2815,7 @@ sap.ui.define([
             sap.ui.getCore().byId("editFacilityName").setValueState("None")
             sap.ui.getCore().byId("editStartDate").setValueState("None")
             sap.ui.getCore().byId("editEndDate").setValueState("None").setMinDate(new Date(sStartDate))
+
 
         },
 
@@ -4306,6 +4312,7 @@ sap.ui.define([
                                         item.EndDate = Bookingdata.EndDate;
                                         item.StartDate = Bookingdata.StartDate;
                                     }
+               
                                 }
                             );
 
@@ -4430,7 +4437,7 @@ sap.ui.define([
 
                                     // Minimum 1 month
                                     months = Math.max(1, months);
-
+                                    // let  months=item.TotalMonths;
 
                                     total = item.quantity ? Number(item.quantity) * months * price : months * price;
 
