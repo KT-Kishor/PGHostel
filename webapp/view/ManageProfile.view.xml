@@ -447,6 +447,12 @@
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
+                    <Text text="{i18n>pNameType}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
                     <Text text="{i18n>room}" />
                 </Column>
                 <Column
@@ -471,6 +477,9 @@
                         <Text text="{profileData>BookingDate}" />
                         <Text text="{profileData>BookingID}" />
                         <Text text="{profileData>customerName}" />
+                        <Text
+                            text="{= ${profileData>BranchName} + (${profileData>PropertyType} ? ' (' + ${profileData>PropertyType} + ')' : '') }"
+                        />
                         <Text
                             text="{= ${profileData>room} + (${profileData>RoomNo} ? ' (' + ${profileData>RoomNo} + ')' : '') }"
                         />

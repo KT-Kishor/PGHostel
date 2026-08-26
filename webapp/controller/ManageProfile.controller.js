@@ -371,6 +371,8 @@ sap.ui.define([
                 currency: booking.Currency || "INR",
                 status: booking.Status || booking.BookingStatus || "",
                 BranchCode: sBranchCode,
+                BranchName: oBranchData.Name || sBranchCode,
+                PropertyType: String(oBranchData.PropertyType || "").trim(),
                 GSTIN: oBranchData.GSTIN || "",
                 GSTType: oBranchData.Type || "",
                 GSTValue: oBranchData.Value || 0
@@ -2805,6 +2807,8 @@ sap.ui.define([
                                 new sap.ui.model.Filter("customerName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("BookingID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("BookingDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("BranchName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("PropertyType", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("room", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("amount", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
