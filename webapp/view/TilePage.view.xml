@@ -107,6 +107,7 @@
 				<Title
                 text="{i18n>tileHome}"
                 level="H2"
+                visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
                 class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
             />
 				<FlexBox

@@ -6674,6 +6674,7 @@
                 CouponCode: oHostelModel.getProperty("/AppliedCouponCode") || "",
                 TotalRoomprice: this._toNumber(oHostelModel.getProperty("/RoomPrice")).toFixed(2),
                 UserID: oHostelModel.getProperty("/UserID") || "",
+                CustomerEmail: oHostelModel.getProperty("/CustomerEmail") || "",
                 GST: "Tax",
                 // GSTType: sEffectiveGSTType,
                 // GSTValue: String(this._toNumber(oHostelModel.getProperty("/EffectiveGSTValue") || oHostelModel.getProperty("/GSTValue"))),
