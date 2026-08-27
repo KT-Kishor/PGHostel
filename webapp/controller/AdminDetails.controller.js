@@ -4225,15 +4225,21 @@ sap.ui.define([
 
                 sap.m.MessageBox.show(
                     "The following facilities have dates outside the booking period:\n\n" +
-                    invalidFacilities
-                        .map(x => {
+                     invalidFacilities
+            .map(x => {
 
-                            let message = `• ${x.item.FacilityName}`;
+                let message = `• ${x.item.FacilityName}`;
 
-                            return message;
-                        })
-                        .join("\n") +
-                    "\n\nDo you want to auto-adjust the invalid dates to match the booking period?",
+                const unit = (x.item.UnitText || "").toLowerCase();
+
+                if (unit === "per month" || unit === "per year") {
+                    message += " - This will cover fully booking period";
+                }
+
+                return message;
+            })
+            .join("\n") +
+        "\n\nDo you want to auto-adjust the invalid dates to match the booking period?",
 
                     {
                         icon: sap.m.MessageBox.Icon.WARNING,
@@ -4710,22 +4716,26 @@ sap.ui.define([
             }
             const customerEndDate = this._parseDate(CustomerData.EndDate);
 
-            let isAnyFacilityMatchingBookingEnd = true;
+            let facilitiesNotMatchingBookingEnd = [];
 
-            for (let i = 0; i < facilityItems.length; i++) {
-                const facilityEnd = this._parseDate(facilityItems[i].EndDate);
+          for (let i = 0; i < facilityItems.length; i++) {
+    const item = facilityItems[i];
 
-                if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
-                    isAnyFacilityMatchingBookingEnd = false;
-                    break;
-                }
-            }
-            if (customerEndDate < bookingEndDate && !isAnyFacilityMatchingBookingEnd && this.call === false) {
+    const facilityEnd = this._parseDate(item.EndDate);
+
+    if (facilityEnd.getTime() !== bookingEndDate.getTime()) {
+        facilitiesNotMatchingBookingEnd.push(item.FacilityName);
+    }
+}
+            if (customerEndDate < bookingEndDate && facilitiesNotMatchingBookingEnd.length > 0 && this.call === false) {
 
                 var that = this;
+                  const facilityNames = [...new Set(facilitiesNotMatchingBookingEnd)];
 
                 sap.m.MessageBox.confirm(
-                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.", {
+                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.\n\n" +
+                  facilityNames.map(name => "• " + name).join("\n"),
+                  {
                     title: "Upgrade Required",
                     actions: ["Extend Now", "Maybe Later"],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
