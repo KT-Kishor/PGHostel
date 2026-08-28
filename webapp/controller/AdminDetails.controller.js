@@ -499,8 +499,7 @@ sap.ui.define([
             try {
                 this.getBusyDialog()
                 const filter = {
-                    BookingID: this.decodedPath,
-                    MemberID: this.MemberID
+                    BookingID: this.decodedPath
                 };
                 const response = await this.ajaxReadWithJQuery("HM_Customer", filter);
                 const oCustomer = response?.Customers || response?.value?.[0] || {};
@@ -5193,6 +5192,7 @@ sap.ui.define([
                 }
             })
                 .then(() => {
+
 
                     // Refresh models
                     this.AD_onSearch();

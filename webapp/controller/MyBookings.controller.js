@@ -721,7 +721,6 @@
 
             this.getOwnerComponent().getRouter().navTo("RouteEditBooking", {
                 BookingID: encodeURIComponent(btoa(oBookingData.BookingID.toString())),
-                MemberID: encodeURIComponent(btoa((oBookingData.MemberID || "").toString())),
                 query: {
                     FromMyBookings: "true"
                 }

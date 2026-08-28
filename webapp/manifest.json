@@ -200,7 +200,7 @@
         },
         {
           "name": "RouteAdminDetails",
-          "pattern": "AdminDetails/{sPath}/{xPath}/{from}/{BranchCode}",
+          "pattern": "AdminDetails/{sPath}/{from}/{BranchCode}",
           "target": [
             "TargetAdminDetails"
           ]
@@ -256,7 +256,7 @@
         },
         {
           "name": "RouteEditBooking",
-          "pattern": "editBooking/{BookingID}/{MemberID}:?query:",
+          "pattern": "editBooking/{BookingID}:?query:",
           "target": [
             "TargetEditBookingView"
           ]

@@ -188,7 +188,6 @@ sap.ui.define([
             this._sReturnRouteAfterEdit = oRouteQuery.FromMyBookings === "true" || oRouteQuery.FromMyBookings === true ? "RouteMyBookings" : "RouteManageProfile";
 
             var sBookingID = this.BookingID;
-            var sMemberID = this._decodeRouteBase64(oArgs.MemberID);
 
             if (!sBookingID) {
                 MessageBox.error("Booking ID is required for editing.");
@@ -201,12 +200,11 @@ sap.ui.define([
             try {
                 this.getBusyDialog();
                 var oPreFetch = await this.ajaxReadWithJQuery("HM_Customer", {
-                    BookingID: sBookingID,
-                    MemberID: sMemberID
+                    BookingID: sBookingID
                 });
                 this.closeBusyDialog();
                 this._oPrefetchedCustomerResponse = oPreFetch;
-                var sOwnerUserID = (oPreFetch && oPreFetch.Customers && oPreFetch.Customers.UserID) || "";
+                var sOwnerUserID = this._getBookingOwnerUserID(oPreFetch);
                 bAccessAllowed = this._isBookingAccessAllowed(sOwnerUserID);
             } catch (e) {
                 this.closeBusyDialog();
@@ -255,6 +253,7 @@ sap.ui.define([
             this._backupFacilityModel = null;
             this._backupFacilitySelection = null;
             this._backupAllFacilities = null;
+            this._aPrefetchedMemberList = null;
 
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
@@ -276,13 +275,13 @@ sap.ui.define([
                 this.getBusyDialog()
                 // 1. Fetch booking data using HM_Customer (reuse pre-fetched response if available)
                 var oResponse = this._oPrefetchedCustomerResponse || await this.ajaxReadWithJQuery("HM_Customer", {
-                    BookingID: sBookingID,
-                    MemberID: sMemberID
+                    BookingID: sBookingID
                 });
                 this._oPrefetchedCustomerResponse = null;
 
-                var oCustomer = oResponse && oResponse.Customers || oResponse && oResponse.value && oResponse.value[0] || {};
-                var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
+                var oCustomer = this._getFirstResponseRecord(oResponse) || {};
+                var vBookings = oCustomer.Bookings || oCustomer.Booking;
+                var oBooking = (Array.isArray(vBookings) ? vBookings[0] : vBookings) || {};
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
                 var sAdminUpdated = oBooking.AdminUpdated || "";
@@ -388,7 +387,8 @@ sap.ui.define([
                 // The actual member documents for edit data will be loaded asynchronously
                 // UserID will be set by _prefillLoggedInUser called later
 
-                var oEditData = this._normalizeBookingEditData(oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs);
+                var aBookingMembers = await this._loadBookingMembers(oCustomer, oBooking);
+                var oEditData = this._normalizeBookingEditData(oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs, aBookingMembers);
                 var fPaymentPaidAmount = this._getEditPaymentPaidAmount(aExistingPayments);
                 oEditData.CustomerEmail = this.CustomerEmail || "";
 
@@ -396,7 +396,7 @@ sap.ui.define([
                 oHostelModel.setProperty("/IsEditMode", true);
                 this._updateEndDateMinDate();
                 oHostelModel.setProperty("/BookingID", sBookingID);
-                oHostelModel.setProperty("/EditMemberID", sMemberID);
+                oHostelModel.setProperty("/EditMemberID", oBooking.MemberID || oCustomer.MemberID || "");
                 oHostelModel.setProperty("/HasExistingPayments", aExistingPayments.length > 0);
                 oHostelModel.setProperty("/PaymentPaidAmount", fPaymentPaidAmount);
                 var oLoadedPrimaryMember = (oEditData.FamilyMembers || []).find(function (oMember) {
@@ -496,12 +496,23 @@ sap.ui.define([
 
         // Returns true only when the active login belongs to this booking owner.
         _isBookingAccessAllowed: function (sOwnerUserID) {
+            sOwnerUserID = String(sOwnerUserID || "").trim();
             if (!sOwnerUserID) {
                 return false;
             }
             var bLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-            var sLoggedInUserID = this._getLoggedInUserID();
+            var sLoggedInUserID = String(this._getLoggedInUserID() || "").trim();
             return bLoggedIn && sLoggedInUserID === sOwnerUserID;
+        },
+
+        // HM_Customer can return the owner at the customer or booking level.
+        _getBookingOwnerUserID: function (oResponse) {
+            var vCustomers = oResponse && (oResponse.Customers || oResponse.value);
+            var oCustomer = Array.isArray(vCustomers) ? vCustomers[0] : vCustomers || {};
+            var vBookings = oCustomer.Bookings || oCustomer.Booking;
+            var oBooking = Array.isArray(vBookings) ? vBookings[0] : vBookings || {};
+
+            return oBooking.UserID || oCustomer.UserID || "";
         },
 
         // Safely decodes the currently logged-in UserID from localStorage.
@@ -634,6 +645,15 @@ sap.ui.define([
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
 
+            if (Array.isArray(this._aPrefetchedMemberList)) {
+                oHostelModel.setProperty("/MemberList", this._aPrefetchedMemberList);
+                this._aPrefetchedMemberList = null;
+                this._mMemberDocumentCache = {};
+                this._bMemberDataLoaded = true;
+                this._bMemberDataLoading = false;
+                return;
+            }
+
             if (!sUserID) {
                 console.warn("Cannot load member data: UserID not available");
                 this._bMemberDataLoaded = true;
@@ -659,6 +679,48 @@ sap.ui.define([
                         this._bMemberDataLoading = false;
                     });
             }, 100); // Small delay to let UI render first
+        },
+
+        _loadBookingMembers: async function (oCustomer, oBooking) {
+            var sMemberIDList = String(oBooking && oBooking.MemberID || "").trim();
+            var aMemberIDs = sMemberIDList.split(",").map(function (sMemberID) {
+                return String(sMemberID || "").trim();
+            }).filter(Boolean);
+            var sUserID = String(
+                oBooking && oBooking.UserID || oCustomer && oCustomer.UserID || ""
+            ).trim();
+
+            if (!aMemberIDs.length || !sUserID) {
+                return [];
+            }
+
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_Memberonly", {
+                    UserID: sUserID
+                });
+                var vData = oResponse && (oResponse.data || oResponse.value || oResponse.Members || oResponse.MemberList);
+                var aMembers = Array.isArray(vData) ? vData : (vData ? [vData] : []);
+                var mMembersByID = {};
+
+                aMembers.forEach(function (oMember) {
+                    var sMemberID = String(oMember && oMember.MemberID || "").trim();
+                    if (sMemberID) {
+                        mMembersByID[sMemberID] = oMember;
+                    }
+                });
+
+                // Reuse this response for the member selection dialog.
+                this._aPrefetchedMemberList = aMembers;
+
+                return aMemberIDs.map(function (sMemberID) {
+                    return mMembersByID[sMemberID];
+                }).filter(Boolean).map(function (oMember) {
+                    return Object.assign({}, oMember, { Selected: true });
+                });
+            } catch (oError) {
+                console.warn("Failed to load booking occupants from HM_Memberonly:", oError);
+                return [];
+            }
         },
 
         _lightweightMergeMemberDocuments: function (aApiMembers, aMemberDocs) {
@@ -1332,13 +1394,15 @@ sap.ui.define([
             };
         },
 
-        _normalizeBookingEditData: function (oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs) {
-            var oCustomer = oResponse && oResponse.Customers || oResponse && oResponse.value && oResponse.value[0] || {};
-            var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
+        _normalizeBookingEditData: function (oResponse, sBookingID, oBranchData, oRoomData, oPricingData, aMemberDocs, aBookingMembers) {
+            var oCustomer = this._getFirstResponseRecord(oResponse) || {};
+            var vBookings = oCustomer.Bookings || oCustomer.Booking;
+            var oBooking = (Array.isArray(vBookings) ? vBookings[0] : vBookings) || {};
             oBranchData = oBranchData || {};
             oRoomData = oRoomData || {};
             oPricingData = oPricingData || {};
             aMemberDocs = aMemberDocs || [];
+            aBookingMembers = Array.isArray(aBookingMembers) ? aBookingMembers : [];
 
             // Simplified facility processing - defer complex processing until needed
             var aRawFacilities = oCustomer.FacilityItems || [];
@@ -1391,7 +1455,7 @@ sap.ui.define([
             // HM_MemberDocument entries carry Documents[] with DocumentType/FileName/File etc.
             // HM_Customer members lack Documents — so we must merge docs INTO the API members
             // instead of discarding the HM_MemberDocument entries that share the same MemberID.
-            var aApiMembers = (oCustomer.Members || oCustomer.MemberList || []).slice();
+            var aApiMembers = aBookingMembers.slice();
             aMemberDocs.forEach(function (oDocMember) {
                 var oExisting = aApiMembers.find(function (am) { return am.MemberID === oDocMember.MemberID; });
                 if (oExisting) {
@@ -1500,7 +1564,7 @@ sap.ui.define([
                 // Members & Facilities
                 MemberList: aMemberList,
                 FamilyMembers: (function () {
-                    var aFamily = (oCustomer.FamilyMembers || oCustomer.Members || aMemberList || []).slice();
+                    var aFamily = aBookingMembers.slice();
                     // The booking's MemberID field is a comma-separated string like "00006_01,00006,00006_02"
                     // The FIRST value is always the primary occupant (0th index).
                     // Sort FamilyMembers to match that order, then set IsPrimary on the 0th entry.
@@ -2187,17 +2251,16 @@ sap.ui.define([
 
                 var oHostelModel = this.getView().getModel("HostelModel");
                 var sBookingID = oHostelModel.getProperty("/BookingID");
-                var sMemberID = oHostelModel.getProperty("/EditMemberID") || "";
 
                 // 1. Fetch current booking data to check payment status
                 var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
-                    BookingID: sBookingID,
-                    MemberID: sMemberID
+                    BookingID: sBookingID
                 });
 
-                var oCustomer = oResponse && oResponse.Customers || oResponse && oResponse.value && oResponse.value[0] || {};
+                var oCustomer = this._getFirstResponseRecord(oResponse) || {};
                 var aPayments = await this._readEditPaymentsByBookingId(sBookingID);
-                var oBooking = (Array.isArray(oCustomer.Bookings) ? oCustomer.Bookings[0] : oCustomer.Bookings) || {};
+                var vBookings = oCustomer.Bookings || oCustomer.Booking;
+                var oBooking = (Array.isArray(vBookings) ? vBookings[0] : vBookings) || {};
                 var fOriginalGrandTotal = parseFloat(oBooking.RentPrice || oBooking.GrandTotal || 0);
                 var oBookingView = this.getView().getModel("BookingView");
 

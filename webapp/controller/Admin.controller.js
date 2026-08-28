@@ -1303,7 +1303,6 @@ sap.ui.define([
 
             this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(sEncodedID),
-                xPath: sMemberID,
                 from: "Customerdetails",
                 BranchCode:sBranchCode
             });
