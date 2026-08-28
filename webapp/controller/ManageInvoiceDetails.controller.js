@@ -625,7 +625,7 @@ sap.ui.define([
                     const paymentType = bookingDetails.PaymentType;
                     const startDate = new Date(bookingDetails.StartDate);
                     const endDate = new Date(bookingDetails.EndDate);
-        
+
                     let invoiceDate, payByDate;
 
                     if (paymentType === "Per Day") {
@@ -827,7 +827,7 @@ sap.ui.define([
                 }
             },
 
-            _getDurationText: function (sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity,FacilityChargeType) {
+            _getDurationText: function (sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity, FacilityChargeType) {
 
                 const qty = Number(quantity) || 1;
                 const mode = selectionMode?.toUpperCase();
@@ -980,8 +980,8 @@ sap.ui.define([
 
                 if (mode === "PERSON_QTY") {
 
-                    if(unit === "package price" && ChargeType==="daily"){
-                         const totalUnits = qty * diffDays;
+                    if (unit === "package price" && ChargeType === "daily") {
+                        const totalUnits = qty * diffDays;
 
                         return `${qty} Unit × ${diffDays} Days (${totalUnits}Units)`;
                     }
@@ -1057,9 +1057,9 @@ sap.ui.define([
                 };
 
                 // Per Month
-                if (paymentType === "Per Month") {
-                    return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
-                }
+                // if (paymentType === "Per Month") {
+                //     return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
+                // }
 
                 // Per Day / Year / Others
                 return `Invoice for ${formatDate(startDate)} - ${formatDate(endDate)}`;
@@ -1873,11 +1873,11 @@ sap.ui.define([
                 oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
                 oInvoiceModel.refresh(true);
 
-                
+
                 this.totalAmountCalculation();
 
-            
-             
+
+
             },
 
             CI_onSelectIGST: function (oEvent) {
@@ -1916,7 +1916,7 @@ sap.ui.define([
                 oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
                 oInvoiceModel.refresh(true);
                 this.totalAmountCalculation();
-              
+
             },
 
             CI_onPercentageChange: function (oEvent) {
@@ -4512,11 +4512,11 @@ sap.ui.define([
                         const oInvoice = oResult.data.ManageInvoice[0];
                         const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
 
-                            if (oInvoice.IGST > 0) {
-                                oInvoice.IGSTSelected=true
-                    } else if (oInvoice.SGST > 0 || oInvoice.CGST > 0) {
-                                oInvoice.CGSTSelected=true
-                              }
+                        if (oInvoice.IGST > 0) {
+                            oInvoice.IGSTSelected = true
+                        } else if (oInvoice.SGST > 0 || oInvoice.CGST > 0) {
+                            oInvoice.CGSTSelected = true
+                        }
 
                         // Format dates
                         oInvoice.InvoiceDate = this.Formatter.formatDate(oInvoice.InvoiceDate);
@@ -4621,7 +4621,7 @@ sap.ui.define([
                         if (oModelData.Status === "Submitted") {
                             MessageToast.show("Invoice items are refreshed");
                             this.onChangeInvoiceStatus("Submitted");
-                        } else if(balanceAmount > 0){
+                        } else if (balanceAmount > 0) {
                             MessageToast.show("New line items added. Opening payment screen...");
                             this.onChangeInvoiceStatus("Payment Partially");
 
@@ -4737,7 +4737,10 @@ sap.ui.define([
                     cycleStart.setHours(0, 0, 0, 0);
                     cycleEnd.setHours(0, 0, 0, 0);
 
-                    nonFacilityItems = RoomRent
+                    nonFacilityItems = [RoomRent[0], ...existingItems.filter(
+                        i => !i.Particulars.includes("Facility") &&
+                            !i.Particulars.includes("Room Rent")
+                    )];
 
                 } else {
                     cycleStart = this._parseDate(roomRent.StartDate);
@@ -4956,18 +4959,18 @@ sap.ui.define([
 
                 // if (bookingUnit !== "per day") {
 
-                    const overlaps =
-                        !(eDate < cycleStart || sDate > cycleEnd);
+                const overlaps =
+                    !(eDate < cycleStart || sDate > cycleEnd);
 
-                    if (!overlaps) {
-                        return 0;
-                    }
+                if (!overlaps) {
+                    return 0;
+                }
 
-                    effectiveStart =
-                        sDate > cycleStart ? sDate : cycleStart;
+                effectiveStart =
+                    sDate > cycleStart ? sDate : cycleStart;
 
-                    effectiveEnd =
-                        eDate < cycleEnd ? eDate : cycleEnd;
+                effectiveEnd =
+                    eDate < cycleEnd ? eDate : cycleEnd;
                 // }
 
                 const calcStart =
@@ -5324,135 +5327,192 @@ sap.ui.define([
                 return `${y}-${m}-${day}`;
             },
             onPaymentDateChange: function (oEvent) {
-    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
-    const oData = oContext.getObject();
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
 
-    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
-},
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
 
-GrossPriceChange: function (oEvent) {
-    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
-    const oData = oContext.getObject();
+            GrossPriceChange: function (oEvent) {
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
 
-    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
-},
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
 
-onChangeUnitText: function (oEvent) {
-    const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
-    const oData = oContext.getObject();
+            onChangeUnitText: function (oEvent) {
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
 
-    this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
-},
-_validateAndCalculateInvoiceItem: function (oData, oSource) {
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
+            _validateAndCalculateInvoiceItem: function (oData, oSource) {
 
-    const oModel = this.getView().getModel("ManageInvoiceItemModel");
-    const oCtx = oSource.getBindingContext("ManageInvoiceItemModel");
+                const oModel = this.getView().getModel("ManageInvoiceItemModel");
+                const oCtx = oSource.getBindingContext("ManageInvoiceItemModel");
 
-    if (!oCtx) {
-        return;
-    }
+                if (!oCtx) {
+                    return;
+                }
 
-    const startDate = this._parseDate(oData.StartDate);
-    const endDate = this._parseDate(oData.EndDate);
+                const sPath = oCtx.getPath();
 
-    const unit = (oData.UnitText || "").trim();
+                const startDate = this._parseDate(oData.StartDate);
+                const endDate = this._parseDate(oData.EndDate);
 
-    const grossPrice = Number(
-        String(oData.GrossPrice || "0").replace(/,/g, "")
-    );
+                const unit = (oData.UnitText || "").trim();
 
-    // Validate dates
-    if (oData.StartDate && oData.EndDate) {
+                const grossPrice = Number(
+                    String(oData.GrossPrice || "0").replace(/,/g, "")
+                );
 
-        if (!startDate || !endDate) {
-            oSource.setValueState("Error");
-            oSource.setValueStateText("Please enter valid dates.");
-            return;
-        }
 
-        if (startDate > endDate) {
-            oSource.setValueState("Error");
-            oSource.setValueStateText(
-                "End Date cannot be earlier than Start Date."
-            );
+                if (oData.StartDate && oData.EndDate) {
 
-            oModel.setProperty(
-                oCtx.getPath() + "/DurationText",
-                ""
-            );
+                    // Invalid date
+                    if (!startDate || !endDate) {
 
-            return;
-        }
+                        oSource.setValueState("Error");
+                        oSource.setValueStateText(
+                            "Please enter valid dates."
+                        );
 
-        oSource.setValueState("None");
-    }
+                        oModel.setProperty(
+                            sPath + "/DurationText",
+                            ""
+                        );
 
-    // Validate Gross Price
-    if (isNaN(grossPrice) || grossPrice < 0) {
+                        oModel.setProperty(
+                            sPath + "/Total",
+                            0
+                        );
 
-        oSource.setValueState("Error");
-        oSource.setValueStateText(
-            "Gross Price must be a valid amount."
-        );
+                        return;
+                    }
 
-        return;
-    }
+                    // Start Date > End Date
+                    if (startDate > endDate) {
 
-    let totalAmount = 0;
-    let durationText = "";
+                        oSource.setValueState("Error");
+                        oSource.setValueStateText(
+                            "End Date cannot be earlier than Start Date."
+                        );
 
-    // Per Day
-    if (unit === "Per Day") {
+                        oModel.setProperty(
+                            sPath + "/DurationText",
+                            ""
+                        );
 
-        if (!startDate || !endDate) {
-            return;
-        }
+                        oModel.setProperty(
+                            sPath + "/Total",
+                            0
+                        );
 
-        const millisecondsPerDay = 24 * 60 * 60 * 1000;
+                        return;
+                    }
 
-        const duration =
-            Math.floor(
-                (endDate.getTime() - startDate.getTime()) /
-                millisecondsPerDay
-            );
 
-        durationText =
-            duration + " Day" +
-            (duration > 1 ? "s" : "");
 
-        totalAmount = Number(
-            (grossPrice * duration).toFixed(2)
-        );
-    }
+                    const oRow = oSource.getParent();
 
-    // Fix
-    else if (unit === "Fix") {
+                    if (oRow && oRow.getCells) {
 
-        durationText = "1";
+                        oRow.getCells().forEach(function (oCell) {
 
-        totalAmount = Number(
-            grossPrice.toFixed(2)
-        );
-    }
+                            if (oCell.isA("sap.m.DatePicker")) {
 
-    // Set values in CURRENT ROW
-    oModel.setProperty(
-        oCtx.getPath() + "/GrossPrice",
-        grossPrice
-    );
+                                const oBinding = oCell.getBinding("value");
 
-    oModel.setProperty(
-        oCtx.getPath() + "/DurationText",
-        durationText
-    );
+                                if (oBinding) {
 
-    oModel.setProperty(
-        oCtx.getPath() + "/Total",
-        totalAmount
-    );
+                                    const sBindingPath = oBinding.getPath();
 
-    // Recalculate invoice overall total
-    this.totalAmountCalculation();
-},
+                                    if (
+                                        sBindingPath === "StartDate" ||
+                                        sBindingPath === "EndDate"
+                                    ) {
+                                        oCell.setValueState("None");
+                                        oCell.setValueStateText("");
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+
+                if (isNaN(grossPrice) || grossPrice < 0) {
+
+                    oSource.setValueState("Error");
+                    oSource.setValueStateText(
+                        "Gross Price must be a valid amount."
+                    );
+
+                    return;
+                }
+
+
+                let totalAmount = 0;
+                let durationText = "";
+
+
+                if (unit === "Per Day") {
+
+                    if (!startDate || !endDate) {
+                        return;
+                    }
+
+                    // Safety check
+                    if (startDate > endDate) {
+                        return;
+                    }
+
+                    const millisecondsPerDay =
+                        24 * 60 * 60 * 1000;
+
+                    const duration = Math.floor(
+                        (
+                            endDate.getTime() -
+                            startDate.getTime()
+                        ) / millisecondsPerDay
+                    );
+
+                    durationText =
+                        duration +
+                        " Day" +
+                        (duration > 1 ? "s" : "");
+
+                    totalAmount = Number(
+                        (grossPrice * duration).toFixed(2)
+                    );
+                }
+
+                else if (unit === "Fix") {
+
+                    durationText = "1";
+
+                    totalAmount = Number(
+                        grossPrice.toFixed(2)
+                    );
+                }
+
+
+                oModel.setProperty(
+                    sPath + "/GrossPrice",
+                    grossPrice
+                );
+
+                oModel.setProperty(
+                    sPath + "/DurationText",
+                    durationText
+                );
+
+                oModel.setProperty(
+                    sPath + "/Total",
+                    totalAmount
+                );
+
+                this.totalAmountCalculation();
+            },
         });
     });
