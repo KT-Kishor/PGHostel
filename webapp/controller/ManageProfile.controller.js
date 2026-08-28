@@ -71,6 +71,14 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var oProfileModel = this.getView().getModel("profileData");
+            if (oProfileModel) {
+                oProfileModel.setProperty("/isEditMode", false);
+            }
+            this._originalProfileData = null;
+            this.clearProfileValueStates();
+            this.clearGlobalSearch();
+
             this.getBusyDialog()
             await this.commonLoginFunction("ManageProfile");
             this.ManageData();
@@ -130,7 +138,6 @@ sap.ui.define([
                 const oControl = this.byId(sId);
                 if (oControl && oControl.setValueState) {
                     oControl.setValueState(sap.ui.core.ValueState.None);
-                    oControl.setValueStateText("");
                 }
             }.bind(this));
         },
