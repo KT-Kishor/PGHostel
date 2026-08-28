@@ -540,7 +540,7 @@
                             <Input
                                 id="EditBookCompanyname_ID"
                                 value="{HostelModel>/CompanyName}"
-                                placeholder="Enter company name (minimum 3 characters)"
+                                placeholder="Enter company name"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                                 width="100%"

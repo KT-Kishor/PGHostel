@@ -7,7 +7,8 @@ sap.ui.define([
     "../utils/validation",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-], function (BaseController, Formatter, JSONModel, MessageToast, MessageBox, utils, Filter, FilterOperator) {
+    "sap/ui/core/Fragment"
+], function (BaseController, Formatter, JSONModel, MessageToast, MessageBox, utils, Filter, FilterOperator, Fragment) {
     "use strict";
     const $C = (id) => sap.ui.getCore().byId(id);
     this._otpResendInterval = null;
@@ -2989,5 +2990,115 @@ sap.ui.define([
         onAmenityImageError: function (oEvent) {
             oEvent.getSource().setSrc("./image/no-image.png");
         },
+
+        onPrivacyPolicyPress: function () {
+            var oView = this.getView();
+
+            if (!this._pTermsDialog) {
+                this._pTermsDialog = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.ui.com.project1.fragment.TermsandCondition",
+                    controller: this
+                }).then(function (oDialog) {
+                    oView.addDependent(oDialog);
+
+                    var oHtml = Fragment.byId(
+                        oView.getId(),
+                        "termsPdfFrame"
+                    );
+
+                    if (!oHtml) {
+                        throw new Error(
+                            "termsPdfFrame was not found."
+                        );
+                    }
+
+                    oHtml.addEventDelegate({
+                        onAfterRendering: function () {
+                            var oIframe = oHtml
+                                .getDomRef()
+                                .querySelector("iframe");
+
+                            if (!oIframe) {
+                                return;
+                            }
+
+                            oIframe.src = sap.ui.require.toUrl(
+                                "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
+                            );
+                        }
+                    });
+
+                    return oDialog;
+                }.bind(this));
+            }
+
+            this._pTermsDialog.then(function (oDialog) {
+                oDialog.open();
+            });
+        },
+
+        onTermsDialogClose: function () {
+            var oDialog = Fragment.byId(
+                this.getView().getId(),
+                "termsDialog"
+            );
+
+            if (oDialog) {
+                oDialog.close();
+            }
+        },
+
+        onDownloadTerms: function () {
+            var sPdfUrl = sap.ui.require.toUrl(
+                "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
+            );
+
+            var oLink = document.createElement("a");
+            oLink.href = sPdfUrl;
+            oLink.download = "TermsAndConditions.pdf";
+
+            document.body.appendChild(oLink);
+            oLink.click();
+            document.body.removeChild(oLink);
+        },
+
+        onTermsDialogClose: function () {
+            this.byId("termsDialog").close();
+        },
+
+        onUsermanualPress: function () {
+            this.getOwnerComponent()
+                .getRouter()
+                .navTo("RouteUserManual");
+        },
+
+
+        onFooterMenuPress: function (oEvent) {
+
+            if (!this._oFooterMenu) {
+
+                this._oFooterMenu = new sap.m.Menu({
+                    items: [
+
+                        new sap.m.MenuItem({
+                            text: "User Manual",
+                            icon: "sap-icon://visits",
+                            press: this.onUsermanualPress.bind(this)
+                        }),
+                        new sap.m.MenuItem({
+                            text: "Terms and Conditions",
+                            icon: "sap-icon://document-text",
+                            press: this.onPrivacyPolicyPress.bind(this)
+                        })
+
+                    ]
+                });
+
+                this.getView().addDependent(this._oFooterMenu);
+            }
+
+            this._oFooterMenu.openBy(oEvent.getSource());
+        },  
     });
 });

@@ -3616,6 +3616,11 @@ sap.ui.define([
             // footer in its editable state if one of those operations fails.
             oBookingView.setProperty("/editModeEnabled", false);
 
+            // Value states are control properties, not model-bound: restoring the
+            // backup data does not reset them, so stale GST validation errors would
+            // survive a cancel and reappear when edit mode is opened again.
+            this._clearBusinessGSTValueStates();
+
             // Restore original data from backup if it exists
             if (this._backupHostelModel) {
                 var oBackupData = JSON.parse(JSON.stringify(this._backupHostelModel));

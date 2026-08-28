@@ -490,22 +490,30 @@ sap.ui.define([
                         text: "Take Photo",
                         icon: "sap-icon://add-photo",
                         press: this.onTakePhoto.bind(this)
-                    }),
+                    }).addStyleClass("myUnifiedBtn"),
                     new sap.m.Button({
                         text: "Upload from Gallery",
                         icon: "sap-icon://image-viewer",
                         press: this.onUploadPhoto.bind(this)
-                    }),
+                    }).addStyleClass("myUnifiedBtn"),
                     new sap.m.Button({
                         text: "Remove Photo",
                         icon: "sap-icon://delete",
-                        type: "Reject",
                         press: this.onRemovePhoto.bind(this)
-                    })
+                    }).addStyleClass("myUnifiedBtn")
                 ],
                 placement: "Bottom"
             });
             this.getView().addDependent(this._oAvatarActionSheet);
+
+            if (sap.ui.Device.system.phone) {
+                var oCancelButton = this._oAvatarActionSheet._getCancelButton();
+                if (oCancelButton) {
+                    oCancelButton.setType(sap.m.ButtonType.Default);
+                    oCancelButton.addStyleClass("myUnifiedBtn");
+                }
+            }
+
             this._oAvatarActionSheet.openBy(oEvent.getSource());
         },
 
