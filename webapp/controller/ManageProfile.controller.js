@@ -78,6 +78,7 @@ sap.ui.define([
             this._originalProfileData = null;
             this.clearProfileValueStates();
             this.clearGlobalSearch();
+            this._ViewDatePickersReadOnly(["id_dob1"], this.getView());
 
             this.getBusyDialog()
             await this.commonLoginFunction("ManageProfile");
@@ -861,6 +862,7 @@ sap.ui.define([
 
             //  IMPORTANT: clear old backup
             this._originalProfileData = null;
+            this._oIdentitySnapshot = null;
         },
 
         _resetValidationStates: function () {
@@ -2062,6 +2064,15 @@ sap.ui.define([
             if (!isEditMode) {
                 oModel.setProperty("/isEditMode", true);
                 oModel.setProperty("/Country", data.Country);
+                // Snapshot the login identity fields so the save path can detect
+                // whether they must also be synced to the Self member record
+                // (HM_MemberDocument) in addition to the HM_Login update.
+                this._oIdentitySnapshot = {
+                    Salutation: oModel.getProperty("/Salutation") || "",
+                    Name: oModel.getProperty("/name") || "",
+                    DateOfBirth: oModel.getData().dob || "",
+                    Gender: oModel.getProperty("/gender") || ""
+                };
                 if (data.Salutation === "Dr.") {
                     this.getView().byId("id_gender1").setEnabled(true)
                 } else {
@@ -2111,7 +2122,33 @@ sap.ui.define([
                 const oLoginmodel = this.getView().getModel("LoginModel");
                 oLoginmodel.setProperty("/EmployeeName", payload.data.UserName);
                 oLoginmodel.refresh(true);
-                MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
+
+                // Identity fields changed -> mirror them onto the Self member
+                // record. HM_Login already succeeded, so a sync failure must not
+                // roll back or fail the profile update itself.
+                var bMemberSyncFailed = false;
+                if (this._hasIdentityFieldsChanged(oModel)) {
+                    try {
+                        await this._syncSelfMemberIdentity();
+
+                        // Refresh the member list only when the Members tab is
+                        // currently visible: switching to that tab later already
+                        // triggers its own HM_Memberonly read, so refreshing on
+                        // other tabs would be a redundant call.
+                        if (oModel.getProperty("/selectedTab") === "Members") {
+                            await this._loadMembers();
+                        }
+                    } catch (oSyncError) {
+                        bMemberSyncFailed = true;
+                        console.warn("Self member identity sync failed:", oSyncError);
+                    }
+                }
+
+                if (bMemberSyncFailed) {
+                    MessageToast.show("Profile updated, but member details could not be synced.");
+                } else {
+                    MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
+                }
 
             } catch (err) {
                 this.closeBusyDialog();
@@ -2120,8 +2157,90 @@ sap.ui.define([
                 this.closeBusyDialog();
                 oModel.setProperty("/isEditMode", false);
                 oModel.refresh(true);
+                this._oIdentitySnapshot = null;
 
             }
+        },
+
+        /**
+         * Compares the current Salutation / Name / DateOfBirth / Gender values
+         * against the snapshot captured when edit mode was entered.
+         */
+        _hasIdentityFieldsChanged: function (oModel) {
+            if (!this._oIdentitySnapshot) {
+                return false;
+            }
+
+            var oCurrent = {
+                Salutation: oModel.getProperty("/Salutation") || "",
+                Name: oModel.getProperty("/name") || "",
+                DateOfBirth: oModel.getData().dob || "",
+                Gender: oModel.getProperty("/gender") || ""
+            };
+
+            return ["Salutation", "Name", "DateOfBirth", "Gender"].some(function (sField) {
+                return String(oCurrent[sField] || "").trim() !== String(this._oIdentitySnapshot[sField] || "").trim();
+            }.bind(this));
+        },
+
+        /**
+         * PUTs the changed login identity fields (Salutation, Name,
+         * DateOfBirth, Gender) to the Self member record in HM_MemberDocument.
+         * Only these fields plus the MemberID/UserID identifiers are sent:
+         * Relation and documents are deliberately omitted so the backend keeps
+         * the stored values untouched. HM_Login stores the name as "UserName",
+         * while HM_MemberDocument stores it as "Name".
+         */
+        _syncSelfMemberIdentity: async function () {
+            const oModel = this.getView().getModel("profileData");
+            const sUserID = oModel.getProperty("/UserID") || "";
+
+            if (!sUserID) {
+                return;
+            }
+
+            var sSalutation = oModel.getProperty("/Salutation") || "";
+            var sName = oModel.getProperty("/name") || "";
+            var sDob = oModel.getData().dob || "";
+            var sGender = oModel.getProperty("/gender") || "";
+
+            // Resolve the Self member: prefer the already-loaded Members list and
+            // fall back to HM_Memberonly when the Members tab was never opened.
+            var oSelfMember = (oModel.getProperty("/Members") || []).find(function (oMember) {
+                return String(oMember.Relation || "").trim().toLowerCase() === "self";
+            });
+
+            if (!oSelfMember) {
+                try {
+                    var resp = await this.ajaxReadWithJQuery("HM_Memberonly", {
+                        UserID: sUserID
+                    });
+                    var aMemberData = Array.isArray(resp?.data) ? resp.data : (resp?.data ? [resp.data] : []);
+                    oSelfMember = aMemberData.find(function (oMember) {
+                        return String(oMember.Relation || "").trim().toLowerCase() === "self";
+                    });
+                } catch (oError) {
+                    oSelfMember = null;
+                }
+            }
+
+            var sMemberID = (oSelfMember && oSelfMember.MemberID) || sUserID;
+
+            var oPayload = {
+                data: [{
+                    Members: [{
+                        MemberID: sMemberID,
+                        Salutation: sSalutation,
+                        Name: sName,
+                        DateOfBirth: sDob ? sDob.split("/").reverse().join("-") : "",
+                        Gender: sGender,
+                        Relation: "Self",
+                        UserID: sUserID
+                    }]
+                }]
+            };
+
+            await this.ajaxUpdateWithJQuery("HM_MemberDocument", oPayload);
         },
 
         onPressBookingRow: function (oEvent) {
