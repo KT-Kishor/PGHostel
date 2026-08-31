@@ -529,6 +529,7 @@
                                 valueStateText="{i18n>gstError}"
                                 width="100%"
                                 enabled="{BookingView>/editModeEnabled}"
+                                maxLength="15"
                             />
 
                             <Label

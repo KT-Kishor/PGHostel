@@ -168,11 +168,32 @@
             await this._loadAdvertisements();
             this._recalculateSummary();
             this._makeDatePickersReadOnly(["BookStartdate_ID"]);
+            this._clearBookingFieldErrorStates();
             oHostelModel.refresh(true);
 
             // Start background loading of member data
             this._loadMemberDataInBackground();
             this.closeBusyDialog()
+        },
+
+        _clearBookingFieldErrorStates: function () {
+            var oRoom = this.byId("BookRoom_ID");
+            var oDuration = this.byId("BookDuration_ID");
+            var oStart = this.byId("BookStartdate_ID");
+            var oEnd = this.byId("BookEnddate_ID");
+
+            if (oRoom && oRoom.setValueState) {
+                oRoom.setValueState("None");
+            }
+            if (oDuration && oDuration.setValueState) {
+                oDuration.setValueState("None");
+            }
+            if (oStart && oStart.setValueState) {
+                oStart.setValueState("None");
+            }
+            if (oEnd && oEnd.setValueState) {
+                oEnd.setValueState("None");
+            }
         },
 
         /**

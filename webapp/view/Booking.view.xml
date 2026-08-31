@@ -636,6 +636,7 @@
                                 class="sapUiTinyMarginBottom"
                                 valueStateText="{i18n>gstError}"
                                 width="100%"
+                                maxLength="ed15"
                             />
 
                             <Label
