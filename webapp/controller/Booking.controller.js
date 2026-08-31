@@ -167,7 +167,7 @@
             this._rebuildSelectedFacilities();
             await this._loadAdvertisements();
             this._recalculateSummary();
-            this._makeDatePickersReadOnly(["BookStartdate_ID"]);
+            this._makeDatePickersReadOnly(["BookStartdate_ID", "BookEnddate_ID"]);
             this._clearBookingFieldErrorStates();
             oHostelModel.refresh(true);
 

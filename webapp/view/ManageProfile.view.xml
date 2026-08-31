@@ -161,10 +161,6 @@
                                 key="Dr."
                                 text="Dr."
                             />
-                            <core:Item
-                                key="Other."
-                                text="Other."
-                            />
                         </Select>
 
                         <Input

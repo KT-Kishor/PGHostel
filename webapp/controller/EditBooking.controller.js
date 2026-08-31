@@ -255,6 +255,7 @@ sap.ui.define([
             this._backupAllFacilities = null;
             this._aPrefetchedMemberList = null;
             this._oInitialBookingDetails = null;
+            this._makeDatePickersReadOnly(["EditBookStartdate_ID","EditBookEnddate_ID"]);
 
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
@@ -440,6 +441,7 @@ sap.ui.define([
                 this._recalculateSummary();
                 // Don't make date pickers read-only here - they're controlled by editModeEnabled binding
                 oHostelModel.refresh(true);
+                this._clearEditBookingFieldErrorStates();
 
                 // Check if status is "New" and update BookingView model accordingly
                 var oBookingView = this.getView().getModel("BookingView");
@@ -493,6 +495,26 @@ sap.ui.define([
                 MessageBox.error("Unable to load booking details for edit.");
             } finally {
                 this.closeBusyDialog();
+            }
+        },
+
+        _clearEditBookingFieldErrorStates: function () {
+            var oRoom = this.byId("EditBookRoom_ID");
+            var oDuration = this.byId("EditBookDuration_ID");
+            var oStart = this.byId("EditBookStartdate_ID");
+            var oEnd = this.byId("EditBookEnddate_ID");
+
+            if (oRoom && oRoom.setValueState) {
+                oRoom.setValueState("None");
+            }
+            if (oDuration && oDuration.setValueState) {
+                oDuration.setValueState("None");
+            }
+            if (oStart && oStart.setValueState) {
+                oStart.setValueState("None");
+            }
+            if (oEnd && oEnd.setValueState) {
+                oEnd.setValueState("None");
             }
         },
 
@@ -3674,6 +3696,7 @@ sap.ui.define([
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
             var oFacilitySelection = this.getView().getModel("FacilitySelection");
+            this._clearEditBookingFieldErrorStates();
 
             // Leave edit mode immediately so later UI refresh work cannot leave the
             // footer in its editable state if one of those operations fails.

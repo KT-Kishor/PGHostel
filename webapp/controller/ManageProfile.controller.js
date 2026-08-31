@@ -121,6 +121,10 @@ sap.ui.define([
 
             utils._LCstrictValidationSelect(oSalutation);
         },
+        onNameInputLiveChange: function (oEvent) {
+            utils._LCvalidateName(oEvent);
+
+        },
         clearProfileValueStates: function () {
             const aControls = [
                 "id_Name1",
@@ -2081,7 +2085,7 @@ sap.ui.define([
                 return;
             }
             const isMandatoryValid = (
-                utils._LCvalidateMandatoryField(this.byId("id_Name1"), "ID") &&
+                utils._LCvalidateName(this.byId("id_Name1"), "ID") &&
                 utils._LCvalidateEmail(this.byId("id_mail1"), "ID") &&
                 this.onChangeDOB(this.byId("id_dob1"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_country1"), "ID") &&
