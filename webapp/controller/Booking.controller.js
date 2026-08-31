@@ -65,7 +65,7 @@
             this._attachDocumentInfoHover();
             this._attachFacilityDiscountInfoHover();
             this._attachFacilitiesBreakdownHover();
-            this._makeDatePickersReadOnly(["BookStartdate_ID"]);
+            this._makeDatePickersReadOnly(["BookStartdate_ID", "BookEnddate_ID"]);
         },
 
         _updateTableColumnWidths: function () {
@@ -167,7 +167,6 @@
             this._rebuildSelectedFacilities();
             await this._loadAdvertisements();
             this._recalculateSummary();
-            this._makeDatePickersReadOnly(["BookStartdate_ID", "BookEnddate_ID"]);
             this._clearBookingFieldErrorStates();
             oHostelModel.refresh(true);
 

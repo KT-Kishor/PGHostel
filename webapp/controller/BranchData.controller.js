@@ -656,7 +656,7 @@ sap.ui.define([
             oStartingPrice.setValueState("None");
 
             const oEditBefore = sap.ui.getCore().byId(oView.createId("BD_id_EditBefore"));
-            if (!utils._LCvalidateEditBeforeHours(oEditBefore, "ID")) {
+            if (!this._LCvalidateEditBeforeHours(oEditBefore, "ID")) {
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -835,6 +835,43 @@ sap.ui.define([
             });
         },
 
+        _LCvalidateEditBeforeHours: function (oEvent, type) {
+            var oField = type === "ID" ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+
+            let sValue = oField.getValue();
+
+            // Agar user 'e', 'E' ya '.' type kare toh error dikhane ke liye
+            if (/[eE.]/.test(sValue)) {
+                oField.setValueState("Error");
+                oField.setValueStateText("Decimals and exponential values are not allowed");
+            }
+
+            sValue = sValue.replace(/[^0-9]/g, "").slice(0, 3);
+
+            if (sValue.startsWith("0") && sValue.length > 1) {
+                sValue = String(parseInt(sValue, 10));
+            }
+
+            oField.setValue(sValue);
+
+            if (!sValue) {
+                oField.setValueState("Error");
+                oField.setValueStateText("Hours cannot be empty");
+                return false;
+            }
+
+            if (parseInt(sValue, 10) < 0) {
+                oField.setValueState("Error");
+                oField.setValueStateText("Hours cannot be negative");
+                return false;
+            }
+
+            oField.setValueState("None");
+            oField.setValueStateText("");
+            return true;
+        },
+
         onPinInputLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
             utils._LCvalidatePinCode(oEvent);
@@ -842,7 +879,7 @@ sap.ui.define([
         },
 
         onEditBeforeLiveChange: function(oEvent) {
-            utils._LCvalidateEditBeforeHours(oEvent);
+            this._LCvalidateEditBeforeHours(oEvent);
         },
 
         onPenaltyInputLiveChange: function(oEvent) {

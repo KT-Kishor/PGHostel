@@ -255,7 +255,7 @@ sap.ui.define([
             this._backupAllFacilities = null;
             this._aPrefetchedMemberList = null;
             this._oInitialBookingDetails = null;
-            this._makeDatePickersReadOnly(["EditBookStartdate_ID","EditBookEnddate_ID"]);
+            this._ViewDatePickersReadOnly(["EditBookStartdate_ID", "EditBookEnddate_ID"], this.getView());
 
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
