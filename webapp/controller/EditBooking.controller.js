@@ -254,6 +254,7 @@ sap.ui.define([
             this._backupFacilitySelection = null;
             this._backupAllFacilities = null;
             this._aPrefetchedMemberList = null;
+            this._oInitialBookingDetails = null;
 
             // Initialize BookingView model with edit mode properties
             var oBookingViewData = this._getBookingViewInitialData ? this._getBookingViewInitialData() : this._getDefaultBookingViewData();
@@ -413,6 +414,7 @@ sap.ui.define([
                 this._syncPropertyTypeState();
                 this._syncPlanState();
                 this._applySelectedPlanPrice();
+                this._storeInitialBookingDetails();
 
                 // Process facilities if we got them in parallel
                 if (oFacilitiesResponse) {
@@ -1639,10 +1641,67 @@ sap.ui.define([
             aBooking[0].BookingID = oHostelModel.getProperty("/BookingID");
             aBooking[0].UserID = sOriginalUserID;
             aBooking[0].MemberID = String(aBooking[0].MemberID || sOriginalMemberID || "").trim();
-            // Remove Status field to prevent updating status
-            delete aBooking[0].Status;
+            aBooking[0].Status = this._haveBookingDetailsChanged()
+                ? "New"
+                : String(this._oInitialBookingDetails && this._oInitialBookingDetails.status || "").trim();
 
             return aBooking;
+        },
+
+        _getBookingDetailsSnapshot: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+
+            return {
+                roomPlan: String(oHostelModel.getProperty("/SelectedPriceType") || "").trim(),
+                duration: String(oHostelModel.getProperty("/SelectedMonths") || "").trim(),
+                startDate: this._formatDateToISO(oHostelModel.getProperty("/StartDate")),
+                endDate: this._formatDateToISO(oHostelModel.getProperty("/EndDate")),
+                status: String(oHostelModel.getProperty("/Status") || "").trim()
+            };
+        },
+
+        _storeInitialBookingDetails: function () {
+            this._oInitialBookingDetails = this._getBookingDetailsSnapshot();
+        },
+
+        _haveBookingDetailsChanged: function () {
+            if (!this._oInitialBookingDetails) {
+                return false;
+            }
+
+            var oCurrentDetails = this._getBookingDetailsSnapshot();
+            return ["roomPlan", "duration", "startDate", "endDate"].some(function (sField) {
+                return this._oInitialBookingDetails[sField] !== oCurrentDetails[sField];
+            }.bind(this));
+        },
+
+        _confirmStatusChangeToNew: function () {
+            var sOriginalStatus = String(this._oInitialBookingDetails && this._oInitialBookingDetails.status || "").trim();
+            if (!this._haveBookingDetailsChanged() || sOriginalStatus === "New") {
+                return Promise.resolve(true);
+            }
+
+            return new Promise(function (resolve) {
+                var sConfirmAction = "Confirm";
+                var sCancelAction = "Cancel";
+                MessageBox.confirm(
+                    // "The stay duration have been modified, so the room status will be reverted from \"" +
+                    // sOriginalStatus + "\" to \"New\". Our team will recheck room availability. Once the booking is confirmed, " +
+                    // "you will be notified by email.",
+                    "Since your stay duration has been updated, your booking status has temporarily shifted to \"New\" "+
+                    " while we recheck room availability, and we will email you the updated status shortly.",
+                    {
+                        title: "Confirm Booking Changes",
+                        actions: [sConfirmAction, sCancelAction],
+                        emphasizedAction: sConfirmAction,
+                        styleClass: "myUnifiedBtn",
+                        contentWidth: "400px",
+                        onClose: function (sAction) {
+                            resolve(sAction === sConfirmAction);
+                        }
+                    }
+                );
+            });
         },
 
         _syncEditRefundInfo: function (fPaymentPaidAmount, fGrandTotal, fExplicitRefundAmount) {
@@ -2243,6 +2302,10 @@ sap.ui.define([
             }
 
             if (!this._validateBookingBeforeUpdate()) {
+                return;
+            }
+
+            if (!await this._confirmStatusChangeToNew()) {
                 return;
             }
 
