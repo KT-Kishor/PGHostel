@@ -1,0 +1,719 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.UserManual"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:g="sap.f"
+    displayBlock="true">
+
+    <Page
+        id="AdminManualPage"
+        title="{i18n>userManualTitle}"
+        showNavButton="true"
+        navButtonPress="onNavBack">
+
+        <content>
+
+            <VBox
+                width="100%">
+
+                <Title
+                    level="H1"
+                    text="{i18n>Productsmanual}"
+                    class="ProductDemoSection"
+                    wrapping="true" />
+
+               <FlexBox
+    width="100%"
+    wrap="Wrap"
+    justifyContent="Start"
+    alignItems="Start"
+    class="grid-container">
+
+                     <VBox
+                     visible="{= ${LoginModel>/Role} === 'ManageVendor'}"
+                      width="50%"
+                        class="ProductSoluction sapUiTinyMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_ManaeVendors">
+                            
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_ManageVendors"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Manage Vendors" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>Managevender}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="ManageVender.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+                  
+                    <!-- Branch Management -->
+                    <VBox
+                    visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'ManageVendor' }"
+                     width="50%"
+                        class="ProductSoluction sapUiTinyMargin"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminBranch">
+                            
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminBranch"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Branch Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminBranchTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="Admin_branch_management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+                    
+                  
+                    <VBox
+                     visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                        
+                            justifyContent="Center"
+                            id="videoFrametour_AdminBedManagement">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminBedManagement"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Bed Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminBedManagementTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="bed_template_guide.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                    <VBox
+                     visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminRoomManagement">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminRoomManagement"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Room Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminRoomManagementTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="Room_Management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                  <VBox
+                   visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                        width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminFacilityManagement">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminFacilityManagement"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Facility Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminFacilityManagementTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="facilities_management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                    <VBox
+                     visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminAminities">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminAminities"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Amenities Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminAminitiesTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="amenities_management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+                   <VBox
+                    visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminCouponManagement">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminCouponManagement"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Coupon Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminCouponTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="coupon_management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+<VBox                  visible="{= ${LoginModel>/Role} !== 'Front Office Employee' &amp;&amp; ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_AdminStaff">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_AdminStaff"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Admin Staff Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminStaffTour}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="Staff_Management.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+                    <VBox                 
+                     visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_ManageBookings">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_ManageBookings"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Manage Bookings" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminManageBooking}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value=".pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                      <VBox        
+                       visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"         
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_InvoiceManagement">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_InvoiceManagement"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Invoice Management" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminInvoicemanage}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value="Manage_Invoice.pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                      <VBox       
+                       visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"          
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_DepositDetails">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_DepositDetails"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Deposit Details" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminDepositdetails}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value=".pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                      <VBox        
+                       visible="{= ${LoginModel>/Role} !== 'ManageVendor' }"         
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_DamageDetails">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_DamageDetails"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Damage Details" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminDamagedetails}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value=".pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                      <VBox         
+                       visible="{= ${LoginModel>/Role} !== 'ManageVendor'  }"        
+                        class="ProductSoluction sapUiTinyMargin"
+                         width="50%"
+                        backgroundDesign="Solid">
+
+                        <VBox
+                            justifyContent="Center"
+                            id="videoFrametour_ComplaintDetails">
+<!-- &lt;video controls autoplay muted playsinline  -->
+                            <core:HTML
+                                id="videoFrameHtml_ComplaintDetails"
+                                content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
+                                    &lt;video controls muted playsinline 
+                                    style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
+                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        Your browser does not support the video tag.
+                                    &lt;/video&gt;
+                                &lt;/div&gt;" />
+
+                        </VBox>
+
+                        <Text
+                            class="hr-text sapUiSmallMargin"
+                            text="Complaint Details" />
+
+                        <Text
+                            class="description-text sapUiSmallMargin"
+                            text="{i18n>AdminComplaintDetails}" />
+                     <HBox
+    width="100%"
+    justifyContent="End"
+    class="download-button-container">
+
+    <Button
+        text="Download Guide"
+        icon="sap-icon://download"
+        type="Emphasized"
+        press="onDownloadGuide" class="myUnifiedBtn">
+
+        <customData>
+            <core:CustomData
+                key="pdfFile"
+                value=".pdf" />
+        </customData>
+
+    </Button>
+
+</HBox>
+
+                    </VBox>
+
+                </FlexBox>
+
+            </VBox>
+
+        </content>
+    </Page>
+
+</mvc:View>

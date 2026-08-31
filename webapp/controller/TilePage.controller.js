@@ -2319,7 +2319,14 @@ sap.ui.define([
 
     // 6️⃣ Close dialog
     this._RaiseBugDialog.close();
-        }
+        },
+
+        onAdminUsermanualPress: function () {
+        this.getOwnerComponent()
+        .getRouter()
+        .navTo("RouteAdminUserManual");
+},
+
 
     })
 })

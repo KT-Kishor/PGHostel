@@ -152,6 +152,7 @@ sap.ui.define([
             if (!this.getView().getModel("VisibilityModel")) {
                 this.getView().setModel(new JSONModel({ NoData: false, ShowViewMore: false }), "VisibilityModel");
             }
+            this.getOwnerComponent().setModel("VisibilityModel");
             const oView = this.getView();
             //  Disable controls initially
             this.byId("id_Branch").setEnabled(true);
@@ -5481,7 +5482,10 @@ sap.ui.define([
 onUsermanualPress: function () {
     this.getOwnerComponent()
         .getRouter()
-        .navTo("RouteUserManual");
+        .navTo("RouteUserManual", {
+            flag: "hostel",
+            branchId:"branchid"
+        });
 },
 
         // for 3dot on mobile device footer menu

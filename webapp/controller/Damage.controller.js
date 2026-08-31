@@ -616,7 +616,6 @@ sap.ui.define([
                 return;
             }
 
-
             if (!this._oReturnDialog) {
                 this._oReturnDialog = sap.ui.xmlfragment(
                     oView.getId(),
@@ -798,7 +797,7 @@ sap.ui.define([
 
             if (!amount || amount < 0 || amount > max) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("0 to " + max);
+                oInput.setValueStateText("1 to " + max);
                 return false;
             }
 

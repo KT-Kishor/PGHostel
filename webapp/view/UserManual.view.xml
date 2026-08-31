@@ -25,13 +25,17 @@
                     class="ProductDemoSection"
                     wrapping="true" />
 
-                <l:Grid
-                    defaultSpan="XL6 L6 M6 S12"
-                    class="grid-container">
+               <FlexBox
+    width="100%"
+    wrap="Wrap"
+    justifyContent="Start"
+    alignItems="Start"
+    class="grid-container">
 
                     <!-- CustomerSignup -->
                     <VBox
-                        class="ProductSoluction sapUiSmallMargin"
+                        class="ProductSoluction"
+                        width="50%"
                         backgroundDesign="Solid">
 
                         <VBox
@@ -71,7 +75,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value="CustomerSignup.pdf" />
+                value="customer_sign in_signup_profile_pic.pdf" />
         </customData>
 
     </Button>
@@ -82,7 +86,8 @@
 
                     <!-- Set/Forgot Password -->
                     <VBox
-                        class="ProductSoluction sapUiSmallMargin"
+                        class="ProductSoluction "
+                        width="50%"
                         backgroundDesign="Solid">
 
                         <VBox
@@ -122,7 +127,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value="branch.pdf" />
+                value="password-reset-guide.pdf" />
         </customData>
 
     </Button>
@@ -133,7 +138,8 @@
 
                     <!-- Create Booking -->
                     <VBox
-                        class="ProductSoluction sapUiSmallMargin"
+                        class="ProductSoluction"
+                              width="50%"
                         backgroundDesign="Solid">
 
                         <VBox
@@ -173,7 +179,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value="branch.pdf" />
+                value="Booking_walk_through.pdf" />
         </customData>
 
     </Button>
@@ -183,7 +189,8 @@
 
                     <!-- Manage Booking -->
                     <VBox
-                        class="ProductSoluction sapUiSmallMargin"
+                        class="ProductSoluction"
+                              width="50%"
                         backgroundDesign="Solid">
 
                         <VBox
@@ -223,7 +230,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value="ManageBooking.pdf" />
+                value="customer_edit_and_cancel.pdf" />
         </customData>
 
     </Button>
@@ -231,7 +238,7 @@
 </HBox>
                     </VBox>
 
-                </l:Grid>
+                </FlexBox>
 
             </VBox>
 

@@ -53,7 +53,7 @@
 					</fb:FilterGroupItem>
 					<fb:FilterGroupItem
                         name="CustomerName"
-                        label="{i18n>customerName}"
+                        label="{i18n>customerNamebookingid}"
                         groupName="ConsultantInvoice"
                         visibleInFilterBar="true">
 						<fb:control>

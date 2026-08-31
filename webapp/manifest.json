@@ -472,9 +472,16 @@
         },
            {
           "name": "RouteUserManual",
-          "pattern": "UserManual",
+          "pattern": "UserManual/{flag}/{branchId}",
           "target": [
             "targetUserManual"
+          ]
+        },
+           {
+          "name": "RouteAdminUserManual",
+          "pattern": "AdminUserManual",
+          "target": [
+            "targetAdminUserManual"
           ]
         }
       ],
@@ -793,6 +800,13 @@
           "clearControlAggregation": false,
           "viewId": "UserManual",
           "viewName": "UserManual"
+        },
+         "targetAdminUserManual": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "AdminUserManual",
+          "viewName": "AdminUserManual"
         }
       }
     },

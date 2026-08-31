@@ -4,43 +4,22 @@ sap.ui.define([
    "sap/m/MessageToast"
 ], function (BaseController, MessageBox, MessageToast) {
   "use strict"; 
-return BaseController.extend("sap.ui.com.project1.controller.UserManual", { 
+return BaseController.extend("sap.ui.com.project1.controller.AdminUserManual", { 
   onInit: function () {
- this.getOwnerComponent().getRouter().getRoute("RouteUserManual").attachMatched(this._onRouteMatched, this);
+ this.getOwnerComponent().getRouter().getRoute("RouteAdminUserManual").attachMatched(this._onRouteMatched, this);
   },
 
-_onRouteMatched: function  (oEvent) {
-  const oLoginModel =
-        this.getOwnerComponent().getModel("LoginModel");
-
-    let filter = {
-        Role: oLoginModel.getProperty("/Role")
-    };
-
-    var oArgs = oEvent.getParameter("arguments");
-
-    // Get values from route
-    this._sFlag = oArgs.flag;
-    this._sBranchId = oArgs.branchId;
+_onRouteMatched: async function  (oEvent) {
+    var LoginFUnction = await this.commonLoginFunction();
+     if (!LoginFUnction) return;
+  const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+              const sRole = oLoginModel.getProperty("/Role");
 },
 
-  onNavBack: function () {
+  onNavBack:function(){
+  this.getOwnerComponent().getRouter().navTo("TilePage");
 
-    if (this._sFlag === "view") {
-
-        this.getOwnerComponent()
-            .getRouter()
-            .navTo("RouteViewRooms", {
-                sPath: this._sBranchId
-            });
-
-    } else {
-
-        this.getOwnerComponent()
-            .getRouter()
-            .navTo("RouteHostel");
-    }
-},
+  },
   onDownloadGuide: function (oEvent) {
                 var oButton = oEvent.getSource();
                 var sFileName = oButton.data("pdfFile");

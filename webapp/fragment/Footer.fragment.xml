@@ -43,7 +43,6 @@
             <Button
                 id="desktopVendorButton"
                 text="Vendor Registration"
-                icon="sap-icon://employee"
                 tooltip="{i18n>adminVendorRegistration}"
                 press="onAdminSIGNUP"
                 class="fa-admin-btn desktopFooterItem" />
