@@ -136,7 +136,7 @@
       },
         "MonthModel": {
         "type": "sap.ui.model.json.JSONModel",
-        "uri": "model/MonthModel.json",
+        "uri": "model/Monthmodel.json",
         "preload": true
       }
     },

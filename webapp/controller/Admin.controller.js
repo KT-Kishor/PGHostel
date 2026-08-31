@@ -1452,55 +1452,84 @@ sap.ui.define([
 
             aControls.forEach(function(oControl) {
                 oControl.setValueState("None");
-                oControl.setValue("");
                 oControl.setSelectedKey("");
 
 
             });
             this.byId("idYearDatePicker").setValue("")
         },
-        onsendreminder:async function(){
-                    
-              if (
-                    !utils._LCstrictValidationComboBox(this.getView().byId("id_Branchname"), "ID") ||
-                    !utils._LCstrictValidationComboBox(this.getView().byId("id_Type"), "ID") ||
-                    (this.flag===true && !utils._LCstrictValidationComboBox(this.getView().byId("id_month"), "ID"))||
-                    !utils._LCvalidateMandatoryField(this.getView().byId("idYearDatePicker"), "ID")
-                ) {
-                    sap.m.MessageToast.show(
-                        this.i18nModel.getText(
-                            "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
-                        )
-                    );
-                    return;
-                }
-            var sBranchcode=this.byId("id_Branchname").getSelectedKey()
-            var Type=this.byId("id_Type").getSelectedKey()
-            var Month=this.byId("id_month").getSelectedKey()
-            var WMonth = this.byId("id_month").getSelectedItem().getText();
-            var Year=this.byId("idYearDatePicker").getDateValue().getFullYear();
+onsendreminder: async function () {
+    try {
 
-            var oHostel = this.getView().getModel("HostelModel").getData().find((item) => 
-                {
-              return  item.BranchCode === sBranchcode
+        if (
+            !utils._LCstrictValidationComboBox(
+                this.getView().byId("id_Branchname"), "ID"
+            ) ||
+            !utils._LCstrictValidationComboBox(
+                this.getView().byId("id_Type"), "ID"
+            ) ||
+            (
+                this.flag === true &&
+                !utils._LCstrictValidationComboBox(
+                    this.getView().byId("id_month"), "ID"
+                )
+            ) ||
+            !utils._LCvalidateMandatoryField(
+                this.getView().byId("idYearDatePicker"), "ID"
+            )
+        ) {
+            sap.m.MessageToast.show(
+                this.i18nModel.getText(
+                    "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                )
+            );
+            return;
+        }
+
+        var sBranchcode = this.byId("id_Branchname").getSelectedKey();
+        var Type = this.byId("id_Type").getSelectedKey();
+        var Month = this.byId("id_month").getSelectedKey();
+        var WMonth = this.byId("id_month").getSelectedItem().getText();
+        var Year = this.byId("idYearDatePicker")
+            .getDateValue()
+            .getFullYear();
+
+        var oHostel = this.getView()
+            .getModel("HostelModel")
+            .getData()
+            .find(function (item) {
+                return item.BranchCode === sBranchcode;
             });
 
+        var filters = {
+            BranchCode: sBranchcode,
+            PaymentType: Type,
+            Month: Month,
+            Year: Year,
+            WMonth: WMonth,
+            PropertyType: oHostel ? oHostel.PropertyType : ""
+        };
 
-            var filters={
-              BranchCode:sBranchcode,
-              PaymentType:Type,
-              Month:Month,
-              Year:Year,
-              WMonth:WMonth,
-              PropertyType:oHostel?oHostel.PropertyType : ""
-            }
+        // API call
+        await this.ajaxReadWithJQuery("HM_SendReminder", filters);
 
-           await this.ajaxReadWithJQuery("HM_SendReminder", filters)
+        // Show success only when API call is successful
+        sap.m.MessageToast.show("Successfully sent");
 
-            MessageToast.show("Successfully sent")
-            
+        // Close dialog only after successful API call
+        if (this.SR_Dialog) {
             this.SR_Dialog.close();
-        },
+        }
+
+    } catch (error) {
+
+        console.error("Error while sending payment reminder:", error);
+
+        sap.m.MessageBox.error(
+            "Failed to send payment reminder. Please try again."
+        );
+    }
+},
       ontypeChange:function(oEvent){
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 

@@ -108,16 +108,16 @@
         </f:SimpleForm>
         <beginButton>
             <Button
-                text="{i18n>send}"
-                tooltip="{i18n>send}"
+                text="Send"
+                tooltip="Send"
                 press=".onsendreminder"
                 class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
-                text="{i18n>CancelButton}"
-                tooltip="{i18n>CancelButton}"
+                text="Cancel"
+                tooltip="Cancel"
                 press="onEditDialogClose"
                 class="myUnifiedBtn"
             />
