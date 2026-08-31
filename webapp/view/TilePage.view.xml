@@ -394,10 +394,10 @@
         </items>
         </FlexBox>
         <ToolbarSpacer />
-        <Link
+        <Button
                 id="AdminusermanualLink"
                 text="User Manual"
-                class="customLinkWhiteBg"
+                class="myUnifiedBtn sapUiTinyMarginEnd"
                 press="onAdminUsermanualPress" />
 
         <Button
