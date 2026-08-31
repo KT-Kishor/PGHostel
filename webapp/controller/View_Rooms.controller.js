@@ -3068,9 +3068,12 @@ sap.ui.define([
         },
 
         onUsermanualPress: function () {
-            this.getOwnerComponent()
-                .getRouter()
-                .navTo("RouteUserManual");
+          this.getOwnerComponent()
+        .getRouter()
+        .navTo("RouteUserManual", {
+            flag: "hostel",
+            branchId:"branchid"
+        });
         },
 
 

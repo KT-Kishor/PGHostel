@@ -38,6 +38,10 @@ sap.ui.define([
                 var loginModel = this.getOwnerComponent().getModel("LoginModel");
                 this.BranchCode = loginModel.getProperty("/BranchCode");
                 this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
+                this.byId("CI_id_InputCustomerGSTNO").setValueState("None")
+                this.byId("CI_id_InputCustomerGSTName").setValueState("None")
+                this.byId("CI_id_InputCustomerGSTAddress").setValueState("None")
+
                 this.Discount = true;
                 this.RateUnit = true;
                 this.Particulars = true;
@@ -366,10 +370,15 @@ sap.ui.define([
                     };
 
                     const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
+                    oBookingData.commentData[0].StartDate = new Date(oBookingData.commentData[0].StartDate);
+                  oBookingData.commentData[0].EndDate = new Date(oBookingData.commentData[0].EndDate);
                     this.getView().setModel(
                         new JSONModel(oBookingData.commentData[0]),
                         "BookinglocalModel"
                     );
+           
+
+
 
                     // this.getView().setModel(oBookingModel, "BookinglocalModel");
                 } catch (error) {
@@ -587,7 +596,9 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-
+                     bookingDetails.StartDate = new Date(bookingDetails.StartDate);
+                  bookingDetails.EndDate = new Date(bookingDetails.EndDate);
+                     
 
                     this.getView().setModel(
                         new sap.ui.model.json.JSONModel(bookingDetails),
@@ -635,6 +646,7 @@ sap.ui.define([
                         invoiceDate = startDate;
                         payByDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 3);
                     }
+                    this.MonthDate=invoiceDate
 
                     const oModel = this.getView().getModel("SelectedCustomerModel");
                     let mergedData = {};
@@ -659,6 +671,8 @@ sap.ui.define([
 
                     mergedData.InvoiceDate = new Date(invoiceDate);
                     mergedData.PayByDate = new Date(payByDate);
+
+
                     // mergedData.InvDate = new Date();
                     mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate, startDate, endDate);
                     oModel.setData(mergedData);
@@ -1057,6 +1071,9 @@ sap.ui.define([
                 };
 
                 // Per Month
+                // if (paymentType === "Per Month") {
+                //     return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
+                // }
                 // if (paymentType === "Per Month") {
                 //     return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
                 // }
@@ -1575,6 +1592,7 @@ sap.ui.define([
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
+                    MonthDate: (sMode === 'Create') ? this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "" : this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-')  || "",
                     CustomerName: this.byId("CID_id_AddCustComboBox").getSelectedKey(),
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
@@ -4741,6 +4759,7 @@ sap.ui.define([
                         i => !i.Particulars.includes("Facility") &&
                             !i.Particulars.includes("Room Rent")
                     )];
+
 
                 } else {
                     cycleStart = this._parseDate(roomRent.StartDate);

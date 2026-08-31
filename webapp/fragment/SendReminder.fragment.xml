@@ -1,0 +1,126 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="sendreminderDialog"
+        contentWidth="28rem"
+        contentHeight="auto"
+        draggable="true"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>sendreminder}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <!-- Facility Name -->
+
+                <Label
+                    text="{i18n>branch}"
+                    required="true"
+                />
+                <ComboBox
+                    id="id_Branchname"
+                    placeholder="Select branch name"
+                    items="{BranchModel>/}"
+                    selectionChange="onbranchChange"
+                    width="100%"
+                    valueStateText="Please select the branch"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>Name}"
+                    />
+                </ComboBox>
+                <Label
+                    text="{i18n>type}"
+                    required="true"
+                />
+                <ComboBox
+                    id="id_Type"
+                    placeholder="Select type"
+                    selectionChange="ontypeChange"
+                    width="100%"
+                    valueStateText="Please select type"
+                >
+                    <core:Item
+                        key="Per Month"
+                        text="Per Month"
+                    />
+                    <core:Item
+                        key="Per Year"
+                        text="Per Year"
+                    />
+                </ComboBox>
+
+                <Label
+                    id="id_Label"
+                    text="{i18n>Month}"
+                    required="true"
+                />
+
+                <ComboBox
+                    id="id_month"
+                    placeholder="Select month"
+                    selectedKey="{edit>/FacilityName}"
+                    items="{MonthModel>/}"
+                    selectionChange="onmonthChange"
+                    width="100%"
+                    valueStateText="Please select month"
+                >
+                    <core:ListItem
+                        key="{MonthModel>Key}"
+                        text="{MonthModel>Name}"
+                    />
+                </ComboBox>
+                <Label
+                    text="{i18n>Year}"
+                    required="true"
+                />
+
+                <DatePicker
+                id="idYearDatePicker"
+                    value="{/Year}"
+                    displayFormat="yyyy"
+                    valueFormat="yyyy"
+                    placeholder="Select Year"
+                    change="onYearDatePickerChange"
+                    valueStateText="Please select year"
+                />
+            </f:content>
+        </f:SimpleForm>
+        <beginButton>
+            <Button
+                text="{i18n>send}"
+                tooltip="{i18n>send}"
+                press=".onsendreminder"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="onEditDialogClose"
+                class="myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

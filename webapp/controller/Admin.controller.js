@@ -1287,11 +1287,20 @@ sap.ui.define([
         onRoomNoChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
+           onbranchChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+          onmonthChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
         DepositAmountLiveChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
         ActualAmountLiveChange: function (oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
+        },
+         onYearDatePickerChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
 
         AD_onPressEditDetails: function (oEvent) {
@@ -1424,6 +1433,88 @@ sap.ui.define([
             }).finally(() => {
                 oSheet.destroy();
             });
+        },
+        HM_sendreminder:function(){
+            var oView = this.getView();
+            if (!this.SR_Dialog) {
+                this.SR_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.SendReminder", this);
+                oView.addDependent(this.SR_Dialog);
+            }
+            this.SR_Dialog.open();
+
+              var aControls = this.SR_Dialog.findAggregatedObjects(true, function(oControl) {
+                return oControl instanceof sap.m.Input ||
+                    oControl instanceof sap.m.ComboBox ||
+                    oControl instanceof sap.m.Select ||
+                    oControl instanceof sap.m.TextArea;
+
+            });
+
+            aControls.forEach(function(oControl) {
+                oControl.setValueState("None");
+                oControl.setValue("");
+                oControl.setSelectedKey("");
+
+
+            });
+            this.byId("idYearDatePicker").setValue("")
+        },
+        onsendreminder:function(){
+                    
+              if (
+                    !utils._LCstrictValidationComboBox(this.getView().byId("id_Branchname"), "ID") ||
+                    !utils._LCstrictValidationComboBox(this.getView().byId("id_Type"), "ID") ||
+                    (this.flag===true && !utils._LCstrictValidationComboBox(this.getView().byId("id_month"), "ID"))||
+                    !utils._LCvalidateMandatoryField(this.getView().byId("idYearDatePicker"), "ID")
+                ) {
+                    sap.m.MessageToast.show(
+                        this.i18nModel.getText(
+                            "pleaseFillallRequiredFieldsCorrectlybeforeSaving"
+                        )
+                    );
+                    return;
+                }
+            var sBranchcode=this.byId("id_Branchname").getSelectedKey()
+            var Type=this.byId("id_Type").getSelectedKey()
+            var Month=this.byId("id_month").getSelectedKey()
+            var WMonth = this.byId("id_month").getSelectedItem().getText();
+            var Year=this.byId("idYearDatePicker").getDateValue().getFullYear();
+
+            var oHostel = this.getView().getModel("HostelModel").getData().find((item) => 
+                {
+              return  item.BranchCode === sBranchcode
+            });
+
+
+            var filters={
+              BranchCode:sBranchcode,
+              PaymentType:Type,
+              Month:Month,
+              Year:Year,
+              WMonth:WMonth,
+              PropertyType:oHostel?oHostel.PropertyType : ""
+            }
+
+            this.ajaxReadWithJQuery("HM_SendReminder", filters)
+            
+            this.SR_Dialog.close();
+        },
+      ontypeChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
+            var Type=this.byId("id_Type").getSelectedKey()
+              if(Type==="Per Month"){
+              this.byId("id_month").setEnabled(true)
+              this.byId("id_Label").setRequired(true)
+              this.flag=true
+            }else{
+              this.byId("id_month").setEnabled(false).setValue("")
+              this.byId("id_Label").setRequired(false)
+              this.flag=false
+                  }
+      },
+        onEditDialogClose:function(){
+            this.SR_Dialog.close();
         }
     });
 });

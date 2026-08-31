@@ -633,6 +633,7 @@ sap.ui.define([
                         MemberName: member.Name,
                         DateOfBirth: member.DateOfBirth,
                         Relation: member.Relation,
+                        Salutation: member.Salutation,
                         Gender: member.Gender,
                         DocumentID: "",
                         DocumentName: "",
