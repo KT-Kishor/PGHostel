@@ -133,6 +133,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/PaymentMode.json",
         "preload": true
+      },
+        "MonthModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/MonthModel.json",
+        "preload": true
       }
     },
     "resources": {

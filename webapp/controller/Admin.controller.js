@@ -1459,7 +1459,7 @@ sap.ui.define([
             });
             this.byId("idYearDatePicker").setValue("")
         },
-        onsendreminder:function(){
+        onsendreminder:async function(){
                     
               if (
                     !utils._LCstrictValidationComboBox(this.getView().byId("id_Branchname"), "ID") ||
@@ -1495,7 +1495,9 @@ sap.ui.define([
               PropertyType:oHostel?oHostel.PropertyType : ""
             }
 
-            this.ajaxReadWithJQuery("HM_SendReminder", filters)
+           await this.ajaxReadWithJQuery("HM_SendReminder", filters)
+
+            MessageToast.show("Successfully sent")
             
             this.SR_Dialog.close();
         },
