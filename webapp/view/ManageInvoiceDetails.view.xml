@@ -73,7 +73,6 @@
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
                                             selectedKey="{SelectedCustomerModel>/CustomerName}"
-
                                         >
                                             <core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"
@@ -135,7 +134,6 @@
                                             valueStateText="Enter the name"
                                             liveChange="CID_ValidateCommonFields"
                                             maxLength="60"
-
                                         />
                                         <m:Label
                                             visible="{visiablityPlay>/editVisi}"
@@ -373,13 +371,12 @@
                                             required="{SelectedCustomerModel>/GSTValid}"
                                         />
                                         <m:Input
-                                        id="GSTValue"
+                                            id="GSTValue"
                                             value="{SelectedCustomerModel>/Value}"
                                             liveChange="CI_onPercentageChange"
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                             visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
-
                                         />
                                         <m:Label text="{i18n>address}" />
                                         <m:TextArea
@@ -632,6 +629,15 @@
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
+                                                width="7rem"
+                                            >
+                                                <m:Text
+                                                    text="{i18n>discount}"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
                                                 width="8rem"
                                             >
                                                 <m:Text
@@ -694,7 +700,7 @@
                                                         displayFormat="dd/MM/yyyy"
                                                         valueFormat="dd/MM/yyyy"
                                                         value="{ManageInvoiceItemModel>StartDate}"
-                                                        change=".onPaymentDateChange"   
+                                                        change=".onPaymentDateChange"
                                                         minDate="{BookinglocalModel>/StartDate}"
                                                         maxDate="{BookinglocalModel>/EndDate}"
                                                         valueStateText="{i18n>selectPaymentDate}"
@@ -707,7 +713,7 @@
                                                         valueFormat="dd/MM/yyyy"
                                                         value="{ManageInvoiceItemModel>EndDate}"
                                                         change=".onPaymentDateChange"
-                                                         minDate="{BookinglocalModel>/StartDate}"
+                                                        minDate="{BookinglocalModel>/StartDate}"
                                                         maxDate="{BookinglocalModel>/EndDate}"
                                                         valueStateText="{i18n>selectPaymentDate}"
                                                         editable="{ManageInvoiceItemModel>EndDateEditable}"
@@ -740,6 +746,19 @@
                                                     <m:Input
                                                         value="{ManageInvoiceItemModel>DurationText}"
                                                         editable="false"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{ManageInvoiceItemModel>Discount}"
+                                                        showValueHelp="true"
+                                                        valueHelpRequest="CD_onDiscountInfoPress"
+                                                        valueHelpIconSrc="sap-icon://message-information"
+                                                        editable="{visiablityPlay>/editable}"
+                                                        change="Comp_OnChangeDiscount"
+                                                        textAlign="End"
+                                                        maxLength="15"
+                                                        valueStateText="{i18n>discountInfoText}"
                                                     />
                                                 </m:cells>
                                                 <m:cells>
