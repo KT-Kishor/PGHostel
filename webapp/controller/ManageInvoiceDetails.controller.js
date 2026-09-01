@@ -4896,7 +4896,7 @@ sap.ui.define([
                         EndDate: endStr,
                         Currency: f.Currency || "INR",
                         GSTCalculation: "YES",
-                        Discount: "",
+                        Discount: existingFacility.Discount || "",
                         GrossPriceEditable: false,
                         UnitEditable: false,
                         DurationEditable: false,
