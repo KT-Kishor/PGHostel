@@ -1434,30 +1434,50 @@ sap.ui.define([
                 oSheet.destroy();
             });
         },
-        HM_sendreminder:function(){
-            var oView = this.getView();
-            if (!this.SR_Dialog) {
-                this.SR_Dialog = sap.ui.xmlfragment(oView.getId(), "sap.ui.com.project1.fragment.SendReminder", this);
-                oView.addDependent(this.SR_Dialog);
-            }
-            this.SR_Dialog.open();
+      HM_sendreminder: function () {
+    var oView = this.getView();
 
-              var aControls = this.SR_Dialog.findAggregatedObjects(true, function(oControl) {
-                return oControl instanceof sap.m.Input ||
-                    oControl instanceof sap.m.ComboBox ||
-                    oControl instanceof sap.m.Select ||
-                    oControl instanceof sap.m.TextArea;
+    if (!this.SR_Dialog) {
+        this.SR_Dialog = sap.ui.xmlfragment(
+            oView.getId(),
+            "sap.ui.com.project1.fragment.SendReminder",
+            this
+        );
 
-            });
+        oView.addDependent(this.SR_Dialog);
+    }
 
-            aControls.forEach(function(oControl) {
-                oControl.setValueState("None");
-                oControl.setSelectedKey("");
+    this.SR_Dialog.open();
 
+    var aControls = this.SR_Dialog.findAggregatedObjects(true, function (oControl) {
+        return oControl instanceof sap.m.Input ||
+            oControl instanceof sap.m.ComboBox ||
+            oControl instanceof sap.m.Select ||
+            oControl instanceof sap.m.TextArea;
+    });
 
-            });
-            this.byId("idYearDatePicker").setValue("")
-        },
+    aControls.forEach(function (oControl) {
+
+        // Reset Input / TextArea
+        if (oControl instanceof sap.m.Input ||
+            oControl instanceof sap.m.TextArea) {
+
+            oControl.setValue("");
+            oControl.setValueState("None");
+        }
+
+        // Reset ComboBox / Select
+        if (oControl instanceof sap.m.ComboBox ||
+            oControl instanceof sap.m.Select) {
+
+            oControl.setSelectedKey("");
+            oControl.setValueState("None");
+        }
+    });
+
+    // Reset Year DatePicker
+    this.byId("idYearDatePicker").setValue("");
+},
 onsendreminder: async function () {
     try {
 
