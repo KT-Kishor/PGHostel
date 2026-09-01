@@ -565,7 +565,6 @@ sap.ui.define([
             var oRoomDetailsModel = oView.getModel("RoomDetailsModel");
             var oBedTypeModel = oView.getModel("BedTypeModel");
 
-
             var BranchCode = oRoomModel.getProperty("/BranchCode");
             var Payload = oRoomModel.getData();
 
@@ -656,31 +655,71 @@ sap.ui.define([
                     return;
                 }
 
-                if (oExistingRoom && !Payload._isEditing && oExistingRoom.RoomNo === Payload.RoomNo) {
-                    sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
-                    var oMatch = aRoomDetails.find(item =>
-                        item.BedTypeName === Payload.BedTypeName &&
-                        item.BranchCode === BranchCode
-                    );
+              // =====================================================
+// ROOM NO DUPLICATE VALIDATION
+// =====================================================
 
-                    if (oMatch) {
+var sOriginalRoomNo = this.RoomNo;
 
-                        oRoomModel.setProperty("/editable", false);
-                    } else {
+// New Room Creation
+if (!Payload._isEditing && !Payload._isRoomEditing) {
 
-                        oRoomModel.setProperty("/editable", true);
-                    }
-                    return;
-                }
-                if (Payload._isEditing) {
-                    // Editing case
-                    var sOriginalRoomNo = this.RoomNo; // We'll store this when opening dialog
+    if (oExistingRoom) {
+        sap.m.MessageToast.show(
+            "Room No '" + Payload.RoomNo + "' Already Exists"
+        );
 
-                    if (oExistingRoom && Payload.RoomNo !== sOriginalRoomNo) {
-                        sap.m.MessageToast.show("Room No '" + Payload.RoomNo + "' Already Exists");
-                        return;
-                    }
-                }
+        var oMatch = aRoomDetails.find(item =>
+            item.BedTypeName === Payload.BedTypeName &&
+            item.BranchCode === BranchCode
+        );
+
+        if (oMatch) {
+            oRoomModel.setProperty("/editable", false);
+        } else {
+            oRoomModel.setProperty("/editable", true);
+        }
+
+        return;
+    }
+}
+
+// Room Number Editing
+if (Payload._isRoomEditing) {
+
+    // If changing Room No, check whether the NEW Room No
+    // already exists in the same branch
+    if (
+        Payload.RoomNo !== sOriginalRoomNo &&
+        oExistingRoom
+    ) {
+        sap.m.MessageToast.show(
+            "Room No '" + Payload.RoomNo + "' Already Exists"
+        );
+        return;
+    }
+
+    // If Room No is the same as the original Room No,
+    // allow save directly.
+}
+
+// Other Room Details Editing
+if (Payload._isEditing) {
+
+    // If only price/details are being edited,
+    // don't perform duplicate Room No validation.
+
+    // If Room No was actually changed, check duplicate
+    if (
+        Payload.RoomNo !== sOriginalRoomNo &&
+        oExistingRoom
+    ) {
+        sap.m.MessageToast.show(
+            "Room No '" + Payload.RoomNo + "' Already Exists"
+        );
+        return;
+    }
+}
                 if (Payload.Price <= 0 && Payload.MonthPrice <= 0 && Payload.YearPrice <= 0) {
                     sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillatLeastOnePrice"));
                     oRoomModel.setProperty("/Price", "");
