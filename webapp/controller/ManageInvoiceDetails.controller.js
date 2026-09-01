@@ -275,6 +275,7 @@ sap.ui.define([
                             ...item,
                             StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
                             EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                            PreviousTotal: item.PreviousTotal,
                             GrossPriceEditable: false,
                             UnitEditable: false,
                             DurationEditable: false,
@@ -371,12 +372,12 @@ sap.ui.define([
 
                     const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
                     oBookingData.commentData[0].StartDate = new Date(oBookingData.commentData[0].StartDate);
-                  oBookingData.commentData[0].EndDate = new Date(oBookingData.commentData[0].EndDate);
+                    oBookingData.commentData[0].EndDate = new Date(oBookingData.commentData[0].EndDate);
                     this.getView().setModel(
                         new JSONModel(oBookingData.commentData[0]),
                         "BookinglocalModel"
                     );
-           
+
 
 
 
@@ -596,9 +597,9 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-                     bookingDetails.StartDate = new Date(bookingDetails.StartDate);
-                  bookingDetails.EndDate = new Date(bookingDetails.EndDate);
-                     
+                    bookingDetails.StartDate = new Date(bookingDetails.StartDate);
+                    bookingDetails.EndDate = new Date(bookingDetails.EndDate);
+
 
                     this.getView().setModel(
                         new sap.ui.model.json.JSONModel(bookingDetails),
@@ -646,7 +647,7 @@ sap.ui.define([
                         invoiceDate = startDate;
                         payByDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 3);
                     }
-                    this.MonthDate=invoiceDate
+                    this.MonthDate = invoiceDate
 
                     const oModel = this.getView().getModel("SelectedCustomerModel");
                     let mergedData = {};
@@ -729,7 +730,7 @@ sap.ui.define([
                         DurationText: bookingDuration,
                         SAC: "996322",
                         GSTCalculation: "YES",
-                        Discount: "0.00",
+                        Discount: "",
                         GrossPrice: bookingDetails.RoomPrice,
                         Total: parseFloat(bookingDetails.BookingPrice),
                         StartDate: this.Formatter.DateFormat(bookingDetails.StartDate),
@@ -778,7 +779,7 @@ sap.ui.define([
                             DurationText: durationText,
                             SAC: "996322",
                             GSTCalculation: "YES",
-                            Discount: "0.00",
+                            Discount: "",
                             GrossPrice: price,
                             Total: parseFloat(item.FacilityPrice),
                             StartDate: this.Formatter.DateFormat(item.StartDate),
@@ -805,7 +806,7 @@ sap.ui.define([
                             DurationText: "-",
                             SAC: "996322",
                             GSTCalculation: "NO",
-                            Discount: "0.00",
+                            Discount: "",
                             GrossPrice: -refundAmount,
                             Total: -refundAmount,
                             StartDate: this.Formatter.DateFormat(new Date()),
@@ -1105,7 +1106,7 @@ sap.ui.define([
                     UnitText: unitText,
                     DurationText: this._getDurationText(unitText, startDate, endDate, 1),
                     Currency: currency,
-                    Discount: "0.00",
+                    Discount: "",
                     GrossPrice: "",
                     Total: "",
                     GrossPriceEditable: true,
@@ -1234,7 +1235,12 @@ sap.ui.define([
 
                     // ---------- ITEM CALCULATION ----------
                     aItems.forEach((item) => {
-                        const baseAmount = parseFloat(item.Total) || 0;
+                        // const baseAmount = parseFloat(item.Total) || 0;
+                        if (item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
+                            item.PreviousTotal = item.Total;
+                        }
+
+                        const baseAmount = (parseFloat(item.PreviousTotal) < 0)  ? (parseFloat(item.Total) || 0)  : (parseFloat(item.PreviousTotal) || 0);
 
                         // ---------- DISCOUNT ----------
                         let discountAmount = 0;
@@ -1244,7 +1250,10 @@ sap.ui.define([
                             discountAmount = parseFloat(item.Discount) || 0;
                         }
 
-                        if (baseAmount > 0 && discountAmount > baseAmount) discountAmount = 0;
+                        if (baseAmount > 0 && discountAmount > baseAmount){ 
+                            discountAmount = 0;
+                            item.Discount = "";
+                        }
 
                         const finalItemAmount = baseAmount - discountAmount;
 
@@ -1513,7 +1522,7 @@ sap.ui.define([
                     var incomePerc = parseFloat(oData.IncomePerc) || 0;
 
                     var tds = ((subTotalInGST + subTotalNotGST) * incomePerc / 100).toFixed(2);
-                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                    // oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
                 }
             },
 
@@ -1592,7 +1601,7 @@ sap.ui.define([
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    MonthDate: (sMode === 'Create') ? this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "" : this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-')  || "",
+                    MonthDate: (sMode === 'Create') ? this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "" : this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "",
                     CustomerName: this.byId("CID_id_AddCustComboBox").getSelectedKey(),
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
@@ -1655,6 +1664,7 @@ sap.ui.define([
                         UnitText: item.UnitText,
                         Particulars: item.Particulars,
                         GrossPrice: item.GrossPrice,
+                        PreviousTotal: item.PreviousTotal,
                         Total: item.Total,
                         Currency: item.Currency,
                         GSTCalculation: item.GSTCalculation,
@@ -2024,6 +2034,7 @@ sap.ui.define([
                                 ...item,
                                 StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
                                 EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                                PreviousTotal: item.PreviousTotal,
                                 GrossPriceEditable: false,
                                 UnitEditable: false,
                                 DurationEditable: false,
@@ -3042,6 +3053,7 @@ sap.ui.define([
                                 item.EndDate || "",
                                 Formatter.fromatNumber(item.GrossPrice) || "0.00",
                                 item.UnitText,
+                                item.Discount || "0.00",
                                 Formatter.fromatNumber(item.Total) || "0.00"
                             ];
 
@@ -3053,9 +3065,9 @@ sap.ui.define([
                         });
 
                     const head = showSAC ? [
-                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Total']
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text','Discount','Total']
                     ] : [
-                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Total']
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text','Discount','Total']
                     ];
 
                     doc.autoTable({
@@ -4082,6 +4094,7 @@ sap.ui.define([
                                 Formatter.formatDate(item.EndDate),
                                 Formatter.fromatNumber(item.GrossPrice),
                                 item.UnitText,
+                                Formatter.fromatNumber(item.Discount || "0.00"),
                                 Formatter.fromatNumber(item.Total)
                             ];
 
@@ -4094,9 +4107,9 @@ sap.ui.define([
 
 
                         const head = showSAC ? [
-                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit','Discount','Total']
                         ] : [
-                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Total']
+                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit','Discount','Total']
                         ];
 
                         doc.autoTable({
@@ -4735,7 +4748,7 @@ sap.ui.define([
                                 Currency: bookingDetails.Currency,
                                 SAC: "996322",
                                 GSTCalculation: "YES",
-                                Discount: "0.00"
+                                Discount: ""
                             };
                         }
 
@@ -4883,7 +4896,7 @@ sap.ui.define([
                         EndDate: endStr,
                         Currency: f.Currency || "INR",
                         GSTCalculation: "YES",
-                        Discount: "0.00",
+                        Discount: "",
                         GrossPriceEditable: false,
                         UnitEditable: false,
                         DurationEditable: false,
@@ -5530,8 +5543,37 @@ sap.ui.define([
                     sPath + "/Total",
                     totalAmount
                 );
+                oModel.setProperty(
+                    sPath + "/PreviousTotal",
+                    totalAmount
+                );
 
                 this.totalAmountCalculation();
+            },
+            CD_onDiscountInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("discountInfoText"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
             },
         });
     });
