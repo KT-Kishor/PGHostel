@@ -1240,7 +1240,7 @@ sap.ui.define([
                             item.PreviousTotal = item.Total;
                         }
 
-                        const baseAmount = (parseFloat(item.PreviousTotal) < 0)  ? (parseFloat(item.Total) || 0)  : (parseFloat(item.PreviousTotal) || 0);
+                        const baseAmount = (parseFloat(item.PreviousTotal) < 0) ? (parseFloat(item.Total) || 0) : (parseFloat(item.PreviousTotal) || 0);
 
                         // ---------- DISCOUNT ----------
                         let discountAmount = 0;
@@ -1250,7 +1250,7 @@ sap.ui.define([
                             discountAmount = parseFloat(item.Discount) || 0;
                         }
 
-                        if (baseAmount > 0 && discountAmount > baseAmount){ 
+                        if (baseAmount > 0 && discountAmount > baseAmount) {
                             discountAmount = 0;
                             item.Discount = "";
                         }
@@ -1480,28 +1480,46 @@ sap.ui.define([
                 var sValue = oEvent.getParameter("value").trim();
                 var regex = /^[0-9]+(\.[0-9]{1,2})?%?$/;
                 var oInput = oEvent.getSource();
+
+                // Allow only numbers, decimal point and %
                 sValue = sValue.replace(/[^0-9.%]/g, "");
 
-                var isPercentage = sValue.indexOf('%') !== -1;
+                var isPercentage = sValue.indexOf("%") !== -1;
+
+                // Remove % for processing
                 if (isPercentage) {
-                    sValue = sValue.replace('%', '');
+                    sValue = sValue.replace("%", "");
+
+                    // If user entered only %, clear the field
+                    if (sValue === "") {
+                        oInput.setValue("");
+                        oInput.setValueState("None");
+                        oInput.setValueStateText("");
+                        this.Discount = true;
+                        await this.totalAmountCalculation();
+                        return;
+                    }
                 }
 
-                var parts = sValue.split('.');
+                // Limit decimal places to 2
+                var parts = sValue.split(".");
                 if (parts.length > 1) {
                     parts[1] = parts[1].substring(0, 2);
-                    sValue = parts.join('.');
+                    sValue = parts.join(".");
                 }
 
-                if (isPercentage) {
-                    sValue = sValue + '%';
+                // Add % back only if there is a numeric value
+                if (isPercentage && sValue !== "") {
+                    sValue += "%";
                 }
+
                 oInput.setValue(sValue);
+
                 await this.totalAmountCalculation();
+
                 if (!sValue) {
                     oInput.setValueState("None");
                     oInput.setValueStateText("");
-                    // this.CI_updateTotalAmount();
                     this.Discount = true;
                 } else if (!regex.test(sValue)) {
                     oInput.setValueState("Error");
@@ -3065,9 +3083,9 @@ sap.ui.define([
                         });
 
                     const head = showSAC ? [
-                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text','Discount','Total']
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ] : [
-                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text','Discount','Total']
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ];
 
                     doc.autoTable({
@@ -4107,9 +4125,9 @@ sap.ui.define([
 
 
                         const head = showSAC ? [
-                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit','Discount','Total']
+                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                         ] : [
-                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit','Discount','Total']
+                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                         ];
 
                         doc.autoTable({
