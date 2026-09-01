@@ -44,7 +44,7 @@
                     width="100%"
                     valueStateText="Please select the branch"
                 >
-                    <core:ListItem
+                    <core:Item
                         key="{BranchModel>BranchID}"
                         text="{BranchModel>Name}"
                     />
@@ -79,13 +79,12 @@
                 <ComboBox
                     id="id_month"
                     placeholder="Select month"
-                    selectedKey="{edit>/FacilityName}"
                     items="{MonthModel>/}"
                     selectionChange="onmonthChange"
                     width="100%"
                     valueStateText="Please select month"
                 >
-                    <core:ListItem
+                    <core:Item
                         key="{MonthModel>Key}"
                         text="{MonthModel>Name}"
                     />
@@ -96,8 +95,7 @@
                 />
 
                 <DatePicker
-                id="idYearDatePicker"
-                    value="{/Year}"
+                   id="idYearDatePicker"
                     displayFormat="yyyy"
                     valueFormat="yyyy"
                     placeholder="Select Year"
