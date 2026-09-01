@@ -3068,11 +3068,15 @@ sap.ui.define([
         },
 
         onUsermanualPress: function () {
-          this.getOwnerComponent()
+    var oVisibilityModel = this.getView().getModel("BranchModel");
+
+    var sBranchId = oVisibilityModel.getProperty("/BranchID");
+
+    this.getOwnerComponent()
         .getRouter()
         .navTo("RouteUserManual", {
-            flag: "hostel",
-            branchId:"branchid"
+            flag: "view",
+            branchId: sBranchId
         });
         },
 
