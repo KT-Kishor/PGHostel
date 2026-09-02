@@ -1566,6 +1566,229 @@ onsendreminder: async function () {
       },
         onEditDialogClose:function(){
             this.SR_Dialog.close();
-        }
+        },
+
+
+
+
+        onRoomAvailability: function () {
+            if (!this.RoomAvailabilityDialog) {
+                this.RoomAvailabilityDialog = sap.ui.xmlfragment(
+                    this.getView().getId(),
+                    "sap.ui.com.project1.fragment.Room_Availability",
+                    this
+                );
+                this.getView().addDependent(this.RoomAvailabilityDialog);
+            }
+
+            this.getView().setModel(
+                new JSONModel({ BranchCode: "", BedTypeName: "", StartDate: "", EndDate: "" }),
+                "RoomAvailabilityFilter"
+            );
+            this.getView().setModel(new JSONModel([]), "RoomAvailabilityModel");
+            this.getView().setModel(new JSONModel([]), "RoomAvailabilityTypes");
+
+            // Reset stale value states from a previous dialog session
+            ["roomAvailabilityBranch", "roomAvailabilityType", "roomAvailabilityStartDate", "roomAvailabilityEndDate"].forEach(function (sId) {
+                var oCombo = this.byId(sId);
+                if (oCombo) {
+                    oCombo.setValueState("None");
+                }
+            }.bind(this));
+
+            // Make the date pickers read-only (calendar only, no typing)
+            this._FragmentDatePickersReadOnly([
+                this.getView().createId("roomAvailabilityStartDate"),
+                this.getView().createId("roomAvailabilityEndDate")
+            ]);
+
+            this.RoomAvailabilityDialog.open();
+        },
+
+        onRoomAvailabilityBranchChange: function (oEvent) {
+            var sBranchCode = oEvent.getSource().getSelectedKey();
+            var aRooms = this._getRoomRecords();
+            var aTypes = aRooms
+                .filter(function (oRoom) { return !sBranchCode || oRoom.BranchCode === sBranchCode; })
+                .reduce(function (aResult, oRoom) {
+                    if (oRoom.BedTypeName && !aResult.some(function (oType) { return oType.BedTypeName === oRoom.BedTypeName; })) {
+                        aResult.push({ BedTypeName: oRoom.BedTypeName });
+                    }
+                    return aResult;
+                }, [])
+                .sort(function (a, b) { return a.BedTypeName.localeCompare(b.BedTypeName); });
+
+            this.getView().getModel("RoomAvailabilityFilter").setProperty("/BedTypeName", "");
+            this.getView().getModel("RoomAvailabilityTypes").setData(aTypes);
+            this.getView().getModel("RoomAvailabilityModel").setData([]);
+        },
+
+        _getRoomRecords: function () {
+            var oModel = this.getOwnerComponent().getModel("RoomDetailsModel");
+            return oModel && Array.isArray(oModel.getData()) ? oModel.getData().filter(Boolean) : [];
+        },
+
+        // HM_Rooms stores the combined "BedType - ACType" in BedTypeName.
+        // HM_ConfirmAvailableRooms expects them as separate Name and ACType params.
+        _splitBedTypeName: function (sBedTypeName) {
+            var sName = sBedTypeName || "";
+            var iSep = sName.lastIndexOf(" - ");
+            if (iSep > -1) {
+                return {
+                    Name: sName.slice(0, iSep).trim(),
+                    ACType: sName.slice(iSep + 3).trim()
+                };
+            }
+            return { Name: sName.trim(), ACType: "" };
+        },
+
+
+        onRoomAvailabilityFieldChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            utils._LCstrictValidationComboBox(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+        },
+
+        onLoadRoomAvailability: async function () {
+            var oBranchCombo = this.byId("roomAvailabilityBranch");
+            var oTypeCombo = this.byId("roomAvailabilityType");
+
+            // Validate one after another: stop at the first invalid field
+            // (focus stays on the offending combo instead of jumping ahead).
+            if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+            // Bed type is optional: only reject a manually typed value that
+            // matches no list item; an empty value loads all bed types.
+            if (oTypeCombo.getValue() && !utils._LCstrictValidationComboBox(oTypeCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            var oStartPicker = this.byId("roomAvailabilityStartDate");
+            var oEndPicker = this.byId("roomAvailabilityEndDate");
+
+            // Dates are optional, but an entered value must be a valid date
+            // (DatePicker sets Error state itself on unparseable input).
+            if (oStartPicker.getValueState() === "Error" || oEndPicker.getValueState() === "Error") {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            var sStartDate = oStartPicker.getDateValue()
+                ? oStartPicker.getValue() // already yyyy-MM-dd via valueFormat
+                : "";
+            var sEndDate = oEndPicker.getDateValue()
+                ? oEndPicker.getValue()
+                : "";
+
+            // If both dates are given, End Date must not precede Start Date
+            if (sStartDate && sEndDate && sEndDate < sStartDate) {
+                oEndPicker.setValueState("Error")
+                    .setValueStateText(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
+                return;
+            }
+
+            var sBranchCode = oBranchCombo.getSelectedKey() || oBranchCombo.getValue();
+            var sBedTypeName = oTypeCombo.getSelectedKey() || oTypeCombo.getValue();
+
+            var aBranches = this.getView().getModel("BranchModel")?.getData() || [];
+            var oBranch = aBranches.find(function (b) { return b.BranchID === sBranchCode; });
+            var sPropertyType = (oBranch && oBranch.PropertyType) || "Hostel";
+
+            // Selected bed type, or every bed type that has rooms in this branch
+            var aBedTypeNames;
+            if (sBedTypeName) {
+                aBedTypeNames = [sBedTypeName];
+            } else {
+                aBedTypeNames = this._getRoomRecords()
+                    .filter(function (oRoom) {
+                        return oRoom.BranchCode === sBranchCode && oRoom.BedTypeName;
+                    })
+                    .reduce(function (aResult, oRoom) {
+                        if (aResult.indexOf(oRoom.BedTypeName) === -1) {
+                            aResult.push(oRoom.BedTypeName);
+                        }
+                        return aResult;
+                    }, [])
+                    .sort();
+            }
+
+            if (!aBedTypeNames.length) {
+                this.getView().getModel("RoomAvailabilityModel").setData([]);
+                MessageToast.show(this.i18nModel.getText("noRoomsFound"));
+                return;
+            }
+
+            this.getBusyDialog();
+            try {
+                var aRows = await Promise.all(aBedTypeNames.map(async function (sName) {
+                    var oParts = this._splitBedTypeName(sName);
+                    try {
+                        var oResponse = await this.ajaxReadWithJQuery("HM_ConfirmAvailableRooms", {
+                            BranchCode: sBranchCode,
+                            ACType: oParts.ACType,
+                            Name: oParts.Name,
+                            PropertyType: sPropertyType,
+                            StartDate: sStartDate,
+                            EndDate: sEndDate
+                        });
+
+                        if (!oResponse || oResponse.success === false) {
+                            return {
+                                BedTypeName: sName,
+                                TotalCapacity: "-",
+                                BookedCount: "-",
+                                AvailableCount: "-",
+                                AvailabilityStatus: "Error",
+                                AvailabilityState: "Error"
+                            };
+                        }
+
+                        // Derive availability from availableCount (the backend "available"
+                        // flag stays true even when the bed type is fully booked).
+                        var iAvailable = parseInt(oResponse.availableCount, 10);
+                        if (isNaN(iAvailable)) {
+                            iAvailable = (parseInt(oResponse.totalCapacity, 10) || 0)
+                                - (parseInt(oResponse.bookedCount, 10) || 0);
+                        }
+                        var bIsAvailable = iAvailable > 0;
+
+                        return {
+                            BedTypeName: sName,
+                            TotalCapacity: oResponse.totalCapacity,
+                            BookedCount: oResponse.bookedCount,
+                            AvailableCount: oResponse.availableCount,
+                            StartDate: sStartDate,
+                            EndDate: sEndDate,
+                            AvailabilityStatus: bIsAvailable ? "Available" : "Fully Booked",
+                            AvailabilityState: bIsAvailable ? "Success" : "Error"
+                        };
+                    } catch (oError) {
+                        return {
+                            BedTypeName: sName,
+                            TotalCapacity: "-",
+                            BookedCount: "-",
+                            AvailableCount: "-",
+                            StartDate: sStartDate,
+                            EndDate: sEndDate,
+                            AvailabilityStatus: "Error",
+                            AvailabilityState: "Error"
+                        };
+                    }
+                }.bind(this)));
+
+                this.getView().getModel("RoomAvailabilityModel").setData(aRows);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onRoomAvailabilityClose: function () {
+            this.RoomAvailabilityDialog.close();
+        },
+
     });
 });

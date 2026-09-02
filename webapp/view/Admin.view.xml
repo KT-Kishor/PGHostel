@@ -194,6 +194,12 @@
                             press="HM_AssignRoom"
                             class="myUnifiedBtn"
                         />
+						<Button
+                            text="{i18n>roomAvailability}"
+                            tooltip="{i18n>roomAvailability}"
+                            press="onRoomAvailability"
+                            class="myUnifiedBtn"
+                        />
 					
 						<Button
                             text="{i18n>download}"

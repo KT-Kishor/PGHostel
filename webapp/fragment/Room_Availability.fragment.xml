@@ -1,0 +1,193 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="roomAvailabilityDialog"
+        draggable="true"
+        resizable="true"
+        stretch="{= ${device>/system/phone} }"
+        contentWidth="75%"
+        contentHeight="auto"
+        class="sapUiContentPadding"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>roomAvailability}" />
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://decline"
+                        press="onRoomAvailabilityClose"
+                        tooltip="{i18n>close}"
+                        class="myUnifiedBtn"
+                    />
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <HBox
+                alignItems="Center"
+                wrap="Wrap"
+                class="sapUiSmallMarginBottom sapUiSmallMarginBegin"
+                renderType="Div"
+            >
+                <Label
+                    text="{i18n>propertyName}"
+                    required="true"
+                    labelFor="roomAvailabilityBranch"
+                    width="8rem"
+                    class="sapUiTinyMarginEnd"
+                />
+                <ComboBox
+                    id="roomAvailabilityBranch"
+                    selectedKey="{RoomAvailabilityFilter>/BranchCode}"
+                    items="{BranchModel>/}"
+                    selectionChange="onRoomAvailabilityBranchChange"
+                    change="onRoomAvailabilityFieldChange"
+                    placeholder="{i18n>selectBranchCode}"
+                    valueStateText="{i18n>selectBranchCode}"
+                    showClearIcon="true"
+                    width="18rem"
+                >
+                    <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>Name}"
+                        additionalText="{BranchModel>BranchID}"
+                    />
+                    <layoutData>
+                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                    </layoutData>
+                </ComboBox>
+                <Label
+                    text="{i18n>bedType}"
+                    labelFor="roomAvailabilityType"
+                    width="5rem"
+                    class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                />
+                <ComboBox
+                    id="roomAvailabilityType"
+                    selectedKey="{RoomAvailabilityFilter>/BedTypeName}"
+                    items="{RoomAvailabilityTypes>/}"
+                    change="onRoomAvailabilityFieldChange"
+                    placeholder="{i18n>selectRoomType}"
+                    valueStateText="{i18n>selectRoomType}"
+                    showClearIcon="true"
+                    width="18rem"
+                >
+                    <core:Item
+                        key="{RoomAvailabilityTypes>BedTypeName}"
+                        text="{RoomAvailabilityTypes>BedTypeName}"
+                    />
+                    <layoutData>
+                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                    </layoutData>
+                </ComboBox>
+            </HBox>
+            <HBox
+                alignItems="Center"
+                wrap="Wrap"
+                class="sapUiSmallMarginBottom sapUiSmallMarginBegin"
+                renderType="Div"
+            >
+                <Label
+                    text="{i18n>startDate}"
+                    labelFor="roomAvailabilityStartDate"
+                    width="8rem"
+                    class="sapUiTinyMarginEnd"
+                />
+                <DatePicker
+                    id="roomAvailabilityStartDate"
+                    value="{RoomAvailabilityFilter>/StartDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onRoomAvailabilityFieldChange"
+                    placeholder="{i18n>startDate}"
+                    valueStateText="{i18n>startDate}"
+                    class="sapUiTinyMarginEnd"
+                    width="18rem"
+                >
+                    <layoutData>
+                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                    </layoutData>
+                </DatePicker>
+                <Label
+                    text="{i18n>endDate}"
+                    labelFor="roomAvailabilityEndDate"
+                    width="5rem"
+                    class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                />
+                <DatePicker
+                    id="roomAvailabilityEndDate"
+                    value="{RoomAvailabilityFilter>/EndDate}"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    change="onRoomAvailabilityFieldChange"
+                    placeholder="{i18n>endDate}"
+                    valueStateText="{i18n>endDate}"
+                    class="sapUiTinyMarginEnd"
+                    width="18rem"
+                >
+                    <layoutData>
+                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                    </layoutData>
+                </DatePicker>
+                <Button
+                    text="{i18n>load}"
+                    press="onLoadRoomAvailability"
+                    type="Emphasized"
+                    class="myUnifiedBtn sapUiTinyMarginBegin"
+                />
+            </HBox>
+            <Table
+                id="roomAvailabilityTable"
+                growing="true"
+                growingThreshold="20"
+                noDataText="{i18n>noRoomsFound}"
+                items="{RoomAvailabilityModel>/}"
+                class="sapUiSmallMarginTop"
+            >
+                <columns>
+                    <Column demandPopin="true"><Text text="{i18n>bedType}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>totalCapacity}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>booked}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>availableBeds}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>date}" /></Column>
+                    <Column demandPopin="true"><Text text="{i18n>status}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{RoomAvailabilityModel>BedTypeName}" />
+                            <Text text="{RoomAvailabilityModel>TotalCapacity}" />
+                            <Text text="{RoomAvailabilityModel>BookedCount}" />
+                            <Text text="{RoomAvailabilityModel>AvailableCount}" />
+                            <VBox>
+                                <Text
+                                    text="{path: 'RoomAvailabilityModel>StartDate', formatter: '.Formatter.formatDate'}"
+                                    visible="{= !!${RoomAvailabilityModel>StartDate} }"
+                                />
+                                <Text
+                                    text="{path: 'RoomAvailabilityModel>EndDate', formatter: '.Formatter.formatDate'}"
+                                    visible="{= !!${RoomAvailabilityModel>EndDate} }"
+                                />
+                            </VBox>
+                            <ObjectStatus
+                                text="{RoomAvailabilityModel>AvailabilityStatus}"
+                                state="{RoomAvailabilityModel>AvailabilityState}"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button
+                text="{i18n>close}"
+                press="onRoomAvailabilityClose"
+                class="myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
