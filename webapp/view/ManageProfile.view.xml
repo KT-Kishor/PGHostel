@@ -248,7 +248,7 @@
                         />
                         <ComboBox
                             id="id_city1"
-                            change="onChange"
+                            change="CC_onCityInputChange"
                             valueStateText="{i18n>cityValueText}"
                             placeholder="{i18n>enterCity}"
                             showSecondaryValues="true"

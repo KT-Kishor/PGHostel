@@ -816,14 +816,26 @@
                 this.closeBusyDialog();
             }
 
+            // A saved document record without actual file content (e.g. left
+            // over from a previously rejected oversized upload) must not
+            // pre-select the document type or show a file name. The dialog
+            // opens as "no document" so a valid file can be uploaded.
+            var bHasDocContent = !!(oDoc.Attachment || oDoc.File);
+            var sDocType = bHasDocContent ? (oDoc.DocumentType || "") : "";
+            var sDocName = bHasDocContent ? (oDoc.FileName || "") : "";
+            var sDocFileType = bHasDocContent ? (oDoc.FileType || "") : "";
+            var sDocContent = oDoc.Attachment || oDoc.File || "";
+
+            // DocumentID is kept even without content so the next save updates
+            // the existing record instead of creating a duplicate.
             this._existingFileData = {
                 DocumentID: oDoc.DocumentID || "",
                 MemberID: oData.MemberID || "",
                 UserID: sEditUserID,
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || "",
-                File: oDoc.Attachment || "",
-                DocumentType: oDoc.DocumentType || ""
+                FileName: sDocName,
+                FileType: sDocFileType,
+                File: sDocContent,
+                DocumentType: sDocType
             };
 
             this.getView().setModel(new JSONModel({
@@ -834,26 +846,43 @@
                 Relation: this._normalizeRelation(oData.Relation),
                 Gender: oData.Gender || "",
                 DateOfBirth: this._formatDateForDialog(oData.DateOfBirth),
-                DocumentType: oDoc.DocumentType || "",
-                DocumentName: oDoc.FileName || "",
-                Document: oDoc.Attachment || "",
-                File: oDoc.Attachment || "",
-                FileType: oDoc.FileType || "",
+                DocumentType: sDocType,
+                DocumentName: sDocName,
+                Document: sDocContent,
+                File: sDocContent,
+                FileType: sDocFileType,
                 DocumentFile: null
             }), "Member");
 
             this._resetMemberDialogControls(Object.assign({}, oData, {
-                DocumentType: oDoc.DocumentType || "",
-                FileName: oDoc.FileName || ""
+                DocumentType: sDocType,
+                FileName: sDocName
             }));
             this.UD_Dialog.open();
         },
 
         _ensureMemberDialog: function () {
             if (!this.UD_Dialog) {
-                this.UD_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Memberedit", this);
+                // Prefix the fragment id with the view id so the shared
+                // Memberedit fragment gets its own global ids per controller.
+                // Without a prefix, the second controller to instantiate it
+                // collides on the fragment's static ids (e.g. "sds12") and the
+                // sync factory returns an empty content array instead of a Dialog.
+                this.UD_Dialog = sap.ui.xmlfragment(
+                    this._getMemberDialogFragmentId(),
+                    "sap.ui.com.project1.fragment.Memberedit",
+                    this
+                );
                 this.getView().addDependent(this.UD_Dialog);
             }
+        },
+
+        _getMemberDialogFragmentId: function () {
+            return this.getView().createId("MembereditDialog");
+        },
+
+        _getMemberDialogControl: function (sLocalId) {
+            return sap.ui.getCore().byId(this._getMemberDialogFragmentId() + "--" + sLocalId);
         },
 
         _resetMemberDialogControls: function (oData) {
@@ -861,11 +890,11 @@
             var aIds = ["idSelect", "MM_id_MemberName", "MemberDOB", "MemberGenderCombo", "MemberRelationCombo", "idDocumentType", "MM_id_FileUploader"];
 
             aIds.forEach(function (sId) {
-                var oControl = sap.ui.getCore().byId(sId);
+                var oControl = this._getMemberDialogControl(sId);
                 if (oControl && oControl.setValueState) {
                     oControl.setValueState("None");
                 }
-            });
+            }.bind(this));
 
             this._setCoreControlValue("idSelect", mValues.Salutation || "");
             this._setCoreControlValue("MM_id_MemberName", mValues.Name || "");
@@ -877,7 +906,7 @@
         },
 
         _setCoreControlValue: function (sId, sValue) {
-            var oControl = sap.ui.getCore().byId(sId);
+            var oControl = this._getMemberDialogControl(sId);
             if (!oControl) {
                 return;
             }
@@ -916,7 +945,7 @@
         onNewMemberSalutationChange: function (oEvent) {
             var oSalutation = oEvent.getSource();
             var sKey = oSalutation.getSelectedKey();
-            var oGender = sap.ui.getCore().byId("MemberGenderCombo");
+            var oGender = this._getMemberDialogControl("MemberGenderCombo");
 
             oSalutation.setValueState("None");
             if (!oGender) {
@@ -959,7 +988,7 @@
 
             // Drop any previous "file missing" error on the uploader,
             // savepress re-evaluates it.
-            var oFileUploader = sap.ui.getCore().byId("MM_id_FileUploader");
+            var oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
 
             if (oFileUploader) {
                 oFileUploader.setValueState("None");
@@ -1056,6 +1085,25 @@
             oProcessedFile = oFile;
             bIsImage = ["jpg", "jpeg", "png", "webp"].indexOf(sExt) >= 0;
 
+            // Non-compressible files (e.g. PDF) over the limit are rejected
+            // BEFORE any model state is touched, so an existing document in
+            // UPDATE mode is never lost to a rejected upload.
+            if (oFile.size > nMaxSizeBytes && !bIsImage) {
+                this._selectedFile = null;
+                MessageToast.show("Please upload a file under 400 KB.");
+                oFileUploader.clear();
+                return;
+            }
+
+            // Snapshot the current document data: the compression path
+            // overwrites it, and every failed upload must restore it.
+            var oPreviousDocData = {
+                DocumentName: String(oModel.getProperty("/DocumentName") || ""),
+                Document: oModel.getProperty("/Document") || "",
+                File: oModel.getProperty("/File") || "",
+                FileType: oModel.getProperty("/FileType") || ""
+            };
+
             try {
                 if (oFile.size > nMaxSizeBytes && bIsImage) {
                     if (typeof imageCompression === "undefined") {
@@ -1079,26 +1127,15 @@
                     this.closeBusyDialog();
 
                     if (oProcessedFile.size > nMaxSizeBytes) {
-                        oModel.setProperty("/DocumentName", "");
-                        oModel.setProperty("/Document", "");
-                        oModel.setProperty("/File", "");
-                        oModel.setProperty("/FileType", "");
-                        oModel.setProperty("/ProcessingActive", false);
-                        oModel.refresh(true);
+                        this._restoreMemberDocumentData(oPreviousDocData);
                         MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
                         oFileUploader.clear();
                         return;
                     }
-                } else if (oFile.size > nMaxSizeBytes && !bIsImage) {
-                    MessageToast.show("Please upload a file under 400 KB.");
-                    oFileUploader.clear();
-                    return;
                 }
             } catch (oError) {
                 this.closeBusyDialog();
-                oModel.setProperty("/DocumentName", "");
-                oModel.setProperty("/ProcessingActive", false);
-                oModel.refresh(true);
+                this._restoreMemberDocumentData(oPreviousDocData);
                 MessageBox.error(oError.message || "Compression failed. Please try a smaller file.");
                 oFileUploader.clear();
                 return;
@@ -1120,13 +1157,31 @@
                 oFileUploader.clear();
             };
             oReader.onerror = function () {
-                oModel.setProperty("/DocumentName", "");
-                oModel.setProperty("/ProcessingActive", false);
-                oModel.refresh(true);
+                this._restoreMemberDocumentData(oPreviousDocData);
                 MessageBox.error("Unable to read selected file.");
                 oFileUploader.clear();
-            };
+            }.bind(this);
             oReader.readAsDataURL(oProcessedFile);
+        },
+
+        /**
+         * Restores the member dialog's document fields after a failed upload
+         * (rejected size / failed compression / read error). The compression
+         * path wipes them, so without a restore an edit-mode save would
+         * silently persist an empty document over the member's existing one.
+         */
+        _restoreMemberDocumentData: function (oPreviousDocData) {
+            var oModel = this.getView().getModel("Member");
+            if (!oModel || !oPreviousDocData) {
+                return;
+            }
+
+            oModel.setProperty("/DocumentName", oPreviousDocData.DocumentName || "");
+            oModel.setProperty("/Document", oPreviousDocData.Document || "");
+            oModel.setProperty("/File", oPreviousDocData.File || "");
+            oModel.setProperty("/FileType", oPreviousDocData.FileType || "");
+            oModel.setProperty("/ProcessingActive", false);
+            oModel.refresh(true);
         },
 
         onMemberFileSizeExceed: function (oEvent) {
@@ -1144,7 +1199,7 @@
             oModel.setProperty("/DocumentType", "");
             oModel.refresh(true);
 
-            var oFileUploader = sap.ui.getCore().byId("MM_id_FileUploader");
+            var oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
             if (oFileUploader) {
                 oFileUploader.clear();
                 oFileUploader.setValueState("None");
@@ -1167,7 +1222,7 @@
          * @returns {boolean} true when valid, false when execution must stop
          */
         _validateMemberDocument: function (oMember) {
-            var oFileUploader = sap.ui.getCore().byId("MM_id_FileUploader");
+            var oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
             var sDocumentType = String(oMember.DocumentType || "").trim();
 
             // A file is considered present if it was just uploaded
@@ -1205,15 +1260,14 @@
         },
 
         savepress: function () {
-            var oCore = sap.ui.getCore();
             var oMember = this.getView().getModel("Member").getData();
 
-            if (!(utils._LCstrictValidationComboBox(oCore.byId("idSelect"), "ID") &&
-                    utils._LCvalidateName(oCore.byId("MM_id_MemberName"), "ID") &&
-                    utils._LCvalidateDate(oCore.byId("MemberDOB"), "ID") &&
-                    utils._LCstrictValidationComboBox(oCore.byId("MemberGenderCombo"), "ID") &&
-                    (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oCore.byId("MemberRelationCombo"), "ID")) &&
-                    utils._LCstrictValidationComboBox(oCore.byId("idDocumentType"), "ID"))) {
+            if (!(utils._LCstrictValidationComboBox(this._getMemberDialogControl("idSelect"), "ID") &&
+                utils._LCvalidateName(this._getMemberDialogControl("MM_id_MemberName"), "ID") &&
+                utils._LCvalidateDate(this._getMemberDialogControl("MemberDOB"), "ID") &&
+                utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberGenderCombo"), "ID") &&
+                (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberRelationCombo"), "ID")) &&
+                utils._LCstrictValidationComboBox(this._getMemberDialogControl("idDocumentType"), "ID"))) {
                 MessageToast.show("Please fill mandatory fields");
                 return;
             }

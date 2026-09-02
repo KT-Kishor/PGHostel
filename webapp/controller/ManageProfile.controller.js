@@ -895,11 +895,22 @@ sap.ui.define([
             });
         },
 
+        _getMemberDialogFragmentId: function () {
+            return this.getView().createId("MembereditDialog");
+        },
+
+        _getMemberDialogControl: function (sLocalId) {
+            return sap.ui.getCore().byId(this._getMemberDialogFragmentId() + "--" + sLocalId);
+        },
+
         onPressAddMember: function () {
 
             if (!this.UD_Dialog) {
                 var oView = this.getView();
+                // Prefix the fragment id with the view id so the shared
+                // Memberedit fragment gets its own global ids per controller.
                 this.UD_Dialog = sap.ui.xmlfragment(
+                    this._getMemberDialogFragmentId(),
                     "sap.ui.com.project1.fragment.Memberedit",
                     this
                 );
@@ -941,13 +952,13 @@ sap.ui.define([
             this._existingFileData = null;
             this._selectedFile = null;
             //  Reset UI fields
-            sap.ui.getCore().byId("idSelect").setSelectedKey("").setValueState("None");
-            sap.ui.getCore().byId("MM_id_MemberName").setValue("").setValueState("None");
-            sap.ui.getCore().byId("MemberDOB").setValue("").setValueState("None");
-            sap.ui.getCore().byId("MemberGenderCombo").setSelectedKey("").setValueState("None");
-            sap.ui.getCore().byId("MemberRelationCombo").setSelectedKey("").setValueState("None");
-            sap.ui.getCore().byId("idDocumentType").setSelectedKey("").setValueState("None");
-            sap.ui.getCore().byId("MM_id_FileUploader").setValue("").setValueState("None");
+            this._getMemberDialogControl("idSelect").setSelectedKey("").setValueState("None");
+            this._getMemberDialogControl("MM_id_MemberName").setValue("").setValueState("None");
+            this._getMemberDialogControl("MemberDOB").setValue("").setValueState("None");
+            this._getMemberDialogControl("MemberGenderCombo").setSelectedKey("").setValueState("None");
+            this._getMemberDialogControl("MemberRelationCombo").setSelectedKey("").setValueState("None");
+            this._getMemberDialogControl("idDocumentType").setSelectedKey("").setValueState("None");
+            this._getMemberDialogControl("MM_id_FileUploader").setValue("").setValueState("None");
 
             this.UD_Dialog.open();
         },
@@ -958,6 +969,7 @@ sap.ui.define([
                 var oView = this.getView();
 
                 this.UD_Dialog = sap.ui.xmlfragment(
+                    this._getMemberDialogFragmentId(),
                     "sap.ui.com.project1.fragment.Memberedit",
                     this
                 );
@@ -995,6 +1007,18 @@ sap.ui.define([
 
             const sDateOfBirth = String(oData.DateOfBirth || "");
 
+            // A saved document record without actual file content (e.g. left
+            // over from a previously rejected oversized upload) must not
+            // pre-select the document type or show a file name. The dialog
+            // opens as "no document" so a valid file can be uploaded.
+            const bHasDocContent = !!(oDoc.Attachment || oDoc.File);
+            const sDocType = bHasDocContent ? (oDoc.DocumentType || "") : "";
+            const sDocName = bHasDocContent ? (oDoc.FileName || "") : "";
+            const sDocFileType = bHasDocContent ? (oDoc.FileType || "") : "";
+            const sDocContent = oDoc.Attachment || oDoc.File || "";
+
+            // DocumentID is kept even without content so the next save updates
+            // the existing record instead of creating a duplicate.
             this._existingFileData = {
                 DateOfBirth: sDateOfBirth || "",
                 Gender: oData.Gender || "",
@@ -1003,10 +1027,10 @@ sap.ui.define([
                 UserID: sEditUserID,
                 Salutation: oData.Salutation,
                 DocumentID: oDoc.DocumentID || "",
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || "",
-                File: oDoc.Attachment || "",
-                DocumentType: oDoc.DocumentType || ""
+                FileName: sDocName,
+                FileType: sDocFileType,
+                File: sDocContent,
+                DocumentType: sDocType
             };
 
             const oMemberData = {
@@ -1019,11 +1043,11 @@ sap.ui.define([
                 DateOfBirth: sDateOfBirth ?
                     sDateOfBirth.split("-").reverse().join("/") :
                     "",
-                DocumentType: oDoc.DocumentType || "",
-                DocumentName: oDoc.FileName || "",
-                Document: oDoc.Attachment || "",
-                File: oDoc.Attachment || "",
-                FileType: oDoc.FileType || "",
+                DocumentType: sDocType,
+                DocumentName: sDocName,
+                Document: sDocContent,
+                File: sDocContent,
+                FileType: sDocFileType,
                 DocumentFile: null
             };
 
@@ -1032,15 +1056,15 @@ sap.ui.define([
                 "Member"
             );
 
-            sap.ui.getCore().byId("idDocumentType").setSelectedKey(oDoc.DocumentType || "").setValueState("None");
-            sap.ui.getCore().byId("MM_id_FileUploader").setValue(oDoc.FileName || "").setValueState("None");
-            sap.ui.getCore().byId("MemberDOB").setValue(sDateOfBirth.split('-').reverse().join('/') || "").setValueState("None");
+            this._getMemberDialogControl("idDocumentType").setSelectedKey(sDocType).setValueState("None");
+            this._getMemberDialogControl("MM_id_FileUploader").setValue(sDocName).setValueState("None");
+            this._getMemberDialogControl("MemberDOB").setValue(sDateOfBirth.split('-').reverse().join('/') || "").setValueState("None");
 
-            sap.ui.getCore().byId("MemberGenderCombo").setValue(oData.Gender || "").setValueState("None");
+            this._getMemberDialogControl("MemberGenderCombo").setValue(oData.Gender || "").setValueState("None");
 
-            sap.ui.getCore().byId("MemberRelationCombo").setValue(oData.Relation || "").setValueState("None");
-            sap.ui.getCore().byId("MM_id_MemberName").setValue(oData.Name || "").setValueState("None");
-            sap.ui.getCore().byId("idSelect").setValue(oData.Salutation || "").setValueState("None");
+            this._getMemberDialogControl("MemberRelationCombo").setValue(oData.Relation || "").setValueState("None");
+            this._getMemberDialogControl("MM_id_MemberName").setValue(oData.Name || "").setValueState("None");
+            this._getMemberDialogControl("idSelect").setValue(oData.Salutation || "").setValueState("None");
             this.UD_Dialog.open();
         },
 
@@ -1054,8 +1078,7 @@ sap.ui.define([
 
             // Drop any previous "file missing" error on the uploader,
             // savepress re-evaluates it.
-            const oFileUploader = sap.ui.getCore()
-                .byId("MM_id_FileUploader");
+            const oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
 
             if (oFileUploader) {
                 oFileUploader.setValueState("None");
@@ -1154,8 +1177,34 @@ sap.ui.define([
             }
         },
 
+        /**
+         * Restores the member dialog's document fields after a failed upload
+         * (rejected size / failed compression). The busy processing row wipes
+         * them, so without a restore an edit-mode save would silently persist
+         * an empty document over the member's existing one.
+         */
+        _restoreMemberDocumentData: function (oPreviousDocData, sTempId) {
+            const oModel = this.getView().getModel("Member");
+            if (!oModel || !oPreviousDocData) {
+                return;
+            }
+
+            // A newer upload may have started meanwhile; do not clobber it.
+            if (sTempId && oModel.getProperty("/tempId") !== sTempId) {
+                return;
+            }
+
+            oModel.setProperty("/DocumentName", oPreviousDocData.DocumentName || "");
+            oModel.setProperty("/FileType", oPreviousDocData.FileType || "");
+            oModel.setProperty("/Document", oPreviousDocData.Document || "");
+            oModel.setProperty("/File", oPreviousDocData.File || "");
+            oModel.setProperty("/ProcessingActive", false);
+            oModel.setProperty("/tempId", "");
+            oModel.refresh(true);
+        },
+
         _showBusyOnUploader: function (bBusy) {
-            const oUploader = sap.ui.getCore().byId("MM_id_FileUploader");
+            const oUploader = this._getMemberDialogControl("MM_id_FileUploader");
             if (oUploader && oUploader.setBusy) {
                 oUploader.setBusy(bBusy);
             }
@@ -1208,15 +1257,35 @@ sap.ui.define([
                 return;
             }
 
-            this._selectedFile = oFile;
-
-            const sTempId = this._addBusyProcessingRow();
-            this._showBusyOnUploader(true);
-
             let processedFile = oFile;
             const MAX_SIZE_KB = 400;
             const iMaxSizeBytes = MAX_SIZE_KB * 1024;
             const isImage = ["jpg", "jpeg", "png", "webp"].includes(sExt);
+
+            // Non-compressible files (e.g. PDF) over the limit are rejected
+            // BEFORE any state is touched. Setting _selectedFile or wiping the
+            // model's document fields first would let savepress pass the
+            // document validation and save an edit with an empty document.
+            if (oFile.size > iMaxSizeBytes && !isImage) {
+                sap.m.MessageToast.show("Please upload a file under 400 KB.");
+                this._selectedFile = null;
+                oFileUploader.clear();
+                return;
+            }
+
+            // Snapshot the current document data: the busy processing row
+            // overwrites it, and every failed upload path must restore it.
+            const oPreviousDocData = {
+                DocumentName: String(oModel.getProperty("/DocumentName") || ""),
+                FileType: oModel.getProperty("/FileType") || "",
+                Document: oModel.getProperty("/Document") || "",
+                File: oModel.getProperty("/File") || ""
+            };
+
+            this._selectedFile = oFile;
+
+            const sTempId = this._addBusyProcessingRow();
+            this._showBusyOnUploader(true);
 
             try {
                 if (oFile.size > iMaxSizeBytes && isImage) {
@@ -1235,14 +1304,10 @@ sap.ui.define([
 
                     if (processedFile.size > iMaxSizeBytes) {
                         sap.m.MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
-                        this._removeProcessingRow(sTempId);
+                        this._selectedFile = null;
+                        this._restoreMemberDocumentData(oPreviousDocData, sTempId);
                         return;
                     }
-                } else if (oFile.size > iMaxSizeBytes && !isImage) {
-                    sap.m.MessageToast.show("Please upload a file under 400 KB.");
-                    oFileUploader.clear();
-                    this._removeProcessingRow(sTempId);
-                    return;
                 }
 
                 const base64 = await new Promise(function (resolve, reject) {
@@ -1271,7 +1336,8 @@ sap.ui.define([
 
             } catch (err) {
                 this.closeBusyDialog();
-                this._removeProcessingRow(sTempId);
+                this._selectedFile = null;
+                this._restoreMemberDocumentData(oPreviousDocData, sTempId);
                 console.error(err);
                 sap.m.MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
             } finally {
@@ -1798,8 +1864,7 @@ sap.ui.define([
 
             oModel.refresh(true);
 
-            const oFileUploader = sap.ui.getCore()
-                .byId("MM_id_FileUploader");
+            const oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
 
             if (oFileUploader) {
                 oFileUploader.clear();
@@ -1820,8 +1885,7 @@ sap.ui.define([
          */
         _validateMemberDocument: function (oMember) {
 
-            const oFileUploader = sap.ui.getCore()
-                .byId("MM_id_FileUploader");
+            const oFileUploader = this._getMemberDialogControl("MM_id_FileUploader");
 
             const sDocumentType = String(oMember.DocumentType || "").trim();
 
@@ -1872,15 +1936,14 @@ sap.ui.define([
 
         savepress: function () {
 
-            var oView = sap.ui.getCore();
             var oMember = this.getView().getModel("Member").getData();
 
-            if (utils._LCstrictValidationComboBox(oView.byId("idSelect"), "ID") &&
-                utils._LCvalidateName(oView.byId("MM_id_MemberName"), "ID") &&
-                utils._LCvalidateDate(oView.byId("MemberDOB"), "ID") &&
-                utils._LCstrictValidationComboBox(oView.byId("MemberGenderCombo"), "ID") &&
-                (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(oView.byId("MemberRelationCombo"), "ID")) &&
-                utils._LCstrictValidationComboBox(oView.byId("idDocumentType"), "ID")
+            if (utils._LCstrictValidationComboBox(this._getMemberDialogControl("idSelect"), "ID") &&
+                utils._LCvalidateName(this._getMemberDialogControl("MM_id_MemberName"), "ID") &&
+                utils._LCvalidateDate(this._getMemberDialogControl("MemberDOB"), "ID") &&
+                utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberGenderCombo"), "ID") &&
+                (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberRelationCombo"), "ID")) &&
+                utils._LCstrictValidationComboBox(this._getMemberDialogControl("idDocumentType"), "ID")
             ) {
 
                 if (!oMember.DocumentType) {
@@ -2028,7 +2091,7 @@ sap.ui.define([
         onNewMemberSalutationChange: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = sap.ui.getCore().byId("MemberGenderCombo");
+            const oGender = this._getMemberDialogControl("MemberGenderCombo");
             // Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
@@ -2090,7 +2153,7 @@ sap.ui.define([
                 this.onChangeDOB(this.byId("id_dob1"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_country1"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_state1"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("id_city1"), "ID") &&
+                this._validateCityField() &&
                 utils._LCvalidateMandatoryField(this.byId("id_phone1"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_gender1"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("id_address1"), "ID")
@@ -2099,6 +2162,16 @@ sap.ui.define([
             if (!isMandatoryValid) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
+            }
+
+            // Final sync: a manually typed city must reach the model even when the
+            // change event did not fire before Save was pressed.
+            const oCityCB = this.byId("id_city1");
+            const oSelectedCityItem = oCityCB.getSelectedItem();
+            if (oSelectedCityItem) {
+                oModel.setProperty("/City", oSelectedCityItem.getKey() || oSelectedCityItem.getText());
+            } else {
+                oModel.setProperty("/City", (oCityCB.getValue() || "").trim());
             }
             const payload = {
                 data: {
@@ -3145,6 +3218,53 @@ sap.ui.define([
 
             // Save in model
             oModel.setProperty("/City", sCityName);
+        },
+
+        /**
+         * Handles manually typed city values (Enter / focus-out).
+         * Accepts BOTH dropdown values and free-text entries; only empty is invalid.
+         * The selectedKey binding alone never syncs a typed value into the model,
+         * so this handler keeps /City aligned with whatever the user typed/selected.
+         */
+        CC_onCityInputChange: function (oEvent) {
+            const oCityCB = oEvent.getSource();
+            const oModel = this.getView().getModel("profileData");
+            const sValue = (oCityCB.getValue() || "").trim();
+
+            if (!sValue) {
+                oModel.setProperty("/City", "");
+                oCityCB.setValueState("Error");
+                return;
+            }
+
+            const oSelectedItem = oCityCB.getSelectedItem();
+            if (oSelectedItem) {
+                oModel.setProperty("/City", oSelectedItem.getKey() || oSelectedItem.getText());
+            } else {
+                oModel.setProperty("/City", sValue);
+                // The selectedKey binding cannot match a free-text city and may
+                // clear the field — re-assert the typed value so it stays visible.
+                oCityCB.setValue(sValue);
+            }
+
+            oCityCB.setValueState("None");
+        },
+
+        /**
+         * City validation for save: any non-empty value is valid — whether picked
+         * from the dropdown or typed manually. Only empty is rejected.
+         */
+        _validateCityField: function () {
+            const oCityCB = this.byId("id_city1");
+            const sValue = (oCityCB.getValue() || "").trim();
+
+            if (!sValue) {
+                oCityCB.setValueState("Error").focus();
+                return false;
+            }
+
+            oCityCB.setValueState("None");
+            return true;
         },
         _onProfileSTDChange: function () {
             const oSTD = this.byId("id_std1");

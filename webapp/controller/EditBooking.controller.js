@@ -1710,7 +1710,7 @@ sap.ui.define([
                     // "The stay duration have been modified, so the room status will be reverted from \"" +
                     // sOriginalStatus + "\" to \"New\". Our team will recheck room availability. Once the booking is confirmed, " +
                     // "you will be notified by email.",
-                    "Please wait while we verify room availability for your revised dates. Once submitted, "+
+                    "Please wait while we verify room availability for your revised dates. Once submitted, " +
                     "we will check availability and email you the updated status shortly.",
                     {
                         title: "Confirm Booking Changes",
@@ -3659,6 +3659,7 @@ sap.ui.define([
             this._backupAllFacilities = JSON.parse(JSON.stringify(this._aAllFacilities || []));
 
             oBookingView.setProperty("/editModeEnabled", true);
+            this._sConfirmedRoomPlan = oHostelModel.getProperty("/SelectedPriceType") || "";
             this._updateEndDateMinDate();
         },
 
@@ -3735,6 +3736,13 @@ sap.ui.define([
             if (this._backupAllFacilities) {
                 this._aAllFacilities = JSON.parse(JSON.stringify(this._backupAllFacilities));
             }
+            
+            // The room-plan change guard compares the new selection against
+            // _sConfirmedRoomPlan. Cancel restores the model data but not this
+            // tracker, so it keeps the plan chosen during the cancelled session.
+            // Re-selecting that same plan then looks like a no-change and the
+            // start/end dates never get cleared. Resync it to the restored plan.
+            this._sConfirmedRoomPlan = oHostelModel.getProperty("/SelectedPriceType") || "";
 
             // Apply facility price filter to ensure facility model is properly synced with _aAllFacilities
             // This updates the FacilityModel's /Facilities array with correct Selected state and prices
