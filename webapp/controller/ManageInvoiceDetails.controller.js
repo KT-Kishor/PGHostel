@@ -2936,14 +2936,28 @@ sap.ui.define([
 
             CID_onPressGeneratePdf: async function () {
                 try {
-                    this.getBusyDialog()
+                    this.getBusyDialog();
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
                     const oModel = oView.getModel("SelectedCustomerModel").getData();
+
+                    // Get branch model data
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    // Find the branch whose BranchID matches oModel.BranchCode
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === oModel.BranchCode)
+                        : (oBranchModelData?.BranchID === oModel.BranchCode ? oBranchModelData : null);
+
+                    // Store the branch name in a variable
+                    const sBranchName = oMatchedBranch?.Name || "";
+
                     const oModel1 = oView.getModel("BookinglocalModel").getData();
                     const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
                     const oCompanyItemModel = oManageInvoiceItemModel.ManageInvoiceItem || [];
-                    var data = this.getView().getModel("FilteredSOWModel").getData();
+                    const data = this.getView().getModel("FilteredSOWModel").getData();
 
                     // fetch company details
                     let filter = { BranchID: [oModel.BranchCode] };
@@ -2968,7 +2982,7 @@ sap.ui.define([
                     const usableWidth = pageWidth - 2 * margin;
                     let currentY = 0;
 
-                    // Header
+                    // Header title
                     let headerMargin = 25.4;
                     doc.setFontSize(14).setFont("times", "bold");
                     if (oModel.Status === "Payment Received") {
@@ -2981,13 +2995,21 @@ sap.ui.define([
                         });
                     }
 
+                    // ---- Add Branch Name FIRST ----
+                    doc.setFont("times", "bold").setFontSize(14);
+                    if (sBranchName) {
+                        doc.text(String(sBranchName).toUpperCase(), margin, headerMargin);
+                    }
+
+                    // ---- Then add Company Image below branch name ----
                     if (companyImage && companyImage.trim() !== "") {
                         const imgData = "data:image/png;base64," + companyImage;
-                        doc.addImage(imgData, "PNG", margin, 15, 40, 40);
+                        // Adjust Y position so image appears below the branch name
+                        doc.addImage(imgData, "PNG", margin, headerMargin + 2, 40, 40);
                     }
 
                     // Invoice Details
-                    const detailsStartY = 35;
+                    const detailsStartY = headerMargin + 10; // adjust if needed based on image height
                     const rowHeight = 6.5;
                     const columnWidths = [40, 40];
                     const rightAlignX = pageWidth - 23 - columnWidths[0] - columnWidths[1];
@@ -3199,8 +3221,6 @@ sap.ui.define([
                         }
                     }
 
-
-
                     const balanceAmount =
                         (Number(data.TotalAmount) || 0) -
                         (
@@ -3214,7 +3234,6 @@ sap.ui.define([
                             Formatter.fromatNumber(balanceAmount)
                         ]);
                     }
-
 
                     const totalRowIndex = summaryBody.length;
                     summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
@@ -3277,13 +3296,11 @@ sap.ui.define([
                     );
                     doc.text(amountLines, margin, currentY);
 
-                    // Move Y below wrapped text
                     currentY += amountLines.length * 5 + 8;
 
                     // ===== Transaction History =====
                     if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
 
-                        // Page break check
                         if (currentY + 60 > pageHeight) {
                             doc.addPage();
                             currentY = 20;
@@ -3350,7 +3367,6 @@ sap.ui.define([
 
                     currentY += 15;
 
-                    // Page break check
                     if (currentY + 20 > pageHeight) {
                         doc.addPage();
                         currentY = 20;
@@ -3358,11 +3374,8 @@ sap.ui.define([
                     doc.setFontSize(11);
                     doc.text("Thank you for staying with us.", margin, currentY);
 
-                    // --------------------------------------------------
-                    // Reserve space above footer
-                    // --------------------------------------------------
-                    const footerHeight = 35;      // Same as your footer
-                    const signatureHeight = 25;   // Space needed for signatures
+                    const footerHeight = 35;
+                    const signatureHeight = 25;
 
                     currentY += 32;
 
@@ -3371,40 +3384,30 @@ sap.ui.define([
                         currentY = 30;
                     }
 
-
                     // ================= SIGNATURES =================
 
                     const leftX = margin;
                     const rightX = pageWidth - margin;
-                    const lineLength = 40; // Decreased line width (adjust as needed)
+                    const lineLength = 40;
 
                     doc.setFont("times", "bold");
                     doc.setFontSize(12);
 
-                    // --- Row 1: Cashier & Guest Sign ---
-
-                    // 1. Left side: "Cashier ____"
                     const cashierLabel = "Cashier ";
                     doc.text(cashierLabel, leftX, currentY);
 
                     const cashierTextWidth = doc.getTextWidth(cashierLabel);
                     const lineStartX = leftX + cashierTextWidth;
 
-                    // Draw shorter straight horizontal line
                     doc.setLineWidth(0.5);
                     doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
 
-                    // 2. Right side: "guest sign ____"
                     const guestLabel = "Guest sign ";
                     const guestTextWidth = doc.getTextWidth(guestLabel);
 
-                    // Draw shorter straight horizontal line on the right end
                     doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
-
-                    // Place "guest sign" right before the line
                     doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
 
-                    // --- Row 2: Created By ---
                     const footerStartY = pageHeight - 40;
 
                     if (currentY + 15 > footerStartY) {
@@ -3428,10 +3431,10 @@ sap.ui.define([
 
                     doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
                 } catch (error) {
-                    this.closeBusyDialog()
+                    this.closeBusyDialog();
                     MessageToast.show(error.message || error.responseText);
                 } finally {
-                    this.closeBusyDialog()
+                    this.closeBusyDialog();
                 }
             },
 
@@ -3502,7 +3505,6 @@ sap.ui.define([
 
             CID_onPressGenerateSelectedPDF: async function () {
                 try {
-
                     const { jsPDF } = window.jspdf;
                     const oView = this.getView();
 
@@ -3513,7 +3515,7 @@ sap.ui.define([
                         MessageToast.show("Select at least one invoice item before printing");
                         return;
                     }
-                    this.getBusyDialog()
+                    this.getBusyDialog();
 
                     //  SELECTED ITEMS 
                     const aInvoiceItems = aSelectedItems.map(oItem =>
@@ -3522,7 +3524,7 @@ sap.ui.define([
 
                     //  MODELS 
                     const oCustomerModel = oView.getModel("SelectedCustomerModel").getData();
-                    const oModel1 = oView.getModel("BookinglocalModel").getData();
+
                     const oSOWModel = oView.getModel("FilteredSOWModel").getData();
 
                     //  GST MASTER CHECK (SAME AS UI) 
@@ -3535,25 +3537,31 @@ sap.ui.define([
                         taxRate > 0 &&
                         currency === "INR";
 
+                    //  BRANCH MODEL & MATCHED BRANCH NAME 
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === oCustomerModel.BranchCode)
+                        : (oBranchModelData?.BranchID === oCustomerModel.BranchCode ? oBranchModelData : null);
+
+                    const sBranchName = oMatchedBranch?.Name || "";
+
                     //  COMPANY DETAILS 
                     const filter = { BranchID: [oCustomerModel.BranchCode] };
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
                     const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                     const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
 
                     //  RECALCULATE TOTALS (SELECTED ONLY) 
                     let totalWithGST = 0;
                     let totalWithoutGST = 0;
-
-                    //  ROOM TOTAL (FOR COUPON) 
                     let roomTotal = 0;
-
-                    //  SUBTOTAL 
                     let subTotal = 0;
 
-                    // Fetch initial global coupon discount
                     let couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
 
-                    // Calculate total available room rent first to cap coupon if needed
                     aInvoiceItems.forEach(item => {
                         const amount = parseFloat(item.Total) || 0;
                         const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
@@ -3562,19 +3570,16 @@ sap.ui.define([
                         }
                     });
 
-                    // Coupon cannot exceed room total
                     if (couponDiscount > roomTotal) {
                         couponDiscount = roomTotal;
                     }
 
                     let remainingCoupon = couponDiscount;
 
-                    // Process item calculations and inject item-level discount
                     aInvoiceItems.forEach(item => {
                         let amount = parseFloat(item.Total) || 0;
                         let itemDiscount = 0;
 
-                        // Identify Room items and apply discount directly here
                         const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
 
                         if (isRoomItem && remainingCoupon > 0) {
@@ -3587,12 +3592,11 @@ sap.ui.define([
                             }
                         }
 
-                        // Adjust amount and item totals based on discount
                         item.itemDiscountValue = itemDiscount;
                         const finalItemTotal = amount - itemDiscount;
                         item.adjustedTotal = finalItemTotal;
 
-                        subTotal += amount; // Keeps track of original subtotal before coupon if needed
+                        subTotal += amount;
 
                         const isGSTApplicable = isGSTEnabled && item.GSTCalculation === "YES";
                         item.SAC = isGSTApplicable ? "996322" : "-";
@@ -3604,24 +3608,20 @@ sap.ui.define([
                         }
                     });
 
-                    //  DISCOUNTED TOTAL 
                     let discountedTotal = subTotal - couponDiscount;
                     if (discountedTotal < 0) {
                         discountedTotal = 0;
                     }
 
-                    //  GST CALCULATION 
                     let cgst = 0;
                     let sgst = 0;
                     let igst = 0;
                     let gstAmount = 0;
 
-                    // GST should calculate AFTER discount
                     let finalAmount = discountedTotal;
 
                     if (isGSTEnabled) {
-                        // Proportional taxable amount after discount
-                        let taxableAmount = totalWithGST; // Using totalWithGST since it already has item discounts subtracted
+                        let taxableAmount = totalWithGST;
 
                         if (taxType === "CGST/SGST") {
                             gstAmount = (taxableAmount * taxRate) / 100;
@@ -3635,7 +3635,6 @@ sap.ui.define([
                         }
                     }
 
-                    //  ASSIGN VALUES FOR PDF 
                     oCustomerModel.SubTotal = subTotal.toFixed(2);
                     oCustomerModel.SubTotalInGST = totalWithGST.toFixed(2);
                     oCustomerModel.SubTotalNotGST = totalWithoutGST.toFixed(2);
@@ -3655,24 +3654,42 @@ sap.ui.define([
                     const pageHeight = doc.internal.pageSize.getHeight();
                     const margin = 15;
                     const usableWidth = pageWidth - margin * 2;
-                    let currentY = 25;
 
-                    //  HEADER 
+                    //  HEADER TITLE 
+                    let headerMargin = 25.4;
                     doc.setFont("times", "bold").setFontSize(14);
-                    doc.text(oCustomerModel.Status === "Payment Received" ? "TAX INVOICE" : "DRAFT INVOICE",
+                    doc.text(
+                        oCustomerModel.Status === "Payment Received" ? "TAX - INVOICE" : "DRAFT INVOICE",
                         pageWidth - 18,
-                        currentY, {
-                        align: "right"
-                    }
+                        headerMargin,
+                        { align: "right" }
                     );
 
-                    if (companyImage) {
-                        doc.addImage("data:image/png;base64," + companyImage, "PNG", margin, 15, 40, 40);
+                    //  BRANCH NAME FIRST 
+                    doc.setFont("times", "bold").setFontSize(14);
+
+                    let branchNameY = headerMargin;
+                    if (sBranchName) {
+                        doc.text(String(sBranchName).toUpperCase(), margin, branchNameY);
+                    }
+                    //         if (sBranchName) {
+                    //     doc.text(
+                    //         String(sBranchName).toUpperCase(),
+                    //         margin,
+                    //         headerMargin
+                    //     );
+                    // }
+
+                    //  COMPANY IMAGE BELOW BRANCH NAME 
+                    let imageY = branchNameY + 2;
+                    if (companyImage && companyImage.trim() !== "") {
+                        const imgData = "data:image/png;base64," + companyImage;
+                        doc.addImage(imgData, "PNG", margin, imageY, 40, 40);
                     }
 
-                    //  INVOICE DETAILS 
-                    currentY = 40;
-                    doc.setFontSize(11).setFont("times", "bold");
+                    //  INVOICE DETAILS (below image) 
+                    let currentY = imageY + 10; // 40mm image + gap
+                    doc.setFontSize(12).setFont("times", "bold");
 
                     const details = [
                         ["Invoice No :", oCustomerModel.InvNo],
@@ -3680,23 +3697,29 @@ sap.ui.define([
                         ["Room No :", oModel1.RoomNo]
                     ];
 
+                    const columnWidths = [40, 40];
+                    const rightAlignX = pageWidth - 23 - columnWidths[0] - columnWidths[1];
+                    const rowHeight = 6.5;
+
                     details.forEach(row => {
-                        doc.text(row[0], pageWidth - 80, currentY);
-                        doc.text(String(row[1] || ""), pageWidth - 53, currentY);
-                        currentY += 6;
+                        doc.text(row[0], rightAlignX + columnWidths[0] - doc.getTextWidth(row[0]), currentY + 5);
+                        doc.text(String(row[1] || ""), rightAlignX + columnWidths[0] + 5, currentY + 5);
+                        currentY += rowHeight;
                     });
 
                     //  CUSTOMER DETAILS 
                     currentY += 10;
+                    doc.setFont("times", "bold").setFontSize(11);
                     doc.text("To,", margin, currentY);
-                    doc.setFont("times", "normal");
+                    doc.setFont("times", "normal").setFontSize(12);
 
-                    if (oCustomerModel.CustomerName)
-                        doc.text(`Name : ${oCustomerModel.CustomerName}`, margin, currentY += 6);
+                    if (oCustomerModel.CustomerName) {
+                        doc.text(`Name : ${oCustomerModel.CustomerName}`, margin, currentY += 5);
+                    }
 
                     if (oCustomerModel.PermanentAddress) {
-                        const addr = doc.splitTextToSize(oCustomerModel.PermanentAddress, usableWidth / 2);
-                        doc.text(addr, margin, currentY += 6);
+                        const addr = doc.splitTextToSize(oCustomerModel.PermanentAddress, usableWidth / 2 - 10);
+                        doc.text(addr, margin, currentY += 5);
                         currentY += addr.length * 5;
                     }
 
@@ -3715,7 +3738,7 @@ sap.ui.define([
 
                     currentY += 5;
 
-                    //  ITEMS TABLE WITH DISCOUNT COLUMN Included
+                    //  ITEMS TABLE WITH DISCOUNT COLUMN 
                     const head = showSAC ? [
                         ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
                     ] : [
@@ -3725,11 +3748,9 @@ sap.ui.define([
                     const body = [...aInvoiceItems]
                         .sort((a, b) => {
                             const startDiff = this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
-
                             if (startDiff !== 0) {
                                 return startDiff;
                             }
-
                             return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
                         })
                         .map((item, i) => {
@@ -3791,7 +3812,7 @@ sap.ui.define([
 
                     currentY = doc.lastAutoTable.finalY + 6;
 
-                    //  SUMMARY (Coupon discount removed from here) 
+                    //  SUMMARY 
                     const summary = [];
 
                     if (totalWithoutGST > 0)
@@ -3852,7 +3873,8 @@ sap.ui.define([
                     doc.setFont("times", "bold");
                     doc.text("Amount in Words :", margin, currentY);
                     doc.setFont("times", "normal");
-                    doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY + 6);
+                    const amountLines = doc.splitTextToSize(totalInWords, usableWidth);
+                    doc.text(amountLines, margin, currentY + 6);
 
                     currentY += 15;
                     doc.setFontSize(11);
@@ -3862,8 +3884,8 @@ sap.ui.define([
                     // --------------------------------------------------
                     // Reserve space above footer
                     // --------------------------------------------------
-                    const footerHeight = 35;      // Same as your footer
-                    const signatureHeight = 25;   // Space needed for signatures
+                    const footerHeight = 35;
+                    const signatureHeight = 25;
 
                     currentY += 32;
 
@@ -3872,40 +3894,29 @@ sap.ui.define([
                         currentY = 30;
                     }
 
-
                     // ================= SIGNATURES =================
 
                     const leftX = margin;
                     const rightX = pageWidth - margin;
-                    const lineLength = 40; // Decreased line width (adjust as needed)
+                    const lineLength = 40;
 
                     doc.setFont("times", "bold");
                     doc.setFontSize(12);
 
-                    // --- Row 1: Cashier & Guest Sign ---
-
-                    // 1. Left side: "Cashier ____"
                     const cashierLabel = "Cashier ";
                     doc.text(cashierLabel, leftX, currentY);
 
                     const cashierTextWidth = doc.getTextWidth(cashierLabel);
                     const lineStartX = leftX + cashierTextWidth;
 
-                    // Draw shorter straight horizontal line
                     doc.setLineWidth(0.5);
                     doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
 
-                    // 2. Right side: "guest sign ____"
                     const guestLabel = "Guest sign ";
                     const guestTextWidth = doc.getTextWidth(guestLabel);
 
-                    // Draw shorter straight horizontal line on the right end
                     doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
-
-                    // Place "guest sign" right before the line
                     doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
-
-                    // --- Row 2: Created By ---
 
                     currentY += 10;
 
@@ -3927,7 +3938,7 @@ sap.ui.define([
                 } catch (e) {
                     MessageToast.show(e.message || "PDF generation failed");
                 } finally {
-                    this.closeBusyDialog()
+                    this.closeBusyDialog();
                 }
             },
 
@@ -3940,6 +3951,17 @@ sap.ui.define([
                     //  FETCH OVERALL INVOICE DATA 
                     const filterData = oView.getModel("SelectedCustomerModel").getData();
                     const oModel1 = oView.getModel("BookinglocalModel").getData();
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    // Find the branch whose BranchID matches oModel.BranchCode
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === filterData.BranchCode)
+                        : (oBranchModelData?.BranchID === filterData.BranchCode ? oBranchModelData : null);
+
+                    // Store the branch name in a variable
+                    const sBranchName = oMatchedBranch?.Name || "";
 
                     const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
                         BookingID: [filterData.BookingID]
@@ -3998,10 +4020,20 @@ sap.ui.define([
                             align: "right"
                         }
                         );
+                        doc.setFont("times", "bold").setFontSize(14);
+
+                        if (sBranchName) {
+                            doc.text(
+                                String(sBranchName).toUpperCase(),
+                                margin,
+                                headerMargin
+                            );
+                        }
+
 
                         if (companyImage && companyImage.trim() !== "") {
                             const imgData = "data:image/png;base64," + companyImage;
-                            doc.addImage(imgData, "PNG", margin, 15, 40, 40);
+                            doc.addImage(imgData, "PNG", margin, 28, 40, 40);
                         }
 
                         //  INVOICE DETAILS 
