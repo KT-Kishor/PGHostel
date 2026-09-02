@@ -597,8 +597,8 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-                    bookingDetails.StartDate = new Date(bookingDetails.StartDate);
-                    bookingDetails.EndDate = new Date(bookingDetails.EndDate);
+                    bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
+                    bookingDetails.EndDate = new Date(bookingDetails?.EndDate);
 
 
                     this.getView().setModel(

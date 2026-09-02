@@ -1509,10 +1509,8 @@ onsendreminder: async function () {
         var sBranchcode = this.byId("id_Branchname").getSelectedKey();
         var Type = this.byId("id_Type").getSelectedKey();
         var Month = this.byId("id_month").getSelectedKey();
-        var WMonth = this.byId("id_month").getSelectedItem().getText();
-        var Year = this.byId("idYearDatePicker")
-            .getDateValue()
-            .getFullYear();
+        var WMonth = this.byId("id_month")?.getSelectedItem()?.getText();
+        var Year = this.byId("idYearDatePicker")?.getDateValue()?.getFullYear();
 
         var oHostel = this.getView()
             .getModel("HostelModel")
