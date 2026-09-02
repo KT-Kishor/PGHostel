@@ -4766,7 +4766,6 @@ sap.ui.define([
                                 Currency: bookingDetails.Currency,
                                 SAC: "996322",
                                 GSTCalculation: "YES",
-                                Discount: ""
                             };
                         }
 
@@ -4914,7 +4913,7 @@ sap.ui.define([
                         EndDate: endStr,
                         Currency: f.Currency || "INR",
                         GSTCalculation: "YES",
-                        Discount: existingFacility.Discount || "",
+                        Discount: existingFacility?.Discount || "",
                         GrossPriceEditable: false,
                         UnitEditable: false,
                         DurationEditable: false,
