@@ -4186,16 +4186,21 @@ sap.ui.define([
                const facilityDateInvalid =
              facilityStart.getTime() > facilityEnd.getTime();
 
+   const facilityOutsideBooking =
+    facilityEnd.getTime() < bookingStartDate.getTime() ||
+    facilityStart.getTime() > bookingEndDate.getTime();
 
 
                 // Store only facilities having invalid dates
-                if (startInvalid || endInvalid || facilityDateInvalid) {
+                if (startInvalid || endInvalid || facilityDateInvalid  ||  facilityOutsideBooking) {
 
                     invalidFacilities.push({
                         item: item,
                         startInvalid: startInvalid,
                         endInvalid: endInvalid,
-                        facilityDateInvalid:facilityDateInvalid
+                        facilityDateInvalid:facilityDateInvalid,
+                        facilityOutsideBooking: facilityOutsideBooking
+
                     });
                 }
                 const startNotMatching =
@@ -4311,23 +4316,39 @@ sap.ui.define([
                                     const item = invalid.item;
 
 
-                                    if (invalid.startInvalid) {
-                                        item.StartDate = Bookingdata.StartDate;
-                                    }
-                                 if(invalid.facilityDateInvalid){
-                                        item.EndDate = Bookingdata.EndDate;
-                                        item.StartDate = Bookingdata.StartDate;
-                                    }
+                                      if (invalid.facilityOutsideBooking) {
 
+        item.StartDate = Bookingdata.StartDate;
+        item.EndDate = Bookingdata.EndDate;
 
-                                    if (invalid.endInvalid) {
+    } else {
 
-                                        item.EndDate = Bookingdata.EndDate;
-                                    }
-                                    if (item.UnitText === "Per Month" || item.UnitText === "Per Year" || item.FacilityChargeType === "Entire Booking") {
-                                        item.EndDate = Bookingdata.EndDate;
-                                        item.StartDate = Bookingdata.StartDate;
-                                    }
+        // Only start date is before booking start
+        if (invalid.startInvalid) {
+            item.StartDate = Bookingdata.StartDate;
+        }
+
+        // Only end date is after booking end
+        if (invalid.endInvalid) {
+            item.EndDate = Bookingdata.EndDate;
+        }
+
+        // Facility dates became invalid
+        if (invalid.facilityDateInvalid) {
+            item.StartDate = Bookingdata.StartDate;
+            item.EndDate = Bookingdata.EndDate;
+        }
+    }
+
+    // These facilities always follow the complete booking period
+    if (
+        item.UnitText === "Per Month" ||
+        item.UnitText === "Per Year" ||
+        item.FacilityChargeType === "Entire Booking"
+    ) {
+        item.StartDate = Bookingdata.StartDate;
+        item.EndDate = Bookingdata.EndDate;
+    }
                
                                 }
                             );

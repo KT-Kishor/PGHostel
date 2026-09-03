@@ -597,8 +597,6 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-                  
-
 
                     this.getView().setModel(
                         new sap.ui.model.json.JSONModel(bookingDetails),
@@ -619,8 +617,7 @@ sap.ui.define([
                         );
                         return;
                     }
-
-                      bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
+                    bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
                     bookingDetails.EndDate = new Date(bookingDetails?.EndDate);
 
                     const facilityArray = Array.isArray(oData.data.BookingFacilityItems) ?
@@ -1618,10 +1615,6 @@ sap.ui.define([
                     sFinalStatus = "Payment Received";
                 }
 
-                if (this.MonthDate) {
-                    oPayload.MonthDate = this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "";
-                }
-
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
@@ -1664,6 +1657,8 @@ sap.ui.define([
                     RefundAmount: oSelectedCustomerModel.RefundAmount || "",
                     DueAmount: balanceAmount
                 };
+
+                if (this.MonthDate) oPayload.MonthDate = this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "";
 
                 const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
                 if (aItemsRaw.length === 0) {
@@ -1743,67 +1738,42 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     // const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
 
+                    const oInvoiceItemModel = this.getView().getModel("ManageInvoiceItemModel");
 
+                    const aInvoiceItems = oInvoiceItemModel ? oInvoiceItemModel.getProperty("/ManageInvoiceItem") : [];
 
-                    const oInvoiceItemModel =
-            this.getView().getModel("ManageInvoiceItemModel");
+                    // Find first blank line item
+                    const iBlankItemIndex = Array.isArray(aInvoiceItems)
+                        ? aInvoiceItems.findIndex(function (item) {
 
-        const aInvoiceItems = oInvoiceItemModel
-            ? oInvoiceItemModel.getProperty("/ManageInvoiceItem")
-            : [];
+                            return (
+                                !item ||
 
-        // Find first blank line item
-        const iBlankItemIndex = Array.isArray(aInvoiceItems)
-            ? aInvoiceItems.findIndex(function (item) {
+                                // Particulars
+                                !item.Particulars || String(item.Particulars).trim() === "" ||
 
-               return (
-        !item ||
+                                // Start Date
+                                !item.StartDate || String(item.StartDate).trim() === "" ||
 
-        // Particulars
-        !item.Particulars ||
-        String(item.Particulars).trim() === "" ||
+                                // End Date
+                                !item.EndDate || String(item.EndDate).trim() === "" ||
 
-        // Start Date
-        !item.StartDate ||
-        String(item.StartDate).trim() === "" ||
+                                // Gross Price
+                                item.GrossPrice === undefined || item.GrossPrice === null || String(item.GrossPrice).trim() === ""
+                            );
+                        }) : -1;
 
-        // End Date
-        !item.EndDate ||
-        String(item.EndDate).trim() === "" ||
+                    // If blank line item exists
+                    if (iBlankItemIndex !== -1) {
+                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                    }
 
-        // Gross Price
-        item.GrossPrice === undefined ||
-        item.GrossPrice === null ||
-        String(item.GrossPrice).trim() === ""
-    );
+                    // CHECK WHETHER AT LEAST ONE LINE ITEM EXISTS
 
-            })
-            : -1;
+                    if (!Array.isArray(aInvoiceItems) || aInvoiceItems.length === 0) {
+                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                    }
 
-
-        // If blank line item exists
-        if (iBlankItemIndex !== -1) {
-
-            MessageToast.show(
-                `Sr. No. ${iBlankItemIndex + 1}: Line item is blank`
-            );
-
-            return;
-        }
-
-
-        // ============================================================
-        // CHECK WHETHER AT LEAST ONE LINE ITEM EXISTS
-        // ============================================================
-
-        if (!Array.isArray(aInvoiceItems) || aInvoiceItems.length === 0) {
-
-            MessageToast.show(
-                "Sr. No. 1: Line item is blank"
-            );
-
-            return;
-        }
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
                     const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bOptionalValid && bConversionRateValid;
@@ -1817,6 +1787,31 @@ sap.ui.define([
                     if (!bIsValid || !bIsValidTwo) {
                         return MessageToast.show(that.i18nModel.getText("mandatoryFieldsError"));
                     }
+
+                    let bIsValidGST = true;
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
+
+                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
+                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
+
+                        bIsValidGST = utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"), "ID") && utils._LCvalidateMandatoryField(this.byId("GSTValue"), "ID");
+
+                        if (!oCGSTCheckbox.getSelected() && !oIGSTCheckbox.getSelected()) {
+                            oCGSTCheckbox.setValueState("Error");
+                            oIGSTCheckbox.setValueState("Error");
+                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            bIsValidTwo = false;
+                        } else {
+                            oCGSTCheckbox.setValueState("None");
+                            oIGSTCheckbox.setValueState("None");
+                        }
+                    }
+
+                    if (!bIsValid || !bIsValidTwo || !bIsValidGST) {
+                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    }
+
                     this.getBusyDialog()
                     const oPayload = await this.SubmitPayload("Create");
                     if (oPayload === false) {
@@ -1957,11 +1952,11 @@ sap.ui.define([
 
                 // Prevent deselect
                 if (!bSelected) {
-                    oCustomerModel.setProperty("/CGSTSelected", true);
-                    return;
+                    return oCustomerModel.setProperty("/CGSTSelected", true);
                 }
                 this.byId("CDI_id_CheckboxIGST").setValueState("None")
                 this.byId("CID_id_CheckboxCGST").setValueState("None")
+                this.byId("GSTValue").setValueState("None")
 
                 const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
                     this.getOwnerComponent().getModel("sBRModel")?.getData();
@@ -1987,12 +1982,7 @@ sap.ui.define([
                 // Update model
                 oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
                 oInvoiceModel.refresh(true);
-
-
                 this.totalAmountCalculation();
-
-
-
             },
 
             CI_onSelectIGST: function (oEvent) {
@@ -2007,6 +1997,7 @@ sap.ui.define([
                 }
                 this.byId("CDI_id_CheckboxIGST").setValueState("None")
                 this.byId("CID_id_CheckboxCGST").setValueState("None")
+                this.byId("GSTValue").setValueState("None")
 
                 const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
                     this.getOwnerComponent().getModel("sBRModel")?.getData();
@@ -2038,7 +2029,6 @@ sap.ui.define([
 
             CI_onPercentageChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-
                 const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
 
                 const oView = this.getView();
@@ -2078,88 +2068,54 @@ sap.ui.define([
                         .getModel("ManageInvoiceItemModel")
                         .getProperty("/ManageInvoiceItem") || [];
 
-                      const bCustomerValid =
-    utils._LCvalidateMandatoryField(
-        this.byId("CID_id_Custmer"),
-        "ID"
-    );
+                    const bCustomerValid = utils._LCvalidateMandatoryField(this.byId("CID_id_Custmer"), "ID");
 
-const bInvoiceDateValid =
-    utils._LCvalidateDate(
-        this.byId("CID_id_NavInvDate"),
-        "ID"
-    );
+                    const bInvoiceDateValid = utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID");
 
-const bInvoiceDescValid =
-    utils._LCvalidateMandatoryField(
-        this.byId("CID_id_InvoiceDesc"),
-        "ID"
-    );
+                    const bInvoiceDescValid = utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID");
 
-const bMobileValid = this.mobileNo;
+                    const bMobileValid = this.mobileNo;
 
-const bEmailValid =
-    utils._LCvalidateEmail(
-        this.byId("CID_id_InputMailID"),
-        "ID"
-    );
+                    const bEmailValid = utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID");
 
-// ============================================================
-// LINE ITEM VALIDATION
-// ============================================================
+                    // LINE ITEM VALIDATION
 
-const iBlankItemIndex = aItems.findIndex(function (item) {
+                    const iBlankItemIndex = aItems.findIndex(function (item) {
 
-   return (
-        !item ||
+                        return (
+                            !item ||
 
-        // Particulars
-        !item.Particulars ||
-        String(item.Particulars).trim() === "" ||
+                            // Particulars
+                            !item.Particulars ||
+                            String(item.Particulars).trim() === "" ||
 
-        // Start Date
-        !item.StartDate ||
-        String(item.StartDate).trim() === "" ||
+                            // Start Date
+                            !item.StartDate ||
+                            String(item.StartDate).trim() === "" ||
 
-        // End Date
-        !item.EndDate ||
-        String(item.EndDate).trim() === "" ||
+                            // End Date
+                            !item.EndDate ||
+                            String(item.EndDate).trim() === "" ||
 
-        // Gross Price
-        item.GrossPrice === undefined ||
-        item.GrossPrice === null ||
-        String(item.GrossPrice).trim() === ""
-    );
+                            // Gross Price
+                            item.GrossPrice === undefined ||
+                            item.GrossPrice === null ||
+                            String(item.GrossPrice).trim() === ""
+                        );
 
-});
+                    });
 
-// Show Sr. No. of blank line item
-if (iBlankItemIndex !== -1) {
+                    // Show Sr. No. of blank line item
+                    if (iBlankItemIndex !== -1) {
+                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                    }
 
-    MessageToast.show(
-        `Sr. No. ${iBlankItemIndex + 1}: Line item is blank`
-    );
+                    // No line items
+                    if (!Array.isArray(aItems) || aItems.length === 0) {
+                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                    }
 
-    return;
-}
-
-// No line items
-if (!Array.isArray(aItems) || aItems.length === 0) {
-
-    MessageToast.show(
-        "Sr. No. 1: Line item is blank"
-    );
-
-    return;
-}
-
-const bIsValid =
-    bCustomerValid &&
-    bInvoiceDateValid &&
-    bInvoiceDescValid &&
-    bMobileValid &&
-    bEmailValid;
-
+                    const bIsValid = bCustomerValid && bInvoiceDateValid && bInvoiceDescValid && bMobileValid && bEmailValid;
 
                     let bIsValidTwo = true;
 
@@ -2170,74 +2126,28 @@ const bIsValid =
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
                     }
 
-                 let bIsValidGST = true;
-
-if (
-    this.getView()
-        .getModel("SelectedCustomerModel")
-        .getProperty("/GST")
-) {
-
-    const oCGSTCheckbox =
-        this.byId("CID_id_CheckboxCGST");
-
-    const oIGSTCheckbox =
-        this.byId("CDI_id_CheckboxIGST");
+                    let bIsValidGST = true;
 
 
-    // ============================================================
-    // GST NUMBER AND GST VALUE VALIDATION
-    // ============================================================
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
 
-    bIsValidGST =
-        utils._LCvalidateGstNumber(
-            this.byId("CID_id_InputGST"),
-            "ID"
-        ) &&
-        utils._LCvalidateMandatoryField(
-            this.byId("GSTValue"),
-            "ID"
-        );
+                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
+                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
 
+                        bIsValidGST = utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"), "ID") && utils._LCvalidateMandatoryField(this.byId("GSTValue"), "ID");
 
-    // ============================================================
-    // CHECK CGST / IGST
-    // At least ONE must be selected
-    // ============================================================
+                        if (!oCGSTCheckbox.getSelected() && !oIGSTCheckbox.getSelected()) {
+                            oCGSTCheckbox.setValueState("Error");
+                            oIGSTCheckbox.setValueState("Error");
+                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            bIsValidTwo = false;
+                        } else {
+                            oCGSTCheckbox.setValueState("None");
+                            oIGSTCheckbox.setValueState("None");
+                        }
+                    }
 
-    const bCGSTSelected =
-        oCGSTCheckbox.getSelected();
-
-    const bIGSTSelected =
-        oIGSTCheckbox.getSelected();
-
-
-    if (!bCGSTSelected && !bIGSTSelected) {
-
-        oCGSTCheckbox.setValueState("Error");
-        oIGSTCheckbox.setValueState("Error");
-
-        oCGSTCheckbox.setValueStateText(
-            "Please select CGST or IGST"
-        );
-
-        oIGSTCheckbox.setValueStateText(
-            "Please select CGST or IGST"
-        );
-
-        bIsValidGST = false;
-
-    } else {
-
-        // At least one selected
-        oCGSTCheckbox.setValueState("None");
-        oIGSTCheckbox.setValueState("None");
-
-    }
-}
-
-
-                    if (!bIsValid || !bIsValidTwo || !bIsValidGST)  {
+                    if (!bIsValid || !bIsValidTwo || !bIsValidGST) {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     }
 
@@ -3976,7 +3886,7 @@ if (
                                 item.EndDate || "",
                                 Formatter.fromatNumber(item.GrossPrice),
                                 item.UnitText,
-                                Formatter.fromatNumber(item.itemDiscountValue), // Discount
+                                item.Discount || "0.00", // Discount
                                 Formatter.fromatNumber(item.adjustedTotal)      // Adjusted Total
                             ];
 
@@ -4359,7 +4269,7 @@ if (
                                 Formatter.formatDate(item.EndDate),
                                 Formatter.fromatNumber(item.GrossPrice),
                                 item.UnitText,
-                                Formatter.fromatNumber(item.Discount || "0.00"),
+                                item.Discount || "0.00",
                                 Formatter.fromatNumber(item.Total)
                             ];
 
@@ -4696,7 +4606,6 @@ if (
                     this.closeBusyDialog()
                 }
             },
-
             CID_onPressrefundAmount: function () {
                 var that = this;
                 if (this.oDialog) {
