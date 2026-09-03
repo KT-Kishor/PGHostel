@@ -1742,6 +1742,68 @@ sap.ui.define([
                         utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
                         utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
                     // const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
+
+
+
+                    const oInvoiceItemModel =
+            this.getView().getModel("ManageInvoiceItemModel");
+
+        const aInvoiceItems = oInvoiceItemModel
+            ? oInvoiceItemModel.getProperty("/ManageInvoiceItem")
+            : [];
+
+        // Find first blank line item
+        const iBlankItemIndex = Array.isArray(aInvoiceItems)
+            ? aInvoiceItems.findIndex(function (item) {
+
+               return (
+        !item ||
+
+        // Particulars
+        !item.Particulars ||
+        String(item.Particulars).trim() === "" ||
+
+        // Start Date
+        !item.StartDate ||
+        String(item.StartDate).trim() === "" ||
+
+        // End Date
+        !item.EndDate ||
+        String(item.EndDate).trim() === "" ||
+
+        // Gross Price
+        item.GrossPrice === undefined ||
+        item.GrossPrice === null ||
+        String(item.GrossPrice).trim() === ""
+    );
+
+            })
+            : -1;
+
+
+        // If blank line item exists
+        if (iBlankItemIndex !== -1) {
+
+            MessageToast.show(
+                `Sr. No. ${iBlankItemIndex + 1}: Line item is blank`
+            );
+
+            return;
+        }
+
+
+        // ============================================================
+        // CHECK WHETHER AT LEAST ONE LINE ITEM EXISTS
+        // ============================================================
+
+        if (!Array.isArray(aInvoiceItems) || aInvoiceItems.length === 0) {
+
+            MessageToast.show(
+                "Sr. No. 1: Line item is blank"
+            );
+
+            return;
+        }
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
                     const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
                     const bIsValid = bMandatoryValid && bOptionalValid && bConversionRateValid;
@@ -2016,13 +2078,88 @@ sap.ui.define([
                         .getModel("ManageInvoiceItemModel")
                         .getProperty("/ManageInvoiceItem") || [];
 
-                    const bIsValid =
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_Custmer"), "ID") &&
-                        utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID") &&
-                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
-                        this.mobileNo &&
-                        utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID") &&
-                        aItems.every(item => item.Particulars && item.Particulars.trim() !== "");
+                      const bCustomerValid =
+    utils._LCvalidateMandatoryField(
+        this.byId("CID_id_Custmer"),
+        "ID"
+    );
+
+const bInvoiceDateValid =
+    utils._LCvalidateDate(
+        this.byId("CID_id_NavInvDate"),
+        "ID"
+    );
+
+const bInvoiceDescValid =
+    utils._LCvalidateMandatoryField(
+        this.byId("CID_id_InvoiceDesc"),
+        "ID"
+    );
+
+const bMobileValid = this.mobileNo;
+
+const bEmailValid =
+    utils._LCvalidateEmail(
+        this.byId("CID_id_InputMailID"),
+        "ID"
+    );
+
+// ============================================================
+// LINE ITEM VALIDATION
+// ============================================================
+
+const iBlankItemIndex = aItems.findIndex(function (item) {
+
+   return (
+        !item ||
+
+        // Particulars
+        !item.Particulars ||
+        String(item.Particulars).trim() === "" ||
+
+        // Start Date
+        !item.StartDate ||
+        String(item.StartDate).trim() === "" ||
+
+        // End Date
+        !item.EndDate ||
+        String(item.EndDate).trim() === "" ||
+
+        // Gross Price
+        item.GrossPrice === undefined ||
+        item.GrossPrice === null ||
+        String(item.GrossPrice).trim() === ""
+    );
+
+});
+
+// Show Sr. No. of blank line item
+if (iBlankItemIndex !== -1) {
+
+    MessageToast.show(
+        `Sr. No. ${iBlankItemIndex + 1}: Line item is blank`
+    );
+
+    return;
+}
+
+// No line items
+if (!Array.isArray(aItems) || aItems.length === 0) {
+
+    MessageToast.show(
+        "Sr. No. 1: Line item is blank"
+    );
+
+    return;
+}
+
+const bIsValid =
+    bCustomerValid &&
+    bInvoiceDateValid &&
+    bInvoiceDescValid &&
+    bMobileValid &&
+    bEmailValid;
+
 
                     let bIsValidTwo = true;
 
@@ -2033,28 +2170,71 @@ sap.ui.define([
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
                     }
 
-                    let bIsValidGST = true;
+                 let bIsValidGST = true;
+
+if (
+    this.getView()
+        .getModel("SelectedCustomerModel")
+        .getProperty("/GST")
+) {
+
+    const oCGSTCheckbox =
+        this.byId("CID_id_CheckboxCGST");
+
+    const oIGSTCheckbox =
+        this.byId("CDI_id_CheckboxIGST");
 
 
-                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
+    // ============================================================
+    // GST NUMBER AND GST VALUE VALIDATION
+    // ============================================================
 
-                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
-                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
+    bIsValidGST =
+        utils._LCvalidateGstNumber(
+            this.byId("CID_id_InputGST"),
+            "ID"
+        ) &&
+        utils._LCvalidateMandatoryField(
+            this.byId("GSTValue"),
+            "ID"
+        );
 
 
-                        bIsValidGST =
-                            utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"),"ID") &&
-                            utils._LCvalidateMandatoryField(this.byId("GSTValue"),"ID");
+    // ============================================================
+    // CHECK CGST / IGST
+    // At least ONE must be selected
+    // ============================================================
 
-                        if (!oCGSTCheckbox.getSelected()) {
-                            oCGSTCheckbox.setValueState("Error");
-                            oIGSTCheckbox.setValueState("Error");
-                            oCGSTCheckbox.setValueStateText("Please select CGST");
-                            bIsValidTwo = false;
-                        } else {
-                            oCGSTCheckbox.setValueState("None");
-                        }
-                    }
+    const bCGSTSelected =
+        oCGSTCheckbox.getSelected();
+
+    const bIGSTSelected =
+        oIGSTCheckbox.getSelected();
+
+
+    if (!bCGSTSelected && !bIGSTSelected) {
+
+        oCGSTCheckbox.setValueState("Error");
+        oIGSTCheckbox.setValueState("Error");
+
+        oCGSTCheckbox.setValueStateText(
+            "Please select CGST or IGST"
+        );
+
+        oIGSTCheckbox.setValueStateText(
+            "Please select CGST or IGST"
+        );
+
+        bIsValidGST = false;
+
+    } else {
+
+        // At least one selected
+        oCGSTCheckbox.setValueState("None");
+        oIGSTCheckbox.setValueState("None");
+
+    }
+}
 
 
                     if (!bIsValid || !bIsValidTwo || !bIsValidGST)  {
