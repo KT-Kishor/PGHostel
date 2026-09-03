@@ -41,7 +41,7 @@ sap.ui.define(
                      * If the route was matched after returning from details,
                      * do not clear or reset the date range.
                      */
-
+                   this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                     await this._loadBranchCode();
                     await this.ManageInvoice_onSearch();
 
