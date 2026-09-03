@@ -497,6 +497,8 @@
                 currency: oBooking.Currency || "INR",
                 status: oBooking.Status || oBooking.BookingStatus || "",
                 BranchCode: sBranchCode,
+                BranchName: oBranchData.Name || sBranchCode,
+                PropertyType: String(oBranchData.PropertyType || "").trim(),
                 GSTIN: oBranchData.GSTIN || "",
                 GSTType: oBranchData.Type || "",
                 GSTValue: oBranchData.Value || 0
@@ -642,6 +644,8 @@
                 new Filter("customerName", FilterOperator.Contains, sQuery),
                 new Filter("BookingID", FilterOperator.Contains, sQuery),
                 new Filter("BookingDate", FilterOperator.Contains, sQuery),
+                new Filter("BranchName", FilterOperator.Contains, sQuery),
+                new Filter("PropertyType", FilterOperator.Contains, sQuery),
                 new Filter("room", FilterOperator.Contains, sQuery),
                 new Filter("status", FilterOperator.Contains, sQuery),
                 new Filter("amount", FilterOperator.Contains, sQuery),
@@ -1237,10 +1241,10 @@
 
             // File Type selected but nothing uploaded -> block
             if (sDocumentType && !bHasFile) {
-                if (oFileUploader) {
-                    oFileUploader.setValueState("Error");
-                    oFileUploader.setValueStateText("Please upload a file for the selected document type");
-                }
+                // if (oFileUploader) {
+                //     oFileUploader.setValueState("Error");
+                //     oFileUploader.setValueStateText("Please upload a file for the selected document type");
+                // }
 
                 MessageToast.show("Please upload a file for the selected document type \"" + sDocumentType + "\".");
                 return false;

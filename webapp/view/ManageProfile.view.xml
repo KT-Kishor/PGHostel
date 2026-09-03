@@ -477,7 +477,7 @@
                             text="{= ${profileData>BranchName} + (${profileData>PropertyType} ? ' (' + ${profileData>PropertyType} + ')' : '') }"
                         />
                         <Text
-                            text="{= ${profileData>room} + (${profileData>RoomNo} ? ' (' + ${profileData>RoomNo} + ')' : '') }"
+                            text="{parts: ['profileData>room', 'profileData>RoomNo'], formatter: '.Formatter.formatRoomWithRoomNo'}"
                         />
                         <Text
                             text="{path:'profileData>amount', formatter:'.Formatter.fromatNumber'} {profileData>currency}"

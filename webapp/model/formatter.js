@@ -332,6 +332,24 @@ sap.ui.define([
             }
             return sType;
         },
+        formatRoomWithRoomNo: function (sRoom, sRoomNo) {
+            var sRoomText = (sRoom || "").trim();
+            var sRoomNoText = (sRoomNo || "").toString().trim();
+
+            if (sRoomText && sRoomNoText) {
+                return sRoomText + " (Room No: " + sRoomNoText + ")";
+            }
+
+            if (sRoomText) {
+                return sRoomText;
+            }
+
+            if (sRoomNoText) {
+                return "Room No: " + sRoomNoText;
+            }
+
+            return "";
+        },
         formatShortFileType: function (mime) {
             if (!mime) return "";
 

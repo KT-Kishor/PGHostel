@@ -1902,12 +1902,12 @@ sap.ui.define([
             // File Type selected but nothing uploaded -> block
             if (sDocumentType && !bHasFile) {
 
-                if (oFileUploader) {
-                    oFileUploader.setValueState("Error");
-                    oFileUploader.setValueStateText(
-                        "Please upload a file for the selected document type"
-                    );
-                }
+                // if (oFileUploader) {
+                //         // oFileUploader.setValueState("Error");
+                //         // oFileUploader.setValueStateText(
+                //         //     "Please upload a file for the selected document type"
+                //         // );
+                // }
 
                 sap.m.MessageToast.show(
                     "Please upload a file for the selected document type \"" +
@@ -2152,9 +2152,9 @@ sap.ui.define([
                 utils._LCvalidateEmail(this.byId("id_mail1"), "ID") &&
                 this.onChangeDOB(this.byId("id_dob1"), "ID") &&
                 utils._LCstrictValidationComboBox(this.byId("id_country1"), "ID") &&
-                utils._LCstrictValidationComboBox(this.byId("id_state1"), "ID") &&
+                this._validateStateField() &&
                 this._validateCityField() &&
-                utils._LCvalidateMandatoryField(this.byId("id_phone1"), "ID") &&
+                this._validateProfileMobile() &&
                 utils._LCstrictValidationComboBox(this.byId("id_gender1"), "ID") &&
                 utils._LCvalidateMandatoryField(this.byId("id_address1"), "ID")
             );
@@ -3160,43 +3160,60 @@ sap.ui.define([
         },
 
         CC_onChangeState: function (oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
-
+            const oStateCB = oEvent.getSource();
             const oModel = this.getView().getModel("profileData");
-            const oItem = oEvent.getSource().getSelectedItem();
+            const oItem = oStateCB.getSelectedItem();
+            const sStateValue = (oStateCB.getValue() || "").trim();
 
             const oCityCB = this.byId("id_city1");
             const oCountryCB = this.byId("id_country1");
 
-            // Clear value state on state
-            oEvent.getSource().setValueState("None");
-
-            // Reset city-related things
+            // A state change invalidates the previously entered city.
             oModel.setProperty("/City", "");
-            // if you have a separate city property:
-            // oModel.setProperty("/city", "");
-
             oCityCB?.setSelectedKey("");
             oCityCB?.setValue("");
             oCityCB?.getBinding("items")?.filter([]);
 
-            // No state selected → clear state in model and exit
-            if (!oItem) {
+            if (!sStateValue) {
                 oModel.setProperty("/State", "");
+                oStateCB.setValueState("Error");
                 return;
             }
 
-            const sStateName = oItem.getKey(); // or getText(), depending on your binding
-            const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
+            const sStateName = oItem ? (oItem.getKey() || oItem.getText()) : sStateValue;
 
-            // Save state in model
             oModel.setProperty("/State", sStateName);
+            oStateCB.setValueState("None");
+
+            // Free-text states cannot filter the master city list reliably.
+            if (!oItem) {
+                return;
+            }
+
+            const sCountryCode = oCountryCB.getSelectedItem()?.getAdditionalText();
 
             // Filter cities by state + country
             oCityCB?.getBinding("items")?.filter([
                 new sap.ui.model.Filter("stateName", sap.ui.model.FilterOperator.EQ, sStateName),
                 new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, sCountryCode)
             ]);
+        },
+
+        _validateStateField: function () {
+            const oStateCB = this.byId("id_state1");
+            const oModel = this.getView().getModel("profileData");
+            const oSelectedItem = oStateCB.getSelectedItem();
+            const sValue = (oStateCB.getValue() || "").trim();
+
+            if (!sValue) {
+                oModel.setProperty("/State", "");
+                oStateCB.setValueState("Error").focus();
+                return false;
+            }
+
+            oModel.setProperty("/State", oSelectedItem?.getKey() || oSelectedItem?.getText() || sValue);
+            oStateCB.setValueState("None");
+            return true;
         },
 
         CC_onChangeCity: function (oEvent) {
@@ -3279,6 +3296,22 @@ sap.ui.define([
             } else {
                 oMobile.setMaxLength(18);
             }
+        },
+
+        _validateProfileMobile: function () {
+            const oSTD = this.byId("id_std1");
+            const oMobile = this.byId("id_phone1");
+
+            // Validate the ISD selection before applying its mobile-number rule.
+            if (!utils._LCstrictValidationComboBox(oSTD, "ID")) {
+                return false;
+            }
+
+            const sStdCode = (oSTD.getValue() || "").replace(/\s+/g, "");
+            const iMaxLength = sStdCode === "+91" ? 10 : 18;
+            oMobile.setMaxLength(iMaxLength);
+
+            return utils._LCvalidateISDmobile(oMobile, sStdCode);
         },
 
         MPonMobileLivechnage: function (oEvent) {

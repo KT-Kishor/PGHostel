@@ -135,6 +135,12 @@
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
+                    <Text text="{i18n>pNameType}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
                     <Text text="{i18n>room}" />
                 </Column>
                 <Column
@@ -159,7 +165,10 @@
                         <Text text="{myBookings>BookingDate}" />        
                         <Text text="{myBookings>BookingID}" />
                         <Text text="{myBookings>customerName}" />
-                        <Text text="{myBookings>room}" />
+                        <Text
+                            text="{= ${myBookings>BranchName} + (${myBookings>PropertyType} ? ' (' + ${myBookings>PropertyType} + ')' : '') }"
+                        />
+                        <Text text="{parts: ['myBookings>room', 'myBookings>RoomNo'], formatter: '.Formatter.formatRoomWithRoomNo'}" />
                         <Text text="{path:'myBookings>amount', formatter:'.Formatter.fromatNumber'} {myBookings>currency}" />
                         <ObjectStatus
                             text="{myBookings>status}"
