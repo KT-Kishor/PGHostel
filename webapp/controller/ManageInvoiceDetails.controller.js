@@ -597,8 +597,7 @@ sap.ui.define([
                     });
 
                     const bookingDetails = oData.data?.BookingData?.[0];
-                    bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
-                    bookingDetails.EndDate = new Date(bookingDetails?.EndDate);
+                  
 
 
                     this.getView().setModel(
@@ -620,6 +619,9 @@ sap.ui.define([
                         );
                         return;
                     }
+
+                      bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
+                    bookingDetails.EndDate = new Date(bookingDetails?.EndDate);
 
                     const facilityArray = Array.isArray(oData.data.BookingFacilityItems) ?
                         oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
@@ -647,7 +649,7 @@ sap.ui.define([
                         invoiceDate = startDate;
                         payByDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 3);
                     }
-                    this.MonthDate = invoiceDate
+                    this.MonthDate = startDate;
 
                     const oModel = this.getView().getModel("SelectedCustomerModel");
                     let mergedData = {};
@@ -1616,10 +1618,13 @@ sap.ui.define([
                     sFinalStatus = "Payment Received";
                 }
 
+                if (this.MonthDate) {
+                    oPayload.MonthDate = this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "";
+                }
+
                 const oPayload = {
                     // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
                     InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
-                    MonthDate: (sMode === 'Create') ? this.MonthDate ? this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') : "" : "",
                     CustomerName: this.byId("CID_id_AddCustComboBox").getSelectedKey(),
                     GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
                     PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
@@ -1893,6 +1898,8 @@ sap.ui.define([
                     oCustomerModel.setProperty("/CGSTSelected", true);
                     return;
                 }
+                this.byId("CDI_id_CheckboxIGST").setValueState("None")
+                this.byId("CID_id_CheckboxCGST").setValueState("None")
 
                 const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
                     this.getOwnerComponent().getModel("sBRModel")?.getData();
@@ -1936,6 +1943,8 @@ sap.ui.define([
                     oCustomerModel.setProperty("/IGSTSelected", true);
                     return;
                 }
+                this.byId("CDI_id_CheckboxIGST").setValueState("None")
+                this.byId("CID_id_CheckboxCGST").setValueState("None")
 
                 const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
                     this.getOwnerComponent().getModel("sBRModel")?.getData();
@@ -1966,6 +1975,8 @@ sap.ui.define([
             },
 
             CI_onPercentageChange: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+
                 const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
 
                 const oView = this.getView();
@@ -2022,7 +2033,31 @@ sap.ui.define([
                             utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
                     }
 
-                    if (!bIsValid || !bIsValidTwo) {
+                    let bIsValidGST = true;
+
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
+
+                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
+                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
+
+
+                        bIsValidGST =
+                            utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"),"ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("GSTValue"),"ID");
+
+                        if (!oCGSTCheckbox.getSelected()) {
+                            oCGSTCheckbox.setValueState("Error");
+                            oIGSTCheckbox.setValueState("Error");
+                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            bIsValidTwo = false;
+                        } else {
+                            oCGSTCheckbox.setValueState("None");
+                        }
+                    }
+
+
+                    if (!bIsValid || !bIsValidTwo || !bIsValidGST)  {
                         return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
                     }
 

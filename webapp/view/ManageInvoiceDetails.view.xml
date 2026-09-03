@@ -347,8 +347,10 @@
                                             valueStateText="{i18n>enterGST}"
                                         />
                                         <m:Label
+                                        
                                             text="{i18n>type}"
-                                            required="{SelectedCustomerModel>/GSTValid}"
+                                            required="true"
+
                                         />
                                         <m:CheckBox
                                             text="{i18n>cgst}"
@@ -368,7 +370,7 @@
                                         />
                                         <m:Label
                                             text="{SelectedCustomerModel>/TaxPercentageLabel}"
-                                            required="{SelectedCustomerModel>/GSTValid}"
+                                            required="true"
                                         />
                                         <m:Input
                                             id="GSTValue"
@@ -377,6 +379,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                             visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
+                                            valueStateText="Enter Tax Percentage"
                                         />
                                         <m:Label text="{i18n>address}" />
                                         <m:TextArea

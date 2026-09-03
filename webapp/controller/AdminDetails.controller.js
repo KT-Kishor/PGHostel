@@ -4183,19 +4183,19 @@ sap.ui.define([
                 const endInvalid =
                     facilityEnd.getTime() > bookingEndDate.getTime();
 
-               const startfacInvalid =
-                    facilityStart.getTime() > bookingStartDate.getTime();
+               const facilityDateInvalid =
+             facilityStart.getTime() > facilityEnd.getTime();
 
 
 
                 // Store only facilities having invalid dates
-                if (startInvalid || endInvalid || startfacInvalid) {
+                if (startInvalid || endInvalid || facilityDateInvalid) {
 
                     invalidFacilities.push({
                         item: item,
                         startInvalid: startInvalid,
                         endInvalid: endInvalid,
-                        startfacInvalid:startfacInvalid
+                        facilityDateInvalid:facilityDateInvalid
                     });
                 }
                 const startNotMatching =
@@ -4311,7 +4311,11 @@ sap.ui.define([
                                     const item = invalid.item;
 
 
-                                    if (invalid.startInvalid || invalid.startfacInvalid) {
+                                    if (invalid.startInvalid) {
+                                        item.StartDate = Bookingdata.StartDate;
+                                    }
+                                 if(invalid.facilityDateInvalid){
+                                        item.EndDate = Bookingdata.EndDate;
                                         item.StartDate = Bookingdata.StartDate;
                                     }
 

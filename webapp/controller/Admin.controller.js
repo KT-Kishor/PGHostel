@@ -1529,7 +1529,11 @@ onsendreminder: async function () {
         };
 
         // API call
+        this.getBusyDialog()
         await this.ajaxReadWithJQuery("HM_SendReminder", filters);
+
+
+        this.closeBusyDialog()
 
         // Show success only when API call is successful
         sap.m.MessageToast.show("Successfully sent");
