@@ -1375,10 +1375,10 @@ sap.ui.define([
 
                     // 3. Compare Total with Net Paid
                     if (netPaid > finalAmount) {
-                        pendingRefundAmount = netPaid - finalAmount;
+                        pendingRefundAmount = netPaid - finalAmount.toFixed(1);
                         balanceAmount = 0;
                     } else {
-                        balanceAmount = finalAmount - netPaid; // 62,705.20 - 62,681.60 = 23.60
+                        balanceAmount = finalAmount.toFixed(1) - netPaid; // 62,705.20 - 62,681.60 = 23.60
                         pendingRefundAmount = 0;
                     }
 
