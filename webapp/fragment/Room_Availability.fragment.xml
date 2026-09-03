@@ -48,7 +48,6 @@
                     change="onRoomAvailabilityFieldChange"
                     placeholder="{i18n>selectBranchCode}"
                     valueStateText="{i18n>selectBranchCode}"
-                    showClearIcon="true"
                     width="18rem"
                 >
                     <core:ListItem
@@ -62,6 +61,7 @@
                 </ComboBox>
                 <Label
                     text="{i18n>bedType}"
+                    required="true"
                     labelFor="roomAvailabilityType"
                     width="5rem"
                     class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
@@ -73,7 +73,6 @@
                     change="onRoomAvailabilityFieldChange"
                     placeholder="{i18n>selectRoomType}"
                     valueStateText="{i18n>selectRoomType}"
-                    showClearIcon="true"
                     width="18rem"
                 >
                     <core:Item
@@ -93,12 +92,14 @@
             >
                 <Label
                     text="{i18n>startDate}"
+                    required="true"
                     labelFor="roomAvailabilityStartDate"
                     width="8rem"
                     class="sapUiTinyMarginEnd"
                 />
                 <DatePicker
                     id="roomAvailabilityStartDate"
+                    required="true"
                     value="{RoomAvailabilityFilter>/StartDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
@@ -114,12 +115,14 @@
                 </DatePicker>
                 <Label
                     text="{i18n>endDate}"
+                    required="true"
                     labelFor="roomAvailabilityEndDate"
                     width="5rem"
                     class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
                 />
                 <DatePicker
                     id="roomAvailabilityEndDate"
+                    required="true"
                     value="{RoomAvailabilityFilter>/EndDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"

@@ -1603,8 +1603,28 @@ onsendreminder: async function () {
                 this.getView().createId("roomAvailabilityStartDate"),
                 this.getView().createId("roomAvailabilityEndDate")
             ]);
+            this._setRoomAvailabilityDateLimits();
 
             this.RoomAvailabilityDialog.open();
+        },
+
+        _setRoomAvailabilityDateLimits: function () {
+            var oToday = new Date();
+            oToday.setHours(0, 0, 0, 0);
+
+            var oMaxDate = new Date(oToday);
+            oMaxDate.setFullYear(oMaxDate.getFullYear() + 30);
+
+            var oStartPicker = this.byId("roomAvailabilityStartDate");
+            var oEndPicker = this.byId("roomAvailabilityEndDate");
+            var oStartDate = oStartPicker && oStartPicker.getDateValue();
+
+            if (oStartPicker) {
+                oStartPicker.setMinDate(oToday).setMaxDate(oMaxDate);
+            }
+            if (oEndPicker) {
+                oEndPicker.setMinDate(oStartDate || oToday).setMaxDate(oMaxDate);
+            }
         },
 
         onRoomAvailabilityBranchChange: function (oEvent) {
@@ -1647,8 +1667,32 @@ onsendreminder: async function () {
 
         onRoomAvailabilityFieldChange: function (oEvent) {
             var oInput = oEvent.getSource();
-            utils._LCstrictValidationComboBox(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+
+            if (oInput instanceof sap.m.ComboBox) {
+                var bValidSelection = utils._LCstrictValidationComboBox(oInput, "ID");
+                if (!bValidSelection) {
+                    oInput.setSelectedKey("").setValue("");
+                }
+            } else if (oInput instanceof sap.m.DatePicker) {
+                if (!oInput.getValue()) {
+                    oInput.setValueState("None");
+                } else if (oInput.getDateValue()) {
+                    // DatePicker valueFormat is yyyy-MM-dd, while the shared
+                    // date validator expects the display format dd/MM/yyyy.
+                    oInput.setValueState("None");
+                } else {
+                    oInput.setValueState("Error");
+                }
+
+                if (oInput.getId().endsWith("roomAvailabilityStartDate")) {
+                    var oEndPicker = this.byId("roomAvailabilityEndDate");
+                    if (oEndPicker) {
+                        oEndPicker.setDateValue(null);
+                        oEndPicker.setValueState("None");
+                    }
+                    this._setRoomAvailabilityDateLimits();
+                }
+            }
         },
 
         onLoadRoomAvailability: async function () {
@@ -1661,9 +1705,7 @@ onsendreminder: async function () {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
-            // Bed type is optional: only reject a manually typed value that
-            // matches no list item; an empty value loads all bed types.
-            if (oTypeCombo.getValue() && !utils._LCstrictValidationComboBox(oTypeCombo, "ID")) {
+            if (!utils._LCstrictValidationComboBox(oTypeCombo, "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -1671,9 +1713,15 @@ onsendreminder: async function () {
             var oStartPicker = this.byId("roomAvailabilityStartDate");
             var oEndPicker = this.byId("roomAvailabilityEndDate");
 
-            // Dates are optional, but an entered value must be a valid date
-            // (DatePicker sets Error state itself on unparseable input).
-            if (oStartPicker.getValueState() === "Error" || oEndPicker.getValueState() === "Error") {
+            if (!oStartPicker.getDateValue() || oStartPicker.getValueState() === "Error") {
+                oStartPicker.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            // DatePicker sets Error state itself on unparseable input.
+            if (!oEndPicker.getDateValue() || oEndPicker.getValueState() === "Error") {
+                oEndPicker.setValueState("Error");
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -1700,23 +1748,7 @@ onsendreminder: async function () {
             var oBranch = aBranches.find(function (b) { return b.BranchID === sBranchCode; });
             var sPropertyType = (oBranch && oBranch.PropertyType) || "Hostel";
 
-            // Selected bed type, or every bed type that has rooms in this branch
-            var aBedTypeNames;
-            if (sBedTypeName) {
-                aBedTypeNames = [sBedTypeName];
-            } else {
-                aBedTypeNames = this._getRoomRecords()
-                    .filter(function (oRoom) {
-                        return oRoom.BranchCode === sBranchCode && oRoom.BedTypeName;
-                    })
-                    .reduce(function (aResult, oRoom) {
-                        if (aResult.indexOf(oRoom.BedTypeName) === -1) {
-                            aResult.push(oRoom.BedTypeName);
-                        }
-                        return aResult;
-                    }, [])
-                    .sort();
-            }
+            var aBedTypeNames = [sBedTypeName];
 
             if (!aBedTypeNames.length) {
                 this.getView().getModel("RoomAvailabilityModel").setData([]);
