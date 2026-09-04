@@ -2868,6 +2868,7 @@ sap.ui.define([
                             Type: "",
                             Description: "",
                             Quantity: "",
+                            RecoverCost:"",
                             Cost: "",
                             ItemCurrency: ""
                         });
@@ -2880,6 +2881,7 @@ sap.ui.define([
                                 Type: it.Type || "",
                                 Description: it.Description || "",
                                 Quantity: it.Quantity ?? "",
+                                RecoverCost: it.RecoverCost ?? "",
                                 Cost: it.Cost ?? "",
                                 ItemCurrency: (it.Currency || "").trim()
                             });
@@ -2888,8 +2890,8 @@ sap.ui.define([
                 }
 
                 // In case backend returns items with DamageIDs not present in header list
-                aItems.forEach(it => {
-                    const sDamageID = it.DamageID || "";
+                aItems.forEach(item => {
+                    const sDamageID = item.DamageID || "";
                     if (sDamageID && !mHeaderByDamageId.has(sDamageID)) {
                         aDamageRows.push({
                             DamageID: sDamageID,
@@ -2898,14 +2900,15 @@ sap.ui.define([
                             RoomNo: "",
                             Status: "",
                             Currency: "",
-                            TotalCost: "",
-                            ItemID: it.ItemID || "",
-                            ItemName: it.ItemName || "",
-                            Type: it.Type || "",
-                            Description: it.Description || "",
-                            Quantity: it.Quantity ?? "",
-                            Cost: it.Cost ?? "",
-                            ItemCurrency: (it.Currency || "").trim()
+                            ActualCost: "",
+                            RecoverCost: item.RecoverCost,
+                            ItemID: item.ItemID || "",
+                            ItemName: item.ItemName || "",
+                            Type: item.Type || "",
+                            Description: item.Description || "",
+                            Quantity: item.Quantity ?? "",
+                            Cost: item.Cost ?? "",
+                            ItemCurrency: (item.Currency || "").trim()
                         });
                     }
                 });

@@ -794,7 +794,13 @@
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Cost" />
+                    <Text text="Actual Cost" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Recover Cost" />
                 </Column>
                 <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column> -->
             </columns>
@@ -808,8 +814,9 @@
                         <Text text="{profileData>Type}" />
                         <Text text="{profileData>Description}" />
                         <Text text="{profileData>Quantity}" />
-                        <Text text="{profileData>Cost}" />
-                        <!-- <Text text="{profileData>TotalCost}"/> -->
+                         <Text text="{parts: ['profileData>Cost'], formatter: '.Formatter.formatCurrency'}"/>
+                        <Text text="{parts: ['profileData>RecoverCost'], formatter: '.Formatter.formatCurrency'}"/>
+                       
                     </cells>
                 </ColumnListItem>
             </items>

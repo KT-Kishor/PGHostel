@@ -126,11 +126,12 @@
 					<Column demandPopin="true">
 						<Text text="{i18n>roomNo}" tooltip="{i18n>roomNo}"/>
 					</Column>
+					
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>Cost}" tooltip="{i18n>Cost}"/>
+						<Text text="{i18n>actualcost}" tooltip="{i18n>actualcost}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>date}" tooltip="{i18n>Cost}"/>
+						<Text text="{i18n>recovercost}" tooltip="{i18n>recovercost}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>Status}" tooltip="{i18n>Status}"/>
@@ -149,6 +150,7 @@
 							<Text text="{Damage>CustomerName}" />
 							<Text text="{Damage>RoomNo}" />
 							<Text text="{parts: ['Damage>TotalCost','Damage>Currency'], formatter: '.Formatter.formatCurrency'}"/>
+							<Text text="{parts: ['Damage>RecoverCost','Damage>Currency'], formatter: '.Formatter.formatCurrency'}"/>
 							<Text text="{path: 'Damage>InvoiceDate', formatter: '.Formatter.formatDate'}"/>
 							<ObjectStatus
 							inverted="false"

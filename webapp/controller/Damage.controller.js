@@ -676,103 +676,150 @@ sap.ui.define([
         },
 
         onSaveReturn: async function () {
-            const oView = this.getView();
-            const oDamage = oView.getModel("DamageModel").getData();
-            const oAmountInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnAmount"));
-            const oModeInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnMode"));
-            const oTxnInput = sap.ui.getCore().byId(oView.createId("DT_id_ReturnTransactionID"));
+    const oView = this.getView();
+    const oDamageModel = oView.getModel("DamageModel");
+    const oDamage = oDamageModel.getData();
 
-            const sReturnMode = oModeInput.getSelectedKey();
+    const oModeInput = sap.ui.getCore().byId(
+        oView.createId("DT_id_ReturnMode")
+    );
 
-            let isMandatoryValid =
-                utils.onNumber(oAmountInput, "ID") &&
-                utils._LCstrictValidationComboBox(oModeInput, "ID");
-
-            // Validate Transaction ID only when mode is NOT Cash
-            if (sReturnMode !== "Cash") {
-                isMandatoryValid =
-                    isMandatoryValid &&
-                    utils._LCvalidateMandatoryField(oTxnInput, "ID");
-            } else {
-                // Clear any previous error state
-                oTxnInput.setValueState("None");
-            }
+    const oTxnInput = sap.ui.getCore().byId(
+        oView.createId("DT_id_ReturnTransactionID")
+    );
 
 
-            if (!isMandatoryValid) {
-                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
-                return;
-            }
+    // ============================================================
+    // RETURN MODE VALIDATION
+    // ============================================================
 
-            const returnAmount = parseFloat(oAmountInput.getValue());
-            const mode = oModeInput.getSelectedKey();
-            const txnID = oTxnInput.getValue();
-            const damageAmount = parseFloat(oDamage.TotalCost);
+    const sReturnMode = oModeInput.getSelectedKey();
 
-            // === VALIDATIONS ===
-            if (!returnAmount || returnAmount <= 0) {
-                MessageToast.show("Enter valid return amount");
-                return;
-            }
+    let isMandatoryValid = true;
 
-            if (returnAmount > damageAmount) {
-                MessageToast.show("Return amount cannot exceed damage amount");
-                return;
-            }
+    // Return mode is mandatory
+    if (!sReturnMode) {
+        oModeInput.setValueState("Error");
+        oModeInput.setValueStateText("Please select return mode");
 
-            if (!mode) {
-                MessageToast.show("Select return mode");
-                return;
-            }
+        MessageToast.show("Select return mode");
 
-            // if (mode !== "CASH" && (!txnID || txnID.trim() === "")) {
-            //     MessageToast.show("Transaction ID required");
-            //     oTxnInput.setValueState("Error");
-            //     return;
-            // }
-
-            this.getBusyDialog()
-
-            try {
-                const currentUser = oView.getModel("LoginModel").getProperty("/EmployeeName");
+        return;
+    } else {
+        oModeInput.setValueState("None");
+    }
 
 
-                const payload = {
-                    ReturnDamageAmount: returnAmount,
-                    ReturnDamageDate: new Date().toISOString().split("T")[0],
-                    ReturnDamageMode: mode,
-                    ReturnDamageTransactionID: txnID || "",
-                    ReturningEmployeeName: currentUser,
-                    Status: "Damage Claimed"
-                };
+    // ============================================================
+    // TRANSACTION ID VALIDATION
+    // Only required when mode is NOT Cash
+    // ============================================================
+
+    if (sReturnMode !== "Cash") {
+
+        isMandatoryValid =
+            utils._LCvalidateMandatoryField(
+                oTxnInput,
+                "ID"
+            );
+
+        if (!isMandatoryValid) {
+
+            MessageToast.show(
+                this.i18nModel.getText("mandetoryFields")
+            );
+
+            return;
+        }
+
+    } else {
+
+        // Cash does not require Transaction ID
+        oTxnInput.setValueState("None");
+        oTxnInput.setValueStateText("");
+    }
 
 
-                // const payload = {
-                //     Filters: {
-                //         DamageID: oDamage.DamageID
-                //     },
-                //     data: updateData
-                // };
+    const mode = oModeInput.getSelectedKey();
+    const txnID = oTxnInput.getValue();
 
-                const res = await this.ajaxUpdateWithJQuery("HM_Damage", {
+
+    const returnAmount =
+        parseFloat(
+            oDamage.ReturnDamageAmount
+        ) || 0;
+    this.getBusyDialog();
+
+
+    try {
+
+        const currentUser =
+            oView
+                .getModel("LoginModel")
+                .getProperty("/EmployeeName");
+        const payload = {
+
+            ReturnDamageAmount: returnAmount,
+
+            ReturnDamageDate:
+                new Date()
+                    .toISOString()
+                    .split("T")[0],
+
+            ReturnDamageMode: mode,
+
+            ReturnDamageTransactionID:
+                txnID || "",
+
+            ReturningEmployeeName:
+                currentUser,
+
+            Status: "Damage Claimed"
+        };
+      
+        const res =
+            await this.ajaxUpdateWithJQuery(
+                "HM_Damage",
+                {
                     data: payload,
+
                     filters: {
                         DamageID: oDamage.DamageID
                     }
-                });
+                }
+            );
 
-                if (!res.success) throw new Error(res.message);
 
-                MessageToast.show("Damage claimed successfully");
-                this._oReturnDialog.close();
-                this.byId("HD_id_ARD_Table").removeSelections(true);
-                await this.Onsearch("true");
-            } catch (e) {
-                MessageToast.show(e.message);
-            } finally {
-                this.closeBusyDialog()
-            }
-        },
+        if (!res.success) {
+            throw new Error(
+                res.message || "Failed to claim damage"
+            );
+        }
+        MessageToast.show(
+            "Damage claimed successfully"
+        );
+
+        this._oReturnDialog.close();
+
+        this.byId(
+            "HD_id_ARD_Table"
+        ).removeSelections(true);
+
+        await this.Onsearch("true");
+
+
+    } catch (e) {
+
+        MessageToast.show(
+            e.message || "Failed to claim damage"
+        );
+
+    } finally {
+
+        this.closeBusyDialog();
+
+    }
+},
 
         onDialogClose: function () {
             this._clearTableSelection(); // Clear table selection

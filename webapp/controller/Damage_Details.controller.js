@@ -39,6 +39,8 @@ sap.ui.define([
                     ItemName: "",
                     Description: "",
                     Cost: "",
+                    ActualCost: "",
+                    RecoverCost: "",
                     Date: Formatter.formatDate(new Date()),
                     Status: "Damage Raised",
                     DamageID: "",
@@ -96,6 +98,7 @@ sap.ui.define([
                             ItemName: item.ItemName,
                             Description: item.Description,
                             Cost: item.Cost,
+                            RecoverCost: item.RecoverCost,
                             Quantity: item.Quantity,
                             ItemId: item.ItemID
                         };
@@ -113,6 +116,7 @@ sap.ui.define([
                         Currency: Damage.Currency,
                         CustomerEmail: Damage.CustomerEmail,
                         UserID: Damage.UserID,
+                        RecoverCost: Damage.RecoverCost,
                         TotalCost: Damage.TotalCost,
                         ReturnDamageAmount: Damage.ReturnDamageAmount,
                         Items: aItemsWithIndex
@@ -169,97 +173,206 @@ sap.ui.define([
 
             }
         },
-        DM_onPressDelete: async function () {
+       DM_onPressDelete: async function () {
 
-            var oTable = this.byId("CID_id_TableInvoiceItem1");
-            var oModel = this.getView().getModel("DamageModel");
-            var aItems = oModel.getProperty("/Items") || [];
-            var aSelectedItems = oTable.getSelectedItems();
-            var that = this;
+    var that = this;
 
-            if (aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one item");
-                return;
-            }
+    var oTable = this.byId("CID_id_TableInvoiceItem1");
 
-            var aIndexes = aSelectedItems.map(function (oItem) {
-                var sPath = oItem.getBindingContext("DamageModel").getPath();
-                return parseInt(sPath.split("/")[2]);
-            });
+    var oModel = this.getView().getModel("DamageModel");
 
-            var hasSavedItem = aSelectedItems.some(function (oItem) {
-                return !!oItem.getBindingContext("DamageModel").getObject().ItemId;
-            });
+    var aItems = oModel.getProperty("/Items") || [];
 
-            var fnDelete = async function () {
+    var aSelectedItems = oTable.getSelectedItems();
 
-                that.getBusyDialog()
+    if (aSelectedItems.length === 0) {
 
+        sap.m.MessageToast.show(
+            "Please select at least one item"
+        );
 
-                try {
+        return;
+    }
 
-                    for (let oItem of aSelectedItems) {
-                        let oData = oItem.getBindingContext("DamageModel").getObject();
+    var aIndexes = aSelectedItems.map(function (oItem) {
 
-                        if (oData.ItemId) {
-                            await that.ajaxDeleteWithJQuery("HM_DamageItem", {
-                                filters: { ItemID: oData.ItemId }
-                            });
-                        }
-                    }
+        var sPath =
+            oItem
+                .getBindingContext("DamageModel")
+                .getPath();
 
-                    aIndexes.sort(function (a, b) {
-                        return b - a;
-                    });
+        return parseInt(
+            sPath.split("/")[2]
+        );
 
-                    aIndexes.forEach(function (index) {
-                        aItems.splice(index, 1);
-                    });
+    });
 
-                    aItems.forEach(function (item, i) {
-                        item.IndexNo = i + 1;
-                    });
+  
+    var hasSavedItem = aSelectedItems.some(function (oItem) {
 
-                    var totalCost = aItems.reduce(function (sum, item) {
-                        return sum + (parseFloat(item.Cost) || 0);
-                    }, 0);
+        return !!oItem
+            .getBindingContext("DamageModel")
+            .getObject()
+            .ItemId;
 
-                    oModel.setProperty("/Items", aItems);
-                    oModel.setProperty("/TotalCost", totalCost.toFixed(2));
-                    var dueAmount = parseFloat(oModel.getProperty("/TotalCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
-                    oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
+    });
 
-                    oTable.removeSelections();
+    // ============================================================
+    // DELETE FUNCTION
+    // ============================================================
 
-                    sap.m.MessageToast.show("Selected Item(s) Deleted");
+    var fnDelete = async function () {
 
-
-                } catch (err) {
-                    that.closeBusyDialog()
-                    console.error(err);
-                    sap.m.MessageToast.show("Error while deleting");
-                }
-                that.closeBusyDialog()
-            };
+        try {
 
             if (hasSavedItem) {
-                sap.m.MessageBox.confirm(
-                    "Are you sure you want to delete selected item(s)?",
-                    {
-                        title: "Confirm Deletion",
-                        styleClass: "myUnifiedBtn",
-                        onClose: function (sAction) {
-                            if (sAction === "OK") {
-                                fnDelete();
-                            }
-                        }
-                    }
-                );
-            } else {
-                fnDelete();
+                that.getBusyDialog();
             }
 
-        },
+            for (let oItem of aSelectedItems) {
+
+                let oData =
+                    oItem
+                        .getBindingContext("DamageModel")
+                        .getObject();
+
+                if (oData.ItemId) {
+
+                    await that.ajaxDeleteWithJQuery(
+                        "HM_DamageItem",
+                        {
+                            filters: {
+                                ItemID: oData.ItemId
+                            }
+                        }
+                    );
+                }
+            }
+
+            // ----------------------------------------------------
+            // REMOVE ITEMS FROM LOCAL MODEL
+            // ----------------------------------------------------
+
+            aIndexes.sort(function (a, b) {
+                return b - a;
+            });
+
+
+            aIndexes.forEach(function (index) {
+
+                aItems.splice(index, 1);
+
+            });
+
+
+            // ----------------------------------------------------
+            // UPDATE INDEX NUMBER
+            // ----------------------------------------------------
+
+            aItems.forEach(function (item, i) {
+
+                item.IndexNo = i + 1;
+
+            });
+
+
+            // ----------------------------------------------------
+            // RECALCULATE TOTAL COST
+            // ----------------------------------------------------
+
+            var totalCost = aItems.reduce(
+                function (sum, item) {
+
+                    return sum +
+                        (parseFloat(item.Cost) || 0);
+
+                },
+                0
+            );
+
+
+            oModel.setProperty(
+                "/Items",
+                aItems
+            );
+
+            oModel.setProperty(
+                "/TotalCost",
+                totalCost.toFixed(2)
+            );
+
+
+            // ----------------------------------------------------
+            // RECALCULATE DUE AMOUNT
+            // ----------------------------------------------------
+
+            var dueAmount =
+                parseFloat(
+                    oModel.getProperty("/TotalCost")
+                ) -
+                parseFloat(
+                    oModel.getProperty("/ReturnDamageAmount") || 0
+                );
+
+
+            oModel.setProperty(
+                "/DueAmount",
+                dueAmount.toFixed(2)
+            );
+            if (hasSavedItem) {
+                that.closeBusyDialog();
+            }
+
+
+            sap.m.MessageToast.show(
+                "Selected Item(s) Deleted"
+            );
+
+
+        } catch (err) {
+
+            if (hasSavedItem) {
+                that.closeBusyDialog();
+            }
+
+            console.error(err);
+
+            sap.m.MessageToast.show(
+                "Error while deleting"
+            );
+        }
+    };
+
+
+    // ============================================================
+    // CONFIRMATION ONLY FOR SAVED ITEMS
+    // ============================================================
+
+    if (hasSavedItem) {
+
+        sap.m.MessageBox.confirm(
+            "Are you sure you want to delete selected item(s)?",
+            {
+                title: "Confirm Deletion",
+
+                styleClass: "myUnifiedBtn",
+
+                onClose: function (sAction) {
+
+                    if (sAction === "OK") {
+
+                        fnDelete();
+
+                    }
+
+                }
+            }
+        );
+
+    } else {
+        fnDelete();
+    }
+},
 
         onNavBack: function () {
              var oViewModel = this.getView().getModel("VisibleModel");
@@ -307,7 +420,8 @@ sap.ui.define([
                 Type: "",
                 ItemName: "",
                 Description: "",
-                Cost: "",
+                ActualCost: "",
+                RecoverCost: "",
                 Total: ""
             });
 
@@ -315,7 +429,8 @@ sap.ui.define([
             var table = this.byId("CID_id_TableInvoiceItem1");
             table.removeSelections();
         },
-        onTotalInputLiveChange: function (oEvent) {
+
+        onTotalInputLiveChange:function(oEvent){
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
 
@@ -336,11 +451,127 @@ sap.ui.define([
                 totalCost += parseFloat(item.Cost) || 0;
             });
 
-            oModel.setProperty("/TotalCost", totalCost.toFixed(2));
-            var dueAmount = parseFloat(oModel.getProperty("/TotalCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
+            oModel.setProperty("/ActualCost", totalCost.toFixed(2));
+            var dueAmount = parseFloat(oModel.getProperty("/ActualCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
             oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
-
         },
+      onRecoverCostLiveChange: function (oEvent) {
+
+    var oInput = oEvent.getSource();
+    var sValue = oEvent.getParameter("value");
+
+    // Allow only numbers and decimal
+    sValue = sValue.replace(/[^0-9.]/g, "");
+
+    // Prevent multiple decimal points
+    var aParts = sValue.split(".");
+    if (aParts.length > 2) {
+        sValue = aParts[0] + "." + aParts.slice(1).join("");
+    }
+
+    var oContext =
+        oInput.getBindingContext("DamageModel");
+
+    var oModel =
+        this.getView().getModel("DamageModel");
+
+    var sPath = oContext.getPath();
+
+    // Get Cost of current row
+    var fCost =
+        parseFloat(
+            oModel.getProperty(sPath + "/Cost")
+        ) || 0;
+
+    var fRecoverCost =
+        parseFloat(sValue) || 0;
+
+
+    // ============================================================
+    // RECOVER COST VALIDATION
+    // ============================================================
+
+    if (fRecoverCost > fCost) {
+
+        oInput.setValueState("Error");
+
+        oInput.setValueStateText(
+            "Recover amount cannot be greater than Cost"
+        );
+
+        MessageToast.show(
+            "Recover amount cannot be greater than Cost"
+        );
+
+        // Clear invalid value
+        oInput.setValue("");
+
+        oModel.setProperty(
+            sPath + "/RecoverCost",
+            ""
+        );
+
+        return;
+
+    } else {
+
+        oInput.setValueState("None");
+
+    }
+
+
+    // ============================================================
+    // SET RECOVER COST
+    // ============================================================
+
+    oInput.setValue(sValue);
+
+    oModel.setProperty(
+        sPath + "/RecoverCost",
+        sValue
+    );
+
+
+    // ============================================================
+    // CALCULATE TOTAL RECOVER COST
+    // ============================================================
+
+    var aItems =
+        oModel.getProperty("/Items") || [];
+
+    var totalRecoverCost = 0;
+
+    aItems.forEach(function (item) {
+
+        totalRecoverCost +=
+            parseFloat(item.RecoverCost) || 0;
+
+    });
+
+
+    oModel.setProperty(
+        "/RecoverCost",
+        totalRecoverCost.toFixed(2)
+    );
+
+
+    // ============================================================
+    // CALCULATE DUE AMOUNT
+    // ============================================================
+
+    var dueAmount =
+        (parseFloat(
+            oModel.getProperty("/TotalCost")
+        ) || 0) -
+        (parseFloat(
+            oModel.getProperty("/ReturnDamageAmount")
+        ) || 0);
+
+    oModel.setProperty(
+        "/DueAmount",
+        dueAmount.toFixed(2)
+    );
+},
         onQuantityInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
@@ -377,6 +608,43 @@ sap.ui.define([
                 );
                 return;
             }
+            var oDamageTable = this.byId("CID_id_TableInvoiceItem1");
+var aRecoverCostInputs = oDamageTable
+    ? oDamageTable.getItems()
+    : [];
+
+for (var j = 0; j < aRecoverCostInputs.length; j++) {
+
+    var oRow = aRecoverCostInputs[j];
+
+    // Get all Input controls from the row
+    var aCells = oRow.getCells();
+
+    for (var k = 0; k < aCells.length; k++) {
+
+        var oCell = aCells[k];
+
+        if (
+            oCell instanceof sap.m.Input &&
+            oCell.getBinding("value") &&
+            oCell.getBinding("value").getPath() === "RecoverCost"
+        ) {
+
+            if (oCell.getValueState() === sap.ui.core.ValueState.Error) {
+
+                sap.m.MessageBox.error(
+                    "Row " + (j + 1) +
+                    " : Recover amount cannot be greater than Cost",
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
+                );
+
+                return;
+            }
+        }
+    }
+}
             var aItems = oData.Items || [];
 
             for (var i = 0; i < aItems.length; i++) {
@@ -396,7 +664,10 @@ sap.ui.define([
                 }
 
                 if (item.Cost === "" || item.Cost === null || item.Cost === undefined) {
-                    aMissingFields.push("Cost");
+                    aMissingFields.push("Actual Cost");
+                }
+                if (item.RecoverCost === "" || item.RecoverCost === null || item.RecoverCost === undefined) {
+                    aMissingFields.push("Recover Cost");
                 }
 
                 // If any field missing → show one message and stop
@@ -422,7 +693,8 @@ sap.ui.define([
                     Currency: oData.Currency,
                     Status: "Damage Raised",
                     BedTypeName: oData.BedTypeName,
-                    TotalCost: oData.TotalCost,
+                    TotalCost: oData.ActualCost,
+                    RecoverCost: oData.RecoverCost,
                     BranchCode: oData.BranchCode
                 },
                 Items: oData.Items.map(item => {
@@ -431,6 +703,7 @@ sap.ui.define([
                         ItemName: item.ItemName,
                         Description: item.Description,
                         Cost: item.Cost,
+                        RecoverCost: item.RecoverCost,
                         Quantity: item.Quantity
                     };
                 })
@@ -449,6 +722,7 @@ sap.ui.define([
                             ItemName: item.ItemName,
                             Description: item.Description,
                             Cost: item.Cost,
+                            RecoverCost: item.RecoverCost,
                             Quantity: item.Quantity,
                         }
 
@@ -697,12 +971,13 @@ sap.ui.define([
                     item.Description || "-",
                     item.Type,
                     item.Quantity,
-                    item.Cost
+                    item.Cost,
+                    item.RecoverCost
                 ]);
 
                 doc.autoTable({
                     startY: currentY,
-                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Cost']],
+                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Actual Cost','Recover Cost']],
                     body: body,
                     theme: "grid",
                     headStyles: {
@@ -738,7 +1013,7 @@ sap.ui.define([
                 currentY = doc.lastAutoTable.finalY + 8;
 
                 // ================= SUMMARY =================
-                const totalAmount = parseFloat(oModel.TotalCost || 0);
+                const totalAmount = parseFloat(oModel.RecoverCost || 0);
                 const summary = [];
 
                 if (totalAmount > 0) {

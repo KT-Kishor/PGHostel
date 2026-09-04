@@ -37,17 +37,14 @@
                 <!-- Damage Amount -->
                 <Label text="Damage Amount"/>
                 <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
-                <Label text="Due Amount" visible="{= ${DamageModel>/Status} === 'Partially Recovered' }"/>
-                <Text visible="{= ${DamageModel>/Status} === 'Partially Recovered' }" text="{parts:[{path:'DamageModel>/DueAmount'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
+              
                 <!-- Return Amount -->
-                <Label text="Amount" required="true"/>
-                <Input
-                    id="DT_id_ReturnAmount"
-                    type="Number"
-                    value="{DamageModel>/ReturnDamageAmount}"
-                    placeholder="Enter return amount"
-                    liveChange="_validateReturnAmount"
-                    valueStateText="Enter return amount"/>
+                <Label text="Actual Cost"/>
+                <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
+               
+                <!-- Return Amount -->
+                <Label text="Recover Amount" />
+                <Text text="{parts:[{path:'DamageModel>/RecoverCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
 
                 <!-- Return Mode -->
                 <Label text="Payment Mode" required="true"/>

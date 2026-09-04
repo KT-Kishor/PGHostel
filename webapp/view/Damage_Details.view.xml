@@ -234,8 +234,17 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="{i18n>cost}"
-                                                    tooltip="{i18n>cost}"
+                                                    text="{i18n>actualcost}"
+                                                    tooltip="{i18n>actualcost}"
+                                                />
+                                            </m:Column>
+                                            <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="{i18n>recovercost}"
+                                                    tooltip="{i18n>recovercost}"
                                                 />
                                             </m:Column>
                                         </m:columns>
@@ -290,6 +299,14 @@
                                                         editable="{VisibleModel>/visible}"
                                                     />
                                                 </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{DamageModel>RecoverCost}"
+                                                        liveChange="onRecoverCostLiveChange"
+                                                         maxLength="7"
+                                                        editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
                                             </m:ColumnListItem>
                                         </m:items>
                                     </m:Table>
@@ -308,7 +325,7 @@
                                                     class="amountText"
                                                     text="{
                                                         parts: [{
-                                                            path: 'DamageModel>/TotalCost'
+                                                            path: 'DamageModel>/RecoverCost'
                                                         }, {
                                                             path: 'DamageModel>/Currency'
                                                         }],
