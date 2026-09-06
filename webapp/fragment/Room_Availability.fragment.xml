@@ -56,7 +56,10 @@
                         additionalText="{BranchModel>BranchID}"
                     />
                     <layoutData>
-                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                        <FlexItemData
+                            minWidth="18rem"
+                            maxWidth="18rem"
+                        />
                     </layoutData>
                 </ComboBox>
                 <Label
@@ -80,7 +83,10 @@
                         text="{RoomAvailabilityTypes>BedTypeName}"
                     />
                     <layoutData>
-                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                        <FlexItemData
+                            minWidth="18rem"
+                            maxWidth="18rem"
+                        />
                     </layoutData>
                 </ComboBox>
             </HBox>
@@ -110,7 +116,10 @@
                     width="18rem"
                 >
                     <layoutData>
-                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                        <FlexItemData
+                            minWidth="18rem"
+                            maxWidth="18rem"
+                        />
                     </layoutData>
                 </DatePicker>
                 <Label
@@ -133,7 +142,10 @@
                     width="18rem"
                 >
                     <layoutData>
-                        <FlexItemData minWidth="18rem" maxWidth="18rem" />
+                        <FlexItemData
+                            minWidth="18rem"
+                            maxWidth="18rem"
+                        />
                     </layoutData>
                 </DatePicker>
                 <Button
@@ -152,20 +164,52 @@
                 class="sapUiSmallMarginTop"
             >
                 <columns>
-                    <Column demandPopin="true"><Text text="{i18n>bedType}" /></Column>
-                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>totalCapacity}" /></Column>
-                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>booked}" /></Column>
-                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>availableBeds}" /></Column>
-                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>date}" /></Column>
-                    <Column demandPopin="true"><Text text="{i18n>status}" /></Column>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>roomNumber}" />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>bedType}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>totalCapacity}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>Inuse}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>availableBeds}" />
+                    </Column>
+                    <Column
+                        minScreenWidth="Tablet"
+                        demandPopin="true"
+                    >
+                        <Text text="{i18n>date}" />
+                    </Column>
+                    <Column demandPopin="true">
+                        <Text text="{i18n>status}" />
+                    </Column>
                 </columns>
                 <items>
                     <ColumnListItem>
                         <cells>
+                            <Text text="{RoomAvailabilityModel>RoomNo}" />
                             <Text text="{RoomAvailabilityModel>BedTypeName}" />
-                            <Text text="{RoomAvailabilityModel>TotalCapacity}" />
+                            <Text
+                                text="{RoomAvailabilityModel>TotalCapacity}"
+                            />
                             <Text text="{RoomAvailabilityModel>BookedCount}" />
-                            <Text text="{RoomAvailabilityModel>AvailableCount}" />
+                            <Text
+                                text="{RoomAvailabilityModel>AvailableCount}"
+                            />
                             <VBox>
                                 <Text
                                     text="{path: 'RoomAvailabilityModel>StartDate', formatter: '.Formatter.formatDate'}"

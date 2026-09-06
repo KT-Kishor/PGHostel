@@ -1705,6 +1705,8 @@ onsendreminder: async function () {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
+            // Bed type is optional: only reject a manually typed value that
+            // matches no list item; an empty value loads all bed types.
             if (!utils._LCstrictValidationComboBox(oTypeCombo, "ID")) {
                 MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
@@ -1748,7 +1750,16 @@ onsendreminder: async function () {
             var oBranch = aBranches.find(function (b) { return b.BranchID === sBranchCode; });
             var sPropertyType = (oBranch && oBranch.PropertyType) || "Hostel";
 
-            var aBedTypeNames = [sBedTypeName];
+            var aBedTypeNames = sBedTypeName
+                ? [sBedTypeName]
+                : this._getRoomRecords()
+                    .filter(function (oRoom) {
+                        return !sBranchCode || oRoom.BranchCode === sBranchCode;
+                    })
+                    .map(function (oRoom) { return oRoom.BedTypeName; })
+                    .filter(function (sName, i, aNames) {
+                        return sName && aNames.indexOf(sName) === i;
+                    });
 
             if (!aBedTypeNames.length) {
                 this.getView().getModel("RoomAvailabilityModel").setData([]);
@@ -1767,54 +1778,45 @@ onsendreminder: async function () {
                             Name: oParts.Name,
                             PropertyType: sPropertyType,
                             StartDate: sStartDate,
-                            EndDate: sEndDate
+                            EndDate: sEndDate,
+                            Status: "Assigned"
                         });
 
-                        if (!oResponse || oResponse.success === false) {
+                        if (!oResponse || oResponse.success === false || !Array.isArray(oResponse.rooms)) {
+                            return [];
+                        }
+
+                        var aRooms = Array.isArray(oResponse.rooms)
+                            ? oResponse.rooms
+                            : [];
+
+                        // Availability is room-level. Use only the values from
+                        // each item in the response rooms array.
+                        return aRooms.map(function (oRoom) {
+                            var iAvailable = parseInt(oRoom.availableCount, 10);
+                            if (isNaN(iAvailable)) {
+                                iAvailable = (parseInt(oRoom.capacity, 10) || 0)
+                                    - (parseInt(oRoom.bookedCount, 10) || 0);
+                            }
+                            var bIsAvailable = iAvailable > 0;
                             return {
                                 BedTypeName: sName,
-                                TotalCapacity: "-",
-                                BookedCount: "-",
-                                AvailableCount: "-",
-                                AvailabilityStatus: "Error",
-                                AvailabilityState: "Error"
+                                RoomNo: oRoom.RoomNo,
+                                TotalCapacity: oRoom.capacity,
+                                BookedCount: oRoom.bookedCount,
+                                AvailableCount: iAvailable,
+                                StartDate: sStartDate,
+                                EndDate: sEndDate,
+                                AvailabilityStatus: oRoom.roomStatus || (bIsAvailable ? "Available" : "Fully Booked"),
+                                AvailabilityState: bIsAvailable ? "Success" : "Error"
                             };
-                        }
-
-                        // Derive availability from availableCount (the backend "available"
-                        // flag stays true even when the bed type is fully booked).
-                        var iAvailable = parseInt(oResponse.availableCount, 10);
-                        if (isNaN(iAvailable)) {
-                            iAvailable = (parseInt(oResponse.totalCapacity, 10) || 0)
-                                - (parseInt(oResponse.bookedCount, 10) || 0);
-                        }
-                        var bIsAvailable = iAvailable > 0;
-
-                        return {
-                            BedTypeName: sName,
-                            TotalCapacity: oResponse.totalCapacity,
-                            BookedCount: oResponse.bookedCount,
-                            AvailableCount: oResponse.availableCount,
-                            StartDate: sStartDate,
-                            EndDate: sEndDate,
-                            AvailabilityStatus: bIsAvailable ? "Available" : "Fully Booked",
-                            AvailabilityState: bIsAvailable ? "Success" : "Error"
-                        };
+                        });
                     } catch (oError) {
-                        return {
-                            BedTypeName: sName,
-                            TotalCapacity: "-",
-                            BookedCount: "-",
-                            AvailableCount: "-",
-                            StartDate: sStartDate,
-                            EndDate: sEndDate,
-                            AvailabilityStatus: "Error",
-                            AvailabilityState: "Error"
-                        };
+                        return [];
                     }
                 }.bind(this)));
 
-                this.getView().getModel("RoomAvailabilityModel").setData(aRows);
+                this.getView().getModel("RoomAvailabilityModel").setData(aRows.flat());
             } finally {
                 this.closeBusyDialog();
             }
