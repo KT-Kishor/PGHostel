@@ -155,8 +155,22 @@
                     class="myUnifiedBtn sapUiTinyMarginBegin"
                 />
             </HBox>
-            <Table
+            <IconTabBar
+                id="roomAvailabilityTabs"
+                selectedKey="rooms"
+                select="onRoomAvailabilityTabSelect"
+                expandable="false"
+                class="sapUiSmallMarginTop"
+            >
+                <items>
+                    <IconTabFilter
+                        key="rooms"
+                        text="{i18n>roomAvailabilityRoomsTab}"
+                    >
+                        <content>
+                    <Table
                 id="roomAvailabilityTable"
+                visible="{= ${RoomAvailabilityUI>/activeTab} === 'rooms' }"
                 growing="true"
                 growingThreshold="20"
                 noDataText="{i18n>noRoomsFound}"
@@ -227,7 +241,79 @@
                         </cells>
                     </ColumnListItem>
                 </items>
-            </Table>
+                    </Table>
+                        </content>
+                    </IconTabFilter>
+                    <IconTabFilter
+                        key="summary"
+                        text="{i18n>roomAvailabilitySummaryTab}"
+                    >
+                        <content>
+                    <Table
+                        id="roomAvailabilitySummaryTable"
+                        visible="{= ${RoomAvailabilityUI>/activeTab} === 'summary' }"
+                        growing="true"
+                        growingThreshold="20"
+                        noDataText="{i18n>noRoomsFound}"
+                        items="{RoomAvailabilitySummaryModel>/}"
+                    >
+                        <columns>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>bedType}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>totalCapacity}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>newBookings}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>confirmedBookings}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>assignedBookings}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>availableBeds}" />
+                            </Column>
+                            <Column minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>date}" />
+                            </Column>
+                            <Column demandPopin="true">
+                                <Text text="{i18n>status}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{RoomAvailabilitySummaryModel>BedTypeName}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>TotalCapacity}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>NewCount}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>ConfirmedCount}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>AssignedCount}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>AvailableCount}" />
+                                    <VBox>
+                                        <Text
+                                            text="{path: 'RoomAvailabilitySummaryModel>StartDate', formatter: '.Formatter.formatDate'}"
+                                            visible="{= !!${RoomAvailabilitySummaryModel>StartDate} }"
+                                        />
+                                        <Text
+                                            text="{path: 'RoomAvailabilitySummaryModel>EndDate', formatter: '.Formatter.formatDate'}"
+                                            visible="{= !!${RoomAvailabilitySummaryModel>EndDate} }"
+                                        />
+                                    </VBox>
+                                    <ObjectStatus
+                                        text="{RoomAvailabilitySummaryModel>AvailabilityStatus}"
+                                        state="{RoomAvailabilitySummaryModel>AvailabilityState}"
+                                    />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                        </content>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
         </content>
         <endButton>
             <Button

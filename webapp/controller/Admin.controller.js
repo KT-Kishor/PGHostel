@@ -1588,7 +1588,18 @@ onsendreminder: async function () {
                 "RoomAvailabilityFilter"
             );
             this.getView().setModel(new JSONModel([]), "RoomAvailabilityModel");
+            this.getView().setModel(new JSONModel([]), "RoomAvailabilitySummaryModel");
             this.getView().setModel(new JSONModel([]), "RoomAvailabilityTypes");
+            this.getView().setModel(new JSONModel({ activeTab: "rooms" }), "RoomAvailabilityUI");
+
+            // The IconTabBar keeps its runtime selected tab after the dialog
+            // is closed. Reset it back to Room Details so the visible tab and
+            // the activeTab model stay in sync on reopen (the select event is
+            // not fired programmatically, so this does not trigger a load).
+            var oTabs = this.byId("roomAvailabilityTabs");
+            if (oTabs) {
+                oTabs.setSelectedKey("rooms");
+            }
 
             // Reset stale value states from a previous dialog session
             ["roomAvailabilityBranch", "roomAvailabilityType", "roomAvailabilityStartDate", "roomAvailabilityEndDate"].forEach(function (sId) {
@@ -1643,8 +1654,30 @@ onsendreminder: async function () {
             this.getView().getModel("RoomAvailabilityFilter").setProperty("/BedTypeName", "");
             this.getView().getModel("RoomAvailabilityTypes").setData(aTypes);
             this.getView().getModel("RoomAvailabilityModel").setData([]);
+            this.getView().getModel("RoomAvailabilitySummaryModel").setData([]);
         },
 
+        onRoomAvailabilityTabSelect: function (oEvent) {
+            var sKey = oEvent.getParameter("key");
+            this.getView().getModel("RoomAvailabilityUI").setProperty("/activeTab", sKey);
+
+            // Auto-load when switching tabs, but only if the mandatory
+            // filters are already filled — tab switching never raises
+            // validation errors (those stay on the Load button).
+            var oBranchCombo = this.byId("roomAvailabilityBranch");
+            var oStartPicker = this.byId("roomAvailabilityStartDate");
+            var oEndPicker = this.byId("roomAvailabilityEndDate");
+
+            var bFiltersComplete = oBranchCombo && oBranchCombo.getSelectedKey()
+                && oStartPicker && oStartPicker.getDateValue()
+                && oEndPicker && oEndPicker.getDateValue()
+                && oStartPicker.getValueState() !== "Error"
+                && oEndPicker.getValueState() !== "Error";
+
+            if (bFiltersComplete) {
+                this.onLoadRoomAvailability();
+            }
+        },
         _getRoomRecords: function () {
             var oModel = this.getOwnerComponent().getModel("RoomDetailsModel");
             return oModel && Array.isArray(oModel.getData()) ? oModel.getData().filter(Boolean) : [];
@@ -1762,17 +1795,22 @@ onsendreminder: async function () {
                     });
 
             if (!aBedTypeNames.length) {
-                this.getView().getModel("RoomAvailabilityModel").setData([]);
+                this.getView().getModel(
+                    this.getView().getModel("RoomAvailabilityUI").getProperty("/activeTab") === "summary"
+                        ? "RoomAvailabilitySummaryModel" : "RoomAvailabilityModel"
+                ).setData([]);
                 MessageToast.show(this.i18nModel.getText("noRoomsFound"));
                 return;
             }
 
             this.getBusyDialog();
             try {
+                var bSummary = this.getView().getModel("RoomAvailabilityUI").getProperty("/activeTab") === "summary";
                 var aRows = await Promise.all(aBedTypeNames.map(async function (sName) {
                     var oParts = this._splitBedTypeName(sName);
                     try {
-                        var oResponse = await this.ajaxReadWithJQuery("HM_ConfirmAvailableRooms", {
+                        var oResponse = await this.ajaxReadWithJQuery(
+                            bSummary ? "HM_BookingSummary" : "HM_ConfirmAvailableRooms", {
                             BranchCode: sBranchCode,
                             ACType: oParts.ACType,
                             Name: oParts.Name,
@@ -1782,13 +1820,49 @@ onsendreminder: async function () {
                             Status: "Assigned"
                         });
 
-                        if (!oResponse || oResponse.success === false || !Array.isArray(oResponse.rooms)) {
+                        if (!oResponse || oResponse.success === false) {
                             return [];
                         }
 
-                        var aRooms = Array.isArray(oResponse.rooms)
-                            ? oResponse.rooms
-                            : [];
+                        if (bSummary) {
+                            // HM_temp returns one flat record per bed type
+                            var aSummaries = Array.isArray(oResponse) ? oResponse : [oResponse];
+                            return aSummaries.map(function (oSummary) {
+                                var iNew = parseInt(oSummary.new, 10) || 0;
+                                var iConfirmed = parseInt(oSummary.confirmed, 10) || 0;
+                                var iAssigned = parseInt(oSummary.assigned, 10) || 0;
+                                var iCapacity = parseInt(oSummary.totalCapacity, 10) || 0;
+                                var iBooked = parseInt(oSummary.bookedCount, 10);
+                                if (isNaN(iBooked)) {
+                                    iBooked = iNew + iConfirmed + iAssigned;
+                                }
+                                var iAvailable = parseInt(oSummary.availableCount, 10);
+                                if (isNaN(iAvailable)) {
+                                    iAvailable = iCapacity - iBooked;
+                                }
+                                var sStatus = oSummary.roomStatus;
+                                if (!sStatus) {
+                                    sStatus = iAvailable <= 0 ? "Fully Booked" : (iBooked === 0 ? "Available" : "Partially Available");
+                                }
+                                return {
+                                    BedTypeName: oSummary.BedType || sName,
+                                    TotalCapacity: iCapacity,
+                                    NewCount: iNew,
+                                    ConfirmedCount: iConfirmed,
+                                    AssignedCount: iAssigned,
+                                    AvailableCount: iAvailable,
+                                    StartDate: oSummary.StartDate || sStartDate,
+                                    EndDate: oSummary.EndDate || sEndDate,
+                                    AvailabilityStatus: sStatus,
+                                    AvailabilityState: sStatus === "Fully Booked" ? "Error" : (sStatus === "Partially Available" ? "Warning" : "Success")
+                                };
+                            });
+                        }
+
+                        var aRooms = Array.isArray(oResponse) ? oResponse :
+                            (Array.isArray(oResponse.rooms) ? oResponse.rooms :
+                                (Array.isArray(oResponse.data) ? oResponse.data :
+                                    (Array.isArray(oResponse.commentData) ? oResponse.commentData : [])));
 
                         // Availability is room-level. Use only the values from
                         // each item in the response rooms array.
@@ -1816,7 +1890,7 @@ onsendreminder: async function () {
                     }
                 }.bind(this)));
 
-                this.getView().getModel("RoomAvailabilityModel").setData(aRows.flat());
+                this.getView().getModel(bSummary ? "RoomAvailabilitySummaryModel" : "RoomAvailabilityModel").setData(aRows.flat());
             } finally {
                 this.closeBusyDialog();
             }
