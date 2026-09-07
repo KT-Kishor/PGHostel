@@ -440,9 +440,15 @@ _LCvalidatePassword: function (oEventOrInput, oStrengthText) {
             };
 
             // 2️⃣ Update strength label ONLY if provided
+            var sLabel = map[strength].txt;
+            if (strength === "poor") {
+                sLabel = this._getPasswordFailureReason(pwd) || "Password does not meet requirements";
+            }
             if (oStrengthText && oStrengthText.setText) {
-                oStrengthText.setText(map[strength].txt);
-                oStrengthText.removeStyleClass("pwdMinFail pwdWeak pwdMedium pwdStrong");
+                oStrengthText.setText(sLabel);
+                ["pwdMinFail", "pwdWeak", "pwdMedium", "pwdStrong"].forEach(function (sCls) {
+                    oStrengthText.removeStyleClass(sCls);
+                });
                 oStrengthText.addStyleClass(map[strength].cls);
             }
 
@@ -456,6 +462,34 @@ _LCvalidatePassword: function (oEventOrInput, oStrengthText) {
             // 4️⃣ Only "poor" is rejected
             return strength !== "poor";
         },
+
+_getPasswordFailureReason: function (pwd) {
+    if (!pwd) return "Password is required";
+    if (/\s/.test(pwd)) return "Spaces are not allowed";
+    if (pwd.length < 6) return "Minimum 6 characters required";
+    if (!/[A-Z]/.test(pwd)) return "Must contain an uppercase letter";
+    if (!/[a-z]/.test(pwd)) return "Must contain a lowercase letter";
+    if (!/\d/.test(pwd)) return "Must contain a number";
+    if (!/[!@#$%^&*()_\-+=]/.test(pwd)) return "Must contain a special character";
+    return null;
+},
+
+_LCresetPasswordStrength: function (vLabels) {
+    // Accepts: nothing (defaults to SignInSignup core IDs), a single control,
+    // an array of controls, or an array of ID strings
+    var aTargets = vLabels || ["passwordStrengthText", "fpPasswordStrengthText"];
+    if (!Array.isArray(aTargets)) aTargets = [aTargets];
+    aTargets.forEach(function (o) {
+        var oLabel = (typeof o === "string") ? sap.ui.getCore().byId(o) : o;
+        if (oLabel && oLabel.setText) {
+            oLabel.setText("");
+            ["pwdMinFail", "pwdWeak", "pwdMedium", "pwdStrong"].forEach(function (sCls) {
+                oLabel.removeStyleClass(sCls);
+            });
+            oLabel.addStyleClass("pwdMinFail");
+        }
+    });
+},
 
 _getPasswordStrength: function(pwd) {
 

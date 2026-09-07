@@ -5544,6 +5544,7 @@ sap.ui.define([
                     c.setValueState("None");
                 }
             });
+            utils._LCresetPasswordStrength();
             this._storedLoginCreds = null;
             this._oResetUser = null;
         },
@@ -5573,6 +5574,7 @@ sap.ui.define([
         },
         onForgotPassword: function () {
             const vm = this.getView().getModel("LoginViewModel");
+            utils._LCresetPasswordStrength();
 
             vm.setProperty("/authFlow", "forgot");
             vm.setProperty("/forgotStep", 1); // safe, runtime only

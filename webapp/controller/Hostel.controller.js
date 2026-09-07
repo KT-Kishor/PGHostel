@@ -1191,6 +1191,9 @@ sap.ui.define([
             // RESET OTP + TIMER
             this._resetOtpState();
 
+            // RESET PASSWORD STRENGTH LABELS
+            utils._LCresetPasswordStrength();
+
             // RESET SIGN-IN FIELDS
             ["signInEmail", "signinPassword", "signInOTP"]
                 .forEach(id => {
@@ -1276,6 +1279,9 @@ sap.ui.define([
             this._FragmentDatePickersReadOnly(["signUpDOB"]);
             this.oViewModel.setProperty("/authFlow", "signup");
             this.oViewModel.setProperty("/dialogTitle", "Sign Up"); // Added back
+
+            // RESET PASSWORD STRENGTH LABELS
+            utils._LCresetPasswordStrength();
 
             oSignInPanel?.setVisible(false);
             oSignUpPanel?.setVisible(true);
@@ -2912,6 +2918,7 @@ sap.ui.define([
 
         onForgotPassword: function () {
             this._resetOtpState();
+            utils._LCresetPasswordStrength();
             this.oViewModel.setProperty("/authFlow", "forgot");
             this.oViewModel.setProperty("/forgotStep", 1); // safe, runtime only
             this.oViewModel.setProperty("/dialogTitle", "Set / Reset Password"); //
@@ -2959,6 +2966,7 @@ sap.ui.define([
                     c.setValueState("None");
                 }
             });
+            utils._LCresetPasswordStrength();
             this._storedLoginCreds = null;
             this._oResetUser = null;
             this._resetOtpState();
