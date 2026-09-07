@@ -17,6 +17,7 @@ sap.ui.define([
 
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog()
+                this.MonthDate="";
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
                 var sArg = oEvent.getParameter("arguments").sPath;
@@ -377,6 +378,10 @@ sap.ui.define([
                         new JSONModel(oBookingData.commentData[0]),
                         "BookinglocalModel"
                     );
+                    if (this.sourceView === "Customerinvoice") {
+    var oTable = this.byId("CID_id_TableInvoiceItem");
+    oTable.setMode("None");
+}
 
 
 
@@ -644,7 +649,7 @@ sap.ui.define([
                         payByDate = endDate;
                     } else {
                         invoiceDate = startDate;
-                        payByDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 3);
+                        payByDate = endDate;
                     }
                     this.MonthDate = startDate;
 
@@ -2068,6 +2073,14 @@ sap.ui.define([
                         .getModel("ManageInvoiceItemModel")
                         .getProperty("/ManageInvoiceItem") || [];
 
+                        const oGstNoInput    = this.byId("CI_id_InputCustomerGSTNO");
+        const oGstNameInput  = this.byId("CI_id_InputCustomerGSTName");
+        const oGstAddrInput  = this.byId("CI_id_InputCustomerGSTAddress");
+
+        if (oGstNoInput)   oGstNoInput.setValueState("None");
+        if (oGstNameInput) oGstNameInput.setValueState("None");
+        if (oGstAddrInput) oGstAddrInput.setValueState("None");
+
                     const bCustomerValid = utils._LCvalidateMandatoryField(this.byId("CID_id_Custmer"), "ID");
 
                     const bInvoiceDateValid = utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID");
@@ -2520,13 +2533,7 @@ sap.ui.define([
 
                 const validItems = items.filter(item => item.Used !== "X" && item.Used !== "Y");
 
-                // Sum of post-invoice payments
-                // const totalReceivedAmount = validItems.reduce(
-                //     (sum, item) => sum + (item.ReceivedAmount) || 0,
-                //     0
-                // );
-
-
+               
                 var oResult = await this.ajaxReadWithJQuery("HM_Payment", {
                     InvNo: this.decodedPath
                 });
