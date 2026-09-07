@@ -187,18 +187,21 @@
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
+                        hAlign="Center"
                     >
                         <Text text="{i18n>totalCapacity}" />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
+                        hAlign="Center"
                     >
                         <Text text="{i18n>Inuse}" />
                     </Column>
                     <Column
                         minScreenWidth="Tablet"
                         demandPopin="true"
+                        hAlign="Center"
                     >
                         <Text text="{i18n>availableBeds}" />
                     </Column>
@@ -261,19 +264,19 @@
                             <Column demandPopin="true">
                                 <Text text="{i18n>bedType}" />
                             </Column>
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>totalCapacity}" />
                             </Column>
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>newBookings}" />
                             </Column>
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>confirmedBookings}" />
                             </Column>
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>assignedBookings}" />
                             </Column>
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>availableBeds}" />
                             </Column>
                             <Column minScreenWidth="Tablet" demandPopin="true">

@@ -1710,8 +1710,7 @@ sap.ui.define([
                     // "The stay duration have been modified, so the room status will be reverted from \"" +
                     // sOriginalStatus + "\" to \"New\". Our team will recheck room availability. Once the booking is confirmed, " +
                     // "you will be notified by email.",
-                    "Please wait while we verify room availability for your revised dates. Once submitted, " +
-                    "we will check availability and email you the updated status shortly.",
+                    "Once you submit your booking, we’ll check availability and email you the updated booking status shortly.",
                     {
                         title: "Confirm Booking Changes",
                         actions: [sConfirmAction, sCancelAction],
