@@ -1477,6 +1477,11 @@ sap.ui.define([
 
     // Reset Year DatePicker
     this.byId("idYearDatePicker").setValue("");
+    var oYearDatePicker = this.byId("idYearDatePicker");
+
+   var currentYear = new Date().getFullYear();
+
+   oYearDatePicker.setDateValue(new Date(currentYear, 0, 1));
 },
 onsendreminder: async function () {
     try {

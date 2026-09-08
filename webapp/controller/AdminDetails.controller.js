@@ -4243,8 +4243,10 @@ sap.ui.define([
 
                 const unit = (x.item.UnitText || "").toLowerCase();
 
-                if (unit === "per month" || unit === "per year") {
+                  if (unit === "per month" || unit === "per year" || x.item.FacilityChargeType === "Entire Booking") {
                     message += " - This will cover fully booking period";
+                }else{
+                    message += " - This will not cover fully booking period";
                 }
 
                 return message;
