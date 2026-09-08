@@ -5005,6 +5005,160 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   gap: 0.75rem;
 }
 
+
+/* Keep the real profile layout in place while masking only its values during
+   the first request. This prevents a separate skeleton screen from flashing. */
+.profileLoadingFields {
+  position: relative;
+}
+
+/* The forms VBox grows to fill the row next to the avatar so the profile
+   section spans the full available width instead of hugging the center. */
+.profileFormBox {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Fluid full width: the 3x3 matrix stability comes from the forced
+   columnsM/L/XL=3 on the SimpleForm, not from a fixed width. */
+.profileDisplayForm {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.profileLoadingFields .sapMText {
+  position: relative;
+  border-radius: 5px;
+}
+
+/* Uniform single-line height while shimmering so every skeleton block and
+   the loaded matrix share the same geometry. Released during the fade so
+   final row heights settle underneath the still-opaque veil. */
+.profileLoadingFields:not(.profileFadingOut) .sapMText {
+  height: 1.1rem;
+  overflow: hidden;
+}
+
+/* Shimmer is painted on an overlay so its opacity (not the un-transitionable
+   background-image) can be animated when the real values fade in. */
+.profileLoadingFields .sapMText::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background-color: #e6ebf0;
+  background-image: linear-gradient(90deg, #e6ebf0 0, #f4f8fc 60px, #e6ebf0 120px);
+  background-size: 240px 100%;
+  background-repeat: no-repeat;
+  animation: profileSkeletonShimmer 1.4s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Fade-out phase: the veil melts away and reveals the bound values. */
+.profileLoadingFields.profileFadingOut .sapMText::after {
+  opacity: 0;
+}
+
+.profileLoadingFields .sapMInputBase,
+.profileLoadingFields .sapMTextArea {
+  border-radius: 6px;
+  background-color: #e6ebf0;
+  background-image: linear-gradient(90deg, #e6ebf0 0, #f4f8fc 60px, #e6ebf0 120px);
+  background-size: 240px 100%;
+  background-repeat: no-repeat;
+  animation: profileSkeletonShimmer 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.profileLoadingFields .sapMInputBaseInner,
+.profileLoadingFields .sapMTextAreaInner,
+.profileLoadingFields .sapMComboBoxBase .sapMInputBaseInner {
+  color: transparent !important;
+  background: transparent !important;
+}
+
+.profileLoadingFields .sapMInputBaseIcon,
+.profileLoadingFields .sapMInputBaseContentWrapper {
+  background-color: transparent !important;
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.profileAvatarShimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 170px;
+  height: 170px;
+  border-radius: 15px;
+  background-color: #e6ebf0;
+  background-image: linear-gradient(90deg, #e6ebf0 0, #f4f8fc 60px, #e6ebf0 120px);
+  background-size: 240px 100%;
+  animation: profileSkeletonShimmer 1.4s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.profileAvatarShimmer.profileFadingOut {
+  opacity: 0;
+}
+
+.profileBookingTable {
+  position: relative;
+}
+
+/* The table and its no-data message stay mounted. The overlay starts below
+   the column header so the loading state covers only the row area. */
+.profileBookingTable.profileTableLoading::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  /* Keep the real table header visible; cover the empty/data area only. */
+  top: 3rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  background-color: #e6ebf0;
+  background-image: linear-gradient(90deg, #e6ebf0 0, #f4f8fc 60px, #e6ebf0 120px);
+  background-size: 240px 100%;
+  animation: profileSkeletonShimmer 1.4s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.profileBookingTable.profileTableFading::after {
+  opacity: 0;
+}
+
+@keyframes profileSkeletonShimmer {
+  0% {
+    background-position: -240px 0;
+  }
+
+  100% {
+    background-position: calc(100% + 240px) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profileLoadingFields .sapMText::after,
+  .profileLoadingFields .sapMInputBase,
+  .profileLoadingFields .sapMTextArea,
+  .profileAvatarShimmer,
+  .profileBookingTable.profileTableLoading::after {
+    animation: none;
+    transition: none;
+  }
+}
 .preview-image-container {
   width: 100%;
   height: 100%;

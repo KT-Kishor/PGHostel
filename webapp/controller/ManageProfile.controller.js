@@ -51,6 +51,25 @@ sap.ui.define([
                 mode: "CREATE"
             }), "viewModel");
 
+            // Initial profile state so visibility bindings (isEditMode / selectedTab)
+            // resolve from the very first render and no edit form or extra tables flash
+            this.getView().setModel(new JSONModel({
+                isEditMode: false,
+                isLoading: true,
+                selectedTab: "Booking History",
+                bookings: [],
+                Members: [],
+                Payments: [],
+                complain: [],
+                damage: [],
+                bookingCount: 0,
+                memberCount: 0,
+                paymentCount: 0,
+                complainCount: 0,
+                damageCount: 0,
+                hasAssignedBooking: false
+            }), "profileData");
+
             // Cache of member documents fetched on demand from
             // HM_Documentonly, keyed by MemberID.
             this._mMemberDocumentCache = {};
@@ -74,15 +93,18 @@ sap.ui.define([
             var oProfileModel = this.getView().getModel("profileData");
             if (oProfileModel) {
                 oProfileModel.setProperty("/isEditMode", false);
+                // Show the shimmer skeleton right away while the profile loads.
+                oProfileModel.setProperty("/isLoading", true);
+                this._setProfileLoading(true);
             }
             this._originalProfileData = null;
             this.clearProfileValueStates();
             this.clearGlobalSearch();
             this._ViewDatePickersReadOnly(["id_dob1"], this.getView());
 
-            this.getBusyDialog()
+            this.getBusyDialog();
             await this.commonLoginFunction("ManageProfile");
-            this.ManageData();
+            await this.ManageData();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({});
             this.getView().setModel(model, "Member")
@@ -166,13 +188,12 @@ sap.ui.define([
                     Payments: [],
                     Members: [],
                     isEditMode: false,
+                    isLoading: true,
                     selectedTab: "Booking History"
                 });
 
                 this.getView().setModel(oTempModel, "profileData");
                 this.byId("id_tabBar1").setSelectedKey("Booking History");
-
-                this.getBusyDialog()
 
                 const filter = {
                     UserID: sUserID
@@ -194,6 +215,7 @@ sap.ui.define([
                 const oProfileModel = new JSONModel({
                     ...fullUserData,
                     isEditMode: false,
+                    isLoading: false,
                     photo: oUser.FileContent ? "data:image/png;base64," + oUser.FileContent : "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
                     name: oUser.UserName || "",
@@ -237,6 +259,7 @@ sap.ui.define([
             } catch (err) {
                 const oProfileModel = new sap.ui.model.json.JSONModel({
                     ...fullUserData,
+                    isLoading: false,
                     photo: oUser.FileContent ? "data:image/png;base64," + oUser.FileContent : "",
                     initials: oUser.UserName ? oUser.UserName.charAt(0).toUpperCase() : "",
                     name: oUser.UserName || "",
@@ -253,8 +276,78 @@ sap.ui.define([
                 this._applyCountryStateCityFilters();
                 oProfileModel.setProperty("/isEditMode", false);
             } finally {
+                // Always drop the shimmer once loading settles (success or error).
+                const oCurrentProfileModel = this.getView().getModel("profileData");
+                if (oCurrentProfileModel) {
+                    oCurrentProfileModel.setProperty("/isLoading", false);
+                }
+                this._setProfileLoading(false);
                 this.closeBusyDialog();
             }
+        },
+
+        _setProfileLoading: function (bLoading) {
+            const aForms = [
+                this.byId("id_profileDisplayForm"),
+                this.byId("id_profileEditForm")
+            ];
+            const oBookingTable = this.byId("Id_ProfileaTable1");
+            const oAvatarShimmer = this.byId("id_avatarShimmer");
+
+            // A pending fade cleanup must never fire over a new loading phase.
+            if (this._iProfileFadeTimer) {
+                clearTimeout(this._iProfileFadeTimer);
+                this._iProfileFadeTimer = null;
+            }
+
+            if (bLoading) {
+                aForms.forEach(function (oForm) {
+                    if (oForm) {
+                        oForm.toggleStyleClass("profileLoadingFields", true);
+                        oForm.toggleStyleClass("profileFadingOut", false);
+                    }
+                });
+                if (oBookingTable) {
+                    oBookingTable.toggleStyleClass("profileTableLoading", true);
+                    oBookingTable.toggleStyleClass("profileTableFading", false);
+                }
+                if (oAvatarShimmer) {
+                    oAvatarShimmer.setVisible(true);
+                    oAvatarShimmer.toggleStyleClass("profileFadingOut", false);
+                }
+                return;
+            }
+
+            // Fade phase: the shimmer veils melt away over ~500ms and reveal
+            // the freshly bound values underneath, instead of snapping.
+            aForms.forEach(function (oForm) {
+                if (oForm) {
+                    oForm.toggleStyleClass("profileFadingOut", true);
+                }
+            });
+            if (oBookingTable) {
+                oBookingTable.toggleStyleClass("profileTableFading", true);
+            }
+            if (oAvatarShimmer) {
+                oAvatarShimmer.toggleStyleClass("profileFadingOut", true);
+            }
+
+            this._iProfileFadeTimer = setTimeout(function () {
+                this._iProfileFadeTimer = null;
+                aForms.forEach(function (oForm) {
+                    if (oForm) {
+                        oForm.removeStyleClass("profileLoadingFields");
+                        oForm.removeStyleClass("profileFadingOut");
+                    }
+                });
+                if (oBookingTable) {
+                    oBookingTable.removeStyleClass("profileTableLoading");
+                    oBookingTable.removeStyleClass("profileTableFading");
+                }
+                if (oAvatarShimmer) {
+                    oAvatarShimmer.setVisible(false);
+                }
+            }.bind(this), 520);
         },
 
         _formatDisplayDate: function (sDate) {

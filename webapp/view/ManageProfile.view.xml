@@ -35,6 +35,7 @@
                     <Button
                         text="{= ${profileData>/isEditMode} ? 'Save' : 'Edit'}"
                         class="myUnifiedBtn"
+                        enabled="{= !${profileData>/isLoading} }"
                         tooltip="{i18n>MSedit}"
                         press="onEditSaveProfile"
                     />
@@ -65,6 +66,10 @@
                     press="onPreviewProfilePhoto"
                     class="customLargeAvatar "
                 />
+                <VBox
+                    id="id_avatarShimmer"
+                    class="profileAvatarShimmer"
+                />
                 <Button
                     icon="sap-icon://camera"
                     press="onPressAvatarEdit"
@@ -81,13 +86,15 @@
             </VBox>
 
             <!-- Profile Forms -->
-            <VBox>
+            <VBox class="profileFormBox">
                 <!-- DISPLAY MODE -->
                 <f:SimpleForm
+                    id="id_profileDisplayForm"
                     layout="ColumnLayout"
                     columnsM="3"
-                    columnsL="4"
-                    class="sapUiTinyMarginTop"
+                    columnsL="3"
+                    columnsXL="3"
+                    class="profileDisplayForm sapUiTinyMarginTop"
                     visible="{= !${profileData>/isEditMode}}"
                 >
                     <f:content>
@@ -129,6 +136,7 @@
 
                 <!-- EDIT MODE -->
                 <f:SimpleForm
+                    id="id_profileEditForm"
                     layout="ColumnLayout"
                     columnsM="3"
                     columnsL="4"
@@ -427,7 +435,7 @@
                 ]
             }"
             width="auto"
-            class="sapUiSmallMargin customRoundedTable"
+            class="sapUiSmallMargin customRoundedTable profileBookingTable"  
         >
             <columns>
                 <Column demandPopin="true">
