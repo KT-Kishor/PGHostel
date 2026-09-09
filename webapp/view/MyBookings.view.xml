@@ -409,8 +409,17 @@
                 <Column demandPopin="true">
                     <Text text="Qty" />
                 </Column>
-                <Column demandPopin="true" minScreenWidth="Tablet">
-                    <Text text="Cost" />
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Actual Cost" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="Recover Cost" />
                 </Column>
             </columns>
             <items>
@@ -423,7 +432,8 @@
                         <Text text="{myBookings>Type}" />
                         <ExpandableText text="{myBookings>Description}" maxCharacters="20" />
                         <Text text="{myBookings>Quantity}" />
-                        <Text text="{myBookings>Cost}" />
+                        <Text text="{parts: ['myBookings>Cost','myBookings>Currency'], formatter: '.Formatter.formatCurrency'}"/>
+                        <Text text="{parts: ['myBookings>RecoverCost','myBookings>Currency'], formatter: '.Formatter.formatCurrency'}"/>
                     </cells>
                 </ColumnListItem>
             </items>
