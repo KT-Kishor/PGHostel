@@ -822,8 +822,8 @@
                         <Text text="{profileData>Type}" />
                         <Text text="{profileData>Description}" />
                         <Text text="{profileData>Quantity}" />
-                         <Text text="{parts: ['profileData>Cost'], formatter: '.Formatter.formatCurrency'}"/>
-                        <Text text="{parts: ['profileData>RecoverCost'], formatter: '.Formatter.formatCurrency'}"/>
+                         <Text text="{parts: ['profileData>Cost','profileData>Currency'], formatter: '.Formatter.formatCurrency'}"/>
+                        <Text text="{parts: ['profileData>RecoverCost','profileData>Currency'], formatter: '.Formatter.formatCurrency'}"/>
                        
                     </cells>
                 </ColumnListItem>
