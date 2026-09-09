@@ -3153,6 +3153,7 @@ sap.ui.define([
                                 new sap.ui.model.Filter("Description", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Quantity", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Cost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("RecoverCost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.Contains, sQuery.toString())
                             ],
                             and: false

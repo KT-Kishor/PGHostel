@@ -379,9 +379,9 @@ sap.ui.define([
                         "BookinglocalModel"
                     );
                     if (this.sourceView === "Customerinvoice") {
-    var oTable = this.byId("CID_id_TableInvoiceItem");
-    oTable.setMode("None");
-}
+                    var oTable = this.byId("CID_id_TableInvoiceItem");
+                    oTable.setMode("None");
+                      }
 
 
 
