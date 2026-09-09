@@ -575,7 +575,8 @@ sap.ui.define([
                 { label: "Booking ID", property: "BookingID", type: "string" },
                 { label: "Customer Name", property: "CustomerName", type: "string" },
                 { label: "Room No", property: "RoomNo", type: "string" },
-                { label: "Cost", property: "TotalCost", type: "string" },
+                { label: "Actual Cost", property: "TotalCost", type: "string" },
+                { label: "Recover Cost", property: "RecoverCost", type: "string" },
                 { label: "Date", property: "InvoiceDate", type: "String" },
                 { label: "Status", property: "Status", type: "string" },
                 { label: "Recover Date", property: "ReturnDamageDate", type: "string" }
