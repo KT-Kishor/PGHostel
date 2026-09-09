@@ -710,6 +710,7 @@
                 new Filter("Description", FilterOperator.Contains, sQuery),
                 new Filter({ path: "Quantity", test: fnValueContains }),
                 new Filter({ path: "Cost", test: fnValueContains }),
+                new Filter({ path: "RecoverCost", test: fnValueContains }),
                 new Filter("Status", FilterOperator.Contains, sQuery)
             ];
         },
