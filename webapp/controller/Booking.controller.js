@@ -156,6 +156,7 @@
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
             this._sLastPrimaryMemberId = "SELF";
+            this._oRoomAvailabilityCheck = null;
             this._resetBookingPageModels();
             oHostelModel.setData(oIncomingBookingData);
 
@@ -5639,6 +5640,9 @@
 
             this._rebuildSelectedFacilities();
             this._refreshCouponAndSummary({ checkDateWindow: true });
+
+            // Availability is verified once the complete date window is known.
+            this._checkRoomAvailabilityForBooking();
         },
 
         // Date.setMonth() overflows into the following month when the target month
@@ -5685,6 +5689,120 @@
             }
 
             oModel.setProperty("/EndDate", this._formatDateToDDMMYYYY(oEndDate));
+
+            // End date (re)computed for Month/Year plans - verify availability.
+            this._checkRoomAvailabilityForBooking();
+        },
+
+        // ---- Room availability check for the selected booking dates ----
+        // Mirrors the View Rooms date filter: calls HM_BookingSummary for the
+        // selected room type + date window and blocks the booking when the
+        // available count is zero.
+        _getBookingAvailabilityCheckKey: function () {
+            const oModel = this.getView().getModel("HostelModel");
+
+            return [
+                oModel.getProperty("/BranchCode") || "",
+                oModel.getProperty("/ACType") || "",
+                oModel.getProperty("/BedType") || "",
+                oModel.getProperty("/PropertyType") || "",
+                this._formatDateToISO(oModel.getProperty("/StartDate")),
+                this._formatDateToISO(oModel.getProperty("/EndDate"))
+            ].join("|");
+        },
+
+        _checkRoomAvailabilityForBooking: async function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const sStartDate = this._formatDateToISO(oModel.getProperty("/StartDate"));
+            const sEndDate = this._formatDateToISO(oModel.getProperty("/EndDate"));
+
+            // The complete window must be known before availability can be verified.
+            if (!sStartDate || !sEndDate || sEndDate < sStartDate) {
+                return;
+            }
+
+            const sCheckKey = this._getBookingAvailabilityCheckKey();
+
+            // Already verified for this exact room + window (e.g. a duration
+            // change that recomputes the same end date) - reuse the verdict.
+            if (this._oRoomAvailabilityCheck && this._oRoomAvailabilityCheck.key === sCheckKey) {
+                if (this._oRoomAvailabilityCheck.available === false) {
+                    this._showRoomUnavailableMessage();
+                }
+                return;
+            }
+
+            this.getBusyDialog();
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_BookingSummary", {
+                    BranchCode: oModel.getProperty("/BranchCode") || "",
+                    ACType: oModel.getProperty("/ACType") || "",
+                    Name: oModel.getProperty("/BedType") || "",
+                    PropertyType: oModel.getProperty("/PropertyType") || "",
+                    StartDate: sStartDate,
+                    EndDate: sEndDate
+                });
+
+                if (!oResponse || oResponse.success === false) {
+                    // Verification failed - do not block the booking flow.
+                    this._oRoomAvailabilityCheck = null;
+                    return;
+                }
+
+                let iAvailableCount = parseInt(oResponse.availableCount, 10);
+                if (isNaN(iAvailableCount)) {
+                    iAvailableCount = (parseInt(oResponse.totalCapacity, 10) || 0) -
+                        (parseInt(oResponse.bookedCount, 10) || 0);
+                }
+
+                const bAvailable = oResponse.available !== false && iAvailableCount > 0;
+
+                this._oRoomAvailabilityCheck = { key: sCheckKey, available: bAvailable };
+
+                if (!bAvailable) {
+                    this._showRoomUnavailableMessage();
+                }
+            } catch (err) {
+                // Verification failed - do not block the booking flow.
+                this._oRoomAvailabilityCheck = null;
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        _showRoomUnavailableMessage: function () {
+            const oModel = this.getView().getModel("HostelModel");
+
+            MessageBox.warning(
+                // "You cannot continue the booking, because the " + this._formatBedTypeText() +
+                // " room is already booked for the selected dates (" +
+                // oModel.getProperty("/StartDate") + " to " + oModel.getProperty("/EndDate") +
+                // "). Please try choosing different dates or a different room.",
+
+
+
+                // You cannot continue the booking, because the Triple - AC room is already booked for the selected dates(10 /09 / 2026 to 16 /09 / 2026).Please try choosing different dates or a different room.
+
+
+
+                "We’re sorry, but the " + this._formatBedTypeText()  + 
+                " room is already booked for (" +
+               oModel.getProperty("/StartDate") + " - " + oModel.getProperty("/EndDate") +
+                ")  Please try selecting different dates or room.",
+                {
+                    title: "Room fully Booked",
+                    icon: MessageBox.Icon.WARNING,
+                    actions: ["Stay", "Go Back"],
+                    styleClass: "myUnifiedBtn",
+                    contentWidth: "450px",
+                    onClose: function (sAction) {
+                        if (sAction === "Go Back") {
+                            this._performNavBackFromBooking();
+                        }
+                        // "Stay" (or dialog closed) - stay on the page as is
+                    }.bind(this)
+                }
+            );
         },
 
         onPropertyTypeChange: function (oEvent) {
@@ -6775,6 +6893,15 @@
                 return false;
             }
 
+            // Room already verified as fully booked for the selected dates -
+            // block the booking before payment.
+            if (this._oRoomAvailabilityCheck &&
+                this._oRoomAvailabilityCheck.available === false &&
+                this._oRoomAvailabilityCheck.key === this._getBookingAvailabilityCheckKey()) {
+                this._showRoomUnavailableMessage();
+                return false;
+            }
+
             if ((oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return !!oMember.Selected;
             }).length < 1) {
@@ -7684,14 +7811,6 @@
         },
 
         onNavBack: function () {
-            const oHostelModel = this.getView().getModel("HostelModel");
-            const sBranchCode = oHostelModel.getProperty("/BranchCode");
-            // ReturnRoute is authoritatively written on the core model
-            // (see TilePage.onAdminBookingBookNow), so read it from there.
-            const oCoreHostelModel = sap.ui.getCore().getModel("HostelModel");
-            const sReturnRoute = oCoreHostelModel ? oCoreHostelModel.getProperty("/ReturnRoute") : "";
-            const oRouter = this.getOwnerComponent().getRouter();
-
             MessageBox.warning(
                 "Do you really want to go back? All saved changes will be lost",
                 {
@@ -7703,27 +7822,42 @@
                             return;
                         }
 
-                        this._resetBookingPageModels();
-
-                        // Admin "Book for Yourself" flow → return to the requested route
-                        if (sReturnRoute) {
-                            oCoreHostelModel.setProperty("/ReturnRoute", "");
-                            oRouter.navTo(sReturnRoute);
-                            return;
-                        }
-
-                        if (sBranchCode) {
-                            oRouter.navTo("RouteViewRooms", {
-                                sPath: sBranchCode
-                            });
-                            return;
-                        }
-
-                        sessionStorage.setItem("homePageReturnTab", "idRooms");
-                        oRouter.navTo("RouteHostel");
+                        this._performNavBackFromBooking();
                     }.bind(this)
                 }
             );
+        },
+
+        // Shared "leave the booking page" navigation used by the header back
+        // button and the room-unavailable block message. All model reads must
+        // happen before _resetBookingPageModels() clears HostelModel.
+        _performNavBackFromBooking: function () {
+            const oHostelModel = this.getView().getModel("HostelModel");
+            const sBranchCode = oHostelModel ? oHostelModel.getProperty("/BranchCode") : "";
+            // ReturnRoute is authoritatively written on the core model
+            // (see TilePage.onAdminBookingBookNow), so read it from there.
+            const oCoreHostelModel = sap.ui.getCore().getModel("HostelModel");
+            const sReturnRoute = oCoreHostelModel ? oCoreHostelModel.getProperty("/ReturnRoute") : "";
+            const oRouter = this.getOwnerComponent().getRouter();
+
+            this._resetBookingPageModels();
+
+            // Admin "Book for Yourself" flow → return to the requested route
+            if (sReturnRoute) {
+                oCoreHostelModel.setProperty("/ReturnRoute", "");
+                oRouter.navTo(sReturnRoute);
+                return;
+            }
+
+            if (sBranchCode) {
+                oRouter.navTo("RouteViewRooms", {
+                    sPath: sBranchCode
+                });
+                return;
+            }
+
+            sessionStorage.setItem("homePageReturnTab", "idRooms");
+            oRouter.navTo("RouteHostel");
         },
 
         onContinueBooking: async function () {

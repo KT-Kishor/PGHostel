@@ -6826,6 +6826,73 @@ html, body {
     min-height: 100%;
 }
 
+/* Keep the date filter flush with the room sections without changing UI5 defaults. */
+.vrDateFilterSection,
+.vrDateFilterSection .sapUxAPObjectPageSubSection,
+.vrDateFilterSection .sapUxAPBlockContainer,
+.vrDateFilterSection.sapUxAPObjectPageSectionFirstVisible,
+.vrRoomDateFilterBar,
+.vrDateFilterSection .vrRoomDateFilterBar.sapUiCompFilterBar {
+    margin: 0 !important;
+    padding-top: 0.3rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.9rem !important;
+}
+
+.vrDateFilterSection .sapUxAPObjectPageSectionHeader {
+    height: 0 !important;
+    line-height: 0 !important;
+    margin: 0 !important;
+    padding: 0rem !important;
+}
+
+.roomsBgLayout .vrRoomContentSection {
+    padding-top: 0.01rem !important;
+}
+
+/* Mobile only: narrow the date filter bar so its inset matches the room cards
+   (sapUiTinyMargin = 0.5rem). The global <=768px .sapUiCompFilterBar padding and the
+   padded section wrappers stack up otherwise. Desktop stays untouched. */
+@media (max-width: 768px) {
+    .vrDateFilterSection,
+    .vrDateFilterSection .sapUxAPObjectPageSubSection,
+    .vrDateFilterSection .sapUxAPBlockContainer {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    /* Single 0.5rem inset carried by the FilterBar itself (overrides the global
+       mobile .sapUiCompFilterBar padding, including its 1rem bottom). */
+    .vrDateFilterSection .vrRoomDateFilterBar.sapUiCompFilterBar {
+        padding: 0.25rem 0.5rem 0.5rem 0.5rem !important;
+    }
+
+    /* Inner FilterBar containers must not re-add horizontal padding. */
+    .vrDateFilterSection .vrRoomDateFilterBar .sapUiCompFilterBarItems,
+    .vrDateFilterSection .vrRoomDateFilterBar .sapUiCompFilterBarButtons,
+    .vrDateFilterSection .vrRoomDateFilterBar > div {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Both date pickers fill the row equally on mobile. The XML width="12rem"
+       leaves checkout narrower when the FilterBar grid squeezes it. */
+    .vrDateFilterSection .vrRoomDateFilterBar .sapMDatePicker,
+    .vrDateFilterSection .vrRoomDateFilterBar .sapMDatePicker .sapMInputBaseInner {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Each filter item cell takes a full row so both pickers get equal space. */
+    .vrDateFilterSection .vrRoomDateFilterBar .sapUiCompFilterBarItems > div {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
 .sapUiAvatarImageContain .sapMAvatarImg,
 .sapUiAvatarImageContain span[style*="background-image"],
 .sapUiAvatarImageContain div[style*="background-image"],
@@ -7613,4 +7680,12 @@ text-transform: none !important;
         width: calc(100% - 20px) !important;
         min-height: 430px;
     }
+}
+
+.pillActionBtn.sapMLnkDsbl {
+  background: #b5b5b5 !important;
+  color: #666666 !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }

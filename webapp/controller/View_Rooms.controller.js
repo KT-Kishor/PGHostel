@@ -20,6 +20,22 @@ sap.ui.define([
         },
 
         onAfterRendering: function () {
+            const oFilterModel = this.getView().getModel("RoomFilterModel");
+            const oToday = new Date();
+            oToday.setHours(0, 0, 0, 0);
+            if (oFilterModel) {
+                oFilterModel.setProperty("/TodayDate", oToday);
+                oFilterModel.setProperty("/EndDateMinDate", oToday);
+            }
+
+            if (!this._roomFilterDatePickersReadOnly) {
+                this._ViewDatePickersReadOnly(
+                    ["VR_id_StartDate", "VR_id_EndDate"],
+                    this.getView()
+                );
+                this._roomFilterDatePickersReadOnly = true;
+            }
+
             var oRatingHBox = this.byId("VR_id_RatingClickable");
             if (oRatingHBox && !this._ratingClickAttached) {
                 this._ratingClickAttached = true;
@@ -65,6 +81,15 @@ sap.ui.define([
 
             });
             this.getView().setModel(model, "VisibilityModel")
+
+            const oToday = new Date();
+            oToday.setHours(0, 0, 0, 0);
+            this.getView().setModel(new JSONModel({
+                StartDate: "",
+                EndDate: "",
+                TodayDate: oToday,
+                EndDateMinDate: oToday
+            }), "RoomFilterModel");
 
             //           if (!this._oBookingDateDialog) {
             //     this._oBookingDateDialog = await sap.ui.core.Fragment.load({
@@ -306,7 +331,10 @@ sap.ui.define([
                     const AverageRating = firstRoom?.AverageRating ? " " + firstRoom.AverageRating : "0";
                     const TotalFeedbacks = firstRoom?.TotalFeedbacks ? " " + firstRoom.TotalFeedbacks : "0";
 
-                    const isVisible = room?.Status === "Available";
+                    // A missing status is treated as available because this endpoint
+                    // can omit status for a room type with no booking yet.
+                    const sRoomStatus = String(room?.Status || "").trim().toLowerCase();
+                    const isVisible = !sRoomStatus || sRoomStatus === "available";
 
                     const PriceVisible = price !== "" || MonthPrice !== "" || YearPrice !== ""
 
@@ -375,7 +403,8 @@ sap.ui.define([
                         Images: aImages,
                         Country: sCountry,
                         PriceVisible: PriceVisible,
-                        Visible: true,
+                        Visible: isVisible,
+                        BaseVisible: isVisible,
                         AvailbleBeds: 2,
                         Address: sAddress,
                         CheckInTime: sCheckInTime,
@@ -425,6 +454,171 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/isDataLoaded", false);
             }
         },
+        onRoomFilterDateChange: function (oEvent) {
+            const oChanged = oEvent.getSource();
+
+            // DatePicker flags unparseable input as "Error" on its own
+            if (oChanged.getValueState() === "Error") return;
+
+            const oStart = this.byId("VR_id_StartDate");
+            const oEnd = this.byId("VR_id_EndDate");
+            const sStart = oStart ? oStart.getValue() : "";
+            const sEnd = oEnd ? oEnd.getValue() : "";
+
+            const oFilterModel = this.getView().getModel("RoomFilterModel");
+            if (oFilterModel && oChanged === oStart) {
+                const oStartDate = oStart.getDateValue();
+                oFilterModel.setProperty("/EndDateMinDate", oStartDate || oFilterModel.getProperty("/TodayDate"));
+                if (oEnd && oEnd.getDateValue() && oStartDate && oEnd.getDateValue() < oStartDate) {
+                    oEnd.setValue("");
+                    oFilterModel.setProperty("/EndDate", "");
+                    return;
+                }
+            }
+
+            // Reset a previous cross-field error (only when End holds a real date)
+            if (oEnd && oEnd.getValueState() === "Error" && oEnd.getDateValue()) {
+                oEnd.setValueState("None");
+                oEnd.setValueStateText("");
+            }
+
+            // valueFormat is yyyy-MM-dd, so plain string comparison is safe
+            if (sStart && sEnd && sEnd < sStart) {
+                oEnd.setValueState("Error");
+                oEnd.setValueStateText(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
+            }
+        },
+        onApplyRoomDateFilter: async function () {
+            const oStart = this.byId("VR_id_StartDate");
+            const oEnd = this.byId("VR_id_EndDate");
+            if (!oStart || !oEnd) return;
+
+            if (!oStart.getDateValue() || oStart.getValueState() === "Error") {
+                oStart.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                return;
+            }
+            if (!oEnd.getDateValue() || oEnd.getValueState() === "Error") {
+                oEnd.setValueState("Error");
+                MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                return;
+            }
+
+            const sStartDate = oStart.getValue(); // yyyy-MM-dd via valueFormat
+            const sEndDate = oEnd.getValue();
+
+            if (sEndDate < sStartDate) {
+                oEnd.setValueState("Error");
+                oEnd.setValueStateText(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
+                MessageToast.show(this.i18nModel.getText("endDatecannotbeearlierthanStartDate"));
+                return;
+            }
+
+            await this._applyDateFilterToRooms(sStartDate, sEndDate);
+        },
+        onClearRoomDateFilter: function () {
+            ["VR_id_StartDate", "VR_id_EndDate"].forEach(sId => {
+                const oPicker = this.byId(sId);
+                if (oPicker) {
+                    oPicker.setValue("");
+                    oPicker.setValueState("None");
+                    oPicker.setValueStateText("");
+                }
+            });
+
+            const oFilterModel = this.getView().getModel("RoomFilterModel");
+            if (oFilterModel) {
+                oFilterModel.setProperty("/StartDate", "");
+                oFilterModel.setProperty("/EndDate", "");
+                oFilterModel.setProperty("/EndDateMinDate", oFilterModel.getProperty("/TodayDate"));
+            }
+
+            // Clearing the date range restores the full, unfiltered card list
+            const oVisibilityModel = this.getView().getModel("VisibilityModel");
+            if (oVisibilityModel) {
+                oVisibilityModel.setProperty("/FilterStartDate", "");
+                oVisibilityModel.setProperty("/FilterEndDate", "");
+                const aRooms = oVisibilityModel.getProperty("/BedTypes") || [];
+                aRooms.forEach(oRoom => {
+                    oRoom.Visible = oRoom.BaseVisible !== false;
+                });
+                this._applyRoomsVisibility(aRooms);
+            }
+        },
+        _applyDateFilterToRooms: async function (sStartDate, sEndDate) {
+            const oVisibilityModel = this.getView().getModel("VisibilityModel");
+            const aAllRooms = oVisibilityModel ? (oVisibilityModel.getProperty("/BedTypes") || []) : [];
+            if (!aAllRooms.length) return;
+
+            let bAnyFailure = false;
+
+            this.getBusyDialog();
+            try {
+                const aChecks = await Promise.all(aAllRooms.map(async oRoom => {
+                    const oPayload = {
+                        BranchCode: oRoom.BranchCode || this.sPath,
+                        ACType: oRoom.ACType || "",
+                        Name: oRoom.Name || "",
+                        PropertyType: oRoom.PropertyType || "",
+                        StartDate: sStartDate,
+                        EndDate: sEndDate
+                    };
+
+                    try {
+                        const oResponse = await this.ajaxReadWithJQuery("HM_BookingSummary", oPayload);
+
+                        // One failed / rejected call must not blank the whole page
+                        if (!oResponse || oResponse.success === false) {
+                            bAnyFailure = true;
+                            return { oRoom: oRoom, bAvailable: true };
+                        }
+
+                        let iAvailable = parseInt(oResponse.availableCount, 10);
+                        if (isNaN(iAvailable)) {
+                            iAvailable = (parseInt(oResponse.totalCapacity, 10) || 0) -
+                                (parseInt(oResponse.bookedCount, 10) || 0);
+                        }
+
+                        return {
+                            oRoom: oRoom,
+                            bAvailable: oResponse.available !== false && iAvailable > 0
+                        };
+                    } catch (err) {
+                        bAnyFailure = true;
+                        return { oRoom: oRoom, bAvailable: true };
+                    }
+                }));
+
+                aChecks.forEach(oCheck => {
+                    oCheck.oRoom.Visible = oCheck.bAvailable;
+                });
+
+                oVisibilityModel.setProperty("/FilterStartDate", sStartDate);
+                oVisibilityModel.setProperty("/FilterEndDate", sEndDate);
+
+                // Keep occupied cards visible and disable only their booking action.
+                this._applyRoomsVisibility(aAllRooms);
+
+                if (bAnyFailure) {
+                    MessageToast.show("Could not verify availability for some rooms.");
+                }
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+        _applyRoomsVisibility: function (aRooms) {
+            const oVisibilityModel = this.getView().getModel("VisibilityModel");
+            if (!oVisibilityModel) return;
+
+            const aACRooms = aRooms.filter(oRoom => (oRoom.ACType || "").toLowerCase() === "ac");
+            const aNonACRooms = aRooms.filter(oRoom => (oRoom.ACType || "").toLowerCase() === "non-ac");
+
+            oVisibilityModel.setProperty("/ACRooms", aACRooms);
+            oVisibilityModel.setProperty("/NonACRooms", aNonACRooms);
+            oVisibilityModel.setProperty("/ShowGlobalNoData", aACRooms.length === 0 && aNonACRooms.length === 0);
+
+            this._restartRoomCardCarouselsAutoSlide();
+        },
         onExit: function () {
             this._stopRoomCardCarouselsAutoSlide();
 
@@ -450,47 +644,28 @@ sap.ui.define([
                     PropertyType: oSelected.PropertyType || ""
                 };
 
-                this.getBusyDialog();
-
-                try {
-                    const filter = {
-                        BranchCode: sBranchCode,
-                        ACType: oSelected.ACType || "",
-                        Name: oSelected.Name || "",
-                        PropertyType: oSelected.PropertyType || ""
-                    };
-
-                    const response = await this.ajaxReadWithJQuery(
-                        "HM_AvailableRooms",
-                        filter
-                    );
-
-                    // API returned an error response
-                    if (response?.success === false) {
-                        sap.m.MessageBox.error(
-                            response.message || "Something went wrong."
-                        );
-
-                        return; // STOP HERE
-                    }
-
-
-                } catch (error) {
-
-                    const message =
-                        error?.responseJSON?.message ||
-                        error?.response?.data?.message ||
-                        error?.message ||
-                        "Something went wrong.";
-
-                    sap.m.MessageBox.error(message);
-
-                    return; // STOP HERE
-
-                } finally {
-
-                    this.closeBusyDialog();
-                }
+                 // HM_AvailableRooms was only a status-based check and does not
+                 // validate the selected date range. Date availability is already
+                 // resolved by _applyDateFilterToRooms, so do not block room details
+                 // with this endpoint.
+                 // this.getBusyDialog();
+                 // try {
+                 //     const response = await this.ajaxReadWithJQuery("HM_AvailableRooms", filter);
+                 //     if (response?.success === false) {
+                 //         sap.m.MessageBox.error(response.message || "Something went wrong.");
+                 //         return;
+                 //     }
+                 // } catch (error) {
+                 //     const message =
+                 //         error?.responseJSON?.message ||
+                 //         error?.response?.data?.message ||
+                 //         error?.message ||
+                 //         "Something went wrong.";
+                 //     sap.m.MessageBox.error(message);
+                 //     return;
+                 // } finally {
+                 //     this.closeBusyDialog();
+                 // }
                 const oFullDetails = {
                     RoomNo: oSelected.RoomNo || "",
                     BedType: oSelected.Name || "",
