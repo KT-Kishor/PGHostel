@@ -291,6 +291,10 @@ sap.ui.define([
                 // Store original booking dates for condition 1/2 facility determination
                 this._sOriginalBookingStartDate = oBooking.StartDate || "";
                 this._sOriginalBookingEndDate = oBooking.EndDate || "";
+                // Keep a normalized copy so availability is checked only when
+                // the edited booking uses a different date range.
+                this._sOriginalEditStartDateISO = this._formatDateToISO(this._sOriginalBookingStartDate);
+                this._sOriginalEditEndDateISO = this._formatDateToISO(this._sOriginalBookingEndDate);
 
                 // 2. Parallel API calls for branch-related data, payments, and facilities
                 var oRoomData = {};
@@ -1686,6 +1690,85 @@ sap.ui.define([
             this._oInitialBookingDetails = this._getBookingDetailsSnapshot();
         },
 
+        _isOriginalEditDateRange: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sCurrentStartDateISO = this._formatDateToISO(oHostelModel.getProperty("/StartDate"));
+            var sCurrentEndDateISO = this._formatDateToISO(oHostelModel.getProperty("/EndDate"));
+
+            return !!this._sOriginalEditStartDateISO &&
+                !!this._sOriginalEditEndDateISO &&
+                sCurrentStartDateISO === this._sOriginalEditStartDateISO &&
+                sCurrentEndDateISO === this._sOriginalEditEndDateISO;
+        },
+
+        _isDateRangeCoveredByOriginalEdit: function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sCurrentStartDateISO = this._formatDateToISO(oHostelModel.getProperty("/StartDate"));
+            var sCurrentEndDateISO = this._formatDateToISO(oHostelModel.getProperty("/EndDate"));
+
+            return !!this._sOriginalEditStartDateISO &&
+                !!this._sOriginalEditEndDateISO &&
+                !!sCurrentStartDateISO &&
+                !!sCurrentEndDateISO &&
+                sCurrentStartDateISO >= this._sOriginalEditStartDateISO &&
+                sCurrentEndDateISO <= this._sOriginalEditEndDateISO &&
+                sCurrentStartDateISO <= sCurrentEndDateISO;
+        },
+
+        // The original confirmed date range is already known to be valid.
+        // Rechecking it would incorrectly treat the existing booking as a new
+        // booking against its own reserved capacity.
+        _checkRoomAvailabilityForBooking: function () {
+            if (this._isDateRangeCoveredByOriginalEdit()) {
+                this._oRoomAvailabilityCheck = null;
+                return Promise.resolve();
+            }
+
+            return BookingController.prototype._checkRoomAvailabilityForBooking.apply(this, arguments);
+        },
+
+        _ensureEditDateAvailability: async function () {
+            if (this._isDateRangeCoveredByOriginalEdit()) {
+                return true;
+            }
+
+            await this._checkRoomAvailabilityForBooking();
+
+            var oAvailabilityCheck = this._oRoomAvailabilityCheck;
+            var sCurrentKey = this._getBookingAvailabilityCheckKey();
+
+            return !oAvailabilityCheck ||
+                oAvailabilityCheck.key !== sCurrentKey ||
+                oAvailabilityCheck.available !== false;
+        },
+
+        _showRoomUnavailableMessage: function () {
+            var oModel = this.getView().getModel("HostelModel");
+
+            MessageBox.warning(
+                "You cannot continue this booking change because the " +
+                (oModel.getProperty("/BedType") || "selected room") +
+                " room is already booked for the selected dates (" +
+                oModel.getProperty("/StartDate") + " to " +
+                oModel.getProperty("/EndDate") +
+                "). Please try choosing different dates.",
+                {
+                    title: "Room Not Available",
+                    icon: MessageBox.Icon.WARNING,
+                    actions: ["Go Back", "Cancel"],
+                    emphasizedAction: "Go Back",
+                    styleClass: "myUnifiedBtn",
+                    contentWidth: "420px",
+                    onClose: function (sAction) {
+                        if (sAction === "Go Back") {
+                            this._resetBookingPageModels();
+                            this._navAfterEditBooking();
+                        }
+                    }.bind(this)
+                }
+            );
+        },
+
         _haveBookingDetailsChanged: function () {
             if (!this._oInitialBookingDetails) {
                 return false;
@@ -2323,6 +2406,12 @@ sap.ui.define([
             }
 
             if (!this._validateBookingBeforeUpdate()) {
+                return;
+            }
+
+            // Existing dates are exempt. A changed date range must pass the
+            // same room availability check before any update/payment flow.
+            if (!await this._ensureEditDateAvailability()) {
                 return;
             }
 

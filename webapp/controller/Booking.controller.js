@@ -5785,21 +5785,22 @@
 
 
 
-                "We’re sorry, but the " + this._formatBedTypeText()  + 
+                "We’re sorry, the " + this._formatBedTypeText()  + 
                 " room is already booked for (" +
                oModel.getProperty("/StartDate") + " - " + oModel.getProperty("/EndDate") +
                 ")  Please try selecting different dates or room.",
                 {
                     title: "Room fully Booked",
                     icon: MessageBox.Icon.WARNING,
-                    actions: ["Stay", "Go Back"],
+                    actions: ["Go Back", "Cancel"],
+                    emphasizedAction: "Go Back",
                     styleClass: "myUnifiedBtn",
-                    contentWidth: "450px",
+                    contentWidth: "420px",
                     onClose: function (sAction) {
                         if (sAction === "Go Back") {
                             this._performNavBackFromBooking();
                         }
-                        // "Stay" (or dialog closed) - stay on the page as is
+                        // "Cancel" (or dialog closed) - stay on the page as is
                     }.bind(this)
                 }
             );

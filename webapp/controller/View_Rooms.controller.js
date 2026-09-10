@@ -456,12 +456,21 @@ sap.ui.define([
         },
         onRoomFilterDateChange: function (oEvent) {
             const oChanged = oEvent.getSource();
-
-            // DatePicker flags unparseable input as "Error" on its own
-            if (oChanged.getValueState() === "Error") return;
-
+            const bValid = oEvent.getParameter("valid");
             const oStart = this.byId("VR_id_StartDate");
             const oEnd = this.byId("VR_id_EndDate");
+
+            // Unparseable manual entry: keep the field flagged with a message.
+            if (!bValid && oChanged.getValue()) {
+                oChanged.setValueState("Error");
+                oChanged.setValueStateText(this.i18nModel.getText("plaeseSelectDate"));
+                return;
+            }
+
+            // A valid selection (or a cleared value) clears the field's own error.
+            oChanged.setValueState("None");
+            oChanged.setValueStateText("");
+
             const sStart = oStart ? oStart.getValue() : "";
             const sEnd = oEnd ? oEnd.getValue() : "";
 
@@ -495,12 +504,14 @@ sap.ui.define([
 
             if (!oStart.getDateValue() || oStart.getValueState() === "Error") {
                 oStart.setValueState("Error");
-                MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                oStart.setValueStateText(oStart.getValueStateText() || this.i18nModel.getText("checkin"));
+                MessageToast.show(this.i18nModel.getText("datesFieldsError"));
                 return;
             }
             if (!oEnd.getDateValue() || oEnd.getValueState() === "Error") {
                 oEnd.setValueState("Error");
-                MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                oEnd.setValueStateText(oEnd.getValueStateText() || this.i18nModel.getText("checkout"));
+                MessageToast.show(this.i18nModel.getText("datesFieldsError"));
                 return;
             }
 
