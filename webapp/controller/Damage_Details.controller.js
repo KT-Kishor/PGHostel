@@ -3,11 +3,13 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "../utils/validation",
     "../model/formatter",
+    "sap/m/MessageToast"
 ], function (
     BaseController,
     JSONModel,
     utils,
-    Formatter
+    Formatter,
+    MessageToast
 ) {
     "use strict";
 
@@ -68,7 +70,7 @@ sap.ui.define([
                 await this.OnSearch();
 
             } catch (err) {
-                MessageToast.show(err.message || err.responseText);
+                sap.m.MessageToast.show(err.message || err.responseText);
             } finally {
                 this.closeBusyDialog();
             }
@@ -159,7 +161,7 @@ sap.ui.define([
                 }
 
             } catch (err) {
-                MessageToast.show(err.message || err.responseText);
+                sap.m.MessageToast.show(err.message || err.responseText);
             }
         },
 
@@ -971,8 +973,8 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                     item.Description || "-",
                     item.Type,
                     item.Quantity,
-                    item.Cost,
-                    item.RecoverCost
+                    Formatter.fromatNumber(item.Cost),
+                    Formatter.fromatNumber(item.RecoverCost)
                 ]);
 
                 doc.autoTable({

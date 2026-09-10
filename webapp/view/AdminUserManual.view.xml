@@ -47,7 +47,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/vendor registration + vendor credentials and login.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -101,7 +101,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Branch.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -155,7 +155,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/bed template.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -207,7 +207,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/room.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -259,7 +259,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='' type='video/mp4'&gt;
+                                        &lt;source src='' type='video/facilities.mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -311,7 +311,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Amenities.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -362,7 +362,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/coupon.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -413,7 +413,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/staff.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -464,7 +464,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Admin Manage booking.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -492,7 +492,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value=".pdf" />
+                value="Admin booking management.pdf" />
         </customData>
 
     </Button>
@@ -516,7 +516,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/invoice.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -568,7 +568,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/deposit.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -596,7 +596,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value=".pdf" />
+                value="deposit.pdf" />
         </customData>
 
     </Button>
@@ -620,7 +620,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Damage.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -648,7 +648,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value=".pdf" />
+                value="Damage management.pdf" />
         </customData>
 
     </Button>
@@ -672,7 +672,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='../Videos/CustomerReg.mp4' type='video/mp4'&gt;
+                                        &lt;source src='../Videos/Complaint.mp4' type='video/mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -700,7 +700,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value=".pdf" />
+                value="complaint-management-without-dashbaord.pdf" />
         </customData>
 
     </Button>
