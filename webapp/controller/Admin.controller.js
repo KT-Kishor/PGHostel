@@ -444,7 +444,7 @@ sap.ui.define([
         //     oDialog.open();
         // },
 
-        HM_AssignRoom: function (oEvent) {
+        HM_AssignRoom:async function (oEvent) {
             this.selectedIndex = 0
 
 
@@ -474,6 +474,8 @@ sap.ui.define([
 
             var Model = selected.getBindingContext("HostelModel");
             this.data = Model.getObject();
+
+           
 
             var BranchData = this.getView().getModel("BranchModel").getData().find((item) => {
                 return item.BranchID === this.data.BranchCode
@@ -532,6 +534,42 @@ sap.ui.define([
                 );
                 return;
             }
+
+             var filter = {
+    MemberID: this.data.MemberID,
+    CustomerEmail: this.data.CustomerEmail,
+    CustomerName: this.data.CustomerName,
+    UserID: this.data.UserID,
+    BookingID: this.data.BookingID,
+    BranchName: BranchData.Name,
+    STDCode: BranchData.STD,
+    MobileNo: BranchData.Contact,
+    AdminEmail: BranchData.EmailID  
+};
+
+this.getBusyDialog()
+try {
+    await this.ajaxReadWithJQuery("HM_BookingDocumentCheck", filter).then((oData) => {
+
+        console.log("Response:", oData);
+
+        if (oData && oData.message) {
+            sap.m.MessageBox.information(oData.message);
+        }
+
+    });
+} catch (err) {
+    console.error("Error:", err);
+
+    sap.m.MessageBox.error(
+        err?.responseJSON?.message || 
+        err?.message || 
+        "Something went wrong"
+    );
+    this.closeBusyDialog()
+    return;
+}
+    this.closeBusyDialog()
 
 
             var oRoomDetailsModel = this.getView().getModel("RoomDetailsModel");

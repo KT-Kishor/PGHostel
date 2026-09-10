@@ -167,12 +167,79 @@
 					</uxap:headerContent>
 
 					<uxap:sections>
+						<uxap:ObjectPageSection
+							id="VR_id_DateFilterSection"
+							title=""
+							titleUppercase="false"
+							class="vrDateFilterSection"
+						>
+							<uxap:subSections>
+								<uxap:ObjectPageSubSection id="VR_id_DateFilterSubSection">
+									<uxap:blocks>
+										<fb:FilterBar
+											id="VR_id_DateFilterBar"
+											persistencyKey="viewRoomsDateFilter"
+											useToolbar="false"
+											clear="onClearRoomDateFilter"
+											showClearOnFB="true"
+											search="onApplyRoomDateFilter"
+											showFilterConfiguration="false"
+											filterContainerWidth="auto"
+											class="sapUiContentPadding HostelRooms sapUiTinyMargin filterBarTheme vrRoomDateFilterBar"
+											busyIndicatorDelay="0"
+										>
+											<fb:filterGroupItems>
+												<fb:FilterGroupItem
+													name="StartDate"
+													label="Check-in Date"
+													groupName="Group1"
+													visibleInFilterBar="true"
+													mandatory="true"
+												>
+													<fb:control>
+														<DatePicker
+															id="VR_id_StartDate"
+															value="{RoomFilterModel>/StartDate}"
+															displayFormat="dd/MM/yyyy"
+											valueFormat="yyyy-MM-dd"
+											minDate="{RoomFilterModel>/TodayDate}"
+															change="onRoomFilterDateChange"
+															width="12rem"
+														/>
+													</fb:control>
+												</fb:FilterGroupItem>
+												<fb:FilterGroupItem
+													name="EndDate"
+													label="Check-out Date"
+													groupName="Group1"
+													visibleInFilterBar="true"
+													mandatory="true"
+												>
+													<fb:control>
+														<DatePicker
+															id="VR_id_EndDate"
+															value="{RoomFilterModel>/EndDate}"
+															displayFormat="dd/MM/yyyy"
+											valueFormat="yyyy-MM-dd"
+											minDate="{RoomFilterModel>/EndDateMinDate}"
+															change="onRoomFilterDateChange"
+															width="12rem"
+														/>
+													</fb:control>
+												</fb:FilterGroupItem>
+											</fb:filterGroupItems>
+										</fb:FilterBar>
+									</uxap:blocks>
+								</uxap:ObjectPageSubSection>
+							</uxap:subSections>
+						</uxap:ObjectPageSection>
 						<!-- AC Rooms Tab Section -->
 						<uxap:ObjectPageSection
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }"
 							id="VR_id_ACSection"
 							title="AC Rooms"
-							titleUppercase="false">
+							titleUppercase="false"
+							class="vrRoomContentSection">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
 									id="VR_id_ACSubSection"
@@ -234,8 +301,9 @@
 																justifyContent="Center"
 																alignItems="Center"
 																class="sapUiTinyMarginTop">
-																<Link
-																	text="Book Room"
+										<Link
+											text="{= ${VisibilityModel>Visible} ? 'Book Room' : 'Occupied' }"
+											enabled="{VisibilityModel>Visible}"
 																	press="onViewDetailsPress"
 																	class="pillActionBtn pillLeft" />
 																<Link
@@ -264,6 +332,7 @@
 							id="VR_id_NonACSection"
 							title="Non-AC Rooms"
 							titleUppercase="false"
+							class="vrRoomContentSection"
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0 }">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
@@ -327,8 +396,9 @@
 																justifyContent="Center"
 																alignItems="Center"
 																class="sapUiTinyMarginTop">
-																<Link
-																	text="Book Room"
+										<Link
+											text="{= ${VisibilityModel>Visible} ? 'Book Room' : 'Occupied' }"
+											enabled="{VisibilityModel>Visible}"
 																	press="onViewDetailsPress"
 																	class="pillActionBtn pillLeft" />
 																<Link
