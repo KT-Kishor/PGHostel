@@ -1286,50 +1286,50 @@ sap.ui.define([
                const bedName = sRoomKey.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
                 const acType = sRoomKey.includes("NON-AC") ? "NON-AC" : "AC";
                 
-                this.getBusyDialog();
+                // this.getBusyDialog();
 
-                try {
-                    const filter = {
-                        BranchCode: oModel.getProperty("/BranchCode") || "",
-                        ACType: acType || "",
-                        Name: bedName || "",
-                        PropertyType: sBranchCode.PropertyType || ""
-                    };
+                // try {
+                //     const filter = {
+                //         BranchCode: oModel.getProperty("/BranchCode") || "",
+                //         ACType: acType || "",
+                //         Name: bedName || "",
+                //         PropertyType: sBranchCode.PropertyType || ""
+                //     };
 
-                    const response = await this.ajaxReadWithJQuery(
-                        "HM_AvailableRooms",
-                        filter
-                    );
+                //     const response = await this.ajaxReadWithJQuery(
+                //         "HM_AvailableRooms",
+                //         filter
+                //     );
 
-                    // API returned an error response
-                    if (response?.success === false) {
-                        sap.m.MessageBox.error(
-                            response.message || "Something went wrong."
-                        );
+                //     // API returned an error response
+                //     if (response?.success === false) {
+                //         sap.m.MessageBox.error(
+                //             response.message || "Something went wrong."
+                //         );
 
-                        return; // STOP HERE
-                    }
+                //         return; // STOP HERE
+                //     }
 
 
-                } catch (error) {
+                // } catch (error) {
 
-                    const message =
-                        error?.responseJSON?.message ||
-                        error?.response?.data?.message ||
-                        error?.message ||
-                        "Something went wrong.";
+                //     const message =
+                //         error?.responseJSON?.message ||
+                //         error?.response?.data?.message ||
+                //         error?.message ||
+                //         "Something went wrong.";
 
-                    sap.m.MessageBox.error(message);
+                //     sap.m.MessageBox.error(message);
 
-                      oRoomCtrl.setSelectedKey("");
-                      oRoomCtrl.setValue("");
+                //       oRoomCtrl.setSelectedKey("");
+                //       oRoomCtrl.setValue("");
 
-                    return; // STOP HERE
+                //     return; // STOP HERE
 
-                } finally {
+                // } finally {
 
-                    this.closeBusyDialog();
-                }
+                //     this.closeBusyDialog();
+                // }
 
             oModel.setProperty("/RoomKey", sRoomKey);
             oModel.setProperty("/SelectedPlan", "");
