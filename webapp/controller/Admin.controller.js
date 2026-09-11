@@ -1633,15 +1633,22 @@ onsendreminder: async function () {
             this.getView().setModel(new JSONModel([]), "RoomAvailabilityModel");
             this.getView().setModel(new JSONModel([]), "RoomAvailabilitySummaryModel");
             this.getView().setModel(new JSONModel([]), "RoomAvailabilityTypes");
-            this.getView().setModel(new JSONModel({ activeTab: "rooms" }), "RoomAvailabilityUI");
+            this.getView().setModel(new JSONModel({ activeTab: "summary" }), "RoomAvailabilityUI");
 
             // The IconTabBar keeps its runtime selected tab after the dialog
-            // is closed. Reset it back to Room Details so the visible tab and
+            // is closed. Reset it back to Summary so the visible tab and
             // the activeTab model stay in sync on reopen (the select event is
             // not fired programmatically, so this does not trigger a load).
             var oTabs = this.byId("roomAvailabilityTabs");
             if (oTabs) {
-                oTabs.setSelectedKey("rooms");
+                var oSummaryTab = oTabs.getItems().find(function (oTab) {
+                    return oTab.getKey() === "summary";
+                });
+                if (oSummaryTab && oTabs.indexOfItem(oSummaryTab) !== 0) {
+                    oTabs.removeItem(oSummaryTab);
+                    oTabs.insertItem(oSummaryTab, 0);
+                }
+                oTabs.setSelectedKey("summary");
             }
 
             // Reset stale value states from a previous dialog session

@@ -1715,6 +1715,36 @@ sap.ui.define([
                 sCurrentStartDateISO <= sCurrentEndDateISO;
         },
 
+        _getEditRoomAvailabilityPayload: function () {
+            var oModel = this.getView().getModel("HostelModel");
+            var sBedType = String(oModel.getProperty("/BedType") || "").trim();
+            var oBedTypeParts = sBedType.match(/^(.*?)\s*-\s*(AC|NON-AC)\s*$/i);
+
+            return {
+                BranchCode: oModel.getProperty("/BranchCode") || "",
+                ACType: oBedTypeParts ? oBedTypeParts[2].toUpperCase() : String(oModel.getProperty("/ACType") || "").trim(),
+                Name: oBedTypeParts ? oBedTypeParts[1].trim() : sBedType,
+                PropertyType: oModel.getProperty("/PropertyType") || "",
+                StartDate: this._formatDateToISO(oModel.getProperty("/StartDate")),
+                EndDate: this._formatDateToISO(oModel.getProperty("/EndDate")),
+                BookingID: oModel.getProperty("/BookingID") || ""
+            };
+        },
+
+        _getBookingAvailabilityCheckKey: function () {
+            var oPayload = this._getEditRoomAvailabilityPayload();
+
+            return [
+                oPayload.BookingID,
+                oPayload.BranchCode,
+                oPayload.ACType,
+                oPayload.Name,
+                oPayload.PropertyType,
+                oPayload.StartDate,
+                oPayload.EndDate
+            ].join("|");
+        },
+
         // The original confirmed date range is already known to be valid.
         // Rechecking it would incorrectly treat the existing booking as a new
         // booking against its own reserved capacity.
@@ -1724,7 +1754,50 @@ sap.ui.define([
                 return Promise.resolve();
             }
 
-            return BookingController.prototype._checkRoomAvailabilityForBooking.apply(this, arguments);
+            var oPayload = this._getEditRoomAvailabilityPayload();
+            if (!oPayload.StartDate || !oPayload.EndDate || oPayload.EndDate < oPayload.StartDate) {
+                return Promise.resolve();
+            }
+
+            var sCheckKey = this._getBookingAvailabilityCheckKey();
+            if (this._oRoomAvailabilityCheck && this._oRoomAvailabilityCheck.key === sCheckKey) {
+                if (this._oRoomAvailabilityCheck.available === false) {
+                    this._showRoomUnavailableMessage();
+                }
+                return Promise.resolve();
+            }
+
+            this.getBusyDialog();
+            return this.ajaxReadWithJQuery("HM_BookingSummary", oPayload)
+                .then(function (oResponse) {
+                    if (!oResponse || oResponse.success === false) {
+                        this._oRoomAvailabilityCheck = null;
+                        return;
+                    }
+
+                    var iAvailableCount = parseInt(oResponse.availableCount, 10);
+                    if (isNaN(iAvailableCount)) {
+                        iAvailableCount = (parseInt(oResponse.totalCapacity, 10) || 0) -
+                            (parseInt(oResponse.bookedCount, 10) || 0);
+                    }
+
+                    var bAvailable = oResponse.available !== false && iAvailableCount > 0;
+                    this._oRoomAvailabilityCheck = {
+                        key: sCheckKey,
+                        available: bAvailable
+                    };
+
+                    if (!bAvailable) {
+                        this._showRoomUnavailableMessage();
+                    }
+                }.bind(this))
+                .catch(function () {
+                    // Verification failure must not block an edit.
+                    this._oRoomAvailabilityCheck = null;
+                }.bind(this))
+                .finally(function () {
+                    this.closeBusyDialog();
+                }.bind(this));
         },
 
         _ensureEditDateAvailability: async function () {

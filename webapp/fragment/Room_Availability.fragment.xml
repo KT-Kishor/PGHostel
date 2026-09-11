@@ -157,7 +157,7 @@
             </HBox>
             <IconTabBar
                 id="roomAvailabilityTabs"
-                selectedKey="rooms"
+                selectedKey="summary"
                 select="onRoomAvailabilityTabSelect"
                 expandable="false"
                 class="sapUiSmallMarginTop"
