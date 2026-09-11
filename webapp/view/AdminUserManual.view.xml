@@ -259,7 +259,7 @@
                                 content="&lt;div style='position:relative;width:100%;padding-top:56.25%;overflow:hidden;border-radius:10px;'&gt;
                                     &lt;video controls muted playsinline 
                                     style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border:none;border-radius:10px;'&gt;
-                                        &lt;source src='' type='video/facilities.mp4'&gt;
+                                        &lt;source src='' type='../Video/facilities.mp4'&gt;
                                         Your browser does not support the video tag.
                                     &lt;/video&gt;
                                 &lt;/div&gt;" />
@@ -700,7 +700,7 @@
         <customData>
             <core:CustomData
                 key="pdfFile"
-                value="complaint-management-without-dashbaord.pdf" />
+                value="Complaint management.pdf" />
         </customData>
 
     </Button>
