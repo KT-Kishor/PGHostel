@@ -194,7 +194,6 @@
 													label="Check-in Date"
 													groupName="Group1"
 													visibleInFilterBar="true"
-													mandatory="true"
 												>
 													<fb:control>
 														<DatePicker
@@ -213,7 +212,6 @@
 													label="Check-out Date"
 													groupName="Group1"
 													visibleInFilterBar="true"
-													mandatory="true"
 												>
 													<fb:control>
 														<DatePicker

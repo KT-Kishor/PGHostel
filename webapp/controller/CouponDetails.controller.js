@@ -889,17 +889,44 @@ sap.ui.define([
         },
 
         onBranchSelect: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent);
-            const oItem = oEvent.getParameter("selectedItem");
-            if (!oItem) return;
+            const oBranchCB = oEvent.getSource();
+            utils._LCstrictValidationComboBox(oBranchCB, "ID");
+            const oItem = oEvent.getParameter("selectedItem") || oBranchCB.getSelectedItem();
+            const oVM = this.getView().getModel("CouponView");
+            if (!oItem) {
+                if (!oBranchCB.getSelectedKey()) {
+                    oVM.setProperty("/CurrentCoupon/BranchCode", "");
+                    oVM.setProperty("/CurrentCoupon/Currency", "");
+                }
+                return;
+            }
 
             const oCtx = oItem.getBindingContext("Branchmodel");
             if (!oCtx) return;
 
             const oBranch = oCtx.getObject();
 
-            //  single source of truth
-            this.getView().getModel("CouponView").setProperty("/CurrentCoupon/BranchCode", oBranch.BranchCode || oBranch.BranchID);
+            // HM_BranchData already contains the currency for the property.
+            const sBranchCode = oBranch.BranchCode || oBranch.BranchID;
+            const sBranchCurrency = String(oBranch.Currency || "").trim();
+            const oCurrencyModel = this.getView().getModel("CountryModel");
+            const aCurrencyItems = oCurrencyModel?.getData() || [];
+            const oCurrency = aCurrencyItems.find(item =>
+                String(item.currency || "").trim().toUpperCase() === sBranchCurrency.toUpperCase()
+            );
+            const sCurrency = oCurrency?.currency || sBranchCurrency;
+
+            oVM.setProperty("/CurrentCoupon/BranchCode", sBranchCode);
+            oVM.setProperty("/CurrentCoupon/Currency", sCurrency);
+
+            // Explicitly select the matching item after the fragment has rendered.
+            const oCurrencyCB = sap.ui.getCore().byId(
+                this.getView().createId("cbCurrency")
+            );
+            if (oCurrencyCB) {
+                oCurrencyCB.setSelectedKey(sCurrency);
+                oCurrencyCB.setValue(sCurrency);
+            }
         },
 
         onClearCoupons: function() {

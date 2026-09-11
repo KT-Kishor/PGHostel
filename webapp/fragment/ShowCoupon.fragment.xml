@@ -14,7 +14,7 @@
                 items="{ShowCouponDetails>/}"
             >
                 <columns>
-                    <Column>
+                    <Column width="15rem">
                         <Text
                             class="couponTitleOpp"
                             text="{i18n>CDCouponCode}"

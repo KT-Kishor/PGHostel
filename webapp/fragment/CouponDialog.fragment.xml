@@ -25,7 +25,6 @@
                     />
                     <ComboBox
                         valueStateText="{i18n>selectBranch}"
-                        change="onBranchSelect"
                         id="cbBranchCode"
                         width="100%"
                         placeholder="{i18n>selectBranch}"
@@ -34,7 +33,7 @@
                         selectionChange="onBranchSelect"
                     >
                         <core:ListItem
-                            key="{Branchmodel>Name}"
+                            key="{Branchmodel>BranchID}"
                             text="{Branchmodel>BranchID} - {Branchmodel>Name}"
                             additionalText="{Branchmodel>City}"
                         />
@@ -49,7 +48,7 @@
                         type="Text"
                         liveChange="onLiveChange_CouponCode"
                         placeholder="{i18n>enterCoupon}"
-                        maxLength="10"
+                        maxLength="21"
                         valueStateText="{i18n>pleaseEnterCoupon}"
                         editable="{= ${CouponView>/DialogMode} === 'Edit' ? false : true}"
                     />

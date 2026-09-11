@@ -17,28 +17,28 @@
             clear="FC_onPressClear" showClearOnFB="true" search="Onsearch" filterChange="IA_.onFilterChange"
             afterVariantLoad="IA_.onAfterVariantLoad" showFilterConfiguration="false" filterContainerWidth="auto"
             class="filterBarTheme">
-				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="FacilityName" label="{i18n>hostelFeatures}" groupName="Group"
+			<fb:filterGroupItems>
+				<fb:FilterGroupItem name="BranchCode" label="{i18n>MSbranchCode}" groupName="Group"
                     visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox id="HF_id_FacilityName" items="{HostelFeatures>/}" showClearIcon="true">
-								<core:Item key="{HostelFeatures>FacilityName}" text="{HostelFeatures>FacilityName}"/>
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-				</fb:filterGroupItems>
-				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="BranchCode" label="{i18n>MSbranchCode}" groupName="Group"
-                        visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox id="HF_id_BranchCode" items="{BranchModel>/}" showClearIcon="true"
-                            showSecondaryValues="true">
-								<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
-                                    additionalText="{BranchModel>City}"/>
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-				</fb:filterGroupItems>
+					<fb:control>
+						<ComboBox id="HF_id_BranchCode" items="{BranchModel>/}" showClearIcon="true"
+                        showSecondaryValues="true">
+							<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
+                                additionalText="{BranchModel>City}"/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+			</fb:filterGroupItems>
+			<fb:filterGroupItems>
+				<fb:FilterGroupItem name="FacilityName" label="{i18n>hostelFeatures}" groupName="Group"
+                    visibleInFilterBar="true">
+					<fb:control>
+						<ComboBox id="HF_id_FacilityName" items="{HostelFeatures>/}" showClearIcon="true">
+							<core:Item key="{HostelFeatures>FacilityName}" text="{HostelFeatures>FacilityName}"/>
+						</ComboBox>
+					</fb:control>
+				</fb:FilterGroupItem>
+			</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="HF_HostelFeatureTable" sticky="ColumnHeaders,HeaderToolbar" mode="MultiSelect" width="auto" busyIndicatorDelay="0" items="{path:'HostelFeatures>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>

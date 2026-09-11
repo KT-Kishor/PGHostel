@@ -437,7 +437,7 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
-                                maxLength="15"
+                                maxLength="21"
                     enabled="{BookingView>/editModeEnabled}"
                     showValueHelp="true"
                     valueHelpRequest="BV_onOpenVH"

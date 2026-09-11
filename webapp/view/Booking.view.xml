@@ -556,7 +556,7 @@
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
-                                maxLength="15"
+                                maxLength="21"
                     showValueHelp="true"
                     valueHelpRequest="BV_onOpenVH"
                     valueStateText="{i18n>modelValueState}"
