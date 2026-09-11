@@ -335,6 +335,9 @@ sap.ui.define([
             oBedTypeModel.setProperty("/", aFiltered);
 
             this.getView().byId("idRoomNumber").setEditable(true);
+            this.getView().byId("idRoomType12").setValue("");
+            this.getView().byId("idBedType").setValue("");
+
 
 
             // --- Open Dialog ---
@@ -1144,6 +1147,25 @@ if (Payload._isEditing) {
             });
               this.RoomNo = oData.RoomNo
             this.BranchCode = oData.BranchCode
+
+
+
+              var aInputIds = [
+                "idRoomType12",
+                "idBedType",
+                "idRoomNumber",
+                "idRoomNumber13",
+                "idPrice",
+                "id_MonthlyPrice",
+                "id_YearlyPrice",
+                "FO_id_Currency"
+            ];
+            aInputIds.forEach(function (sId) {
+                var oInput = oView.byId(sId);
+                if (oInput && oInput.setValueState) {
+                    oInput.setValueState("None");
+                }
+            });
         }
     });
 });

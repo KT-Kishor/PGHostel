@@ -551,12 +551,6 @@ this.getBusyDialog()
 try {
     await this.ajaxReadWithJQuery("HM_BookingDocumentCheck", filter).then((oData) => {
 
-        console.log("Response:", oData);
-
-        if (oData && oData.message) {
-            sap.m.MessageBox.information(oData.message);
-        }
-
     });
 } catch (err) {
     console.error("Error:", err);

@@ -2257,11 +2257,19 @@ sap.ui.define([
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
         },
 
-        onBookingEditDateChange: function (oEvent) {
+        onBookingEditDateChange:async function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oBookingModel = this.getView().getModel("Bookingmodel");
             var oCustomerModel = this.getView().getModel("CustomerData");
             var oData = oBookingModel.getData();
+
+            var CustData = oCustomerModel.getData();
+
+
+            
+                const bedName = CustData.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                const acType = CustData.BedType.includes("NON-AC") ? "NON-AC" : "AC";
+        
 
             var sStart = oData.StartDate;
             var sEnd = oData.EndDate;
@@ -2299,7 +2307,9 @@ sap.ui.define([
                 oDate.setDate(oDate.getDate() + 1);
                 oEndDatePicker.setMinDate(oDate);
             }
-            var CustData = oCustomerModel.getData();
+
+            
+
             // DAILY CALCULATION
             if (sUnit === "daily" || sUnit === "Per Day") {
 
@@ -2358,6 +2368,34 @@ sap.ui.define([
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
 
                 oData.EndDate = this._formatDate(oEnd);
+
+                 if(oData.StartDate && oData.EndDate){
+
+               var filters={
+                   StartDate: oData.StartDate.split("/").reverse().join("-"),
+                   EndDate:oData.EndDate.split("/").reverse().join("-"),
+                   BranchCode:CustData.BranchCode,
+                   Name:bedName,
+                   ACType:acType,
+                   PropertyType:CustData.PropertyType,
+                   BookingID:CustData.BookingID
+                }
+                this.getBusyDialog()
+               const response =await this.ajaxReadWithJQuery("HM_BookingSummary", filters);
+              if (response.roomStatus === "Fully Booked") {
+
+ 
+
+    MessageBox.error("This booking dates have fully booked, Please select another date.");
+     this.Date=false
+     this.closeBusyDialog()
+    return;
+}
+     this.closeBusyDialog()
+
+       this.Date=true
+            }
+
                 oBookingModel.refresh();
                 return;
             }
@@ -2451,6 +2489,34 @@ sap.ui.define([
             // Save final EndDate in yyyy-MM-dd
             oData.EndDate = this._formatDate(oEnd);
 
+
+                if(oData.StartDate && oData.EndDate){
+
+               var filters={
+                   StartDate: oData.StartDate.split("/").reverse().join("-"),
+                   EndDate:oData.EndDate.split("/").reverse().join("-"),
+                   BranchCode:CustData.BranchCode,
+                   Name:bedName,
+                   ACType:acType,
+                   PropertyType:CustData.PropertyType,
+                   BookingID:CustData.BookingID
+                }
+                this.getBusyDialog()
+               const response =await this.ajaxReadWithJQuery("HM_BookingSummary", filters);
+              if (response.roomStatus === "Fully Booked") {
+
+ 
+
+    MessageBox.error("This booking dates have fully booked, Please select another date.");
+     this.Date=false
+     this.closeBusyDialog()
+    return;
+}
+     this.closeBusyDialog()
+
+       this.Date=true
+            }
+
             oBookingModel.refresh();
         },
 
@@ -2461,7 +2527,7 @@ sap.ui.define([
             return `${yyyy}-${mm}-${dd}`;
         },
 
-        onBookMonthYearChange: function (oEvent) {
+        onBookMonthYearChange: async function (oEvent) {
             const oModel = this.getView().getModel("Bookingmodel");
             const oCustomerData = this.getView().getModel("CustomerData");
             var CustData = this.getView().getModel("CustomerData").getData()
@@ -2525,6 +2591,29 @@ sap.ui.define([
             // Format yyyy-MM-dd for DatePicker
             const sFormatted = this._formatDate(oEnd);
             oModel.setProperty("/EndDate", sFormatted);
+
+              const bedName = CustData.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                const acType = CustData.BedType.includes("NON-AC") ? "NON-AC" : "AC";
+
+               var filters={
+                   StartDate: oModel.getProperty("/StartDate").split('/').reverse().join('-'),
+                   EndDate:sFormatted,
+                   BranchCode:CustData.BranchCode,
+                   Name:bedName,
+                   ACType:acType,
+                   PropertyType:CustData.PropertyType,
+                   BookingID:CustData.BookingID
+                }
+
+            const response =await this.ajaxReadWithJQuery("HM_BookingSummary", filters);
+              if (response.roomStatus === "Fully Booked") { 
+    MessageBox.error(
+        this.i18nModel.getText("roomFullyBooked")
+    );
+     this.Date=false
+    return;
+}
+       this.Date=true
             var fPrice = oCustomerData.getProperty("/RentPrice")
 
             var fFacilityPrice = parseFloat(oCustomerData.getProperty("/TotalFacilityPrice") || 0);
@@ -2559,6 +2648,7 @@ sap.ui.define([
             oCustomerData.setProperty("/SubTotal", SubTotal);
             oCustomerData.setProperty("/Discount", CustData.Discount)
             oCustomerData.setProperty("/Duration", iCount)
+
         },
 
         onCancelBooking: function () {
@@ -3909,7 +3999,7 @@ sap.ui.define([
                 EndDate: ID.EndDate ? ID.EndDate.split('/').reverse().join('-') : "",
                 MemberID: ID.MemberID || "",
                 Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
-                RentPrice: ID.RentPrice || 0,
+                RentPrice: ID.GrandTotal || 0,
                 PropertyName: ID.BranchName,
                 PropertySTD: ID.PropertySTD || "",
                 PropertyMobileNo: ID.PropertyMobileNo || "",
@@ -3966,6 +4056,11 @@ sap.ui.define([
             oModel.refresh(true);
         },
         onSaveBooking: async function () {
+
+            if(this.Date===false){
+            sap.m.MessageBox.error("This Booking date have fully booked, Please select another date.");
+                return;
+            }
             this.call = false
             this.continue = true
             const oModel = this.getView().getModel("CustomerData");
