@@ -72,7 +72,7 @@
 						<ToolbarSpacer />
 						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
                         press="SP_resolve" class="myUnifiedBtn"/>
-						<Button text="{i18n>download}" icon="sap-icon://excel-attachment"
+						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="S_onDownload"
                         class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>

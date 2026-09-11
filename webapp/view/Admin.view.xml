@@ -203,7 +203,7 @@
 					
 						<Button
                             text="{i18n>download}"
-                            icon="sap-icon://excel-attachment"
+
                             tooltip="{i18n>downloadAdminData}"
                             press="MD_onDownload"
                             class="myUnifiedBtn"

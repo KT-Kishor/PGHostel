@@ -400,7 +400,7 @@ sap.ui.define([
                 ...item,
                 Pincode: item.Pincode ? String(item.Pincode) : "",
                 Contact: item.Contact ? String(item.Contact) : "",
-                Penalty: item.Penalty ?tem.Penalty + " " + item.Currency: "",
+                Penalty: item.Penalty ? item.Penalty + " " + item.Currency : "",
                 Contact: item.STD + " " + item.Contact
             }));
             const aCols = this.createTableSheet();
@@ -580,7 +580,7 @@ _setDefaultCountryIndiaBranch: function() {
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("BD_id_Type")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idAddress")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idLandmark")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_idGeoLocation")), "ID") &&
+                this._LCvalidateGeoLocation(sap.ui.getCore().byId(oView.createId("BD_idGeoLocation")), "ID") &&
                 utils._LCvalidatePinCode(sap.ui.getCore().byId(oView.createId("BD_idPin")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_Country")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_State")), "ID") &&
@@ -717,7 +717,7 @@ _setDefaultCountryIndiaBranch: function() {
                 LandMark: Payload.LandMark,
                 PropertyType: Payload.PropertyType,
                 Address: Payload.Address,
-                GeoLocation: Payload.GeoLocation,
+                GeoLocation: (Payload.GeoLocation || "").replace(/\s/g, ""),
                 Status: Payload.Mode || "Active",
                 Pincode: Payload.Pincode,
                 Contact: Payload.Contact,
@@ -857,8 +857,39 @@ _setDefaultCountryIndiaBranch: function() {
 
         onGeoLocationLiveChange: function(oEvent) {
             var oInput = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-            if (oInput.getValue() === "") oInput.setValueState("None");
+            var sRawValue = oInput.getValue();
+
+            var sValue = sRawValue.replace(/\s/g, "");
+            if (sRawValue !== sValue) {
+                oInput.setValue(sValue);
+                oInput.setValueState("Error");
+                oInput.setValueStateText("Spaces are not allowed in Geo location");
+                return;
+            }
+
+            oInput.setValueState("None");
+            oInput.setValueStateText(this.i18nModel.getText("GL_error"));
+        },
+
+        _LCvalidateGeoLocation: function(oEvent, type) {
+            var oField = type === "ID" ? oEvent : oEvent.getSource();
+            if (!oField) return false;
+
+            var sValue = oField.getValue().replace(/\s/g, "");
+            if (oField.getValue() !== sValue) {
+                oField.setValue(sValue);
+            }
+
+            if (!sValue) {
+                oField.setValueState("Error");
+                oField.setValueStateText(this.i18nModel.getText("GL_error"));
+                oField.focus();
+                return false;
+            }
+
+            oField.setValueState("None");
+            oField.setValueStateText(this.i18nModel.getText("GL_error"));
+            return true;
         },
 
         _resetFacilityValueStates: function() {

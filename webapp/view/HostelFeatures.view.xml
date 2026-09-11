@@ -54,7 +54,7 @@
 						<Button text="{i18n>MSdelete}" tooltip="{i18n>MSdelete}"
                         press="HM_DeleteHostelFeature" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
-						<Button text="{i18n>download}" icon="sap-icon://excel-attachment"
+						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="HF_onDownload" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
 					</OverflowToolbar>

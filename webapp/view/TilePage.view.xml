@@ -94,7 +94,7 @@
                     header="{i18n>manageAds}"
                     press="TileV_onpressManageAds"
                 >
-						<TileContent unit="{i18n>managebugs}">
+						<TileContent unit="{i18n>manageAdsss}">
 							<ImageContent src="sap-icon://manager-insight"/>
 						</TileContent>
 					</GenericTile>
