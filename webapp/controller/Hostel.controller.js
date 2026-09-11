@@ -4084,11 +4084,13 @@ sap.ui.define([
                         oCountryCB.setBusy(false); // Spinner hatao
 
                         // Ab auto-populate start karo
+                          this._setDefaultCountryIndia();
                         this._triggerAutoPopulation();
                     }
                 }, 300);
             } else {
                 // Data pehle se hai, toh seedha trigger karo
+                  this._setDefaultCountryIndia();
                 this._triggerAutoPopulation();
             }
 
@@ -4676,7 +4678,7 @@ sap.ui.define([
                 DOB: "",
                 Gender: "",
                 Email: "",
-                Country: "",
+                Country: "India",
                 State: "",
                 City: "",
                 STDCode: "",
@@ -4691,6 +4693,31 @@ sap.ui.define([
             this.getView().setModel(oModel, "AdminSignupModel");
         },
 
+        _setDefaultCountryIndia: function () {
+    const oModel = this.getView().getModel("AdminSignupModel");
+    const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
+    const oStateModel = this.getView().getModel("StateModel");
+
+    if (!oCountryModel || !oStateModel) return;
+
+    const aCountries = oCountryModel.getData() || [];
+    const oIndia = aCountries.find(c => c.code === "IN") || aCountries.find(c => (c.countryName || "").toLowerCase() === "india");
+    if (!oIndia) return;
+
+    // Set Country
+    oModel.setProperty("/Country", oIndia.countryName);
+    $C("adminsignUpCountry")?.setSelectedKey(oIndia.countryName);
+
+    // Filter States for India only
+    const allStates = oStateModel.getData() || [];
+    const filteredStates = allStates.filter(s => s.countryCode === "IN");
+    oStateModel.setProperty("/filtered", filteredStates);
+
+    // Mobile/STD defaults for India
+    const oMobile = $C("adminMobileNo");
+    if (oMobile) oMobile.setMaxLength(10);
+    this._autoSelectSTD("IN");
+},
         onAdminDocTypeChange: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();

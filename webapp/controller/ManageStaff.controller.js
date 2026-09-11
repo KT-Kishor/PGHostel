@@ -70,7 +70,7 @@ sap.ui.define([
                 // comfirmpass: "",
                 STDCode: "+91",
                 Address: "",
-                Country: "",
+                Country: "India",
                 State: "",
                 City: "",
                 Gender: "",
@@ -127,9 +127,40 @@ sap.ui.define([
 
             this._initEmptyMDModel(); // RESET MODEL
             // this._clearManualFields();  // CLEAR UI FIELDS
+            
             this._resetValueStates();
+            this._setDefaultCountryIndiaStaff();
             this.ARD_Dialog.open();
         },
+        _setDefaultCountryIndiaStaff: function() {
+    var oModel = this.getView().getModel("MDmodel");
+    var oCountryCB = this.byId("MS_id_signUpCountry");
+    var oStateCB = this.byId("MS_id_signUpState");
+    var oSTD = this.byId("MS_id_signUpSTD");
+
+    if (!oCountryCB || !oStateCB) return;
+
+    var aCountries = this.getOwnerComponent().getModel("CountryModel").getData() || [];
+    var oIndia = aCountries.find(c => c.code === "IN") || aCountries.find(c => (c.countryName || "").toLowerCase() === "india");
+    if (!oIndia) return;
+
+    // Set Country
+    oModel.setProperty("/Country", oIndia.countryName);
+    oCountryCB.setSelectedKey(oIndia.countryName);
+    oCountryCB.setValue(oIndia.countryName);
+
+    // Filter State ComboBox to India only
+    oStateCB.getBinding("items")?.filter([
+        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, "IN")
+    ]);
+
+    // STD code default, same as onChangeCountry does
+    if (oIndia.stdCode && oSTD) {
+        oModel.setProperty("/STDCode", oIndia.stdCode);
+        oSTD.setValue(oIndia.stdCode);
+        this.onSTDChange({ getSource: () => oSTD });
+    }
+},
 
         HM_EditHostelFeature: function() {
             const oTable = this.byId("MS_id_ManageStaff");

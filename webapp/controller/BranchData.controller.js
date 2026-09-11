@@ -498,7 +498,7 @@ sap.ui.define([
                 Pincode: "",
                 Contact: "",
                 stdCode: "+91",
-                country: "",
+                country: "India",
                 state: "",
                 baseLocation: "",
                 GSTIN: "",
@@ -519,9 +519,47 @@ sap.ui.define([
 
             this.setDefaultTimesOnCreate();
             this.isEdit = false;
+            this._setDefaultCountryIndiaBranch();
             this.oDialog.open();
         },
+_setDefaultCountryIndiaBranch: function() {
+    var oView = this.getView();
+    var oModel = oView.getModel("MDmodel");
+    var oCountryCB = this.byId("MC_id_Country");
+    var oStateCB = this.byId("MC_id_State");
+    var oSTD = this.byId("MC_id_codeModel");
+    var oCurrency = this.byId("Bd_id_DepositCurrency");
+    var oVisible = oView.getModel("visiblePlay");
 
+    var aCountries = this.getOwnerComponent().getModel("CountryModel").getData() || [];
+    var oIndia = aCountries.find(c => c.code === "IN") || aCountries.find(c => (c.countryName || "").toLowerCase() === "india");
+    if (!oIndia || !oCountryCB || !oStateCB) return;
+
+    // Set Country
+    oModel.setProperty("/country", oIndia.countryName);
+    oCountryCB.setSelectedKey(oIndia.countryName);
+    oCountryCB.setValue(oIndia.countryName);
+
+    // Filter State ComboBox items to India only
+    oStateCB.getBinding("items")?.filter([
+        new sap.ui.model.Filter("countryCode", sap.ui.model.FilterOperator.EQ, "IN")
+    ]);
+
+    // GST visibility (India-only feature per MC_onChangeCountry)
+    if (oVisible) oVisible.setProperty("/isIndia", true);
+
+    // STD code + currency defaults, same as MC_onChangeCountry
+    if (oIndia.stdCode && oSTD) {
+        oModel.setProperty("/stdCode", oIndia.stdCode);
+        oSTD.setValue(oIndia.stdCode);
+        oSTD.setSelectedKey(oIndia.stdCode);
+        this.onSTDChange();
+    }
+    if (oIndia.currency && oCurrency) {
+        oModel.setProperty("/Currency", oIndia.currency);
+        oCurrency.setSelectedKey(oIndia.currency);
+    }
+},
         onDepositCurrency: function(oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
