@@ -73,10 +73,8 @@ sap.ui.define([
             if (SRaisedBy) filters.RaisedBy = SRaisedBy;
             if (SStatus) filters.Status = SStatus;
             if (BugID) filters.BugID = BugID;
-            if (oStartDate && oEndDate) {
-                filters.StartDate = oDateFormat.format(oStartDate);
-                filters.EndDate = oDateFormat.format(oEndDate);
-            }
+
+            Object.assign(filters, this._getRoleBasedBugFilters(true));
 
             this.getBusyDialog();
             await this.ajaxReadWithJQuery("HM_Bug", filters).then((oData) => {
@@ -89,8 +87,36 @@ sap.ui.define([
             this.closeBusyDialog();
         },
 
+        // SuperAdmin: date range only (no email). Other roles: logged-in
+        // user's EmailID from HM_Login, never dates.
+        _getRoleBasedBugFilters: function (bIncludeDates) {
+            var oLoginModel = this.getView().getModel("LoginModel");
+            var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
+            var sEmail = oLoginModel ? oLoginModel.getProperty("/EmailID") : "";
+            var oFilters = {};
+
+            if (sRole === "SuperAdmin") {
+                if (bIncludeDates) {
+                    var oDateRange = this.byId("RB_id_Dates");
+                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                        pattern: "yyyy-MM-dd"
+                    });
+                    var oStartDate = oDateRange.getDateValue();
+                    var oEndDate = oDateRange.getSecondDateValue();
+                    if (oStartDate && oEndDate) {
+                        oFilters.StartDate = oDateFormat.format(oStartDate);
+                        oFilters.EndDate = oDateFormat.format(oEndDate);
+                    }
+                }
+            } else if (sEmail) {
+                oFilters.Email = sEmail;
+            }
+
+            return oFilters;
+        },
+
         _loadAllFilterData: async function () {
-            await this.ajaxReadWithJQuery("HM_Bug", {}).then((oData) => {
+            await this.ajaxReadWithJQuery("HM_Bug", this._getRoleBasedBugFilters(false)).then((oData) => {
                 var aFullData = Array.isArray(oData.data) ? oData.data : [oData.data];
 
                 // ✅ Store full dataset

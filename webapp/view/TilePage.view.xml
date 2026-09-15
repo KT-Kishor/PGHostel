@@ -38,9 +38,9 @@
 		<content>
 
         <VBox class="categoryBlock sapUiMediumMarginTop"
-              visible="{= ${TileVisibility>/ManageVendor} !== 0 }">
+              visible="true">
 				<Title
-                text="{i18n>vendorrgistration}"
+                text="{= ${TileVisibility>/ManageVendor} !== 0 ? ${i18n>vendorrgistration} : ${i18n>raisedBugs} }"
                 level="H2"
                 class="roomHeaderTitle1 sapUiMediumMarginBeginEnd"
             />
@@ -78,7 +78,7 @@
 					</GenericTile>
 					<GenericTile
                     id="idRaiseBug"
-                    visible="{= ${TileVisibility>/ManageVendor}!== 0?true:false }"
+                    visible="true"
                     class="sapUiTinyMargin glassTile"
                     header="{i18n>Bug Details}"
                     press="TileV_onpressBugRaiseVendor"

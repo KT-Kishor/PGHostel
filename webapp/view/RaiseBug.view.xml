@@ -14,6 +14,7 @@
 		<content>
 			<fb:FilterBar
                 id="Rb_id_Filterbar"
+                visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="SP_onPressClear"
@@ -92,7 +93,7 @@
 			</fb:FilterBar>
 			<Table id="idBugTable"
                 sticky="ColumnHeaders,HeaderToolbar"
-                mode="SingleSelectLeft"
+                mode="{= ${LoginModel>/Role} === 'SuperAdmin' ? 'SingleSelectLeft' : 'None' }"
                 width="auto"
 				selectionChange="onBugTableSelectionChange"
                 items="{path: 'RaiseBugModel>/',sorter: {path: 'Status', group: true}, length:1000}" >
@@ -101,9 +102,11 @@
 						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>
 						<ToolbarSpacer />
 							<Button id="ideditButton" text="{i18n>Edit}" tooltip="{i18n>Edit}"
-                        press="RB_edit" class="myUnifiedBtn"/>
+                        press="RB_edit" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
 						<Button id="idresolveButton" text="{i18n>Resolve}" tooltip="{i18n>resolve}"
-                        press="RB_resolve" class="myUnifiedBtn"/>
+                        press="RB_resolve" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
 						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="RB_onDownload"
                         class="myUnifiedBtn"

@@ -155,6 +155,8 @@
                     class="myUnifiedBtn sapUiTinyMarginBegin"
                 />
             </HBox>
+            <!-- IconTabBar hidden: only one tab remained, so the summary table
+                 is rendered directly. Original markup kept for reference.
             <IconTabBar
                 id="roomAvailabilityTabs"
                 selectedKey="summary"
@@ -163,6 +165,9 @@
                 class="sapUiSmallMarginTop"
             >
                 <items>
+            -->
+                    <!-- Assigned Room Details tab and its table are hidden for now.
+                         Code kept for reference; do not delete.
                     <IconTabFilter
                         key="rooms"
                         text="{i18n>roomAvailabilityRoomsTab}"
@@ -247,11 +252,16 @@
                     </Table>
                         </content>
                     </IconTabFilter>
+                    -->
+
+                    <!-- Booking Summary tab header hidden: the summary table is
+                         shown directly. Original markup kept for reference.
                     <IconTabFilter
                         key="summary"
                         text="{i18n>roomAvailabilitySummaryTab}"
                     >
                         <content>
+                    -->
                     <Table
                         id="roomAvailabilitySummaryTable"
                         visible="{= ${RoomAvailabilityUI>/activeTab} === 'summary' }"
@@ -313,10 +323,12 @@
                             </ColumnListItem>
                         </items>
                     </Table>
+                    <!--
                         </content>
                     </IconTabFilter>
                 </items>
             </IconTabBar>
+                    -->
         </content>
         <endButton>
             <Button
