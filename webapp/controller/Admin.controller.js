@@ -187,6 +187,9 @@ sap.ui.define([
 
                 const sBranchName = this.byId("PO_id_PropertyName").getSelectedKey()
 
+                const sBedtype = this.byId("PO_id_Bedtype").getSelectedKey()
+
+
                 const oDateRange = this.byId("PO_id_Date");
                 const oStartDate = oDateRange.getDateValue();
                 const oEndDate = oDateRange.getSecondDateValue();
@@ -239,6 +242,8 @@ sap.ui.define([
                 if (sStatus) filters.Status = sStatus;
                 if (sCustomerName) filters.CustomerName = sCustomerName;
                 if (sBranchName) filters.BranchCode = sBranchName;
+                if (sBedtype) filters.BedType = sBedtype;
+
 
 
                 // ================= Date Handling (Same as Invoice) =================
@@ -342,7 +347,9 @@ sap.ui.define([
             let uniqueValues = {
                 PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
-                PO_id_CustomerName: new Set()
+                PO_id_CustomerName: new Set(),
+                PO_id_Bedtype: new Set()
+
 
             };
 
@@ -357,12 +364,15 @@ sap.ui.define([
                 if (item.CustomerName) {
                     uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
                 }
+                if (item.BedType) {
+                    uniqueValues.PO_id_Bedtype.add(item.BedType.trim());
+                }
 
             });
 
             let oView = this.getView();
 
-            ["PO_id_BookingId", "PO_id_CompanyName", "PO_id_CustomerName"].forEach(field => {
+            ["PO_id_BookingId", "PO_id_CompanyName", "PO_id_CustomerName", "PO_id_Bedtype"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -1316,7 +1326,9 @@ if (this.data.Status === "Assigned") {
             this.getView().byId("PO_id_Status").setSelectedKey("")
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
+            this.getView().byId("PO_id_Bedtype").setSelectedKey("")
             this.getView().byId("PO_id_PropertyName").setSelectedKey("")
+
 
             this.byId("PO_id_Date").setValue("");
         },

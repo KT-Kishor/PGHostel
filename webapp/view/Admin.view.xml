@@ -51,6 +51,28 @@
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
+
+                <fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Bed Type"
+                        label="Bed Type"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+						<fb:control>
+							<ComboBox
+                                id="PO_id_Bedtype"
+                                items="{HostelModel>/}"
+                                showClearIcon="true"
+                            >
+								<core:ListItem
+                                    key="{HostelModel>BedType}"
+                                    text="{HostelModel>BedType}"
+                                />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
 				
             
 				<fb:filterGroupItems>
