@@ -1,0 +1,109 @@
+<mvc:View
+	controllerName="sap.ui.com.project1.controller.NewManual"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	displayBlock="true">
+
+	<Page id="manualPage"  class="umPage">
+
+		<!-- ===== Top bar ===== -->
+		<customHeader>
+			<Toolbar class="umTopbar" height="64px">
+				<Button
+					icon="sap-icon://nav-back"
+					type="Transparent"
+					class="umBackBtn"
+					press="onBack"
+					tooltip="Go back" />
+				<VBox class="umTitleBlock">
+					<Title text="User Manual" level="H1" class="umTitle" />
+					<Text text="Short video walkthroughs and printable guides for every feature." class="umSubtitle" />
+				</VBox>
+				<ToolbarSpacer />
+				<SearchField
+					id="topicSearch"
+					width="260px"
+					placeholder="Search topics"
+					liveChange="onSearch"
+					class="umSearch" />
+			</Toolbar>
+		</customHeader>
+
+		<content>
+			<VBox class="umWrap">
+
+				<!-- ===== Cards, two per row ===== -->
+				<FlexBox
+					id="cardGrid"
+					items="{manual>/topics}"
+					wrap="Wrap"
+					class="umGrid">
+
+					<VBox class="umCard">
+
+						<HBox class="umCardHead" alignItems="Center">
+							<core:Icon src="{manual>icon}" class="umIcon" />
+							<VBox class="umCardHeadText">
+								<Title text="{manual>title}" level="H2" class="umCardTitle" />
+								<Text text="{manual>meta}" class="umMeta" />
+							</VBox>
+						</HBox>
+<VBox class="umDescriptionBox">
+
+    <Text
+        text="{
+            parts: [
+                { path: 'manual>description' },
+                { path: 'manual>expanded' }
+            ],
+            formatter: '.formatDescription'
+        }"
+        class="umDesc" />
+
+    <Link
+        text="{
+            path: 'manual>expanded',
+            formatter: '.formatDescriptionLinkText'
+        }"
+        visible="{
+            path: 'manual>description',
+            formatter: '.showDescriptionLinkVisible'
+        }"
+        press="onToggleDescription"
+        class="umShowDescription" />
+
+</VBox>
+						<HBox class="umActions">
+							<Button
+								text="Video guide"
+								icon="sap-icon://media-play"
+								type="Emphasized"
+								class="umBtnPrimary"
+								press="onViewDemo" />
+							<Button 
+    text="Download guide" 
+    icon="sap-icon://download" 
+    type="Default" 
+    class="umBtnGhost" 
+    press="onDownloadGuide">
+
+    <customData>
+        <core:CustomData
+            key="pdfFile"
+            value="{manual>guideUrl}" />
+    </customData>
+
+</Button>
+						</HBox>
+
+					</VBox>
+				</FlexBox>
+
+				<Text id="emptyState" text="No topics match that search" class="umEmpty" visible="false" />
+
+			</VBox>
+		</content>
+	</Page>
+
+</mvc:View>

@@ -2324,7 +2324,7 @@ sap.ui.define([
         onAdminUsermanualPress: function () {
         this.getOwnerComponent()
         .getRouter()
-        .navTo("RouteAdminUserManual");
+        .navTo("RouteNewManual");
 },
 
 

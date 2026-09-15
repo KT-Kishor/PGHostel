@@ -138,6 +138,11 @@
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/Monthmodel.json",
         "preload": true
+      },
+        "usermanualModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/UserManual.json",
+        "preload": true
       }
     },
     "resources": {
@@ -488,6 +493,13 @@
           "target": [
             "targetAdminUserManual"
           ]
+        },
+        {
+          "name": "RouteNewManual",
+          "pattern": "NewManual",
+          "target": [
+            "targetNewManual"
+          ]
         }
       ],
       "targets": {
@@ -812,6 +824,13 @@
           "clearControlAggregation": false,
           "viewId": "AdminUserManual",
           "viewName": "AdminUserManual"
+        },
+         "targetNewManual": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "NewManual",
+          "viewName": "NewManual"
         }
       }
     },

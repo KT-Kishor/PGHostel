@@ -7555,13 +7555,7 @@ text-transform: none !important;
         width: 100%;
     }
 }
-/* .sapUiIcon::before {
-    content: attr(data-sap-ui-icon-content);
-    speak: none;
-    font-weight: normal;
-    -webkit-font-smoothing: antialiased;
-    color: white;
-} */
+
  .mobileFooterMenu .sapMBtnIcon {
     color: #ffffff !important;
 }
@@ -7580,7 +7574,7 @@ text-transform: none !important;
   text-transform: capitalize;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 
-  background-image: linear-gradient(to right, #F1AD53, #F1AD53);
+  background-image: linear-gradient(to right, #007984, #007984);
   background-repeat: no-repeat;
   background-size: 100% 3px;
   background-position: right 100%;
@@ -7688,4 +7682,173 @@ text-transform: none !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   pointer-events: none;
+}
+
+
+
+/* ===== Design tokens ===== */
+.umPage {
+	--um-ink: #0F2740;
+	--um-ink-soft: #5A6D82;
+	--um-line: #DCE6EF;
+	--um-surface: #FFFFFF;
+	--um-page: #F2F6FA;
+	--um-teal: #0E9AA7;
+	--um-teal-dark: #0B7E89;
+	--um-teal-tint: #E4F5F7;
+
+	background: var(--um-page);
+}
+
+/* ===== Top bar ===== */
+.umTopbar {
+	background: var(--um-surface) !important;
+	border-bottom: 1px solid var(--um-line);
+	padding: 0 20px;
+}
+
+.umBackBtn {
+	margin-right: 8px;
+}
+
+.umTitleBlock {
+	justify-content: center;
+}
+
+.umTitle {
+	font-size: 1.05rem !important;
+	font-weight: 700 !important;
+	color: var(--um-ink) !important;
+	line-height: 1.2 !important;
+}
+
+.umSubtitle {
+	font-size: 0.78rem !important;
+	color: var(--um-ink-soft) !important;
+}
+
+.umSearch input {
+	
+	
+	border-radius: 9px !important;
+}
+
+/* ===== Layout ===== */
+.umWrap {
+	max-width: 1100px;
+	margin: 18px auto;
+	padding: 28px 24px 56px;
+}
+
+.umGrid {
+	gap: 18px;
+}
+
+.umEmpty {
+	display: block;
+	text-align: center;
+	padding: 60px 20px;
+	color: var(--um-ink-soft) !important;
+	font-size: 0.92rem !important;
+}
+
+/* ===== Card ===== */
+.umCard {
+	background: var(--um-surface);
+	border: 1px solid var(--um-line);
+	border-radius: 14px;
+	overflow: hidden;
+	transition: border-color 0.15s;
+	box-sizing: border-box;
+	flex: 1 1 calc(33.333% - 12px);   /* two per row */
+	min-width: 300px;
+	max-width: 100%;
+	padding: 22px 22px 18px;
+}
+
+.umCard:hover {
+	border-color: #C3D6E6;
+}
+
+.umCardHead {
+	margin-bottom: 10px;
+}
+
+.umIcon {
+	width: 38px;
+	height: 38px;
+	min-width: 38px;
+	border-radius: 10px;
+	background: var(--um-teal-tint);
+	color: var(--um-teal-dark) !important;
+	font-size: 1.1rem !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 12px;
+}
+
+.umCardHeadText {
+	justify-content: center;
+}
+
+.umCardTitle {
+	font-size: 1.03rem !important;
+	font-weight: 700 !important;
+	color: var(--um-ink) !important;
+}
+
+.umMeta {
+	font-size: 0.78rem !important;
+	color: var(--um-ink-soft) !important;
+	margin-top: 1px;
+}
+
+.umDesc {
+	display: block;
+	color: var(--um-ink-soft) !important;
+	font-size: 0.88rem !important;
+	line-height: 1.6 !important;
+	max-width: 100%;
+	margin-bottom: 18px;
+}
+
+/* ===== Actions ===== */
+.umActions {
+	gap: 10px;
+	flex-wrap: wrap;
+	padding-top: 14px;
+	border-top: 1px solid var(--um-line);
+}
+
+.umBtnPrimary.sapMBtn {
+	border-color: var(--um-teal) !important;
+	border-radius: 9px !important;
+  color: #fff !important;
+}
+
+.umBtnPrimary.sapMBtn:hover {
+	border-color: var(--um-teal-dark) !important;
+}
+
+.umBtnGhost.sapMBtn {
+	background-color: var(--um-surface) !important;
+	border-color: var(--um-line) !important;
+	color: var(--um-ink) !important;
+	border-radius: 9px !important;
+}
+
+.umBtnGhost.sapMBtn:hover {
+	border-color: var(--um-teal) !important;
+	color: var(--um-teal-dark) !important;
+}
+
+/* ===== Responsive: single column on narrow screens ===== */
+@media (max-width: 760px) {
+	.umWrap {
+		padding: 18px 14px 40px;
+	}
+	.umActions .sapMBtn {
+		flex: 1;
+	}
 }
