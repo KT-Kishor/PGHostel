@@ -7755,8 +7755,8 @@ text-transform: none !important;
 /* ===== Card ===== */
 .umCard {
 	background: var(--um-surface);
-	border: 1px solid var(--um-line);
 	border-radius: 14px;
+  border-left: 4px solid transparent;
 	overflow: hidden;
 	transition: border-color 0.15s;
 	box-sizing: border-box;
@@ -7767,7 +7767,7 @@ text-transform: none !important;
 }
 
 .umCard:hover {
-	border-color: #C3D6E6;
+	 border-left-color: #00b3c3;
 }
 
 .umCardHead {

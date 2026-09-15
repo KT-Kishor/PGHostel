@@ -13,7 +13,7 @@
 				<Button
 					icon="sap-icon://nav-back"
 					type="Transparent"
-					class="umBackBtn"
+					class="umBackBtn myUnifiedBtn"
 					press="onBack"
 					tooltip="Go back" />
 				<VBox class="umTitleBlock">
@@ -79,7 +79,7 @@
 								text="Video guide"
 								icon="sap-icon://media-play"
 								type="Emphasized"
-								class="umBtnPrimary"
+								class="umBtnPrimary myUnifiedBtn"
 								press="onViewDemo" />
 							<Button 
     text="Download guide" 
