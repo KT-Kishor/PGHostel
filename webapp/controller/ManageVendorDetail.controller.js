@@ -115,9 +115,12 @@ sap.ui.define([
         _loadVendorDetails: async function(sUserID) {
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
-                    UserID: sUserID
+                    UserID: sUserID,
+                    _: Date.now() // cache-buster: force fresh data after status changes
                 });
                 const oData = oResponse.data;
+                // Track status loaded from backend (to detect a change to "Inactive" on save)
+                this._sOriginalStatus = oData[0].Status;
                 // Normalize model structure
                 const oAdminData = {
                     UserID: oData[0].UserID,
@@ -145,12 +148,29 @@ sap.ui.define([
                     DocTypeEnabled: true
                 };
 
+                // Status ComboBox items: only backend status; "Inactive" extra only when status is "Active"
+                const aStatuses = oAdminData.Status === "Active" ?
+                    [oAdminData.Status, "Inactive"] :
+                    [oAdminData.Status].filter(s => s);
+                let oStatusModel = this.getView().getModel("StatusModel");
+                if (!oStatusModel) {
+                    oStatusModel = new sap.ui.model.json.JSONModel();
+                    this.getView().setModel(oStatusModel, "StatusModel");
+                }
+                oStatusModel.setData(aStatuses.map(s => ({
+                    Status: s
+                })));
+
                 let oModel = this.getView().getModel("AdminSignupModel");
                 if (!oModel) {
                     oModel = new sap.ui.model.json.JSONModel();
                     this.getView().setModel(oModel, "AdminSignupModel");
                 }
                 oModel.setData(oAdminData);
+
+                // Clear lingering error states from previous visit
+                this.getView().findAggregatedObjects(true, c => c && typeof c.setValueState === "function")
+                    .forEach(c => c.setValueState("None"));
             } catch (err) {
                 MessageToast.show(this.i18nModel.getText("vendorLoadError"));
             }
@@ -311,7 +331,8 @@ sap.ui.define([
                     utils._LCvalidateMandatoryField(C("MV_id_City"), "ID") === true &&
                     utils._LCstrictValidationComboBox(C("MV_id_StdCode"), "ID") === true &&
                     utils._LCvalidateISDmobile(C("MV_id_MobileNo"), std) === true &&
-                    utils._LCvalidateAddress(C("MV_id_Address")) === true;
+                    utils._LCvalidateAddress(C("MV_id_Address")) === true &&
+                    utils._LCstrictValidationComboBox(C("MV_id_status"), "ID") === true;
 
                 if (!isValid) {
                     MessageToast.show(this.i18nModel.getText("MSfillallfields"));
@@ -330,11 +351,17 @@ sap.ui.define([
                         State: oData.State,
                         City: oData.City,
                         DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                        Status: oData.Status,
                     },
                     filters: {
                         UserID: oData.UserID
                     }
                 };
+                // Only when status is CHANGED to "Inactive", blank the password
+                if (oData.Status === "Inactive" && this._sOriginalStatus !== "Inactive") {
+                    payload.data.Password = "";
+                    payload.data.AdminComment= "";
+                }
                 this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
@@ -813,8 +840,20 @@ sap.ui.define([
                 };
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 this.oDialog.close();
-                // Reload latest data
+                // Reflect new status immediately in UI
+                this.getView().getModel("AdminSignupModel").setProperty("/Status", statusMap[btnText]);
+
+                // Fresh read call: reload latest data from backend
                 await this._loadVendorDetails(oData.UserID);
+
+                // Force the Status ComboBox to display the fresh status
+                const oVendorModel = this.getView().getModel("AdminSignupModel");
+                const sNewStatus = oVendorModel.getProperty("/Status") || statusMap[btnText];
+                const oStatusCB = this.byId("MV_id_status");
+                if (oStatusCB) {
+                    oStatusCB.setSelectedKey(sNewStatus);
+                    oStatusCB.setValue(sNewStatus);
+                }
             } catch (err) {
                 sap.m.MessageBox.error(
                     btnText === "Approve" ?
@@ -984,6 +1023,13 @@ sap.ui.define([
 
             const sCity = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/City", sCity);
+        },
+
+        onStatusChange: function(oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+            const oCombo = oEvent.getSource();
+            const sStatus = oCombo.getSelectedItem()?.getText() || oCombo.getValue() || "";
+            this.getView().getModel("AdminSignupModel").setProperty("/Status", sStatus);
         },
 
         ADMIN_onChangeSTD: function() {
