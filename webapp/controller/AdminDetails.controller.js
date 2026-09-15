@@ -2267,8 +2267,8 @@ sap.ui.define([
 
 
             
-                const bedName = CustData.BedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
-                const acType = CustData.BedType.includes("NON-AC") ? "NON-AC" : "AC";
+                const bedName = oData.BedTypeName.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+                const acType = oData.BedTypeName.includes("NON-AC") ? "NON-AC" : "AC";
         
 
             var sStart = oData.StartDate;
