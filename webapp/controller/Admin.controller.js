@@ -627,6 +627,8 @@ try {
             var oAvailableRoomsModel = new sap.ui.model.json.JSONModel(availableRoomNos);
             this.getView().setModel(oAvailableRoomsModel, "AvailableRoomsModel");
 
+         
+
             if (!this.HM_Dialog) {
                 this.HM_Dialog = sap.ui.xmlfragment(
                     "sap.ui.com.project1.fragment.Assign_Room",
@@ -671,17 +673,39 @@ try {
             var bShowDeposit = this.data.Status !== "Assigned" && depositRequired > 0;
             this._bDepositRequired = bShowDeposit;
 
-            if (this.data.Status === "Assigned") {
-                sap.ui.getCore().byId("idRoomNumber1")
-                    .setSelectedKey(this.data.RoomNo)
-                    .setValueState("None");
+           var oModel = this.getView().getModel("AvailableRoomsModel");
+var aRooms = oModel.getData() || [];
 
-            } else {
-                sap.ui.getCore().byId("idRoomNumber1")
-                    .setSelectedKey("")
-                    .setValueState("None");
+var oComboBox = sap.ui.getCore().byId("idRoomNumber1");
 
-            }
+if (this.data.Status === "Assigned") {
+
+    // Make sure assigned room exists in ComboBox items
+    var bRoomExists = aRooms.some(function (oRoom) {
+        return oRoom.RoomNo === this.data.RoomNo;
+    }.bind(this));
+
+    if (!bRoomExists && this.data.RoomNo) {
+        aRooms.unshift({
+            RoomNo: this.data.RoomNo
+        });
+
+        oModel.setData(aRooms);
+    }
+
+    oComboBox
+        .setEnabled(true)
+        .setSelectedKey(this.data.RoomNo)
+        .setValueState("None");
+
+} else {
+
+    oComboBox
+        .setEnabled(aRooms.length > 0)
+        .setSelectedKey("")
+        .setValueState("None");
+}
+               
             this.getView().getModel("Visiblemodel").setProperty("/Visible", bShowDeposit);
             sap.ui.getCore().byId("id_DepositAmount").setValue(depositRequired);
             this.Deposit = depositRequired

@@ -3201,7 +3201,7 @@ sap.ui.define([
             }
         },
 
-        onRoomBedChange: function (oEvent) {
+        onRoomBedChange:async function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
             var oSelectedItem = oEvent.getParameter("selectedItem");
 
@@ -3294,47 +3294,6 @@ sap.ui.define([
                     }
                 })
 
-                // if (CustData.CouponCode || this.Code) {
-                //     var oCouponData = this.getView().getModel("CouponModel").getData();
-                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
-
-                //     if (oMatchedCoupon.MinOrderValue <= (fFacilityPrice + (CustData.RentPrice || 0))) {
-
-                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage" && CustData.Discount) {
-                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                //             CustData.Discount = (fFacilityPrice + (CustData.RentPrice || 0)) * Number(this.CouponDiscount) / 100
-                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                //             }
-                //         } else {
-                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                //         }
-
-                //     }
-                // }
-
-                // var SubTotal = fOriginalRentPrice + fFacilityPrice - Number(CustData.Discount)
-                // var CGST = SubTotal * CustData.GSTValue / 100
-
-
-                // if(CustData.GSTType==="IGST"){
-                // oCustomerModel.setProperty("/IGST", CGST)
-                //  oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST );
-                // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST- CustData.PaymentPaid);
-
-                // }else{
-                // oCustomerModel.setProperty("/SGST", CGST)
-                // oCustomerModel.setProperty("/CGST", CGST)
-                //  oCustomerModel.setProperty("/GrandTotal", SubTotal + CGST * 2);
-                // oCustomerModel.setProperty("/DueAmount", SubTotal + CGST * 2 - CustData.PaymentPaid);
-                // }
-
-                // oCustomerModel.setProperty("/SubTotal", SubTotal)
-
-                // oCustomerModel.setProperty("/Discount", CustData.Discount)
-                // oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
-
                 var SubTotal = fOriginalRentPrice + fFacilityPrice - Number(CustData.Discount)
                 var CGST = SubTotal * CustData.GSTValue / 100
 
@@ -3347,30 +3306,7 @@ sap.ui.define([
                 } else {
                     TotalAmount = SubTotal
                 }
-                // if (CustData.CouponCode || this.Code) {
-                //     var oCouponData = this.getView().getModel("CouponModel").getData();
-                //     var sEnteredCode = this.Code || CustData.CouponCode; // user entered code
-                //     var oMatchedCoupon = oCouponData.find(coupon => coupon.CouponCode === sEnteredCode);
-
-
-                //     if (oMatchedCoupon.MinOrderValue <= TotalAmount) {
-
-                //         if (oMatchedCoupon.DiscountType === "Percentage" && this.CouponDiscount || oMatchedCoupon.DiscountType === "Percentage"
-                //             && CustData.Discount) {
-                //             this.CouponDiscount = this.CouponDiscount || oMatchedCoupon.DiscountValue || "0"
-                //             CustData.Discount = TotalAmount * Number(this.CouponDiscount) / 100
-                //             if (oMatchedCoupon.UptoValue > 0 && CustData.Discount > oMatchedCoupon.UptoValue) {
-                //                 CustData.Discount = Number(oMatchedCoupon.UptoValue);
-                //             }
-                //         } else {
-                //             CustData.Discount = this.CouponDiscount || CustData.Discount || "0.00";
-                //         }
-
-                //     }
-                // }
-
-
-
+             
 
                 if (CustData.GSTType === "IGST") {
                     oCustomerModel.setProperty("/IGST", CGST)
@@ -3387,6 +3323,32 @@ sap.ui.define([
 
                 oCustomerModel.setProperty("/Discount", CustData.Discount)
                 oCustomerModel.setProperty("/Deposit", Deposit.Deposit)
+            }
+              if(oBookingModel.getProperty("/StartDate") && oBookingModel.getProperty("/EndDate")){
+
+               var filters={
+                   StartDate: oBookingModel.getProperty("/StartDate").split("/").reverse().join("-"),
+                   EndDate:oBookingModel.getProperty("/EndDate").split("/").reverse().join("-"),
+                   BranchCode:CustData.BranchCode,
+                   Name:Bedname,
+                   ACType:Acname,
+                   PropertyType:CustData.PropertyType,
+                   BookingID:CustData.BookingID
+                }
+                this.getBusyDialog()
+               const response =await this.ajaxReadWithJQuery("HM_BookingSummary", filters);
+              if (response.roomStatus === "Fully Booked") {
+
+ 
+
+    MessageBox.error("This booking dates have fully booked, Please select another date.");
+     this.Date=false
+     this.closeBusyDialog()
+    return;
+}
+     this.closeBusyDialog()
+
+       this.Date=true
             }
         },
 
