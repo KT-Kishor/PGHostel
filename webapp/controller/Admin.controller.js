@@ -163,6 +163,27 @@ sap.ui.define([
 
             }
         },
+        onPropertyChange:function() {
+            var Branchcode=this.getView().byId("PO_id_PropertyName").getSelectedKey();
+
+var filteredData = this._originalRoomdata.filter(function (item) {
+    return item.BranchCode === Branchcode;
+});
+
+// Remove duplicate BedType
+var uniqueData = Array.from(
+    new Map(filteredData.map(item => [item.BedType, item])).values()
+);
+
+            this.getView().setModel(new JSONModel(uniqueData), "BedModel");
+
+            if(Branchcode===""){
+            this.getView().byId("PO_id_Bedtype").setEnabled(false);
+            }else{
+            this.getView().byId("PO_id_Bedtype").setEnabled(true);
+
+            }
+        },
 
         Cust_read: function (flag, bBusyAlreadyOpen) {
             try {
@@ -237,7 +258,13 @@ sap.ui.define([
                     filters.BranchCode = oExistingModel.BranchCode;
                 }
 
-                if (sbookID) filters.BookingID = sbookID;
+                if (sbookID)
+                    {
+                        filters.BookingID = sbookID
+                        filters.flag = true
+                    }else{
+                        filters.flag = false
+                    };
                 if (sRoomNo) filters.RoomNo = sRoomNo;
                 if (sStatus) filters.Status = sStatus;
                 if (sCustomerName) filters.CustomerName = sCustomerName;
@@ -309,12 +336,29 @@ sap.ui.define([
 
                     const oModel = new sap.ui.model.json.JSONModel(mappedData);
                     this.getView().setModel(oModel, "HostelModel");
+
+
+
+
+
+
+
+
+
                     this.getOwnerComponent().setModel(oModel, "HostelModelcheckrooms");
 
 
 
                     this._populateUniqueFilterValues(this._originalRoomdata);
                     this._addNoDataToComboBoxes();
+                    var filteredData = this._originalRoomdata.filter(function (item) {
+    return item.BranchCode === Branchcode;
+});
+var uniqueData = Array.from(
+    new Map(filteredData.map(item => [item.BedType, item])).values()
+);
+
+this.getView().getModel("BedModel").setData(uniqueData);
                     this.closeBusyDialog()
                 }).catch(() => this.closeBusyDialog());
             } catch (e) {
@@ -348,7 +392,6 @@ sap.ui.define([
                 PO_id_BookingId: new Set(),
                 PO_id_CompanyName: new Set(),
                 PO_id_CustomerName: new Set(),
-                PO_id_Bedtype: new Set()
 
 
             };
@@ -364,15 +407,13 @@ sap.ui.define([
                 if (item.CustomerName) {
                     uniqueValues.PO_id_CustomerName.add(item.CustomerName.trim());
                 }
-                if (item.BedType) {
-                    uniqueValues.PO_id_Bedtype.add(item.BedType.trim());
-                }
+               
 
             });
 
             let oView = this.getView();
 
-            ["PO_id_BookingId", "PO_id_CompanyName", "PO_id_CustomerName", "PO_id_Bedtype"].forEach(field => {
+            ["PO_id_BookingId", "PO_id_CompanyName", "PO_id_CustomerName"].forEach(field => {
                 let oComboBox = oView.byId(field);
                 if (!oComboBox) return;
 
@@ -1326,7 +1367,7 @@ if (this.data.Status === "Assigned") {
             this.getView().byId("PO_id_Status").setSelectedKey("")
             this.getView().byId("PO_id_BookingId").setSelectedKey("")
             this.getView().byId("PO_id_CustomerName").setSelectedKey("")
-            this.getView().byId("PO_id_Bedtype").setSelectedKey("")
+            this.getView().byId("PO_id_Bedtype").setSelectedKey("").setEnabled(false)
             this.getView().byId("PO_id_PropertyName").setSelectedKey("")
 
 

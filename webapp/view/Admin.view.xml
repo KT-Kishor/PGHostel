@@ -42,6 +42,7 @@
                                 id="PO_id_PropertyName"
                                 items="{BranchFilterModel>/}"
                                 showClearIcon="true"
+                                change="onPropertyChange"
                             >
 								<core:ListItem
                                     key="{BranchFilterModel>BranchCode}"
@@ -52,27 +53,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 
-                <fb:filterGroupItems>
-					<fb:FilterGroupItem
-                        name="Bed Type"
-                        label="Bed Type"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-						<fb:control>
-							<ComboBox
-                                id="PO_id_Bedtype"
-                                items="{HostelModel>/}"
-                                showClearIcon="true"
-                            >
-								<core:ListItem
-                                    key="{HostelModel>BedType}"
-                                    text="{HostelModel>BedType}"
-                                />
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
-				</fb:filterGroupItems>
+               
 				
             
 				<fb:filterGroupItems>
@@ -176,6 +157,29 @@
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
                             />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+                 <fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Bed Type"
+                        label="Bed Type"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+						<fb:control>
+							<ComboBox
+                                id="PO_id_Bedtype"
+                                items="{BedModel>/}"
+                                showClearIcon="true"
+                                enabled="false"
+
+                            >
+								<core:ListItem
+                                    key="{BedModel>BedType}"
+                                    text="{BedModel>BedType}"
+                                />
+							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
