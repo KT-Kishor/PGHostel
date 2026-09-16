@@ -7,115 +7,166 @@
             "icon": "sap-icon://supplier",
             "videoUrl": "Videos/vendor registration + vendor credentials and login.mp4",
             "guideUrl": "ManageVender.pdf",
-            "expanded": false
+            "excludeRoles": ["Front Office Employee", "Admin","Housekeeping","Branch Manager"],
+             "showWhenNoRole": true
         },
         {
             "title": "Admin Branch Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can manage multiple branches by creating different branch types, such as Hostels, PGs, and Hotels.While creating a branch, the Admin can enter all required branch details along with the applicable GST information.\nThe system provides an option to specify whether GST is applicable to the respective branch.The Admin can download branch data in Excel format for reporting and record-keeping purposes.The Admin can also edit or delete existing branch details whenever required.",
+            "description": "The Admin can manage multiple branches by creating different branch types, such as Hostels, PGs, and Hotels. While creating a branch, the Admin can enter all required branch details, including applicable GST information. The system provides an option to specify whether GST is applicable to the respective branch. The Admin can download complete branch data in Excel format for reporting and record-keeping. The Admin can also edit, update, or delete existing branch details whenever required to maintain accurate branch records as needed.",
             "icon": "sap-icon://building",
             "videoUrl": "Videos/Branch.mp4",
             "guideUrl": "Admin_branch_management.pdf",
-            "expanded": false
+             "excludeRoles": ["Front Office Employee","ManageVendor","Customer"]
+           
         },
         {
             "title": "Admin Bed Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage different bed types, such as Single Bed, Double Bed, and other customized bed configurations.While creating a bed type, the Admin can provide the required details and upload relevant images for better identification.\nThe Admin can define the number of rooms available for each bed type and specify the maximum number of occupants per room.All bed-related information can be downloaded in Excel format for reporting and record-keeping purposes.The Admin can easily manage existing bed types by editing or deleting their details whenever required.",
+            "description": "The Admin can create and manage bed types, such as Single Bed, Double Bed, and customized bed configurations. While creating a bed type, the Admin can provide required details and upload relevant images for identification. The Admin can define the number of rooms available for each bed type and specify the maximum number of occupants per room. All bed-related information can be downloaded in Excel format for reporting and record-keeping. The Admin can also manage existing bed types by editing or deleting their details whenever required.",
             "icon": "sap-icon://bed",
             "videoUrl": "Videos/bed template.mp4",
             "guideUrl": "bed_template_guide.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+          
         },
         {
             "title": "Admin Room Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage rooms by assigning room numbers and defining the required number of rooms for each property.The Admin can set and manage room prices based on the selected room or room type.Room details, including room numbers, availability, and pricing, can be updated whenever required.The Admin can download room-related data in Excel format for reporting and record-keeping purposes.The Admin can easily edit room details, change room numbers or prices, and manage room information as needed.",
+            "description": "The Admin can create and manage rooms by assigning room numbers and defining the required number of rooms for each property. The Admin can set and manage room prices based on the selected room or room type. Room details, including room numbers, availability, and pricing, can be updated whenever required. The Admin can download room data in Excel format for reporting and record-keeping. The Admin can also edit room details, change room numbers or prices, and manage room information as needed. This helps maintain accurate room records.",
             "icon": "sap-icon://home",
             "videoUrl": "Videos/room.mp4",
             "guideUrl": "Room_Management.pdf",
-            "expanded": false
+           "excludeRoles": ["ManageVendor","Customer"]
         },
         {
             "title": "Admin Facility Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage various facilities and define the applicable pricing for each facility.\nThe Admin can add facility images along with relevant details to provide a clear overview of the available services.Facility pricing can be configured based on different durations, such as daily, monthly, or yearly rates.The Admin can download facility data in Excel format for reporting and record-keeping purposes.The Admin can easily edit facility details, update prices, change images, and manage the facility information whenever required.",
+            "description": "The Admin can create and manage various facilities and define the applicable pricing for each facility. The Admin can add facility images along with relevant details to provide an overview of the available services. Facility pricing can be configured based on different durations, such as daily, monthly, or yearly rates. The Admin can download facility data in Excel format for reporting and record-keeping purposes. The Admin can easily edit facility details, update prices, change images, and manage facility details whenever required.",
             "icon": "sap-icon://activity-items",
             "videoUrl": "Videos/facilities.mp4",
             "guideUrl": "facilities_management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+           
         },
         {
             "title": "Admin Amenities Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage various amenities available within each property.The Admin can add relevant images and provide detailed information for each amenity.The system allows the Admin to specify the number of amenities available at a particular property.Amenity data can be downloaded in Excel format for reporting and record-keeping purposes.The Admin can easily edit, update, or delete amenity details whenever required.",
+            "description": "The Admin can create and manage various amenities available within each property. The Admin can add relevant images and provide detailed information for each amenity. The system allows the Admin to specify the number of amenities available at a particular property. Amenity data can be downloaded in Excel format for reporting and record-keeping purposes. The Admin can easily edit, update, or delete amenity details whenever required. This helps maintain accurate amenity records and provides clear information about available facilities across different properties for effective management and reference.",
             "icon": "sap-icon://add-product",
             "videoUrl": "Videos/Amenities.mp4",
             "guideUrl": "amenities_management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+          
         },
         {
             "title": "Admin Coupon Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage coupons by defining the coupon name, discount value, maximum discount limit, and usage limit.The Admin can configure the minimum order value and set an expiration date for each coupon.Coupons can be managed efficiently by updating their details and monitoring their validity and usage limits.The Admin can share coupons with customers through WhatsApp and email for promotional purposes.The complete coupon data can be downloaded in Excel format for reporting, tracking, and record-keeping.",
+            "description": "The Admin can create and manage coupons by defining the coupon name, discount value, maximum discount limit, and usage limit. The Admin can configure the minimum order value and set an expiration date for each coupon. Coupons can be managed efficiently by updating their details and monitoring their validity and usage limits. The Admin can share coupons with customers through WhatsApp and email for promotional purposes. The complete coupon data can be downloaded in Excel format for reporting, tracking, and record-keeping as required.",
             "icon": "sap-icon://marketing-campaign",
             "videoUrl": "Videos/coupon.mp4",
             "guideUrl": "coupon_management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+           
         },
         {
             "title": "Admin Staff Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can create and manage staff members by assigning different roles and responsibilities based on the requirements of the property.\nEach staff member can be assigned to a specific branch to ensure proper access.After creation, staff members can log in using their credentials and access only the applications and features authorized for their assigned role.The Admin can manage staff information by updating role assignments, branch details, and access permissions whenever required.Staff data can also be downloaded in Excel format for reporting, tracking, and record-keeping purposes.",
+            "description": "The Admin can create and manage staff members by assigning roles and responsibilities based on property requirements. Each staff member can be assigned to a branch to ensure access. Staff members can log in using their credentials and access only the applications and features authorized for their assigned role. The Admin can update staff information, including role assignments, branch information, and access permissions whenever required. Staff data can be downloaded in Excel format for reporting, tracking, and record-keeping purposes.",
             "icon": "sap-icon://employee",
             "videoUrl": "Videos/staff.mp4",
             "guideUrl": "Staff_Management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Front Office Employee","Customer"]
+           
         },
         {
             "title": "Manage Bookings",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can view and manage all bookings made by customers across the properties.The Admin can review and update booking details and manage the booking status as required.Bookings can be confirmed, rejected, or cancelled based on availability and operational requirements.The Admin can assign available rooms to customers and manage room assignments throughout the booking process.Complete booking data can be downloaded in Excel format for reporting, tracking, and record-keeping purposes.",
+            "description": "The Admin can view and manage all bookings made by customers across different properties. The Admin can review and update booking details and manage booking status as required. Bookings can be confirmed, rejected, or cancelled based on availability and operational requirements. The Admin can assign available rooms to customers and manage room assignments throughout the booking process. Complete booking data can be downloaded in Excel format for reporting, tracking, verification, and record-keeping purposes, ensuring accurate and organized booking information is maintained across all properties.",
             "icon": "sap-icon://calendar",
             "videoUrl": "Videos/Admin Manage booking.mp4",
             "guideUrl": "Admin booking management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+            
         },
         {
             "title": "Invoice Management",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can generate and manage invoices based on individual customer requirements and booking details.\nInvoices can be generated for different billing periods, including monthly, yearly, or complete booking totals.\nThe Admin can apply and manage GST details accurately while generating invoices.Complete invoices can be downloaded in PDF format for sharing, reporting, and record-keeping purposes.The Admin can review and manage invoice details, including billing amounts, GST, and other applicable charges.The Admin can filter invoices based on relevant criteria and download the complete filtered invoice data.",
+            "description": "The Admin can generate and manage invoices based on customer requirements and booking details. Invoices can be generated for monthly, yearly, or complete booking periods. The Admin can apply GST details while generating invoices. Complete invoices can be downloaded in PDF format for sharing and record-keeping. The Admin can review invoice details, including billing amounts, GST, and applicable charges. The Admin can filter invoices based on criteria and download filtered invoice data in Excel format for reporting and record-keeping.",
             "icon": "sap-icon://receipt",
             "videoUrl": "Videos/invoice.mp4",
             "guideUrl": "Manage_Invoice.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Housekeeping","Customer"]
+           
         },
         {
             "title": "Deposit Details",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can view and manage all deposit details collected from customers at the time of room assignment.The system records the deposit amount along with the relevant customer and booking details for easy tracking.The Admin can review and edit deposit information whenever required to maintain accurate records.The Admin can process and record the return or refund of the deposit amount to the customer when applicable.Complete deposit data can be filtered and downloaded in Excel format for reporting, reconciliation, and record-keeping purposes.",
+            "description": "The Admin can view and manage all deposit details collected from customers during room assignment. The system records the deposit amount along with customer and booking details for easy tracking. The Admin can review and edit deposit information whenever required to maintain accurate records. The Admin can process and record the return or refund of the deposit amount to the customer when applicable. Complete deposit data can be filtered and downloaded in Excel format for reporting, reconciliation, and record-keeping purposes.",
             "icon": "sap-icon://money-bills",
             "videoUrl": "Videos/deposit.mp4",
             "guideUrl": "deposit.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Housekeeping","Customer"]
+           
         },
         {
             "title": "Damage Details",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can record and manage damage details when a customer or student damages any property or facility.The Admin can create a damage record by adding the item details, damage description, and applicable cost.The system can calculate and generate a PDF report showing the damaged item and the total associated cost.The Admin can review and edit damage records whenever required to maintain accurate information.Complete damage data can also be filtered and downloaded for reporting, tracking, and record-keeping purposes.",
+            "description": "The Admin can record and manage damage details when a customer or student damages any property or facility. The Admin can create a damage record by adding item details, damage description, and applicable cost. The system can calculate and generate a PDF report showing the damaged item and the total associated cost. The Admin can review and edit damage records whenever required to maintain accurate information. Complete damage data can also be filtered and downloaded in Excel format for reporting, tracking, reconciliation, and record-keeping purposes across the property.",
             "icon": "sap-icon://warning",
             "videoUrl": "Videos/Damage.mp4",
             "guideUrl": "Damage management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+           
         },
         {
             "title": "Complaint Details",
             "meta": "Demo · PDF guide",
-            "description": "The Admin can view and manage complaints raised by customers or students, including the complete complaint details.The Admin can review any images or supporting attachments submitted with the complaint for better understanding of the issue.Complaints can be assigned to the appropriate staff member for investigation and resolution.Once the issue is resolved, the Admin can update and manage the complaint status and resolution details.Complaint information and key statistics can also be monitored through the dashboard for effective tracking and management.",
+            "description": "The Admin can view and manage all complaints raised by customers or students, including complaint details. The Admin can review images and supporting attachments submitted with each complaint to understand the issue. Complaints can be assigned to the appropriate staff member for investigation and resolution. Once the issue is resolved, the Admin can update the complaint status and resolution details. Complaint information and key statistics can also be monitored through the dashboard for effective tracking and management as required.",
             "icon": "sap-icon://discussion",
             "videoUrl": "Videos/Complaint.mp4",
             "guideUrl": "Complaint management.pdf",
-            "expanded": false
+            "excludeRoles": ["ManageVendor","Customer"]
+        },
+        {
+            "title": "Customer SignUp",
+            "meta": "Demo · PDF guide",
+            "description": "The Customer Signup Form allows customers to provide basic personal details, such as their name and mobile number. Users can enter contact information, including email address, country, city, and other relevant details. The form collects accurate information to create and maintain the customer profile. In the final step, customers can set a secure password for their account. Once all required details are completed, the customer can review the entered information, submit the form, and successfully create an account for accessing the system and managing their profile.",
+            "icon": "sap-icon://visits",
+            "videoUrl": "Videos/Customer Reg + Sign in + Profile Pic.mp4",
+            "guideUrl": "customer_sign in_signup_profile_pic.pdf",
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+             "showWhenNoRole": true
+        },
+        {
+            "title": "Set/Forgot Password",
+            "meta": "Demo · PDF guide",
+            "description": "The Set/Forgot Password feature allows customers to securely create or reset their account password. Customers need to enter their registered email address to receive a One-Time Password (OTP). After receiving the OTP, they must enter and verify it to confirm their identity. Once the OTP is successfully verified, the customer can enter and confirm a new password. After successfully setting the new password, the customer can use it to securely log in to their account and access the system without any issues for secure account access.",
+            "icon": "sap-icon://key",
+            "videoUrl": "Videos/set - reset password.mp4",
+            "guideUrl": "password-reset-guide.pdf",
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+             "showWhenNoRole": true
+        },
+        {
+            "title": "Create Booking",
+            "meta": "Demo · PDF guide",
+            "description": "The Create Booking feature allows customers to select a property and choose their preferred bed type before proceeding to the booking page. Customers can specify the booking date and the number of members staying. Additional facilities or services can be selected based on their requirements. Customers can also apply an available coupon and add applicable GST or tax to the booking. After reviewing all booking details and the final amount, the customer can confirm and book the room, ensuring all required information is complete.",
+            "icon": "sap-icon://home",
+            "videoUrl": "Videos/Booking.mp4",
+            "guideUrl": "Booking_walk_through.pdf",
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+             "showWhenNoRole": true
+        },
+        {
+            "title": "Manage Booking",
+            "meta": "Demo · PDF guide",
+            "description": "The Manage Booking feature allows customers to view and manage their existing bookings in one place. Customers can edit previously entered booking details, such as booking date, number of members, selected facilities, applied coupons, and applicable GST. If required, customers can cancel their booking directly from the Manage Booking section. The updated booking details and booking status are reflected immediately, helping customers keep track of their reservation and stay informed about the latest changes to their booking promptly.",
+            "icon": "sap-icon://reset",
+            "videoUrl": "Videos/Booking edit & Cancel.mp4",
+            "guideUrl": "customer_edit_and_cancel.pdf",
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+            "showWhenNoRole": true
         }
     ]
 }

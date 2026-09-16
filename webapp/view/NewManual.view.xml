@@ -40,7 +40,13 @@
 					wrap="Wrap"
 					class="umGrid">
 
-					<VBox class="umCard">
+					<VBox class="umCard" 	visible="{
+							parts: [
+								{ path: 'manual>excludeRoles' },
+								{ path: 'LoginModel>/Role' }
+							],
+							formatter: '.isCardVisible'
+						}">
 
 						<HBox class="umCardHead" alignItems="Center">
 							<core:Icon src="{manual>icon}" class="umIcon" />
@@ -56,36 +62,26 @@
             parts: [
                 { path: 'manual>description' },
                 { path: 'manual>expanded' }
-            ],
-            formatter: '.formatDescription'
+            ]
+          
         }"
         class="umDesc" />
 
-    <Link
-        text="{
-            path: 'manual>expanded',
-            formatter: '.formatDescriptionLinkText'
-        }"
-        visible="{
-            path: 'manual>description',
-            formatter: '.showDescriptionLinkVisible'
-        }"
-        press="onToggleDescription"
-        class="umShowDescription" />
+   
 
 </VBox>
-						<HBox class="umActions">
+						<HBox class="umActions" justifyContent="End">
 							<Button
-								text="Video guide"
-								icon="sap-icon://media-play"
+								text="Video Guide"
+							
 								type="Emphasized"
 								class="umBtnPrimary myUnifiedBtn"
 								press="onViewDemo" />
 							<Button 
-    text="Download guide" 
-    icon="sap-icon://download" 
+    text="Download Guide" 
+   
     type="Default" 
-    class="umBtnGhost" 
+    class="umBtnGhost myUnifiedBtn" 
     press="onDownloadGuide">
 
     <customData>

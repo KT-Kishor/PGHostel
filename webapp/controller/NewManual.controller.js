@@ -13,44 +13,65 @@ sap.ui.define([
 	return BaseController.extend("sap.ui.com.project1.controller.NewManual", {
 
 		onInit: function () {
+             this.getOwnerComponent().getRouter().getRoute("RouteNewManual").attachMatched(this._onRouteMatched, this);
 			   var oModel = new JSONModel();
 
             oModel.loadData(
                 sap.ui.require.toUrl("sap/ui/com/project1/model/UserManual.json")
             );
 			this.getView().setModel(oModel, "manual");
+        
 
              this.getView().setModel(new JSONModel({
                 title: ""
             }), "dialog");
 		},
-
+_onRouteMatched: async function  (oEvent) {
+    var LoginFUnction = await this.commonLoginFunction();
+     if (!LoginFUnction) return;
+  const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+              const sRole = oLoginModel.getProperty("/Role");
+          
+			this._applyFilters();
+},
 	 onBack:function(){
   this.getOwnerComponent().getRouter().navTo("TilePage");
 
   },
+  isCardVisible: function (aExcludeRoles, sRole) {
+			if (!aExcludeRoles || !aExcludeRoles.length) {
+				return true;
+			}
+			return aExcludeRoles.indexOf(sRole) === -1;
+		},
 
-		onSearch: function (oEvent) {
-			var sQuery = oEvent.getParameter("newValue");
+      _applyFilters: function (sSearchQuery) {
 			var oGrid = this.byId("cardGrid");
 			var oBinding = oGrid.getBinding("items");
-
-			if (!sQuery) {
-				oBinding.filter([]);
-			} else {
-				var aFilters = new Filter({
+			if (!oBinding) {
+				return;
+			}
+ 
+			if (sSearchQuery) {
+				oBinding.filter(new Filter({
 					filters: [
-						new Filter("title", FilterOperator.Contains, sQuery),
-						new Filter("description", FilterOperator.Contains, sQuery)
+						new Filter("title", FilterOperator.Contains, sSearchQuery),
+						new Filter("description", FilterOperator.Contains, sSearchQuery)
 					],
 					and: false
-				});
-				oBinding.filter(aFilters);
+				}));
+			} else {
+				oBinding.filter([]);
 			}
-
+ 
 			var bEmpty = oBinding.getLength() === 0;
 			this.byId("emptyState").setVisible(bEmpty);
 			oGrid.setVisible(!bEmpty);
+		},
+
+			onSearch: function (oEvent) {
+			var sQuery = oEvent.getParameter("newValue");
+			this._applyFilters(sQuery);
 		},
 
 onViewDemo: function (oEvent) {
@@ -204,29 +225,9 @@ onVideoDialogClose: function () {
     oLink.click();
     document.body.removeChild(oLink);
 },
-      formatDescription: function (sDescription, bExpanded) {
+    
 
-    if (!sDescription) {
-        return "";
-    }
 
-    // Show complete description
-    if (bExpanded === true) {
-        return sDescription;
-    }
-
-    // Show only first 300 characters
-    if (sDescription.length > 300) {
-        return sDescription.substring(0, 300) + "...";
-    }
-
-    return sDescription;
-},
-
-formatDescriptionLinkText: function (bExpanded) {
-
-    return bExpanded === true ? "Show Less" : "Show More";
-},
 
 showDescriptionLinkVisible: function (sDescription) {
 

@@ -30,7 +30,7 @@
             <Link
                 id="usermanualLink"
                 text="User Manual"
-                class="_link desktopFooterItem"
+                class="_link desktopFooterItem sapUiTinyMarginEnd"
                 press="onUsermanualPress" />
                 
             <Link
