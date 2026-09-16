@@ -117,6 +117,12 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteRoomImages");
         },
+         TileV_onpressInvoice: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+               oRouter.navTo("Routecustominvoice",{
+                sPath:"TilePage"
+            });
+        },
 
         TileV_onpressfacilities: function () {
             var oRouter = this.getOwnerComponent().getRouter();

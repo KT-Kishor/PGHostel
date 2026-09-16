@@ -240,7 +240,19 @@
                     header="{i18n>invoiceDetails}"
                     press="TileV_onpressManageInvoice"
                 >
+                
 						<TileContent unit="{i18n>TileinvoiceDetails}">
+							<ImageContent src="sap-icon://expense-report" />
+						</TileContent>
+					</GenericTile>
+                        <GenericTile
+                    id="idinvoiceTile"
+                    visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
+                    class="sapUiTinyMargin glassTile"
+                    header="Generate Invoice"
+                    press="TileV_onpressInvoice"
+                >
+						<TileContent unit="{i18n>ManagecustomizedInvoice}">
 							<ImageContent src="sap-icon://expense-report" />
 						</TileContent>
 					</GenericTile>

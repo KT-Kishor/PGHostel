@@ -1,0 +1,5760 @@
+sap.ui.define([
+    "./BaseController", //call base controller
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+    "../utils/validation",
+    "sap/ui/model/odata/type/Currency",
+    "../model/formatter",
+    "sap/m/MessageBox",
+],
+    function (BaseController, JSONModel, MessageToast, utils, Currency, Formatter, MessageBox) {
+        "use strict";
+        return BaseController.extend("sap.ui.com.project1.controller.ManageInvoiceplaindetails", {
+            Formatter: Formatter,
+            onInit: function () {
+                this.getOwnerComponent().getRouter().getRoute("Routecustomdetailsinvoice").attachMatched(this._onRouteMatched, this);
+            },
+
+            _onRouteMatched: async function (oEvent) {
+                this.getBusyDialog()
+                this.MonthDate="";
+                var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+                if (!LoginFUnction) return;
+                var sArg = oEvent.getParameter("arguments").sPath;
+                this.BookingID = ""
+                if (sArg.includes(",")) {
+                    this.BookingID = decodeURIComponent(sArg.split(",")[1]);
+                    sArg = "X";
+                }
+
+                var sSource = oEvent.getParameter("arguments").dash; // Get the source parameter
+                this.sourceView = sSource || "ManageInvoice";
+
+                this.scrollToSection("CID_id_CmpInvObjectPageLayout", "CID_id_CmpInvGoals");
+                this._makeDatePickersReadOnly(["CID_id_Invoice", "CID_id_Payby", "CID_id_NavInvoice", "CID_id_NavPayby", "CI_Id_Status", "CID_id_Date", "CID_id_NavInvDate"]);
+
+                this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+                this.loginModel = this.getView().getModel("LoginModel");
+
+                var loginModel = this.getOwnerComponent().getModel("LoginModel");
+                this.BranchCode = loginModel.getProperty("/BranchCode");
+                this.decodedPath = decodeURIComponent(decodeURIComponent(sArg));
+                this.byId("CI_id_InputCustomerGSTNO").setValueState("None")
+                this.byId("CI_id_InputCustomerGSTName").setValueState("None")
+                this.byId("CI_id_InputCustomerGSTAddress").setValueState("None")
+
+                this.Discount = true;
+                this.RateUnit = true;
+                this.Particulars = true;
+                this.mobileNo = true;
+                this.ResivedTDSFlag = true;
+                this.byId("CID_id_AddCustComboBox").setValueState("None");
+                this.byId("CID_id_AddBooking").setValueState("None");
+                this.byId("CID_id_InvoiceDesc").setValueState("None");
+                this.byId("CID_id_InputGST").setValueState("None");
+                this.byId("CID_id_ConversionRate").setValueState("None");
+                this.byId("CID_id_InputMailID").setValueState("None");
+                this.byId("CID_id_InputMobileNo").setValueState("None");
+
+                // this.byId("CID_id_IncomeTaxPercentage").setValueState("None");
+                this.byId("CID_id_CurrencySelect").setEditable(true);
+                const oView = this.getView();
+                if (this.getView().getModel("ManageInvoiceModel")) {
+                    if (this.getView().getModel("ManageInvoiceModel").getData().length === 0) {
+                        var LastInvoiceDate = new Date()
+                    } else {
+                        var LastInvoiceDate = new Date(this.getView().getModel("ManageInvoiceModel").getData()[0].InvoiceDate)
+                    }
+                }
+
+                oView.setModel(new JSONModel({
+                    BookingID: "",
+                    CustomerName: "",
+                    InvNo: "",
+                    // InvDate: "",
+                    InvoiceDate: "",
+                    Name: "",
+                    // PAN: "",
+                    GST: "",
+                    PermanentAddress: "",
+                    CustomerEmail: "",
+                    MobileNo: "",
+                    SOWDetails: "",
+                    Type: "",
+                    InvoiceDescription: "",
+                    Currency: "INR",
+                    PayByDate: "",
+                    POSOW: "",
+                    Status: "Submitted",
+                    SubTotalNotGST: "0",
+                    SubTotalInGST: "0",
+                    LUT: "",
+                    // IncomePerc: "10",
+                    RoomNo: "",
+                    BranchCode: "",
+                    RefundAmount: "",
+                    TaxPercentageLabel: "Tax Percentage"
+                }), "SelectedCustomerModel");
+                this.SelectedCustomerModel = oView.getModel("SelectedCustomerModel");
+
+                oView.setModel(new JSONModel({
+                    BookingID: "",
+                }), "BookingModel");
+
+                oView.setModel(new JSONModel({
+                    results: [],
+                    InvNo: this.newID,
+                    IndexNo: "",
+                    ItemID: "",
+                    UnitText: "",
+                    Particulars: "",
+                    SAC: "",
+                    Rate: "",
+                    Currency: "INR",
+                    Total: "",
+                    GrossPrice: "",
+                    gstAmount: "",
+                    TotalAmount: "",
+                    subTotal: ""
+                }), "FilteredSOWModel");
+
+                oView.setModel(new JSONModel({
+                    createVisi: true,
+                    editVisi: false,
+                    editable: true,
+                    igstVisi: false,
+                    gstVisiable: false,
+                    flexVisiable: false,
+                    CInvoice: false,
+                    addInvBtn: true,
+                    refresh: false,
+                    merge: false,
+                    GST: true,
+                    payByDate: false,
+                    Form: true,
+                    Table: false,
+                    MultiEmail: true,
+                    Edit: true,
+                    IncomeTax: true,
+                    fromMyBookings: false,
+                    minDate: LastInvoiceDate
+                }), "visiablityPlay");
+                oView.setModel(new JSONModel({ AllReceivedAmount: 0, AllDueAmount: 0 }), "InvoicePayment");
+
+                var SowDataModel = new JSONModel({ items: [] });
+
+                this.getView().setModel(SowDataModel, "CombinedData");
+                this.visiablityPlay = oView.getModel("visiablityPlay");
+                // Arriving from MyBookings the invoice page is read-only for everybody:
+                // Admin / SuperAdmin / Branch Manager / Front Office Employee must see
+                // exactly what a Customer sees. Instead of repeating that exception in
+                // every binding, hand the view an "effective role" that collapses to
+                // Customer on this route. Set once per route match, so the later flag
+                // toggles (edit / save / refresh) can never bring a button back.
+                var bFromMyBookings = this.sourceView === "MyBookings";
+                this.visiablityPlay.setProperty("/fromMyBookings", bFromMyBookings);
+                this.visiablityPlay.setProperty("/effRole", bFromMyBookings ? "Customer" : loginModel.getProperty("/Role"));
+                this.visiablityPlay.setProperty("/Edit", false);
+                this.visiablityPlay.setProperty("/MultiEmail", false);
+                this.visiablityPlay.setProperty("/merge", false);
+                oView.setModel(new JSONModel(), "ManageInvoiceItemModel");
+                // this.byId("CID_id_TableInvoiceItem").setMode("Delete");
+                this.Update = false;
+                if (sArg === "X") {
+                    const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
+                    const sBookingID = oNavCtx?.getProperty("/BookingID");
+                    const sCustomerName = oNavCtx?.getProperty("/CustomerName");
+
+                    const oCustomerCombo = this.byId("CID_id_AddCustComboBox");
+                    const oBookingCombo = this.byId("CID_id_AddBooking");
+
+                    if (sCustomerName && sBookingID) {
+                        oCustomerCombo.setSelectedKey(null);
+                        oBookingCombo.setSelectedKey(null);
+                        sap.ui.getCore().applyChanges();
+
+                        oCustomerCombo.setSelectedKey(sCustomerName); // Set selected keys
+                        oBookingCombo.setSelectedKey(sBookingID);
+                        this.SelectKey = sBookingID; // Store customer for booking 
+                        oCustomerCombo.setEditable(false); // Lock customer selection
+
+                        const customerData = [{
+                            BookingID: sBookingID,
+                            CustomerName: sCustomerName
+                        }];
+                        this.getView().setModel(new sap.ui.model.json.JSONModel(customerData), "ManageCustomerModel");
+
+                        const bookingData = [{
+                            BookingID: sBookingID,
+                            Status: "Assigned"
+                        }];
+                        this.getView().setModel(new sap.ui.model.json.JSONModel(bookingData), "BookingModel");
+
+                        // Clear invoice items before loading
+                        this.getView().setModel(new sap.ui.model.json.JSONModel({
+                            ManageInvoiceItem: []
+                        }), "ManageInvoiceItemModel");
+
+                        await this.onChangeBookingID({
+                            getSource: () => oBookingCombo
+                        });
+
+                        // Clear navigation context
+                        oNavCtx.setProperty("/CustomerName", "");
+                        oNavCtx.setProperty("/BookingID", "");
+                    } else {
+                        const oNavCtx = this.getOwnerComponent().getModel("InvoiceNavContext");
+                        if (oNavCtx) {
+                            oNavCtx.setProperty("/CustomerName", "");
+                            oNavCtx.setProperty("/BookingID", "");
+                        }
+
+                        oCustomerCombo.setSelectedKey(null); // Also clear ComboBox UI state
+                        oBookingCombo.setSelectedKey(null);
+                        sap.ui.getCore().applyChanges();
+
+                        oCustomerCombo.setEditable(true);
+                        await this.onSearch();
+                    }
+                    if (this.BookingID) this.onChangeAddCustomer(this.BookingID);
+
+                    this.closeBusyDialog()
+
+                    return;
+                }
+                this.visiablityPlay.setProperty("/Edit", true);
+                this.visiablityPlay.setProperty("/flexVisiable", true);
+                this.visiablityPlay.setProperty("/createVisi", false);
+                this.visiablityPlay.setProperty("/editVisi", true);
+                this.visiablityPlay.setProperty("/editable", false);
+                this.visiablityPlay.setProperty("/addInvBtn", false);
+                this.visiablityPlay.setProperty("/refresh", false);
+                this.visiablityPlay.setProperty("/MultiEmail", false);
+                // this.byId("CID_id_TableInvoiceItem").setMode("None");
+                this.byId("CID_id_CurrencySelect").setEditable(false);
+                this.visiablityPlay.setProperty("/merge", true);
+                this.visiablityPlay.setProperty("/MultiEmail", true);
+
+                this.getBusyDialog()
+                try {
+                    const oData = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
+                        InvNo: this.decodedPath
+                    });
+                    this.Update = true;
+                    if (!oData.success) throw new Error("Invalid data structure");
+
+                    var oHeader = oData.data.ManageInvoice?.[0] || {};
+                    this.byId("CID_id_Payby").setMinDate(new Date(oHeader.InvoiceDate));
+                    this.byId("CID_id_NavPayby").setMinDate(new Date(oHeader.InvoiceDate));
+                    oHeader.InvoiceDate = this.Formatter.DateFormat(oHeader.InvoiceDate);
+                    var PayByDate = oHeader.PayByDate;
+                    oHeader.PayByDate = this.Formatter.DateFormat(oHeader.PayByDate);
+                    // var InvDate = oHeader.InvoiceDate
+                    // oHeader.InvoiceDate = this.Formatter.formatDate(InvDate);
+                    this.SelectedCustomerModel.setData(oHeader);
+
+                    // ---- GST checkbox derived selection ----
+                    const igst = parseFloat(oHeader.IGST) || 0;
+                    const cgst = parseFloat(oHeader.CGST) || 0;
+                    const sgst = parseFloat(oHeader.SGST) || 0;
+
+                    // reset first
+                    this.SelectedCustomerModel.setProperty("/IGSTSelected", false);
+                    this.SelectedCustomerModel.setProperty("/CGSTSelected", false);
+
+                    if (igst > 0) {
+                        this.SelectedCustomerModel.setProperty("/IGSTSelected", true);
+                        this.SelectedCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+
+                    } else if (cgst > 0 || sgst > 0) {
+                        this.SelectedCustomerModel.setProperty("/CGSTSelected", true);
+                        this.SelectedCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                    }
+
+                    const aItems = oData.data.ManageInvoiceItem
+                        .map(item => ({
+                            ...item,
+                            StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
+                            EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                            PreviousTotal: item.PreviousTotal,
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        }))
+                        .sort((a, b) => {
+                            const startDiff = this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+
+                            // If StartDate is different, sort by StartDate
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+
+                            // If StartDate is same, sort by EndDate
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
+                        .map((item, index) => ({
+                            ...item,
+                            IndexNo: index + 1
+                        }));
+
+                    oView.setModel(new JSONModel({
+                        ManageInvoiceItem: aItems
+                    }), "ManageInvoiceItemModel");
+
+                    const {
+                        IGST = "0", SGST = "0", CGST = "0", Value, Currency, Status, InvNo
+                    } = oHeader;
+                    this.getView().getModel("FilteredSOWModel").setProperty("/Currency", Currency);
+                    if (IGST === "0") {
+                        this.visiablityPlay.setProperty("/igstVisi", false);
+                        this.visiablityPlay.setProperty("/gstVisiable", true);
+                    } else {
+                        this.visiablityPlay.setProperty("/igstVisi", true);
+                        this.visiablityPlay.setProperty("/gstVisiable", false);
+                    }
+
+                    if (IGST === "0" && SGST === "0" && CGST === "0") {
+                        this.visiablityPlay.setProperty("/igstVisi", false);
+                        this.visiablityPlay.setProperty("/gstVisiable", false);
+                    }
+
+                    if (Value == null) {
+                        this.visiablityPlay.setProperty("/igstVisi", false);
+                        this.visiablityPlay.setProperty("/gstVisiable", false);
+                    }
+
+                    if (Currency !== "INR") {
+                        this.visiablityPlay.setProperty("/GST", false);
+                        this.byId("idSAC")?.setVisible(false);
+                        this.byId("idGSTCalculation")?.setVisible(false);
+                        this.visiablityPlay.setProperty("/TDS", false);
+                    } else {
+                        this.visiablityPlay.setProperty("/GST", true);
+                        this.byId("idSAC")?.setVisible(true);
+                        this.byId("idGSTCalculation")?.setVisible(true);
+                        this.visiablityPlay.setProperty("/TDS", true);
+                    }
+
+                    if (PayByDate) {
+                        const payByDate = new Date(PayByDate);
+                        const today = new Date();
+                        const daysDiff = Math.ceil((payByDate - today) / (1000 * 60 * 60 * 24));
+                        const showReminder = daysDiff <= 10;
+                        this.visiablityPlay.setProperty("/payByDate", showReminder);
+                        this.ReminderEmail = showReminder;
+                    }
+
+                    if (Status === "Payment Received") {
+                        this.visiablityPlay.setProperty("/payByDate", false);
+                        this.visiablityPlay.setProperty("/createVisi", false);
+                        // this.visiablityPlay.setProperty("/Edit", false);
+                        this.visiablityPlay.setProperty("/MultiEmail", false);
+                    }
+                    this.Status = Status;
+                    await this.Readcall("HM_InvoicePaymentDetail", {
+                        InvNo: this.decodedPath
+                    })
+                    await this.Readcall("fetchHM_InvoicePaymentDetail", {
+                        InvNo: this.decodedPath
+                    });
+                    await this.totalAmountCalculation();
+
+                    var oFooterBar = this.byId("invoicefooter");
+                    if (oFooterBar) {
+                        oFooterBar.invalidate();
+                    }
+                    const sBookingID = this.SelectedCustomerModel.getProperty("/BookingID");
+
+                    const oFilter = {
+                        BookingID: [sBookingID]
+                    };
+
+                    const oBookingData = await this.ajaxReadWithJQuery("HM_Booking", oFilter);
+                    oBookingData.commentData[0].StartDate = new Date(oBookingData.commentData[0].StartDate);
+                    oBookingData.commentData[0].EndDate = new Date(oBookingData.commentData[0].EndDate);
+                    this.getView().setModel(
+                        new JSONModel(oBookingData.commentData[0]),
+                        "BookinglocalModel"
+                    );
+                    if (this.sourceView === "Customerinvoice") {
+                    var oTable = this.byId("CID_id_TableInvoiceItem");
+                    oTable.setMode("None");
+                      }
+
+
+
+
+                    // this.getView().setModel(oBookingModel, "BookinglocalModel");
+                } catch (error) {
+                    MessageToast.show(error.responseText || "Failed to Load Invoice Data.");
+                } finally {
+                    this.closeBusyDialog()
+                }
+            },
+
+            onSearch: function () {
+                return new Promise((resolve, reject) => {
+                    this.getBusyDialog()
+
+                    var filter = {
+                        BranchCode: this.BranchCode
+                    };
+
+                    this.ajaxReadWithJQuery("HM_CustomerReadCall", filter)
+                        .then((oData) => {
+                            var aData = Array.isArray(oData.commentData) ?
+                                oData.commentData : [oData.commentData];
+
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+
+                            const aFilteredData = aData.filter(item => {
+                                if (item.Status === "Assigned") {
+                                    return true;
+                                }
+
+                                // if (item.Status === "Completed") {
+                                //     const endDate = new Date(item.EndDate);
+                                //     endDate.setHours(0, 0, 0, 0);
+
+                                //     const diffDays = Math.floor(
+                                //         (today - endDate) / (1000 * 60 * 60 * 24)
+                                //     );
+
+                                //     // Show Completed records only for 5 days after EndDate
+                                //     return diffDays <= 5;
+                                // }
+
+                                return false;
+                            });
+                            const aBranchData =
+                                this.getOwnerComponent().getModel("BranchModel")?.getData() || [];
+
+                            const aFinalData = aFilteredData.map(item => {
+                                const oBranch = aBranchData.find(
+                                    br => br.BranchID === item.BranchCode
+                                );
+                                return {
+                                    ...item,
+                                    BranchName: oBranch?.Name || ""
+                                };
+                            });
+
+                            this.getView().setModel(
+                                new sap.ui.model.json.JSONModel(aFinalData),
+                                "ManageCustomerModel"
+                            );
+
+                            resolve();
+                        }).catch((err) => {
+                            MessageToast.show(err.responseText || "Failed to Load Customer Data.");
+                            this.closeBusyDialog()
+                        })
+                });
+            },
+
+            onNavBack: function () {
+
+                var oViewModel = this.getView().getModel("visiablityPlay");
+                var bIsEditMode = oViewModel && oViewModel.getProperty("/editable");
+
+                // Ask confirmation only in edit mode
+                if (bIsEditMode) {
+
+                    this.showConfirmationDialog(
+                        this.i18nModel.getText("ConfirmActionTitle"),
+                        this.i18nModel.getText("backConfirmation"),
+
+                        function () {
+
+                            oViewModel.setProperty("/Edit", false);
+
+                            if (this.sourceView === "Customerinvoice") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                            } else if (this.sourceView === "MyBookings") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
+
+                            } else if (this.sourceView === "AdminPage") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                                    sPath: "ManageInvoice"
+                                });
+
+                            } else if (this.sourceView === "PaymentDashboard") {
+
+                                this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+                            } else {
+
+                                this.getOwnerComponent().getRouter().navTo("Routecustominvoice", {
+                                    sPath: "ManageInvoicedetails"
+                                });
+                            }
+
+                        }.bind(this)
+                    );
+
+                } else {
+
+                    // Direct navigation when not in edit mode
+                    if (this.sourceView === "Customerinvoice") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteManageProfile");
+
+                    } else if (this.sourceView === "MyBookings") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
+
+                    } else if (this.sourceView === "AdminPage") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                            sPath: "ManageInvoice"
+                        });
+
+                    } else if (this.sourceView === "PaymentDashboard") {
+
+                        this.getOwnerComponent().getRouter().navTo("RouteHostelDashboard");
+
+                    } else {
+
+                        this.getOwnerComponent().getRouter().navTo("Routecustominvoice", {
+                            sPath: "ManageInvoicedetails"
+                        });
+                    }
+                }
+            },
+            onHome: function () {
+                this.CommonLogoutFunction();
+            },
+
+            onChangeAddCustomer: async function (oEvent) {
+                try {
+                    let bookingID = "";
+
+                    // Called from ComboBox change event
+                    if (oEvent && oEvent.getSource) {
+                        utils._LCvalidateMandatoryField(oEvent);
+
+                        const oSelectedItem = oEvent.getSource().getSelectedItem();
+                        if (!oSelectedItem) {
+                            return;
+                        }
+
+                        bookingID = oSelectedItem.getAdditionalText();
+                    }
+                    // Called manually
+                    else {
+                        bookingID = oEvent;
+                    }
+
+                    this.SelectKey = bookingID;
+
+                    const ManageModel = this.getView().getModel("ManageCustomerModel");
+                    const allData = ManageModel.getData();
+
+                    const bookingList = allData
+                        .filter(item => item.BookingID === bookingID)
+                        .map(item => ({
+                            BookingID: item.BookingID,
+                            Status: item.Status,
+                            CustomerName: item.CustomerName
+                        }));
+                    ManageModel.setProperty("/CustomerName", bookingList[0]?.CustomerName);
+                    if (!bookingList.length) {
+                        return;
+                    }
+
+                    this.getView().setModel(new sap.ui.model.json.JSONModel(bookingList), "BookingModel");
+
+                    this.byId("CID_id_AddBooking").setSelectedKey("");
+
+                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingList[0].BookingID);
+                    const sBookingID = bookingList[0].BookingID;
+
+                    this.byId("CID_id_AddBooking").setValue(bookingList[0].BookingID);
+                    this.onChangeBookingID();
+                    this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", []);
+                } catch (err) {
+                    MessageToast.show(err.message);
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            onChangeBookingID: async function (oEvent) {
+                try {
+                    const bookingID = oEvent ? oEvent.getSource().getSelectedKey() : this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID");
+                    this.getView().getModel("SelectedCustomerModel").setProperty("/BookingID", bookingID);
+
+                    if (!bookingID) return;
+
+                    this.getBusyDialog()
+
+                    const oData = await this.ajaxCreateWithJQuery("HM_getAllheaderData", {
+                        data: {
+                            BookingID: bookingID
+                        }
+                    });
+
+                    const bookingDetails = oData.data?.BookingData?.[0];
+
+                    this.getView().setModel(
+                        new sap.ui.model.json.JSONModel(bookingDetails),
+                        "BookinglocalModel"
+                    );
+
+                    if (!bookingDetails) {
+                        sap.m.MessageBox.information(
+                            "This invoice has already been generated.",
+                            {
+                                styleClass: "myUnifiedBtn",
+                                onClose: function () {
+                                    this.getOwnerComponent().getRouter().navTo("Routecustominvoice", {
+                                        sPath: "ManageInvoicedetails"
+                                    });
+                                }.bind(this)
+                            }
+                        );
+                        return;
+                    }
+                    bookingDetails.StartDate = new Date(bookingDetails?.StartDate);
+                    bookingDetails.EndDate = new Date(bookingDetails?.EndDate);
+
+                    const facilityArray = Array.isArray(oData.data.BookingFacilityItems) ?
+                        oData.data.BookingFacilityItems : [oData.data.BookingFacilityItems];
+
+                    if (!bookingDetails && facilityArray.length === 0) {
+                        sap.m.MessageBox.information(
+                            "Booking is Fully Completed. No new Invoice can be Generated.",
+                            {
+                                styleClass: "myUnifiedBtn"
+                            }
+                        );
+                        return;
+                    }
+
+                    const paymentType = bookingDetails.PaymentType;
+                    const startDate = new Date(bookingDetails.StartDate);
+                    const endDate = new Date(bookingDetails.EndDate);
+
+                    let invoiceDate, payByDate;
+
+                    if (paymentType === "Per Day") {
+                        invoiceDate = startDate;
+                        payByDate = endDate;
+                    } else {
+                        invoiceDate = startDate;
+                        payByDate = endDate;
+                    }
+                    this.MonthDate = startDate;
+
+                    const oModel = this.getView().getModel("SelectedCustomerModel");
+                    let mergedData = {};
+                    if (oData.data.ManageCustomer && oData.data.ManageCustomer.length > 0) {
+                        mergedData = Object.assign({}, oData.data.ManageCustomer[0], {
+                            RoomNo: bookingDetails.RoomNo || "",
+                            BranchCode: bookingDetails.BranchCode || "",
+                            CouponDiscount: bookingDetails.Discount || "",
+                            CustomerName: bookingDetails.CustomerName,
+                            BookingID: bookingID,
+                            UserID: bookingDetails.UserID || "",
+                            PaidAmount: oData.data.PerMonthTotalRent || "0.00",
+                            CouponCode: bookingDetails.CouponCode,
+                            GST: bookingDetails.GSTIN || "",
+                            Type: bookingDetails.GSTType || "",
+                            Value: bookingDetails.GSTValue || "",
+                            CustomerGSTNO: bookingDetails.CustomerGSTIN || "",
+                            CustomerGSTName: bookingDetails.CustCompanyName || "",
+                            CustomerGSTAddress: bookingDetails.CustCompanyAddress || ""
+                        });
+                    }
+
+                    // mergedData.InvoiceDate = new Date(invoiceDate);
+                    mergedData.PayByDate = new Date(payByDate);
+
+
+                    // mergedData.InvDate = new Date();
+                    // mergedData.InvoiceDescription = this._getInvoiceDescription(invoiceDate, startDate, endDate);
+                    oModel.setData(mergedData);
+
+                    const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                    // ---- GST auto mapping from BranchDetails ----
+                    if (mergedData.Type) {
+                        oCustomerModel.setProperty("/GST", mergedData.GST);
+                        oCustomerModel.setProperty("/GSTValid", true);
+
+                        // Set percentage
+                        oCustomerModel.setProperty("/Value", mergedData.Value || "");
+
+                        // Select GST Type
+                        if (mergedData.Type === "CGST/SGST") {
+                            oCustomerModel.setProperty("/Type", "CGST/SGST");
+                            oCustomerModel.setProperty("/CGSTSelected", true);
+                            oCustomerModel.setProperty("/IGSTSelected", false);
+                            oCustomerModel.setProperty("/TaxPercentageLabel", "CGST Percentage");
+                        } else if (mergedData.Type === "IGST") {
+                            oCustomerModel.setProperty("/Type", "IGST");
+                            oCustomerModel.setProperty("/CGSTSelected", false);
+                            oCustomerModel.setProperty("/IGSTSelected", true);
+                            oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+                        }
+                    } else {
+                        // Reset GST section if no GST from backend
+                        oCustomerModel.setProperty("/GSTValid", false);
+                        oCustomerModel.setProperty("/Type", "");
+                        oCustomerModel.setProperty("/Value", "");
+                        oCustomerModel.setProperty("/CGSTSelected", false);
+                        oCustomerModel.setProperty("/IGSTSelected", false);
+                    }
+
+                    this.byId("CID_id_Invoice").setMinDate(invoiceDate);
+                    this.byId("CID_id_Payby").setMinDate(invoiceDate);
+
+                    this.byId("CID_id_Invoice").setDateValue(invoiceDate);
+                    this.byId("CID_id_Payby").setDateValue(payByDate);
+
+                    let finalInvoiceItems = [];
+                    const bookingDuration = this._getDurationText(
+                        bookingDetails.PaymentType,
+                        bookingDetails.StartDate,
+                        bookingDetails.EndDate
+                    );
+
+                    finalInvoiceItems.push({
+                        IndexNo: 1,
+                        InvNo: this.newID,
+                        Particulars: `${bookingDetails.BedType} - Room Rent`,
+                        UnitText: bookingDetails.PaymentType,
+                        DurationText: bookingDuration,
+                        SAC: "996322",
+                        GSTCalculation: "YES",
+                        Discount: "",
+                        GrossPrice: bookingDetails.RoomPrice,
+                        Total: parseFloat(bookingDetails.BookingPrice),
+                        StartDate: this.Formatter.DateFormat(bookingDetails.StartDate),
+                        EndDate: this.Formatter.DateFormat(bookingDetails.EndDate),
+                        Currency: bookingDetails.Currency,
+                        GrossPriceEditable: false,
+                        UnitEditable: false,
+                        DurationEditable: false,
+                        StartDateEditable: false,
+                        EndDateEditable: false
+                    });
+
+                    facilityArray.forEach((item, index) => {
+                        const durationText = this._getDurationText(
+                            item.UnitText,
+                            item.StartDate,
+                            item.EndDate,
+                            item.TotalHour,
+                            item.SelectionMode,
+                            item.Quantity,
+                            item.FacilityChargeType
+                        );
+
+                        let particulars = "";
+                        const memberSuffix = item.MemberName ? ` (${item.MemberName})` : "";
+
+                        // Build Particulars
+                        if (item.FacilityName === "Penalty Charges") {
+                            particulars = `Penalty Charges${memberSuffix}`;
+                        } else if (item.UnitText === "Per Hour") {
+                            const totalHours = Number(item.TotalHour) || 1;
+                            particulars = `${item.FacilityName} - Facility (${totalHours} Hours)${memberSuffix}`;
+                        } else {
+                            particulars = `${item.FacilityName} - Facility${memberSuffix}`;
+                        }
+
+                        const unitPrice = parseFloat(item.UnitPrice ?? 0) || 0;
+                        const basicPrice = parseFloat(item.BasicFacilityPrice ?? 0) || 0;
+                        const price = basicPrice > 0 ? basicPrice : unitPrice;
+
+                        finalInvoiceItems.push({
+                            IndexNo: index + 2,
+                            InvNo: this.newID,
+                            Particulars: particulars,
+                            UnitText: item.UnitText,
+                            DurationText: durationText,
+                            SAC: "996322",
+                            GSTCalculation: "YES",
+                            Discount: "",
+                            GrossPrice: price,
+                            Total: parseFloat(item.FacilityPrice),
+                            StartDate: this.Formatter.DateFormat(item.StartDate),
+                            EndDate: this.Formatter.DateFormat(item.EndDate),
+                            Currency: item.Currency,
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        });
+                    });
+
+                    // REFUND PROCESSED LINE ITEM AUTO CREATE
+                    const refundAmount = parseFloat(oData.data.ManageInvoice?.[0]?.RefundAmount || 0);
+                    const refundProcessed = oData.data.ManageInvoice?.[0]?.RefundProcessed;
+
+                    if (refundAmount > 0 && (!refundProcessed || refundProcessed === "")) {
+                        finalInvoiceItems.push({
+                            IndexNo: finalInvoiceItems.length + 1,
+                            InvNo: this.newID,
+                            Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
+                            UnitText: "Fix",
+                            DurationText: "-",
+                            SAC: "996322",
+                            GSTCalculation: "NO",
+                            Discount: "",
+                            GrossPrice: -refundAmount,
+                            Total: -refundAmount,
+                            StartDate: this.Formatter.DateFormat(new Date()),
+                            EndDate: this.Formatter.DateFormat(new Date()),
+                            Currency: bookingDetails.Currency,
+                            GrossPriceEditable: false,
+                            UnitEditable: false,
+                            DurationEditable: false,
+                            StartDateEditable: false,
+                            EndDateEditable: false
+                        });
+                    }
+                    finalInvoiceItems.sort((a, b) => {
+                        return (
+                            this._parseDate(a.StartDate) - this._parseDate(b.StartDate) ||
+                            this._parseDate(a.EndDate) - this._parseDate(b.EndDate)
+                        );
+                    });
+
+                    // Assign sequential IndexNo
+                    finalInvoiceItems.forEach((item, index) => {
+                        item.IndexNo = index + 1;
+                    });
+
+
+                    // this.getView().getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalInvoiceItems);
+                    await this.totalAmountCalculation();
+                    // utils._LCvalidateMandatoryField(oEvent);
+                } catch (err) {
+                    MessageToast.show(err.message);
+                } finally {
+                    this.closeBusyDialog()
+                }
+            },
+
+            _getDurationText: function (sUnit, sStartDate, sEndDate, totalHour, selectionMode, quantity, FacilityChargeType) {
+
+                const qty = Number(quantity) || 1;
+                const mode = selectionMode?.toUpperCase();
+                const unit = sUnit?.toLowerCase();
+                const ChargeType = FacilityChargeType?.toLowerCase();
+
+
+                // ---------
+                // VALIDATE DATES
+                // ---------
+                if (!sStartDate || !sEndDate) return "";
+
+                const start = new Date(sStartDate);
+                const end = new Date(sEndDate);
+
+                const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let baseDuration = "";
+
+                // ---------
+                // BASE DURATION CALCULATION
+                // ---------
+                if (unit === "per day") {
+                    baseDuration = diffDays + (diffDays === 1 ? " Day" : " Days");
+                } else if (unit === "per month") {
+
+                    let months =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() > start.getDate()) {
+                        months += 1;
+                    }
+
+                    months = Math.max(months, 1);
+
+                    baseDuration = months + (months === 1 ? " Month" : " Months");
+                } else if (unit === "per year") {
+
+                    let years =
+                        end.getFullYear() - start.getFullYear();
+
+                    if (
+                        end.getMonth() > start.getMonth() ||
+                        (
+                            end.getMonth() === start.getMonth() &&
+                            end.getDate() > start.getDate()
+                        )
+                    ) {
+                        years += 1;
+                    }
+
+                    years = Math.max(years, 1);
+
+                    baseDuration = years + (years === 1 ? " Year" : " Years");
+                } else if (unit === "per hour") {
+
+                    const hoursPerDay = Number(totalHour) || 1;
+                    const totalHours = hoursPerDay * diffDays;
+
+                    baseDuration = totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                } else if (unit === "unit price" || unit === "package price") {
+                    baseDuration = "";
+                } else if (unit === "fix") {
+                    return "-";
+                }
+
+                if (mode === "SINGLE") {
+
+                    if (unit === "per day") {
+                        return diffDays + (diffDays === 1 ? " Day" : " Days");
+                    }
+
+                    if (unit === "per month") {
+
+                        let months =
+                            (end.getFullYear() - start.getFullYear()) * 12 +
+                            (end.getMonth() - start.getMonth());
+
+                        if (end.getDate() > start.getDate()) {
+                            months += 1;
+                        }
+
+                        months = Math.max(months, 1);
+
+                        return months + (months === 1 ? " Month" : " Months");
+                    }
+
+                    if (unit === "per year") {
+
+                        let years = end.getFullYear() - start.getFullYear();
+
+                        if (
+                            end.getMonth() > start.getMonth() ||
+                            (
+                                end.getMonth() === start.getMonth() &&
+                                end.getDate() > start.getDate()
+                            )
+                        ) {
+                            years += 1;
+                        }
+
+                        years = Math.max(years, 1);
+
+                        return years + (years === 1 ? " Year" : " Years");
+                    }
+
+                    if (unit === "per hour") {
+
+                        const hoursPerDay = Number(totalHour) || 1;
+                        const totalHours = hoursPerDay * diffDays;
+
+                        return totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                    }
+
+                    if (unit === "unit price") {
+                        return "Unit Price";
+                    }
+
+                    if (unit === "package price") {
+                        return "Package Price";
+                    }
+
+                    if (unit === "fix") {
+                        return "-";
+                    }
+
+                    return sUnit;
+                }
+
+                // SELECTION MODE HANDLING
+                if (mode === "QTY") {
+
+                    if (unit === "unit price" || unit === "package price") {
+                        return `${qty} Qty`;
+                    }
+
+                    return `${qty} Qty × ${baseDuration}`;
+                }
+
+                if (mode === "PERSON") {
+
+                    if (unit === "unit price" || unit === "package price") {
+                        return `${qty} Persons`;
+                    }
+
+                    return `${qty} Persons × ${baseDuration}`;
+                }
+
+                if (mode === "PERSON_QTY") {
+
+                    if (unit === "package price" && ChargeType === "daily") {
+                        const totalUnits = qty * diffDays;
+
+                        return `${qty} Unit × ${diffDays} Days (${totalUnits}Units)`;
+                    }
+
+                    if (unit === "unit price" || unit === "package price") {
+                        return `${qty} Units`;
+                    }
+
+                    if (unit === "per day") {
+
+                        const totalUnits = qty * diffDays;
+
+                        return `${totalUnits} Units (${qty} × ${diffDays} Days)`;
+                    }
+
+                    return `${qty} Units × ${baseDuration}`;
+                }
+
+                return baseDuration;
+            },
+
+            onChangeInvoiceDate: function (oEvent) {
+                const selectedDate = oEvent.getSource().getDateValue();
+                if (!selectedDate) return;
+
+                const payByDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 3);
+
+                this.byId("CID_id_Payby").setDateValue(payByDate);
+                this.byId("CID_id_Invoice").setMinDate(selectedDate);
+                this.byId("CID_id_Payby").setMinDate(selectedDate);
+
+                const oModel = this.getView().getModel("SelectedCustomerModel");
+
+                oModel.setProperty("/InvoiceDate", selectedDate);
+                oModel.setProperty("/PayByDate", payByDate);
+
+                const paymentType = oModel.getProperty("/PaymentType");
+                const startDate = new Date(oModel.getProperty("/StartDate"));
+                const endDate = new Date(oModel.getProperty("/EndDate"));
+
+                oModel.setProperty(
+                    "/InvoiceDescription",
+                    this._getInvoiceDescription(paymentType, startDate, endDate)
+                );
+
+                utils._LCvalidateDate(oEvent);
+            },
+
+            onPayByDateDatePickerChange: function (oEvent) {
+                utils._LCvalidateDate(oEvent);
+            },
+
+            onChangeDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent);
+            },
+
+            _getInvoiceDescription: function (paymentType, startDate, endDate) {
+                if (!startDate) {
+                    return "";
+                }
+
+                const aMonths = [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+
+                // Format: DD/MM/YYYY
+                const formatDate = function (oDate) {
+                    const day = String(oDate.getDate()).padStart(2, "0");
+                    const month = String(oDate.getMonth() + 1).padStart(2, "0");
+                    const year = oDate.getFullYear();
+                    return `${day}/${month}/${year}`;
+                };
+
+                // Per Month
+                // if (paymentType === "Per Month") {
+                //     return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
+                // }
+                // if (paymentType === "Per Month") {
+                //     return `Invoice for ${aMonths[startDate.getMonth()]} ${startDate.getFullYear()}`;
+                // }
+
+                // Per Day / Year / Others
+                return `Invoice for ${formatDate(startDate)} - ${formatDate(endDate)}`;
+            },
+
+            CID_onPressAddInvoiceItems: function (oEvent) {
+                const oView = this.getView();
+                const oItemModel = oView.getModel("ManageInvoiceItemModel");
+                let oData = oItemModel.getProperty("/ManageInvoiceItem") || [];
+
+                const currency = this.byId("CID_id_CurrencySelect").getValue();
+                this.IndexNo = oData.length ? oData[oData.length - 1].IndexNo + 1 : 1;
+
+                const startDate = new Date();
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + 1);
+                const unitText = "Fix"; // default unit
+
+                const newItem = {
+                    IndexNo: this.IndexNo,
+                    Particulars: "",
+                    SAC: "996322",
+                    GSTCalculation: (currency === "INR") ? "YES" : "",
+                    StartDate: this.Formatter.formatDate(startDate),
+                    EndDate: this.Formatter.formatDate(endDate),
+                    UnitText: unitText,
+                    DurationText: this._getDurationText(unitText, startDate, endDate, 1),
+                    Currency: currency,
+                    Discount: "",
+                    GrossPrice: "",
+                    Total: "",
+                    GrossPriceEditable: true,
+                    UnitEditable: true,
+                    DurationEditable: true,
+                    StartDateEditable: true,
+                    EndDateEditable: true
+                };
+
+                if (this.Update) {
+                    newItem.flag = "create";
+                }
+
+                oData.push(newItem);
+                oItemModel.setProperty("/ManageInvoiceItem", oData);
+                oItemModel.refresh(true);
+            },
+
+            onChangeUnitText: function (oEvent) {
+                const oItem = oEvent.getSource().getBindingContext("ManageInvoiceItemModel").getObject();
+                const unit = oItem.UnitText;
+
+                oItem.DurationText = this._getText(unit, oItem.StartDate, oItem.EndDate, oItem.TotalHour || 1);
+
+                this.getView().getModel("ManageInvoiceItemModel").refresh(true);
+            },
+
+            _getText: function (sUnit, sStartDate, sEndDate, totalHour) {
+                if (!sStartDate || !sEndDate) return "";
+
+                const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                    pattern: "dd/MM/yyyy"
+                });
+
+                const start = oDateFormat.parse(sStartDate);
+                const end = oDateFormat.parse(sEndDate);
+
+                if (!start || !end) return "";
+
+                const diffTime = end.getTime() - start.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (sUnit === "Per Day") {
+                    return diffDays + (diffDays === 1 ? " Day" : " Days");
+                }
+
+                if (sUnit === "Per Month") {
+                    let months =
+                        (end.getFullYear() - start.getFullYear()) * 12 +
+                        (end.getMonth() - start.getMonth());
+
+                    if (end.getDate() > start.getDate()) {
+                        months += 1;
+                    }
+
+                    months = Math.max(months, 1);
+
+                    return months + (months === 1 ? " Month" : " Months");
+                }
+
+                if (sUnit === "Per Year") {
+
+                    let years =
+                        end.getFullYear() - start.getFullYear();
+
+                    if (
+                        end.getMonth() > start.getMonth() ||
+                        (
+                            end.getMonth() === start.getMonth() &&
+                            end.getDate() > start.getDate()
+                        )
+                    ) {
+                        years += 1;
+                    }
+
+                    years = Math.max(years, 1);
+
+                    return years + (years === 1 ? " Year" : " Years");
+                }
+
+                if (sUnit === "Per Hour") {
+                    const hoursPerDay = Number(totalHour) || 1;
+                    const totalHours = hoursPerDay * diffDays;
+                    return totalHours + (totalHours === 1 ? " Hour" : " Hours");
+                }
+
+                if (sUnit === "Fix") {
+                    return "-";
+                }
+
+                return "";
+            },
+
+            onChangeTotal: function (oEvent) {
+                const oInput = oEvent.getSource();
+                const oCtx = oInput.getBindingContext("ManageInvoiceItemModel");
+                if (!oCtx) return;
+
+                let value = oEvent.getParameter("value") || "0";
+                value = value.replace(/,/g, ""); // remove formatting commas
+                this.getView().getModel("ManageInvoiceItemModel").setProperty(oCtx.getPath() + "/Total", value);
+                this.totalAmountCalculation();
+            },
+
+            totalAmountCalculation: function () {
+                const oView = this.getView();
+                const oSOWModel = oView.getModel("FilteredSOWModel");
+                const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
+                const oCustomerModel = oView.getModel("SelectedCustomerModel");
+                const InvoicePayment = this.getView().getModel("InvoicePayment");
+
+                try {
+                    let aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                    let totalWithGST = 0;
+                    let totalWithoutGST = 0;
+
+                    // ---------- GST MASTER CHECK ----------
+                    const taxType = oCustomerModel.getProperty("/Type");
+                    const taxRate = parseFloat(oCustomerModel.getProperty("/Value")) || 0;
+                    const currency = oSOWModel.getProperty("/Currency");
+
+                    const isGSTEnabled = !!taxType && taxRate > 0 && currency === "INR";
+
+                    this.visiablityPlay.setProperty("/GST", isGSTEnabled);
+
+                    // ---------- ITEM CALCULATION ----------
+                    aItems.forEach((item) => {
+                        // const baseAmount = parseFloat(item.Total) || 0;
+                        if (item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
+                            item.PreviousTotal = item.Total;
+                        }
+
+                        const baseAmount = (parseFloat(item.PreviousTotal) < 0) ? (parseFloat(item.Total) || 0) : (parseFloat(item.PreviousTotal) || 0);
+
+                        // ---------- DISCOUNT ----------
+                        let discountAmount = 0;
+                        if (typeof item.Discount === "string" && item.Discount.trim().endsWith("%")) {
+                            discountAmount = baseAmount * (parseFloat(item.Discount) / 100);
+                        } else {
+                            discountAmount = parseFloat(item.Discount) || 0;
+                        }
+
+                        if (baseAmount > 0 && discountAmount > baseAmount) {
+                            discountAmount = 0;
+                            item.Discount = "";
+                        }
+
+                        const finalItemAmount = baseAmount - discountAmount;
+
+                        item.DiscountAmount = discountAmount.toFixed(2);
+                        item.FinalAmount = finalItemAmount.toFixed(2);
+                        item.Total = finalItemAmount.toFixed(2);
+
+                        // ---------- GST LOGIC ----------
+                        let itemWantsGST = item.GSTCalculation === true || item.GSTCalculation === "YES" || item.GSTCalculation === "true";
+
+                        if (finalItemAmount < 0 && isGSTEnabled) {
+                            itemWantsGST = true;
+                        }
+
+                        if (!isGSTEnabled) {
+                            item.GSTCalculation = "NO";
+                        } else {
+                            item.GSTCalculation = itemWantsGST ? "YES" : "NO";
+                        }
+
+                        const isGSTApplicable = isGSTEnabled && itemWantsGST;
+                        item.SAC = isGSTApplicable ? "996322" : "-";
+
+                        if (isGSTApplicable) {
+                            totalWithGST += finalItemAmount;
+                        } else {
+                            totalWithoutGST += finalItemAmount;
+                        }
+                    });
+
+                    // ---------- SUBTOTALS ----------
+                    const subTotal = totalWithGST + totalWithoutGST;
+
+                    oCustomerModel.setProperty("/SubTotalInGST", totalWithGST.toFixed(2));
+                    oCustomerModel.setProperty("/SubTotalNotGST", totalWithoutGST.toFixed(2));
+                    oCustomerModel.setProperty("/SubTotal", subTotal.toFixed(2));
+
+                    // ---------- COUPON ----------
+                    let couponDiscount = parseFloat(oCustomerModel.getProperty("/CouponDiscount")) || 0;
+                    oCustomerModel.setProperty("/CouponDiscountValue", couponDiscount.toFixed(2));
+
+                    // ---------- DISCOUNTED TOTAL ----------
+                    let discountedTotal = subTotal - couponDiscount;
+                    if (discountedTotal < 0) discountedTotal = 0;
+
+                    oCustomerModel.setProperty("/DiscountedTotal", discountedTotal.toFixed(2));
+
+                    // ---------- ALLOCATE COUPON DISCOUNT PROPORTIONALLY ----------
+                    let couponForGST = 0;
+                    let couponForNonGST = 0;
+
+                    if (subTotal > 0) {
+                        const gstShare = totalWithGST / subTotal;
+                        couponForGST = couponDiscount * gstShare;
+                        couponForNonGST = couponDiscount - couponForGST;
+                    }
+
+                    let netGSTAmount = totalWithGST - couponForGST;
+                    if (netGSTAmount < 0) netGSTAmount = 0;
+
+                    let netNonGSTAmount = totalWithoutGST - couponForNonGST;
+                    if (netNonGSTAmount < 0) netNonGSTAmount = 0;
+
+                    // ---------- GST CALCULATION ----------
+                    let gstAmount = 0;
+                    let finalAmount = netGSTAmount + netNonGSTAmount;
+
+                    if (isGSTEnabled) {
+                        const taxableAmount = netGSTAmount;
+
+                        if (taxType === "CGST/SGST") {
+                            const halfRate = taxRate;
+                            const cgst = (taxableAmount * halfRate) / 100;
+                            const sgst = (taxableAmount * halfRate) / 100;
+                            gstAmount = cgst;
+
+                            finalAmount += cgst + sgst;
+
+                            oCustomerModel.setProperty("/CGST", cgst.toFixed(2));
+                            oCustomerModel.setProperty("/SGST", sgst.toFixed(2));
+                            oCustomerModel.setProperty("/IGST", "0.00");
+                        } else if (taxType === "IGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            finalAmount += gstAmount;
+
+                            oCustomerModel.setProperty("/IGST", gstAmount.toFixed(2));
+                            oCustomerModel.setProperty("/CGST", "0.00");
+                            oCustomerModel.setProperty("/SGST", "0.00");
+                        }
+                    } else {
+                        oCustomerModel.setProperty("/CGST", "0.00");
+                        oCustomerModel.setProperty("/SGST", "0.00");
+                        oCustomerModel.setProperty("/IGST", "0.00");
+                    }
+
+                    oCustomerModel.setProperty("/TaxableAmount", netGSTAmount.toFixed(2));
+                    oSOWModel.setProperty("/gstAmount", gstAmount.toFixed(2));
+                    oSOWModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+                    oCustomerModel.setProperty("/TotalAmount", finalAmount.toFixed(2));
+
+                    // ---------- PAYMENT & REFUND PROCESSED LOGIC ----------
+                    let paidAmount = parseFloat(oCustomerModel.getProperty("/PaidAmount")) || 0;
+
+                    const oInvoicePaymentModel = oView.getModel("InvoicePayment");
+                    let allReceivedAmount = 0;
+
+                    if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
+                        allReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+                    }
+
+                    // 1. Fetch RefundProcessed from SelectedCustomerModel
+                    let refundProcessed = parseFloat(oCustomerModel.getProperty("/RefundProcessed")) || 0;
+
+                    // 2. Calculate Effective Net Money Retained
+                    let grossPaid = paidAmount + allReceivedAmount;
+                    let netPaid = grossPaid; // Subtracts processed refund
+
+                    let balanceAmount = 0;
+                    let pendingRefundAmount = 0;
+
+                    // 3. Compare Total with Net Paid
+                    if (netPaid > finalAmount) {
+                        pendingRefundAmount = netPaid - finalAmount.toFixed(2);
+                        balanceAmount = 0;
+                    } else {
+                        balanceAmount = finalAmount.toFixed(2) - netPaid; // 62,705.20 - 62,681.60 = 23.60
+                        pendingRefundAmount = 0;
+                    }
+
+                    let sFinalStatus = "Submitted";
+                    if (balanceAmount === 0 && finalAmount > 0) {
+                        sFinalStatus = "Payment Received";
+                    } else if (balanceAmount === finalAmount) {
+                        sFinalStatus = "Submitted";
+                    } else if (netPaid > 0 && netPaid < finalAmount) {
+                        sFinalStatus = "Payment Partially";
+                    } else if (netPaid >= finalAmount && finalAmount > 0) {
+                        sFinalStatus = "Payment Received";
+                    }
+
+                    // Update Models
+                    oCustomerModel.setProperty("/Status", sFinalStatus);
+                    this.getView().byId("CI_Id_Status").setValue(sFinalStatus);
+                    oCustomerModel.setProperty("/PaidAmount", paidAmount.toFixed(2));
+                    oCustomerModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                    oCustomerModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
+
+
+                    oSOWModel.setProperty("/BalanceAmount", balanceAmount.toFixed(2));
+                    InvoicePayment.setProperty("/AllDueAmount", balanceAmount.toFixed(2));
+                    oSOWModel.setProperty("/RefundAmount", pendingRefundAmount.toFixed(2));
+
+                    oInvoiceModel.refresh(true);
+                    this.onChangeConversionRate();
+
+                } catch (oError) {
+                    sap.m.MessageToast.show("Unable to calculate invoice totals. Please check the invoice items and tax settings.");
+                }
+            },
+
+            Comp_onChangeGSTCalculation: function (oEvent) {
+                const oItem = oEvent.getSource().getBindingContext("ManageInvoiceItemModel").getObject();
+                const selectedKey = oEvent.getSource().getSelectedKey();
+
+                // Update model directly (single source of truth)
+                oItem.GSTCalculation = selectedKey;
+
+                this.totalAmountCalculation();
+            },
+
+            onChangeConversionRate: function (oEvent) {
+                if (oEvent) {
+                    utils._LCvalidateAmount(oEvent);
+                }
+                var oModel = this.getView().getModel("FilteredSOWModel").getData().subTotal;
+                var value = this.getView().getModel("SelectedCustomerModel");
+                var data = parseFloat(value.getData().ConversionRate) * parseFloat(oModel);
+                value.setProperty("/AmountInFCurrency", parseFloat(data).toFixed(2));
+            },
+
+            onChangeSowDetailsCal: async function (oEvent) {
+                this.RateUnit = utils._LCvalidateAmount(oEvent);
+                const oInput = oEvent.getSource();
+                const oRowContext = oInput.getBindingContext("ManageInvoiceItemModel");
+                if (!oRowContext) return;
+
+                const oSOW = oRowContext.getObject();
+                const rate = parseFloat(oSOW.Rate) || 0;
+                const unit = parseFloat(oSOW.Unit) || 0;
+                const discount = parseFloat(oSOW.Discount) || 0;
+
+                let iTotal = unit ? rate * unit : rate;
+                iTotal -= discount;
+
+                const sTotalPath = oRowContext.getPath() + "/Total";
+                oRowContext.getModel().setProperty(sTotalPath, isNaN(iTotal) ? 0 : iTotal.toFixed(2));
+
+                this.visiablityPlay.setProperty("/flexVisiable", true);
+
+                await this.totalAmountCalculation();
+
+                const oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                const oNavigationData = oNavigationModel.getData();
+
+                if (oNavigationData.Currency === "INR") {
+                    const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                    const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
+                    const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
+
+                    const totalAmount = subTotalInGST + subTotalNotGST;
+                    const tds = ((totalAmount * incomePerc) / 100).toFixed(2);
+
+                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                } else {
+                    oNavigationModel.setProperty("/IncomeTax", "0.00");
+                }
+            },
+
+            onParticularsInputLiveChange: function (oEvent) {
+                this.Particulars = utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            Comp_OnChangeDiscount: async function (oEvent) {
+                var sValue = oEvent.getParameter("value").trim();
+                var regex = /^[0-9]+(\.[0-9]{1,2})?%?$/;
+                var oInput = oEvent.getSource();
+
+                // Allow only numbers, decimal point and %
+                sValue = sValue.replace(/[^0-9.%]/g, "");
+
+                var isPercentage = sValue.indexOf("%") !== -1;
+
+                // Remove % for processing
+                if (isPercentage) {
+                    sValue = sValue.replace("%", "");
+
+                    // If user entered only %, clear the field
+                    if (sValue === "") {
+                        oInput.setValue("");
+                        oInput.setValueState("None");
+                        oInput.setValueStateText("");
+                        this.Discount = true;
+                        await this.totalAmountCalculation();
+                        return;
+                    }
+                }
+
+                // Limit decimal places to 2
+                var parts = sValue.split(".");
+                if (parts.length > 1) {
+                    parts[1] = parts[1].substring(0, 2);
+                    sValue = parts.join(".");
+                }
+
+                // Add % back only if there is a numeric value
+                if (isPercentage && sValue !== "") {
+                    sValue += "%";
+                }
+
+                oInput.setValue(sValue);
+
+                await this.totalAmountCalculation();
+
+                if (!sValue) {
+                    oInput.setValueState("None");
+                    oInput.setValueStateText("");
+                    this.Discount = true;
+                } else if (!regex.test(sValue)) {
+                    oInput.setValueState("Error");
+                    oInput.setValueStateText(this.i18nModel.getText("discountValueText"));
+                    this.Discount = false;
+                } else {
+                    oInput.setValueState("None");
+                    oInput.setValueStateText("");
+                    this.Discount = true;
+                }
+
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                var oData = oNavigationModel.getData();
+
+                if (oData.Currency === "INR") {
+                    var subTotalInGST = parseFloat(oData.SubTotalInGST) || 0;
+                    var subTotalNotGST = parseFloat(oData.SubTotalNotGST) || 0;
+                    var incomePerc = parseFloat(oData.IncomePerc) || 0;
+
+                    var tds = ((subTotalInGST + subTotalNotGST) * incomePerc / 100).toFixed(2);
+                    // oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                }
+            },
+
+            CID_ValidateDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent)
+            },
+
+            CID_ValidateGstNumber: function (oEvent) {
+                var oInput = oEvent.getSource();
+                utils._LCvalidateGstNumber(oEvent)
+                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+            },
+
+            CID_ValidateGstName: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent)
+            },
+
+            CID_ValidateGstAddress: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            CID_ValidateDatePayByDate: function (oEvent) {
+                utils._LCvalidateDate(oEvent)
+                var [day, month, year] = oEvent.getSource().getValue().split('/').map(Number);
+                var payByDate = new Date(year, month - 1, day);
+                var today = new Date();
+                var timeDiff = payByDate - today;
+                var daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                if (daysDiff <= 10) {
+                    this.ReminderEmail = true;
+                } else {
+                    this.ReminderEmail = false;
+                }
+            },
+
+            SubmitPayload: async function (sMode) {
+                const oView = this.getView();
+                const oSelectedCustomerModel = oView.getModel("SelectedCustomerModel").getData();
+                const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
+                var FilterModel = this.getView().getModel("FilteredSOWModel").getData();
+
+                const oModel = {
+                    subTotal: oSelectedCustomerModel.SubTotalInGST,
+                    gstAmount: oSelectedCustomerModel.gstAmount,
+                    TotalAmount: oSelectedCustomerModel.TotalAmount
+                };
+
+                //    const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
+                // const totalAmount = Number(oSelectedCustomerModel.TotalAmount) || 0;
+                // const balanceAmount = Number(oSelectedCustomerModel.BalanceAmount) || 0;
+
+                const totalAmount = Number(FilterModel.TotalAmount) || 0;
+                const paidAmount = Number(oSelectedCustomerModel.PaidAmount) || 0;
+                const allReceivedAmount = Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0;
+
+                const balanceAmount = totalAmount - (paidAmount + allReceivedAmount);
+
+                let sFinalStatus = "Submitted";
+
+                const refundAmount = Number(
+                    this.getView().getModel("SelectedCustomerModel").getProperty("/RefundAmount")
+                ) || 0;
+
+                if (refundAmount > 0) {
+                    sFinalStatus = "Payment Received";
+                } else if (balanceAmount === 0) {
+                    sFinalStatus = "Payment Received";
+                } else if (balanceAmount === totalAmount) {
+                    sFinalStatus = "Submitted";
+                } else if (allReceivedAmount < totalAmount) {
+                    sFinalStatus = "Payment Partially";
+                } else if (allReceivedAmount > totalAmount) {
+                    sFinalStatus = "Payment Received";
+                }
+
+                const oPayload = {
+                    // InvDate: (sMode === 'update') ? oSelectedCustomerModel.InvDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvDate).split('/').reverse().join('-') || "",
+                    InvoiceDate: (sMode === 'update') ? oSelectedCustomerModel.InvoiceDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.InvoiceDate).split('/').reverse().join('-') || "",
+                    CustomerName: this.byId("CID_id_AddCustComboBox").getSelectedKey(),
+                    GST: oSelectedCustomerModel.GST != null ? String(oSelectedCustomerModel.GST) : '',
+                    PermanentAddress: oSelectedCustomerModel.PermanentAddress || "",
+                    MobileNo: oSelectedCustomerModel.MobileNo != null ? String(oSelectedCustomerModel.MobileNo) : '',
+                    AmountInFCurrency: FilterModel.Currency === "INR" ?
+                        (!isNaN(oSelectedCustomerModel.AmountInFCurrency) ? oSelectedCustomerModel.AmountInFCurrency : "0") : parseFloat(oModel.subTotal) || 0,
+                    Currency: FilterModel.Currency || "",
+                    ConversionRate: !isNaN(oSelectedCustomerModel.ConversionRate) ? parseFloat(oSelectedCustomerModel.ConversionRate) : 0,
+                    AmountInINR: FilterModel.Currency === "INR" ?
+                        parseFloat(oModel.subTotal) || 0 : parseFloat(oSelectedCustomerModel.AmountInFCurrency) || 0,
+                    CGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oSelectedCustomerModel.CGST) || 0 : 0,
+                    SGST: oSelectedCustomerModel.Type === "CGST/SGST" ? parseFloat(oSelectedCustomerModel.SGST) || 0 : 0,
+                    IGST: oSelectedCustomerModel.Type === "IGST" ? parseFloat(oSelectedCustomerModel.IGST) || 0 : 0,
+                    TotalAmount: parseFloat(oModel.TotalAmount) || 0,
+                    Status: sFinalStatus,
+                    InvoiceDescription: oSelectedCustomerModel.InvoiceDescription || "",
+                    IncomeTax: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomeTax : "",
+                    CustomerEmail: oSelectedCustomerModel.CustomerEmail || "",
+                    Type: oSelectedCustomerModel.Type || "",
+                    Value: (!oSelectedCustomerModel.Value || isNaN(oSelectedCustomerModel.Value)) ? "0" : oSelectedCustomerModel.Value,
+                    PayByDate: (sMode === 'update') ? oSelectedCustomerModel.PayByDate.split('/').reverse().join('-') : this.Formatter.formatDate(oSelectedCustomerModel.PayByDate).split('/').reverse().join('-') || "",
+                    SubTotalNotGST: parseFloat(oSelectedCustomerModel.SubTotalNotGST) || 0,
+                    SubTotalInGST: parseFloat(oSelectedCustomerModel.SubTotalInGST) || 0,
+                    LUT: oSelectedCustomerModel.LUT || "",
+                    // IncomePerc: (FilterModel.Currency === "INR") ? oSelectedCustomerModel.IncomePerc || "10" : "",
+                    BookingID: oSelectedCustomerModel.BookingID || "",
+                    BranchCode: oSelectedCustomerModel.BranchCode || "",
+                    RoomNo: oSelectedCustomerModel.RoomNo || "",
+                    CouponDiscount: oSelectedCustomerModel.CouponDiscount || "",
+                    UserID: oSelectedCustomerModel.UserID || "",
+                    PaidAmount: oSelectedCustomerModel.PaidAmount || "",
+                    // BalanceAmount: balanceAmount.toString() || "",
+                    CouponCode: oSelectedCustomerModel.CouponCode || "",
+                    CustomerGSTNO: oSelectedCustomerModel.CustomerGSTNO || "",
+                    CustomerGSTName: oSelectedCustomerModel.CustomerGSTName || "",
+                    CustomerGSTAddress: oSelectedCustomerModel.CustomerGSTAddress || "",
+                    RefundAmount: oSelectedCustomerModel.RefundAmount || "",
+                    DueAmount: balanceAmount
+                };
+
+                if (this.MonthDate) oPayload.MonthDate = this.Formatter.formatDate(this.MonthDate).split('/').reverse().join('-') || "";
+
+                const aItemsRaw = oManageInvoiceItemModel.ManageInvoiceItem || [];
+                if (aItemsRaw.length === 0) {
+                    this.getBusyDialog();
+                    MessageToast.show(this.i18nModel.getText("companyTableValidation"));
+                    return false;
+                }
+
+                for (let i = 0; i < aItemsRaw.length; i++) {
+                    const item = aItemsRaw[i];
+                    if (!item.Particulars) {
+                        this.getBusyDialog();
+                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
+                        return false;
+                    }
+                }
+                const aItems = aItemsRaw.map(item => {
+                    const itemData = {
+                        InvNo: oSelectedCustomerModel.InvNo,
+                        SAC: item.SAC,
+                        UnitText: item.UnitText,
+                        Particulars: item.Particulars,
+                        GrossPrice: item.GrossPrice,
+                        PreviousTotal: item.PreviousTotal,
+                        Total: item.Total,
+                        Currency: item.Currency,
+                        GSTCalculation: item.GSTCalculation,
+                        Discount: item.Discount,
+                        DurationText: item.DurationText,
+                        StartDate: item.StartDate.includes('/') ? item.StartDate.split('/').reverse().join('-') : item.StartDate,
+                        EndDate: item.EndDate.includes('/') ? item.EndDate.split('/').reverse().join('-') : item.EndDate,
+                    };
+
+                    if (sMode === "update") {
+                        let filters;
+                        if (item.flag === "create" || !item.ItemID) {
+                            filters = { flag: "create" };
+                        } else {
+                            filters = {
+                                InvNo: oSelectedCustomerModel.InvNo,
+                                ItemID: item.ItemID
+                            };
+                        }
+                        return {
+                            data: itemData,
+                            filters: filters
+                        };
+                    } else {
+                        return itemData;
+                    }
+                });
+                const finalPayload = {
+                    payload: oPayload
+                };
+                if (sMode === "update") {
+                    finalPayload.filters = {
+                        InvNo: oSelectedCustomerModel.InvNo,
+                    };
+                }
+                finalPayload.items = aItems;
+                return finalPayload;
+            },
+
+            CID_onPressSubmit: async function (oEvent) {
+                try {
+                    var that = this;
+                    var oModel = this.getView().getModel("FilteredSOWModel").getData();
+                    const oSelectedCustomerModel = that.getView().getModel("SelectedCustomerModel");
+
+                    const bMandatoryValid =
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_AddCustComboBox"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_AddBooking"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Date"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Invoice"), "ID") &&
+                        utils._LCvalidateDate(this.byId("CID_id_Payby"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID") &&
+                        utils._LCvalidateMandatoryField(this.byId("CID_id_CurrencySelect"), "ID");
+                    // const bTDSValid = oModel.Currency === "INR" ? utils._LCvalidateVariablePay(this.byId("CID_id_IncomeTaxPercentage"), "ID") : true;
+
+                    const oInvoiceItemModel = this.getView().getModel("ManageInvoiceItemModel");
+
+                    const aInvoiceItems = oInvoiceItemModel ? oInvoiceItemModel.getProperty("/ManageInvoiceItem") : [];
+
+                    // Find first blank line item
+                    const iBlankItemIndex = Array.isArray(aInvoiceItems)
+                        ? aInvoiceItems.findIndex(function (item) {
+
+                            return (
+                                !item ||
+
+                                // Particulars
+                                !item.Particulars || String(item.Particulars).trim() === "" ||
+
+                                // Start Date
+                                !item.StartDate || String(item.StartDate).trim() === "" ||
+
+                                // End Date
+                                !item.EndDate || String(item.EndDate).trim() === "" ||
+
+                                // Gross Price
+                                item.GrossPrice === undefined || item.GrossPrice === null || String(item.GrossPrice).trim() === ""
+                            );
+                        }) : -1;
+
+                    // If blank line item exists
+                    if (iBlankItemIndex !== -1) {
+                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                    }
+
+                    // CHECK WHETHER AT LEAST ONE LINE ITEM EXISTS
+
+                    if (!Array.isArray(aInvoiceItems) || aInvoiceItems.length === 0) {
+                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                    }
+
+                    const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
+                    const bOptionalValid = this.Discount && this.RateUnit && this.Particulars;
+                    const bIsValid = bMandatoryValid && bOptionalValid && bConversionRateValid;
+
+                    let bIsValidTwo = true;
+
+                    if (oSelectedCustomerModel.getProperty("/CustomerGSTNO")) {
+                        bIsValidTwo = utils._LCvalidateGstNumber(this.byId("CI_id_InputCustomerGSTNO"), "ID") && utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTName"), "ID") && utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
+                    }
+
+                    if (!bIsValid || !bIsValidTwo) {
+                        return MessageToast.show(that.i18nModel.getText("mandatoryFieldsError"));
+                    }
+
+                    let bIsValidGST = true;
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
+
+                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
+                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
+
+                        bIsValidGST = utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"), "ID") && utils._LCvalidateMandatoryField(this.byId("GSTValue"), "ID");
+
+                        if (!oCGSTCheckbox.getSelected() && !oIGSTCheckbox.getSelected()) {
+                            oCGSTCheckbox.setValueState("Error");
+                            oIGSTCheckbox.setValueState("Error");
+                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            bIsValidTwo = false;
+                        } else {
+                            oCGSTCheckbox.setValueState("None");
+                            oIGSTCheckbox.setValueState("None");
+                        }
+                    }
+
+                    if (!bIsValid || !bIsValidTwo || !bIsValidGST) {
+                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    }
+
+                    this.getBusyDialog()
+                    const oPayload = await this.SubmitPayload("Create");
+                    if (oPayload === false) {
+                        this.closeBusyDialog()
+                        return;
+                    }
+                    try {
+                         oPayload.payload.Inv="true"
+                        var response = await that.ajaxCreateWithJQuery("HM_ManageInvoice", {
+                            data: oPayload.payload,
+                            Items: oPayload.items
+                        });
+                        oSelectedCustomerModel.setProperty("/InvNo", response.InvoiceNo);
+                        var CustomerName = oSelectedCustomerModel.getProperty("/Customer") || oPayload.payload.CustomerName;
+                        oSelectedCustomerModel.setProperty("/CustomerName", CustomerName)
+                        var Status = oSelectedCustomerModel.getProperty("/Status") || oPayload.payload.Status;
+                        oSelectedCustomerModel.setProperty("/Status", Status)
+                        that.closeBusyDialog();
+                        var oDialog = new sap.m.Dialog({
+                            title: that.i18nModel.getText("success"),
+                            type: sap.m.DialogType.Message,
+                            state: sap.ui.core.ValueState.Success,
+                            class: "myUnifiedBtn",
+                            content: new sap.m.Text({
+                                text: that.i18nModel.getText("invoiceCreatemsg")
+                            }),
+                            beginButton: new sap.m.Button({
+                                text: "OK",
+                                type: "Transparent",
+                                class: "myUnifiedBtn",
+                                press: function () {
+                                    oDialog.close();
+                                    that.getOwnerComponent().getRouter().navTo("Routecustominvoice", {
+                                        sPath: "TilePage"
+                                    });
+                                }
+                            }),
+                            endButton: new sap.m.Button({
+                                text: "Generate PDF",
+                                type: "Transparent",
+                                class: "myUnifiedBtn",
+                                press: async () => {
+                                    oDialog.close();
+                                    await that.CID_onPressGeneratePdf();
+                                    that.getOwnerComponent().getRouter().navTo("Routecustominvoice", {
+                                        sPath: "ManageInvoicedetails"
+                                    });
+                                }
+                            }),
+                            afterClose: function () {
+                                oDialog.destroy();
+                            }
+                        });
+                        oDialog.open();
+                    } catch (error) {
+                        MessageToast.show(error.responseText || "Submission Failed");
+                    }
+                } catch (error) {
+                    MessageToast.show(that.i18nModel.getText("technicalError"));
+                }
+            },
+
+            CID_onPressEdit: function () {
+                var isEditMode = this.visiablityPlay.getProperty("/editable");
+                if (isEditMode) {
+                    this.onPressUpdateInvoice();
+                } else {
+                    this.visiablityPlay.setProperty("/editable", true);
+                    this.visiablityPlay.setProperty("/CInvoice", true);
+                    // this.byId("CID_id_TableInvoiceItem").setMode(sap.m.ListMode.MultiSelect);
+                    this.visiablityPlay.setProperty("/addInvBtn", true);
+                    this.visiablityPlay.setProperty("/merge", false);
+                    this.visiablityPlay.setProperty("/MultiEmail", false);
+                    this.visiablityPlay.setProperty("/payByDate", false);
+                    this.visiablityPlay.setProperty("/refresh", true);
+                }
+            },
+
+            CID_onPressLiveChangeEmail: function (oEvent) {
+                utils._LCvalidateEmail(oEvent)
+            },
+
+            CID_onPressLiveChangeMobileNo: function (oEvent) {
+                this.mobileNo = utils._LCvalidateMobileNumber(oEvent);
+            },
+
+            CID_onPressLiveChangeGST: function (oEvent) {
+                const oInput = oEvent.getSource();
+                const sGST = oInput.getValue().toUpperCase();
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                oInput.setValue(sGST);
+
+                // Empty GST → reset
+                if (!sGST) {
+                    oInput.setValueState("None");
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/Value", "");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                    this.totalAmountCalculation();
+                    return;
+                }
+
+                // Validate GST format
+                if (!utils._LCvalidateGstNumber(oEvent)) {
+                    return;
+                }
+
+                // First 2 digits = State Code
+                const stateCode = sGST.substring(0, 2);
+
+                if (stateCode === "29") {
+                    // Karnataka → CGST + SGST
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                } else {
+                    // Other states → IGST
+                    oCustomerModel.setProperty("/Type", "");
+                    oCustomerModel.setProperty("/CGSTSelected", false);
+                    oCustomerModel.setProperty("/IGSTSelected", false);
+                }
+
+                // GST is valid → allow percentage entry
+                oCustomerModel.setProperty("/GSTValid", true);
+
+                // Keep existing Value if already present
+                if (!oCustomerModel.getProperty("/Value")) {
+                    oCustomerModel.setProperty("/Value", "");
+                }
+                this.totalAmountCalculation();
+            },
+
+            CI_onSelectCGST: function (oEvent) {
+
+                const bSelected = oEvent.getParameter("selected");
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                // Prevent deselect
+                if (!bSelected) {
+                    return oCustomerModel.setProperty("/CGSTSelected", true);
+                }
+                this.byId("CDI_id_CheckboxIGST").setValueState("None")
+                this.byId("CID_id_CheckboxCGST").setValueState("None")
+                this.byId("GSTValue").setValueState("None")
+
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                    this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                const CustomerData = oCustomerModel.getData();
+                const Branch = BranchData.find(item => item.BranchID === CustomerData.BranchCode);
+
+                oCustomerModel.setProperty("/CGSTSelected", true);
+                oCustomerModel.setProperty("/IGSTSelected", false);
+
+                oCustomerModel.setProperty("/Type", "CGST/SGST");
+                oCustomerModel.setProperty("/Value", Number(Branch.Value) / 2);
+                oCustomerModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
+
+                const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = "YES";
+                    item.SAC = "996322";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
+                this.totalAmountCalculation();
+            },
+
+            CI_onSelectIGST: function (oEvent) {
+
+                const bSelected = oEvent.getParameter("selected");
+                const oCustomerModel = this.getView().getModel("SelectedCustomerModel");
+
+                // Prevent deselect
+                if (!bSelected) {
+                    oCustomerModel.setProperty("/IGSTSelected", true);
+                    return;
+                }
+                this.byId("CDI_id_CheckboxIGST").setValueState("None")
+                this.byId("CID_id_CheckboxCGST").setValueState("None")
+                this.byId("GSTValue").setValueState("None")
+
+                const BranchData = this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                    this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                const CustomerData = oCustomerModel.getData();
+                const Branch = BranchData.find(item => item.BranchID === CustomerData.BranchCode);
+
+                oCustomerModel.setProperty("/IGSTSelected", true);
+                oCustomerModel.setProperty("/CGSTSelected", false);
+
+                oCustomerModel.setProperty("/Type", "IGST");
+                oCustomerModel.setProperty("/Value", Number(Branch.Value));
+                oCustomerModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+
+                const oInvoiceModel = this.getView().getModel("ManageInvoiceItemModel");
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = "YES";
+                    item.SAC = "996322";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
+                this.totalAmountCalculation();
+
+            },
+
+            CI_onPercentageChange: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+                const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
+
+                const oView = this.getView();
+                const oCustomerModel = oView.getModel("SelectedCustomerModel");
+                const oInvoiceModel = oView.getModel("ManageInvoiceItemModel");
+
+                // Update GST percentage
+                oCustomerModel.setProperty("/Value", sPercentage);
+
+                // Get invoice items
+                const aItems = oInvoiceModel.getProperty("/ManageInvoiceItem") || [];
+
+                // Update GSTCalculation for all items
+                aItems.forEach(function (item, index) {
+                    item.GSTCalculation = sPercentage > 0 ? "YES" : "NO";
+                });
+
+                // Update model
+                oInvoiceModel.setProperty("/ManageInvoiceItem", aItems);
+                oInvoiceModel.refresh(true);
+
+                // Recalculate totals
+                this.totalAmountCalculation();
+            },
+
+
+            CID_onPressLiveChangePAN: function (oEvent) {
+                var oInput = oEvent.getSource();
+                utils._LCvalidatePanCard(oEvent)
+                if (oInput.getValue() === "") oInput.setValueState("None"); // Clear error state on empty input
+            },
+
+            onPressUpdateInvoice: async function (Value) {
+                try {
+                    // var oModel = this.getView().getModel("FilteredSOWModel").getData();
+                    const aItems = this.getView()
+                        .getModel("ManageInvoiceItemModel")
+                        .getProperty("/ManageInvoiceItem") || [];
+
+                        const oGstNoInput    = this.byId("CI_id_InputCustomerGSTNO");
+        const oGstNameInput  = this.byId("CI_id_InputCustomerGSTName");
+        const oGstAddrInput  = this.byId("CI_id_InputCustomerGSTAddress");
+
+        if (oGstNoInput)   oGstNoInput.setValueState("None");
+        if (oGstNameInput) oGstNameInput.setValueState("None");
+        if (oGstAddrInput) oGstAddrInput.setValueState("None");
+
+                    const bCustomerValid = utils._LCvalidateMandatoryField(this.byId("CID_id_Custmer"), "ID");
+
+                    const bInvoiceDateValid = utils._LCvalidateDate(this.byId("CID_id_NavInvDate"), "ID");
+
+                    const bInvoiceDescValid = utils._LCvalidateMandatoryField(this.byId("CID_id_InvoiceDesc"), "ID");
+
+                    const bMobileValid = this.mobileNo;
+
+                    const bEmailValid = utils._LCvalidateEmail(this.byId("CID_id_InputMailID"), "ID");
+
+                    // LINE ITEM VALIDATION
+
+                    const iBlankItemIndex = aItems.findIndex(function (item) {
+
+                        return (
+                            !item ||
+
+                            // Particulars
+                            !item.Particulars ||
+                            String(item.Particulars).trim() === "" ||
+
+                            // Start Date
+                            !item.StartDate ||
+                            String(item.StartDate).trim() === "" ||
+
+                            // End Date
+                            !item.EndDate ||
+                            String(item.EndDate).trim() === "" ||
+
+                            // Gross Price
+                            item.GrossPrice === undefined ||
+                            item.GrossPrice === null ||
+                            String(item.GrossPrice).trim() === ""
+                        );
+
+                    });
+
+                    // Show Sr. No. of blank line item
+                    if (iBlankItemIndex !== -1) {
+                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                    }
+
+                    // No line items
+                    if (!Array.isArray(aItems) || aItems.length === 0) {
+                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                    }
+
+                    const bIsValid = bCustomerValid && bInvoiceDateValid && bInvoiceDescValid && bMobileValid && bEmailValid;
+
+                    let bIsValidTwo = true;
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/CustomerGSTNO")) {
+                        bIsValidTwo =
+                            utils._LCvalidateGstNumber(this.byId("CI_id_InputCustomerGSTNO"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTName"), "ID") &&
+                            utils._LCvalidateMandatoryField(this.byId("CI_id_InputCustomerGSTAddress"), "ID");
+                    }
+
+                    let bIsValidGST = true;
+
+
+                    if (this.getView().getModel("SelectedCustomerModel").getProperty("/GST")) {
+
+                        const oCGSTCheckbox = this.byId("CID_id_CheckboxCGST");
+                        const oIGSTCheckbox = this.byId("CDI_id_CheckboxIGST");
+
+                        bIsValidGST = utils._LCvalidateGstNumber(this.byId("CID_id_InputGST"), "ID") && utils._LCvalidateMandatoryField(this.byId("GSTValue"), "ID");
+
+                        if (!oCGSTCheckbox.getSelected() && !oIGSTCheckbox.getSelected()) {
+                            oCGSTCheckbox.setValueState("Error");
+                            oIGSTCheckbox.setValueState("Error");
+                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            bIsValidTwo = false;
+                        } else {
+                            oCGSTCheckbox.setValueState("None");
+                            oIGSTCheckbox.setValueState("None");
+                        }
+                    }
+
+                    if (!bIsValid || !bIsValidTwo || !bIsValidGST) {
+                        return MessageToast.show(this.i18nModel.getText("mandatoryFieldsError"));
+                    }
+
+                    this.getBusyDialog()
+                    const oPayload = await this.SubmitPayload("update");
+
+                    if (oPayload === false) {
+                        this.closeBusyDialog()
+                        return;
+                    } else {
+                        var Status = oPayload.payload.Status;
+                    }
+                    try {
+                        await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                            data: oPayload.payload,
+                            filtres: oPayload.filters,
+                            Items: oPayload.items
+                        });
+
+
+                        const oData = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
+                            InvNo: this.decodedPath
+                        });
+
+                        const aItems = oData.data.ManageInvoiceItem
+                            .map(item => ({
+                                ...item,
+                                StartDate: item.StartDate ? this.Formatter.DateFormat(item.StartDate) : "",
+                                EndDate: item.EndDate ? this.Formatter.DateFormat(item.EndDate) : "",
+                                PreviousTotal: item.PreviousTotal,
+                                GrossPriceEditable: false,
+                                UnitEditable: false,
+                                DurationEditable: false,
+                                StartDateEditable: false,
+                                EndDateEditable: false
+                            }))
+                            .sort((a, b) => this._parseDate(a.StartDate) - this._parseDate(b.StartDate) || this._parseDate(a.EndDate) - this._parseDate(b.EndDate))
+                            .map((item, index) => ({
+                                ...item,
+                                IndexNo: index + 1
+                            }));
+
+                        this.getView().setModel(
+                            new sap.ui.model.json.JSONModel({
+                                ManageInvoiceItem: aItems
+                            }),
+                            "ManageInvoiceItemModel"
+                        );
+
+                        this.totalAmountCalculation();
+
+                        this.visiablityPlay.setProperty("/editable", false);
+                        this.visiablityPlay.setProperty("/CInvoice", false);
+                        // this.byId("CID_id_TableInvoiceItem").setMode("None");
+                        this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
+                        this.visiablityPlay.setProperty("/merge", true);
+                        this.visiablityPlay.setProperty("/MultiEmail", true);
+                        if (Status !== "Payment Received") this.visiablityPlay.setProperty("/payByDate", this.ReminderEmail);
+                        if (Status === "Payment Received") {
+                            this.visiablityPlay.setProperty("/MultiEmail", false);
+                            // this.visiablityPlay.setProperty("/Edit", false);
+                        }
+                        if (Value !== "Dont Show") MessageToast.show(this.i18nModel.getText("invoiceUpdateMess"));
+                        this.closeBusyDialog()
+                    } catch (error) {
+                        this.closeBusyDialog()
+                        MessageToast.show(error.responseText || this.i18nModel.getText("invoiceUpdateMessFailed"));
+                    }
+                } catch (error) {
+                    this.closeBusyDialog()
+                    MessageToast.show(this.i18nModel.getText("technicalError"));
+                }
+            },
+
+            onChangeInvoiceStatus: function (oEventOrStatus) {
+                var that = this;
+                var oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+
+                this.OldStatus = this.Status
+                var status = "";
+
+                if (that.oDialog) {
+                    that.oDialog.destroy();
+                    that.oDialog = null;
+                }
+
+                if (oEventOrStatus && typeof oEventOrStatus.getSource === "function") {
+                    var oSource = oEventOrStatus.getSource();
+                    status = oSource.getValue();
+
+                    if (this.visiablityPlay) {
+                        this.visiablityPlay.setProperty("/Form", true);
+                        this.visiablityPlay.setProperty("/Table", false);
+                        // this.visiablityPlay.setProperty("/CInvoice", true);
+                    }
+
+                    var oSelectedCustomer = oSelectedModel ? oSelectedModel.getData() : {};
+                    var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
+
+                    var paidAmount = Number(oSelectedCustomer.PaidAmount) || 0;
+                    var totalAmount = Number(oSelectedCustomer.TotalAmount) || 0;
+                    var allReceivedAmount = 0;
+                    var dueAmount = Number(oSelectedCustomer.BalanceAmount) || 0;
+
+                    if (oInvoicePaymentModel) {
+                        allReceivedAmount = Number(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+                        dueAmount = Number(oInvoicePaymentModel.getProperty("/AllDueAmount")) || dueAmount;
+                    }
+
+                    var totalPaid = paidAmount + allReceivedAmount;
+
+                    const balanceAmount =
+                        (Number(oSelectedCustomer.TotalAmount) || 0) -
+                        (
+                            (Number(oSelectedCustomer.PaidAmount) || 0) +
+                            (Number(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0)
+                        );
+
+
+                    if (totalPaid === 0) {
+                        if (status === "Payment Partially" || status === "Payment Received") {
+                            oSelectedModel.setProperty("/Status", this._previousInvoiceStatus);
+                            oSource.setValue(this._previousInvoiceStatus);
+                        }
+                        this._previousInvoiceStatus = status;
+                    }
+                    else if (totalPaid > 0 && balanceAmount > 0) {
+                        if (status !== "Payment Partially") {
+                            oSelectedModel.setProperty("/Status", "Payment Partially");
+                            oSource.setValue("Payment Partially");
+                            status = "Payment Partially";
+                        }
+                        this._previousInvoiceStatus = "Payment Partially";
+                    }
+                    else if (totalPaid >= totalAmount || balanceAmount === 0) {
+                        if (status !== "Payment Received") {
+                            MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
+                            oSelectedModel.setProperty("/Status", "Payment Received");
+                            oSource.setValue("Payment Received");
+                            status = "Payment Received";
+                            return;
+                        }
+                        this._previousInvoiceStatus = "Payment Received";
+                    }
+                } else if (typeof oEventOrStatus === "string") {
+                    status = oEventOrStatus;
+
+                    if (oSelectedModel && status != "Open") {
+                        oSelectedModel.setProperty("/Status", status);
+                    }
+                    this._previousInvoiceStatus = status;
+
+                    if (this.visiablityPlay) {
+                        this.visiablityPlay.setProperty("/Form", true);
+                        this.visiablityPlay.setProperty("/Table", false);
+                        // this.visiablityPlay.setProperty("/CInvoice", true);
+                    }
+                }
+                if (status === "Payment Received" || status === "Payment Partially" || status === "Open") {
+                    var oView = that.getView();
+
+                    sap.ui.core.Fragment.load({
+                        name: "sap.ui.com.project1.fragment.ManageInvoice",
+                        controller: that
+                    }).then(function (oDialog) {
+                        that.oDialog = oDialog;
+                        oView.addDependent(oDialog);
+                        oDialog.open();
+
+                        if (typeof that.modelFunction === "function") {
+                            that.modelFunction();
+                        }
+                    });
+                }
+            },
+
+            modelFunction: function () {
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+
+                var fTotalAmount = parseFloat(oNavigationModel.TotalAmount) || 0;
+                var fPaidAmount = parseFloat(oNavigationModel.PaidAmount) || 0;
+
+                var oInvoicePaymentModel = this.getView().getModel("InvoicePayment");
+
+                var fAllReceivedAmount = 0;
+                var fBackendDueAmount = null;
+
+                if (oInvoicePaymentModel && oInvoicePaymentModel.getData()) {
+                    fAllReceivedAmount = parseFloat(oInvoicePaymentModel.getProperty("/AllReceivedAmount")) || 0;
+
+                    var tempDue = parseFloat(oInvoicePaymentModel.getProperty("/AllDueAmount"));
+                    if (!isNaN(tempDue)) {
+                        fBackendDueAmount = tempDue;
+                    }
+                }
+
+                var fTotalReceived = fPaidAmount + fAllReceivedAmount; // Total received
+
+                var fCalculatedDue = fTotalAmount - fTotalReceived;
+                if (fCalculatedDue < 0) {
+                    fCalculatedDue = 0;
+                }
+
+                var fFinalDue;
+                if (fTotalAmount > fAllReceivedAmount) {
+                    fFinalDue = fCalculatedDue;
+                } else {
+                    fFinalDue = (fBackendDueAmount !== null) ? fBackendDueAmount : fCalculatedDue;
+                }
+
+                var oModel = new sap.ui.model.json.JSONModel({
+                    InvNo: oNavigationModel.InvNo,
+                    TransactionId: "",
+                    ReceivedDate: "",
+                    ReceivedAmount: "",
+                    TotalAmount: fTotalAmount.toFixed(2),
+                    DueAmount: fFinalDue.toFixed(2),
+                    Currency: oNavigationModel.Currency,
+                    ConversionRate: "",
+                    AmountInINR: "",
+                    FlagVisCompany: "Company Invoice",
+                    CustomerName: oNavigationModel.CustomerName,
+                    BookingID: oNavigationModel.BookingID,
+                    BranchCode: oNavigationModel.BranchCode
+                });
+                this.getView().setModel(oModel, "PaymentModel");
+            },
+
+            CID_onPressDisplayPaymentDetail: function () {
+                this.onChangeInvoiceStatus("Open");
+                this.visiablityPlay.setProperty("/Form", false);
+                this.visiablityPlay.setProperty("/Table", true);
+            },
+
+            onChangeReceivedAmount: function (oEvent) {
+                var paymentModel = this.getView().getModel("PaymentModel");
+                var allPaymentData = this.getView().getModel("InvoicePayment");
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+
+                // Helper function to safely parse string/number inputs to rounded floats
+                var parseAmount = function (val) {
+                    if (val === null || val === undefined) return 0;
+                    var cleanVal = String(val).replaceAll(',', '').trim();
+                    var parsed = parseFloat(cleanVal);
+                    return isNaN(parsed) ? 0 : parsed;
+                };
+
+                // Helper function to handle floating point math safely
+                var round2 = function (num) {
+                    return Math.round((num + Number.EPSILON) * 100) / 100;
+                };
+
+                // 1. Get base amounts as clean numbers
+                var totalReceivedAmount = allPaymentData ? parseAmount(allPaymentData.getProperty("/AllReceivedAmount")) : 0;
+                var paidAmount = parseAmount(oNavigationModel.PaidAmount);
+                var totalAmount = parseAmount(paymentModel.getProperty("/TotalAmount"));
+
+                // 2. Format /ReceivedAmount in paymentModel
+                var sValue = paymentModel.getProperty("/ReceivedAmount") || "";
+                sValue = String(sValue).replaceAll(',', '');
+                paymentModel.setProperty("/ReceivedAmount", sValue);
+
+                var receivedAmount = parseAmount(sValue);
+
+                // 3. Safe calculations (prevents 0.1 + 0.2 = 0.30000000000000004 issues)
+                var totalPaidTillNow = round2(paidAmount + totalReceivedAmount + receivedAmount);
+                var dueAmount = Math.max(0, round2(totalAmount - totalPaidTillNow));
+
+                this.onChangePaymentConvertionRate();
+
+                if (oEvent) {
+                    var sEventValue = oEvent.getParameter("value") || "";
+                    var enteredAmount = parseAmount(sEventValue);
+
+                    const effectivePaid = paidAmount - oNavigationModel.RefundProcessed;
+                    var remainingDue = Math.max(0, round2(totalAmount - (effectivePaid + totalReceivedAmount)));
+
+                    this.ResivedAmount = true;
+
+                    if (enteredAmount > remainingDue) {
+                        this.ResivedAmount = false;
+
+                        sap.ui.getCore().byId("idReceivedAmount")
+                            .setValueState("Error")
+                            .setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+
+                        paymentModel.setProperty("/DueAmount", remainingDue.toFixed(2));
+                        return;
+                    }
+
+                    sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
+
+                    if (enteredAmount < remainingDue) {
+                        utils._LCvalidateAmountZeroTaking(oEvent);
+                    }
+                }
+
+                paymentModel.setProperty("/DueAmount", dueAmount.toFixed(2));
+            },
+
+            onChangePaymentConvertionRate: function (oEvent) {
+                if (oEvent) utils._LCvalidateAmount(oEvent);
+                var oModelData = this.getView().getModel("PaymentModel");
+                var receivedAmount = parseFloat(oModelData.getData().ReceivedAmount) || 0;
+                var conversionRate = parseFloat(oModelData.getData().ConversionRate) || 0;
+                var AmountInINR = receivedAmount * conversionRate;
+                (isNaN(AmountInINR)) ? oModelData.setProperty("/AmountInINR", '0.00') : oModelData.setProperty("/AmountInINR", AmountInINR.toFixed(2));
+            },
+
+            Readcall: async function (entity, filterValue) {
+                const oData = await this.ajaxReadWithJQuery(entity, filterValue);
+
+                if (entity === "HM_ManageInvoice") {
+                    return oData.data;
+                }
+
+                if (entity === "HM_ManageInvoice") {
+                    const invoiceData = oData.data?.[0] || {};
+                    invoiceData.InvoiceDate = this.Formatter.formatDate(invoiceData.InvoiceDate);
+                    // invoiceData.InvDate = this.Formatter.formatDate(invoiceData.InvDate);
+                    invoiceData.PayByDate = this.Formatter.formatDate(invoiceData.PayByDate);
+                    // ---- GST checkbox derived selection ----
+                    const igst = invoiceData.IGST || 0;
+                    const cgst = invoiceData.CGST || 0;
+                    const sgst = invoiceData.SGST || 0;
+
+                    // reset first
+                    invoiceData.IGSTSelected = false;
+                    invoiceData.CGSTSelected = false;
+
+                    if (igst > 0) {
+                        invoiceData.IGSTSelected = true;
+                    } else if (cgst > 0 || sgst > 0) {
+                        invoiceData.CGSTSelected = true;
+                    }
+                    var oModel = this.getView().getModel("SelectedCustomerModel");
+
+                    if (oModel) {
+                        oModel.setData(invoiceData);
+
+                        if (invoiceData.IGSTSelected) {
+                            oModel.setProperty("/TaxPercentageLabel", "IGST Percentage");
+                        } else if (invoiceData.CGSTSelected) {
+                            oModel.setProperty("/TaxPercentageLabel", "CGST/SGST Percentage");
+                        }
+
+                        oModel.refresh(true);
+                    }
+                    this.Status = invoiceData.Status;
+                    this._previousInvoiceStatus = invoiceData.Status;
+                    return;
+                }
+
+                const view = this.getView();
+                view.setModel(new JSONModel(oData.data), "InvoicePayment");
+
+                if (entity === "fetchHM_InvoicePaymentDetail") {
+                    view.setModel(new JSONModel({
+                        InvoicePaymentDetail: oData.data
+                    }), "PaymentDetailModel");
+                }
+
+                const items = oData.data || [];
+
+                // Case 1: Only 1 record and Used = X → skip calculation
+                if (items.length === 1 && items[0].Used === "X") {
+                    return;
+                }
+
+                const validItems = items.filter(item => item.Used !== "X" && item.Used !== "Y");
+
+               
+                var oResult = await this.ajaxReadWithJQuery("HM_Payment", {
+                    InvNo: this.decodedPath
+                });
+
+
+                const totalYAmount = oResult.commentData
+                    .filter(item => item.Used === "Y")
+                    .reduce((sum, item) => sum + (Number(item.Amount) || 0), 0);
+
+                const totalReceivedAmount = (oResult || []).commentData.reduce((total, item) => {
+                    const amount = Number(item.Amount) || 0;
+
+                    if (item.Used === "X" || item.Used === "") {
+                        return total + amount;
+                    } else if (item.Used === "Y") {
+                        return total - amount;
+                    }
+
+                    return total;
+                }, 0);
+
+                var totalDueAmount1 = validItems[0]?.TotalAmount - totalReceivedAmount;
+                // Safe TotalAmount fetch
+                // const totalAmount =
+                //     validItems[0]?.TotalAmount || items[0]?.TotalAmount - totalDueAmount1  || 0;
+
+                const totalAmount =
+                    (Number(validItems[0]?.TotalAmount || items[0]?.TotalAmount || 0)) - Number(totalDueAmount1 || 0);
+
+                // PaidAmount (advance)
+                const oNavigationModel = view.getModel("SelectedCustomerModel")?.getData() || {};
+                const paidAmount = oNavigationModel.PaidAmount - oNavigationModel.RefundProcessed || 0;
+
+                // FINAL CALCULATION
+                const totalPaid = Number(paidAmount) + Number(totalReceivedAmount);
+
+                let totalDueAmount = totalAmount - totalPaid;
+                if (totalDueAmount < 0) {
+                    totalDueAmount = 0;
+                }
+
+                const invoiceModel = view.getModel("InvoicePayment");
+                invoiceModel.setProperty("/AllReceivedAmount", totalReceivedAmount.toFixed(2));
+                invoiceModel.setProperty("/AllDueAmount", totalDueAmount);
+                this.getView().getModel("SelectedCustomerModel").setProperty("/RefundProcessed", totalYAmount);
+
+                invoiceModel.refresh(true);
+            },
+
+            onChangePaymentRecived: async function () {
+                var paymentModel = this.getView().getModel("PaymentModel").getData();
+                const isTransactionValid = paymentModel.PaymentType === "UPI"
+                    ? utils._LCvalidateMandatoryField(sap.ui.getCore().byId("MI_id_TransactionID"), "ID")
+                    : true;
+
+                const isMandatoryValid =
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("idInvoicePaymentMode"), "ID") &&
+                    isTransactionValid &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("idReceivedDate"), "ID");
+
+                let isCurrencyValid = true;
+                if (paymentModel.Currency !== "INR") {
+                    isCurrencyValid = utils._LCvalidateAmount(sap.ui.getCore().byId("idFrgConvertionRate"), "ID");
+                }
+
+                var receivedAmount = parseFloat((paymentModel.ReceivedAmount || "0").replaceAll(',', ''));
+                var isReceivedAmountInvalid = isNaN(receivedAmount) || receivedAmount <= 0;
+
+                if (!isMandatoryValid || !isCurrencyValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
+                if (isReceivedAmountInvalid) {
+                    sap.ui.getCore().byId("idReceivedAmount")
+                        .setValueState("Error")
+                        .setValueStateText(this.i18nModel.getText("invoiceRecievedAmountMessage"));
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
+                const isValid = isMandatoryValid && isCurrencyValid;
+                if (!this.ResivedAmount) {
+                    MessageToast.show(this.i18nModel.getText("Receiving amount cannot exceed the due amount"));
+                    return;
+                }
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+                if (Number(paymentModel.DueAmount) < 0) {
+                    MessageToast.show(this.i18nModel.getText("dueAmountZeroOrNegative"));
+                    return;
+                }
+
+                this.getBusyDialog()
+                const jsonData = {
+                    InvNo: String(paymentModel.InvNo),
+                    TransactionId: String(paymentModel.TransactionId),
+                    ReceivedDate: paymentModel.ReceivedDate ? paymentModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    ReceivedAmount: paymentModel.ReceivedAmount,
+                    TotalAmount: paymentModel.TotalAmount,
+                    DueAmount: paymentModel.DueAmount,
+                    Currency: String(paymentModel.Currency),
+                    ConversionRate: paymentModel.Currency !== "INR" ? paymentModel.ConversionRate : "",
+                    AmountInINR: paymentModel.Currency !== "INR" ? paymentModel.AmountInINR : "",
+                    CustomerName: paymentModel.CustomerName,
+                    BookingID: paymentModel.BookingID,
+                    BranchCode: paymentModel.BranchCode,
+                    EntryDate: new Date(),
+                    PaymentType: paymentModel.PaymentType,
+                    ReceivedBy: paymentModel.ReceivedBy,
+                    Payment: "Paid"
+                };
+
+                try {
+                    const oData = await this.ajaxCreateWithJQuery("HM_InvoicePaymentDetail", {
+                        data: jsonData
+                    });
+
+                    if (oData && oData.success) {
+                        // this.oDialog.close();
+                        await this.Readcall("HM_ManageInvoice", {
+                            InvNo: this.decodedPath
+                        });
+                        await this.Readcall("HM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
+                        await this.Readcall("fetchHM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
+                        const hasDue = parseFloat(paymentModel.DueAmount) > 0;
+                        this.visiablityPlay.setProperty("/payByDate", hasDue ? this.ReminderEmail : false);
+                        this.visiablityPlay.setProperty("/MultiEmail", hasDue);
+                        this.visiablityPlay.setProperty("/Edit", true);
+                        this.visiablityPlay.setProperty("/editable", true);
+                        this.visiablityPlay.setProperty("/CInvoice", false);
+                        this.visiablityPlay.setProperty("/merge", false);
+                        this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
+
+                        if (this.oDialog) {
+                            this.oDialog.destroy();
+                            this.oDialog = null;
+                        }
+                        this.onPressUpdateInvoice("Dont Show");
+                        MessageToast.show(this.i18nModel.getText("paymentMessage"));
+                    }
+                } catch (error) {
+                    MessageToast.show(error.responseText);
+                } finally {
+                    this.closeBusyDialog()
+                }
+            },
+
+            onPressInvClose: function () {
+                this.totalAmountCalculation();
+                sap.ui.getCore().byId("MI_id_TransactionID").setValueState("None");
+                sap.ui.getCore().byId("idReceivedAmount").setValueState("None");
+                sap.ui.getCore().byId("idFrgConvertionRate").setValueState("None");
+
+                if (this.oDialog) {
+                    this.oDialog.close();
+                    this.oDialog.destroy(true);
+                    this.oDialog = null;
+                }
+            },
+
+            onLiveTransactionID: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+            onLiveRefundpay: function (oEvent) {
+                utils.onNumber(oEvent.getSource(), "ID");
+            },
+
+            onPaymentModeChange: function (oEvent) {
+                var oComboBox = oEvent.getSource();
+                utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+                var sPaymentMode = oComboBox.getSelectedKey();
+
+                if (sPaymentMode === "Cash") {
+                    var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+
+                    this.getView().getModel("PaymentModel").setProperty(
+                        "/ReceivedBy",
+                        oLoginData.EmployeeName
+                    );
+                    sap.ui.getCore().byId("MI_id_TransactionID").setVisible(false)
+                    sap.ui.getCore().byId("idrecivedby").setVisible(true)
+
+                } else {
+                    this.getView().getModel("PaymentModel").setProperty("/TransactionId", "");
+                    sap.ui.getCore().byId("MI_id_TransactionID").setVisible(true)
+                    sap.ui.getCore().byId("idrecivedby").setVisible(false)
+                }
+            },
+
+            onReceivedDateDatePickerChange: function (oEvent) {
+                utils._LCvalidateDate(oEvent);
+            },
+
+            CID_ValidateCommonFields: function (oEvent) {
+                utils._LCvalidateMandatoryField(oEvent);
+            },
+
+            CID_CurrencyChanges: function (oEvent) {
+                if (oEvent.getSource().getValue() !== "INR") {
+                    this.byId("idSAC").setVisible(false);
+                    this.byId("idGSTCalculation").setVisible(false);
+                    // this.visiablityPlay.setProperty("/TDS", false);
+                } else {
+                    this.byId("idSAC").setVisible(true);
+                    this.byId("idGSTCalculation").setVisible(true);
+                    // this.visiablityPlay.setProperty("/TDS", true);
+                }
+                this.visiablityPlay.refresh(true);
+                this.totalAmountCalculation();
+            },
+
+            CD_onDiscountInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("discountInfoText"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
+            },
+
+            CID_onPressDelete: function () {
+                var that = this;
+                var oTable = this.byId("CID_id_TableInvoiceItem");
+                var oModel = this.getView().getModel("ManageInvoiceItemModel");
+
+                var aSelectedItems = oTable.getSelectedItems();
+                //  No selection
+                if (!aSelectedItems.length) {
+                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
+                    return;
+                }
+
+                //  More than one selected
+                if (aSelectedItems.length > 1) {
+                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
+                    return;
+                }
+
+                //  Single selected item
+                var oSelectedItem = aSelectedItems[0];
+                var oContext = oSelectedItem.getBindingContext("ManageInvoiceItemModel");
+                var oObject = oContext.getObject();
+
+                var sPath = oContext.getPath(); // /ManageInvoiceItem/2
+                var iIndex = parseInt(sPath.split("/")[2], 10);
+
+                var aData = oModel.getProperty("/ManageInvoiceItem");
+
+                var fnDeleteLocal = function () {
+                    aData.splice(iIndex, 1);
+
+                    // Re-index
+                    aData.forEach(function (item, idx) {
+                        item.IndexNo = idx + 1;
+                    });
+
+                    oModel.setProperty("/ManageInvoiceItem", aData);
+                    oTable.removeSelections(true);
+
+                    oModel.refresh(true);
+
+                    // Clear ValueState of Particulars inputs
+                    oTable.getItems().forEach(function (oItem) {
+                        var oInput = oItem.getCells()[1]; // Particulars Input (2nd column)
+                        if (oInput && oInput.setValueState) {
+                            oInput.setValueState(sap.ui.core.ValueState.None);
+                            oInput.setValueStateText("");
+                        }
+                    });
+
+                    that.SNoValue = aData.length;
+                    that.totalAmountCalculation();
+
+                    MessageToast.show(that.i18nModel.getText("ManageInvoiceDeleteSuccess"));
+                };
+
+                // 🔁 If already saved → backend delete
+                if (oObject.ItemID) {
+                    this.showConfirmationDialog(
+                        that.i18nModel.getText("msgBoxConfirm"),
+                        that.i18nModel.getText("msgBoxConfirmDelete"),
+                        function () {
+                            that.getBusyDialog();
+
+                            that.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
+                                filters: {
+                                    ItemID: oObject.ItemID
+                                }
+                            }).then(function () {
+                                fnDeleteLocal();
+                                that.closeBusyDialog();
+                            }).catch(function (error) {
+                                that.closeBusyDialog();
+                                MessageToast.show(error.responseText);
+                            });
+                        },
+                        function () {
+                            // Cancel
+                            oTable.removeSelections(true);
+                        }
+                    );
+                }
+                //  Not saved yet → local delete only
+                else {
+                    fnDeleteLocal();
+                }
+            },
+
+            CID_onPressSendEmail: function (oEvent) {
+                var that = this;
+                that.loginModel.setProperty("/RichText", true);
+                that.loginModel.setProperty("/SimpleForm", false);
+
+                var modelData = that.getView().getModel("SelectedCustomerModel").getData();
+                var receivedAmount = this.getView().getModel("InvoicePayment").getProperty("/AllReceivedAmount");
+                var dueAmount = this.getView().getModel("InvoicePayment").getProperty("/AllDueAmount");
+
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: modelData.CustomerEmail,
+                    ToName: modelData.CustomerName,
+                    CCEmail: "",
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: true,
+                    Subject: `STAYVRIKSHA - INVOICE PAYMENT REMINDER`,
+                    htmlbody: `
+                        <p>Dear ${modelData.CustomerName},</p>
+
+                        <p>I hope you are doing well. This is a kind reminder that the payment for the hostel invoice <b>${modelData.InvNo}</b>, issued on <b>${modelData.InvoiceDate}</b>, is still pending. Please review the invoice details below:</p>
+
+                        <ul>
+                            <li><b>Invoice No:</b> ${modelData.InvNo}</li>
+                            <li><b>Due Date:</b> ${modelData.PayByDate}</li>
+                            <li><b>Invoice Amount:</b> ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</li>
+                            <li><b>Received Amount:</b> ${this.Formatter.fromatNumber(receivedAmount)} ${modelData.Currency}</li>
+                            <li><b>Pending Amount:</b> ${this.Formatter.fromatNumber(dueAmount)} ${modelData.Currency}</li>
+                            <li><b>Description:</b> ${modelData.InvoiceDescription}</li>
+                        </ul>
+
+                        <p>We request you to kindly process the payment at the earliest. If payment has already been completed, please disregard this email.</p>
+
+                        <p>If you have any questions or require further clarification, feel free to reach out to us.</p>
+
+                        <p>Thank you for your cooperation.</p>
+                        <br>
+                        <p style="margin:0;">Warm Regards,</p>
+                        <p style="margin:0;">Accounts & Finance Team</p>
+                        <p style="margin:0;">StayVriksha</p>
+                    `
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.EOD_commonOpenDialog("sap.ui.com.project1.fragment.CommonMail", true);
+            },
+
+            CID_onPressSendMultipalEmail: function () {
+                var that = this;
+                that.loginModel.setProperty("/RichText", true);
+                that.loginModel.setProperty("/SimpleForm", true);
+                var modelData = that.getView().getModel("SelectedCustomerModel").getData();
+                // that.getView().getModel("TextDisplay").setProperty("/name", "");
+
+                var oUploaderDataModel = new JSONModel({
+                    isEmailValid: true,
+                    ToEmail: modelData.CustomerEmail,
+                    ToName: modelData.CustomerName,
+                    CCEmail: "",
+                    name: "",
+                    mimeType: "",
+                    content: "",
+                    isFileUploaded: false,
+                    button: false,
+                    Subject: `${modelData.CustomerName} - ${modelData.InvoiceDescription}`,
+                    htmlbody: `<p>Dear Finance Team,</p>
+                    <p>Please find the following invoice details below:</p>
+                    <li><b>Invoice No : ${modelData.InvNo}</b></li>
+                    <li><b>Invoice Date : ${modelData.InvoiceDate}</b></li>
+                    <li><b>Total Amount : ${this.Formatter.fromatNumber(modelData.TotalAmount)} ${modelData.Currency}</b></li>
+                    <li><b>Description : ${modelData.InvoiceDescription}</b></li>
+
+                    <p>If you have any questions or require further information, please do not hesitate to contact us.</p>
+                   <p style="margin: 0;">Best Regards,</p>
+                   <p style="margin: 0;">Nikhil Shah,</p>
+                   <p style="margin: 0;">Accountant Manager</p>
+                   `
+                });
+                this.getView().setModel(oUploaderDataModel, "UploaderData");
+                this.EOD_commonOpenDialog("sap.ui.com.project1.fragment.CommonMail", false);
+                this.validateSendButton();
+            },
+
+            Mail_onPressClose: function () {
+                this.loginModel.setProperty("/RichText", false);
+                this.loginModel.setProperty("/SimpleForm", true);
+                this.EOU_oDialogMail.close();
+                this.EOU_oDialogMail.destroy(true);
+                this.EOU_oDialogMail = null
+            },
+
+            EOD_commonOpenDialog: async function (fragmentName, value) {
+                if (!this.EOU_oDialogMail) {
+                    sap.ui.core.Fragment.load({
+                        name: fragmentName,
+                        controller: this,
+                    }).then(function (EOU_oDialogMail) {
+                        this.EOU_oDialogMail = EOU_oDialogMail;
+                        this.getView().addDependent(this.EOU_oDialogMail);
+                        this.EOU_oDialogMail.open();
+                        if (value === true) sap.ui.getCore().byId("SendMail_Button").setEnabled(true);
+                    }.bind(this));
+                } else {
+                    this.EOU_oDialogMail.open();
+                    if (value === true) sap.ui.getCore().byId("SendMail_Button").setEnabled(true);
+                }
+            },
+
+            Mail_onUpload: function (oEvent) {
+                this.handleFileUpload(
+                    oEvent,
+                    this, // context
+                    "UploaderData", // model name
+                    "/attachments", // path to attachment array
+                    "/name", // path to comma-separated file names
+                    "/isFileUploaded", // boolean flag path
+                    "uploadSuccessfull", // i18n success key
+                    "fileAlreadyUploaded", // i18n duplicate key
+                    "noFileSelected", // i18n no file selected
+                    "fileReadError", // i18n file read error
+                    () => this.validateSendButton()
+                );
+            },
+
+            //Mail dialog button visibility
+            validateSendButton: function () {
+                const sendBtn = sap.ui.getCore().byId("SendMail_Button");
+                const uploaderModel = this.getView().getModel("UploaderData");
+
+                if (!sendBtn || !uploaderModel) {
+                    return;
+                }
+
+                const isFileUploaded = uploaderModel.getProperty("/isFileUploaded") === true;
+                sendBtn.setEnabled(isFileUploaded);
+            },
+
+            Mail_onEmailChange: function () {
+                this.validateSendButton();
+            },
+
+            //Send mail
+            Mail_onSendEmail: function () {
+                try {
+                    var oModel = this.getView().getModel("UploaderData").getData();
+                    if (this.loginModel.getProperty("/SimpleForm")) {
+                        if (!oModel.attachments || oModel.attachments.length === 0) {
+                            MessageToast.show(this.i18nModel.getText("attachmentRequired")); // Or a hardcoded string: "Please add at least one attachment."
+                            return;
+                        }
+                    }
+                    var SelectedModel = this.getView().getModel("SelectedCustomerModel");
+                    var oPayload = {
+                        "InvNo": SelectedModel.getData().InvNo,
+                        "toEmailID": oModel.ToEmail,
+                        "toName": oModel.ToName,
+                        "subject": oModel.Subject,
+                        "body": oModel.htmlbody,
+                        "CCEmailId": oModel.CCEmail,
+                        "attachments": oModel.attachments
+                    };
+                    this.getBusyDialog()
+                    this.ajaxCreateWithJQuery("CompanyInvoiceEmail", oPayload).then((oData) => {
+                        MessageToast.show(this.i18nModel.getText("emailSuccess"));
+                        this.closeBusyDialog()
+                        SelectedModel.setProperty("/Status", "Invoice Sent");
+                        SelectedModel.refresh(true);
+                        this.loginModel.setProperty("/RichText", false);
+                        this.loginModel.setProperty("/SimpleForm", true);
+                    }).catch((error) => {
+                        this.closeBusyDialog()
+                        MessageToast.show(error.responseText);
+                    });
+                    this.Mail_onPressClose();
+                } catch (error) {
+                    this.closeBusyDialog()
+                    MessageToast.show(error.responseText);
+                }
+            },
+
+            onIncomeTaxPercentageInputLiveChange: function (oEvent) {
+                utils._LCvalidateVariablePay(oEvent);
+                const oNavigationModel = this.getView().getModel("SelectedCustomerModel");
+                const oNavigationData = oNavigationModel.getData();
+
+                if (oNavigationData.Currency === "INR") {
+                    const subTotalInGST = parseFloat(oNavigationData.SubTotalInGST) || 0;
+                    const subTotalNotGST = parseFloat(oNavigationData.SubTotalNotGST) || 0;
+                    const incomePerc = parseFloat(oNavigationData.IncomePerc) || 0;
+
+                    const total = subTotalInGST + subTotalNotGST;
+                    const tds = ((total * incomePerc) / 100).toFixed(2);
+                    oNavigationModel.setProperty("/IncomeTax", Math.round(tds));
+                }
+            },
+
+            CID_onPressGeneratePdf: async function () {
+                try {
+                    this.getBusyDialog();
+                    const { jsPDF } = window.jspdf;
+                    const oView = this.getView();
+                    const oModel = oView.getModel("SelectedCustomerModel").getData();
+
+                    // Get branch model data
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    // Find the branch whose BranchID matches oModel.BranchCode
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === oModel.BranchCode)
+                        : (oBranchModelData?.BranchID === oModel.BranchCode ? oBranchModelData : null);
+
+                    // Store the branch name in a variable
+                    const sBranchName = oMatchedBranch?.Name || "";
+
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
+                    const oManageInvoiceItemModel = oView.getModel("ManageInvoiceItemModel").getData();
+                    const oCompanyItemModel = oManageInvoiceItemModel.ManageInvoiceItem || [];
+                    const data = this.getView().getModel("FilteredSOWModel").getData();
+
+                    // fetch company details
+                    let filter = { BranchID: [oModel.BranchCode] };
+                    const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+                    const companyImage = oCompanyDetailsModel.data[0].Photo1;
+
+                    let paymentTermsFilter = { InvNo: [oModel.InvNo] };
+                    const paymentdata = await this.ajaxReadWithJQuery("HM_Payment", paymentTermsFilter);
+
+                    let totalInWords = await this.convertNumberToWords(oModel.TotalAmount, data.Currency);
+                    const showSAC = oModel.GST !== undefined && oModel.GST !== "";
+
+                    const margin = 15;
+                    const doc = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    });
+
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const usableWidth = pageWidth - 2 * margin;
+                    let currentY = 0;
+
+                    // Header title
+                    let headerMargin = 25.4;
+                    doc.setFontSize(14).setFont("times", "bold");
+                    if (oModel.Status === "Payment Received") {
+                        doc.text("TAX - INVOICE", pageWidth - 18, headerMargin, {
+                            align: "right"
+                        });
+                    } else {
+                        doc.text("DRAFT INVOICE", pageWidth - 18, headerMargin, {
+                            align: "right"
+                        });
+                    }
+
+                    // ---- Add Branch Name FIRST ----
+                    doc.setFont("times", "bold").setFontSize(14);
+                    if (sBranchName) {
+                        doc.text(String(sBranchName).toUpperCase(), margin, headerMargin);
+                    }
+
+                    // ---- Then add Company Image below branch name ----
+                    if (companyImage && companyImage.trim() !== "") {
+                        const imgData = "data:image/png;base64," + companyImage;
+                        // Adjust Y position so image appears below the branch name
+                        doc.addImage(imgData, "PNG", margin, headerMargin + 2, 40, 40);
+                    }
+
+                    // Invoice Details
+                    const detailsStartY = headerMargin + 10; // adjust if needed based on image height
+                    const rowHeight = 6.5;
+                    const columnWidths = [40, 40];
+                    const rightAlignX = pageWidth - 23 - columnWidths[0] - columnWidths[1];
+
+                    doc.setFontSize(12).setFont("times", "bold");
+
+                    const detailsTable = [{
+                        label: 'Invoice No. :',
+                        value: oModel.InvNo
+                    },
+                    {
+                        label: 'Date :',
+                        value: typeof oModel.InvoiceDate === "string" ? oModel.InvoiceDate : Formatter.formatDate(oModel.InvoiceDate)
+                    },
+                    {
+                        label: 'Room No :',
+                        value: oModel1.RoomNo
+                    }
+                    ];
+
+                    currentY = detailsStartY;
+                    detailsTable.forEach(row => {
+                        doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                        doc.text(String(row.value), rightAlignX + columnWidths[0] + 5, currentY + 5);
+                        currentY += rowHeight;
+                    });
+
+                    currentY += 15;
+                    doc.setFont("times", "bold").setFontSize(11);
+                    doc.text("To,", margin, currentY);
+
+                    currentY += 5;
+                    doc.setFont("times", "normal").setFontSize(12);
+
+                    // Customer details
+                    if (oModel.CustomerName) {
+                        doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    if (oModel.PermanentAddress) {
+                        const ConsultantAddressLines = doc.splitTextToSize(oModel.PermanentAddress, usableWidth / 2 - 10);
+                        doc.text(ConsultantAddressLines, margin, currentY);
+                        currentY += ConsultantAddressLines.length * 5;
+                    }
+
+                    if (oModel.MobileNo) {
+                        doc.text(`Mobile No : ${oModel.MobileNo}`, margin, currentY);
+                        currentY += 5;
+                    }
+                    if (oModel.CustomerEmail) {
+                        doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    if (oModel.CustomerGSTNO) {
+                        doc.text(`GSTIN : ${oModel.CustomerGSTNO}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    currentY += 5;
+
+                    // ===== TABLE BODY =====
+                    const body = oCompanyItemModel
+                        .filter(item => item)
+                        .sort((a, b) => {
+                            const startDiff =
+                                this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
+                        .map((item, index) => {
+                            const row = [
+                                index + 1,
+                                item.Particulars,
+                                item.StartDate || "",
+                                item.EndDate || "",
+                                Formatter.fromatNumber(item.GrossPrice) || "0.00",
+                                item.UnitText,
+                                item.Discount || "0.00",
+                                Formatter.fromatNumber(item.Total) || "0.00"
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
+
+                    const head = showSAC ? [
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                    ] : [
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                    ];
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: head,
+                        body: body,
+                        theme: 'grid',
+                        pageBreak: 'auto',
+                        rowPageBreak: 'auto',
+                        headStyles: {
+                            fillColor: [20, 170, 183]
+                        },
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            cellPadding: 3,
+                            lineWidth: 0.5,
+                            lineColor: [30, 30, 30],
+                            halign: "center"
+                        },
+                        columnStyles: {
+                            0: {
+                                halign: 'center'
+                            },
+                            1: {
+                                halign: 'left'
+                            },
+                            ...(showSAC ? {
+                                2: {
+                                    halign: 'center'
+                                },
+                                3: {
+                                    halign: 'right'
+                                },
+                                4: {
+                                    halign: 'right'
+                                },
+                                5: {
+                                    halign: 'right'
+                                },
+                                6: {
+                                    halign: 'right'
+                                },
+                                7: {
+                                    halign: 'right'
+                                }
+                            } : {
+                                2: {
+                                    halign: 'center'
+                                },
+                                3: {
+                                    halign: 'right'
+                                },
+                                4: {
+                                    halign: 'right'
+                                },
+                                5: {
+                                    halign: 'right'
+                                },
+                                6: {
+                                    halign: 'right'
+                                }
+                            })
+                        },
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 5;
+
+                    if (currentY + 40 > pageHeight) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+
+                    // ===== SUMMARY TABLE =====
+                    const summaryBody = [];
+
+                    if (parseFloat(oModel.SubTotalNotGST) > 0) {
+                        summaryBody.push([`Sub-Total ( Non-Taxable ) (${data.Currency}) :`,
+                        Formatter.fromatNumber(parseFloat(oModel.SubTotalNotGST))
+                        ]);
+                    }
+
+                    if (parseFloat(oModel.SubTotalInGST) > 0) {
+                        summaryBody.push([
+                            `Sub-Total ( Taxable ) (${data.Currency}) :`,
+                            Formatter.fromatNumber(parseFloat(oModel.SubTotalInGST))
+                        ]);
+                    }
+
+                    if (parseFloat(oModel.CouponDiscount) > 0) {
+                        summaryBody.push([
+                            `Discount (${oModel.CouponCode}) :`,
+                            "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                        ]);
+                    }
+
+                    if (data.Currency !== "USD" && oModel.Type) {
+                        const percentageText = oModel.Value && oModel.Value !== "0" ? `(${oModel.Value}%)` : "";
+
+                        const cgstValue = parseFloat(oModel.CGST);
+                        const sgstValue = parseFloat(oModel.SGST);
+                        const igstValue = parseFloat(oModel.IGST);
+
+                        if (data.Currency === "INR" && oModel.Type === "CGST/SGST" && cgstValue) {
+                            summaryBody.push([`CGST ${percentageText} :`, Formatter.fromatNumber(cgstValue.toFixed(2))]);
+                            summaryBody.push([`SGST ${percentageText} :`, Formatter.fromatNumber(sgstValue.toFixed(2))]);
+                        }
+
+                        if (data.Currency === "INR" && oModel.Type === "IGST" && igstValue) {
+                            summaryBody.push([`IGST ${percentageText} :`, Formatter.fromatNumber(igstValue.toFixed(2))]);
+                        }
+                    }
+
+                    const balanceAmount =
+                        (Number(data.TotalAmount) || 0) -
+                        (
+                            (Number(oModel.PaidAmount) || 0) +
+                            (Number(oView.getModel("InvoicePayment").getProperty("/AllReceivedAmount")) || 0)
+                        );
+
+                    if (balanceAmount > 0) {
+                        summaryBody.push([
+                            "Due Amount :",
+                            Formatter.fromatNumber(balanceAmount)
+                        ]);
+                    }
+
+                    const totalRowIndex = summaryBody.length;
+                    summaryBody.push([`Total (${data.Currency}) :`, Formatter.fromatNumber(parseFloat(oModel.TotalAmount))]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [],
+                        body: summaryBody,
+                        theme: 'plain',
+                        pageBreak: 'auto',
+                        rowPageBreak: 'auto',
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            halign: "right",
+                            cellPadding: 2,
+                            overflow: "ellipsize"
+                        },
+                        columnStyles: {
+                            0: {
+                                halign: "right",
+                                cellWidth: 60
+                            },
+                            1: {
+                                halign: "right",
+                                cellWidth: 40
+                            }
+                        },
+                        margin: {
+                            left: 95,
+                            bottom: 40,
+                        },
+                        didParseCell: function (data) {
+                            if (data.row.index === totalRowIndex) {
+                                data.cell.styles.lineWidth = {
+                                    top: 0.5,
+                                    right: 0,
+                                    bottom: 0,
+                                    left: 0
+                                };
+                                data.cell.styles.lineColor = [0, 0, 0];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 10;
+
+                    // ===== AMOUNT IN WORDS =====
+                    oModel.AmountInWords = totalInWords;
+                    doc.setFont("times", "bold");
+                    doc.text("Amount in Words :", margin, currentY);
+
+                    currentY += 5;
+                    doc.setFont("times", "normal");
+
+                    const amountLines = doc.splitTextToSize(
+                        oModel.AmountInWords || "",
+                        usableWidth
+                    );
+                    doc.text(amountLines, margin, currentY);
+
+                    currentY += amountLines.length * 5 + 8;
+
+                    // ===== Transaction History =====
+                    if (paymentdata && paymentdata.commentData && paymentdata.commentData.length > 0) {
+
+                        if (currentY + 60 > pageHeight) {
+                            doc.addPage();
+                            currentY = 20;
+                        }
+
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("Transaction History", margin, currentY);
+
+                        currentY += 5;
+                        const aSortedPayments = paymentdata.commentData.sort(function (a, b) {
+                            return new Date(b.Date) - new Date(a.Date);
+                        });
+                        const paymentBody = aSortedPayments.map((item, index) => ([
+                            index + 1,
+                            Formatter.formatDate(item.Date),
+                            item.PaymentType || "",
+                            item.Payment || "",
+                            item.BankTransactionID || "-",
+                            Formatter.fromatNumber(item.Amount),
+                            item.Currency || ""
+                        ]));
+
+                        doc.autoTable({
+                            startY: currentY,
+                            head: [
+                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                            ],
+                            body: paymentBody,
+                            theme: 'grid',
+                            pageBreak: 'auto',
+                            rowPageBreak: 'auto',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                1: {
+                                    halign: "center"
+                                },
+                                2: {
+                                    halign: "left"
+                                },
+                                3: {
+                                    halign: "left"
+                                },
+                                4: {
+                                    halign: "left"
+                                },
+                                5: {
+                                    halign: "right"
+                                }
+                            }
+                        });
+
+                        currentY = doc.lastAutoTable.finalY + 8;
+                    }
+
+                    currentY += 15;
+
+                    if (currentY + 20 > pageHeight) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+                    doc.setFontSize(11);
+                    doc.text("Thank you for staying with us.", margin, currentY);
+
+                    const footerHeight = 35;
+                    const signatureHeight = 25;
+
+                    currentY += 32;
+
+                    if (currentY + signatureHeight > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
+
+                    // ================= SIGNATURES =================
+
+                    const leftX = margin;
+                    const rightX = pageWidth - margin;
+                    const lineLength = 40;
+
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(12);
+
+                    const cashierLabel = "Cashier ";
+                    doc.text(cashierLabel, leftX, currentY);
+
+                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                    const lineStartX = leftX + cashierTextWidth;
+
+                    doc.setLineWidth(0.5);
+                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                    const guestLabel = "Guest sign ";
+                    const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                    const footerStartY = pageHeight - 40;
+
+                    if (currentY + 15 > footerStartY) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
+
+                    currentY += 10;
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(12);
+
+                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                    doc.text(createdByText, leftX, currentY);
+
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${oModel.CustomerName}-${oModel.InvNo}-Invoice.pdf`);
+                } catch (error) {
+                    this.closeBusyDialog();
+                    MessageToast.show(error.message || error.responseText);
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            addFooter: function (doc, oCompanyDetailsModel, pageWidth, pageHeight, currentPage, totalPages) {
+                const footerHeight = 18;
+                const footerYPosition = pageHeight - footerHeight;
+                const footerWidth = pageWidth;
+
+                const company = oCompanyDetailsModel.data[0];
+
+                // Grey footer background
+                doc.setFillColor(128, 128, 128);
+                doc.rect(0, footerYPosition, footerWidth, footerHeight, 'F');
+
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(255, 255, 255); // White text
+
+                const textYPosition = footerYPosition + 5;
+                const lineHeight = 5;
+                let currentYPosition = textYPosition;
+
+                // Jurisdiction line
+                if (company && company.City) {
+                    doc.setFontSize(8);
+                    doc.text(`SUBJECT TO ${company.City.toUpperCase()} JURISDICTION`, footerWidth / 2, currentYPosition, {
+                        align: 'center'
+                    });
+                    currentYPosition += lineHeight;
+                }
+
+                // GSTIN
+                if (company) {
+                    doc.setFontSize(10);
+
+                    const gstValue = company?.GSTIN || "NA";
+
+                    // Give extra right margin only for "NA"
+                    const rightMargin = gstValue === "NA" ? 18 : 5;
+
+                    doc.text(
+                        `GSTIN : ${gstValue}`,
+                        footerWidth - rightMargin,
+                        currentYPosition,
+                        { align: "right" }
+                    );
+                }
+
+                if (company && company.Address) {
+                    doc.setFontSize(10);
+
+                    // Combine address + mobile at the end
+                    let fullAddress = company.Address;
+                    if (company.Contact) {
+                        fullAddress += `, Mobile No : ${company.STD}-${company.Contact}`;
+                    }
+
+                    // Wrap text to fit footer width
+                    const addressLines = doc.splitTextToSize(fullAddress, footerWidth - 100);
+                    let currentYPosition = textYPosition + 5;
+
+                    // Render each line
+                    addressLines.forEach((line) => {
+                        doc.text(line, 5, currentYPosition);
+                        currentYPosition += lineHeight;
+                    });
+                }
+            },
+
+            CID_onPressGenerateSelectedPDF: async function () {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const oView = this.getView();
+
+                    const oTable = this.byId("CID_id_TableInvoiceItem");
+                    const aSelectedItems = oTable.getSelectedItems();
+
+                    if (!aSelectedItems.length) {
+                        MessageToast.show("Select at least one invoice item before printing");
+                        return;
+                    }
+                    this.getBusyDialog();
+
+                    //  SELECTED ITEMS 
+                    const aInvoiceItems = aSelectedItems.map(oItem =>
+                        oItem.getBindingContext("ManageInvoiceItemModel").getObject()
+                    );
+
+                    //  MODELS 
+                    const oCustomerModel = oView.getModel("SelectedCustomerModel").getData();
+
+                    const oSOWModel = oView.getModel("FilteredSOWModel").getData();
+
+                    //  GST MASTER CHECK (SAME AS UI) 
+                    const gstin = oCustomerModel.GST;
+                    const taxType = oCustomerModel.Type;
+                    const taxRate = parseFloat(oCustomerModel.Value) || 0;
+                    const currency = oSOWModel.Currency;
+
+                    const isGSTEnabled = !!taxType &&
+                        taxRate > 0 &&
+                        currency === "INR";
+
+                    //  BRANCH MODEL & MATCHED BRANCH NAME 
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === oCustomerModel.BranchCode)
+                        : (oBranchModelData?.BranchID === oCustomerModel.BranchCode ? oBranchModelData : null);
+
+                    const sBranchName = oMatchedBranch?.Name || "";
+
+                    //  COMPANY DETAILS 
+                    const filter = { BranchID: [oCustomerModel.BranchCode] };
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
+                    const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
+                    const companyImage = oCompanyDetailsModel.data[0]?.Photo1;
+
+                    //  RECALCULATE TOTALS (SELECTED ONLY) 
+                    let totalWithGST = 0;
+                    let totalWithoutGST = 0;
+                    let roomTotal = 0;
+                    let subTotal = 0;
+
+                    let couponDiscount = parseFloat(oCustomerModel.CouponDiscount) || 0;
+
+                    aInvoiceItems.forEach(item => {
+                        const amount = parseFloat(item.Total) || 0;
+                        const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
+                        if (isRoomItem) {
+                            roomTotal += amount;
+                        }
+                    });
+
+                    if (couponDiscount > roomTotal) {
+                        couponDiscount = roomTotal;
+                    }
+
+                    let remainingCoupon = couponDiscount;
+
+                    aInvoiceItems.forEach(item => {
+                        let amount = parseFloat(item.Total) || 0;
+                        let itemDiscount = 0;
+
+                        const isRoomItem = item.Particulars && item.Particulars.toLowerCase().includes("room");
+
+                        if (isRoomItem && remainingCoupon > 0) {
+                            if (remainingCoupon >= amount) {
+                                itemDiscount = amount;
+                                remainingCoupon -= amount;
+                            } else {
+                                itemDiscount = remainingCoupon;
+                                remainingCoupon = 0;
+                            }
+                        }
+
+                        item.itemDiscountValue = itemDiscount;
+                        const finalItemTotal = amount - itemDiscount;
+                        item.adjustedTotal = finalItemTotal;
+
+                        subTotal += amount;
+
+                        const isGSTApplicable = isGSTEnabled && item.GSTCalculation === "YES";
+                        item.SAC = isGSTApplicable ? "996322" : "-";
+
+                        if (isGSTApplicable) {
+                            totalWithGST += finalItemTotal;
+                        } else {
+                            totalWithoutGST += finalItemTotal;
+                        }
+                    });
+
+                    let discountedTotal = subTotal - couponDiscount;
+                    if (discountedTotal < 0) {
+                        discountedTotal = 0;
+                    }
+
+                    let cgst = 0;
+                    let sgst = 0;
+                    let igst = 0;
+                    let gstAmount = 0;
+
+                    let finalAmount = discountedTotal;
+
+                    if (isGSTEnabled) {
+                        let taxableAmount = totalWithGST;
+
+                        if (taxType === "CGST/SGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            cgst = gstAmount;
+                            sgst = gstAmount;
+                            finalAmount = discountedTotal + cgst + sgst;
+                        } else if (taxType === "IGST") {
+                            gstAmount = (taxableAmount * taxRate) / 100;
+                            igst = gstAmount;
+                            finalAmount = discountedTotal + igst;
+                        }
+                    }
+
+                    oCustomerModel.SubTotal = subTotal.toFixed(2);
+                    oCustomerModel.SubTotalInGST = totalWithGST.toFixed(2);
+                    oCustomerModel.SubTotalNotGST = totalWithoutGST.toFixed(2);
+                    oCustomerModel.DiscountedTotal = discountedTotal.toFixed(2);
+                    oCustomerModel.CGST = cgst.toFixed(2);
+                    oCustomerModel.SGST = sgst.toFixed(2);
+                    oCustomerModel.IGST = igst.toFixed(2);
+                    oCustomerModel.CouponDiscount = couponDiscount.toFixed(2);
+                    oCustomerModel.TotalAmount = finalAmount.toFixed(2);
+
+                    const totalInWords = await this.convertNumberToWords(oCustomerModel.TotalAmount, currency);
+                    const showSAC = isGSTEnabled;
+
+                    //  PDF INIT 
+                    const doc = new jsPDF("p", "mm", "a4");
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const margin = 15;
+                    const usableWidth = pageWidth - margin * 2;
+
+                    //  HEADER TITLE 
+                    let headerMargin = 25.4;
+                    doc.setFont("times", "bold").setFontSize(14);
+                    doc.text(
+                        oCustomerModel.Status === "Payment Received" ? "TAX - INVOICE" : "DRAFT INVOICE",
+                        pageWidth - 18,
+                        headerMargin,
+                        { align: "right" }
+                    );
+
+                    //  BRANCH NAME FIRST 
+                    doc.setFont("times", "bold").setFontSize(14);
+
+                    let branchNameY = headerMargin;
+                    if (sBranchName) {
+                        doc.text(String(sBranchName).toUpperCase(), margin, branchNameY);
+                    }
+                    //         if (sBranchName) {
+                    //     doc.text(
+                    //         String(sBranchName).toUpperCase(),
+                    //         margin,
+                    //         headerMargin
+                    //     );
+                    // }
+
+                    //  COMPANY IMAGE BELOW BRANCH NAME 
+                    let imageY = branchNameY + 2;
+                    if (companyImage && companyImage.trim() !== "") {
+                        const imgData = "data:image/png;base64," + companyImage;
+                        doc.addImage(imgData, "PNG", margin, imageY, 40, 40);
+                    }
+
+                    //  INVOICE DETAILS (below image) 
+                    let currentY = imageY + 10; // 40mm image + gap
+                    doc.setFontSize(12).setFont("times", "bold");
+
+                    const details = [
+                        ["Invoice No :", oCustomerModel.InvNo],
+                        ["Date :", oCustomerModel.InvoiceDate.includes("-") ? Formatter.formatDate(oCustomerModel.InvoiceDate) : oCustomerModel.InvoiceDate],
+                        ["Room No :", oModel1.RoomNo]
+                    ];
+
+                    const columnWidths = [40, 40];
+                    const rightAlignX = pageWidth - 23 - columnWidths[0] - columnWidths[1];
+                    const rowHeight = 6.5;
+
+                    details.forEach(row => {
+                        doc.text(row[0], rightAlignX + columnWidths[0] - doc.getTextWidth(row[0]), currentY + 5);
+                        doc.text(String(row[1] || ""), rightAlignX + columnWidths[0] + 5, currentY + 5);
+                        currentY += rowHeight;
+                    });
+
+                    //  CUSTOMER DETAILS 
+                    currentY += 10;
+                    doc.setFont("times", "bold").setFontSize(11);
+                    doc.text("To,", margin, currentY);
+                    doc.setFont("times", "normal").setFontSize(12);
+
+                    if (oCustomerModel.CustomerName) {
+                        doc.text(`Name : ${oCustomerModel.CustomerName}`, margin, currentY += 5);
+                    }
+
+                    if (oCustomerModel.PermanentAddress) {
+                        const addr = doc.splitTextToSize(oCustomerModel.PermanentAddress, usableWidth / 2 - 10);
+                        doc.text(addr, margin, currentY += 5);
+                        currentY += addr.length * 5;
+                    }
+
+                    if (oCustomerModel.MobileNo) {
+                        doc.text(`Mobile No : ${oCustomerModel.MobileNo}`, margin, currentY);
+                        currentY += 5;
+                    }
+                    if (oCustomerModel.CustomerEmail) {
+                        doc.text(`Email : ${oCustomerModel.CustomerEmail}`, margin, currentY);
+                        currentY += 5;
+                    }
+                    if (oCustomerModel.CustomerGSTNO) {
+                        doc.text(`GSTIN : ${oCustomerModel.CustomerGSTNO}`, margin, currentY);
+                        currentY += 5;
+                    }
+
+                    currentY += 5;
+
+                    //  ITEMS TABLE WITH DISCOUNT COLUMN 
+                    const head = showSAC ? [
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                    ] : [
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                    ];
+
+                    const body = [...aInvoiceItems]
+                        .sort((a, b) => {
+                            const startDiff = this._parseDate(a.StartDate) - this._parseDate(b.StartDate);
+                            if (startDiff !== 0) {
+                                return startDiff;
+                            }
+                            return this._parseDate(a.EndDate) - this._parseDate(b.EndDate);
+                        })
+                        .map((item, i) => {
+                            const row = [
+                                i + 1,
+                                item.Particulars,
+                                item.StartDate || "",
+                                item.EndDate || "",
+                                Formatter.fromatNumber(item.GrossPrice),
+                                item.UnitText,
+                                item.Discount || "0.00", // Discount
+                                Formatter.fromatNumber(item.adjustedTotal)      // Adjusted Total
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
+
+                    doc.autoTable({
+                        startY: currentY,
+                        head,
+                        body,
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [20, 170, 183]
+                        },
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            cellPadding: 3,
+                            lineWidth: 0.5,
+                            lineColor: [30, 30, 30],
+                            halign: "center"
+                        },
+                        columnStyles: {
+                            0: { halign: 'center' },
+                            1: { halign: 'left' },
+                            ...(showSAC ? {
+                                2: { halign: 'center' }, // SAC
+                                3: { halign: 'right' },  // Start Date
+                                4: { halign: 'right' },  // End Date
+                                5: { halign: 'right' },  // Gross Price
+                                6: { halign: 'right' },  // Unit Text
+                                7: { halign: 'right' },  // Discount
+                                8: { halign: 'right' }   // Total
+                            } : {
+                                2: { halign: 'center' }, // Start Date
+                                3: { halign: 'right' },  // End Date
+                                4: { halign: 'right' },  // Gross Price
+                                5: { halign: 'right' },  // Unit Text
+                                6: { halign: 'right' },  // Discount
+                                7: { halign: 'right' }   // Total
+                            })
+                        },
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 6;
+
+                    //  SUMMARY 
+                    const summary = [];
+
+                    if (totalWithoutGST > 0)
+                        summary.push(["Sub-Total (Non-Taxable) :", Formatter.fromatNumber(totalWithoutGST)]);
+
+                    if (totalWithGST > 0)
+                        summary.push(["Sub-Total (Taxable) :", Formatter.fromatNumber(totalWithGST)]);
+
+                    const pct = taxRate ? `(${taxRate}%)` : "";
+
+                    if (cgst > 0) summary.push([`CGST ${pct} :`, Formatter.fromatNumber(cgst)]);
+                    if (sgst > 0) summary.push([`SGST ${pct} :`, Formatter.fromatNumber(sgst)]);
+                    if (igst > 0) summary.push([`IGST ${pct} :`, Formatter.fromatNumber(igst)]);
+
+                    const totalRowIndex = summary.length;
+                    summary.push(["Total :", Formatter.fromatNumber(finalAmount)]);
+
+                    doc.autoTable({
+                        startY: currentY,
+                        body: summary,
+                        theme: 'plain',
+                        styles: {
+                            font: "times",
+                            fontSize: 10,
+                            halign: "right",
+                            cellPadding: 2,
+                            overflow: "ellipsize"
+                        },
+                        columnStyles: {
+                            0: {
+                                halign: "right",
+                                cellWidth: 60
+                            },
+                            1: {
+                                halign: "right",
+                                cellWidth: 40
+                            }
+                        },
+                        margin: {
+                            left: 95
+                        },
+                        didParseCell: function (data) {
+                            if (data.row.index === totalRowIndex) {
+                                data.cell.styles.lineWidth = {
+                                    top: 0.5,
+                                    right: 0,
+                                    bottom: 0,
+                                    left: 0
+                                };
+                                data.cell.styles.lineColor = [0, 0, 0];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                    });
+
+                    //  AMOUNT IN WORDS 
+                    currentY = doc.lastAutoTable.finalY + 8;
+                    doc.setFont("times", "bold");
+                    doc.text("Amount in Words :", margin, currentY);
+                    doc.setFont("times", "normal");
+                    const amountLines = doc.splitTextToSize(totalInWords, usableWidth);
+                    doc.text(amountLines, margin, currentY + 6);
+
+                    currentY += 15;
+                    doc.setFontSize(11);
+                    doc.setFont("times", "bold");
+                    doc.text("Thank you for staying with us.", margin, currentY + 5);
+
+                    // --------------------------------------------------
+                    // Reserve space above footer
+                    // --------------------------------------------------
+                    const footerHeight = 35;
+                    const signatureHeight = 25;
+
+                    currentY += 32;
+
+                    if (currentY + signatureHeight > pageHeight - footerHeight) {
+                        doc.addPage();
+                        currentY = 30;
+                    }
+
+                    // ================= SIGNATURES =================
+
+                    const leftX = margin;
+                    const rightX = pageWidth - margin;
+                    const lineLength = 40;
+
+                    doc.setFont("times", "bold");
+                    doc.setFontSize(12);
+
+                    const cashierLabel = "Cashier ";
+                    doc.text(cashierLabel, leftX, currentY);
+
+                    const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                    const lineStartX = leftX + cashierTextWidth;
+
+                    doc.setLineWidth(0.5);
+                    doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                    const guestLabel = "Guest sign ";
+                    const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                    doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+                    doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                    currentY += 10;
+
+                    doc.setFont("times", "normal");
+                    doc.setFontSize(12);
+
+                    const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                    doc.text(createdByText, leftX, currentY);
+
+                    //  FOOTER 
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, oCompanyDetailsModel, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${oCustomerModel.CustomerName}-${oCustomerModel.InvNo}-Invoice.pdf`);
+                    this.byId("CID_id_TableInvoiceItem").removeSelections(true);
+                } catch (e) {
+                    MessageToast.show(e.message || "PDF generation failed");
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            CID_onPressGenerateSummaryPDF: async function () {
+                try {
+                    this.getBusyDialog()
+                    const { jsPDF } = window.jspdf;
+                    const oView = this.getView();
+
+                    //  FETCH OVERALL INVOICE DATA 
+                    const filterData = oView.getModel("SelectedCustomerModel").getData();
+                    const oModel1 = oView.getModel("BookinglocalModel").getData();
+                    const oBranchModelData =
+                        this.getOwnerComponent().getModel("BranchModel")?.getData() ||
+                        this.getOwnerComponent().getModel("sBRModel")?.getData();
+
+                    // Find the branch whose BranchID matches oModel.BranchCode
+                    const oMatchedBranch = Array.isArray(oBranchModelData)
+                        ? oBranchModelData.find(b => b.BranchID === filterData.BranchCode)
+                        : (oBranchModelData?.BranchID === filterData.BranchCode ? oBranchModelData : null);
+
+                    // Store the branch name in a variable
+                    const sBranchName = oMatchedBranch?.Name || "";
+
+                    const response = await this.ajaxReadWithJQuery("HM_getInvoiceData", {
+                        BookingID: [filterData.BookingID]
+                    });
+
+                    const invoices = response.data || [];
+                    if (!invoices.length) {
+                        MessageToast.show("No data found");
+                        return;
+                    }
+
+                    //  COMPANY DETAILS 
+                    const companyRes = await this.ajaxReadWithJQuery("HM_Branch", {
+                        BranchID: [invoices[0].BranchCode]
+                    });
+                    const company = companyRes.data[0];
+                    const companyImage = company.Photo1;
+
+                    //  PAYMENT HISTORY (COMMON) 
+                    const paymentRes = await this.ajaxReadWithJQuery("HM_Payment", {
+                        BookingID: [filterData.BookingID]
+                    });
+
+                    //  PDF INIT 
+                    const doc = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4"
+                    });
+
+                    const margin = 15;
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const usableWidth = pageWidth - 2 * margin;
+
+                    //  LOOP EACH INVOICE 
+                    for (let invIndex = 0; invIndex < invoices.length; invIndex++) {
+
+                        const oModel = invoices[invIndex];
+                        const oCompanyItemModel = oModel.InvoicePaymentDetail || [];
+
+
+                        if (invIndex > 0) {
+                            doc.addPage();
+                        }
+
+                        let currentY = 0;
+
+                        //  HEADER 
+                        let headerMargin = 25.4;
+                        doc.setFontSize(14).setFont("times", "bold");
+                        doc.text(
+                            oModel.Status === "Payment Received" ? "TAX - INVOICE" : "DRAFT INVOICE",
+                            pageWidth - 18,
+                            headerMargin, {
+                            align: "right"
+                        }
+                        );
+                        doc.setFont("times", "bold").setFontSize(14);
+
+                        if (sBranchName) {
+                            doc.text(
+                                String(sBranchName).toUpperCase(),
+                                margin,
+                                headerMargin
+                            );
+                        }
+
+
+                        if (companyImage && companyImage.trim() !== "") {
+                            const imgData = "data:image/png;base64," + companyImage;
+                            doc.addImage(imgData, "PNG", margin, 28, 40, 40);
+                        }
+
+                        //  INVOICE DETAILS 
+                        const detailsStartY = 35;
+                        const rowHeight = 6.5;
+                        const columnWidths = [40, 40];
+                        const rightAlignX = pageWidth - 24 - columnWidths[0] - columnWidths[1];
+
+                        doc.setFontSize(12).setFont("times", "bold");
+
+                        const detailsTable = [{
+                            label: "Invoice No. :",
+                            value: oModel.InvNo
+                        },
+                        {
+                            label: "Date :",
+                            value: Formatter.formatDate(oModel.InvoiceDate)
+                        },
+                        {
+                            label: "Room No :",
+                            value: oModel1.RoomNo
+                        }
+                        ];
+
+                        currentY = detailsStartY;
+                        detailsTable.forEach(row => {
+                            doc.text(row.label, rightAlignX + columnWidths[0] - doc.getTextWidth(row.label), currentY + 5);
+                            doc.text(String(row.value), rightAlignX + columnWidths[0] + 5, currentY + 5);
+                            currentY += rowHeight;
+                        });
+
+                        //  CUSTOMER DETAILS 
+                        currentY += 15;
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("To,", margin, currentY);
+
+                        currentY += 5;
+                        doc.setFont("times", "normal").setFontSize(12);
+
+                        if (oModel.CustomerName) {
+                            doc.text(`Name : ${oModel.CustomerName}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.PermanentAddress) {
+                            const addressLines = doc.splitTextToSize(oModel.PermanentAddress, usableWidth / 2);
+                            doc.text(addressLines, margin, currentY);
+                            currentY += addressLines.length * 5;
+                        }
+
+                        if (oModel.MobileNo) {
+                            doc.text(`Mobile No : ${oModel.MobileNo}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.CustomerEmail) {
+                            doc.text(`Email : ${oModel.CustomerEmail}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        if (oModel.CustomerGSTNO) {
+                            doc.text(`GSTIN : ${oModel.CustomerGSTNO}`, margin, currentY);
+                            currentY += 5;
+                        }
+
+                        currentY += 5;
+
+                        //  ITEM TABLE 
+                        // const showSAC = !!oModel.GST;
+
+                        // ITEM TABLE
+                        const showSAC = !!oModel.GST;
+
+                        // Remove duplicate items first
+                        const uniqueItems = oCompanyItemModel.filter((item, index, self) =>
+                            index === self.findIndex(x =>
+                                x.Particulars === item.Particulars &&
+                                x.StartDate === item.StartDate &&
+                                x.EndDate === item.EndDate &&
+                                x.Total === item.Total
+                            )
+                        );
+
+                        // Sort by StartDate ASC, then EndDate ASC
+                        const sortedItems = [...uniqueItems].sort((a, b) => {
+
+                            const startA = this._parseDate(a.StartDate);
+                            const startB = this._parseDate(b.StartDate);
+
+                            // Start Date ascending
+                            if (startA.getTime() !== startB.getTime()) {
+                                return startA.getTime() - startB.getTime();
+                            }
+
+                            // End Date ascending when Start Date is same
+                            const endA = this._parseDate(a.EndDate);
+                            const endB = this._parseDate(b.EndDate);
+
+                            return endA.getTime() - endB.getTime();
+                        });
+
+                        const body = sortedItems.map((item, index) => {
+
+                            const row = [
+                                index + 1,
+                                item.Particulars,
+                                Formatter.formatDate(item.StartDate),
+                                Formatter.formatDate(item.EndDate),
+                                Formatter.fromatNumber(item.GrossPrice),
+                                item.UnitText,
+                                item.Discount || "0.00",
+                                Formatter.fromatNumber(item.Total)
+                            ];
+
+                            if (showSAC) {
+                                row.splice(2, 0, item.SAC);
+                            }
+
+                            return row;
+                        });
+
+
+                        const head = showSAC ? [
+                            ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
+                        ] : [
+                            ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
+                        ];
+
+                        doc.autoTable({
+                            startY: currentY,
+                            head,
+                            body,
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                0: {
+                                    halign: 'center'
+                                },
+                                1: {
+                                    halign: 'left'
+                                },
+                                ...(showSAC ? {
+                                    2: {
+                                        halign: 'center'
+                                    },
+                                    3: {
+                                        halign: 'right'
+                                    },
+                                    4: {
+                                        halign: 'right'
+                                    },
+                                    5: {
+                                        halign: 'right'
+                                    },
+                                    6: {
+                                        halign: 'right'
+                                    },
+                                    7: {
+                                        halign: 'right'
+                                    }
+                                } : {
+                                    2: {
+                                        halign: 'center'
+                                    },
+                                    3: {
+                                        halign: 'right'
+                                    },
+                                    4: {
+                                        halign: 'right'
+                                    },
+                                    5: {
+                                        halign: 'right'
+                                    },
+                                    6: {
+                                        halign: 'right'
+                                    }
+                                })
+                            },
+                        });
+
+
+                        currentY = doc.lastAutoTable.finalY + 5;
+
+                        //  SUMMARY 
+                        const summaryBody = [];
+                        const invoicePaymentRes = await this.ajaxReadWithJQuery("HM_invoicePaymentDetail", {
+                            InvNo: [oModel.InvNo]
+                        });
+
+                        const aInvoicePaymentDetails = invoicePaymentRes.data || [];
+                        const subTotalGST = parseFloat(oModel.SubTotalInGST || 0);
+                        const subTotalNoGST = parseFloat(oModel.SubTotalNotGST || 0);
+                        const igst = parseFloat(oModel.IGST || 0);
+                        const cgst = parseFloat(oModel.CGST || 0);
+                        const sgst = parseFloat(oModel.SGST || 0);
+                        const totalAmount = parseFloat(oModel.TotalAmount || 0);
+
+                        // Sub Total (GST or NON-GST)
+                        if (subTotalGST > 0) {
+                            summaryBody.push([`Sub-Total ( Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalGST)]);
+
+                        }
+                        if (subTotalNoGST > 0) {
+                            summaryBody.push([`Sub-Total ( Non-Taxable ) (${oModel.Currency}) :`, Formatter.fromatNumber(subTotalNoGST)]);
+                        }
+                        if (parseFloat(oModel.CouponDiscount) > 0) {
+                            summaryBody.push([
+                                `Discount (${oModel.CouponCode}) :`,
+                                "- " + Formatter.fromatNumber(parseFloat(oModel.CouponDiscount))
+                            ]);
+                        }
+
+                        // IGST
+                        if (oModel.Type === "IGST" && igst > 0) {
+                            summaryBody.push([`IGST (${oModel.Value}%) :`, Formatter.fromatNumber(igst)]);
+                        }
+
+                        // CGST/SGST
+                        if (oModel.Type === "CGST/SGST") {
+                            if (cgst > 0) {
+                                summaryBody.push([`CGST (${oModel.Value}%) :`, Formatter.fromatNumber(cgst)]);
+                            }
+                            if (sgst > 0) {
+                                summaryBody.push([`SGST (${oModel.Value}%) :`, Formatter.fromatNumber(sgst)]);
+                            }
+                        }
+
+
+                        // Get the latest payment record based on EntryDate (date + time)
+                        // Get the latest payment record based on EntryDate (date + time)
+
+                        // Remove any old Due Amount rows first
+                        // Add Due Amount only for the current invoice
+                        const dueAmount = Number(oModel.DueAmount || 0);
+
+                        if (dueAmount > 0) {
+                            summaryBody.push([
+                                "Due Amount :",
+                                Formatter.fromatNumber(dueAmount)
+                            ]);
+                        }
+                        // Total
+                        const totalRowIndex = summaryBody.length;
+                        summaryBody.push([
+                            `Total (${oModel.Currency}) :`,
+                            Formatter.fromatNumber(totalAmount)
+                        ]);
+
+                        doc.autoTable({
+                            startY: currentY,
+                            body: summaryBody,
+                            theme: 'plain',
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                halign: "right",
+                                cellPadding: 2,
+                                overflow: "ellipsize"
+                            },
+                            columnStyles: {
+                                0: {
+                                    halign: "right",
+                                    cellWidth: 60
+                                },
+                                1: {
+                                    halign: "right",
+                                    cellWidth: 40
+                                }
+                            },
+                            margin: {
+                                left: 95,
+                                bottom: 40,
+
+                            },
+                            didParseCell: function (data) {
+                                if (data.row.index === totalRowIndex) {
+                                    data.cell.styles.lineWidth = {
+                                        top: 0.5,
+                                        right: 0,
+                                        bottom: 0,
+                                        left: 0
+                                    };
+                                    data.cell.styles.lineColor = [0, 0, 0];
+                                    data.cell.styles.fontStyle = 'bold';
+                                }
+                            }
+                        });
+
+                        currentY = doc.lastAutoTable.finalY + 10;
+
+                        //  AMOUNT IN WORDS 
+                        const totalInWords = await this.convertNumberToWords(oModel.TotalAmount, oModel.Currency);
+                        doc.setFont("times", "bold");
+                        doc.text("Amount in Words :", margin, currentY);
+                        currentY += 5;
+
+                        doc.setFont("times", "normal");
+                        doc.text(doc.splitTextToSize(totalInWords, usableWidth), margin, currentY);
+                    }
+
+                    //  Transaction History (ONCE) 
+                    if (paymentRes?.commentData?.length) {
+
+                        const sortedPaymentData = [...paymentRes.commentData].sort((a, b) => {
+                            return new Date(b.Date) - new Date(a.Date);
+                        });
+                        doc.addPage();
+                        doc.setFont("times", "bold").setFontSize(11);
+                        doc.text("Transaction History", margin, 20);
+
+                        doc.autoTable({
+                            startY: 25,
+                            head: [
+                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid ', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                            ],
+                            body: sortedPaymentData.map((p, i) => ([
+                                i + 1,
+                                Formatter.formatDate(p.Date),
+                                p.PaymentType,
+                                p.Payment || "-",
+                                p.BankTransactionID || "-",
+                                Formatter.fromatNumber(p.Amount),
+                                p.Currency
+                            ])),
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [20, 170, 183]
+                            },
+                            styles: {
+                                font: "times",
+                                fontSize: 10,
+                                cellPadding: 3,
+                                lineWidth: 0.5,
+                                lineColor: [30, 30, 30],
+                                halign: "center"
+                            },
+                            columnStyles: {
+                                1: {
+                                    halign: "center"
+                                },
+                                2: {
+                                    halign: "left"
+                                },
+                                3: {
+                                    halign: "left"
+                                },
+                                4: {
+                                    halign: "left"
+                                },
+                                5: {
+                                    halign: "right"
+                                }
+                            }
+                        });
+
+                        let currentY = doc.lastAutoTable.finalY + 15;
+
+                        doc.setFontSize(11);
+                        doc.setFont("times", "bold");
+                        doc.text("Thank you for staying with us.", margin, currentY + 5);
+
+
+
+                        // --------------------------------------------------
+                        // Reserve space above footer
+                        // --------------------------------------------------
+                        const footerHeight = 35;      // Same as your footer
+                        const signatureHeight = 25;   // Space needed for signatures
+
+                        currentY += 32;
+
+                        if (currentY + signatureHeight > pageHeight - footerHeight) {
+                            doc.addPage();
+                            currentY = 30;
+                        }
+
+                        // ================= SIGNATURES =================
+
+                        // ================= SIGNATURES =================
+
+                        const leftX = margin;
+                        const rightX = pageWidth - margin;
+                        const lineLength = 40; // Decreased line width (adjust as needed)
+
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(12);
+
+                        // --- Row 1: Cashier & Guest Sign ---
+
+                        // 1. Left side: "Cashier ____"
+                        const cashierLabel = "Cashier ";
+                        doc.text(cashierLabel, leftX, currentY);
+
+                        const cashierTextWidth = doc.getTextWidth(cashierLabel);
+                        const lineStartX = leftX + cashierTextWidth;
+
+                        // Draw shorter straight horizontal line
+                        doc.setLineWidth(0.5);
+                        doc.line(lineStartX, currentY - 1, lineStartX + lineLength, currentY - 1);
+
+                        // 2. Right side: "guest sign ____"
+                        const guestLabel = "Guest sign ";
+                        const guestTextWidth = doc.getTextWidth(guestLabel);
+
+                        // Draw shorter straight horizontal line on the right end
+                        doc.line(rightX - lineLength, currentY - 1, rightX, currentY - 1);
+
+                        // Place "guest sign" right before the line
+                        doc.text(guestLabel, rightX - lineLength - guestTextWidth, currentY);
+
+                        // --- Row 2: Created By ---
+
+                        currentY += 10;
+
+                        doc.setFont("times", "normal");
+                        doc.setFontSize(12);
+
+                        const createdByText = `Created By - ${this.getView().getModel("LoginModel").getProperty('/EmployeeName') || ""}`;
+                        doc.text(createdByText, leftX, currentY);
+                    }
+
+                    //  FOOTER 
+                    const totalPages = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        doc.setPage(i);
+                        this.addFooter(doc, {
+                            data: [company]
+                        }, pageWidth, pageHeight, i, totalPages);
+                    }
+
+                    doc.save(`${filterData.CustomerName}-Invoice.pdf`);
+                } catch (e) {
+                    MessageToast.show(e.message || "Error generating summary invoice");
+                } finally {
+                    this.closeBusyDialog()
+                }
+            },
+            CID_onPressrefundAmount: function () {
+                var that = this;
+                if (this.oDialog) {
+                    this.oDialog.destroy();
+                    this.oDialog = null;
+                }
+                var oView = that.getView();
+                if (!that.oDialog) {
+                    sap.ui.core.Fragment.load({
+                        name: "sap.ui.com.project1.fragment.RefundAmount",
+                        controller: that
+                    }).then(function (oDialog) {
+                        that.oDialog = oDialog;
+                        oView.addDependent(oDialog);
+                        oDialog.open();
+                        that.refundFunction();
+                    });
+                } else {
+                    that.oDialog.open();
+                    that.refundFunction();
+                }
+            },
+
+            refundFunction: function () {
+                var oNavigationModel = this.getView().getModel("SelectedCustomerModel").getData();
+
+                var oModel = new sap.ui.model.json.JSONModel({
+                    InvNo: oNavigationModel.InvNo,
+                    TransactionId: "",
+                    ReceivedDate: "",
+                    RefundAmount: oNavigationModel.RefundAmount,
+                    Currency: oNavigationModel.Currency,
+                    CustomerName: oNavigationModel.CustomerName,
+                    BookingID: oNavigationModel.BookingID,
+                    BranchCode: oNavigationModel.BranchCode
+                });
+                this.getView().setModel(oModel, "RefundModel");
+            },
+
+            HM_onPressRefundAmount: async function () {
+                var RefundModel = this.getView().getModel("RefundModel").getData();
+                const isMandatoryValid =
+                    // utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_Refundpay"), "ID") &&
+                    utils._LCstrictValidationComboBox(sap.ui.getCore().byId("HM_id_PaymentMode"), "ID") &&
+                    utils._LCvalidateMandatoryField(sap.ui.getCore().byId("HM_id_TransactionID"), "ID") &&
+                    utils._LCvalidateDate(sap.ui.getCore().byId("HM_id_ReceivedDate"), "ID");
+
+                const isValid = isMandatoryValid
+                if (!isValid) {
+                    MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                    return;
+                }
+
+                this.getBusyDialog()
+                const jsonData = {
+                    InvNo: String(RefundModel.InvNo),
+                    BankTransactionID: String(RefundModel.TransactionId),
+                    Date: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    EntryDate: RefundModel.ReceivedDate ? RefundModel.ReceivedDate.split("/").reverse().join("-") : "",
+                    Amount: (RefundModel.RefundAmount),
+                    Currency: String(RefundModel.Currency),
+                    CustomerName: RefundModel.CustomerName,
+                    BookingID: RefundModel.BookingID,
+                    BranchCode: RefundModel.BranchCode,
+                    PaymentType: RefundModel.PaymentMode,
+                    BankName: RefundModel.PaymentMode,
+                    Used: "Y",
+                    Payment: "Refund"
+                };
+
+                try {
+                    const oData = await this.ajaxCreateWithJQuery("HM_Payment", {
+                        data: jsonData
+                    });
+
+                    if (oData && oData.success) {
+                        this.oDialog.close();
+
+
+                        await this.Readcall("HM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
+                        await this.Readcall("fetchHM_InvoicePaymentDetail", {
+                            InvNo: this.decodedPath
+                        });
+                        var oResult = await this.ajaxReadWithJQuery("HM_ManageInvoiceItem", {
+                            InvNo: this.decodedPath
+                        });
+
+
+
+
+                        const invoiceModel = this.getView().getModel("InvoicePayment");
+
+
+                        var balanceAmount = Number(RefundModel.RefundPayment).toFixed(2) - invoiceModel.getProperty("/AllDueAmount").toFixed(2)
+
+                        var Payload = {
+                            DueAmount: balanceAmount
+                        }
+
+                        await this.ajaxUpdateWithJQuery("HM_ManageInvoice", {
+                            data: Payload,
+                            filtres: {
+                                InvNo: String(RefundModel.InvNo)
+                            }
+                        });
+
+                        const oInvoice = oResult.data.ManageInvoice[0];
+                        const oSelectedModel = this.getView().getModel("SelectedCustomerModel");
+
+                        if (oInvoice.IGST > 0) {
+                            oInvoice.IGSTSelected = true
+                        } else if (oInvoice.SGST > 0 || oInvoice.CGST > 0) {
+                            oInvoice.CGSTSelected = true
+                        }
+
+                        // Format dates
+                        oInvoice.InvoiceDate = this.Formatter.formatDate(oInvoice.InvoiceDate);
+                        oInvoice.PayByDate = this.Formatter.formatDate(oInvoice.PayByDate);
+
+                        // Set model
+                        oSelectedModel.setData(oInvoice);
+                        this.totalAmountCalculation()
+                        oSelectedModel.refresh(true);
+                        oSelectedModel.refresh(true);
+                        // this.visiablityPlay.setProperty("/Edit", false);
+                        this.visiablityPlay.setProperty("/editable", false);
+                        this.visiablityPlay.setProperty("/CInvoice", false);
+                        this.visiablityPlay.setProperty("/merge", true);
+                        this.visiablityPlay.setProperty("/addInvBtn", false);
+                        this.visiablityPlay.setProperty("/refresh", false);
+                        if (this.oDialog) {
+                            this.oDialog.destroy();
+                            this.oDialog = null;
+                        }
+                        MessageToast.show(this.i18nModel.getText("refundMessage"));
+                    }
+                } catch (error) {
+                    MessageToast.show(error.responseText);
+                } finally {
+                    this.closeBusyDialog()
+                }
+            },
+            HM_onPressClose: function () {
+                sap.ui.getCore().byId("HM_id_PaymentMode").setValueState("None");
+                sap.ui.getCore().byId("HM_id_TransactionID").setValueState("None");
+                sap.ui.getCore().byId("HM_id_ReceivedDate").setValueState("None");
+
+                if (this.oDialog) {
+                    this.oDialog.close();
+                    this.oDialog.destroy(true);
+                    this.oDialog = null;
+                }
+            },
+
+            onRefreshInvoice: async function () {
+                try {
+                    const oView = this.getView();
+                    const oSelectedModel = oView.getModel("SelectedCustomerModel");
+                    const oModelData = oSelectedModel ? oSelectedModel.getData() : {};
+
+                    // 1. Get the item count BEFORE running refresh
+                    const existingItems = oView.getModel("ManageInvoiceItemModel")
+                        ?.getProperty("/ManageInvoiceItem") || [];
+                    const initialItemCount = existingItems.length;
+
+                    this.getBusyDialog();
+
+                    // 2. Fetch updated facility items
+                    const oData = await this.ajaxReadWithJQuery("HM_BookingandFacilityItems", {
+                        BookingID: oModelData.BookingID,
+                    });
+
+                    // 3. Process new items list
+                    const finalItems = await this._prepareInvoiceItems(oData);
+
+                    const itemsToDelete = existingItems.filter(existing =>
+                        !finalItems.some(item => item.ItemID === existing.ItemID)
+                    );
+
+                    // Delete extra items
+                    for (const oObject of itemsToDelete) {
+                        try {
+                            await this.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
+                                filters: {
+                                    ItemID: oObject.ItemID
+                                }
+                            });
+
+                            // Optional: Remove from local model
+                            const index = existingItems.findIndex(item => item.ItemID === oObject.ItemID);
+                            if (index !== -1) {
+                                existingItems.splice(index, 1);
+                            }
+
+                        } catch (error) {
+                            MessageToast.show(error.responseText);
+                        }
+                    }
+
+                    // 4. Update model with new items
+                    oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
+
+                    // 5. Recalculate invoice totals and balance due
+                    await this.totalAmountCalculation();
+
+                    // 6. Check if new line items were added AND there is an outstanding due amount
+                    const updatedCustomerData = oSelectedModel.getData();
+                    const balanceAmount = Number(updatedCustomerData.BalanceAmount) || 0;
+                    const newItemAdded = finalItems.length > initialItemCount;
+
+
+                    if (newItemAdded || balanceAmount > 0) {
+
+                        // Automatically updates status to 'Payment Partially' and opens the ManageInvoice fragment
+
+                        if (oModelData.Status === "Submitted") {
+                            MessageToast.show("Invoice items are refreshed");
+                            this.onChangeInvoiceStatus("Submitted");
+                        } else if (balanceAmount > 0) {
+                            MessageToast.show("New line items added. Opening payment screen...");
+                            this.onChangeInvoiceStatus("Payment Partially");
+
+                        }
+                    }
+
+                } catch (e) {
+                    MessageToast.show(e.message || "Error refreshing invoice");
+                } finally {
+                    this.closeBusyDialog();
+                }
+            },
+
+            _prepareInvoiceItems: async function (oData) {
+                const oView = this.getView();
+                const existingItems = oView.getModel("ManageInvoiceItemModel")
+                    .getProperty("/ManageInvoiceItem") || [];
+
+                const existingInvoices = oView.getModel("ManageInvoiceModel")?.getProperty("/ManageInvoice") || [];
+                var invoiceIndex = existingInvoices.length;
+
+                var data = await this.Readcall("HM_ManageInvoice", {
+                    BookingID: this.getView().getModel("SelectedCustomerModel").getProperty("/BookingID")
+                });
+
+                invoiceIndex = 0;
+
+                if (data && data.length > 0) {
+
+                    const currentInvNo = this.getView().getModel("SelectedCustomerModel").getProperty("/InvNo");
+
+                    // Sort invoices if required
+                    const sortedInvoices = [...data].sort((a, b) =>
+                        a.InvNo.localeCompare(b.InvNo)
+                    );
+
+                    const firstInvoiceNo = sortedInvoices[0].InvNo;
+
+                    if (currentInvNo && currentInvNo === firstInvoiceNo) {
+                        // Editing the first invoice
+                        invoiceIndex = 0;
+                    } else {
+                        // Second invoice onwards
+                        invoiceIndex = data.length;
+                    }
+                }
+
+
+
+                const roomRent = existingItems.find(i =>
+                    i.Particulars && i.Particulars.includes("Room Rent")
+                );
+
+                if (!roomRent) return existingItems;
+
+
+                let cycleStart
+                let cycleEnd
+                let nonFacilityItems = [];
+
+
+                if (roomRent && roomRent.UnitText === "Per Day") {
+                    let RoomRent = roomRent ? [{ ...roomRent }] : [];
+
+                    if (RoomRent.length && oData?.commentData?.length) {
+
+                        const bookingDetails = oData.commentData.find(item =>
+                            item.BedType
+                        );
+
+                        if (bookingDetails) {
+
+                            const bookingDuration = this._getDurationText(
+                                bookingDetails.PaymentType,
+                                bookingDetails.StartDate,
+                                bookingDetails.EndDate
+                            );
+
+                            RoomRent[0] = {
+                                ...RoomRent[0],
+                                Particulars: `${bookingDetails.BedType} - Room Rent`,
+                                UnitText: bookingDetails.PaymentType,
+                                DurationText: bookingDuration,
+                                GrossPrice: bookingDetails.RoomPrice,
+                                Total: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                                FinalAmount: parseFloat(bookingDetails.TotalRoomprice).toFixed(2),
+                                StartDate: this.Formatter.DateFormat(
+                                    bookingDetails.StartDate
+                                ),
+                                EndDate: this.Formatter.DateFormat(
+                                    bookingDetails.EndDate
+                                ),
+                                Currency: bookingDetails.Currency,
+                                SAC: "996322",
+                                GSTCalculation: "YES",
+                            };
+                        }
+
+                    }
+
+
+                    cycleStart = this._parseDate(RoomRent[0].StartDate);
+                    cycleEnd = this._parseDate(RoomRent[0].EndDate);
+
+                    const oModel = this.getView().getModel("SelectedCustomerModel");
+                    oModel.setProperty(
+                        "/InvoiceDescription",
+                        this._getInvoiceDescription(RoomRent[0].UnitText, cycleStart, cycleEnd)
+                    );
+
+
+                    cycleStart.setHours(0, 0, 0, 0);
+                    cycleEnd.setHours(0, 0, 0, 0);
+
+                    nonFacilityItems = [RoomRent[0], ...existingItems.filter(
+                        i => !i.Particulars.includes("Facility") &&
+                            !i.Particulars.includes("Room Rent")
+                    )];
+
+
+                } else {
+                    cycleStart = this._parseDate(roomRent.StartDate);
+                    cycleEnd = this._parseDate(roomRent.EndDate);
+
+                    const oModel = this.getView().getModel("SelectedCustomerModel");
+                    oModel.setProperty(
+                        "/InvoiceDescription",
+                        this._getInvoiceDescription(roomRent.UnitText, cycleStart, cycleEnd)
+                    );
+
+                    cycleStart.setHours(0, 0, 0, 0);
+                    cycleEnd.setHours(0, 0, 0, 0);
+
+                    nonFacilityItems = existingItems.filter(i => !i.Particulars.includes("Facility") && !i.Particulars.includes("Meals") && !i.Particulars.includes("Laundry") && !i.Particulars.includes("Housekeeping") && !i.Particulars.includes("Pillow") && !i.Particulars.includes("Penalty"));
+                }
+
+                const dbFacilitiesRaw = (oData.commentData || []).filter(item => !item.BedType);
+                const processedFacilityItems = [];
+                const usedItemIds = new Set();
+
+                dbFacilitiesRaw.forEach((f) => {
+                    let fStart = new Date(f.StartDate);
+                    let fEnd = new Date(f.EndDate);
+
+                    fStart.setHours(0, 0, 0, 0);
+                    fEnd.setHours(0, 0, 0, 0);
+
+                    // First invoice should not include items starting on cycle end date
+                    if (fStart >= cycleEnd) {
+                        return;
+                    }
+
+                    const bookingUnit = f.PaymentType?.toLowerCase()
+
+                    if (bookingUnit !== "per day") {
+                        if (fEnd < cycleStart || fStart > cycleEnd) return;
+                    }
+
+                    const effectiveStart = fStart > cycleStart ? fStart : cycleStart;
+                    const effectiveEnd = fEnd < cycleEnd ? fEnd : cycleEnd;
+
+                    const selectionMode = f.SelectionMode?.toUpperCase();
+                    const chargeType = f.FacilityChargeType?.toUpperCase();
+                    const unit = f.UnitText?.toLowerCase();
+
+
+                    if (unit === "unit price") {
+
+                        const startWithinCycle =
+                            fStart >= cycleStart &&
+                            fStart <= cycleEnd;
+
+                        if (!startWithinCycle) {
+                            return;
+                        }
+                    }
+
+                    if (unit === "per month" || unit === "per year") {
+                        if (fEnd.getTime() === cycleStart.getTime()) {
+                            return;
+                        }
+                    }
+
+
+                    if (invoiceIndex > 0) {
+                        if ((selectionMode === "PERSON_QTY" && chargeType === "ENTIRE BOOKING")) {
+                            return;
+                        }
+                    }
+
+                    let particulars = "";
+                    const memberSuffix = f.MemberName ? ` (${f.MemberName})` : "";
+
+                    if (f.FacilityName === "Penalty Charges") {
+                        particulars = `Penalty Charges${memberSuffix}`;
+                    } else if (unit === "per hour") {
+                        const hrs = Number(f.TotalHour) || 1;
+                        particulars = `${f.FacilityName} - Facility (${hrs} Hours)${memberSuffix}`;
+                    } else {
+                        particulars = `${f.FacilityName} - Facility${memberSuffix}`;
+                    }
+
+                    const startStr = this._formatDateLocal(effectiveStart);
+                    const endStr = this._formatDateLocal(effectiveEnd);
+
+                    const facilityTotal = this._calculateFacilityTotal(f, cycleStart, cycleEnd, invoiceIndex);
+
+                    if (facilityTotal <= 0 && invoiceIndex > 0) return;
+
+                    // const existingFacility = existingItems.find(i =>
+                    //     i.Particulars && i.Particulars.trim() === particulars.trim()
+                    // );
+
+                    const existingFacility = existingItems.find(i =>
+                        i.Particulars?.trim() === particulars.trim() &&
+                        !usedItemIds.has(i.ItemID)
+                    );
+
+                    if (existingFacility) {
+                        usedItemIds.add(existingFacility.ItemID);
+                    }
+
+                    processedFacilityItems.push({
+                        ItemID: existingFacility ? existingFacility.ItemID : null,
+                        InvNo: nonFacilityItems[0]?.InvNo,
+                        Particulars: particulars,
+                        UnitText: f.UnitText,
+                        DurationText: this._getDurationText(
+                            f.UnitText,
+                            effectiveStart,
+                            effectiveEnd,
+                            f.TotalHour,
+                            f.SelectionMode,
+                            f.Quantity,
+                            f.FacilityChargeType
+                        ),
+                        GrossPrice: Number(f.BasicFacilityPrice) || 0,
+                        Total: facilityTotal,
+                        StartDate: startStr,
+                        EndDate: endStr,
+                        Currency: f.Currency || "INR",
+                        GSTCalculation: "YES",
+                        Discount: existingFacility?.Discount || "",
+                        GrossPriceEditable: false,
+                        UnitEditable: false,
+                        DurationEditable: false,
+                        StartDateEditable: false,
+                        EndDateEditable: false
+                    });
+                });
+
+                const finalItems = [
+                    ...nonFacilityItems,
+                    ...processedFacilityItems
+                ];
+                finalItems.sort((a, b) => {
+                    return (
+                        this._parseDate(a.StartDate) - this._parseDate(b.StartDate) ||
+                        this._parseDate(a.EndDate) - this._parseDate(b.EndDate)
+                    );
+                });
+
+                finalItems.forEach((item, index) => {
+                    item.IndexNo = index + 1;
+                });
+
+                return finalItems;
+            },
+
+            _parseDate: function (dateStr) {
+
+                if (!dateStr) {
+                    return new Date(0);
+                }
+
+                // If date is DD/MM/YYYY
+                if (typeof dateStr === "string" && dateStr.includes("/")) {
+
+                    const [day, month, year] = dateStr.split("/");
+
+                    return new Date(
+                        Number(year),
+                        Number(month) - 1,
+                        Number(day)
+                    );
+                }
+
+                // If backend sends ISO date
+                return new Date(dateStr);
+            },
+            onPaymentModerefundChange: function (oEvent) {
+                var oComboBox = oEvent.getSource();
+                utils._LCstrictValidationComboBox(oComboBox, "ID");
+
+                var sPaymentMode = oComboBox.getSelectedKey();
+
+                if (sPaymentMode === "Cash") {
+                    var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+
+
+                    this.getView().getModel("RefundModel").setProperty("/TransactionId", oLoginData.EmployeeName);
+                    sap.ui.getCore().byId("HM_id_TransactionID").setEditable(false)
+
+                } else {
+                    this.getView().getModel("RefundModel").setProperty("/TransactionId", "");
+                    sap.ui.getCore().byId("HM_id_TransactionID").setEditable(true)
+                }
+            },
+
+            _calculateFacilityTotal: function (item, cycleStart, cycleEnd, invoiceIndex = 0) {
+
+                const sDate = new Date(item.StartDate);
+                const eDate = new Date(item.EndDate);
+
+                sDate.setHours(0, 0, 0, 0);
+                eDate.setHours(0, 0, 0, 0);
+
+                const unit = item.UnitText?.toLowerCase();
+                const selectionMode = item.SelectionMode?.toUpperCase();
+                const chargeType = item.FacilityChargeType?.toUpperCase();
+                const bookingUnit = item.PaymentType?.toLowerCase() || item.UnitText?.toLowerCase();
+
+                const qty = parseFloat(item.Quantity ?? 1) || 1;
+                const unitPrice = parseFloat(item.UnitPrice ?? 0) || 0;
+                const basicPrice = parseFloat(item.BasicFacilityPrice ?? 0) || 0;
+
+                const price = basicPrice > 0 ? basicPrice : unitPrice;
+
+                const totalPrice = parseFloat(item.FacilitiPrice ?? price) || price;
+                const totalHour = parseFloat(item.TotalHour ?? 1) || 1;
+
+                let effectiveStart = sDate;
+                let effectiveEnd = eDate;
+                let facilityAmount = 0;
+
+                // if (bookingUnit !== "per day") {
+
+                const overlaps =
+                    !(eDate < cycleStart || sDate > cycleEnd);
+
+                if (!overlaps) {
+                    return 0;
+                }
+
+                effectiveStart =
+                    sDate > cycleStart ? sDate : cycleStart;
+
+                effectiveEnd =
+                    eDate < cycleEnd ? eDate : cycleEnd;
+                // }
+
+                const calcStart =
+                    bookingUnit === "per day"
+                        ? effectiveStart
+                        : effectiveStart;
+
+                const calcEnd =
+                    bookingUnit === "per day"
+                        ? effectiveEnd
+                        : effectiveEnd;
+
+                const usedDays =
+                    this._calculateDays(calcStart, calcEnd);
+
+                const usedDaysForDay =
+                    this._calculateDaysForDay(calcStart, calcEnd);
+
+                const calculateYearAmount = (multiplier = 1) => {
+
+                    const years =
+                        Math.ceil(
+                            this._calculateTotalMonths(
+                                sDate,
+                                eDate
+                            ) / 12
+                        ) || 1;
+
+                    const yearlyPrice =
+                        totalPrice / years;
+
+                    const overlapDays =
+                        this._calculateDays(
+                            calcStart,
+                            calcEnd
+                        );
+
+                    if (overlapDays >= 364) {
+                        return this._round2(
+                            multiplier * yearlyPrice
+                        );
+                    }
+
+                    return this._round2(
+                        multiplier *
+                        (yearlyPrice / 365) *
+                        overlapDays
+                    );
+                };
+
+                // PERSON_QTY
+                if (selectionMode === "PERSON_QTY") {
+
+                    if (chargeType === "DAILY") {
+
+                        if (unit === "package price") {
+
+                            facilityAmount =
+                                this._truncate2(
+                                    price * usedDaysForDay
+                                );
+
+                        } else if (bookingUnit === "per year") {
+
+                            facilityAmount =
+                                calculateYearAmount();
+
+                        } else if (bookingUnit === "per day") {
+
+                            facilityAmount =
+                                this._truncate2(
+                                    price * usedDaysForDay
+                                );
+
+                        } else if (bookingUnit === "per month") {
+                            facilityAmount = truncate2(
+                                price * calculateTotalMonths(calcStart, calcEnd)
+                            );
+                        }
+
+                        item.CalculatedUnits = qty;
+                    }
+
+                    else if (chargeType === "ENTIRE BOOKING") {
+
+                        if (invoiceIndex > 0) {
+                            return 0;
+                        }
+
+                        facilityAmount =
+                            this._truncate2(price);
+
+                        item.CalculatedUnits = qty;
+
+                        item.StartDate =
+                            this._formatDateLocal(sDate);
+
+                        item.EndDate =
+                            this._formatDateLocal(eDate);
+                    }
+                }
+
+                // QTY
+                else if (selectionMode === "QTY") {
+
+                    switch (unit) {
+                        case "unit price":
+                            // if (invoiceIndex > 0) {
+                            //     return 0;
+                            // }
+
+                            facilityAmount = this._truncate2(qty * price);
+
+                            break;
+
+                        case "per day":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per hour":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    totalHour *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per month":
+                            facilityAmount =
+                                this._truncate2(
+                                    qty *
+                                    price *
+                                    this._calculateTotalMonths(
+                                        calcStart,
+                                        calcEnd
+                                    )
+                                );
+                            break;
+
+                        case "per year":
+                            facilityAmount =
+                                calculateYearAmount(qty);
+                            break;
+                    }
+
+                    item.CalculatedQty = qty;
+                }
+
+                // SINGLE / PERSON
+                else if (
+                    selectionMode === "SINGLE" ||
+                    selectionMode === "PERSON"
+                ) {
+
+                    switch (unit) {
+
+                        case "per day":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per hour":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    totalHour *
+                                    usedDaysForDay
+                                );
+                            break;
+
+                        case "per month":
+                            facilityAmount =
+                                this._truncate2(
+                                    price *
+                                    this._calculateTotalMonths(
+                                        calcStart,
+                                        calcEnd
+                                    )
+                                );
+                            break;
+
+                        case "per year":
+                            facilityAmount =
+                                calculateYearAmount();
+                            break;
+                    }
+                }
+
+                if (
+                    !(
+                        selectionMode === "PERSON_QTY" &&
+                        chargeType === "ENTIRE BOOKING"
+                    )
+                ) {
+                    item.StartDate =
+                        this._formatDateLocal(calcStart);
+
+                    item.EndDate =
+                        this._formatDateLocal(calcEnd);
+                }
+
+                item.UsedDays = usedDays;
+                item.FacilityPrice = facilityAmount;
+
+                return facilityAmount;
+            },
+
+            _getDaysInMonth: function (date) {
+                return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            },
+
+            // MONTHLY CYCLE
+            _getMonthlyCycle: function (baseDate, index) {
+
+                const cycleStart = new Date(baseDate);
+
+                cycleStart.setMonth(
+                    cycleStart.getMonth() + index
+                );
+
+                const cycleEnd = new Date(cycleStart);
+
+                cycleEnd.setMonth(
+                    cycleEnd.getMonth() + 1
+                );
+
+                cycleStart.setHours(0, 0, 0, 0);
+                cycleEnd.setHours(0, 0, 0, 0);
+
+                return {
+                    cycleStart,
+                    cycleEnd
+                };
+            },
+
+
+            // YEARLY CYCLE
+            _getYearlyCycle: function (baseDate, index) {
+
+                const cycleStart = new Date(baseDate);
+
+                cycleStart.setFullYear(
+                    cycleStart.getFullYear() + index
+                );
+
+                const cycleEnd = new Date(cycleStart);
+
+                cycleEnd.setFullYear(
+                    cycleEnd.getFullYear() + 1
+                );
+
+                cycleStart.setHours(0, 0, 0, 0);
+                cycleEnd.setHours(0, 0, 0, 0);
+
+                return {
+                    cycleStart,
+                    cycleEnd
+                };
+            },
+
+
+            // TOTAL MONTHS
+            _calculateTotalMonths: function (startDate, endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                let months =
+                    (end.getFullYear() - start.getFullYear()) * 12 +
+                    (end.getMonth() - start.getMonth());
+
+                if (end.getDate() > start.getDate()) {
+                    months += 1;
+                }
+
+                return Math.max(months, 1);
+            },
+
+
+            // DAYS
+            _calculateDays: function (start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                ) + 1;
+            },
+
+
+            // DAYS FOR DAY
+
+            _calculateDaysForDay: function (start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                );
+            },
+
+
+            // YEAR DAYS
+
+            _calculateYearDays: function (start, end) {
+
+                return Math.floor(
+                    (end - start) / 86400000
+                ) + 1;
+            },
+
+
+            // ROUND 2
+
+            _round2: function (value) {
+
+                return Math.round(
+                    (Number(value) + Number.EPSILON) * 100
+                ) / 100;
+            },
+
+
+            // TRUNCATE 2
+
+            _truncate2: function (value) {
+
+                return Math.floor(
+                    (Number(value) + Number.EPSILON) * 100
+                ) / 100;
+            },
+
+
+            // FORMAT DATE
+
+            _formatDateLocal: function (date) {
+
+                const d = new Date(date);
+
+                const y = d.getFullYear();
+
+                const m = String(
+                    d.getMonth() + 1
+                ).padStart(2, "0");
+
+                const day = String(
+                    d.getDate()
+                ).padStart(2, "0");
+
+                return `${y}-${m}-${day}`;
+            },
+            onPaymentDateChange: function (oEvent) {
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
+
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
+
+            GrossPriceChange: function (oEvent) {
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
+
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
+
+            onChangeUnitText: function (oEvent) {
+                const oContext = oEvent.getSource().getBindingContext("ManageInvoiceItemModel");
+                const oData = oContext.getObject();
+
+                this._validateAndCalculateInvoiceItem(oData, oEvent.getSource());
+            },
+            _validateAndCalculateInvoiceItem: function (oData, oSource) {
+
+                const oModel = this.getView().getModel("ManageInvoiceItemModel");
+                const oCtx = oSource.getBindingContext("ManageInvoiceItemModel");
+
+                if (!oCtx) {
+                    return;
+                }
+
+                const sPath = oCtx.getPath();
+
+                const startDate = this._parseDate(oData.StartDate);
+                const endDate = this._parseDate(oData.EndDate);
+
+                const unit = (oData.UnitText || "").trim();
+
+                const grossPrice = Number(
+                    String(oData.GrossPrice || "0").replace(/,/g, "")
+                );
+
+
+                if (oData.StartDate && oData.EndDate) {
+
+                    // Invalid date
+                    if (!startDate || !endDate) {
+
+                        oSource.setValueState("Error");
+                        oSource.setValueStateText(
+                            "Please enter valid dates."
+                        );
+
+                        oModel.setProperty(
+                            sPath + "/DurationText",
+                            ""
+                        );
+
+                        oModel.setProperty(
+                            sPath + "/Total",
+                            0
+                        );
+
+                        return;
+                    }
+
+                    // Start Date > End Date
+                    if (startDate > endDate) {
+
+                        oSource.setValueState("Error");
+                        oSource.setValueStateText(
+                            "End Date cannot be earlier than Start Date."
+                        );
+
+                        oModel.setProperty(
+                            sPath + "/DurationText",
+                            ""
+                        );
+
+                        oModel.setProperty(
+                            sPath + "/Total",
+                            0
+                        );
+
+                        return;
+                    }
+
+
+
+                    const oRow = oSource.getParent();
+
+                    if (oRow && oRow.getCells) {
+
+                        oRow.getCells().forEach(function (oCell) {
+
+                            if (oCell.isA("sap.m.DatePicker")) {
+
+                                const oBinding = oCell.getBinding("value");
+
+                                if (oBinding) {
+
+                                    const sBindingPath = oBinding.getPath();
+
+                                    if (
+                                        sBindingPath === "StartDate" ||
+                                        sBindingPath === "EndDate"
+                                    ) {
+                                        oCell.setValueState("None");
+                                        oCell.setValueStateText("");
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+
+                if (isNaN(grossPrice) || grossPrice < 0) {
+
+                    oSource.setValueState("Error");
+                    oSource.setValueStateText(
+                        "Gross Price must be a valid amount."
+                    );
+
+                    return;
+                }
+
+
+                let totalAmount = 0;
+                let durationText = "";
+
+
+                if (unit === "Per Day") {
+
+                    if (!startDate || !endDate) {
+                        return;
+                    }
+
+                    // Safety check
+                    if (startDate > endDate) {
+                        return;
+                    }
+
+                    const millisecondsPerDay =
+                        24 * 60 * 60 * 1000;
+
+                    const duration = Math.floor(
+                        (
+                            endDate.getTime() -
+                            startDate.getTime()
+                        ) / millisecondsPerDay
+                    );
+
+                    durationText =
+                        duration +
+                        " Day" +
+                        (duration > 1 ? "s" : "");
+
+                    totalAmount = Number(
+                        (grossPrice * duration).toFixed(2)
+                    );
+                }
+
+                else if (unit === "Fix") {
+
+                    durationText = "1";
+
+                    totalAmount = Number(
+                        grossPrice.toFixed(2)
+                    );
+                }
+
+
+                oModel.setProperty(
+                    sPath + "/GrossPrice",
+                    grossPrice
+                );
+
+                oModel.setProperty(
+                    sPath + "/DurationText",
+                    durationText
+                );
+
+                oModel.setProperty(
+                    sPath + "/Total",
+                    totalAmount
+                );
+                oModel.setProperty(
+                    sPath + "/PreviousTotal",
+                    totalAmount
+                );
+
+                this.totalAmountCalculation();
+            },
+            CD_onDiscountInfoPress: function (oEvent) {
+                if (!this._oPopover) {
+                    this._oPopover = new sap.m.Popover({
+                        contentWidth: "400px",
+                        contentHeight: "auto",
+                        showHeader: false,
+                        placement: sap.m.PlacementType.Bottom,
+                        content: [
+                            new sap.m.VBox({
+                                alignItems: "Center",
+                                justifyContent: "Center",
+                                width: "100%",
+                                items: [
+                                    new sap.m.Text({
+                                        text: this.i18nModel.getText("discountInfoText"),
+                                        wrapping: true
+                                    })
+                                ]
+                            }).addStyleClass("customPopoverContent")
+                        ]
+                    });
+                    this.getView().addDependent(this._oPopover);
+                }
+                this._oPopover.openBy(oEvent.getSource());
+            },
+        });
+    });

@@ -1,0 +1,160 @@
+<mvc:View controllerName="sap.ui.com.project1.controller.ManageInvoiceplain"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core">
+	<Page id="CI_id_ManageInvoice">
+		<headerContent>
+			<core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
+		</headerContent>
+		<content>
+			<fb:FilterBar
+                id="CI_id_InvoiceFilterBar"
+                showFilterConfiguration="false"
+                useToolbar="false"
+                clear="onPressClear"
+                showClearOnFB="true"
+                search="ManageInvoice_onSearch"
+                class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="InvNo"
+                        label="{i18n>invoiceNo}"
+                        groupName="ConsultantInvoice"
+                        visibleInFilterBar="true"
+                    >
+						<fb:control>
+							<ComboBox
+                                id="CI_id_InvNo"
+                                items="{path:'ManageInvoiceFilterModel>/', length:1000}"
+                                filterSecondaryValues="true"
+                                showSecondaryValues="true"
+                                showClearIcon="true">
+								<core:ListItem
+                                    key="{ManageInvoiceFilterModel>InvNo}"
+                                    text="{ManageInvoiceFilterModel>InvNo}"
+                                    additionalText="{ManageInvoiceFilterModel>CustomerName}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+                        name="InvoiceDate"
+                        label="{i18n>invoiceDate}"
+                        groupName="ConsultantInvoice"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<DateRangeSelection
+                                id="CI_id_InvoiceDatePicker"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                                change="onDateRangeChange"/>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+                        name="CustomerName"
+                        label="{i18n>customerNamebookingid}"
+                        groupName="ConsultantInvoice"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="CI_id_CustomerNameComboBox"
+                                items="{CustomerFilterModel>/}"
+                                showSecondaryValues="true"
+                                showClearIcon="true"
+                                filterSecondaryValues="true">
+								<core:ListItem
+                                    key="{CustomerFilterModel>CustomerName}"
+                                    text="{CustomerFilterModel>CustomerName}"
+                                    additionalText="{CustomerFilterModel>BookingID}"
+                                />
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem
+                        name="Status"
+                        label="{i18n>status}"
+                        groupName="ConsultantInvoice"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+                                id="CI_id_StatusComboBox"
+                                items="{CompanyInvoiceStatus>/}"
+                                showClearIcon="true">
+								<core:ListItem key="{CompanyInvoiceStatus>ID}" text="{CompanyInvoiceStatus>InvoiceStatus}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+			<Table id="CI_id_InvoiceTable" sticky="ColumnHeaders,HeaderToolbar"
+                items="{path: 'ManageInvoiceModel>/', sorter: { path: 'BranchName', descending: false, group: true },groupHeaderFactory: '.getGroupHeader'}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title id="CI_id_Title" text="{i18n>invoiceapp} ({= ${ManageInvoiceModel>/}.length})"/>
+						<ToolbarSpacer />
+						<Button text="{i18n>download}"   class="myUnifiedBtn"
+                        tooltip="{i18n>invoicedownload}" press="CI_onPressDownload"/>
+						<Button text="{i18n>InvoiceAddBtn}" class="myUnifiedBtn" tooltip="{i18n>addInvoice}"
+                        press="CI_onPressAddInvoice"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>invoiceDate}" tooltip="{i18n>invoiceDate}"/>
+					</Column>
+					<Column demandPopin="true">
+						<Text text="{i18n>invoiceNo}" tooltip="{i18n>invoiceNo}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>invoiceDescription}" tooltip="{i18n>invoiceDescription}"/>
+					</Column>
+						<Column demandPopin="true">
+						<Text text="{i18n>customer}" tooltip="{i18n>customer}"/>
+					</Column>
+						<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>totalAmount}" tooltip="{i18n>totalAmount}"/>
+					</Column>
+				
+				
+					
+				
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>gstAmount}" tooltip="{i18n>gstAmount}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>status}" tooltip="{i18n>status}"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="CI_onPressInvoiceRow">
+						<cells>
+							<Text text="{path:'ManageInvoiceModel>InvoiceDate',formatter: '.Formatter.formatDate'}"/>
+
+							<Text text="{ManageInvoiceModel>InvNo}" />
+							<ExpandableText text="{ManageInvoiceModel>InvoiceDescription}" maxCharacters="40"/>
+							<Text text="{= ${ManageInvoiceModel>BookingID} + ' (' + ${ManageInvoiceModel>CustomerName} + ')' }" />
+							<Text text="{path: 'ManageInvoiceModel>TotalAmount', formatter: '.Formatter.fromatNumber'} {ManageInvoiceModel>Currency}" textAlign="End"/>
+						<Text
+    text="{
+        parts: [
+            'ManageInvoiceModel>IGST',
+            'ManageInvoiceModel>CGST',
+            'ManageInvoiceModel>SGST',
+            'ManageInvoiceModel>Currency'
+        ],
+        formatter: '.Formatter.formatTaxAmount'
+    }" />
+							<ObjectStatus text="{ManageInvoiceModel>Status}" inverted="false"
+                            state="{path: 'ManageInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<footer>
+			<core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.AppFooter" type="XML"/>
+		</footer>
+	</Page>
+</mvc:View>
