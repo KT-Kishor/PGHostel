@@ -46,8 +46,49 @@ sap.ui.define([
                 var sText = oItem.getText() || "";
                 return sText.toLowerCase().indexOf(sTerm.toLowerCase()) > -1;
             });
+
+            // Raised By combo shows the email as secondary text, so the
+            // type-ahead must match either the name or the email.
+            this.byId("RB_id_RaisedBy1").setFilterFunction(function (sTerm, oItem) {
+                var sSearchTerm = sTerm.toLowerCase();
+                var sText = (oItem.getText() || "").toLowerCase();
+                var sEmail = (oItem.getAdditionalText ? oItem.getAdditionalText() : "").toLowerCase();
+                return sText.indexOf(sSearchTerm) > -1 || sEmail.indexOf(sSearchTerm) > -1;
+            });
+            await this._loadVendorEmailFilter()
             this.CD_read()
             this._loadAllFilterData()
+        },
+
+        // Admin users of type Vendor are only allowed to see bugs raised by the
+        // Admin staff of the branch codes assigned to them. Those branch codes
+        // come from HM_Login; resolve the matching staff email IDs from
+        // HM_StaffContact once so the table read and the dropdowns reuse the
+        // same comma separated email list.
+        _loadVendorEmailFilter: async function () {
+            this._vendorEmails = "";
+            var oLoginModel = this.getView().getModel("LoginModel");
+            var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
+            var sType = oLoginModel ? oLoginModel.getProperty("/Type") : "";
+            var sBranchCode = oLoginModel ? oLoginModel.getProperty("/BranchCode") : "";
+
+            if (sRole !== "Admin" || sType !== "Vendor" || !sBranchCode) return;
+
+            try {
+                var oData = await this.ajaxReadWithJQuery("HM_StaffContact", {
+                    BranchCode: sBranchCode,
+                    Role: "Admin"
+                });
+                var aStaff = Array.isArray(oData.data) ? oData.data : (oData.data ? [oData.data] : []);
+                var aEmails = aStaff
+                    .map(function (oStaff) { return oStaff.EmailID; })
+                    .filter(function (sEmail) { return sEmail && sEmail.trim(); })
+                    .map(function (sEmail) { return sEmail.trim(); });
+
+                this._vendorEmails = Array.from(new Set(aEmails)).join(",");
+            } catch (oError) {
+                this._vendorEmails = "";
+            }
         },
 
         SP_onPressClear: function () {
@@ -70,7 +111,13 @@ sap.ui.define([
 
             let filters = {};
 
-            if (SRaisedBy) filters.RaisedBy = SRaisedBy;
+            if (SRaisedBy) {
+                if (SRaisedBy.indexOf("@") > -1) {
+                    filters.Email = SRaisedBy;
+                } else {
+                    filters.RaisedBy = SRaisedBy;
+                }
+            }
             if (SStatus) filters.Status = SStatus;
             if (BugID) filters.BugID = BugID;
 
@@ -87,31 +134,50 @@ sap.ui.define([
             this.closeBusyDialog();
         },
 
-        // SuperAdmin: date range only (no email). Other roles: logged-in
-        // user's EmailID from HM_Login, never dates.
+        // SuperAdmin: date range only (no email). Admin + Vendor: the staff
+        // emails resolved for the assigned branch codes, plus the date range.
+        // Other roles: logged-in user's EmailID from HM_Login, never dates.
         _getRoleBasedBugFilters: function (bIncludeDates) {
             var oLoginModel = this.getView().getModel("LoginModel");
             var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
             var sEmail = oLoginModel ? oLoginModel.getProperty("/EmailID") : "";
             var oFilters = {};
 
+            // Admin + Vendor: restrict to the staff emails resolved from the
+            // assigned branch codes of HM_Login.
+            if (this._vendorEmails) {
+                oFilters.Email = this._vendorEmails;
+                if (bIncludeDates) {
+                    Object.assign(oFilters, this._getDateRangeFilters());
+                }
+                return oFilters;
+            }
+
             if (sRole === "SuperAdmin") {
                 if (bIncludeDates) {
-                    var oDateRange = this.byId("RB_id_Dates");
-                    var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
-                        pattern: "yyyy-MM-dd"
-                    });
-                    var oStartDate = oDateRange.getDateValue();
-                    var oEndDate = oDateRange.getSecondDateValue();
-                    if (oStartDate && oEndDate) {
-                        oFilters.StartDate = oDateFormat.format(oStartDate);
-                        oFilters.EndDate = oDateFormat.format(oEndDate);
-                    }
+                    Object.assign(oFilters, this._getDateRangeFilters());
                 }
             } else if (sEmail) {
                 oFilters.Email = sEmail;
             }
 
+            return oFilters;
+        },
+
+        _getDateRangeFilters: function () {
+            var oFilters = {};
+            var oDateRange = this.byId("RB_id_Dates");
+            if (!oDateRange) return oFilters;
+
+            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+                pattern: "yyyy-MM-dd"
+            });
+            var oStartDate = oDateRange.getDateValue();
+            var oEndDate = oDateRange.getSecondDateValue();
+            if (oStartDate && oEndDate) {
+                oFilters.StartDate = oDateFormat.format(oStartDate);
+                oFilters.EndDate = oDateFormat.format(oEndDate);
+            }
             return oFilters;
         },
 
@@ -132,10 +198,15 @@ sap.ui.define([
                 RB_id_Status: new Set(),
                 RB_id_RaisebugID: new Set()
             };
+            let mRaisedByEmail = {};
 
             data.forEach(item => {
                 if (item.RaisedBy && item.RaisedBy.trim()) {
-                    uniqueValues.RB_id_RaisedBy1.add(item.RaisedBy.trim());
+                    var sRaisedBy = item.RaisedBy.trim();
+                    uniqueValues.RB_id_RaisedBy1.add(sRaisedBy);
+                    if (item.Email && !mRaisedByEmail[sRaisedBy]) {
+                        mRaisedByEmail[sRaisedBy] = item.Email;
+                    }
                 }
                 if (item.Status && item.Status.trim()) {
                     uniqueValues.RB_id_Status.add(item.Status.trim());
@@ -158,10 +229,18 @@ sap.ui.define([
                 Array.from(uniqueValues[field])
                     .sort()
                     .forEach(value => {
-                        oComboBox.addItem(new sap.ui.core.Item({
-                            key: value,
-                            text: value
-                        }));
+                        if (field === "RB_id_RaisedBy1") {
+                            oComboBox.addItem(new sap.ui.core.ListItem({
+                                key: value,
+                                text: value,
+                                additionalText: mRaisedByEmail[value] || ""
+                            }));
+                        } else {
+                            oComboBox.addItem(new sap.ui.core.Item({
+                                key: value,
+                                text: value
+                            }));
+                        }
                     });
                 // ✅ Restore selection if still valid
                 if (sSelectedKey && uniqueValues[field].has(sSelectedKey)) {

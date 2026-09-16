@@ -765,6 +765,7 @@ sap.ui.define([
         oLoginModel.setProperty("/UserName", "");
         oLoginModel.setProperty("/EmployeeName", "");
         oLoginModel.setProperty("/Role", "");
+        oLoginModel.setProperty("/Type", "");
         oLoginModel.setProperty("/BranchCode", "");
         oLoginModel.setProperty("/Salutation", "");
         oLoginModel.setProperty("/EmailID", "");
@@ -920,6 +921,7 @@ sap.ui.define([
         oLoginModel.setProperty("/UserName", user.UserName || "");
         oLoginModel.setProperty("/EmailID", user.EmailID || "");
         oLoginModel.setProperty("/Role", user.Role || "");
+        oLoginModel.setProperty("/Type", user.Type || "");
         oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
         oLoginModel.setProperty("/STDCode", user.STDCode || "");
         oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
