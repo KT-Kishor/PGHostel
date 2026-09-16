@@ -1614,9 +1614,17 @@ sap.ui.define([
             sap.ui.getCore().byId("ID_editCouponCode").setShowValueHelp(false)
         },
 
-        onQuantityLiveChange: function (oEvent) {
-            utils._LCvalidateMandatoryField(oEvent);
-        },
+       onQuantityLiveChange: function (oEvent) {
+    var oInput = oEvent.getSource();
+    var sValue = oInput.getValue();
+
+    if (parseFloat(sValue) > 10000) {
+        oInput.setValue("");
+        return;
+    }
+
+    utils._LCvalidateMandatoryField(oEvent);
+},
 
         onEditFacilitySave: function () {
             var oCustomerModel = this.getView().getModel("CustomerData");

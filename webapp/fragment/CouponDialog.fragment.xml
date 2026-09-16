@@ -31,6 +31,7 @@
                         items="{Branchmodel>/}"
                         showSecondaryValues="true"
                         selectionChange="onBranchSelect"
+                        editable="{= ${CouponView>/DialogMode} === 'Edit' ? false : true}"
                     >
                         <core:ListItem
                             key="{Branchmodel>BranchID}"

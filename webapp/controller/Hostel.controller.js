@@ -1271,6 +1271,11 @@ sap.ui.define([
                 ?.getContentMiddle()[0]
                 ?.setText("Sign In");
         },
+        _setDefaultCountryIndiaSignup: function () {
+    const oLoginModel = this.getView().getModel("LoginMode");
+    oLoginModel.setProperty("/Country", "India");
+    this.onChangeCountry(null); // reuses _findBestMatch + state filtering, same as manual entry
+},
 
         onSwitchToSignUp: function () {
             const oSignInPanel = $C("signInPanel");
@@ -1294,7 +1299,7 @@ sap.ui.define([
                 oDOBpicker.setMaxDate(oToday);
                 // oDOBpicker.setMinDate(new Date(2000, 0, 1)); // Jan 1, 2000 as minimum age limit
             }
-
+ this._setDefaultCountryIndiaSignup();
             // --- AUTO-POPULATE WITH BUSY INDICATOR ---
             const oCountryCB = $C("signUpCountry");
             const oCountryModel = this.getOwnerComponent().getModel("CountryModel");
@@ -1339,6 +1344,7 @@ sap.ui.define([
                         $C("signUpPhone").setEnabled(true);
 
                         oCountryCB.setBusy(false);
+                        this._setDefaultCountryIndiaSignup();
                         fnRunAutoPopulate();
                     }
                 }, 300);

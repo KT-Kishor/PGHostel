@@ -102,7 +102,7 @@
                 <Input
                     id="editquantity"
                     value="{edit>/quantity}"
-                    maxLength="2"
+                    maxLength="5"
                     visible="{= ${edit>/UnitText} === 'Unit Price' }"
                     placeholder="Enter Quantity"
                     valueStateText="Enter Quantity"

@@ -53,7 +53,7 @@
                                     <f:content>
                                         <m:Label
                                             text="Branch Name"
-                                            required="true"
+                        
                                         />
                                         <m:ComboBox
                                             id="idRoomType12"
@@ -63,7 +63,7 @@
                                             change="onbranchChange"
                                             showSecondaryValues="true"
                                             valueStateText="{i18n>placeSelectBranchCode}"
-                                            editable="{editable>/Edit}"
+                                            editable="false"
                                         >
                                             <core:ListItem
                                                 key="{BranchModel>BranchID}"
