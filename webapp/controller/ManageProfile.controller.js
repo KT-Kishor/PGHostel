@@ -51,6 +51,11 @@ sap.ui.define([
                 mode: "CREATE"
             }), "viewModel");
 
+            // Acknowledgement state for the Deactivate Account dialog
+            this.getView().setModel(new JSONModel({
+                acknowledged: false
+            }), "deactivateModel");
+
             // Initial profile state so visibility bindings (isEditMode / selectedTab)
             // resolve from the very first render and no edit form or extra tables flash
             this.getView().setModel(new JSONModel({
@@ -3019,6 +3024,142 @@ sap.ui.define([
                 this.closeBusyDialog();
                 this._updateRowCount();
             }
+        },
+
+        onDeactivateAccountPress: function () {
+            const sRole = (this.getOwnerComponent().getModel("LoginModel")?.getProperty("/Role")) ||
+                this._oLoggedInUser?.Role || "";
+
+            // Admin accounts must not be self-deactivated; only support can do it.
+            if (sRole === "Admin") {
+                MessageToast.show(this.i18nModel.getText("MSadminDeleteRestricted"));
+                return;
+            }
+
+            const oDeactivateModel = this.getView().getModel("deactivateModel");
+            if (oDeactivateModel) {
+                oDeactivateModel.setProperty("/acknowledged", false);
+            }
+
+            if (!this._oDeactivateDialog) {
+                Fragment.load({
+                    name: "sap.ui.com.project1.fragment.DeactivateAccount",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._oDeactivateDialog = oDialog;
+                    oDialog.setModel(this.getView().getModel("deactivateModel"), "deactivateModel");
+                    this.getView().addDependent(oDialog);
+                    oDialog.open();
+                }.bind(this));
+                return;
+            }
+
+            this._oDeactivateDialog.open();
+        },
+
+        onDeactivateAccountCancel: function () {
+            if (this._oDeactivateDialog) {
+                this._oDeactivateDialog.close();
+            }
+        },
+
+        onDeactivateAccountEscape: function (oEvent) {
+            if (this._oDeactivateDialog) {
+                this._oDeactivateDialog.close();
+            }
+
+            // The dialog is closed explicitly above; suppress the default ESC close.
+            if (oEvent && typeof oEvent.preventDefault === "function") {
+                oEvent.preventDefault();
+            }
+        },
+
+        onDeactivateAccountAfterClose: function () {
+            const oDeactivateModel = this.getView().getModel("deactivateModel");
+            if (oDeactivateModel) {
+                oDeactivateModel.setProperty("/acknowledged", false);
+            }
+        },
+
+        onDeactivateAccountConfirm: async function () {
+            if (this._bDeactivating) {
+                return;
+            }
+
+            const oProfileModel = this.getView().getModel("profileData");
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
+            const sUserID = (oProfileModel && oProfileModel.getProperty("/UserID")) ||
+                (oLoginModel && oLoginModel.getProperty("/UserID")) ||
+                this._oLoggedInUser?.UserID || "";
+
+            if (!sUserID) {
+                MessageToast.show(this.i18nModel.getText("deactivateAccountFailed"));
+                return;
+            }
+
+            this._bDeactivating = true;
+            this.getBusyDialog();
+
+            try {
+                await this.ajaxUpdateWithJQuery("HM_Login", {
+                    data: {
+                        Status: "Inactive",
+                        Password: ""
+                    },
+                    filters: {
+                        UserID: sUserID
+                    }
+                });
+
+                if (this._oDeactivateDialog) {
+                    this._oDeactivateDialog.close();
+                }
+
+                this._clearDeactivationState();
+                this.CommonLogoutFunction();
+                MessageToast.show(this.i18nModel.getText("deactivateAccountSuccess"));
+            } catch (err) {
+                console.error("Account deactivation failed", err);
+                MessageToast.show(this.i18nModel.getText("deactivateAccountFailed"));
+            } finally {
+                this._bDeactivating = false;
+                this.closeBusyDialog();
+            }
+        },
+
+        /**
+         * Wipes the local user model, application state and session/cache
+         * memory so no deactivated account data survives in the browser.
+         * The login model itself is cleared by CommonLogoutFunction.
+         */
+        _clearDeactivationState: function () {
+            const oProfileModel = this.getView().getModel("profileData");
+            if (oProfileModel) {
+                oProfileModel.setData({});
+            }
+            sap.ui.getCore().setModel(null, "profileData");
+
+            const oUserModel = this.getOwnerComponent().getModel("UserModel");
+            if (oUserModel) {
+                oUserModel.setData({});
+            }
+
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+            if (oUIModel) {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+
+            this._oLoggedInUser = {};
+            this._mMemberDocumentCache = {};
+
+            try {
+                sessionStorage.clear();
+            } catch (e) {
+                // Storage may be unavailable (private mode); nothing to clear.
+            }
+
+            // Inactivity tracking key is not removed by CommonLogoutFunction.
+            localStorage.removeItem("lastActivity");
         },
 
         onlogout: function () {

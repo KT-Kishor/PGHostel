@@ -40,6 +40,13 @@
                         press="onEditSaveProfile"
                     />
                     <Button
+                        text="{i18n>deactivateAccount}"
+                        class="deactivateHeaderBtn"
+                        tooltip="{i18n>deactivateAccount}"
+                        visible="{= !${profileData>/isEditMode} }"
+                        press="onDeactivateAccountPress"
+                    />
+                    <Button
                         icon="sap-icon://log"
                         class="myUnifiedBtn"
                         tooltip="{i18n>logout}"
