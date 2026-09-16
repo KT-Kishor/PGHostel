@@ -1538,6 +1538,42 @@ sap.ui.define([
         }, oHeader);
 
         return oHeader;
+    },
+   _forceCloseAllBusyDialogs: function () {
+
+    try {
+        // Close sap.m.BusyDialog
+        if (sap.ui.core.Element.registry) {
+
+            sap.ui.core.Element.registry.forEach(function (oControl) {
+
+                if (
+                    oControl &&
+                    oControl.isA &&
+                    oControl.isA("sap.m.BusyDialog")
+                ) {
+                    oControl.close();
+                }
+
+            });
+        }
+        // Home page Busy state
+        var oHome = this.byId && this.byId("idHome");
+
+        if (oHome && oHome.setBusy) {
+            oHome.setBusy(false);
+        }
+
+        // Reset booking state
+        this._bBusyFromBooking = false;
+
+    } catch (e) {
+
+        console.warn(
+            "Error while closing busy indicators:",
+            e
+        );
     }
+},
   })
 });

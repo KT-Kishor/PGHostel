@@ -121,6 +121,7 @@ sap.ui.define([
             var LoginFunction = await this.commonLoginFunction("LoginPage");
             if (!bBusyOnLoad) {
                 this.closeBusyDialog();
+                this._forceCloseAllBusyDialogs();
             }
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");

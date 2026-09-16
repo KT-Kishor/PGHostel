@@ -5,7 +5,7 @@
             "meta": "Demo · PDF guide",
             "description": "The Super Admin can view and manage complete vendor details submitted through the system.The Super Admin can review vendor information and approve or reject vendors based on the provided details and verification requirements.Required documents can be uploaded and managed as part of the vendor verification process.The Super Admin can edit and update vendor details whenever necessary to maintain accurate records.Complete vendor data can be filtered and downloaded in Excel format for reporting, verification, and record-keeping purposes.",
             "icon": "sap-icon://supplier",
-            "videoUrl": "Videos/vendor registration + vendor credentials and logi.mp4",
+            "videoUrl": "Videos/vendor registration + vendor credentials and login.mp4",
             "guideUrl": "ManageVender.pdf",
             "expanded": false
         },
@@ -41,7 +41,7 @@
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage various facilities and define the applicable pricing for each facility.\nThe Admin can add facility images along with relevant details to provide a clear overview of the available services.Facility pricing can be configured based on different durations, such as daily, monthly, or yearly rates.The Admin can download facility data in Excel format for reporting and record-keeping purposes.The Admin can easily edit facility details, update prices, change images, and manage the facility information whenever required.",
             "icon": "sap-icon://activity-items",
-            "videoUrl": "Video/facilities.mp4",
+            "videoUrl": "Videos/facilities.mp4",
             "guideUrl": "facilities_management.pdf",
             "expanded": false
         },
