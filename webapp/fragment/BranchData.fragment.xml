@@ -275,7 +275,6 @@
                  id="Bd_id_Mode_Label"
                     text="Mode"
                     required="true"
-                    visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
                 />
 				<Select
                     id="Bd_id_Active"
@@ -283,7 +282,6 @@
                     valueStateText="{i18n>selectCurrency}"
                     width="100%"
                     showSecondaryValues="true"
-                    visible="{= ${LoginModel>/Role} === 'SuperAdmin'}"
                     class="sapUiSmallMarginBottom"
                 >
 					<core:Item
