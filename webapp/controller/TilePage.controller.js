@@ -2782,7 +2782,7 @@ sap.ui.define([
                     oPayloadData.Password = "";
                 }
 
-                await this.ajaxUpdateWithJQuery("HM_Login", {
+                await this.ajaxUpdateWithJQuery("HM_ActiveDeactive", {
                     data: oPayloadData,
                     filters: {
                         UserID: oSelected.UserID

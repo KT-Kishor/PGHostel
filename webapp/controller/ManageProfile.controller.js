@@ -3110,14 +3110,17 @@ sap.ui.define([
             try {
                 // Email/Role/Type now come from the already-loaded profile
                 // model, so no extra HM_Login read is needed.
-                await this.ajaxUpdateWithJQuery("HM_Login", {
+                await this.ajaxUpdateWithJQuery("HM_ActiveDeactive", {
                     data: {
                         UserName: sName || "",
                         EmailID: sEmail || "",
                         Role: (oProfileModel && oProfileModel.getProperty("/role")) || "",
                         Type: (oProfileModel && oProfileModel.getProperty("/type")) || "",
                         Status: "Inactive",
-                        Password: ""
+                        Password: "",
+                        FileName: "",
+                        FileType: "",
+                        FileContent: ""
                     },
                     filters: {
                         UserID: sUserID

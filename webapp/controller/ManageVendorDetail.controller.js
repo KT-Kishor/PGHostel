@@ -379,7 +379,7 @@ sap.ui.define([
                     payload.data.Type = oLoginRow.Type || "";
                 }
                 this.getBusyDialog()
-                await this.ajaxUpdateWithJQuery("HM_Login", payload);
+                await this.ajaxUpdateWithJQuery("HM_ActiveDeactive", payload);
                 await this._loadVendorDetails(oData.UserID);
                 this.closeBusyDialog()
                 MessageToast.show(this.i18nModel.getText("vendorSuccess"));
