@@ -78,6 +78,16 @@
             "excludeRoles": ["ManageVendor","Front Office Employee","Customer"]
            
         },
+         {
+            "title": "Admin Room Booking",
+            "meta": "Demo · PDF guide",
+            "description": "The Admin Room Booking feature allows the Admin to create and manage bookings for customers and for self-booking when required. The Admin can book rooms for new customers by entering the necessary booking details and selecting available rooms. Existing customer bookings can also be created or managed using their existing customer information. The Admin can select room types, booking dates, members, facilities, coupons, and applicable GST or tax. Booking details can be reviewed and managed to ensure accurate reservations efficiently.",
+            "icon": "sap-icon://employee",
+            "videoUrl": "Videos/Admin Booking.mp4",
+            "guideUrl": "Admin Booking.pdf",
+            "excludeRoles": ["ManageVendor","Front Office Employee","Customer"]
+           
+        },
         {
             "title": "Admin Manage Bookings",
             "meta": "Demo · PDF guide",
