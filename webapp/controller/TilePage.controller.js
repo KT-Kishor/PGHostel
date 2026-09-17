@@ -2694,6 +2694,9 @@ sap.ui.define([
             // matching the self-deactivation flow. Any other status change
             // leaves the credentials untouched.
             var oPayloadData = {
+                EmailID: oSelected.EmailID || "",
+                Role: oSelected.Role || "",
+                Type: oSelected.Type || "",
                 Status: sNewStatus
             };
             if (sNewStatus === "Inactive") {
