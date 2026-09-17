@@ -2690,21 +2690,28 @@ sap.ui.define([
 
             var sNewStatus = oModel.getProperty("/newStatus") || oStatusCombo.getSelectedKey() || "";
 
-            // Saving the account as Inactive always clears the stored password,
-            // matching the self-deactivation flow. Any other status change
-            // leaves the credentials untouched.
-            var oPayloadData = {
-                EmailID: oSelected.EmailID || "",
-                Role: oSelected.Role || "",
-                Type: oSelected.Type || "",
-                Status: sNewStatus
-            };
-            if (sNewStatus === "Inactive") {
-                oPayloadData.Password = "";
-            }
-
             this.getBusyDialog();
             try {
+                // HM_LoginUser does not expose Type, so read the authoritative
+                // HM_Login row by email for EmailID/Role/Type.
+                var oRead = await this.ajaxReadWithJQuery("HM_Login", {
+                    EmailID: oSelected.EmailID
+                });
+                var oLoginRow = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || {};
+
+                // Saving the account as Inactive always clears the stored password,
+                // matching the self-deactivation flow. Any other status change
+                // leaves the credentials untouched.
+                var oPayloadData = {
+                    EmailID: oLoginRow.EmailID || oSelected.EmailID || "",
+                    Role: oLoginRow.Role || oSelected.Role || "",
+                    Type: oLoginRow.Type || "",
+                    Status: sNewStatus
+                };
+                if (sNewStatus === "Inactive") {
+                    oPayloadData.Password = "";
+                }
+
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: oPayloadData,
                     filters: {
