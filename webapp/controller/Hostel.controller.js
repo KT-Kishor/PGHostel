@@ -2663,7 +2663,7 @@ sap.ui.define([
 
             var data = this.getOwnerComponent().getModel("sBRModel").getData()
             var Branchdata = data.filter((item) => {
-                return item.City === Scity
+                return item.City === Scity && item.Status ==="Active"
             })
             this.Branchlength = Branchdata.length
 
