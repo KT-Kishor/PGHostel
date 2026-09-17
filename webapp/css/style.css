@@ -7727,7 +7727,7 @@ text-transform: none !important;
 
 .umSubtitle {
 	font-size: 0.78rem !important;
-	color: var(--um-ink-soft) !important;
+	color: #2b4056 !important;
 }
 
 .umSearch input {
@@ -7767,10 +7767,8 @@ text-transform: none !important;
 	min-width: 300px;
 	max-width: 100%;
 	padding: 22px 22px 18px;
-}
-
-.umCard:hover {
-	 border-left-color: #00b3c3;
+  border-right-color: #00b3c3;
+  border-left-color: #00b3c3;
 }
 
 .umCardHead {
@@ -7809,7 +7807,7 @@ text-transform: none !important;
 
 .umDesc {
 	display: block;
-	color: var(--um-ink-soft) !important;
+	color: #2b4056 !important;
 	font-size: 0.88rem !important;
 	line-height: 1.6 !important;
 	max-width: 100%;

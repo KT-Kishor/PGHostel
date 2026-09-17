@@ -55,8 +55,7 @@ _onRouteMatched: async function  (oEvent) {
 			if (sSearchQuery) {
 				oBinding.filter(new Filter({
 					filters: [
-						new Filter("title", FilterOperator.Contains, sSearchQuery),
-						new Filter("description", FilterOperator.Contains, sSearchQuery)
+						new Filter("title", FilterOperator.Contains, sSearchQuery)
 					],
 					and: false
 				}));

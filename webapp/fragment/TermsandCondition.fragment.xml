@@ -4,11 +4,26 @@
 
     <Dialog
         id="termsDialog"
-        title="Terms and Conditions"
         contentWidth="80%"
         draggable="true"
         resizable="true"
         class="termsDialog">
+         <customHeader>
+        <Bar>
+            <contentLeft>
+                <Title text="Terms and Conditions" />
+            </contentLeft>
+
+            <contentRight>
+                <Button
+                    icon="sap-icon://decline"
+                    press="onTermsDialogClose"
+                     tooltip="{i18n>close}"
+                      type="Transparent"
+                    class="myUnifiedBtn" />
+            </contentRight>
+        </Bar>
+    </customHeader>
 
         <content>
             <core:HTML
@@ -16,24 +31,11 @@
                 content="&lt;iframe
                     class='terms-pdf-iframe'
                     title='Terms and Conditions'
-                    src='Documents/TermsAndConditions.pdf'
+                    src='Documents/TermsAndConditions.pdf#navpanes=0'
                     frameborder='0'
                     allow='fullscreen'&gt;
                 &lt;/iframe&gt;" />
         </content>
-
-        <buttons>
-            <Button
-                text="Download"
-                icon="sap-icon://download"
-                type="Emphasized"
-                press="onDownloadTerms" class="myUnifiedBtn" />
-
-            <Button
-                text="Close"
-                press="onTermsDialogClose" class="myUnifiedBtn" />
-        </buttons>
-
     </Dialog>
 
 </core:FragmentDefinition>

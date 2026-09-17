@@ -5502,20 +5502,6 @@ sap.ui.define([
                 }
             },
 
-            onDownloadTerms: function () {
-                var sPdfUrl = sap.ui.require.toUrl(
-                    "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
-                );
-
-                var oLink = document.createElement("a");
-                oLink.href = sPdfUrl;
-                oLink.download = "TermsAndConditions.pdf";
-
-                document.body.appendChild(oLink);
-                oLink.click();
-                document.body.removeChild(oLink);
-            },
-
             onTermsDialogClose: function () {
                 this.byId("termsDialog").close();
             },

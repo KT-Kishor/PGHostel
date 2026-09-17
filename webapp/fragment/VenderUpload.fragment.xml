@@ -54,25 +54,39 @@
                     change="onidproofchange"
                 >
                     <core:ListItem
-                        key="Aadhaar Card"
-                        text="Aadhaar Card"
-                    />
-                    <core:ListItem
-                        key="PAN Card"
-                        text="PAN Card"
-                    />
-                    <core:ListItem
-                        key="Company Registration Certificate"
-                        text="Company Registration Certificate"
-                    />
-                    <core:ListItem
-                        key="Bank Account"
-                        text="Bank Account"
-                    />
-                    <core:ListItem
-                        key="Other"
-                        text="Other"
-                    />
+                            key="Government-issued Identity Proof"
+                            text="Government-issued Identity Proof"
+                        />
+                        <core:ListItem
+                            key="Property Ownership Authorisation Proof"
+                            text="Property Ownership Authorisation Proof"
+                        />
+                        <core:ListItem
+                            key="Company Registration Certificate"
+                            text="Company Registration Certificate"
+                        />
+                        <core:ListItem
+                            key="Trade Licence"
+                            text="Trade Licence"
+                        />
+                        <!-- <core:ListItem key="Resume" text="Resume"/> -->
+                        <core:ListItem
+                            key="PG Registration"
+                            text="PG Registration"
+                        />
+                        <core:ListItem
+                            key="GST Registration Certificate"
+                            text="GST Registration Certificate"
+                        />
+                        <core:ListItem
+                            key="Bank Account Details"
+                            text="Bank Account Details" />
+                        <core:ListItem
+                            key="Organization PAN "
+                            text="Organization PAN " />
+                        <core:ListItem
+                            key="Others"
+                            text="Others" />
                 </ComboBox>
                 <Label
                     text="{i18n>uploadDocument}"

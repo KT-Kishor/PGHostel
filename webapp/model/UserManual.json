@@ -3,15 +3,14 @@
         {
             "title": "Manage Vendors",
             "meta": "Demo · PDF guide",
-            "description": "The Super Admin can view and manage complete vendor details submitted through the system.The Super Admin can review vendor information and approve or reject vendors based on the provided details and verification requirements.Required documents can be uploaded and managed as part of the vendor verification process.The Super Admin can edit and update vendor details whenever necessary to maintain accurate records.Complete vendor data can be filtered and downloaded in Excel format for reporting, verification, and record-keeping purposes.",
+            "description": "Vendors can register through the “Vendor Registration” button and submit required company and contact details. The Super Admin can review and verify complete vendor information submitted through the system. The Super Admin can approve or reject vendors based on the provided details and verification requirements. Vendors can upload supporting documents for registration and verification, while the Super Admin can view and manage them. The Super Admin can edit and update vendor information whenever required to maintain accurate records.",
             "icon": "sap-icon://supplier",
-            "videoUrl": "Videos/vendor registration + vendor credentials and login.mp4",
+            "videoUrl": "Videos/vendor registration  + vendor Approval + vendor credentials and login.mp4",
             "guideUrl": "ManageVender.pdf",
-            "excludeRoles": ["Front Office Employee", "Admin","Housekeeping","Branch Manager"],
-             "showWhenNoRole": true
+            "excludeRoles": ["Front Office Employee", "Admin","Housekeeping","Branch Manager","Customer"]
         },
         {
-            "title": "Admin Branch Management",
+            "title": "Branch Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can manage multiple branches by creating different branch types, such as Hostels, PGs, and Hotels. While creating a branch, the Admin can enter all required branch details, including applicable GST information. The system provides an option to specify whether GST is applicable to the respective branch. The Admin can download complete branch data in Excel format for reporting and record-keeping. The Admin can also edit, update, or delete existing branch details whenever required to maintain accurate branch records as needed.",
             "icon": "sap-icon://building",
@@ -21,7 +20,7 @@
            
         },
         {
-            "title": "Admin Bed Management",
+            "title": "Bed Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage bed types, such as Single Bed, Double Bed, and customized bed configurations. While creating a bed type, the Admin can provide required details and upload relevant images for identification. The Admin can define the number of rooms available for each bed type and specify the maximum number of occupants per room. All bed-related information can be downloaded in Excel format for reporting and record-keeping. The Admin can also manage existing bed types by editing or deleting their details whenever required.",
             "icon": "sap-icon://bed",
@@ -31,7 +30,7 @@
           
         },
         {
-            "title": "Admin Room Management",
+            "title": "Room Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage rooms by assigning room numbers and defining the required number of rooms for each property. The Admin can set and manage room prices based on the selected room or room type. Room details, including room numbers, availability, and pricing, can be updated whenever required. The Admin can download room data in Excel format for reporting and record-keeping. The Admin can also edit room details, change room numbers or prices, and manage room information as needed. This helps maintain accurate room records.",
             "icon": "sap-icon://home",
@@ -40,7 +39,7 @@
            "excludeRoles": ["ManageVendor","Customer"]
         },
         {
-            "title": "Admin Facility Management",
+            "title": "Facility Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage various facilities and define the applicable pricing for each facility. The Admin can add facility images along with relevant details to provide an overview of the available services. Facility pricing can be configured based on different durations, such as daily, monthly, or yearly rates. The Admin can download facility data in Excel format for reporting and record-keeping purposes. The Admin can easily edit facility details, update prices, change images, and manage facility details whenever required.",
             "icon": "sap-icon://activity-items",
@@ -50,7 +49,7 @@
            
         },
         {
-            "title": "Admin Amenities Management",
+            "title": "Amenities Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage various amenities available within each property. The Admin can add relevant images and provide detailed information for each amenity. The system allows the Admin to specify the number of amenities available at a particular property. Amenity data can be downloaded in Excel format for reporting and record-keeping purposes. The Admin can easily edit, update, or delete amenity details whenever required. This helps maintain accurate amenity records and provides clear information about available facilities across different properties for effective management and reference.",
             "icon": "sap-icon://add-product",
@@ -60,7 +59,7 @@
           
         },
         {
-            "title": "Admin Coupon Management",
+            "title": "Coupon Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage coupons by defining the coupon name, discount value, maximum discount limit, and usage limit. The Admin can configure the minimum order value and set an expiration date for each coupon. Coupons can be managed efficiently by updating their details and monitoring their validity and usage limits. The Admin can share coupons with customers through WhatsApp and email for promotional purposes. The complete coupon data can be downloaded in Excel format for reporting, tracking, and record-keeping as required.",
             "icon": "sap-icon://marketing-campaign",
@@ -70,7 +69,7 @@
            
         },
         {
-            "title": "Admin Staff Management",
+            "title": "Staff Management",
             "meta": "Demo · PDF guide",
             "description": "The Admin can create and manage staff members by assigning roles and responsibilities based on property requirements. Each staff member can be assigned to a branch to ensure access. Staff members can log in using their credentials and access only the applications and features authorized for their assigned role. The Admin can update staff information, including role assignments, branch information, and access permissions whenever required. Staff data can be downloaded in Excel format for reporting, tracking, and record-keeping purposes.",
             "icon": "sap-icon://employee",
@@ -80,7 +79,7 @@
            
         },
         {
-            "title": "Manage Bookings",
+            "title": "Admin Manage Bookings",
             "meta": "Demo · PDF guide",
             "description": "The Admin can view and manage all bookings made by customers across different properties. The Admin can review and update booking details and manage booking status as required. Bookings can be confirmed, rejected, or cancelled based on availability and operational requirements. The Admin can assign available rooms to customers and manage room assignments throughout the booking process. Complete booking data can be downloaded in Excel format for reporting, tracking, verification, and record-keeping purposes, ensuring accurate and organized booking information is maintained across all properties.",
             "icon": "sap-icon://calendar",
@@ -129,13 +128,23 @@
             "excludeRoles": ["ManageVendor","Customer"]
         },
         {
+            "title": "Vendor Registration",
+            "meta": "Demo · PDF guide",
+            "description": "The Vendor can submit and manage registration details through the system. The Vendor can provide required business information, contact details, and verification documents during registration. After approval, login credentials will be sent to the registered email address. The Vendor can use these credentials to log in to the system. After the first login, the Vendor can change the provided password for security. Vendor details and documents can be managed whenever required to maintain accurate records for verification and reference.",
+            "icon": "sap-icon://supplier",
+            "videoUrl": "Videos/vendor registration + vendor credentials and login.mp4",
+            "guideUrl": "1. Vendor-onboarding-(vendor's perspective).pdf",
+            "excludeRoles": ["Front Office Employee", "Admin","Housekeeping","Branch Manager","SuperAdmin"],
+             "showWhenNoRole": true
+        },
+        {
             "title": "Customer SignUp",
             "meta": "Demo · PDF guide",
             "description": "The Customer Signup Form allows customers to provide basic personal details, such as their name and mobile number. Users can enter contact information, including email address, country, city, and other relevant details. The form collects accurate information to create and maintain the customer profile. In the final step, customers can set a secure password for their account. Once all required details are completed, the customer can review the entered information, submit the form, and successfully create an account for accessing the system and managing their profile.",
             "icon": "sap-icon://visits",
             "videoUrl": "Videos/Customer Reg + Sign in + Profile Pic.mp4",
             "guideUrl": "customer_sign in_signup_profile_pic.pdf",
-            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager","SuperAdmin"],
              "showWhenNoRole": true
         },
         {
@@ -145,7 +154,7 @@
             "icon": "sap-icon://key",
             "videoUrl": "Videos/set - reset password.mp4",
             "guideUrl": "password-reset-guide.pdf",
-            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager","SuperAdmin"],
              "showWhenNoRole": true
         },
         {
@@ -155,7 +164,7 @@
             "icon": "sap-icon://home",
             "videoUrl": "Videos/Booking.mp4",
             "guideUrl": "Booking_walk_through.pdf",
-            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager","SuperAdmin"],
              "showWhenNoRole": true
         },
         {
@@ -165,7 +174,7 @@
             "icon": "sap-icon://reset",
             "videoUrl": "Videos/Booking edit & Cancel.mp4",
             "guideUrl": "customer_edit_and_cancel.pdf",
-            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager"],
+            "excludeRoles": ["ManageVendor","Front Office Employee","Housekeeping","Branch Manager","SuperAdmin"],
             "showWhenNoRole": true
         }
     ]

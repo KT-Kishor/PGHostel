@@ -6,7 +6,7 @@ sap.ui.define([
 
   return Controller.extend("sap.ui.com.project1.controller.App", {
 
-    TIMEOUT_DURATION: 10 * 60 * 1000, // 10 minutes
+    TIMEOUT_DURATION: 30 * 60 * 1000, // 10 minutes
     LAST_ACTIVITY_KEY: "lastActivity",
 
     _activityCheckInterval: null,

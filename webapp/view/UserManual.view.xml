@@ -9,17 +9,24 @@
 		<!-- ===== Top bar ===== -->
 		<customHeader>
 			<Toolbar class="umTopbar" height="64px">
+			<Image
+                src="./image/SVLogo.png"
+                height="2.5rem"
+                class="logoFix"
+                press="onBack"
+            />
+				
+				<VBox class="umTitleBlock">
+					<Title text="User Manuals" level="H1" class="umTitle" />
+					<Text text="Short video walkthroughs and printable guides for every feature." class="umSubtitle" />
+				</VBox>
+				<ToolbarSpacer />
 				<Button
-					icon="sap-icon://nav-back"
+					icon="sap-icon://home"
 					type="Transparent"
 					class="umBackBtn myUnifiedBtn"
 					press="onBack"
 					tooltip="Go back" />
-				<VBox class="umTitleBlock">
-					<Title text="User Manual" level="H1" class="umTitle" />
-					<Text text="Short video walkthroughs and printable guides for every feature." class="umSubtitle" />
-				</VBox>
-				<ToolbarSpacer />
 				<SearchField
 					id="topicSearch1"
 					width="260px"

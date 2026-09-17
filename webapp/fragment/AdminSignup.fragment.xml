@@ -359,11 +359,8 @@ filterSecondaryValues="true"
                             key="Bank Account Details"
                             text="Bank Account Details" />
                         <core:ListItem
-                            key="PAN Details"
-                            text="PAN Details" />
-                        <core:ListItem
-                            key="GST Details"
-                            text="GST Details" />
+                            key="Organization PAN "
+                            text="Organization PAN " />
                         <core:ListItem
                             key="Others"
                             text="Others" />
