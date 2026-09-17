@@ -3095,6 +3095,9 @@ sap.ui.define([
             const sEmail = (oProfileModel && oProfileModel.getProperty("/email")) ||
                 (oLoginModel && oLoginModel.getProperty("/EmailID")) ||
                 this._oLoggedInUser?.EmailID || "";
+            const sName = (oProfileModel && oProfileModel.getProperty("/name")) ||
+                (oLoginModel && oLoginModel.getProperty("/UserName")) ||
+                this._oLoggedInUser?.UserName || "";
 
             if (!sUserID) {
                 MessageToast.show(this.i18nModel.getText("deactivateAccountFailed"));
@@ -3109,6 +3112,7 @@ sap.ui.define([
                 // model, so no extra HM_Login read is needed.
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: {
+                        UserName: sName || "",
                         EmailID: sEmail || "",
                         Role: (oProfileModel && oProfileModel.getProperty("/role")) || "",
                         Type: (oProfileModel && oProfileModel.getProperty("/type")) || "",

@@ -2350,6 +2350,7 @@ sap.ui.define([
                     displayRole: "",
                     hasSelection: false,
                     newStatus: "Active",
+                    statusChanged: false,
                     password: "",
                     confirmPassword: ""
                 }), "RPModel");
@@ -2442,6 +2443,7 @@ sap.ui.define([
                         oModel.setProperty("/selected", oFresh);
                         oModel.setProperty("/hasSelection", true);
                         oModel.setProperty("/newStatus", oFresh.Status || "Active");
+                        oModel.setProperty("/statusChanged", false);
                         this._setRPStatusOptions(oFresh.Status);
                         this._applyRPDisplayRole();
                     } else {
@@ -2516,6 +2518,7 @@ sap.ui.define([
             oModel.setProperty("/selected", oUser);
             oModel.setProperty("/hasSelection", true);
             oModel.setProperty("/newStatus", oUser.Status || "Active");
+            oModel.setProperty("/statusChanged", false);
             this._setRPStatusOptions(oUser.Status);
             oModel.setProperty("/password", "");
             oModel.setProperty("/confirmPassword", "");
@@ -2585,6 +2588,26 @@ sap.ui.define([
 
         onRPNewStatusChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+            this._updateRPStatusChangedState(oEvent.getSource().getSelectedKey());
+        },
+
+        // The status dropdown only allows a meaningful update: the button stays
+        // disabled while the chosen status equals the user's current status.
+        _updateRPStatusChangedState: function (sSelectedStatus) {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return false;
+            }
+
+            var oSelected = oModel.getProperty("/selected");
+            var sOriginal = (oSelected && oSelected.Status) || "";
+            var sNew = (sSelectedStatus === undefined || sSelectedStatus === null)
+                ? (oModel.getProperty("/newStatus") || "")
+                : sSelectedStatus;
+
+            var bChanged = !!oSelected && !!sNew && sNew !== sOriginal;
+            oModel.setProperty("/statusChanged", bChanged);
+            return bChanged;
         },
 
         _clearRPSelection: function () {
@@ -2597,6 +2620,7 @@ sap.ui.define([
             oModel.setProperty("/displayRole", "");
             oModel.setProperty("/hasSelection", false);
             oModel.setProperty("/newStatus", "Active");
+            oModel.setProperty("/statusChanged", false);
             this._setRPStatusOptions(null);
             oModel.setProperty("/password", "");
             oModel.setProperty("/confirmPassword", "");
@@ -2733,6 +2757,13 @@ sap.ui.define([
 
             var sNewStatus = oModel.getProperty("/newStatus") || oStatusCombo.getSelectedKey() || "";
 
+            // No-op updates are blocked: the chosen status must differ from the
+            // user's current status for the button to be enabled.
+            if (!this._updateRPStatusChangedState(sNewStatus)) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordStatusUnchanged"));
+                return;
+            }
+
             this._showRPBusy();
             try {
                 // HM_LoginUser now carries EmailID/Role/Type, so the payload is
@@ -2741,6 +2772,7 @@ sap.ui.define([
                 // matching the self-deactivation flow. Any other status change
                 // leaves the credentials untouched.
                 var oPayloadData = {
+                    UserName: oSelected.UserName || "",
                     EmailID: oSelected.EmailID || "",
                     Role: oSelected.Role || "",
                     Type: oSelected.Type || "",
