@@ -2782,6 +2782,14 @@ sap.ui.define([
                     oPayloadData.Password = "";
                 }
 
+                // Only Customer accounts (Role and Type both "Customer") being
+                // saved as Inactive clear the profile document fields.
+                if (sNewStatus === "Inactive" && oSelected.Role === "Customer" && oSelected.Type === "Customer") {
+                    oPayloadData.FileName = "";
+                    oPayloadData.FileType = "";
+                    oPayloadData.FileContent = "";
+                }
+
                 await this.ajaxUpdateWithJQuery("HM_ActiveDeactive", {
                     data: oPayloadData,
                     filters: {
