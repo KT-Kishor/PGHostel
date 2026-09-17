@@ -2780,93 +2780,131 @@ sap.ui.define([
                 this._oPopover.openBy(oEvent.getSource());
             },
 
-            CID_onPressDelete: function () {
-                var that = this;
-                var oTable = this.byId("CID_id_TableInvoiceItem");
-                var oModel = this.getView().getModel("ManageInvoiceItemModel");
+                     CID_onPressDelete: function () {
+    var that = this;
+    var oTable = this.byId("CID_id_TableInvoiceItem");
+    var oModel = this.getView().getModel("ManageInvoiceItemModel");
 
-                var aSelectedItems = oTable.getSelectedItems();
-                //  No selection
-                if (!aSelectedItems.length) {
-                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
-                    return;
+    var aSelectedItems = oTable.getSelectedItems();
+
+    // No selection
+    if (!aSelectedItems.length) {
+        MessageToast.show(
+            this.i18nModel.getText("pleaseselectrowstoDelete")
+        );
+        return;
+    }
+
+    var aData = oModel.getProperty("/ManageInvoiceItem") || [];
+
+    // Get selected objects and their indexes
+    var aSelectedObjects = aSelectedItems.map(function (oItem) {
+        var oContext = oItem.getBindingContext("ManageInvoiceItemModel");
+
+        return {
+            object: oContext.getObject(),
+            index: parseInt(oContext.getPath().split("/")[2], 10)
+        };
+    });
+
+    var fnDeleteLocal = function () {
+
+        // Remove selected rows from highest index to lowest
+        // so indexes don't change while deleting
+        aSelectedObjects
+            .sort(function (a, b) {
+                return b.index - a.index;
+            })
+            .forEach(function (item) {
+                aData.splice(item.index, 1);
+            });
+
+        // Re-index
+        aData.forEach(function (item, idx) {
+            item.IndexNo = idx + 1;
+        });
+
+        oModel.setProperty("/ManageInvoiceItem", aData);
+
+        oTable.removeSelections(true);
+        oModel.refresh(true);
+
+        // Clear ValueState of Particulars inputs
+        oTable.getItems().forEach(function (oItem) {
+            var oInput = oItem.getCells()[1];
+
+            if (oInput && oInput.setValueState) {
+                oInput.setValueState(sap.ui.core.ValueState.None);
+                oInput.setValueStateText("");
+            }
+        });
+
+        that.SNoValue = aData.length;
+        that.totalAmountCalculation();
+
+        MessageToast.show(
+            that.i18nModel.getText("ManageInvoiceDeleteSuccess")
+        );
+    };
+
+    // Saved items only
+    var aSavedItems = aSelectedObjects
+        .filter(function (item) {
+            return item.object.ItemID;
+        })
+        .map(function (item) {
+            return item.object;
+        });
+
+    var fnDeleteBackend = function () {
+
+        if (!aSavedItems.length) {
+            fnDeleteLocal();
+            return Promise.resolve();
+        }
+
+        // Delete all saved items
+        var aDeletePromises = aSavedItems.map(function (oObject) {
+            return that.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
+                filters: {
+                    ItemID: oObject.ItemID
                 }
+            });
+        });
 
-                //  More than one selected
-                if (aSelectedItems.length > 1) {
-                    MessageToast.show(this.i18nModel.getText("pleaseselectonlyonerowtoDelete"));
-                    return;
-                }
+        return Promise.all(aDeletePromises)
+            .then(function () {
+                fnDeleteLocal();
+            });
+    };
 
-                //  Single selected item
-                var oSelectedItem = aSelectedItems[0];
-                var oContext = oSelectedItem.getBindingContext("ManageInvoiceItemModel");
-                var oObject = oContext.getObject();
+    // Confirmation
+    this.showConfirmationDialog(
+        that.i18nModel.getText("msgBoxConfirm"),
+        that.i18nModel.getText("msgBoxConfirmDelete"),
+        function () {
 
-                var sPath = oContext.getPath(); // /ManageInvoiceItem/2
-                var iIndex = parseInt(sPath.split("/")[2], 10);
+            that.getBusyDialog();
 
-                var aData = oModel.getProperty("/ManageInvoiceItem");
+            fnDeleteBackend()
+                .then(function () {
+                    that.closeBusyDialog();
+                })
+                .catch(function (error) {
+                    that.closeBusyDialog();
 
-                var fnDeleteLocal = function () {
-                    aData.splice(iIndex, 1);
-
-                    // Re-index
-                    aData.forEach(function (item, idx) {
-                        item.IndexNo = idx + 1;
-                    });
-
-                    oModel.setProperty("/ManageInvoiceItem", aData);
-                    oTable.removeSelections(true);
-
-                    oModel.refresh(true);
-
-                    // Clear ValueState of Particulars inputs
-                    oTable.getItems().forEach(function (oItem) {
-                        var oInput = oItem.getCells()[1]; // Particulars Input (2nd column)
-                        if (oInput && oInput.setValueState) {
-                            oInput.setValueState(sap.ui.core.ValueState.None);
-                            oInput.setValueStateText("");
-                        }
-                    });
-
-                    that.SNoValue = aData.length;
-                    that.totalAmountCalculation();
-
-                    MessageToast.show(that.i18nModel.getText("ManageInvoiceDeleteSuccess"));
-                };
-
-                // 🔁 If already saved → backend delete
-                if (oObject.ItemID) {
-                    this.showConfirmationDialog(
-                        that.i18nModel.getText("msgBoxConfirm"),
-                        that.i18nModel.getText("msgBoxConfirmDelete"),
-                        function () {
-                            that.getBusyDialog();
-
-                            that.ajaxDeleteWithJQuery("/HM_ManageInvoiceItem", {
-                                filters: {
-                                    ItemID: oObject.ItemID
-                                }
-                            }).then(function () {
-                                fnDeleteLocal();
-                                that.closeBusyDialog();
-                            }).catch(function (error) {
-                                that.closeBusyDialog();
-                                MessageToast.show(error.responseText);
-                            });
-                        },
-                        function () {
-                            // Cancel
-                            oTable.removeSelections(true);
-                        }
+                    MessageToast.show(
+                        error.responseText ||
+                        that.i18nModel.getText("ManageInvoiceDeleteError")
                     );
-                }
-                //  Not saved yet → local delete only
-                else {
-                    fnDeleteLocal();
-                }
-            },
+                });
+        },
+        function () {
+            // Cancel
+            oTable.removeSelections(true);
+        }
+    );
+},
 
             CID_onPressSendEmail: function (oEvent) {
                 var that = this;
