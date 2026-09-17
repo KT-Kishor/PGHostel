@@ -2361,7 +2361,7 @@ sap.ui.define([
                     controller: this
                 }).then(function (oDialog) {
                     this._oResetPasswordDialog = oDialog;
-                    oDialog.setStretch(sap.ui.Device.system.phone);
+                    this._applyRPContentHeight(oDialog);
                     this.getView().addDependent(oDialog);
                     this._applyRPEmailContainsFilter();
                     oDialog.open();
@@ -2370,10 +2370,20 @@ sap.ui.define([
                 return;
             }
 
+            this._applyRPContentHeight(this._oResetPasswordDialog);
             this._applyRPEmailContainsFilter();
-            this._oResetPasswordDialog.setStretch(sap.ui.Device.system.phone);
             this._oResetPasswordDialog.open();
             this._loadResetPasswordUsers();
+        },
+
+        // Bound the dialog content on small screens so it scrolls internally
+        // and the footer stays attached; on larger screens let it size itself.
+        _applyRPContentHeight: function (oDialog) {
+            if (!oDialog) {
+                return;
+            }
+
+            oDialog.setContentHeight(sap.ui.Device.system.phone ? "70%" : "");
         },
 
         // Case-insensitive "contains" filter on the Email combobox so a partial
