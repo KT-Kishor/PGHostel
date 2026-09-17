@@ -62,11 +62,26 @@
                         class="deactivateConsequenceItem"
                     >
                         <core:Icon
+                            src="sap-icon://delete"
+                            class="deactivateConsequenceIcon"
+                        />
+                        <Text
+                            text="{i18n>deactivateConsequenceDeleted}"
+                            wrapping="true"
+                            class="deactivateConsequenceText deactivateConsequenceStrong"
+                        />
+                    </HBox>
+
+                    <HBox
+                        alignItems="Start"
+                        class="deactivateConsequenceItem"
+                    >
+                        <core:Icon
                             src="sap-icon://database"
                             class="deactivateConsequenceIcon"
                         />
                         <Text
-                            text="{i18n>deactivateConsequenceData}"
+                            text="{i18n>deactivateConsequenceInaccessible}"
                             wrapping="true"
                             class="deactivateConsequenceText"
                         />

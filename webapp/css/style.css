@@ -8060,6 +8060,11 @@ text-transform: none !important;
   color: #32363a;
 }
 
+.deactivateConsequenceStrong,
+.deactivateConsequenceStrong .sapMText {
+  font-weight: 700;
+}
+
 .deactivateAckRow {
   width: 100%;
   margin-top: 0.5rem;

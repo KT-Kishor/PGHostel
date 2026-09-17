@@ -3120,13 +3120,20 @@ sap.ui.define([
                     }
                 });
 
-                if (this._oDeactivateDialog) {
-                    this._oDeactivateDialog.close();
-                }
+                // Acknowledge first: only after the user dismisses this
+                // message do we close the dialog and log out.
+                MessageBox.alert(this.i18nModel.getText("deactivateAccountSuccess"), {
+                    title: this.i18nModel.getText("deactivateAccount"),
+                    styleClass: "myUnifiedBtn",
+                    onClose: function () {
+                        if (this._oDeactivateDialog) {
+                            this._oDeactivateDialog.close();
+                        }
 
-                this._clearDeactivationState();
-                this.CommonLogoutFunction();
-                MessageToast.show(this.i18nModel.getText("deactivateAccountSuccess"));
+                        this._clearDeactivationState();
+                        this.CommonLogoutFunction();
+                    }.bind(this)
+                });
             } catch (err) {
                 console.error("Account deactivation failed", err);
                 MessageToast.show(this.i18nModel.getText("deactivateAccountFailed"));
