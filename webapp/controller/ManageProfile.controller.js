@@ -237,6 +237,7 @@ sap.ui.define([
                     stdCode: oUser.STDCode,
                     branchCode: oUser.BranchCode,
                     role: oUser.Role,
+                    type: oUser.Type || "",
                     BranchCombo: aBranchComboData,
                     AsgnRoomNo: aAssignedRoomData,
                     selectedBranchCode: "",
@@ -3091,6 +3092,9 @@ sap.ui.define([
             const sUserID = (oProfileModel && oProfileModel.getProperty("/UserID")) ||
                 (oLoginModel && oLoginModel.getProperty("/UserID")) ||
                 this._oLoggedInUser?.UserID || "";
+            const sEmail = (oProfileModel && oProfileModel.getProperty("/email")) ||
+                (oLoginModel && oLoginModel.getProperty("/EmailID")) ||
+                this._oLoggedInUser?.EmailID || "";
 
             if (!sUserID) {
                 MessageToast.show(this.i18nModel.getText("deactivateAccountFailed"));
@@ -3101,8 +3105,13 @@ sap.ui.define([
             this.getBusyDialog();
 
             try {
+                // Email/Role/Type now come from the already-loaded profile
+                // model, so no extra HM_Login read is needed.
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: {
+                        EmailID: sEmail || "",
+                        Role: (oProfileModel && oProfileModel.getProperty("/role")) || "",
+                        Type: (oProfileModel && oProfileModel.getProperty("/type")) || "",
                         Status: "Inactive",
                         Password: ""
                     },

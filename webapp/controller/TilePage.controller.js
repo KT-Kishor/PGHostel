@@ -2347,6 +2347,7 @@ sap.ui.define([
                     ],
                     selectedEmail: "",
                     selected: null,
+                    displayRole: "",
                     hasSelection: false,
                     newStatus: "Active",
                     password: "",
@@ -2409,7 +2410,7 @@ sap.ui.define([
                 return;
             }
 
-            this.getBusyDialog();
+            this._showRPBusy();
             try {
                 var oData = await this.ajaxReadWithJQuery("HM_LoginUser", {});
                 var aRows = Array.isArray(oData.data) ? oData.data : (oData.data ? [oData.data] : []);
@@ -2442,6 +2443,7 @@ sap.ui.define([
                         oModel.setProperty("/hasSelection", true);
                         oModel.setProperty("/newStatus", oFresh.Status || "Active");
                         this._setRPStatusOptions(oFresh.Status);
+                        this._applyRPDisplayRole();
                     } else {
                         oModel.setProperty("/selectedEmail", "");
                         this._clearRPSelection();
@@ -2450,7 +2452,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
             } finally {
-                this.closeBusyDialog();
+                this._hideRPBusy();
             }
         },
 
@@ -2518,6 +2520,46 @@ sap.ui.define([
             oModel.setProperty("/password", "");
             oModel.setProperty("/confirmPassword", "");
             this._resetRPPasswordState();
+
+            // HM_LoginUser carries Type, so the display role resolves from the
+            // already-loaded row without an extra backend call.
+            this._applyRPDisplayRole();
+        },
+
+        // Reference-counted busy dialog so nested opens (list refresh +
+        // status/password updates) don't close the indicator early.
+        _showRPBusy: function () {
+            this._iRPBusyCount = (this._iRPBusyCount || 0) + 1;
+            if (this._iRPBusyCount === 1) {
+                this.getBusyDialog();
+            }
+        },
+
+        _hideRPBusy: function () {
+            this._iRPBusyCount = Math.max(0, (this._iRPBusyCount || 0) - 1);
+            if (this._iRPBusyCount === 0) {
+                this.closeBusyDialog();
+            }
+        },
+
+        // The HM_LoginUser row carries the role and Type. When the role is
+        // "Admin" but the record is a Vendor, present the role as "Vendor";
+        // otherwise keep the role as-is.
+        _applyRPDisplayRole: function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            var oSelected = oModel.getProperty("/selected");
+            if (!oSelected) {
+                oModel.setProperty("/displayRole", "");
+                return;
+            }
+
+            var sRole = oSelected.Role || "";
+            var sType = oSelected.Type || "";
+            oModel.setProperty("/displayRole", (sRole === "Admin" && sType === "Vendor") ? "Vendor" : sRole);
         },
 
         // The status dropdown always offers Active/Inactive plus, when the
@@ -2552,6 +2594,7 @@ sap.ui.define([
             }
 
             oModel.setProperty("/selected", null);
+            oModel.setProperty("/displayRole", "");
             oModel.setProperty("/hasSelection", false);
             oModel.setProperty("/newStatus", "Active");
             this._setRPStatusOptions(null);
@@ -2690,22 +2733,17 @@ sap.ui.define([
 
             var sNewStatus = oModel.getProperty("/newStatus") || oStatusCombo.getSelectedKey() || "";
 
-            this.getBusyDialog();
+            this._showRPBusy();
             try {
-                // HM_LoginUser does not expose Type, so read the authoritative
-                // HM_Login row by email for EmailID/Role/Type.
-                var oRead = await this.ajaxReadWithJQuery("HM_Login", {
-                    EmailID: oSelected.EmailID
-                });
-                var oLoginRow = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || {};
-
+                // HM_LoginUser now carries EmailID/Role/Type, so the payload is
+                // built straight from the selected row (no extra HM_Login read).
                 // Saving the account as Inactive always clears the stored password,
                 // matching the self-deactivation flow. Any other status change
                 // leaves the credentials untouched.
                 var oPayloadData = {
-                    EmailID: oLoginRow.EmailID || oSelected.EmailID || "",
-                    Role: oLoginRow.Role || oSelected.Role || "",
-                    Type: oLoginRow.Type || "",
+                    EmailID: oSelected.EmailID || "",
+                    Role: oSelected.Role || "",
+                    Type: oSelected.Type || "",
                     Status: sNewStatus
                 };
                 if (sNewStatus === "Inactive") {
@@ -2728,7 +2766,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
             } finally {
-                this.closeBusyDialog();
+                this._hideRPBusy();
             }
         },
 
@@ -2777,7 +2815,7 @@ sap.ui.define([
                 return;
             }
 
-            this.getBusyDialog();
+            this._showRPBusy();
             try {
                 await this.ajaxUpdateWithJQuery("HM_Login", {
                     data: {
@@ -2795,7 +2833,7 @@ sap.ui.define([
             } catch (err) {
                 MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
             } finally {
-                this.closeBusyDialog();
+                this._hideRPBusy();
             }
         },
 
@@ -2809,6 +2847,7 @@ sap.ui.define([
             var oModel = this.getView().getModel("RPModel");
 
             this._clearRPSelection();
+            this._iRPBusyCount = 0;
 
             // Reset the model so every bound field starts empty next time.
             if (oModel) {

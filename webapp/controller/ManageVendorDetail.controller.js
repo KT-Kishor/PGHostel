@@ -361,6 +361,22 @@ sap.ui.define([
                 if (oData.Status === "Inactive" && this._sOriginalStatus !== "Inactive") {
                     payload.data.Password = "";
                     payload.data.AdminComment= "";
+
+                    // HM_LoginReadCall does not expose Type, so read the
+                    // authoritative HM_Login row by email for Role/Type.
+                    let oLoginRow = {};
+                    try {
+                        const oRead = await this.ajaxReadWithJQuery("HM_Login", {
+                            EmailID: oData.Email
+                        });
+                        oLoginRow = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || {};
+                    } catch (e) {
+                        oLoginRow = {};
+                    }
+
+                    payload.data.EmailID = oLoginRow.EmailID || oData.Email || "";
+                    payload.data.Role = oLoginRow.Role || "";
+                    payload.data.Type = oLoginRow.Type || "";
                 }
                 this.getBusyDialog()
                 await this.ajaxUpdateWithJQuery("HM_Login", payload);
