@@ -2327,6 +2327,510 @@ sap.ui.define([
     this._RaiseBugDialog.close();
         },
 
+        // ─────────────────────────────────────────────────────────────────
+        //  Reset Passwords (Admin / SuperAdmin credentials management)
+        // ─────────────────────────────────────────────────────────────────
+        onResetPasswordPress: function () {
+            var sRole = this.getOwnerComponent().getModel("LoginModel")?.getProperty("/Role") || "";
+
+            if (sRole !== "Admin" && sRole !== "SuperAdmin") {
+                MessageToast.show(this.i18nModel.getText("resetPasswordAdminOnly"));
+                return;
+            }
+
+            if (!this.getView().getModel("RPModel")) {
+                this.getView().setModel(new JSONModel({
+                    users: [],
+                    statusOptions: [
+                        { key: "Active", text: "Active" },
+                        { key: "Inactive", text: "Inactive" }
+                    ],
+                    selectedEmail: "",
+                    selected: null,
+                    hasSelection: false,
+                    newStatus: "Active",
+                    password: "",
+                    confirmPassword: ""
+                }), "RPModel");
+            }
+
+            if (!this._oResetPasswordDialog) {
+                sap.ui.core.Fragment.load({
+                    id: this.getView().getId(),
+                    name: "sap.ui.com.project1.fragment.ResetPassword",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._oResetPasswordDialog = oDialog;
+                    oDialog.setStretch(sap.ui.Device.system.phone);
+                    this.getView().addDependent(oDialog);
+                    this._applyRPEmailContainsFilter();
+                    oDialog.open();
+                    this._loadResetPasswordUsers();
+                }.bind(this));
+                return;
+            }
+
+            this._applyRPEmailContainsFilter();
+            this._oResetPasswordDialog.setStretch(sap.ui.Device.system.phone);
+            this._oResetPasswordDialog.open();
+            this._loadResetPasswordUsers();
+        },
+
+        // Case-insensitive "contains" filter on the Email combobox so a partial
+        // term searches both the email (primary) and the name (secondary),
+        // instead of UI5's default starts-with on the primary text only.
+        _applyRPEmailContainsFilter: function () {
+            var oEmailCombo = this.byId("RP_id_email");
+            if (!oEmailCombo || !oEmailCombo.setFilterFunction) {
+                return;
+            }
+
+            oEmailCombo.setFilterFunction(function (sTerm, oItem) {
+                var sNeedle = String(sTerm || "").toLowerCase();
+                var sEmail = String(oItem.getText() || "").toLowerCase();
+                var sName = String(oItem.getAdditionalText() || "").toLowerCase();
+                return sEmail.indexOf(sNeedle) !== -1 || sName.indexOf(sNeedle) !== -1;
+            });
+        },
+
+        _loadResetPasswordUsers: async function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            this.getBusyDialog();
+            try {
+                var oData = await this.ajaxReadWithJQuery("HM_LoginUser", {});
+                var aRows = Array.isArray(oData.data) ? oData.data : (oData.data ? [oData.data] : []);
+
+                // Keep one row per user and present them alphabetically.
+                var oSeen = {};
+                var aUsers = [];
+                aRows.forEach(function (oRow) {
+                    if (oRow && oRow.UserID && !oSeen[oRow.UserID]) {
+                        oSeen[oRow.UserID] = true;
+                        aUsers.push(oRow);
+                    }
+                });
+                aUsers.sort(function (a, b) {
+                    return String(a.UserName || a.EmailID || "").localeCompare(String(b.UserName || b.EmailID || ""));
+                });
+
+                oModel.setProperty("/users", aUsers);
+
+                // Re-resolve the selected user so the details panel stays fresh
+                // after a status change re-reads the list.
+                var sSelectedEmail = oModel.getProperty("/selectedEmail");
+                if (sSelectedEmail) {
+                    var oFresh = aUsers.filter(function (oUser) {
+                        return oUser.EmailID === sSelectedEmail;
+                    })[0];
+
+                    if (oFresh) {
+                        oModel.setProperty("/selected", oFresh);
+                        oModel.setProperty("/hasSelection", true);
+                        oModel.setProperty("/newStatus", oFresh.Status || "Active");
+                        this._setRPStatusOptions(oFresh.Status);
+                    } else {
+                        oModel.setProperty("/selectedEmail", "");
+                        this._clearRPSelection();
+                    }
+                }
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onRPEmailSelect: function (oEvent) {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            var oEmailCombo = oEvent.getSource();
+            var oSelectedItem = oEvent.getParameter && oEvent.getParameter("selectedItem");
+
+            // While typing, UI5 can fire selectionChange without a selected
+            // item. Keep the typed text and only drop the previously selected
+            // user; never reset /selectedEmail here because it is two-way bound
+            // to the ComboBox selectedKey (resetting it wiped the typed letter).
+            if (!oSelectedItem) {
+                this._clearRPSelection();
+                return;
+            }
+
+            if (!utils._LCstrictValidationComboBox(oEmailCombo, "ID")) {
+                this._clearRPSelection();
+                return;
+            }
+
+            this._populateRPUserByEmail(oEmailCombo.getSelectedKey() || oEmailCombo.getValue() || "");
+        },
+
+        // Committed value (blur / Enter). Flags an error when the typed email
+        // is not one of the available options, even if no item was selected.
+        onRPEmailChange: function (oEvent) {
+            var oEmailCombo = oEvent.getSource();
+
+            if (!utils._LCstrictValidationComboBox(oEmailCombo, "ID")) {
+                this._clearRPSelection();
+                return;
+            }
+
+            this._populateRPUserByEmail(oEmailCombo.getSelectedKey() || oEmailCombo.getValue() || "");
+        },
+
+        _populateRPUserByEmail: function (sEmail) {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            oModel.setProperty("/selectedEmail", sEmail);
+
+            var aUsers = oModel.getProperty("/users") || [];
+            var oUser = aUsers.filter(function (oRow) {
+                return oRow.EmailID === sEmail;
+            })[0];
+
+            if (!oUser) {
+                this._clearRPSelection();
+                return;
+            }
+
+            oModel.setProperty("/selected", oUser);
+            oModel.setProperty("/hasSelection", true);
+            oModel.setProperty("/newStatus", oUser.Status || "Active");
+            this._setRPStatusOptions(oUser.Status);
+            oModel.setProperty("/password", "");
+            oModel.setProperty("/confirmPassword", "");
+            this._resetRPPasswordState();
+        },
+
+        // The status dropdown always offers Active/Inactive plus, when the
+        // selected user's own status differs, that original status too.
+        _setRPStatusOptions: function (sOriginalStatus) {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            var aStatuses = ["Active", "Inactive"];
+            if (sOriginalStatus && aStatuses.indexOf(sOriginalStatus) < 0) {
+                aStatuses.push(sOriginalStatus);
+            }
+
+            oModel.setProperty("/statusOptions", aStatuses.map(function (sStatus) {
+                return {
+                    key: sStatus,
+                    text: sStatus
+                };
+            }));
+        },
+
+        onRPNewStatusChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+        },
+
+        _clearRPSelection: function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            oModel.setProperty("/selected", null);
+            oModel.setProperty("/hasSelection", false);
+            oModel.setProperty("/newStatus", "Active");
+            this._setRPStatusOptions(null);
+            oModel.setProperty("/password", "");
+            oModel.setProperty("/confirmPassword", "");
+            this._resetRPPasswordState();
+        },
+
+        _resetRPPasswordState: function () {
+            var oPwd = this.byId("RP_id_password");
+            var oConfirm = this.byId("RP_id_confirmPassword");
+            var oStrength = this.byId("RP_id_pwdStrength");
+
+            if (oPwd) {
+                oPwd.setValueState("None");
+            }
+            if (oConfirm) {
+                oConfirm.setValueState("None");
+                oConfirm.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
+            }
+            if (oStrength) {
+                oStrength.setText("");
+                oStrength.removeStyleClass("pwdWeak");
+                oStrength.removeStyleClass("pwdMedium");
+                oStrength.removeStyleClass("pwdStrong");
+                oStrength.addStyleClass("pwdMinFail");
+            }
+        },
+
+        // Passwords cannot contain spaces: drop them as they are typed.
+        _stripRPWhitespace: function (oInput, sPath) {
+            if (!oInput) {
+                return;
+            }
+
+            var sValue = oInput.getValue() || "";
+            var sCleaned = sValue.replace(/\s/g, "");
+            if (sValue !== sCleaned) {
+                oInput.setValue(sCleaned);
+            }
+
+            var oModel = this.getView().getModel("RPModel");
+            if (oModel) {
+                oModel.setProperty(sPath, sCleaned);
+            }
+        },
+
+        onRPPasswordLiveChange: function (oEvent) {
+            this._stripRPWhitespace(oEvent.getSource(), "/password");
+            utils._LCvalidatePassword(oEvent, this.byId("RP_id_pwdStrength"));
+            this._validateRPConfirmMatch();
+        },
+
+        onRPPasswordChange: function (oEvent) {
+            this._stripRPWhitespace(oEvent.getSource(), "/password");
+            utils._LCvalidatePassword(oEvent, this.byId("RP_id_pwdStrength"));
+            this._validateRPConfirmMatch();
+        },
+
+        onRPConfirmPasswordLiveChange: function (oEvent) {
+            this._stripRPWhitespace(oEvent.getSource(), "/confirmPassword");
+            this._validateRPConfirmMatch();
+        },
+
+        onRPConfirmPasswordChange: function (oEvent) {
+            this._stripRPWhitespace(oEvent.getSource(), "/confirmPassword");
+            this._validateRPConfirmMatch();
+        },
+
+        // Eye toggle on a password field (same behaviour as SignInSignup):
+        // switch the field between Password/Text and swap the help icon.
+        onRPTogglePasswordVisibility: function (oEvent) {
+            var oInput = oEvent.getSource();
+
+            // 1. Capture the value BEFORE the type change.
+            var sValue = oInput.getValue();
+
+            // 2. Toggle the type.
+            var bIsPassword = oInput.getType() === "Password";
+            oInput.setType(bIsPassword ? "Text" : "Password");
+
+            // 3. Toggle the icon.
+            oInput.setValueHelpIconSrc(bIsPassword ? "sap-icon://hide" : "sap-icon://show");
+
+            // 4. Restore the value after the re-render.
+            oInput.setValue(sValue);
+        },
+
+        // Reads the values straight from the controls: liveChange fires before
+        // the two-way binding writes /password and /confirmPassword, so using
+        // the model here would compare stale values.
+        _validateRPConfirmMatch: function () {
+            var oPwd = this.byId("RP_id_password");
+            var oConfirm = this.byId("RP_id_confirmPassword");
+            if (!oConfirm) {
+                return true;
+            }
+
+            var sPwd = (oPwd ? oPwd.getValue() : "").trim();
+            var sConfirm = (oConfirm.getValue() || "").trim();
+
+            if (!sConfirm || sPwd === sConfirm) {
+                oConfirm.setValueState("None");
+                return true;
+            }
+
+            oConfirm.setValueState("Error");
+            oConfirm.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
+            return false;
+        },
+
+        onRPUpdateStatusPress: async function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            var oEmailCombo = this.byId("RP_id_email");
+            var oStatusCombo = this.byId("RP_id_newStatus");
+
+            if (!utils._LCstrictValidationComboBox(oEmailCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordSelectUser"));
+                return;
+            }
+
+            var oSelected = oModel.getProperty("/selected");
+            if (!oSelected || !oSelected.UserID) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordSelectUser"));
+                return;
+            }
+
+            if (!utils._LCstrictValidationComboBox(oStatusCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordStatusRequired"));
+                return;
+            }
+
+            var sNewStatus = oModel.getProperty("/newStatus") || oStatusCombo.getSelectedKey() || "";
+
+            // Saving the account as Inactive always clears the stored password,
+            // matching the self-deactivation flow. Any other status change
+            // leaves the credentials untouched.
+            var oPayloadData = {
+                Status: sNewStatus
+            };
+            if (sNewStatus === "Inactive") {
+                oPayloadData.Password = "";
+            }
+
+            this.getBusyDialog();
+            try {
+                await this.ajaxUpdateWithJQuery("HM_Login", {
+                    data: oPayloadData,
+                    filters: {
+                        UserID: oSelected.UserID
+                    }
+                });
+
+                MessageToast.show(this.i18nModel.getText("resetPasswordUpdateStatusSuccess"));
+                if (oStatusCombo) {
+                    oStatusCombo.setValueState("None");
+                }
+
+                await this._loadResetPasswordUsers();
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onRPResetPasswordPress: async function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return;
+            }
+
+            var oEmailCombo = this.byId("RP_id_email");
+            if (!utils._LCstrictValidationComboBox(oEmailCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordSelectUser"));
+                return;
+            }
+
+            var oSelected = oModel.getProperty("/selected");
+            if (!oSelected || !oSelected.UserID) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordSelectUser"));
+                return;
+            }
+
+            var oPwd = this.byId("RP_id_password");
+            var oConfirm = this.byId("RP_id_confirmPassword");
+            var sPassword = ((oPwd ? oPwd.getValue() : "") || (oModel.getProperty("/password") || "")).trim();
+            var sConfirm = ((oConfirm ? oConfirm.getValue() : "") || (oModel.getProperty("/confirmPassword") || "")).trim();
+
+            if (!sPassword) {
+                if (oPwd) {
+                    // Keep the error state (red border); the strength text below
+                    // already explains the requirement, so no valueStateText.
+                    oPwd.setValueStateText("");
+                    oPwd.setValueState("Error");
+                }
+                MessageToast.show(this.i18nModel.getText("passwordRequired"));
+                return;
+            }
+
+            if (!utils._LCvalidatePassword(oPwd, this.byId("RP_id_pwdStrength"))) {
+                MessageToast.show(this.i18nModel.getText("mustContainUppercaseLowercaseNumberSpecialCharacter"));
+                return;
+            }
+
+            if (sPassword !== sConfirm) {
+                this._validateRPConfirmMatch();
+                MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
+                return;
+            }
+
+            this.getBusyDialog();
+            try {
+                await this.ajaxUpdateWithJQuery("HM_Login", {
+                    data: {
+                        Password: btoa(sPassword)
+                    },
+                    filters: {
+                        UserID: oSelected.UserID
+                    }
+                });
+
+                MessageToast.show(this.i18nModel.getText("resetPasswordSuccess"));
+                oModel.setProperty("/password", "");
+                oModel.setProperty("/confirmPassword", "");
+                this._resetRPPasswordState();
+            } catch (err) {
+                MessageToast.show(err.message || err.responseText || this.i18nModel.getText("failed"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        onRPCancel: function () {
+            if (this._oResetPasswordDialog) {
+                this._oResetPasswordDialog.close();
+            }
+        },
+
+        onRPAfterClose: function () {
+            var oModel = this.getView().getModel("RPModel");
+
+            this._clearRPSelection();
+
+            // Reset the model so every bound field starts empty next time.
+            if (oModel) {
+                oModel.setProperty("/selectedEmail", "");
+                oModel.setProperty("/newStatus", "");
+                oModel.setProperty("/password", "");
+                oModel.setProperty("/confirmPassword", "");
+            }
+
+            // Also clear the controls' values and error states explicitly
+            // (a bound selectedKey can keep the displayed text).
+            var oEmail = this.byId("RP_id_email");
+            if (oEmail) {
+                oEmail.setSelectedKey("");
+                oEmail.setValue("");
+                oEmail.setValueState("None");
+            }
+
+            var oStatus = this.byId("RP_id_newStatus");
+            if (oStatus) {
+                oStatus.setSelectedKey("");
+                oStatus.setValue("");
+                oStatus.setValueState("None");
+            }
+
+            var oPwd = this.byId("RP_id_password");
+            if (oPwd) {
+                oPwd.setValue("");
+                oPwd.setValueState("None");
+                oPwd.setType("Password");
+                oPwd.setValueHelpIconSrc("sap-icon://show");
+            }
+
+            var oConfirm = this.byId("RP_id_confirmPassword");
+            if (oConfirm) {
+                oConfirm.setValue("");
+                oConfirm.setValueState("None");
+                oConfirm.setType("Password");
+                oConfirm.setValueHelpIconSrc("sap-icon://show");
+            }
+        },
+
         onAdminUsermanualPress: function () {
         this.getOwnerComponent()
         .getRouter()

@@ -410,7 +410,7 @@
         <Button
                 id="AdminusermanualLink"
                 text="User Manual"
-                class="myUnifiedBtn sapUiTinyMarginEnd"
+                class="myUnifiedBtn"
                 press="onAdminUsermanualPress" />
 
         <Button
@@ -418,8 +418,17 @@
                 text="{i18n>raisebug}"
                 tooltip="{i18n>proceedToPay}"
             visible="true"
-            class="myUnifiedBtn sapUiSmallMarginEnd"
+            class="myUnifiedBtn "
             press="onPressbugs"
+        />
+
+        <Button
+                id="idResetPasswordFooterBtn"
+                text="{i18n>resetPasswords}"
+                tooltip="{i18n>resetPasswordsTitle}"
+                visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"
+                class="myUnifiedBtn sapUiSmallMarginEnd"
+                press="onResetPasswordPress"
         />
 
          <!-- visible="{OBTNModel>/Submit}" -->

@@ -7234,7 +7234,10 @@ html, body {
     }
 }
 
-.sapMPopover.sapMPopoverWithoutFooter .sapMPopoverCont, .sapMPopover .sapMIBar.sapMFooter-CTX{
+/* Keep the fixed 250px width for footer-less popovers, but not for ComboBox
+   dropdown pickers: those must keep UI5's natural width (the field width). */
+.sapMPopover.sapMPopoverWithoutFooter:not(.sapMComboBoxBasePicker) .sapMPopoverCont,
+.sapMPopover:not(.sapMComboBoxBasePicker) .sapMIBar.sapMFooter-CTX{
   width:250px !important;
 }
 .sapMPopover .sapMIBar.sapMFooter-CTX.tourGuideFooter{
@@ -8207,5 +8210,190 @@ text-transform: none !important;
 
   .deactivateWarningIcon {
     font-size: 2.5rem;
+  }
+}
+
+/* ==========================================================================
+   Reset Passwords
+   ========================================================================== */
+
+.resetPasswordDialog {
+  max-height: 92vh !important;
+}
+
+.resetPasswordDialog .resetPasswordContent {
+  width: 100%;
+  padding: 0.75rem 1rem 0.5rem;
+  box-sizing: border-box;
+}
+
+.resetPasswordDialog .resetPasswordStrip {
+  margin: 0.75rem 0;
+}
+
+.resetPasswordDialog .resetPasswordFilterPanel,
+.resetPasswordDialog .resetPasswordSectionPanel {
+  margin-top: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.resetPasswordDialog .resetPasswordFilterPanel .sapMPanelHdr,
+.resetPasswordDialog .resetPasswordSectionPanel .sapMPanelHdr {
+  background: #f5f6f7;
+  font-weight: 600;
+}
+
+.resetPasswordDialog .resetPasswordFilterForm .sapUiFormResGridCont {
+  padding-bottom: 0.25rem;
+}
+
+.resetPasswordDialog .resetPasswordDetailsForm .sapMLabel {
+  color: #6a6d70;
+}
+
+.resetPasswordDialog .resetPasswordDetailsForm .sapMText {
+  font-weight: 600;
+  color: #32363a;
+}
+
+.resetPasswordDialog .resetPasswordHintStrip {
+  margin-top: 0.75rem;
+}
+
+.resetPasswordDialog .resetPasswordSectionBody {
+  padding: 0.25rem 0.25rem 0.5rem;
+  box-sizing: border-box;
+}
+
+.resetPasswordDialog .resetPasswordStatusStrip {
+  margin-bottom: 0.75rem;
+}
+
+.resetPasswordDialog .resetPasswordActionRow {
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.resetPasswordDialog .resetPasswordActionRow > .sapMFlexItem:last-child {
+  flex: 0 0 auto !important;
+}
+
+/* Two columns: filters + details (60%) on the left, actions (40%) on the right. */
+.resetPasswordDialog .resetPasswordColumns {
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.resetPasswordDialog .resetPasswordColumns > .sapMFlexItem:first-child {
+  flex: 3 1 0 !important;
+  min-width: 16rem;
+}
+
+.resetPasswordDialog .resetPasswordColumns > .sapMFlexItem:last-child {
+  flex: 2 1 0 !important;
+  min-width: 13rem;
+}
+
+.resetPasswordDialog .resetPasswordColumn {
+  width: 100%;
+}
+
+/* Compact inline details: label and value on the same row. */
+.resetPasswordDialog .resetPasswordDetailsList {
+  padding: 0.25rem 0.25rem 0.5rem;
+  box-sizing: border-box;
+}
+
+.resetPasswordDialog .resetPasswordDetailRow {
+  width: 100%;
+  margin-bottom: 0.25rem;
+  box-sizing: border-box;
+}
+
+.resetPasswordDialog .resetPasswordDetailLabel {
+  flex: 0 0 auto;
+  line-height: 1.3rem;
+}
+
+.resetPasswordDialog .resetPasswordDetailValue {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 0.5rem;
+  font-weight: 600;
+  color: #32363a;
+  line-height: 1.3rem;
+}
+
+.resetPasswordDialog .resetPasswordDetailRow .sapMObjStatus {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  line-height: 1.3rem;
+}
+
+.resetPasswordDialog .resetPasswordDetailRow .sapMObjStatus .sapMObjStatusText {
+  padding-left: 0 !important;
+}
+
+.resetPasswordDialog .resetPasswordDetailLabel .sapMLabel,
+.resetPasswordDialog .resetPasswordDetailLabel.sapMLabel {
+  color: #6a6d70;
+  font-weight: 400;
+}
+
+.resetPasswordDialog .resetPasswordStrength {
+  display: block;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.resetPasswordDialog .resetPasswordRule {
+  display: block;
+  font-size: 0.8125rem;
+  color: #6a6d70;
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+}
+
+@media (max-width: 720px) {
+  .resetPasswordDialog {
+    width: calc(100vw - 1rem) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 1rem) !important;
+    /* Fill the available height so the stacked content scrolls and the
+       footer (Close) stays visible instead of dropping below the fold. */
+    height: calc(100vh - 1.5rem) !important;
+    max-height: calc(100vh - 1.5rem) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* UI5 sets content-box + a bottom padding on dialogs; border-box keeps the
+       total height (and the footer) inside the viewport. */
+    box-sizing: border-box !important;
+  }
+
+  .resetPasswordDialog .resetPasswordColumns > .sapMFlexItem:first-child,
+  .resetPasswordDialog .resetPasswordColumns > .sapMFlexItem:last-child {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* UI5 forces .sapMDialogScroll to height:100% on phones, which pushes the
+     footer below the dialog box. Let it flex instead so the footer stays put. */
+  .resetPasswordDialog .sapMDialogScroll {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+  }
+
+  .resetPasswordDialog .sapMDialogScrollCont {
+    height: auto !important;
+  }
+
+  .resetPasswordDialog .sapMDialogFooter {
+    flex: 0 0 auto !important;
   }
 }

@@ -291,6 +291,23 @@ sap.ui.define([
             }
         },
 
+        // Account status label/state for the Reset Passwords dialog: a user
+        // without an explicit status is treated as an active account.
+        formatAccountStatus: function (sStatus) {
+            return sStatus || "Active";
+        },
+
+        formatAccountStatusState: function (sStatus) {
+            switch (sStatus || "Active") {
+                case "Active":
+                    return "Success";
+                case "Inactive":
+                    return "Error";
+                default:
+                    return "Indication01";
+            }
+        },
+
         formatDiscount: function (sDiscountType, vDiscountValue, sCurrency) {
             if (!sDiscountType) {
                 return "";
