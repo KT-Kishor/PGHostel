@@ -407,7 +407,7 @@
                                 />
                             </Column>
 
-                            <Column demandPopin="true">
+                            <Column demandPopin="true" >
                                 <Text
                                     text="{i18n>MVDdocumenttype}"
                                     tooltip="{i18n>MVDdocumenttype}"
@@ -439,15 +439,12 @@
                                     <Text text="{CustomerData>Gender}" />
                                     <Text text="{CustomerData>Relation}" />
 
-                                    <HBox
-                                        justifyContent="Center"
-                                        width="40%"
-                                    >
+                                   
                                         <Text
                                             text="{CustomerData>DocumentType}"
                                             emptyIndicatorMode="On"
                                         />
-                                    </HBox>
+                                    
 
                                     <Link
                                         text="{= ${CustomerData>FileName} ? ${CustomerData>FileName} : 'No Document' }"
