@@ -4065,78 +4065,80 @@ sap.ui.define([
                 documents.find(doc => doc.IsPrimary === true) || documents[0];
 
             // Find facilities whose member is no longer valid
-            const toUpdate = [];
+          const toDelete = facilityItems.filter(f =>
+    f.MemberID &&
+    !validMemberIds.has(f.MemberID)
+);
 
-            facilityItems.forEach(f => {
-                if (
-                    f.MemberID &&
-                    !validMemberIds.has(f.MemberID)
-                ) {
-                    toUpdate.push(f);
-                }
-            });
+if (toDelete.length === 0) {
+    this.onSaveBooking1();
+    return;
+}
 
-            if (toUpdate.length === 0) {
-                this.onSaveBooking1();
+sap.m.MessageBox.confirm(
+    "Some facilities are assigned to different members. Do you want to delete those facilities?",
+    {
+        actions: [
+            sap.m.MessageBox.Action.YES,
+            sap.m.MessageBox.Action.NO
+        ],
+        emphasizedAction: sap.m.MessageBox.Action.YES,
+        styleClass: "myUnifiedBtn",
+
+        onClose: async function (oAction) {
+
+            if (oAction !== sap.m.MessageBox.Action.YES) {
                 return;
             }
 
-            const propertyType = CustomerData.PropertyType;
+            try {
 
-            let sMessage;
+                // Get all FacilityIDs
+                const aFacilityIDs = toDelete.map(
+                    f => f.FacilityID
+                );
 
-            if (propertyType === "Hostel" || propertyType === "PG") {
-                sMessage =
-                    "Some facilities are assigned to different members. Do you want to assign them to the selected member?";
-            } else {
-                sMessage =
-                    "Some facilities are assigned to different members. Do you want to assign them to the primary member?";
+                // Delete all facilities in one call
+                
+                this.ajaxDeleteWithJQuery(
+                    "HM_BookingFacilityItems",
+                    {
+                        filters: {
+                            FacilityID: aFacilityIDs
+                        }
+                    }
+                );
+
+                // Remove deleted facilities from UI
+                const updatedFacilities = facilityItems.filter(f =>
+                    !(
+                        f.MemberID &&
+                        !validMemberIds.has(f.MemberID)
+                    )
+                );
+
+                oModel.setProperty(
+                    "/AllSelectedFacilities",
+                    updatedFacilities
+                );
+
+                this.onSaveBooking1();
+
+            } catch (error) {
+
+                console.error(
+                    "Error deleting facilities:",
+                    error
+                );
+
+                sap.m.MessageBox.error(
+                    "Failed to delete facility items."
+                );
             }
 
-            sap.m.MessageBox.confirm(
-                sMessage,
-                {
-                    actions: [
-                        sap.m.MessageBox.Action.YES,
-                        sap.m.MessageBox.Action.NO
-                    ],
-                    emphasizedAction: sap.m.MessageBox.Action.YES,
-                    styleClass: "myUnifiedBtn",
-
-                    onClose: async function (oAction) {
-
-                        if (oAction !== sap.m.MessageBox.Action.YES) {
-                            return;
-                        }
-
-                        // 1. Update UI
-                        const updatedFacilities = facilityItems.map(f => {
-
-                            const isInvalid = toUpdate.some(
-                                u => u.FacilityID === f.FacilityID
-                            );
-
-                            if (isInvalid) {
-                                return {
-                                    ...f,
-                                    MemberID: primaryMember.MemberID,
-                                    MemberName: primaryMember.MemberName
-                                };
-                            }
-
-                            return f;
-                        });
-
-                        oModel.setProperty(
-                            "/AllSelectedFacilities",
-                            updatedFacilities
-                        );
-
-                        this.onSaveBooking1();
-
-                    }.bind(this)
-                }
-            );
+        }.bind(this)
+    }
+);
         },
 
         onSaveBooking1: async function () {
