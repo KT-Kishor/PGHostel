@@ -18,6 +18,16 @@
                 afterVariantLoad="IA_.onAfterVariantLoad" showFilterConfiguration="false"
                 filterContainerWidth="auto" class="filterBarTheme">
 				<fb:filterGroupItems>
+					<fb:FilterGroupItem name="BranchCode" label="{i18n>MSbranchCode}" groupName="Group"
+                        visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox id="FN_id_BranchCode" items="{BranchModel>/}"
+                            showClearIcon="true"  showSecondaryValues="true"  busyIndicatorDelay="0">
+								<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
+                                    additionalText="{BranchModel>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
 					<fb:FilterGroupItem name="FacilityName" label="{i18n>facilityname}" groupName="Group"
                         visibleInFilterBar="true">
 						<fb:control>
@@ -30,16 +40,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 				<fb:filterGroupItems>
-					<fb:FilterGroupItem name="BranchCode" label="{i18n>MSbranchCode}" groupName="Group"
-                        visibleInFilterBar="true">
-						<fb:control>
-							<ComboBox id="FN_id_BranchCode" items="{BranchModel>/}"
-                            showClearIcon="true"  showSecondaryValues="true"  busyIndicatorDelay="0">
-								<core:ListItem key="{BranchModel>BranchID}" text="{BranchModel>BranchID} - {BranchModel>Name}"
-                                    additionalText="{BranchModel>City}"/>
-							</ComboBox>
-						</fb:control>
-					</fb:FilterGroupItem>
+				
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="id_facilityTable" sticky="ColumnHeaders,HeaderToolbar" mode="MultiSelect"

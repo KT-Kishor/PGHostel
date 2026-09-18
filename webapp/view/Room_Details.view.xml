@@ -26,6 +26,28 @@
                 filterContainerWidth="auto"
                 class="filterBarTheme">
 				<fb:filterGroupItems>
+                <fb:FilterGroupItem
+                        name="Branch"
+                        label="{i18n>branch}"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <ComboBox
+                                id="PO_id_RBranch"
+                                 items="{BranchModel>/}"
+                                showClearIcon="true"
+                                showSecondaryValues="true"
+                            >
+                               
+                                  <core:ListItem
+                        key="{BranchModel>BranchID}"
+                        text="{BranchModel>BranchID} - {BranchModel>Name}"
+                        additionalText="{BranchModel>City}"
+                    />
+                            </ComboBox>
+                        </fb:control>
+                    </fb:FilterGroupItem>
 					<fb:FilterGroupItem
                         name="Room Number"
                         label="{i18n>roomNumber}"
@@ -58,28 +80,7 @@
 					</fb:FilterGroupItem>
 
 					
-                      <fb:FilterGroupItem
-                        name="Branch"
-                        label="{i18n>branch}"
-                        groupName="Group"
-                        visibleInFilterBar="true"
-                    >
-                        <fb:control>
-                            <ComboBox
-                                id="PO_id_RBranch"
-                                 items="{BranchModel>/}"
-                                showClearIcon="true"
-                                showSecondaryValues="true"
-                            >
-                               
-                                  <core:ListItem
-                        key="{BranchModel>BranchID}"
-                        text="{BranchModel>BranchID} - {BranchModel>Name}"
-                        additionalText="{BranchModel>City}"
-                    />
-                            </ComboBox>
-                        </fb:control>
-                    </fb:FilterGroupItem>
+                      
 				</fb:filterGroupItems>
 				
 			</fb:FilterBar>

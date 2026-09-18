@@ -237,7 +237,7 @@
                     id="id4roomTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiTinyMargin glassTile"
-                    header="{i18n>invoiceDetails}"
+                    header="Generate Invoice"
                     press="TileV_onpressManageInvoice"
                 >
                 
@@ -249,7 +249,7 @@
                     id="idinvoiceTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiTinyMargin glassTile"
-                    header="Generate Invoice"
+                    header="Additional Invoice"
                     press="TileV_onpressInvoice"
                 >
 						<TileContent unit="{i18n>ManagecustomizedInvoice}">
