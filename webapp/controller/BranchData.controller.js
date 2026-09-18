@@ -150,7 +150,7 @@ sap.ui.define([
                     filters.Role = "Admin";
 
                 } else if (oExistingModel.Role === "SuperAdmin") {
-
+                    filters.Role = "SuperAdmin";
                     filters.BranchID = "";
 
                 } else {
