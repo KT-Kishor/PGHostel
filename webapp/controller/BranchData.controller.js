@@ -66,6 +66,10 @@ sap.ui.define([
             this._mBranchImageCache = {};
         },
 
+        getGroupHeader: function(oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
+
         _onRouteMatched: async function() {
             try {
                 this.getBusyDialog()
@@ -1166,6 +1170,81 @@ _setDefaultCountryIndiaBranch: function() {
                                 this.closeBusyDialog()
                                 oTable.removeSelections(true);
                             }
+                        }
+                    }
+                }
+            );
+        },
+
+        // Bulk status change: sets Status "Active" on every branch currently
+        // displayed in the table (i.e. respecting the active search filters).
+        // Branches already Active are skipped, so only the ones that need a
+        // change are sent to HM_Branch as a PUT.
+        MD_ActivateAllRows: function() {
+            var oTable = this.byId("id_MD_Table");
+            var oBinding = oTable.getBinding("items");
+
+            if (!oBinding) {
+                return;
+            }
+
+            var aDisplayedBranches = oBinding.getContexts(0, oBinding.getLength())
+                .map(function(oContext) {
+                    return oContext && oContext.getObject();
+                })
+                .filter(function(oRow) {
+                    return oRow && oRow.BranchID;
+                });
+
+            if (!aDisplayedBranches.length) {
+                sap.m.MessageToast.show(this.i18nModel.getText("MSnodata"));
+                return;
+            }
+
+            var aToActivate = aDisplayedBranches.filter(function(oRow) {
+                return String(oRow.Status || "").trim().toLowerCase() !== "active";
+            });
+
+            if (!aToActivate.length) {
+                sap.m.MessageToast.show(this.i18nModel.getText("activateAllNone"));
+                return;
+            }
+
+            sap.m.MessageBox.confirm(
+                this.i18nModel.getText("activateAllConfirm", [aToActivate.length]), {
+                    icon: sap.m.MessageBox.Icon.WARNING,
+                    title: this.i18nModel.getText("confirmation"),
+                    actions: [
+                        sap.m.MessageBox.Action.YES,
+                        sap.m.MessageBox.Action.NO
+                    ],
+                    emphasizedAction: sap.m.MessageBox.Action.NO,
+                    styleClass: "myUnifiedBtn",
+
+                    onClose: async (sAction) => {
+                        if (sAction !== sap.m.MessageBox.Action.YES) {
+                            return;
+                        }
+
+                        this.getBusyDialog();
+                        try {
+                            for (const oBranch of aToActivate) {
+                                await this.ajaxUpdateWithJQuery("HM_Branch", {
+                                    data: {
+                                        Status: "Active"
+                                    },
+                                    filters: {
+                                        BranchID: oBranch.BranchID
+                                    }
+                                });
+                            }
+                            await this.Onsearch(true);
+                            sap.m.MessageToast.show(this.i18nModel.getText("activateAllSuccess"));
+                        } catch (err) {
+                            console.error("Activate all failed:", err);
+                            sap.m.MessageBox.error(this.i18nModel.getText("activateAllFailed"));
+                        } finally {
+                            this.closeBusyDialog();
                         }
                     }
                 }

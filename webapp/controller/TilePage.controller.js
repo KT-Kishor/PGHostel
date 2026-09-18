@@ -1152,7 +1152,7 @@ sap.ui.define([
                 } else {
                     filters.BranchID = sAssignedBranches;
                 }
-
+                filters.Status = "Active";
                 var oData = await this.ajaxReadWithJQuery("HM_Branch", filters);
                 var aBranchData = Array.isArray(oData.data) ? oData.data : [oData.data].filter(Boolean);
 
@@ -1777,7 +1777,7 @@ sap.ui.define([
             try {
                 this.getBusyDialog();
                 //here i have to work: Mateen
-                var oData = await this.ajaxReadWithJQuery("HM_LoginUser", {});
+                var oData = await this.ajaxReadWithJQuery("HM_LoginUser", {Status: "Active"});
                 var aRows = Array.isArray(oData.data) ? oData.data : [oData.data].filter(Boolean);
 
                 var oSeen = {};
