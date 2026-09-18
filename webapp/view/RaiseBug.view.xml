@@ -14,7 +14,7 @@
 		<content>
 			<fb:FilterBar
                 id="Rb_id_Filterbar"
-                visible="{= ${LoginModel>/Role} === 'SuperAdmin' || (${LoginModel>/Role} === 'Admin' &amp;&amp; ${LoginModel>/Type} === 'Vendor') }"
+                visible="true"
                 persistencyKey="myPersKey"
                 useToolbar="false"
                 clear="SP_onPressClear"

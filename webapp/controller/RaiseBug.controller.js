@@ -56,8 +56,72 @@ sap.ui.define([
                 return sText.indexOf(sSearchTerm) > -1 || sEmail.indexOf(sSearchTerm) > -1;
             });
             await this._loadVendorEmailFilter()
+            this._applyRaisedByLock()
             this.CD_read()
             this._loadAllFilterData()
+        },
+
+        // SuperAdmin and Admin+Vendor are the only users allowed to change the
+        // "Raised By" filter freely. Everyone else is locked to their own
+        // logged-in identity (email + name) so they only see their own bugs.
+        _isPrivilegedBugFilterUser: function () {
+            var oLoginModel = this.getView().getModel("LoginModel");
+            var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
+            var sType = oLoginModel ? oLoginModel.getProperty("/Type") : "";
+            return sRole === "SuperAdmin" || (sRole === "Admin" && sType === "Vendor");
+        },
+
+        _applyRaisedByLock: function () {
+            var oComboBox = this.byId("RB_id_RaisedBy1");
+            if (!oComboBox) return;
+
+            var bLocked = !this._isPrivilegedBugFilterUser();
+            this._bRaisedByLocked = bLocked;
+            oComboBox.setEditable(!bLocked);
+            oComboBox.setShowClearIcon(!bLocked);
+
+            if (bLocked) {
+                var oLoginModel = this.getView().getModel("LoginModel");
+                this._lockedRaisedByEmail = (oLoginModel && oLoginModel.getProperty("/EmailID")) || "";
+                this._lockedRaisedByName = (oLoginModel && (oLoginModel.getProperty("/UserName") || oLoginModel.getProperty("/EmployeeName"))) || "";
+                this._selectLockedRaisedBy(oComboBox);
+            } else {
+                this._lockedRaisedByEmail = "";
+                this._lockedRaisedByName = "";
+            }
+        },
+
+        // Pre-select the logged-in user in the Raised By combo. Prefer the item
+        // whose secondary email matches; fall back to the name, then to a plain
+        // value so the locked identity is always visible.
+        _selectLockedRaisedBy: function (oComboBox) {
+            var sEmail = (this._lockedRaisedByEmail || "").toLowerCase();
+            var sName = this._lockedRaisedByName || "";
+            var aItems = oComboBox.getItems();
+            var oMatch = null;
+
+            if (sEmail) {
+                oMatch = aItems.find(function (oItem) {
+                    var sAdditional = (oItem.getAdditionalText ? oItem.getAdditionalText() : "") || "";
+                    return sAdditional.toLowerCase() === sEmail;
+                });
+            }
+            if (!oMatch && sName) {
+                oMatch = aItems.find(function (oItem) {
+                    return (oItem.getText() || "").toLowerCase() === sName.toLowerCase();
+                });
+            }
+
+            if (oMatch) {
+                oComboBox.setSelectedKey(oMatch.getKey());
+            } else {
+                oComboBox.setSelectedKey("");
+                if (sEmail) {
+                    oComboBox.setValue(sEmail);
+                } else if (sName) {
+                    oComboBox.setValue(sName);
+                }
+            }
         },
 
         // Admin users of type Vendor are only allowed to see bugs raised by the
@@ -92,9 +156,15 @@ sap.ui.define([
         },
 
         SP_onPressClear: function () {
-            this.getView().byId("RB_id_RaisedBy1").setSelectedKey("")
             this.getView().byId("RB_id_Status").setSelectedKey("")
             this.getView().byId("RB_id_RaisebugID").setSelectedKey("")
+            var oRaisedBy = this.getView().byId("RB_id_RaisedBy1");
+            if (this._bRaisedByLocked) {
+                // Keep the locked identity selected for non-privileged users.
+                this._selectLockedRaisedBy(oRaisedBy);
+            } else {
+                oRaisedBy.setSelectedKey("")
+            }
         },
 
         CD_read: async function () {
@@ -243,7 +313,9 @@ sap.ui.define([
                         }
                     });
                 // ✅ Restore selection if still valid
-                if (sSelectedKey && uniqueValues[field].has(sSelectedKey)) {
+                if (field === "RB_id_RaisedBy1" && this._bRaisedByLocked) {
+                    this._selectLockedRaisedBy(oComboBox);
+                } else if (sSelectedKey && uniqueValues[field].has(sSelectedKey)) {
                     oComboBox.setSelectedKey(sSelectedKey);
                 } else {
                     oComboBox.setSelectedKey("");
