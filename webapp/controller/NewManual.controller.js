@@ -224,41 +224,6 @@ onVideoDialogClose: function () {
     oLink.click();
     document.body.removeChild(oLink);
 },
-    
-
-
-
-showDescriptionLinkVisible: function (sDescription) {
-
-    return !!sDescription && sDescription.length > 300;
-},
-onShowDescription: function (oEvent) {
-
-    var oLink = oEvent.getSource();
-    var oContext = oLink.getBindingContext("manual");
-
-    var sDescription = oContext.getProperty("description");
-
-    // Show complete description
-    MessageBox.information(sDescription, {
-        title: "Description"
-    });
-},
-onToggleDescription: function (oEvent) {
-
-    var oLink = oEvent.getSource();
-    var oContext = oLink.getBindingContext("manual");
-
-    var oModel = this.getView().getModel("manual");
-    var sPath = oContext.getPath();
-
-    var bExpanded = oModel.getProperty(sPath + "/expanded");
-
-    oModel.setProperty(
-        sPath + "/expanded",
-        !bExpanded
-    );
-},
 
 	});
 });

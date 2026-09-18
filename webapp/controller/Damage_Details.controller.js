@@ -126,19 +126,6 @@ sap.ui.define([
 
                     this.getView().setModel(new JSONModel(DamageModel), "DamageModel");
 
-                    if (Damage.Status === "Partially Recovered") {
-
-                        var dueAmount =
-                            parseFloat(DamageModel.TotalCost) -
-                            parseFloat(DamageModel.ReturnDamageAmount || 0);
-
-                        this.getView().getModel("DamageModel").setProperty("/DueAmount", dueAmount.toString());
-
-                        this.getView().getModel("DamageModel").setProperty(
-                            "/ReturnDamageAmount",
-                            DamageModel.ReturnDamageAmount.toString()
-                        );
-                    }
                 }
 
                 if (this.decodedPath === "Damage") {
@@ -774,7 +761,6 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                     .then((Data) => {
                         this.decodedPath = Data.InvoiceNo;
                         this.closeBusyDialog()
-                        this.OnSearch();
                         this.getView().getModel("VisibleModel").setProperty("/visible", false);
                         this.getView().byId("HD_id_BookingID1").setEditable(false);
                         sap.m.MessageBox.confirm(
@@ -909,20 +895,23 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                 doc.setFontSize(11);
                 doc.setFont("times", "bold");
 
-                const damageDetails = [
-                    {
-                        label: "Damage No :",
-                        value: oModel.DamageID || "N/A"
-                    },
-                    {
-                        label: "Date :",
-                        value: oModel.Date || "N/A"
-                    },
-                    {
-                        label: "Room No :",
-                        value: oModel.RoomNo || "N/A"
-                    }
-                ];
+               const damageDetails = [
+    ...(oModel.DamageID
+        ? [{
+            label: "Damage No :",
+            value: oModel.DamageID
+        }]
+        : []),
+
+    {
+        label: "Date :",
+        value: oModel.Date || "N/A"
+    },
+    {
+        label: "Room No :",
+        value: oModel.RoomNo || "N/A"
+    }
+];
 
                 // Print right-aligned structured block
                 currentY = detailsStartY;
@@ -1007,6 +996,9 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                             halign: "center"
                         },
                         5: {
+                            halign: "right"
+                        },
+                        6: {
                             halign: "right"
                         }
                     }

@@ -72,8 +72,8 @@
                                         >
                                             <core:ListItem
                                                 key="{CustomerModel>BookingID}"
-                                                text="{CustomerModel>BookingID}"
-                                                additionalText="{CustomerModel>CustomerName}"
+                                                text="{CustomerModel>CustomerName}"
+                                                additionalText="{CustomerModel>BookingID}"
                                             />
                                         </m:ComboBox>
                                         <!-- Customer Name -->
@@ -185,7 +185,6 @@
                                         </m:headerToolbar>
                                         <m:columns>
                                             <m:Column
-                                                width="4rem"
                                                 minScreenWidth="Tablet"
                                             >
                                                 <m:Text
@@ -200,8 +199,6 @@
                                                 />
                                             </m:Column>
                                             <m:Column
-                                                width="15rem"
-
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
                                             >
@@ -219,16 +216,7 @@
                                                     tooltip="Quantity"
                                                 />
                                             </m:Column>
-                                            <m:Column
-                                            
-                                                minScreenWidth="Tablet"
-                                                demandPopin="true"
-                                            >
-                                                <m:Text
-                                                    text="Description"
-                                                    tooltip="Description"
-                                                />
-                                            </m:Column>
+                                           
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -245,6 +233,16 @@
                                                 <m:Text
                                                     text="{i18n>recovercost}"
                                                     tooltip="{i18n>recovercost}"
+                                                />
+                                            </m:Column>
+                                             <m:Column
+                                            
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="Description"
+                                                    tooltip="Description"
                                                 />
                                             </m:Column>
                                         </m:columns>
@@ -281,16 +279,7 @@
                                                      liveChange="onQuantityInputLiveChange"
                                                      maxLength="2"/>
                                                 </m:cells>
-                                                <m:cells>
-                                                    <m:TextArea
-                                                        width="15rem"
-
-                                                        value="{DamageModel>Description}"
-                                                        rows="2"
-                                                        maxLength="120"
-                                                        editable="{VisibleModel>/visible}"
-                                                    />
-                                                </m:cells>
+                                               
                                                 <m:cells>
                                                     <m:Input
                                                         value="{DamageModel>Cost}"
@@ -304,6 +293,14 @@
                                                         value="{DamageModel>RecoverCost}"
                                                         liveChange="onRecoverCostLiveChange"
                                                          maxLength="7"
+                                                        editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
+                                                 <m:cells>
+                                                    <m:TextArea
+                                                        value="{DamageModel>Description}"
+                                                        rows="2"
+                                                        maxLength="120"
                                                         editable="{VisibleModel>/visible}"
                                                     />
                                                 </m:cells>
