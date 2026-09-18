@@ -5941,11 +5941,23 @@
                 }
 
                 var sOriginalCouponCode = String(oModel.getProperty("/OriginalCouponCode") || "").trim();
-                var bIsOriginalCoupon = sOriginalCouponCode && sEnteredCode.toUpperCase() === sOriginalCouponCode.toUpperCase();
+                var bHasOriginalCoupon = !!sOriginalCouponCode;
+                var bIsOriginalCoupon = bHasOriginalCoupon && sEnteredCode.toUpperCase() === sOriginalCouponCode.toUpperCase();
+                var bCouponUsageExhausted = Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0);
 
-                if (!bIsOriginalCoupon && Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
+                if (!bIsOriginalCoupon && bCouponUsageExhausted) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("This coupon cannot be applied to this booking");
+
+                    var sCouponErrorMessage;
+                    if (bHasOriginalCoupon) {
+                        // 1. The entered code is not the coupon this booking was created with.
+                        sCouponErrorMessage = "This coupon is not the coupon linked to this booking, so it cannot be applied.";
+                    } else {
+                        // 2. The coupon's usage count from HM_CouponBookingCount has reached its MaxUses.
+                        sCouponErrorMessage = "This coupon has reached its maximum usage limit and can no longer be used.";
+                    }
+
+                    MessageToast.show(sCouponErrorMessage || "This coupon cannot be applied to this booking");
                     return;
                 }
 

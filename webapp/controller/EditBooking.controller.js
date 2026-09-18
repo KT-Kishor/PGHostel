@@ -3900,7 +3900,13 @@ sap.ui.define([
             }
         },
 
-        onEditBookingPress: function () {
+        onEditBookingPress: async function () {
+            // Re-verify the server-side booking status before entering edit mode,
+            // so a concurrently updated booking cannot be edited by mistake.
+            if (!await this._verifyBookingStatusUnchanged()) {
+                return;
+            }
+
             const oView = this.getView();
 
             var oBookingView = this.getView().getModel("BookingView");
