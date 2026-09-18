@@ -255,6 +255,10 @@ sap.ui.define([
             this._backupAllFacilities = null;
             this._aPrefetchedMemberList = null;
             this._oInitialBookingDetails = null;
+            // Reset the guard state used to detect concurrent booking updates.
+            this._bStaleBookingDetected = false;
+            this._sInitialBookingStatus = "";
+            this._sInitialAdminUpdated = "";
             this._ViewDatePickersReadOnly(["EditBookStartdate_ID", "EditBookEnddate_ID"], this.getView());
 
             // Initialize BookingView model with edit mode properties
@@ -287,6 +291,11 @@ sap.ui.define([
                 var sBranchCode = oBooking.BranchCode || "";
                 var sStatus = oBooking.Status || "";
                 var sAdminUpdated = oBooking.AdminUpdated || "";
+
+                // Snapshot the status the footer buttons were computed from, so a
+                // mutating action can detect a concurrent update later on.
+                this._sInitialBookingStatus = String(sStatus).trim();
+                this._sInitialAdminUpdated = String(sAdminUpdated).trim();
 
                 // Store original booking dates for condition 1/2 facility determination
                 this._sOriginalBookingStartDate = oBooking.StartDate || "";
@@ -1881,6 +1890,90 @@ sap.ui.define([
             });
         },
 
+        /**
+         * Reads the current server-side Status/AdminUpdated for this booking.
+         * Returns null when the booking id is not available.
+         */
+        _readLatestBookingGuardState: async function () {
+            var oHostelModel = this.getView().getModel("HostelModel");
+            var sBookingID = String(
+                (oHostelModel && oHostelModel.getProperty && oHostelModel.getProperty("/BookingID")) ||
+                this.BookingID ||
+                ""
+            ).trim();
+
+            if (!sBookingID) {
+                return null;
+            }
+
+            var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
+                BookingID: sBookingID
+            });
+            var oCustomer = this._getFirstResponseRecord(oResponse) || {};
+            var vBookings = oCustomer.Bookings || oCustomer.Booking;
+            var oBooking = (Array.isArray(vBookings) ? vBookings[0] : vBookings) || {};
+
+            return {
+                Status: String(oBooking.Status || "").trim(),
+                AdminUpdated: String(oBooking.AdminUpdated || "").trim()
+            };
+        },
+
+        /**
+         * Guard for update/cancel actions. Re-reads the booking and returns
+         * true only when Status/AdminUpdated still match what the page loaded.
+         * On a mismatch it alerts the user and navigates back to the source page.
+         */
+        _verifyBookingStatusUnchanged: async function () {
+            if (this._bStaleBookingDetected) {
+                return false;
+            }
+
+            try {
+                this.getBusyDialog();
+                var oLatestState = await this._readLatestBookingGuardState();
+                this.closeBusyDialog();
+
+                if (!oLatestState) {
+                    return true;
+                }
+
+                var bStatusChanged = String(this._sInitialBookingStatus || "") !== oLatestState.Status;
+                var bAdminUpdatedChanged = String(this._sInitialAdminUpdated || "") !== oLatestState.AdminUpdated;
+
+                if (!bStatusChanged && !bAdminUpdatedChanged) {
+                    return true;
+                }
+
+                this._bStaleBookingDetected = true;
+                this._showStaleBookingMessage();
+                return false;
+            } catch (oError) {
+                this.closeBusyDialog();
+                console.warn("Booking status verification failed:", oError);
+                // A failed verification read must not block the user's action.
+                return true;
+            }
+        },
+
+        _showStaleBookingMessage: function () {
+            MessageBox.warning(
+                "Booking status was updated while you were on this page. Syncing the latest details, please wait...",
+                {
+                    title: "Booking Already Updated",
+                    styleClass: "myUnifiedBtn",
+                    contentWidth: "470px",
+                    actions: [MessageBox.Action.OK],
+                    emphasizedAction: MessageBox.Action.OK,
+                    onClose: function () {
+                        // Reload the current edit page so it re-reads the booking
+                        // and reflects the latest status instead of navigating away.
+                        window.location.reload();
+                    }
+                }
+            );
+        },
+
         _syncEditRefundInfo: function (fPaymentPaidAmount, fGrandTotal, fExplicitRefundAmount) {
             var oHostelModel = this.getView().getModel("HostelModel");
             var bHasExistingPayments = !!oHostelModel.getProperty("/HasExistingPayments");
@@ -2482,6 +2575,12 @@ sap.ui.define([
                 return;
             }
 
+            // Re-verify the server-side booking status before touching the booking,
+            // so a concurrent admin update cannot be overwritten accidentally.
+            if (!await this._verifyBookingStatusUnchanged()) {
+                return;
+            }
+
             // Existing dates are exempt. A changed date range must pass the
             // same room availability check before any update/payment flow.
             if (!await this._ensureEditDateAvailability()) {
@@ -2737,6 +2836,12 @@ sap.ui.define([
 
         _onPaymentSubmit: async function () {
             try {
+                // The payment dialog can stay open for a while, so re-verify the
+                // booking status again before the deferred update is written.
+                if (!await this._verifyBookingStatusUnchanged()) {
+                    return;
+                }
+
                 var oPaymentModel = this._oPaymentDialog.getModel("PaymentModel");
                 var oPaymentData = oPaymentModel.getData();
 
@@ -3935,6 +4040,12 @@ sap.ui.define([
                 styleClass: "myUnifiedBtn",
                 onClose: async function (oAction) {
                     if (oAction !== sap.m.MessageBox.Action.YES) {
+                        return;
+                    }
+
+                    // Re-verify the server-side booking status before cancelling,
+                    // so a concurrently updated booking is not cancelled by mistake.
+                    if (!await that._verifyBookingStatusUnchanged()) {
                         return;
                     }
 
