@@ -47,6 +47,12 @@
                         press="onDeactivateAccountPress"
                     />
                     <Button
+                        text="{i18n>requestSupport}"
+                        class="myUnifiedBtn"
+                        tooltip="{i18n>requestSupport}"
+                        press="onSupportRequest"
+                    />
+                    <Button
                         icon="sap-icon://log"
                         class="myUnifiedBtn"
                         tooltip="{i18n>logout}"
@@ -392,6 +398,10 @@
                     <IconTabFilter
                         key="Damage"
                         text="{= ${profileData>/damageCount} > 0 ? 'Damage (' + ${profileData>/damageCount} + ')' : 'Damage' }"
+                    />
+                    <IconTabFilter
+                        key="Raised Support"
+                        text="{= ${profileData>/supportCount} > 0 ? 'Raised Support (' + ${profileData>/supportCount} + ')' : 'Raised Support' }"
                     />
                 </items>
             </IconTabHeader>
@@ -832,6 +842,113 @@
                          <Text text="{parts: ['profileData>Cost','profileData>Currency'], formatter: '.Formatter.formatCurrency'}"/>
                         <Text text="{parts: ['profileData>RecoverCost','profileData>Currency'], formatter: '.Formatter.formatCurrency'}"/>
                        
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <!-- ================= RAISED SUPPORT TABLE ================= -->
+
+        <Table
+            id="Id_SupportTable"
+            visible="{= ${profileData>/selectedTab} === 'Raised Support' }"
+            updateFinished="onTableUpdateFinished"
+            busyIndicatorDelay="0"
+            noDataText="No raised support history found"
+            width="auto"
+            items="{
+                path: 'profileData>/supportTickets',
+                sorter: [
+                    { path: 'Status', descending: false, group: true },
+                    { path: 'CreatedDate', descending: true }
+                ],
+                groupHeaderFactory: '.getGroupHeader'
+            }"
+            class="sapUiSmallMargin customRoundedTable"
+        >
+            <columns>
+                <Column demandPopin="true">
+                    <Text text="{i18n>TicketID}" />
+                </Column>
+                <Column demandPopin="true">
+                    <Text text="Issue" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>IssueType}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>IssueDescription}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    hAlign="Center"
+                    width="6rem"
+                >
+                    <Text text="{i18n>image}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Tablet"
+                >
+                    <Text text="{i18n>Createddate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>Resolvedate}" />
+                </Column>
+                <Column
+                    demandPopin="true"
+                    minScreenWidth="Desktop"
+                >
+                    <Text text="{i18n>ResolvedDescription}" />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    width="3rem"
+                >
+                    <Text text="" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem type="Inactive">
+                    <cells>
+                        <Text text="{profileData>TicketID}" />
+                        <Text text="{profileData>IssueName}" />
+                        <Text text="{profileData>IssueType}" />
+                        <ExpandableText
+                            text="{profileData>IssueDescription}"
+                            maxCharacters="20"
+                        />
+                        <Link
+                            text="{i18n>view}"
+                            tooltip="View Support Images"
+                            press="onPressSupportImageView"
+                        />
+                        <Text
+                            text="{path: 'profileData>CreatedDate', formatter: '.Formatter.formatDate'}"
+                        />
+                        <Text
+                            text="{path: 'profileData>ResolvedDate', formatter: '.Formatter.formatResolvedDate'}"
+                        />
+                        <ExpandableText
+                            text="{profileData>ResolvedDescription}"
+                            maxCharacters="20"
+                        />
+                        <Button
+                            icon="sap-icon://edit"
+                            type="Transparent"
+                            press="onPressSupportRow"
+                            tooltip="Edit Support Request"
+                            visible="{path: 'profileData>Status', formatter: '.Formatter.canEditSupport'}"
+                        />
                     </cells>
                 </ColumnListItem>
             </items>

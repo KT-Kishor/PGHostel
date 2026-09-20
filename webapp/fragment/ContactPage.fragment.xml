@@ -56,6 +56,7 @@
                 icon="sap-icon://headset"
                 text="Request Support"
                 class="contact-support-btn contact-support-btn-style"
+                visible="false"
             />
         </VBox>
         <!-- Right: Google Map -->

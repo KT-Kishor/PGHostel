@@ -1,0 +1,159 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="MPSR_id_SupportDialog"
+        type="Message"
+        class="sapUiContentPadding"
+        contentWidth="28rem"
+        resizable="true"
+        draggable="true"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{MP_SupportModel>/dialogTitle}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+        >
+            <f:content>
+                <!-- Issue Name -->
+                <Label
+                    text="{i18n>issuename}"
+                    required="true"
+                />
+                <Input
+                    id="MPSR_id_IssueName"
+                    placeholder="{i18n>enterissuename}"
+                    valueStateText="Enter issue name"
+                    value="{MP_SupportModel>/IssueName}"
+                    liveChange="onMPSupportIssueNameChange"
+                    maxLength="100"
+                />
+
+                <!-- Issue Type -->
+                <Label
+                    text="{i18n>issuecategory}"
+                    required="true"
+                />
+                <ComboBox
+                    id="MPSR_id_IssueType"
+                    valueStateText="{i18n>enterissuetype}"
+                    placeholder="Select issue type"
+                    value="{MP_SupportModel>/IssueType}"
+                    change="onMPSupportIssueTypeChange"
+                    items="{SupportRequest>/}"
+                >
+                    <core:Item
+                        key="{SupportRequest>ID}"
+                        text="{SupportRequest>IssueType}"
+                    />
+                </ComboBox>
+
+                <!-- Issue Description -->
+                <Label
+                    text="{i18n>issuedetails}"
+                    required="true"
+                />
+                <TextArea
+                    id="MPSR_id_IssueDescription"
+                    rows="4"
+                    liveChange="onMPSupportDescriptionChange"
+                    valueStateText="{i18n>enterdetails}"
+                    placeholder="Enter issue description"
+                    value="{MP_SupportModel>/IssueDescription}"
+                    maxLength="500"
+                />
+
+                <!-- Single image section: stored photos of the ticket and new
+                     uploads appear together in one list -->
+                <Label text="{i18n>attachedImages}" />
+
+                <VBox
+                    alignItems="Start"
+                    width="100%"
+                    renderType="Bare"
+                >
+                    <List
+                        id="MPSR_id_ImageList"
+                        width="100%"
+                        mode="None"
+                        items="{MP_SupportImages>/}"
+                    >
+                        <CustomListItem>
+                            <HBox
+                                width="100%"
+                                justifyContent="SpaceBetween"
+                                alignItems="Center"
+                            >
+                                <Link
+                                    text="{MP_SupportImages>name}"
+                                    tooltip="{i18n>clickToPreview}"
+                                    press="onMPSupportImagePress"
+                                    visible="{= ${MP_SupportImages>source} !== 'processing' }"
+                                />
+                                <Text
+                                    text="{MP_SupportImages>name}"
+                                    class="sapUiTinyMarginTop"
+                                    visible="{= ${MP_SupportImages>source} === 'processing' }"
+                                />
+                                <Button
+                                    icon="sap-icon://decline"
+                                    type="Transparent"
+                                    tooltip="Remove"
+                                    press="onMPSupportImageRemove"
+                                    visible="{= ${MP_SupportImages>source} !== 'processing' }"
+                                />
+                            </HBox>
+                        </CustomListItem>
+                    </List>
+
+                    <HBox width="100%">
+                        <u:FileUploader
+                            id="MPSR_id_FileUploader"
+                            fileType="jpg,jpeg,png"
+                            change="onMPSupportFileChange"
+                            buttonOnly="true"
+                            iconFirst="true"
+                            buttonText="Upload Images"
+                            multiple="true"
+                            uploadOnChange="false"
+                        />
+                    </HBox>
+                </VBox>
+            </f:content>
+        </f:SimpleForm>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Submit"
+                    press="onMPSupportSubmit"
+                    class="marginRight myUnifiedBtn"
+                />
+                <Button
+                    text="Cancel"
+                    press="onMPSupportDialogCancel"
+                    class="marginRight myUnifiedBtn"
+                />
+            </Toolbar>
+        </footer>
+    </Dialog>
+</c:FragmentDefinition>

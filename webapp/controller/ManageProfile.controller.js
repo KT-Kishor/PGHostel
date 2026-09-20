@@ -56,6 +56,27 @@ sap.ui.define([
                 acknowledged: false
             }), "deactivateModel");
 
+            // Request Support dialog state. RaisedBy/Email are captured from
+            // HM_Login, never typed by the user. TicketID is empty for a new
+            // ticket and carries the primary key when editing.
+            this.getView().setModel(new JSONModel({
+                TicketID: "",
+                dialogTitle: "Support Request",
+                IssueName: "",
+                IssueType: "",
+                IssueDescription: "",
+                RaisedBy: "",
+                Email: "",
+                UserID: ""
+            }), "MP_SupportModel");
+
+            // Single image list of the Request Support dialog. It holds the
+            // photos already stored on the edited ticket (HM_Supportdata ->
+            // Photo1..Photo3) and the newly picked files together, so both show
+            // up in one section. Each entry: { key, name, type, content, source }
+            // where source is "existing" or "new".
+            this.getView().setModel(new JSONModel([]), "MP_SupportImages");
+
             // Initial profile state so visibility bindings (isEditMode / selectedTab)
             // resolve from the very first render and no edit form or extra tables flash
             this.getView().setModel(new JSONModel({
@@ -67,11 +88,13 @@ sap.ui.define([
                 Payments: [],
                 complain: [],
                 damage: [],
+                supportTickets: [],
                 bookingCount: 0,
                 memberCount: 0,
                 paymentCount: 0,
                 complainCount: 0,
                 damageCount: 0,
+                supportCount: 0,
                 hasAssignedBooking: false
             }), "profileData");
 
@@ -103,6 +126,10 @@ sap.ui.define([
                 this._setProfileLoading(true);
             }
             this._originalProfileData = null;
+
+            // HM_Login identity used for support tickets is re-read per visit.
+            this._oSupportUserContext = null;
+
             this.clearProfileValueStates();
             this.clearGlobalSearch();
             this._ViewDatePickersReadOnly(["id_dob1"], this.getView());
@@ -2516,6 +2543,14 @@ sap.ui.define([
             this._updateRowCount();
         },
 
+        /**
+         * Group header for the Raised Support table (grouped by Status), styled
+         * the same way as the support management view.
+         */
+        getGroupHeader: function (oGroup) {
+            return this.getStyledGroupHeader(oGroup);
+        },
+
         _updateRowCount: function () {
             const oProfileModel = this.getView().getModel("profileData");
             const sSelectedTab = oProfileModel.getProperty("/selectedTab");
@@ -2529,6 +2564,8 @@ sap.ui.define([
                 oTable = this.byId("Id_CompmaintTable");
             } else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
+            } else if (sSelectedTab === "Raised Support") {
+                oTable = this.byId("Id_SupportTable");
             } else if (sSelectedTab === "Members") {
                 oTable = this.byId("Id_MemberTable");
             }
@@ -2546,6 +2583,8 @@ sap.ui.define([
                 oProfileModel.setProperty("/complainCount", length);
             } else if (sSelectedTab === "Damage") {
                 oProfileModel.setProperty("/damageCount", length);
+            } else if (sSelectedTab === "Raised Support") {
+                oProfileModel.setProperty("/supportCount", length);
             } else if (sSelectedTab === "Members") {
                 oProfileModel.setProperty("/memberCount", length);
             }
@@ -2606,6 +2645,8 @@ sap.ui.define([
             // When Damage tab selected, fetch damages and bind
             else if (sKey === "Damage") {
                 await this._loadDamage();
+            } else if (sKey === "Raised Support") {
+                await this._loadSupportTickets();
             } else if (sKey === "Members") {
                 await this._loadMembers();
             }
@@ -3211,7 +3252,8 @@ sap.ui.define([
                 "Id_ProfileaTable1",
                 "Id_CompmaintTable",
                 "Id_DamageTable",
-                "Id_MemberTable"
+                "Id_MemberTable",
+                "Id_SupportTable"
             ];
 
             aTables.forEach(function (sTableId) {
@@ -3240,6 +3282,8 @@ sap.ui.define([
                 oTable = this.byId("Id_CompmaintTable");
             } else if (sSelectedTab === "Damage") {
                 oTable = this.byId("Id_DamageTable");
+            } else if (sSelectedTab === "Raised Support") {
+                oTable = this.byId("Id_SupportTable");
             } else if (sSelectedTab === "Members") {
                 oTable = this.byId("Id_MemberTable");
             }
@@ -3318,6 +3362,22 @@ sap.ui.define([
                                 new sap.ui.model.Filter("Quantity", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Cost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("RecoverCost", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.Contains, sQuery.toString())
+                            ],
+                            and: false
+                        })
+                    ];
+                } else if (sSelectedTab === "Raised Support") {
+                    aFilters = [
+                        new sap.ui.model.Filter({
+                            filters: [
+                                new sap.ui.model.Filter("TicketID", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("IssueName", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("IssueType", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("IssueDescription", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ResolvedDescription", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("CreatedDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
+                                new sap.ui.model.Filter("ResolvedDate", sap.ui.model.FilterOperator.Contains, sQuery.toString()),
                                 new sap.ui.model.Filter("Status", sap.ui.model.FilterOperator.Contains, sQuery.toString())
                             ],
                             and: false
@@ -4192,6 +4252,16 @@ sap.ui.define([
                 this._oComplaintPreviewDialog.destroy();
                 this._oComplaintPreviewDialog = null;
             }
+
+            if (this._oSupportRequestDialog) {
+                this._oSupportRequestDialog.destroy();
+                this._oSupportRequestDialog = null;
+            }
+
+            if (this._oSupportImageDialog) {
+                this._oSupportImageDialog.destroy();
+                this._oSupportImageDialog = null;
+            }
         },
         onComplaintTypeChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent);
@@ -5044,6 +5114,917 @@ sap.ui.define([
                 this._oPreviewDialog.close();
                 this._oPreviewDialog.destroy();
                 this._oPreviewDialog = null;
+            }
+        },
+
+        /* ==================== REQUEST SUPPORT (MANAGE PROFILE) ==================== */
+
+        /**
+         * Resolves the logged-in identity straight from HM_Login (UserID,
+         * UserName, Email) so the support payload never depends on values the
+         * customer could type. The result is cached for the current visit and
+         * falls back to LoginModel when the read call is unavailable.
+         */
+        _getSupportUserContext: async function () {
+            if (this._oSupportUserContext) {
+                return this._oSupportUserContext;
+            }
+
+            const oProfileModel = this.getView().getModel("profileData");
+            const oLoggedInUser = this.getView().getModel("LoginModel")?.getData() || this._oLoggedInUser || {};
+            const sUserID = oProfileModel?.getProperty("/UserID") || oLoggedInUser.UserID || oLoggedInUser.EmployeeID || "";
+
+            let oContext = {
+                UserID: sUserID,
+                UserName: oLoggedInUser.UserName || oLoggedInUser.EmployeeName || "",
+                Email: oLoggedInUser.EmailID || ""
+            };
+
+            if (sUserID) {
+                try {
+                    const resp = await this.ajaxReadWithJQuery("HM_Login", {
+                        UserID: sUserID
+                    });
+                    const oRow = Array.isArray(resp?.data) ? resp.data[0] : resp?.data;
+
+                    if (oRow) {
+                        oContext = {
+                            UserID: oRow.UserID || sUserID,
+                            UserName: oRow.UserName || oContext.UserName,
+                            Email: oRow.EmailID || oContext.Email
+                        };
+                    }
+                } catch (err) {
+                    console.error("Error reading HM_Login for support request", err);
+                }
+            }
+
+            this._oSupportUserContext = oContext;
+            return oContext;
+        },
+
+        onSupportRequest: async function () {
+            const oView = this.getView();
+
+            this.getBusyDialog();
+            let oContext;
+
+            try {
+                oContext = await this._getSupportUserContext();
+            } finally {
+                this.closeBusyDialog();
+            }
+
+            // RaisedBy / Email are captured from HM_Login and are never editable
+            // in this dialog, so only the issue fields are shown to the user.
+            oView.getModel("MP_SupportModel").setData({
+                TicketID: "",
+                dialogTitle: "Support Request",
+                IssueName: "",
+                IssueType: "",
+                IssueDescription: "",
+                RaisedBy: oContext.UserName || "",
+                Email: oContext.Email || "",
+                UserID: oContext.UserID || ""
+            });
+            this._resetSupportDialogState();
+            oView.getModel("MP_SupportImages").setData([]);
+            this._iExistingSupportImageCount = 0;
+            this._bSupportImagesLoaded = false;
+
+            await this._openSupportDialog();
+        },
+
+        /**
+         * Opens the Request Support dialog in edit mode for the pressed row.
+         * TicketID is the primary key and is sent as the update filter.
+         */
+        onPressSupportRow: async function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("profileData");
+            const oTicket = oContext && oContext.getObject();
+
+            if (!oTicket || !oTicket.TicketID) {
+                MessageToast.show("TicketID not found.");
+                return;
+            }
+
+            const sStatus = (oTicket.Status || "").trim().toLowerCase();
+
+            if (sStatus !== "open") {
+                MessageToast.show("Only open support requests can be edited");
+                return;
+            }
+
+            const oView = this.getView();
+            const oUserContext = await this._getSupportUserContext();
+
+            oView.getModel("MP_SupportModel").setData({
+                TicketID: oTicket.TicketID,
+                dialogTitle: "Edit Support Request",
+                IssueName: oTicket.IssueName || "",
+                IssueType: oTicket.IssueType || "",
+                IssueDescription: oTicket.IssueDescription || "",
+                RaisedBy: oTicket.RaisedBy || oUserContext.UserName || "",
+                Email: oTicket.Email || oUserContext.Email || "",
+                UserID: oUserContext.UserID || ""
+            });
+
+            // Existing attachments are not re-sent on update; only newly
+            // uploaded images replace the photo fields.
+            this._resetSupportDialogState();
+
+            // Saved photos live in HM_Supportdata, not in the HM_Support list.
+            await this._loadSupportTicketImages(oTicket.TicketID);
+
+            await this._openSupportDialog();
+        },
+
+        /**
+         * Loads Photo1..Photo3 of a ticket from HM_Supportdata (filtered by the
+         * TicketID primary key) and exposes them as preview links in the dialog.
+         */
+        _loadSupportTicketImages: async function (sTicketID) {
+            const oImagesModel = this.getView().getModel("MP_SupportImages");
+            if (oImagesModel) {
+                oImagesModel.setData([]);
+            }
+
+            // Count of photos the ticket arrived with. A lower number in the
+            // dialog model means the user removed some of them.
+            this._iExistingSupportImageCount = 0;
+            this._bSupportImagesLoaded = false;
+
+            if (!sTicketID) return;
+
+            this.getBusyDialog();
+
+            let aImages = [];
+
+            try {
+                aImages = await this._fetchSupportTicketImages(sTicketID);
+
+                // The read succeeded: photo slots may now be rewritten safely.
+                this._bSupportImagesLoaded = true;
+
+                if (oImagesModel) {
+                    oImagesModel.setData(aImages);
+                }
+
+                this._iExistingSupportImageCount = aImages.length;
+            } catch (err) {
+                console.error("Error loading support ticket images", err);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        /**
+         * Reads the saved photos of a ticket from HM_Supportdata (filtered by
+         * the TicketID primary key) and returns them as
+         * { key, name, type, content, source } entries.
+         */
+        _fetchSupportTicketImages: async function (sTicketID) {
+            const resp = await this.ajaxReadWithJQuery("HM_Supportdata", {
+                TicketID: sTicketID
+            });
+
+            const oRecord = Array.isArray(resp?.data) ? resp.data[0] : resp?.data;
+            if (!oRecord) {
+                return [];
+            }
+
+            const aImages = [];
+            [1, 2, 3].forEach(function (i) {
+                const sContent = oRecord[`Photo${i}`];
+                if (!sContent) return;
+
+                aImages.push({
+                    key: `Photo${i}`,
+                    name: oRecord[`Photo${i}Name`] || `Image ${i}`,
+                    type: oRecord[`Photo${i}Type`] || "",
+                    content: sContent,
+                    source: "existing"
+                });
+            });
+
+            return aImages;
+        },
+
+        /**
+         * Opens the support image viewer for a table row: all photos saved on
+         * that ticket are shown in a carousel.
+         */
+        onPressSupportImageView: async function (oEvent) {
+            const oTicket = oEvent.getSource().getBindingContext("profileData")?.getObject();
+
+            if (!oTicket || !oTicket.TicketID) {
+                MessageToast.show("TicketID not found.");
+                return;
+            }
+
+            this.getBusyDialog();
+
+            let aImages = [];
+
+            try {
+                aImages = await this._fetchSupportTicketImages(oTicket.TicketID);
+            } catch (err) {
+                console.error("Error loading support images", err);
+                MessageToast.show(err?.message || err?.responseText || "Failed to load images");
+                return;
+            } finally {
+                this.closeBusyDialog();
+            }
+
+            if (!aImages.length) {
+                MessageBox.information("No images uploaded.", {
+                    styleClass: "myUnifiedBtn"
+                });
+                return;
+            }
+
+            this._openSupportImageCarousel(aImages);
+        },
+
+        /**
+         * Builds the carousel pages from the ticket photos and opens them in a
+         * dialog, mirroring the Support view image viewer.
+         */
+        _openSupportImageCarousel: function (aImages) {
+            const aCarouselPages = aImages.map(function (oImage) {
+                // Photos can arrive as plain base64 or as a Buffer object.
+                let sBase64 = this._fileToBase64(oImage.content).replace(/\s/g, "");
+
+                if (!sBase64.startsWith("data:image")) {
+                    let sType = oImage.type || "";
+
+                    if (!sType.startsWith("image/")) {
+                        sType = sBase64.startsWith("/9j") ? "image/jpeg" :
+                            (sBase64.startsWith("UklGR") ? "image/webp" : "image/png");
+                    }
+
+                    sBase64 = `data:${sType};base64,${sBase64}`;
+                }
+
+                return new sap.m.FlexBox({
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "Center",
+                    justifyContent: "Center",
+                    renderType: "Bare",
+                    items: [
+                        new sap.m.Image({
+                            src: sBase64,
+                            densityAware: false,
+                            decorative: false
+                        }).addStyleClass("supportCarouselImage")
+                    ]
+                }).addStyleClass("supportCarouselImagePage");
+            }.bind(this));
+
+            const oCarousel = new sap.m.Carousel({
+                pages: aCarouselPages,
+                width: "100%",
+                height: "100%",
+                showPageIndicator: false
+            }).addStyleClass("supportImageCarousel");
+
+            if (this._oSupportImageDialog) {
+                this._oSupportImageDialog.destroy();
+            }
+
+            this._oSupportImageDialog = new sap.m.Dialog({
+                title: "Support Images",
+                contentWidth: "80vw",
+                contentHeight: "80vh",
+                resizable: true,
+                draggable: true,
+                verticalScrolling: false,
+                content: [oCarousel],
+                endButton: new sap.m.Button({
+                    text: "Close",
+                    press: function () {
+                        this._oSupportImageDialog.close();
+                    }.bind(this)
+                }).addStyleClass("myUnifiedBtn"),
+                afterClose: function () {
+                    this._oSupportImageDialog.destroy();
+                    this._oSupportImageDialog = null;
+                }.bind(this)
+            }).addStyleClass("supportImageDialog");
+
+            this._oSupportImageDialog.open();
+        },
+
+        _openSupportDialog: async function () {
+            const oView = this.getView();
+
+            if (!this._oSupportRequestDialog) {
+                this._oSupportRequestDialog = await Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.ui.com.project1.fragment.ManageProfileSupportRequest",
+                    controller: this
+                });
+
+                oView.addDependent(this._oSupportRequestDialog);
+                this._oSupportRequestDialog.setModel(oView.getModel("MP_SupportModel"), "MP_SupportModel");
+                this._oSupportRequestDialog.setModel(oView.getModel("MP_SupportImages"), "MP_SupportImages");
+            }
+
+            this._oSupportRequestDialog.open();
+        },
+
+        _resetSupportDialogState: function () {
+            const oImagesModel = this.getView().getModel("MP_SupportImages");
+
+            if (oImagesModel) {
+                oImagesModel.setData([]);
+            }
+
+            this._bSupportImageProcessing = false;
+
+            ["MPSR_id_IssueName", "MPSR_id_IssueType", "MPSR_id_IssueDescription"].forEach(function (sId) {
+                const oControl = this.byId(sId);
+                if (oControl && oControl.setValueState) {
+                    oControl.setValueState("None");
+                }
+            }.bind(this));
+
+            const oUploader = this.byId("MPSR_id_FileUploader");
+            if (oUploader) {
+                oUploader.clear();
+            }
+        },
+
+        onMPSupportDialogCancel: function () {
+            this._resetSupportDialogState();
+
+            const oSupportModel = this.getView().getModel("MP_SupportModel");
+            if (oSupportModel) {
+                oSupportModel.setData({
+                    TicketID: "",
+                    dialogTitle: "Support Request",
+                    IssueName: "",
+                    IssueType: "",
+                    IssueDescription: "",
+                    RaisedBy: "",
+                    Email: "",
+                    UserID: ""
+                });
+            }
+
+            const oImagesModel = this.getView().getModel("MP_SupportImages");
+            if (oImagesModel) {
+                oImagesModel.setData([]);
+            }
+
+            if (this._oSupportRequestDialog) {
+                this._oSupportRequestDialog.close();
+            }
+        },
+
+        onMPSupportIssueNameChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onMPSupportIssueTypeChange: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent);
+        },
+
+        onMPSupportDescriptionChange: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent);
+        },
+
+        onMPSupportFileChange: async function (oEvent) {
+            const oFiles = oEvent.getParameter("files");
+            if (!oFiles || oFiles.length === 0) return;
+
+            // A previous batch is still being compressed: its attachments are not
+            // in the list yet, so a second batch would overwrite it.
+            if (this._bSupportImageProcessing) {
+                MessageToast.show("Please wait, images are still being processed.");
+                oEvent.getSource().clear();
+                return;
+            }
+
+            const oView = this.getView();
+            const oImagesModel = oView.getModel("MP_SupportImages");
+
+            const aImages = oImagesModel.getData() || [];
+            const aExisting = aImages.filter(image => image.source === "existing");
+            const aNew = aImages.filter(image => image.source === "new");
+
+            const sTicketID = oView.getModel("MP_SupportModel").getProperty("/TicketID") || "";
+            const bIsEdit = !!sTicketID;
+
+            if (bIsEdit) {
+                // Edit mode: the photos already saved on the ticket occupy slots,
+                // so the limit is the remaining capacity, not the flat maximum.
+                const iRemaining = 3 - aExisting.length;
+
+                if (aNew.length + oFiles.length > iRemaining) {
+                    MessageToast.show("Maximum 3 images allowed.");
+                    oEvent.getSource().clear();
+                    return;
+                }
+            } else {
+                const totalAfterAdd = aNew.length + oFiles.length;
+                if (totalAfterAdd > 3) {
+                    MessageToast.show("You can upload maximum 3 images only");
+                    oEvent.getSource().clear();
+                    return;
+                }
+            }
+
+            for (let i = 0; i < oFiles.length; i++) {
+                const oFile = oFiles[i];
+
+                const bDuplicate = aNew.some(image => image.originalFilename === oFile.name);
+                if (bDuplicate) {
+                    MessageToast.show("This file is already uploaded and cannot be uploaded again");
+                    oEvent.getSource().clear();
+                    return;
+                }
+
+                if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                    MessageToast.show(`"${oFile.name}" is not a valid image. Only JPG, JPEG, PNG allowed`);
+                    oEvent.getSource().clear();
+                    return;
+                }
+            }
+
+            const sIssueType = oView.getModel("MP_SupportModel").getProperty("/IssueType") || "";
+            const sBaseName = sIssueType || "support";
+
+            // Continue the existing numbering so a new file never repeats a name
+            // already used by a stored photo of the ticket.
+            const iMaxNamedSuffix = aImages.reduce(function (iMax, image) {
+                const oMatch = new RegExp(`^${sBaseName} (\\d+)$`).exec(image.name || "");
+                return oMatch ? Math.max(iMax, parseInt(oMatch[1], 10)) : iMax;
+            }, 0);
+
+            this._bSupportImageProcessing = true;
+
+            // The list keeps the current images and gets one extra "Compressing..."
+            // row, so the placeholder is visible while the files are processed.
+            oImagesModel.setData(aImages.concat([{
+                key: "processing",
+                name: "Compressing...",
+                source: "processing"
+            }]));
+
+            // Let the placeholder actually paint before the compression work
+            // starts, otherwise the frame is only flushed after processing ends.
+            await this._yieldForRender();
+
+            try {
+                const aAdded = [];
+
+                for (let i = 0; i < oFiles.length; i++) {
+                    const oFile = oFiles[i];
+
+                    let processedFile = oFile;
+                    const MAX_SIZE_KB = 400;
+                    const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+                    const isImage = oFile.type === "image/jpeg" || oFile.type === "image/jpg" || oFile.type === "image/png";
+
+                    if (oFile.size > iMaxSizeBytes && isImage) {
+                        if (typeof imageCompression === "undefined") {
+                            throw new Error("Compression library missing");
+                        }
+                        const options = {
+                            maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            initialQuality: 0.95
+                        };
+                        processedFile = await imageCompression(oFile, options);
+
+                        if (processedFile.size > iMaxSizeBytes) {
+                            throw new Error(oFile.name + " could not be compressed below 400 KB.");
+                        }
+                    }
+
+                    const base64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(",")[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(processedFile);
+                    });
+
+                    const sFileName = `${sBaseName} ${iMaxNamedSuffix + i + 1}`;
+
+                    aAdded.push({
+                        key: sFileName,
+                        name: sFileName,
+                        type: processedFile.type || oFile.type,
+                        content: base64,
+                        source: "new",
+                        originalFilename: oFile.name
+                    });
+                }
+
+                oImagesModel.setData(aImages.concat(aAdded));
+            } catch (err) {
+                oImagesModel.setData(aImages);
+                MessageToast.show(err.message || "Failed to process image.");
+            } finally {
+                this._bSupportImageProcessing = false;
+                oEvent.getSource().clear();
+            }
+        },
+
+        /**
+         * Resolves after the browser has had a chance to paint, so UI updates
+         * made just before an async operation become visible.
+         */
+        _yieldForRender: function () {
+            return new Promise(function (resolve) {
+                window.requestAnimationFrame(function () {
+                    window.requestAnimationFrame(function () {
+                        resolve();
+                    });
+                });
+            });
+        },
+
+        /**
+         * Previews any image of the dialog, whether it was already stored on the
+         * ticket or freshly picked in this session.
+         */
+        onMPSupportImagePress: function (oEvent) {
+            const oCtx = oEvent.getSource().getBindingContext("MP_SupportImages");
+            const oImage = oCtx && oCtx.getObject();
+
+            if (!oImage || !oImage.content) {
+                MessageToast.show("Image not available for preview");
+                return;
+            }
+
+            this._previewSupportImage(oImage.content, oImage.type, oImage.name);
+        },
+
+        /**
+         * Removes an image from the dialog. Stored photos and newly picked files
+         * live in the same list; the remaining ones are re-packed into
+         * Photo1..Photo3 on submit, so slots never keep a gap.
+         */
+        onMPSupportImageRemove: function (oEvent) {
+            const oCtx = oEvent.getSource().getBindingContext("MP_SupportImages");
+            const sKey = oCtx && oCtx.getProperty("key");
+            if (!sKey) return;
+
+            const oImagesModel = this.getView().getModel("MP_SupportImages");
+            const aImages = (oImagesModel.getData() || []).filter(image => image.key !== sKey);
+
+            oImagesModel.setData(aImages);
+            MessageToast.show("Image removed. Save the request to apply the change.");
+        },
+
+        /**
+         * Shared image previewer, reusing the same DocumentPreview fragment as
+         * the member document dialog.
+         */
+        _previewSupportImage: async function (oContent, sMimeType, sFileName) {
+            const sBase64 = this._normalizeSupportBase64(oContent);
+
+            if (!sBase64) {
+                MessageToast.show("Image not available for preview");
+                return;
+            }
+
+            let sType = sMimeType || "";
+
+            if (sBase64.startsWith("iVB")) {
+                sType = "image/png";
+            } else if (sBase64.startsWith("/9j")) {
+                sType = "image/jpeg";
+            } else if (sBase64.startsWith("UklGR")) {
+                sType = "image/webp";
+            }
+
+            if (!sType.startsWith("image/")) {
+                sType = "image/png";
+            }
+
+            this._sPreviewFileName = sFileName || "Image Preview";
+            this._sPreviewMimeType = sType;
+            this._sPreviewBase64 = sBase64;
+
+            if (this._oPreviewDialog) {
+                this._oPreviewDialog.destroy();
+                this._oPreviewDialog = null;
+            }
+
+            this._oPreviewDialog = await Fragment.load({
+                id: this.getView().getId(),
+                name: "sap.ui.com.project1.fragment.DocumentPreview",
+                controller: this
+            });
+
+            this.getView().addDependent(this._oPreviewDialog);
+
+            const sViewId = this.getView().getId();
+            const oDialog = sap.ui.core.Fragment.byId(sViewId, "previewDialog");
+            const oImage = sap.ui.core.Fragment.byId(sViewId, "previewImage");
+            const oHtml = sap.ui.core.Fragment.byId(sViewId, "previewHtml");
+
+            oDialog.setTitle(this._sPreviewFileName);
+
+            oImage.setVisible(false);
+            oImage.setSrc("");
+            oHtml.setVisible(false);
+            oHtml.setContent("");
+
+            if (this._pdfBlobUrl) {
+                URL.revokeObjectURL(this._pdfBlobUrl);
+                this._pdfBlobUrl = null;
+            }
+
+            const sSrc = `data:${sType};base64,${sBase64}`;
+            const oImg = new Image();
+
+            oImg.onload = function () {
+                const viewportW = window.innerWidth * 0.8;
+                const viewportH = window.innerHeight * 0.8;
+                const imgRatio = oImg.width / oImg.height;
+
+                let finalWidth = viewportW;
+                let finalHeight = viewportW / imgRatio;
+
+                if (finalHeight > viewportH) {
+                    finalHeight = viewportH;
+                    finalWidth = viewportH * imgRatio;
+                }
+
+                oDialog.setContentWidth(finalWidth + "px");
+                oDialog.setContentHeight(finalHeight + "px");
+
+                oImage.setSrc(sSrc);
+                oImage.setVisible(true);
+
+                oDialog.open();
+            };
+
+            oImg.onerror = function () {
+                MessageToast.show("Unable to preview image.");
+            };
+
+            oImg.src = sSrc;
+        },
+
+        /**
+         * Normalizes backend photo values (raw base64, Buffer objects or
+         * double-encoded strings) into plain base64.
+         */
+        _normalizeSupportBase64: function (oValue) {
+            if (!oValue) return "";
+
+            let sBase64 = this._fileToBase64(oValue).replace(/\s/g, "");
+
+            for (let i = 0; i < 5; i++) {
+                if (sBase64.startsWith("iVB") || sBase64.startsWith("/9j") || sBase64.startsWith("UklGR")) {
+                    return sBase64;
+                }
+
+                try {
+                    sBase64 = atob(sBase64);
+                } catch (e) {
+                    break;
+                }
+            }
+
+            return sBase64;
+        },
+
+        /**
+         * Drops empty photo slots from an update payload so the stored images
+         * of those slots are not overwritten with blanks.
+         */
+        _removeEmptySupportPhotoSlots: function (oData) {
+            [1, 2, 3].forEach(function (i) {
+                if (!oData[`Photo${i}`]) {
+                    delete oData[`Photo${i}`];
+                    delete oData[`Photo${i}Name`];
+                    delete oData[`Photo${i}Type`];
+                }
+            });
+
+            return oData;
+        },
+
+        onMPSupportSubmit: async function () {
+            const oView = this.getView();
+            const oSupportModel = oView.getModel("MP_SupportModel").getData();
+            const sTicketID = oSupportModel.TicketID || "";
+            const bIsEdit = !!sTicketID;
+
+            const isMandatoryValid = (
+                utils._LCvalidateMandatoryField(this.byId("MPSR_id_IssueName"), "ID") &&
+                utils._LCstrictValidationComboBox(this.byId("MPSR_id_IssueType"), "ID") &&
+                utils._LCvalidateMandatoryField(this.byId("MPSR_id_IssueDescription"), "ID")
+            );
+
+            if (!isMandatoryValid) {
+                MessageToast.show(this.i18nModel.getText("mandetoryFields"));
+                return;
+            }
+
+            // One list holds the stored photos and the new uploads; the order in
+            // the dialog is the order that fills Photo1..Photo3 on save.
+            const aListData = oView.getModel("MP_SupportImages").getData() || [];
+
+            if (aListData.some(image => image.source === "processing")) {
+                MessageToast.show("Please wait, images are still being processed.");
+                return;
+            }
+
+            const aImages = aListData.filter(image => image.source !== "processing");
+            const aExisting = aImages.filter(image => image.source === "existing");
+            const aNew = aImages.filter(image => image.source === "new");
+
+            const aSlots = aImages.slice(0, 3).map(image => ({
+                content: image.source === "existing" ? this._fileToBase64(image.content) : image.content,
+                name: image.name,
+                type: image.type
+            }));
+
+            let photoPayload = {
+                Photo1: "",
+                Photo1Name: "",
+                Photo1Type: "",
+                Photo2: "",
+                Photo2Name: "",
+                Photo2Type: "",
+                Photo3: "",
+                Photo3Name: "",
+                Photo3Type: ""
+            };
+
+            aSlots.forEach((oSlot, index) => {
+                const i = index + 1;
+                photoPayload[`Photo${i}`] = oSlot.content || "";
+                photoPayload[`Photo${i}Name`] = oSlot.name || "";
+                photoPayload[`Photo${i}Type`] = oSlot.type || "";
+            });
+
+            // Identity always comes from HM_Login, never from the dialog.
+            const oContext = await this._getSupportUserContext();
+            const todayDate = new Date().toISOString().split("T")[0];
+
+            const data = {
+                IssueName: oSupportModel.IssueName,
+                IssueType: oSupportModel.IssueType,
+                IssueDescription: oSupportModel.IssueDescription,
+                RaisedBy: oContext.UserName || oSupportModel.RaisedBy,
+                Email: oContext.Email || oSupportModel.Email,
+                UserID: oContext.UserID || oSupportModel.UserID,
+                CreatedDate: todayDate,
+                Status: "Open",
+                ...photoPayload
+            };
+
+            this.getBusyDialog();
+
+            try {
+                if (bIsEdit) {
+                    // TicketID is the primary key: it travels in the payload and
+                    // drives the update filter. CreatedDate/Status are owned by
+                    // the backend.
+                    const oEditData = { ...data };
+                    oEditData.TicketID = sTicketID;
+                    delete oEditData.CreatedDate;
+                    delete oEditData.Status;
+
+                    if (!this._bSupportImagesLoaded) {
+                        // Photo state unknown (the HM_Supportdata read failed), so
+                        // only the freshly uploaded images may be sent.
+                        this._removeEmptySupportPhotoSlots(oEditData);
+                    } else {
+                        const bImagesChanged = aNew.length > 0 ||
+                            aExisting.length !== (this._iExistingSupportImageCount || 0);
+
+                        if (!bImagesChanged) {
+                            // Nothing touched: leave the stored photos untouched.
+                            [1, 2, 3].forEach(function (i) {
+                                delete oEditData[`Photo${i}`];
+                                delete oEditData[`Photo${i}Name`];
+                                delete oEditData[`Photo${i}Type`];
+                            });
+                        }
+                        // When images did change, the re-packed Photo1..Photo3
+                        // slots above already replace the stored set, so a
+                        // removed photo leaves no gap.
+                    }
+
+                    await this.ajaxUpdateWithJQuery("HM_Support", {
+                        data: oEditData,
+                        filters: {
+                            TicketID: sTicketID
+                        }
+                    });
+
+                    MessageToast.show("Support request updated successfully");
+                } else {
+                    await this.ajaxCreateWithJQuery("HM_Support", {
+                        data: data
+                    });
+
+                    MessageToast.show("Support request submitted successfully");
+                }
+
+                this.onMPSupportDialogCancel();
+
+                // A newly created ticket opens the Raised Support tab so the
+                // user immediately sees what was just submitted.
+                if (!bIsEdit) {
+                    this._openRaisedSupportTab();
+                }
+
+                // Keep the Raised Support table (and its tab count) in sync.
+                await this._loadSupportTickets(true);
+            } catch (err) {
+                console.error("Error saving support request", err);
+                MessageToast.show(err?.message || err?.responseText ||
+                    (bIsEdit ? "Error while updating support request" : "Error while submitting support request"));
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        /**
+         * Switches the profile tabs to Raised Support. Setting the tab key
+         * programmatically does not fire IconTabHeader's select event, so the
+         * table is refreshed separately by the caller.
+         */
+        _openRaisedSupportTab: function () {
+            const oProfileModel = this.getView().getModel("profileData");
+
+            if (oProfileModel) {
+                oProfileModel.setProperty("/selectedTab", "Raised Support");
+            }
+
+            const oTabBar = this.byId("id_tabBar1");
+            if (oTabBar) {
+                oTabBar.setSelectedKey("Raised Support");
+            }
+        },
+
+        /**
+         * Reads HM_Support for the logged-in Email (captured from HM_Login)
+         * and binds every ticket of the current user to the Raised Support tab.
+         */
+        _loadSupportTickets: async function (bSilent) {
+            const oProfileModel = this.getView().getModel("profileData");
+            if (!oProfileModel) return;
+
+            const oContext = await this._getSupportUserContext();
+            const sEmail = oContext.Email || "";
+
+            if (!sEmail) {
+                if (!bSilent) {
+                    MessageToast.show("Email not found.");
+                }
+                return;
+            }
+
+            try {
+                if (!bSilent) this.getBusyDialog();
+
+                const resp = await this.ajaxReadWithJQuery("HM_Support", {
+                    Email: sEmail
+                });
+
+                const aRaw = Array.isArray(resp?.data) ? resp.data :
+                    (resp?.data ? [resp.data] :
+                        (Array.isArray(resp?.SupportData) ? resp.SupportData : []));
+
+                const aTickets = aRaw.map(ticket => ({
+                    TicketID: ticket.TicketID || "",
+                    IssueName: ticket.IssueName || "",
+                    IssueType: ticket.IssueType || "",
+                    IssueDescription: ticket.IssueDescription || "",
+                    RaisedBy: ticket.RaisedBy || "",
+                    Email: ticket.Email || "",
+                    CreatedDate: ticket.CreatedDate || "",
+                    ResolvedDate: ticket.ResolvedDate || "",
+                    ResolvedDescription: ticket.ResolvedDescription || "",
+                    Status: ticket.Status || ""
+                }));
+
+                oProfileModel.setProperty("/supportTickets", aTickets);
+                oProfileModel.setProperty("/supportCount", aTickets.length);
+                oProfileModel.updateBindings(true);
+            } catch (err) {
+                console.error("Error loading support tickets", err);
+                if (!bSilent) {
+                    MessageToast.show(err?.message || err?.responseText || "Error loading support tickets");
+                }
+            } finally {
+                if (!bSilent) {
+                    this.closeBusyDialog();
+                }
+                this._updateRowCount();
             }
         },
 

@@ -43,6 +43,26 @@ sap.ui.define([
             }
             return sDate;
         },
+
+        /**
+         * Formats a resolved date, treating the backend placeholder date
+         * (1899-11-30) and empty values as "not resolved yet".
+         */
+        formatResolvedDate: function (sDate) {
+            if (!sDate) {
+                return "";
+            }
+
+            if (sDate.toString().startsWith("1899-11-30")) {
+                return "";
+            }
+
+            var oDateFormat = DateFormat.getDateInstance({
+                pattern: "dd/MM/yyyy"
+            });
+
+            return oDateFormat.format(new Date(sDate));
+        },
         formatDateString: function (sDate) {
             if (sDate) {
                 return sDate.split("T")[0].split("-").reverse().join("/");
@@ -596,6 +616,13 @@ sap.ui.define([
             }
             const status = sStatus.trim().toLowerCase();
             return status !== "in progress" && status !== "resolved";
+        },
+
+        canEditSupport: function (sStatus) {
+            if (!sStatus) {
+                return false;
+            }
+            return sStatus.trim().toLowerCase() === "open";
         },
 
         formatAgeFromDOBOrAge: function (sDateValue) {
