@@ -867,39 +867,50 @@
             class="sapUiSmallMargin customRoundedTable"
         >
             <columns>
-                <Column demandPopin="true">
+                <Column
+                    demandPopin="true"
+                    width="10rem"
+                >
                     <Text text="{i18n>TicketID}" />
                 </Column>
-                <Column demandPopin="true">
+                <Column
+                    demandPopin="true"
+                    width="12rem"
+                >
                     <Text text="Issue" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
+                    width="10rem"
                 >
                     <Text text="{i18n>IssueType}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
+                    width="18rem"
                 >
                     <Text text="{i18n>IssueDescription}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
+                    width="7rem"
                 >
                     <Text text="{i18n>Createddate}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
+                    width="7rem"
                 >
                     <Text text="{i18n>Resolvedate}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
+                    width="18rem"
                 >
                     <Text text="{i18n>ResolvedDescription}" />
                 </Column>

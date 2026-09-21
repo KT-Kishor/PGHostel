@@ -116,7 +116,11 @@ sap.ui.define([
             this.SP_Dialog.open();
             this._FragmentDatePickersReadOnly(["SP_id_ResolutionDate"])
             sap.ui.getCore().byId("SP_id_Description").setValue("").setValueState("None");
-            sap.ui.getCore().byId("SP_id_ResolutionDate").setValue(this.Formatter.formatDate(new Date())).setValueState("None");
+            var oResolutionDate = sap.ui.getCore().byId("SP_id_ResolutionDate");
+            var oToday = new Date();
+            oToday.setHours(0, 0, 0, 0);
+            oResolutionDate.setMinDate(oToday);
+            oResolutionDate.setDateValue(null).setValue("").setValueState("None");
         },
 
         supportCancel: function () {
