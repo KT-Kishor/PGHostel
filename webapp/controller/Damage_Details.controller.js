@@ -162,239 +162,239 @@ sap.ui.define([
 
             }
         },
-       DM_onPressDelete: async function () {
+        DM_onPressDelete: async function () {
 
-    var that = this;
+            var that = this;
 
-    var oTable = this.byId("CID_id_TableInvoiceItem1");
+            var oTable = this.byId("CID_id_TableInvoiceItem1");
 
-    var oModel = this.getView().getModel("DamageModel");
+            var oModel = this.getView().getModel("DamageModel");
 
-    var aItems = oModel.getProperty("/Items") || [];
+            var aItems = oModel.getProperty("/Items") || [];
 
-    var aSelectedItems = oTable.getSelectedItems();
+            var aSelectedItems = oTable.getSelectedItems();
 
-    if (aSelectedItems.length === 0) {
+            if (aSelectedItems.length === 0) {
 
-        sap.m.MessageToast.show(
-            "Please select at least one item"
-        );
-
-        return;
-    }
-
-    var aIndexes = aSelectedItems.map(function (oItem) {
-
-        var sPath =
-            oItem
-                .getBindingContext("DamageModel")
-                .getPath();
-
-        return parseInt(
-            sPath.split("/")[2]
-        );
-
-    });
-
-  
-    var hasSavedItem = aSelectedItems.some(function (oItem) {
-
-        return !!oItem
-            .getBindingContext("DamageModel")
-            .getObject()
-            .ItemId;
-
-    });
-
-    // ============================================================
-    // DELETE FUNCTION
-    // ============================================================
-
-    var fnDelete = async function () {
-
-        try {
-
-            if (hasSavedItem) {
-                that.getBusyDialog();
-            }
-
-            for (let oItem of aSelectedItems) {
-
-                let oData =
-                    oItem
-                        .getBindingContext("DamageModel")
-                        .getObject();
-
-                if (oData.ItemId) {
-
-                    await that.ajaxDeleteWithJQuery(
-                        "HM_DamageItem",
-                        {
-                            filters: {
-                                ItemID: oData.ItemId
-                            }
-                        }
-                    );
-                }
-            }
-
-            // ----------------------------------------------------
-            // REMOVE ITEMS FROM LOCAL MODEL
-            // ----------------------------------------------------
-
-            aIndexes.sort(function (a, b) {
-                return b - a;
-            });
-
-
-            aIndexes.forEach(function (index) {
-
-                aItems.splice(index, 1);
-
-            });
-
-
-            // ----------------------------------------------------
-            // UPDATE INDEX NUMBER
-            // ----------------------------------------------------
-
-            aItems.forEach(function (item, i) {
-
-                item.IndexNo = i + 1;
-
-            });
-
-
-            // ----------------------------------------------------
-            // RECALCULATE TOTAL COST
-            // ----------------------------------------------------
-
-            var totalCost = aItems.reduce(
-                function (sum, item) {
-
-                    return sum +
-                        (parseFloat(item.Cost) || 0);
-
-                },
-                0
-            );
-
-
-            oModel.setProperty(
-                "/Items",
-                aItems
-            );
-
-            oModel.setProperty(
-                "/TotalCost",
-                totalCost.toFixed(2)
-            );
-
-
-            // ----------------------------------------------------
-            // RECALCULATE DUE AMOUNT
-            // ----------------------------------------------------
-
-            var dueAmount =
-                parseFloat(
-                    oModel.getProperty("/TotalCost")
-                ) -
-                parseFloat(
-                    oModel.getProperty("/ReturnDamageAmount") || 0
+                sap.m.MessageToast.show(
+                    "Please select at least one item"
                 );
 
-
-            oModel.setProperty(
-                "/DueAmount",
-                dueAmount.toFixed(2)
-            );
-            if (hasSavedItem) {
-                that.closeBusyDialog();
+                return;
             }
 
+            var aIndexes = aSelectedItems.map(function (oItem) {
 
-            sap.m.MessageToast.show(
-                "Selected Item(s) Deleted"
-            );
+                var sPath =
+                    oItem
+                        .getBindingContext("DamageModel")
+                        .getPath();
 
+                return parseInt(
+                    sPath.split("/")[2]
+                );
 
-        } catch (err) {
-
-            if (hasSavedItem) {
-                that.closeBusyDialog();
-            }
-
-            console.error(err);
-
-            sap.m.MessageToast.show(
-                "Error while deleting"
-            );
-        }
-    };
+            });
 
 
-    // ============================================================
-    // CONFIRMATION ONLY FOR SAVED ITEMS
-    // ============================================================
+            var hasSavedItem = aSelectedItems.some(function (oItem) {
 
-    if (hasSavedItem) {
+                return !!oItem
+                    .getBindingContext("DamageModel")
+                    .getObject()
+                    .ItemId;
 
-        sap.m.MessageBox.confirm(
-            "Are you sure you want to delete selected item(s)?",
-            {
-                title: "Confirm Deletion",
+            });
 
-                styleClass: "myUnifiedBtn",
+            // ============================================================
+            // DELETE FUNCTION
+            // ============================================================
 
-                onClose: function (sAction) {
+            var fnDelete = async function () {
 
-                    if (sAction === "OK") {
+                try {
 
-                        fnDelete();
-
+                    if (hasSavedItem) {
+                        that.getBusyDialog();
                     }
 
-                }
-            }
-        );
+                    for (let oItem of aSelectedItems) {
 
-    } else {
-        fnDelete();
-    }
-},
+                        let oData =
+                            oItem
+                                .getBindingContext("DamageModel")
+                                .getObject();
+
+                        if (oData.ItemId) {
+
+                            await that.ajaxDeleteWithJQuery(
+                                "HM_DamageItem",
+                                {
+                                    filters: {
+                                        ItemID: oData.ItemId
+                                    }
+                                }
+                            );
+                        }
+                    }
+
+                    // ----------------------------------------------------
+                    // REMOVE ITEMS FROM LOCAL MODEL
+                    // ----------------------------------------------------
+
+                    aIndexes.sort(function (a, b) {
+                        return b - a;
+                    });
+
+
+                    aIndexes.forEach(function (index) {
+
+                        aItems.splice(index, 1);
+
+                    });
+
+
+                    // ----------------------------------------------------
+                    // UPDATE INDEX NUMBER
+                    // ----------------------------------------------------
+
+                    aItems.forEach(function (item, i) {
+
+                        item.IndexNo = i + 1;
+
+                    });
+
+
+                    // ----------------------------------------------------
+                    // RECALCULATE TOTAL COST
+                    // ----------------------------------------------------
+
+                    var totalCost = aItems.reduce(
+                        function (sum, item) {
+
+                            return sum +
+                                (parseFloat(item.Cost) || 0);
+
+                        },
+                        0
+                    );
+
+
+                    oModel.setProperty(
+                        "/Items",
+                        aItems
+                    );
+
+                    oModel.setProperty(
+                        "/TotalCost",
+                        totalCost.toFixed(2)
+                    );
+
+
+                    // ----------------------------------------------------
+                    // RECALCULATE DUE AMOUNT
+                    // ----------------------------------------------------
+
+                    var dueAmount =
+                        parseFloat(
+                            oModel.getProperty("/TotalCost")
+                        ) -
+                        parseFloat(
+                            oModel.getProperty("/ReturnDamageAmount") || 0
+                        );
+
+
+                    oModel.setProperty(
+                        "/DueAmount",
+                        dueAmount.toFixed(2)
+                    );
+                    if (hasSavedItem) {
+                        that.closeBusyDialog();
+                    }
+
+
+                    sap.m.MessageToast.show(
+                        "Selected Item(s) Deleted"
+                    );
+
+
+                } catch (err) {
+
+                    if (hasSavedItem) {
+                        that.closeBusyDialog();
+                    }
+
+                    console.error(err);
+
+                    sap.m.MessageToast.show(
+                        "Error while deleting"
+                    );
+                }
+            };
+
+
+            // ============================================================
+            // CONFIRMATION ONLY FOR SAVED ITEMS
+            // ============================================================
+
+            if (hasSavedItem) {
+
+                sap.m.MessageBox.confirm(
+                    "Are you sure you want to delete selected item(s)?",
+                    {
+                        title: "Confirm Deletion",
+
+                        styleClass: "myUnifiedBtn",
+
+                        onClose: function (sAction) {
+
+                            if (sAction === "OK") {
+
+                                fnDelete();
+
+                            }
+
+                        }
+                    }
+                );
+
+            } else {
+                fnDelete();
+            }
+        },
 
         onNavBack: function () {
-             var oViewModel = this.getView().getModel("VisibleModel");
+            var oViewModel = this.getView().getModel("VisibleModel");
 
-    // Check edit mode
-    var bIsEditMode = oViewModel.getProperty("/visible");
+            // Check edit mode
+            var bIsEditMode = oViewModel.getProperty("/visible");
 
-    if (bIsEditMode) {
+            if (bIsEditMode) {
 
-        // Ask confirmation only in edit mode
-        this.showConfirmationDialog(
-            this.i18nModel.getText("ConfirmActionTitle"),
-            this.i18nModel.getText("backConfirmation"),
+                // Ask confirmation only in edit mode
+                this.showConfirmationDialog(
+                    this.i18nModel.getText("ConfirmActionTitle"),
+                    this.i18nModel.getText("backConfirmation"),
 
-            function () {
+                    function () {
 
-                // Reset edit mode
-                oViewModel.setProperty("/Edit", false);
-                oViewModel.setProperty("/save", false);
+                        // Reset edit mode
+                        oViewModel.setProperty("/Edit", false);
+                        oViewModel.setProperty("/save", false);
 
-                // Navigate back
+                        // Navigate back
+                        this.getRouter().navTo("RouteDamage", {
+                            sPath: "DamageDetails"
+                        });
+                    }.bind(this)
+                );
+            } else {
+                // Direct navigation when not editing
                 this.getRouter().navTo("RouteDamage", {
                     sPath: "DamageDetails"
                 });
-            }.bind(this)
-        );
-    }else {
-        // Direct navigation when not editing
-        this.getRouter().navTo("RouteDamage", {
-             sPath:"DamageDetails"
-        });
-    }
-              
+            }
+
         },
 
         onHome: function () {
@@ -419,7 +419,7 @@ sap.ui.define([
             table.removeSelections();
         },
 
-        onTotalInputLiveChange:function(oEvent){
+        onTotalInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
 
@@ -444,123 +444,123 @@ sap.ui.define([
             var dueAmount = parseFloat(oModel.getProperty("/ActualCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
             oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
         },
-      onRecoverCostLiveChange: function (oEvent) {
+        onRecoverCostLiveChange: function (oEvent) {
 
-    var oInput = oEvent.getSource();
-    var sValue = oEvent.getParameter("value");
+            var oInput = oEvent.getSource();
+            var sValue = oEvent.getParameter("value");
 
-    // Allow only numbers and decimal
-    sValue = sValue.replace(/[^0-9.]/g, "");
+            // Allow only numbers and decimal
+            sValue = sValue.replace(/[^0-9.]/g, "");
 
-    // Prevent multiple decimal points
-    var aParts = sValue.split(".");
-    if (aParts.length > 2) {
-        sValue = aParts[0] + "." + aParts.slice(1).join("");
-    }
+            // Prevent multiple decimal points
+            var aParts = sValue.split(".");
+            if (aParts.length > 2) {
+                sValue = aParts[0] + "." + aParts.slice(1).join("");
+            }
 
-    var oContext =
-        oInput.getBindingContext("DamageModel");
+            var oContext =
+                oInput.getBindingContext("DamageModel");
 
-    var oModel =
-        this.getView().getModel("DamageModel");
+            var oModel =
+                this.getView().getModel("DamageModel");
 
-    var sPath = oContext.getPath();
+            var sPath = oContext.getPath();
 
-    // Get Cost of current row
-    var fCost =
-        parseFloat(
-            oModel.getProperty(sPath + "/Cost")
-        ) || 0;
+            // Get Cost of current row
+            var fCost =
+                parseFloat(
+                    oModel.getProperty(sPath + "/Cost")
+                ) || 0;
 
-    var fRecoverCost =
-        parseFloat(sValue) || 0;
-
-
-    // ============================================================
-    // RECOVER COST VALIDATION
-    // ============================================================
-
-    if (fRecoverCost > fCost) {
-
-        oInput.setValueState("Error");
-
-        oInput.setValueStateText(
-            "Recover amount cannot be greater than Cost"
-        );
-
-        MessageToast.show(
-            "Recover amount cannot be greater than Cost"
-        );
-
-        // Clear invalid value
-        oInput.setValue("");
-
-        oModel.setProperty(
-            sPath + "/RecoverCost",
-            ""
-        );
-
-        return;
-
-    } else {
-
-        oInput.setValueState("None");
-
-    }
+            var fRecoverCost =
+                parseFloat(sValue) || 0;
 
 
-    // ============================================================
-    // SET RECOVER COST
-    // ============================================================
+            // ============================================================
+            // RECOVER COST VALIDATION
+            // ============================================================
 
-    oInput.setValue(sValue);
+            if (fRecoverCost > fCost) {
 
-    oModel.setProperty(
-        sPath + "/RecoverCost",
-        sValue
-    );
+                oInput.setValueState("Error");
 
+                oInput.setValueStateText(
+                    "Recover amount cannot be greater than Cost"
+                );
 
-    // ============================================================
-    // CALCULATE TOTAL RECOVER COST
-    // ============================================================
+                MessageToast.show(
+                    "Recover amount cannot be greater than Cost"
+                );
 
-    var aItems =
-        oModel.getProperty("/Items") || [];
+                // Clear invalid value
+                oInput.setValue("");
 
-    var totalRecoverCost = 0;
+                oModel.setProperty(
+                    sPath + "/RecoverCost",
+                    ""
+                );
 
-    aItems.forEach(function (item) {
+                return;
 
-        totalRecoverCost +=
-            parseFloat(item.RecoverCost) || 0;
+            } else {
 
-    });
+                oInput.setValueState("None");
 
-
-    oModel.setProperty(
-        "/RecoverCost",
-        totalRecoverCost.toFixed(2)
-    );
+            }
 
 
-    // ============================================================
-    // CALCULATE DUE AMOUNT
-    // ============================================================
+            // ============================================================
+            // SET RECOVER COST
+            // ============================================================
 
-    var dueAmount =
-        (parseFloat(
-            oModel.getProperty("/TotalCost")
-        ) || 0) -
-        (parseFloat(
-            oModel.getProperty("/ReturnDamageAmount")
-        ) || 0);
+            oInput.setValue(sValue);
 
-    oModel.setProperty(
-        "/DueAmount",
-        dueAmount.toFixed(2)
-    );
-},
+            oModel.setProperty(
+                sPath + "/RecoverCost",
+                sValue
+            );
+
+
+            // ============================================================
+            // CALCULATE TOTAL RECOVER COST
+            // ============================================================
+
+            var aItems =
+                oModel.getProperty("/Items") || [];
+
+            var totalRecoverCost = 0;
+
+            aItems.forEach(function (item) {
+
+                totalRecoverCost +=
+                    parseFloat(item.RecoverCost) || 0;
+
+            });
+
+
+            oModel.setProperty(
+                "/RecoverCost",
+                totalRecoverCost.toFixed(2)
+            );
+
+
+            // ============================================================
+            // CALCULATE DUE AMOUNT
+            // ============================================================
+
+            var dueAmount =
+                (parseFloat(
+                    oModel.getProperty("/TotalCost")
+                ) || 0) -
+                (parseFloat(
+                    oModel.getProperty("/ReturnDamageAmount")
+                ) || 0);
+
+            oModel.setProperty(
+                "/DueAmount",
+                dueAmount.toFixed(2)
+            );
+        },
         onQuantityInputLiveChange: function (oEvent) {
             var oInput = oEvent.getSource();
             var sValue = oEvent.getParameter("value");
@@ -598,42 +598,42 @@ sap.ui.define([
                 return;
             }
             var oDamageTable = this.byId("CID_id_TableInvoiceItem1");
-var aRecoverCostInputs = oDamageTable
-    ? oDamageTable.getItems()
-    : [];
+            var aRecoverCostInputs = oDamageTable
+                ? oDamageTable.getItems()
+                : [];
 
-for (var j = 0; j < aRecoverCostInputs.length; j++) {
+            for (var j = 0; j < aRecoverCostInputs.length; j++) {
 
-    var oRow = aRecoverCostInputs[j];
+                var oRow = aRecoverCostInputs[j];
 
-    // Get all Input controls from the row
-    var aCells = oRow.getCells();
+                // Get all Input controls from the row
+                var aCells = oRow.getCells();
 
-    for (var k = 0; k < aCells.length; k++) {
+                for (var k = 0; k < aCells.length; k++) {
 
-        var oCell = aCells[k];
+                    var oCell = aCells[k];
 
-        if (
-            oCell instanceof sap.m.Input &&
-            oCell.getBinding("value") &&
-            oCell.getBinding("value").getPath() === "RecoverCost"
-        ) {
+                    if (
+                        oCell instanceof sap.m.Input &&
+                        oCell.getBinding("value") &&
+                        oCell.getBinding("value").getPath() === "RecoverCost"
+                    ) {
 
-            if (oCell.getValueState() === sap.ui.core.ValueState.Error) {
+                        if (oCell.getValueState() === sap.ui.core.ValueState.Error) {
 
-                sap.m.MessageBox.error(
-                    "Row " + (j + 1) +
-                    " : Recover amount cannot be greater than Cost",
-                    {
-                        styleClass: "myUnifiedBtn"
+                            sap.m.MessageBox.error(
+                                "Row " + (j + 1) +
+                                " : Recover amount cannot be greater than Cost",
+                                {
+                                    styleClass: "myUnifiedBtn"
+                                }
+                            );
+
+                            return;
+                        }
                     }
-                );
-
-                return;
+                }
             }
-        }
-    }
-}
             var aItems = oData.Items || [];
 
             for (var i = 0; i < aItems.length; i++) {
@@ -777,8 +777,8 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                                     if (oAction === sap.m.MessageBox.Action.OK) {
                                         this.getOwnerComponent()
                                             .getRouter()
-                                            .navTo("RouteDamage",{
-                                                sPath:"DamageDetails"
+                                            .navTo("RouteDamage", {
+                                                sPath: "DamageDetails"
                                             });
                                     } else {
                                         this.DM_onPressGeneratePDF();
@@ -860,30 +860,88 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
 
                 const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
                 var companyImage = oCompanyDetailsModel?.data[0].Photo1 || "";
+                var branchName = (oCompanyDetailsModel?.data[0].Name || "").toUpperCase();
 
                 const margin = 15;
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
-                let currentY = 20;
 
+                let currentY = 20;
 
                 doc.setFont("times", "bold");
                 doc.setFontSize(16);
 
-                if (oModel.Status === "Damage Claimed") {
-                    doc.text("DAMAGE RECEIPT", pageWidth - margin, currentY, { align: "right" });
-                } else {
-                    doc.text("DAMAGE NOTICE", pageWidth - margin, currentY, { align: "right" });
+                // ================= HEADER =================
+
+                const documentTitle =
+                    oModel.Status === "Damage Claimed"
+                        ? "DAMAGE RECEIPT"
+                        : "DAMAGE NOTICE";
+
+                // Keep some space for the right-side title
+                const titleWidth = doc.getTextWidth(documentTitle);
+                const branchMaxWidth = pageWidth - (margin * 2) - titleWidth - 10;
+
+                // Branch name wrapping
+                let branchNameLines = [];
+
+                if (branchName && branchName.trim() !== "") {
+
+                    branchNameLines = doc.splitTextToSize(
+                        branchName,
+                        branchMaxWidth
+                    );
+
+                    doc.text(
+                        branchNameLines,
+                        margin,
+                        currentY,
+                        {
+                            align: "left",
+                            lineHeightFactor: 1.2
+                        }
+                    );
                 }
 
-                currentY += 15;
+                // Right side title
+                doc.text(
+                    documentTitle,
+                    pageWidth - margin,
+                    currentY,
+                    {
+                        align: "right"
+                    }
+                );
+
+                // ================= LOGO =================
+
+                let logoY = 17;
+
+                // ONLY add margin when branch name is wrapped
+                if (branchNameLines.length > 1) {
+
+                    // Extra margin based on number of wrapped lines
+                    logoY = 17 + ((branchNameLines.length - 1) * 8) + 5;
+                }
 
                 if (companyImage && companyImage.trim() !== "") {
+
                     const imgData = "data:image/png;base64," + companyImage;
-                    doc.addImage(imgData, "PNG", margin, 15, 40, 40);
+
+                    doc.addImage(
+                        imgData,
+                        "PNG",
+                        margin,
+                        logoY,
+                        40,
+                        40
+                    );
                 }
 
+                // ================= NEXT CONTENT =================
 
+                // Logo bottom + margin
+                currentY = logoY + 15;
                 // ================= DAMAGE META (RIGHT SIDE TABLE STYLE) =================
                 const detailsStartY = currentY;
                 const rowHeight = 7;
@@ -895,23 +953,23 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
                 doc.setFontSize(11);
                 doc.setFont("times", "bold");
 
-               const damageDetails = [
-    ...(oModel.DamageID
-        ? [{
-            label: "Damage No :",
-            value: oModel.DamageID
-        }]
-        : []),
+                const damageDetails = [
+                    ...(oModel.DamageID
+                        ? [{
+                            label: "Damage No :",
+                            value: oModel.DamageID
+                        }]
+                        : []),
 
-    {
-        label: "Date :",
-        value: oModel.Date || "N/A"
-    },
-    {
-        label: "Room No :",
-        value: oModel.RoomNo || "N/A"
-    }
-];
+                    {
+                        label: "Date :",
+                        value: oModel.Date || "N/A"
+                    },
+                    {
+                        label: "Room No :",
+                        value: oModel.RoomNo || "N/A"
+                    }
+                ];
 
                 // Print right-aligned structured block
                 currentY = detailsStartY;
@@ -968,7 +1026,7 @@ for (var j = 0; j < aRecoverCostInputs.length; j++) {
 
                 doc.autoTable({
                     startY: currentY,
-                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Actual Cost','Recover Cost']],
+                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Actual Cost', 'Recover Cost']],
                     body: body,
                     theme: "grid",
                     headStyles: {
