@@ -1964,6 +1964,7 @@ onsendreminder: async function () {
                                 var iNew = parseInt(oSummary.new, 10) || 0;
                                 var iConfirmed = parseInt(oSummary.confirmed, 10) || 0;
                                 var iAssigned = parseInt(oSummary.assigned, 10) || 0;
+                                var iCompleted = parseInt(oSummary.completed, 10) || 0;
                                 var iCapacity = parseInt(oSummary.totalCapacity, 10) || 0;
                                 var iBooked = parseInt(oSummary.bookedCount, 10);
                                 if (isNaN(iBooked)) {
@@ -1983,6 +1984,7 @@ onsendreminder: async function () {
                                     NewCount: iNew,
                                     ConfirmedCount: iConfirmed,
                                     AssignedCount: iAssigned,
+                                    CompletedCount: iCompleted,
                                     AvailableCount: iAvailable,
                                     StartDate: oSummary.StartDate || sStartDate,
                                     EndDate: oSummary.EndDate || sEndDate,

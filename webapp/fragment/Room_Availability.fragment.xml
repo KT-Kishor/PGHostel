@@ -289,6 +289,10 @@
                             <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>availableBeds}" />
                             </Column>
+                            <Column demandPopin="true" hAlign="Center">
+                                <Text text="{i18n>completedBookings}" />
+                            </Column>
+
                             <Column minScreenWidth="Tablet" demandPopin="true">
                                 <Text text="{i18n>date}" />
                             </Column>
@@ -305,6 +309,7 @@
                                     <Text text="{RoomAvailabilitySummaryModel>ConfirmedCount}" />
                                     <Text text="{RoomAvailabilitySummaryModel>AssignedCount}" />
                                     <Text text="{RoomAvailabilitySummaryModel>AvailableCount}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>CompletedCount}" />
                                     <VBox>
                                         <Text
                                             text="{path: 'RoomAvailabilitySummaryModel>StartDate', formatter: '.Formatter.formatDate'}"

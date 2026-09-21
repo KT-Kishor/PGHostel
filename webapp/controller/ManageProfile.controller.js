@@ -2547,9 +2547,9 @@ sap.ui.define([
          * Group header for the Raised Support table (grouped by Status), styled
          * the same way as the support management view.
          */
-        getGroupHeader: function (oGroup) {
-            return this.getStyledGroupHeader(oGroup);
-        },
+        // getGroupHeader: function (oGroup) {
+        //     return this.getStyledGroupHeader(oGroup);
+        // },
 
         _updateRowCount: function () {
             const oProfileModel = this.getView().getModel("profileData");
