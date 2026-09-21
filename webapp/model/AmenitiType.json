@@ -17,5 +17,6 @@
   { "ID": 18, "AmenitiName": "Personal Lockers" },
   { "ID": 19, "AmenitiName": "Communal Spaces" },
   { "ID": 20, "AmenitiName": "Lounge Areas" },
+  { "ID": 22, "AmenitiName": "Swimming Pool" },
   { "ID": 21, "AmenitiName": "Others" }
 ]

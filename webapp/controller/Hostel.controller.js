@@ -904,7 +904,8 @@ sap.ui.define([
                 "Kitchen Access": "../image/Kitchen Access.png",
                 "Personal Lockers": "../image/locker.jpg",
                 "Communal Spaces": "../image/CommonSpace.jpg",
-                "Lounge Areas": "../image/LoungeArea.jpg"
+                "Lounge Areas": "../image/LoungeArea.jpg",
+                "Swimming Pool": "../image/pool.png"
             };
 
             return list.map(item => {
