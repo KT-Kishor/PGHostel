@@ -147,13 +147,30 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="StartDate"
-                        label="{i18n>date}"
+                        label="Start - End Date"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
 						<fb:control>
 							<DateRangeSelection
                                 id="PO_id_Date"
+                                valueFormat="yyyy-MM-dd"
+                                displayFormat="dd/MM/yyyy"
+                            />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+
+                <fb:filterGroupItems>
+					<fb:FilterGroupItem
+                        name="Date"
+                        label="Date"
+                        groupName="Group"
+                        visibleInFilterBar="true"
+                    >
+						<fb:control>
+							<DateRangeSelection
+                                id="PO_id_BookingDate"
                                 valueFormat="yyyy-MM-dd"
                                 displayFormat="dd/MM/yyyy"
                             />

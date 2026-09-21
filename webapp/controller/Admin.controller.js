@@ -33,7 +33,7 @@ sap.ui.define([
                 fyEnd = new Date(currentYear, 2, 31); // March 31 this year
             }
             // Set the date range UI (override user-selected values)
-            const dateRangeControl = this.byId("PO_id_Date");
+            const dateRangeControl = this.byId("PO_id_BookingDate");
             if (dateRangeControl) {
                 dateRangeControl.setDateValue(fyStart);
                 dateRangeControl.setSecondDateValue(fyEnd);
@@ -97,8 +97,10 @@ sap.ui.define([
             let filters = {};
 
             if (oExistingModel.Role === "Admin" && aBranchCodes) {
+                filters.Role="Admin"
                 filters.BranchID = aBranchCodes;
             } else if (oExistingModel.Role === "SuperAdmin") {
+                filters.Role="SuperAdmin"
                 filters.BranchID = "";
             } else {
                 filters.BranchID = oExistingModel.BranchCode;
@@ -211,9 +213,13 @@ var uniqueData = Array.from(
                 const sBedtype = this.byId("PO_id_Bedtype").getSelectedKey()
 
 
-                const oDateRange = this.byId("PO_id_Date");
+                const oDateRange = this.byId("PO_id_BookingDate");
                 const oStartDate = oDateRange.getDateValue();
                 const oEndDate = oDateRange.getSecondDateValue();
+
+                    const SERange = this.byId("PO_id_Date");
+                const StartDate = SERange.getDateValue();
+                const EndDate = SERange.getSecondDateValue();
 
                 const oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
                     pattern: "yyyy-MM-dd"
@@ -280,15 +286,19 @@ var uniqueData = Array.from(
                     delete filters.EndDate;
                     this._isClearPressed = false;
 
-                } else if (oStartDate && oEndDate) {
+                } else if (StartDate && EndDate) {
                     // User selected date range
-                    filters.StartDate = oDateFormat.format(oStartDate);
-                    filters.EndDate = oDateFormat.format(oEndDate);
+                    filters.StartDate = oDateFormat.format(StartDate);
+                    filters.EndDate = oDateFormat.format(EndDate);
 
-                } else {
+                }else if(oStartDate && oEndDate){
+                     filters.BookingStartDate = oDateFormat.format(oStartDate);
+                    filters.BookingEndDate = oDateFormat.format(oEndDate);
+                } 
+                else {
                     // No date selected → default Financial Year
-                    filters.StartDate = oDateFormat.format(fyStart);
-                    filters.EndDate = oDateFormat.format(fyEnd);
+                    filters.BookingStartDate = oDateFormat.format(fyStart);
+                    filters.BookingEndDate = oDateFormat.format(fyEnd);
 
                     // Set picker UI values
                     oDateRange.setDateValue(fyStart);
@@ -1372,6 +1382,8 @@ if (this.data.Status === "Assigned") {
 
 
             this.byId("PO_id_Date").setValue("");
+            this.byId("PO_id_BookingDate").setValue("");
+
         },
         onPaymentModeChange: function (oEvent) {
             var oComboBox = oEvent.getSource();

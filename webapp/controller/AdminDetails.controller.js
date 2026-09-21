@@ -255,22 +255,55 @@ sap.ui.define([
             });
         },
 
-        onChekout: function () {
-            var data = this.getView().getModel("CustomerData").getData()
+onChekout: function () {
+    var data = this.getView().getModel("CustomerData").getData();
 
-            if (!this.CK_Dialog) {
-                var oView = this.getView();
-                this.CK_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Checkout", this);
-                oView.addDependent(this.CK_Dialog);
-            }
-            sap.ui.getCore().byId("Ck_id_editStartDate").setValue(data.StartDate)
-            sap.ui.getCore().byId("Ck_id_editEndDate").setValue(data.EndDate)
+    sap.m.MessageBox.confirm(
+        "Please verify that all invoices and payments are completed correctly before proceeding with checkout. Do you want to continue?",
+        {
+            actions: [
+                sap.m.MessageBox.Action.OK,
+                sap.m.MessageBox.Action.CANCEL
+            ],
+            emphasizedAction: sap.m.MessageBox.Action.OK,
+            styleClass: "myUnifiedBtn",
 
-            this._FragmentDatePickersReadOnly(["Ck_id_editEndDate"]);
+            onClose: function (oAction) {
 
+                if (oAction !== sap.m.MessageBox.Action.OK) {
+                    return;
+                }
 
-            this.CK_Dialog.open();
-        },
+                if (!this.CK_Dialog) {
+                    var oView = this.getView();
+
+                    this.CK_Dialog = sap.ui.xmlfragment(
+                        "sap.ui.com.project1.fragment.Checkout",
+                        this
+                    );
+
+                    oView.addDependent(this.CK_Dialog);
+                }
+
+                sap.ui.getCore()
+                    .byId("Ck_id_editStartDate")
+                    .setValue(data.StartDate);
+
+                sap.ui.getCore()
+                    .byId("Ck_id_editEndDate")
+                    .setValue(data.EndDate);
+
+                this._FragmentDatePickersReadOnly([
+                    "Ck_id_editEndDate"
+                ]);
+
+                this.CK_Dialog.open();
+
+            }.bind(this)
+        }
+    );
+}
+,
 
         Ck_onCancelButtonPress: function () {
             this.CK_Dialog.close();
