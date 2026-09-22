@@ -511,6 +511,7 @@ sap.ui.define([
             };
 
             oModel.setProperty("/Submitting", true);
+            this.getBusyDialog();
             try {
                 await this.ajaxCreateWithJQuery("HM_AskSupport", { data: oPayload });
                 this.SP_AskCustomerDialog.close();
@@ -520,6 +521,7 @@ sap.ui.define([
             } catch (oError) {
                 MessageToast.show(this.i18nModel.getText("askCustomerFailed"));
             } finally {
+                this.closeBusyDialog();
                 oModel.setProperty("/Submitting", false);
             }
         },

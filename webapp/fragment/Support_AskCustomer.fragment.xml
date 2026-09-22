@@ -8,8 +8,6 @@
         class="sapUiContentPadding"
         contentWidth="44rem"
         stretch="{device>/system/phone}"
-        busy="{AskSupportModel>/Submitting}"
-        busyIndicatorDelay="0"
         initialFocus="SP_id_CustomerQuestion"
         ariaLabelledBy="SP_id_AskCustomerTitle"
     >
@@ -65,7 +63,6 @@
                 text="{i18n>submit}"
                 tooltip="{i18n>submit}"
                 press="supportAskSave"
-                enabled="{= !${AskSupportModel>/Submitting} }"
                 class="myUnifiedBtn"
             />
         </beginButton>
@@ -74,7 +71,6 @@
                 text="{i18n>CancelButton}"
                 tooltip="{i18n>CancelButton}"
                 press="supportAskCancel"
-                enabled="{= !${AskSupportModel>/Submitting} }"
                 class="myUnifiedBtn"
             />
         </endButton>
