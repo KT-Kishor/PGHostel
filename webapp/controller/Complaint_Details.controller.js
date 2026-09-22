@@ -411,7 +411,7 @@ sap.ui.define([
 
         },
         onAddComplainSave: async function () {
-            var Assignedto = this.byId("CD_id_Assignedto").getValue()
+            var Assignedto = this.byId("CD_id_Assignedto").getSelectedItem()?.getText()
             var EstimatDate = this.byId("CD_id_EstimatedDate").getValue()
             var ResolutionDate = this.byId("CD_id_ResolutionDate").getValue()
             var Comments = this.byId("CD_id_Comments").getValue()
@@ -462,16 +462,12 @@ sap.ui.define([
             });
             if ((Complaint.Status === "Pending" || Complaint.Status === "In Progress") && this.flag === false) {
 
-                 const ccemailIds = (loginResponse.data || [])
-                .map(item => item.EmailID?.trim())
-                .filter(Boolean)
-                .join(",");
                 var payload = {
                     AssignedBy: Assignedto, 
                     EstimatDate: EstimatDate.includes("-") ? EstimatDate : EstimatDate.split("/").reverse().join("-"),
                     Status: "In Progress",
-                    ccmailids:ccemailIds,
-                    emailIds: Complaint.CustomerEmail,
+                    ccmailids:Complaint.CustomerEmail,
+                    emailIds: this.byId("CD_id_Assignedto").getSelectedKey(),
                     BranchName: Complaint.BranchName,
                     RoomNo: Complaint.RoomNo,
                     ComplaintType: Complaint.ComplaintType,

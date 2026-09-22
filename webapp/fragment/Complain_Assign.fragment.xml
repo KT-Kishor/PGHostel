@@ -45,8 +45,9 @@
 
                 >
                     <core:Item
-                        key="{FilteredStaffModel>UserName}"
+                        key="{FilteredStaffModel>EmailID}"
                         text="{FilteredStaffModel>UserName}"
+                       
                     />
                 </ComboBox>
 
@@ -97,7 +98,7 @@
             <Button
                 text="{i18n>save}"
                 tooltip="{i18n>save}"
-                press=".onAddComplainSave"
+                press=".onAddComplainSave"  
                 class="myUnifiedBtn"
             />
         </beginButton>
