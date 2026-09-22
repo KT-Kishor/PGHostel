@@ -128,7 +128,7 @@
 					</Column>
 					
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="{i18n>actualcost}" tooltip="{i18n>actualcost}"/>
+						<Text text="Total Cost" tooltip="Total Cost"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>recovercost}" tooltip="{i18n>recovercost}"/>

@@ -226,6 +226,15 @@
                                                     tooltip="{i18n>actualcost}"
                                                 />
                                             </m:Column>
+                                              <m:Column
+                                                minScreenWidth="Tablet"
+                                                demandPopin="true"
+                                            >
+                                                <m:Text
+                                                    text="Total Cost"
+                                                    tooltip="Total Cost"
+                                                />
+                                            </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
                                                 demandPopin="true"
@@ -277,7 +286,7 @@
                                                     <m:Input value="{DamageModel>Quantity}"  
                                                      editable="{VisibleModel>/visible}" 
                                                      liveChange="onQuantityInputLiveChange"
-                                                     maxLength="2"/>
+                                                     maxLength="3"/>
                                                 </m:cells>
                                                
                                                 <m:cells>
@@ -286,6 +295,12 @@
                                                         liveChange="onTotalInputLiveChange"
                                                          maxLength="7"
                                                         editable="{VisibleModel>/visible}"
+                                                    />
+                                                </m:cells>
+                                                <m:cells>
+                                                    <m:Input
+                                                        value="{DamageModel>TotalCost}"
+                                                        editable="false"
                                                     />
                                                 </m:cells>
                                                 <m:cells>

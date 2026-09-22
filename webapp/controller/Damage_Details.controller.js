@@ -100,6 +100,7 @@ sap.ui.define([
                             ItemName: item.ItemName,
                             Description: item.Description,
                             Cost: item.Cost,
+                            TotalCost:item.TotalCost,
                             RecoverCost: item.RecoverCost,
                             Quantity: item.Quantity,
                             ItemId: item.ItemID
@@ -419,31 +420,60 @@ sap.ui.define([
             table.removeSelections();
         },
 
-        onTotalInputLiveChange: function (oEvent) {
-            var oInput = oEvent.getSource();
-            var sValue = oEvent.getParameter("value");
+      onQuantityInputLiveChange: function (oEvent) {
+    var oInput = oEvent.getSource();
+    var sValue = oEvent.getParameter("value");
 
-            // Allow only numbers and decimal
-            sValue = sValue.replace(/[^0-9.]/g, "");
+    // Allow only numbers and decimal
+    sValue = sValue.replace(/[^0-9.]/g, "");
+    oInput.setValue(sValue);
 
-            oInput.setValue(sValue);
+    this._calculateTotalCost(oInput);
+},
 
-            var oContext = oInput.getBindingContext("DamageModel");
+onTotalInputLiveChange: function (oEvent) {
+    var oInput = oEvent.getSource();
+    var sValue = oEvent.getParameter("value");
+
+    // Allow only numbers and decimal
+    sValue = sValue.replace(/[^0-9.]/g, "");
+    oInput.setValue(sValue);
+
+    this._calculateTotalCost(oInput);
+},
+
+_calculateTotalCost: function (oInput) {
+    var oContext = oInput.getBindingContext("DamageModel");
+
+    if (!oContext) {
+        return;
+    }
+
+    var oData = oContext.getObject();
+
+    var fQuantity = parseFloat(oData.Quantity) || 0;
+    var fCost = parseFloat(oData.Cost) || 0;
+
+    var fTotalCost = fQuantity * fCost;
+
+    // Update TotalCost in model
+    oContext.getModel().setProperty(
+        oContext.getPath() + "/TotalCost",
+        fTotalCost
+    );
+      var oContext = oInput.getBindingContext("DamageModel");
             var oModel = this.getView().getModel("DamageModel");
 
-            oModel.setProperty(oContext.getPath() + "/Cost", sValue);
 
             var aItems = oModel.getProperty("/Items") || [];
             var totalCost = 0;
 
             aItems.forEach(function (item) {
-                totalCost += parseFloat(item.Cost) || 0;
+                totalCost += parseFloat(item.TotalCost) || 0;
             });
 
-            oModel.setProperty("/ActualCost", totalCost.toFixed(2));
-            var dueAmount = parseFloat(oModel.getProperty("/ActualCost")) - parseFloat(oModel.getProperty("/ReturnDamageAmount") || 0);
-            oModel.setProperty("/DueAmount", dueAmount.toFixed(2));
-        },
+            oModel.setProperty("/Cost", totalCost.toFixed(2));
+},
         onRecoverCostLiveChange: function (oEvent) {
 
             var oInput = oEvent.getSource();
@@ -561,15 +591,7 @@ sap.ui.define([
                 dueAmount.toFixed(2)
             );
         },
-        onQuantityInputLiveChange: function (oEvent) {
-            var oInput = oEvent.getSource();
-            var sValue = oEvent.getParameter("value");
-
-            // Allow only numbers and decimal
-            sValue = sValue.replace(/[^0-9.]/g, "");
-
-            oInput.setValue(sValue);
-        },
+      
 
         DM_onPressSubmit: function () {
 
@@ -682,7 +704,7 @@ sap.ui.define([
                     Currency: oData.Currency,
                     Status: "Damage Raised",
                     BedTypeName: oData.BedTypeName,
-                    TotalCost: oData.ActualCost,
+                    TotalCost: oData.Cost,
                     RecoverCost: oData.RecoverCost,
                     BranchCode: oData.BranchCode
                 },
@@ -692,6 +714,7 @@ sap.ui.define([
                         ItemName: item.ItemName,
                         Description: item.Description,
                         Cost: item.Cost,
+                        TotalCost:(item.TotalCost || 0).toString(),
                         RecoverCost: item.RecoverCost,
                         Quantity: item.Quantity
                     };
@@ -711,6 +734,7 @@ sap.ui.define([
                             ItemName: item.ItemName,
                             Description: item.Description,
                             Cost: item.Cost,
+                            TotalCost:(item.TotalCost || 0).toString(),
                             RecoverCost: item.RecoverCost,
                             Quantity: item.Quantity,
                         }
@@ -1021,12 +1045,13 @@ sap.ui.define([
                     item.Type,
                     item.Quantity,
                     Formatter.fromatNumber(item.Cost),
+                    Formatter.fromatNumber(item.TotalCost),
                     Formatter.fromatNumber(item.RecoverCost)
                 ]);
 
                 doc.autoTable({
                     startY: currentY,
-                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Actual Cost', 'Recover Cost']],
+                    head: [['Sl.No', 'Item Name', 'Description', 'Type', 'Quantity', 'Actual Cost','Total Cost','Recover Cost']],
                     body: body,
                     theme: "grid",
                     headStyles: {
