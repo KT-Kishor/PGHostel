@@ -930,7 +930,9 @@ if (this.data.Status === "Assigned") {
             /* ================= VALIDATIONS ================= */
 
             if (this._bDepositRequired && ID.Status === "Confirmed" && this.selectedIndex === 0) {
+                var bedit=this._bDepositRequired && Number(DepositAmount) > Number(this.Deposit)
                 if (
+                    bedit ||
                     !utils._LCvalidateMandatoryField(oView.byId("id_ActualAmount"), "ID") ||
                     !utils._LCstrictValidationComboBox(oView.byId("idPaymentMode"), "ID") ||
                     (!utils._LCvalidateMandatoryField(oView.byId("id_TransactionID"), "ID")) ||
