@@ -1,0 +1,84 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        id="SupportAssignID"
+        type="Message"
+        class="sapUiContentPadding"
+        contentWidth="40rem"
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>assignSupport}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="12"
+            labelSpanL="12"
+            labelSpanM="12"
+            labelSpanS="12"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+        >
+            <f:content>
+                <Label text="{i18n>TicketID}" />
+                <Text text="{AssignEmployeeModel>/ticketId}" />
+
+                <Label
+                    text="{i18n>AssignedBy}"
+                    required="true"
+                />
+                <ComboBox
+                    id="SA_id_Employee"
+                    items="{AssignEmployeeModel>/employees}"
+                    showSecondaryValues="true"
+                    placeholder="{i18n>SelectAssignedTo}"
+                    valueStateText="{i18n>selectEmployee}"
+                    change="onAssignEmployeeChange"
+                    width="100%"
+                >
+                    <core:ListItem
+                        key="{AssignEmployeeModel>Key}"
+                        text="{AssignEmployeeModel>DisplayName}"
+                        additionalText="{AssignEmployeeModel>EmailID}"
+                    />
+                </ComboBox>
+
+                <Label text="{i18n>assignedDate}" />
+                <DatePicker
+                    id="SA_id_AssignedDate"
+                    width="100%"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    editable="false"
+                />
+            </f:content>
+        </f:SimpleForm>
+
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="supportAssignSave"
+                class="myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="supportAssignCancel"
+                class="myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

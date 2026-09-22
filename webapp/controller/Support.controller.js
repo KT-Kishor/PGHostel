@@ -177,6 +177,221 @@ sap.ui.define([
             }
         },
 
+        SP_assign: async function () {
+            var oTable = this.byId("idSupportTable");
+            var oSelected = oTable.getSelectedItem();
+
+            if (!oSelected) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssign"));
+                return;
+            }
+
+            var oData = oSelected.getBindingContext("SupportModel").getObject();
+
+            // Assignment is allowed only for tickets that are still Open.
+            var sStatus = String(oData.Status || "").trim().toLowerCase();
+            if (sStatus !== "open") {
+                if (sStatus === "assigned") {
+                    MessageToast.show(this.i18nModel.getText("alreadyAssigned"));
+                } else if (sStatus === "resolved") {
+                    MessageToast.show(this.i18nModel.getText("alreadyResolved"));
+                } else {
+                    MessageToast.show(this.i18nModel.getText("wecannotAssign"));
+                }
+                return;
+            }
+
+            var oView = this.getView();
+
+            try {
+                if (!this.SP_AssignDialog) {
+                    this.SP_AssignDialog = await sap.ui.core.Fragment.load({
+                        id: oView.getId(),
+                        name: "sap.ui.com.project1.fragment.Support_Assign",
+                        controller: this
+                    });
+                    oView.addDependent(this.SP_AssignDialog);
+                }
+            } catch (oError) {
+                console.error("Failed to load assign support dialog", oError);
+                MessageToast.show(this.i18nModel.getText("assignSupportFailed"));
+                return;
+            }
+
+            var oCombo = this.byId("SA_id_Employee");
+            if (oCombo) {
+                oCombo.setSelectedKey("").setValue("").setValueState("None");
+                this._applyAssignEmployeeFilter(oCombo);
+            }
+
+            var oDatePicker = this.byId("SA_id_AssignedDate");
+            if (oDatePicker) {
+                oDatePicker.setDateValue(new Date());
+            }
+
+            this.SP_AssignDialog.open();
+
+            // Load the DevEmployee list while the dialog is open so the
+            // ComboBox always receives the filtered HM_LoginUser result.
+            await this._loadAssignEmployees();
+
+            var oAssignModel = oView.getModel("AssignEmployeeModel");
+            if (oAssignModel) {
+                oAssignModel.setProperty("/ticketId", oData.TicketID || "");
+            }
+        },
+
+        // Loads employees once per session from HM_LoginUser (Role = DevEmployee)
+        // and exposes them as AssignEmployeeModel>/employees for the assign dialog.
+        _loadAssignEmployees: function () {
+            var oView = this.getView();
+
+            if (this._bAssignEmployeesLoaded) {
+                return Promise.resolve();
+            }
+
+            this.getBusyDialog();
+
+            return this.ajaxReadWithJQuery("HM_LoginUser", { Role: "DevEmployee" })
+                .then(function (oResponse) {
+                    var aRows = Array.isArray(oResponse.data)
+                        ? oResponse.data
+                        : (oResponse.data ? [oResponse.data] : []);
+                    var oSeen = {};
+                    var aEmployees = [];
+
+                    aRows.forEach(function (oRow) {
+                        if (!oRow) {
+                            return;
+                        }
+                        var sEmail = (oRow.EmailID || "").trim();
+                        var sUserId = (oRow.UserID || "").trim();
+                        var sUserName = (oRow.UserName || "").trim();
+                        var sKey = sEmail || sUserId || sUserName;
+
+                        if (!sKey || oSeen[sKey]) {
+                            return;
+                        }
+                        oSeen[sKey] = true;
+
+                        aEmployees.push({
+                            Key: sKey,
+                            EmailID: sEmail,
+                            UserID: sUserId,
+                            UserName: sUserName,
+                            DisplayName: sUserName || sEmail || sUserId
+                        });
+                    });
+
+                    aEmployees.sort(function (a, b) {
+                        return String(a.DisplayName).localeCompare(String(b.DisplayName));
+                    });
+
+                    oView.setModel(new JSONModel({ employees: aEmployees, ticketId: "" }), "AssignEmployeeModel");
+                    this._bAssignEmployeesLoaded = true;
+                }.bind(this))
+                .catch(function (oError) {
+                    console.error("Failed to load DevEmployee list from HM_LoginUser", oError);
+                    oView.setModel(new JSONModel({ employees: [], ticketId: "" }), "AssignEmployeeModel");
+                    MessageToast.show(this.i18nModel.getText("loadEmployeeFailed"));
+                }.bind(this))
+                .finally(function () {
+                    this.closeBusyDialog();
+                }.bind(this));
+        },
+
+        // Let the employee ComboBox type-ahead match either the UserName
+        // (item text) or the EmailID (additionalText), instead of the default
+        // starts-with match on the display text only.
+        _applyAssignEmployeeFilter: function (oCombo) {
+            if (!oCombo || !oCombo.setFilterFunction) {
+                return;
+            }
+            oCombo.setFilterFunction(function (sTerm, oItem) {
+                var sNeedle = String(sTerm || "").toLowerCase();
+                var sName = String(oItem.getText() || "").toLowerCase();
+                var sEmail = String(oItem.getAdditionalText() || "").toLowerCase();
+                return sName.indexOf(sNeedle) !== -1 || sEmail.indexOf(sNeedle) !== -1;
+            });
+        },
+
+        onAssignEmployeeChange: function (oEvent) {
+            var oCombo = oEvent.getSource();
+
+            if (!oCombo.getValue()) {
+                oCombo.setValueState("None");
+                return;
+            }
+
+            utils._LCstrictValidationComboBox(oCombo, "ID");
+        },
+
+        supportAssignSave: function () {
+            var oCombo = this.byId("SA_id_Employee");
+
+            if (!utils._LCstrictValidationComboBox(oCombo, "ID")) {
+                MessageToast.show(this.i18nModel.getText("selectEmployee"));
+                return;
+            }
+
+            var sValue = oCombo.getValue();
+            var oItem = oCombo.getItems().find(function (oEmployeeItem) {
+                return oEmployeeItem.getText() === sValue || oEmployeeItem.getKey() === sValue;
+            });
+            var sAssignedTo = oItem ? oItem.getKey() : (oCombo.getSelectedKey() || sValue);
+
+            // AssignedName carries the employee's UserName from HM_LoginUser.
+            var sAssignedName = "";
+            var oItemContext = oItem && oItem.getBindingContext("AssignEmployeeModel");
+            if (oItemContext) {
+                sAssignedName = oItemContext.getObject().UserName || "";
+            }
+            if (!sAssignedName) {
+                sAssignedName = oItem ? oItem.getText() : sValue;
+            }
+
+            var oSelected = this.byId("idSupportTable").getSelectedItem();
+            if (!oSelected) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordtoAssign"));
+                return;
+            }
+
+            var oData = oSelected.getBindingContext("SupportModel").getObject();
+            var oPayload = {
+                "TicketID": oData.TicketID,
+                "IssueName": oData.IssueName,
+                "IssueType": oData.IssueType,
+                "IssueDescription": oData.IssueDescription,
+                "RaisedBy": oData.RaisedBy,
+                "Email": oData.Email,
+                "Status": "Assigned",
+                "AssignedTo": sAssignedTo,
+                "AssignedName": sAssignedName,
+                "AssignedDate": new Date().toISOString().split("T")[0]
+            };
+
+            this.getBusyDialog();
+            this.ajaxUpdateWithJQuery("HM_Support", {
+                data: oPayload,
+                filters: {
+                    TicketID: oData.TicketID
+                },
+            }).then(async () => {
+                await this.CD_read();
+                this.SP_AssignDialog.close();
+                MessageToast.show(this.i18nModel.getText("assignSupportSuccess"));
+            }).catch(() => {
+                MessageToast.show(this.i18nModel.getText("assignSupportFailed"));
+            }).finally(() => {
+                this.closeBusyDialog();
+            });
+        },
+
+        supportAssignCancel: function () {
+            this.byId("idSupportTable").removeSelections();
+            this.SP_AssignDialog.close();
+        },
+
         HF_viewroom: async function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext("SupportModel");
             var oRowData = oContext.getObject();
@@ -319,6 +534,16 @@ sap.ui.define([
                 type: "string"
             },
             {
+                label: "Assigned To",
+                property: "AssignedToDisplay",
+                type: "string"
+            },
+            {
+                label: "Assigned Date",
+                property: "AssignedDate",
+                type: "string"
+            },
+            {
                 label: "Resolved Date",
                 property: "ResolvedDate",
                 type: "string"
@@ -348,10 +573,19 @@ sap.ui.define([
                         createdDate = Formatter.formatDate(item.CreatedDate);
                     }
                 }
+                let assignedDate = "";
+                if (item.AssignedDate) {
+                    const d3 = new Date(item.AssignedDate);
+                    if (d3.getFullYear() > 1900) {
+                        assignedDate = Formatter.formatDate(item.AssignedDate);
+                    }
+                }
                 return {
                     ...item,
                     ResolvedDate: resolvedDate,
-                    CreatedDate: createdDate
+                    CreatedDate: createdDate,
+                    AssignedToDisplay: Formatter.formatAssignedNameAndEmail(item.AssignedName, item.AssignedTo),
+                    AssignedDate: assignedDate
                 };
             });
             const aCols = this.createTableSheet();

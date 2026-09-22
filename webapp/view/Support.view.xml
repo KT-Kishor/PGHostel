@@ -72,6 +72,8 @@
 						<ToolbarSpacer />
 						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
                         press="SP_resolve" class="myUnifiedBtn"/>
+						<Button text="{i18n>Assign}" tooltip="{i18n>Assign}"
+                        press="SP_assign" class="myUnifiedBtn"/>
 						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="S_onDownload"
                         class="myUnifiedBtn"
@@ -100,6 +102,12 @@
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
 					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>AssignedBy}" tooltip="{i18n>AssignedBy}"/>
+					</Column>
+					<Column demandPopin="true" minScreenWidth="Tablet">
+						<Text text="{i18n>assignedDate}" tooltip="{i18n>assignedDate}"/>
+					</Column>
 					<!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>Status}" tooltip="{i18n>Status}"/></Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>Resolvedate}" tooltip="{i18n>Resolvedate}"/>
@@ -118,6 +126,8 @@
 							<Text text="{SupportModel>RaisedBy}" />
 							<Text text="{SupportModel>Email}" />
 							<Text text="{path:'SupportModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
+							<Text text="{parts: [{path:'SupportModel>AssignedName'}, {path:'SupportModel>AssignedTo'}], formatter: '.Formatter.formatAssignedNameAndEmail'}"/>
+							<Text text="{path:'SupportModel>AssignedDate', formatter: '.Formatter.formatResolvedDate'}"/>
 							<!-- <ObjectStatus inverted="false" text="{SupportModel>Status}"
                             state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${SupportModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${SupportModel>ResolvedDate} === null ? '' : ${path: 'SupportModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>

@@ -609,6 +609,17 @@ sap.ui.define([
             return mode + " / " + txnId;
         },
 
+        // Merges the assigned employee's name and email into a single display
+        // value: "UserName (EmailID)". Falls back to whichever part exists.
+        formatAssignedNameAndEmail: function (sAssignedName, sAssignedTo) {
+            var sName = (sAssignedName || "").trim();
+            var sEmail = (sAssignedTo || "").trim();
+            if (!sName && !sEmail) return "";
+            if (!sName) return sEmail;
+            if (!sEmail || sEmail === sName) return sName;
+            return sName + " (" + sEmail + ")";
+        },
+
 
         canEditComplaint: function (sStatus) {
             if (!sStatus) {
