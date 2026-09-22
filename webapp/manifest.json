@@ -378,7 +378,7 @@
         },
         {
           "name": "RouteDeposit",
-          "pattern": "Deposit/{from}",
+          "pattern": "Deposit/{from}/{BookingID}",
           "target": [
             "TargetDeposit"
           ]

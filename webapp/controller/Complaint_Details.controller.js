@@ -457,19 +457,33 @@ sap.ui.define([
                     return;
                 }
             }
+               var loginResponse = await this.ajaxReadWithJQuery("HM_StaffEmailIDs", {
+                BranchCode: Complaint.BranchCode
+            });
             if ((Complaint.Status === "Pending" || Complaint.Status === "In Progress") && this.flag === false) {
+
+                 const ccemailIds = (loginResponse.data || [])
+                .map(item => item.EmailID?.trim())
+                .filter(Boolean)
+                .join(",");
                 var payload = {
-                    AssignedBy: Assignedto,
+                    AssignedBy: Assignedto, 
                     EstimatDate: EstimatDate.includes("-") ? EstimatDate : EstimatDate.split("/").reverse().join("-"),
-                    Status: "In Progress"
+                    Status: "In Progress",
+                    ccmailids:ccemailIds,
+                    emailIds: Complaint.CustomerEmail,
+                    BranchName: Complaint.BranchName,
+                    RoomNo: Complaint.RoomNo,
+                    ComplaintType: Complaint.ComplaintType,
+                    Description:Complaint.Description,
+                    CustomerName: Complaint.CustomerName
+
                 };
             }
             if ((Complaint.Status === "In Progress" || Complaint.Status === "Resolved") && this.flag === true) {
                 this.getBusyDialog()
                     
-            var loginResponse = await this.ajaxReadWithJQuery("HM_StaffEmailIDs", {
-                BranchCode: Complaint.BranchCode
-            });
+         
 
             const ccemailIds = (loginResponse.data || [])
                 .map(item => item.EmailID?.trim())

@@ -1419,6 +1419,15 @@ if (this.data.Status === "Assigned") {
         },
         ActualAmountLiveChange: function (oEvent) {
             utils.onNumber(oEvent.getSource(), "ID");
+
+            var Depositamount=this.getView().getModel("HostelModel").getProperty("/DepositAmount")
+            var ActualAmount=this.getView().getModel("HostelModel").getProperty("/ActualAmount")
+
+            if(Number(Depositamount)<Number(ActualAmount)){
+                sap.ui.getCore().byId("id_ActualAmount").setValueState("Error")
+            }else{
+                sap.ui.getCore().byId("id_ActualAmount").setValueState("None")
+            }
         },
          onYearDatePickerChange: function (oEvent) {
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");

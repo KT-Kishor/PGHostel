@@ -10396,9 +10396,12 @@ sap.m.MessageBox.confirm(
             }
         },
         onPressDeposit: function () {
+           var BookingID= this.getView().getModel("CustomerData").getProperty("/BookingID")
+           var sBookingID= btoa(BookingID.toString())
             var oRouter = this.getOwnerComponent().getRouter()
             oRouter.navTo("RouteDeposit", {
-                from: "Invoice"   // any identifier for the source page
+                from: "ManageBoooking",
+                BookingID:encodeURIComponent(sBookingID)
             });
         }
     });

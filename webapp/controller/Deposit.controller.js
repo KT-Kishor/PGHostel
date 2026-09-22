@@ -78,6 +78,8 @@ sap.ui.define([
             var LoginFUnction = await this.commonLoginFunction("ManageSecurityDeposit");
             if (!LoginFUnction) return;
            this._sFrom = oEvent.getParameter("arguments").from || "";
+           this.BookingID =atob(decodeURIComponent(oEvent.getParameter("arguments").BookingID)) || "";
+
             // Bind LoginModel to the view
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             if (oLoginModel) {
@@ -183,6 +185,10 @@ sap.ui.define([
             fyEnd.setHours(0, 0, 0, 0);
 
             return { fyStart, fyEnd };
+        },
+        onDepositfilterSearch:function(){
+            this.BookingID=""
+         this.onDepositSearch()
         },
 
         onDepositSearch: async function () {
@@ -342,7 +348,14 @@ sap.ui.define([
                         params.Status = sStatus.trim();
                     }
                 }
+                         if(this.BookingID && this._sFrom==="ManageBoooking"){
+                           params.BookingID=this.BookingID
+                           this.getView().byId("DfBookingID").setSelectedKey(this.BookingID)
+                           this.getView().byId("fDepositRange").setValue("")
 
+                           params.BookingID=this.BookingID
+                           params.DepositDate=[]
+                         }
 
                 // ================= API Call =================
                 const oResult = await this.ajaxReadWithJQuery("HM_Deposit", params);
