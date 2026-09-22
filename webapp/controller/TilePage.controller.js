@@ -2349,6 +2349,7 @@ sap.ui.define([
                     selected: null,
                     displayRole: "",
                     hasSelection: false,
+                    passwordResetAllowed: false,
                     newStatus: "Active",
                     statusChanged: false,
                     password: "",
@@ -2446,6 +2447,7 @@ sap.ui.define([
                         oModel.setProperty("/statusChanged", false);
                         this._setRPStatusOptions(oFresh.Status);
                         this._applyRPDisplayRole();
+                        this._updateRPPasswordResetAllowed();
                     } else {
                         oModel.setProperty("/selectedEmail", "");
                         this._clearRPSelection();
@@ -2527,6 +2529,7 @@ sap.ui.define([
             // HM_LoginUser carries Type, so the display role resolves from the
             // already-loaded row without an extra backend call.
             this._applyRPDisplayRole();
+            this._updateRPPasswordResetAllowed();
         },
 
         // Reference-counted busy dialog so nested opens (list refresh +
@@ -2586,6 +2589,29 @@ sap.ui.define([
             }));
         },
 
+        // Passwords may only be reset for Active accounts. An Inactive user has
+        // no usable credentials until reactivated, so both password fields and
+        // the reset button stay locked out until the status is back to Active.
+        _updateRPPasswordResetAllowed: function () {
+            var oModel = this.getView().getModel("RPModel");
+            if (!oModel) {
+                return false;
+            }
+
+            var oSelected = oModel.getProperty("/selected");
+            var bAllowed = !!oSelected && String(oSelected.Status || "") === "Active";
+
+            oModel.setProperty("/passwordResetAllowed", bAllowed);
+
+            if (!bAllowed) {
+                oModel.setProperty("/password", "");
+                oModel.setProperty("/confirmPassword", "");
+                this._resetRPPasswordState();
+            }
+
+            return bAllowed;
+        },
+
         onRPNewStatusChange: function (oEvent) {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
             this._updateRPStatusChangedState(oEvent.getSource().getSelectedKey());
@@ -2619,6 +2645,7 @@ sap.ui.define([
             oModel.setProperty("/selected", null);
             oModel.setProperty("/displayRole", "");
             oModel.setProperty("/hasSelection", false);
+            oModel.setProperty("/passwordResetAllowed", false);
             oModel.setProperty("/newStatus", "Active");
             oModel.setProperty("/statusChanged", false);
             this._setRPStatusOptions(null);
@@ -2825,6 +2852,13 @@ sap.ui.define([
             var oSelected = oModel.getProperty("/selected");
             if (!oSelected || !oSelected.UserID) {
                 MessageToast.show(this.i18nModel.getText("resetPasswordSelectUser"));
+                return;
+            }
+
+            // Only Active accounts may have their password reset. Inactive users
+            // must be reactivated first, so the whole section stays blocked.
+            if (!this._updateRPPasswordResetAllowed()) {
+                MessageToast.show(this.i18nModel.getText("resetPasswordActiveOnly"));
                 return;
             }
 
