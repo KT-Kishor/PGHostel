@@ -109,6 +109,13 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("alreadyResolved"));
                 return;
             }
+
+            // A ticket has to be assigned to an employee before it can be resolved.
+            if (String(Data.Status || "").trim().toLowerCase() === "open") {
+                MessageToast.show(this.i18nModel.getText("resolveRequiresAssignment"));
+                return;
+            }
+
             if (!this.SP_Dialog) {
                 this.SP_Dialog = sap.ui.xmlfragment("sap.ui.com.project1.fragment.Support", this);
                 this.getView().addDependent(this.SP_Dialog);
@@ -252,7 +259,7 @@ sap.ui.define([
 
             this.getBusyDialog();
 
-            return this.ajaxReadWithJQuery("HM_LoginUser", { Role: "DevEmployee" })
+            return this.ajaxReadWithJQuery("HM_LoginUser", { Role: "DevEmployee,SuperAdmin" })
                 .then(function (oResponse) {
                     var aRows = Array.isArray(oResponse.data)
                         ? oResponse.data
@@ -390,6 +397,141 @@ sap.ui.define([
         supportAssignCancel: function () {
             this.byId("idSupportTable").removeSelections();
             this.SP_AssignDialog.close();
+        },
+
+        // Resolved tickets cannot be modified, so their selection radio is
+        // disabled. The radio is owned by the list item and its enabled state
+        // is not propagated from the row, so it is switched off per item once
+        // the table has rendered.
+        SP_onTableUpdateFinished: function () {
+            this.byId("idSupportTable").getItems().forEach(function (oItem) {
+                var oContext = oItem.getBindingContext("SupportModel");
+                var oModeControl = oItem.getModeControl && oItem.getModeControl();
+                if (!oContext || !oModeControl || !oModeControl.setEnabled) {
+                    return;
+                }
+                var oData = oContext.getObject();
+                oModeControl.setEnabled(String(oData.Status || "").trim() !== "Resolved");
+            });
+        },
+
+        // Safety net for non-pointer selection (for example keyboard) on a
+        // resolved row, whose radio is already disabled.
+        SP_onSelectionChange: function (oEvent) {
+            var oItem = oEvent.getParameter("listItem");
+            if (!oItem) {
+                return;
+            }
+            var oContext = oItem.getBindingContext("SupportModel");
+            var oData = oContext && oContext.getObject();
+            if (oData && String(oData.Status || "").trim() === "Resolved") {
+                this.byId("idSupportTable").removeSelections();
+                MessageToast.show(this.i18nModel.getText("resolvedTicketCannotBeSelected"));
+            }
+        },
+
+        SP_askCustomer: async function () {
+            if (this._bAskCustomerOpening || (this.SP_AskCustomerDialog && this.SP_AskCustomerDialog.isOpen())) {
+                return;
+            }
+
+            var oSelected = this.byId("idSupportTable").getSelectedItem();
+            var oContext = oSelected && oSelected.getBindingContext("SupportModel");
+            if (!oContext) {
+                MessageToast.show(this.i18nModel.getText("pleaseSelectRecordToAskCustomer"));
+                return;
+            }
+
+            var oView = this.getView();
+            // Keep the displayed ticket fixed even if the table binding changes.
+            oView.setModel(new JSONModel({
+                Ticket: Object.assign({}, oContext.getObject()),
+                Question: "",
+                Submitting: false
+            }), "AskSupportModel");
+
+            this._bAskCustomerOpening = true;
+            try {
+                if (!this.SP_AskCustomerDialog) {
+                    this.SP_AskCustomerDialog = await this.loadFragment({
+                        name: "sap.ui.com.project1.fragment.Support_AskCustomer"
+                    });
+                    this.SP_AskCustomerDialog.setEscapeHandler(function (oPromise) {
+                        if (oView.getModel("AskSupportModel").getProperty("/Submitting")) {
+                            oPromise.reject();
+                        } else {
+                            oPromise.resolve();
+                        }
+                    });
+                }
+                this.byId("SP_id_CustomerQuestion").setValueState("None");
+                this.SP_AskCustomerDialog.open();
+            } catch (oError) {
+                MessageToast.show(this.i18nModel.getText("askCustomerDialogFailed"));
+            } finally {
+                this._bAskCustomerOpening = false;
+            }
+        },
+
+        supportAskSave: async function () {
+            var oModel = this.getView().getModel("AskSupportModel");
+            if (!oModel || oModel.getProperty("/Submitting")) {
+                return;
+            }
+
+            var oQuestion = this.byId("SP_id_CustomerQuestion");
+            var sQuestion = oQuestion.getValue().trim();
+            if (!sQuestion || sQuestion.length > oQuestion.getMaxLength()) {
+                oQuestion.setValueState("Error").focus();
+                return;
+            }
+            oQuestion.setValueState("None");
+
+            var oTicket = oModel.getProperty("/Ticket");
+            if (!String(oTicket.TicketID || "").trim()) {
+                MessageToast.show(this.i18nModel.getText("askCustomerTicketRequired"));
+                return;
+            }
+            var sEmail = String(oTicket.Email || "").trim();
+            if (!/^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/.test(sEmail)) {
+                MessageToast.show(this.i18nModel.getText("askCustomerEmailRequired"));
+                return;
+            }
+
+            var oLogin = this.getView().getModel("LoginModel").getData();
+            var oPayload = {
+                AskedByEmail: oLogin.EmailID || "",
+                AskedByName: oLogin.UserName || "",
+                RaisedByEmail: sEmail,
+                IssueName: oTicket.IssueName || "",
+                IssueType: oTicket.IssueType || "",
+                Question: sQuestion,
+                RaisedBy: oTicket.RaisedBy || "",
+                TicketID: String(oTicket.TicketID).trim()
+            };
+
+            oModel.setProperty("/Submitting", true);
+            try {
+                await this.ajaxCreateWithJQuery("HM_AskSupport", oPayload);
+                this.SP_AskCustomerDialog.close();
+                oModel.setProperty("/Question", "");
+                this.byId("idSupportTable").removeSelections();
+                MessageToast.show(this.i18nModel.getText("askCustomerSuccess"));
+            } catch (oError) {
+                MessageToast.show(this.i18nModel.getText("askCustomerFailed"));
+            } finally {
+                oModel.setProperty("/Submitting", false);
+            }
+        },
+
+        supportAskCancel: function () {
+            var oModel = this.getView().getModel("AskSupportModel");
+            if (oModel.getProperty("/Submitting")) {
+                return;
+            }
+            this.SP_AskCustomerDialog.close();
+            oModel.setProperty("/Question", "");
+            this.byId("idSupportTable").removeSelections();
         },
 
         HF_viewroom: async function (oEvent) {

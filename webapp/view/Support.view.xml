@@ -65,6 +65,8 @@
                 mode="SingleSelectLeft"
                 width="auto"
                 busyIndicatorDelay="0"
+                updateFinished="SP_onTableUpdateFinished"
+                selectionChange="SP_onSelectionChange"
                 items="{path: 'SupportModel>/',sorter: {path: 'Status', group: true},groupHeaderFactory: '.getGroupHeader'}" >
 				<headerToolbar>
 					<OverflowToolbar>
@@ -74,6 +76,8 @@
                         press="SP_resolve" class="myUnifiedBtn"/>
 						<Button text="{i18n>Assign}" tooltip="{i18n>Assign}"
                         press="SP_assign" class="myUnifiedBtn"/>
+						<Button text="{i18n>askCustomer}" tooltip="{i18n>askCustomer}"
+                        press="SP_askCustomer" class="myUnifiedBtn"/>
 						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="S_onDownload"
                         class="myUnifiedBtn"

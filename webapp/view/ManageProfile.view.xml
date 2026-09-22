@@ -401,7 +401,7 @@
                     />
                     <IconTabFilter
                         key="Raised Support"
-                        text="{= ${profileData>/supportCount} > 0 ? 'Support (' + ${profileData>/supportCount} + ')' : 'Support' }"
+                        text="{= ${profileData>/supportCount} > 0 ? 'Support Ticket (' + ${profileData>/supportCount} + ')' : 'Support Ticket' }"
                     />
                 </items>
             </IconTabHeader>
