@@ -512,7 +512,7 @@ sap.ui.define([
 
             oModel.setProperty("/Submitting", true);
             try {
-                await this.ajaxCreateWithJQuery("HM_AskSupport", oPayload);
+                await this.ajaxCreateWithJQuery("HM_AskSupport", { data: oPayload });
                 this.SP_AskCustomerDialog.close();
                 oModel.setProperty("/Question", "");
                 this.byId("idSupportTable").removeSelections();
