@@ -2575,6 +2575,14 @@ sap.ui.define([
                 return;
             }
 
+            // When a new/different coupon was applied while editing, re-check its
+            // remaining uses before the update is written. A coupon that ran out
+            // in the meantime is removed and the flow stops for user review. The
+            // booking's original coupon is exempt from this check.
+            if (!await this._verifyAppliedCouponMaxUsage(true)) {
+                return;
+            }
+
             // Re-verify the server-side booking status before touching the booking,
             // so a concurrent admin update cannot be overwritten accidentally.
             if (!await this._verifyBookingStatusUnchanged()) {

@@ -6071,7 +6071,8 @@
                 icon: MessageBox.Icon.WARNING,
                 title: "Coupon Removed",
                 actions: [MessageBox.Action.OK],
-                emphasizedAction: MessageBox.Action.OK
+                emphasizedAction: MessageBox.Action.OK,
+                contentWidth: "420px"
             });
 
             setTimeout(function () {
@@ -6150,6 +6151,86 @@
                 oModel.setProperty("/AppliedDiscount", fDiscountAmount);
                 return fExistingDiscount !== fDiscountAmount;
             }
+        },
+
+        /**
+         * Final guard against the coupon usage race. The coupon is validated when
+         * it is applied, but another user can consume the remaining uses before
+         * this booking is confirmed. Right before continuing/updating we re-read
+         * the live usage count and, only for the MaxUses condition, drop the
+         * coupon when it is no longer available.
+         *
+         * If the read fails due to a network/server error the flow is blocked and
+         * the user is asked to try again manually.
+         *
+         * @param {boolean} bIsEditFlow True when called from the edit-booking flow.
+         *   Only then is the booking's original coupon allowed to bypass the
+         *   check; a new booking always verifies every applied coupon.
+         * @returns {Promise<boolean>} True when the flow can proceed, false when
+         *   the coupon was removed or the check could not be completed.
+         */
+        _verifyAppliedCouponMaxUsage: async function (bIsEditFlow) {
+            var oModel = this.getView().getModel("HostelModel");
+            var sAppliedCode = String(oModel.getProperty("/AppliedCouponCode") || "").trim();
+
+            if (!sAppliedCode) {
+                return true;
+            }
+
+            // Edit flow only: the coupon the booking was originally created with
+            // is always allowed to stay. A new booking never skips the check.
+            if (bIsEditFlow) {
+                var sOriginalCode = String(oModel.getProperty("/OriginalCouponCode") || "").trim();
+                if (sOriginalCode && sAppliedCode.toUpperCase() === sOriginalCode.toUpperCase()) {
+                    return true;
+                }
+            }
+
+            var sBranchCode = String(oModel.getProperty("/BranchCode") || "").trim();
+            var oMatchedCoupon;
+
+            try {
+                this.getBusyDialog();
+                var oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+                    CouponCode: sAppliedCode,
+                    Status: "Active"
+                });
+                this.closeBusyDialog();
+                var aCoupons = (oResponse && oResponse.data) || [];
+
+                oMatchedCoupon = aCoupons.find(function (oCoupon) {
+                    var sCouponBranchCode = String(oCoupon.BranchCode || "").trim();
+                    return String(oCoupon.CouponCode || "").trim().toUpperCase() === sAppliedCode.toUpperCase()
+                        && sCouponBranchCode === sBranchCode;
+                });
+            } catch (oError) {
+                this.closeBusyDialog();
+
+                // Network/server error: block the flow. The user retries manually
+                // with the Continue / Update Booking button once the connection is
+                // stable.
+                MessageToast.show("Unable to verify coupon status due to a network error. Please try again.");
+                return false;
+            }
+
+            var sRemovalReason = "";
+            if (!oMatchedCoupon) {
+                sRemovalReason = "is no longer available";
+            } else if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
+                sRemovalReason = "has reached its maximum usage limit";
+            }
+
+            if (!sRemovalReason) {
+                return true;
+            }
+
+            this._resetCouponState(false);
+            this._recalculateSummary();
+            this._showCouponInvalidMessage(
+                "The applied coupon '" + sAppliedCode + "' " + sRemovalReason +
+                " and has been removed from this booking. Please review the updated total before continuing."
+            );
+            return false;
         },
 
 
@@ -7884,6 +7965,13 @@
             let oPaymentTypeGroup;
 
             if (!this._validateBookingBeforePayment()) {
+                return;
+            }
+
+            // Re-check the applied coupon's remaining uses right before the
+            // payment step so a coupon exhausted in the meantime is not carried
+            // into the booking. New bookings never skip this check.
+            if (!await this._verifyAppliedCouponMaxUsage(false)) {
                 return;
             }
 
