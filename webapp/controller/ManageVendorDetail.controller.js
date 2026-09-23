@@ -374,6 +374,7 @@ sap.ui.define([
                         City: oData.City,
                         DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
                         Status: oData.Status,
+                        flag: "ResendMail"
                     },
                     filters: {
                         UserID: oData.UserID

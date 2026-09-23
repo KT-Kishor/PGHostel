@@ -139,7 +139,42 @@ sap.ui.define([
             utils._LCvalidateMandatoryField(oEvent.getSource(), "ID");
         },
 
-        supportSave: function () {
+        // Resolves the comma-separated EmailID list of every SuperAdmin
+        // (HM_LoginUser, Role = SuperAdmin). Cached per session; a failed
+        // load returns "" and is retried on the next call.
+        _getSuperAdminEmails: function () {
+            if (this._pSuperAdminEmails) {
+                return this._pSuperAdminEmails;
+            }
+
+            this._pSuperAdminEmails = this.ajaxReadWithJQuery("HM_LoginUser", { Role: "SuperAdmin" })
+                .then(function (oResponse) {
+                    var aRows = Array.isArray(oResponse.data) ?
+                        oResponse.data :
+                        (oResponse.data ? [oResponse.data] : []);
+                    var oSeen = {};
+                    var aEmails = [];
+
+                    aRows.forEach(function (oRow) {
+                        var sEmail = ((oRow && oRow.EmailID) || "").trim();
+                        if (sEmail && !oSeen[sEmail]) {
+                            oSeen[sEmail] = true;
+                            aEmails.push(sEmail);
+                        }
+                    });
+
+                    return aEmails.join(",");
+                }.bind(this))
+                .catch(function (oError) {
+                    console.error("Failed to load SuperAdmin emails from HM_LoginUser", oError);
+                    this._pSuperAdminEmails = null;
+                    return "";
+                }.bind(this));
+
+            return this._pSuperAdminEmails;
+        },
+
+        supportSave: async function () {
             if (
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SP_id_Description"), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId("SP_id_ResolutionDate"), "ID")
@@ -153,6 +188,10 @@ sap.ui.define([
                 }
                 var oContext = selected.getBindingContext("SupportModel");
                 var SPData = oContext.getObject();
+
+                this.getBusyDialog();
+                var sSuperAdminEmails = await this._getSuperAdminEmails();
+
                 var Payload = {
                     "TicketID": SPData.TicketID,
                     "IssueName": SPData.IssueName,
@@ -162,9 +201,9 @@ sap.ui.define([
                     "Email": SPData.Email,
                     "ResolvedDescription": sap.ui.getCore().byId("SP_id_Description").getValue(),
                     "Status": "Resolved",
-                    "ResolvedDate": sap.ui.getCore().byId("SP_id_ResolutionDate").getValue()
+                    "ResolvedDate": sap.ui.getCore().byId("SP_id_ResolutionDate").getValue(),
+                    "SuperAdmin": sSuperAdminEmails
                 }
-                this.getBusyDialog()
                 this.ajaxUpdateWithJQuery("HM_Support", {
                     data: Payload,
                     filters: {
