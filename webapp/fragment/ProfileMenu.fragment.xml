@@ -1,0 +1,50 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Popover
+        id="id_profileMenuPopover"
+        placement="Bottom"
+        showHeader="false"
+        contentWidth="auto"
+        horizontalScrolling="false"
+        class="profileMenuPopover"
+    >
+        <List
+            showSeparators="None"
+            mode="None"
+        >
+            <StandardListItem
+                title="{= ${profileData>/isEditMode} ? ${i18n>save} : ${i18n>editProfile} }"
+                icon="sap-icon://edit"
+                type="{= ${profileData>/isLoading} ? 'Inactive' : 'Active' }"
+                class="profileMenuTint"
+                press="onProfileMenuEdit"
+            />
+            <StandardListItem
+                title="{i18n>deactivateAccount}"
+                icon="sap-icon://decline"
+                type="Active"
+                class="profileMenuTint"
+                visible="{= !${profileData>/isEditMode} }"
+                press="onProfileMenuDeactivate"
+            />
+            <StandardListItem
+                title="{i18n>requestSupport}"
+                icon="sap-icon://headset"
+                type="Active"
+                class="profileMenuTint"
+                visible="{= !${profileData>/isEditMode} }"
+                press="onProfileMenuSupport"
+            />
+            <StandardListItem
+                title="{i18n>logout}"
+                icon="sap-icon://log"
+                type="Active"
+                class="profileMenuTint"
+                visible="{= !${profileData>/isEditMode} }"
+                press="onProfileMenuLogout"
+            />
+        </List>
+    </Popover>
+</core:FragmentDefinition>

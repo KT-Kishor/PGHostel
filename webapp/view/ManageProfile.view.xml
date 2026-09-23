@@ -33,30 +33,12 @@
                 </contentMiddle>
                 <contentRight>
                     <Button
-                        text="{= ${profileData>/isEditMode} ? 'Save' : 'Edit'}"
-                        class="myUnifiedBtn"
-                        enabled="{= !${profileData>/isLoading} }"
-                        tooltip="{i18n>MSedit}"
-                        press="onEditSaveProfile"
-                    />
-                    <Button
-                        text="{i18n>deactivateAccount}"
-                        class="deactivateHeaderBtn"
-                        tooltip="{i18n>deactivateAccount}"
-                        visible="{= !${profileData>/isEditMode} }"
-                        press="onDeactivateAccountPress"
-                    />
-                    <Button
-                        text="{i18n>requestSupport}"
-                        class="myUnifiedBtn"
-                        tooltip="{i18n>requestSupport}"
-                        press="onSupportRequest"
-                    />
-                    <Button
-                        icon="sap-icon://log"
-                        class="myUnifiedBtn"
-                        tooltip="{i18n>logout}"
-                        press="onlogout"
+                        id="id_profileMenuBtn"
+                        icon="sap-icon://menu2"
+                        text="{= ${profileData>/isEditMode} ? ${i18n>save} : '' }"
+                        tooltip="{i18n>profileOptions}"
+                        class="myUnifiedBtn profileMenuHeaderBtn"
+                        press="onPressProfileMenu"
                     />
                 </contentRight>
             </Bar>

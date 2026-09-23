@@ -579,6 +579,65 @@ sap.ui.define([
             oRouter.navTo("RouteHostel");
         },
 
+        /**
+         * Opens the header actions popover under the profile menu button.
+         * The popover is declared in a fragment instead of the view because
+         * the XML view template treats a root-level <dependents> element as
+         * a control class and tries to load "sap/m/dependents.js".
+         * A plain sap.m.Popover is used instead of a MenuButton because
+         * MenuButton renders its menu as a full-screen dialog on phones,
+         * while this stays a compact popover on every device.
+         */
+        onPressProfileMenu: function (oEvent) {
+            const oAnchor = oEvent.getSource();
+
+            if (this._oProfileMenuPopover) {
+                this._oProfileMenuPopover.openBy(oAnchor);
+                return;
+            }
+
+            this.loadFragment({
+                name: "sap.ui.com.project1.fragment.ProfileMenu"
+            }).then(function (oPopover) {
+                this._oProfileMenuPopover = oPopover;
+                this.getView().addDependent(oPopover);
+                oPopover.openBy(oAnchor);
+            }.bind(this));
+        },
+
+        _closeProfileMenu: function () {
+            const oPopover = this._oProfileMenuPopover;
+            if (oPopover && oPopover.isOpen()) {
+                oPopover.close();
+            }
+        },
+
+        onProfileMenuEdit: function () {
+            // The item is rendered as Inactive while the profile loads;
+            // ignore the press so no edit mode opens on an empty model.
+            const oProfileModel = this.getView().getModel("profileData");
+            if (!oProfileModel || oProfileModel.getProperty("/isLoading")) {
+                return;
+            }
+            this._closeProfileMenu();
+            this.onEditSaveProfile();
+        },
+
+        onProfileMenuDeactivate: function () {
+            this._closeProfileMenu();
+            this.onDeactivateAccountPress();
+        },
+
+        onProfileMenuSupport: function () {
+            this._closeProfileMenu();
+            this.onSupportRequest();
+        },
+
+        onProfileMenuLogout: function () {
+            this._closeProfileMenu();
+            this.onlogout();
+        },
+
         onPreviewProfilePhoto: function () {
             const oProfileModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
@@ -622,37 +681,45 @@ sap.ui.define([
         },
 
         onPressAvatarEdit: function (oEvent) {
-            this._oAvatarActionSheet = new sap.m.ActionSheet({
-                buttons: [
-                    new sap.m.Button({
-                        text: "Take Photo",
-                        icon: "sap-icon://add-photo",
-                        press: this.onTakePhoto.bind(this)
-                    }).addStyleClass("myUnifiedBtn"),
-                    new sap.m.Button({
-                        text: "Upload from Gallery",
-                        icon: "sap-icon://image-viewer",
-                        press: this.onUploadPhoto.bind(this)
-                    }).addStyleClass("myUnifiedBtn"),
-                    new sap.m.Button({
-                        text: "Remove Photo",
-                        icon: "sap-icon://delete",
-                        press: this.onRemovePhoto.bind(this)
-                    }).addStyleClass("myUnifiedBtn")
-                ],
-                placement: "Bottom"
-            });
-            this.getView().addDependent(this._oAvatarActionSheet);
-
-            if (sap.ui.Device.system.phone) {
-                var oCancelButton = this._oAvatarActionSheet._getCancelButton();
-                if (oCancelButton) {
-                    oCancelButton.setType(sap.m.ButtonType.Default);
-                    oCancelButton.addStyleClass("myUnifiedBtn");
-                }
+            if (!this._oAvatarMenuPopover) {
+                // Same List/StandardListItem markup as the header popover
+                // fragment, so both menus share one identical visual style.
+                // A plain Popover keeps it anchored to the avatar on phones;
+                // an ActionSheet would slide up as a full-width dialog.
+                this._oAvatarMenuPopover = new sap.m.Popover({
+                    showHeader: false,
+                    placement: "Bottom",
+                    contentWidth: "auto",
+                    horizontalScrolling: false,
+                    content: new sap.m.List({
+                        showSeparators: "None",
+                        mode: "None",
+                        items: [
+                            new sap.m.StandardListItem({
+                                title: "Take Photo",
+                                icon: "sap-icon://add-photo",
+                                type: "Active",
+                                press: this.onTakePhoto.bind(this)
+                            }).addStyleClass("profileMenuTint"),
+                            new sap.m.StandardListItem({
+                                title: "Upload from Gallery",
+                                icon: "sap-icon://image-viewer",
+                                type: "Active",
+                                press: this.onUploadPhoto.bind(this)
+                            }).addStyleClass("profileMenuTint"),
+                            new sap.m.StandardListItem({
+                                title: "Remove Photo",
+                                icon: "sap-icon://delete",
+                                type: "Active",
+                                press: this.onRemovePhoto.bind(this)
+                            }).addStyleClass("profileMenuTint")
+                        ]
+                    })
+                }).addStyleClass("profileAvatarPopover");
+                this.getView().addDependent(this._oAvatarMenuPopover);
             }
 
-            this._oAvatarActionSheet.openBy(oEvent.getSource());
+            this._oAvatarMenuPopover.openBy(oEvent.getSource());
         },
 
         onTakePhoto: function () {

@@ -7974,10 +7974,45 @@ text-transform: none !important;
 }
 
 @media (max-width: 720px) {
-  .deactivateAccountDialog {
+  /* UI5 renders the dialog with box-sizing: content-box and a 3rem
+     padding-bottom that reserves room for the absolutely positioned footer.
+     Without border-box the max-height ignored that reserve, so the footer
+     ended up below the viewport. Border-box keeps footer + content inside. */
+  .deactivateAccountDialog.sapMDialog {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    height: auto !important;
     width: calc(100vw - 1rem) !important;
     min-width: 0 !important;
     max-width: calc(100vw - 1rem) !important;
+    max-height: calc(100vh - 1rem) !important;
+    max-height: calc(100dvh - 1rem) !important;
+    top: 0.5rem !important;
+    bottom: auto !important;
+  }
+
+  .deactivateAccountDialog.sapMDialog .sapMDialogTitleGroup {
+    flex: 0 0 auto;
+  }
+
+  .deactivateAccountDialog.sapMDialog .sapMDialogSection {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .deactivateAccountDialog.sapMDialog .sapMDialogScroll {
+    /* UI5 ships inline-block + vertical-align: middle. Inside the now-clipped
+       section that centring cut off the top of the content (the warning
+       icon), so top-align it and let it scroll from the first item. */
+    display: block !important;
+    vertical-align: top !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 
@@ -8028,10 +8063,15 @@ text-transform: none !important;
   font-weight: 600;
   color: #32363a;
   margin: 0.5rem 0 0.75rem 0;
+  /* Same left indent as the consequence list so all body content lines up. */
+  padding-inline-start: 0.5rem;
+  box-sizing: border-box;
 }
 
 .deactivateConsequenceList {
   margin: 0.5rem 0 1.25rem 0;
+  padding-inline-start: 0.5rem;
+  box-sizing: border-box;
 }
 
 .deactivateConsequenceItem {
@@ -8043,9 +8083,11 @@ text-transform: none !important;
 .deactivateConsequenceIcon {
   color: #bb0000;
   font-size: 1rem;
-  line-height: 1.25rem;
+  /* Match the first text line's box height (1.125rem x 1.5) and top offset so
+     the icon sits on the same line as the text instead of slightly high. */
+  line-height: 1.6875rem;
   margin-right: 0.5rem;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   flex-shrink: 0;
 }
 
@@ -8213,6 +8255,55 @@ text-transform: none !important;
 
   .deactivateWarningIcon {
     font-size: 2.5rem;
+    line-height: 2.5rem;
+  }
+
+  /* Smaller type on phones so less scrolling is needed. The MessageStrip is
+     deliberately left at its default size. */
+  .deactivateAccountDialog .deactivateDialogTitle {
+    font-size: 1.125rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .deactivateAccountDialog .deactivateMessageStrip {
+    margin: 0.375rem 0 0.75rem 0 !important;
+  }
+
+  .deactivateAccountDialog .deactivateIntroText {
+    font-size: 0.9375rem !important;
+    margin: 0.375rem 0 0.5rem 0 !important;
+  }
+
+  .deactivateAccountDialog .deactivateConsequenceList {
+    margin: 0.375rem 0 0.75rem 0 !important;
+  }
+
+  .deactivateAccountDialog .deactivateConsequenceItem {
+    margin: 0.35rem 0 !important;
+  }
+
+  .deactivateAccountDialog .deactivateConsequenceText,
+  .deactivateAccountDialog .deactivateConsequenceText .sapMText {
+    font-size: 0.9375rem !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Keep the icon aligned with the smaller first line (0.9375rem x 1.35). */
+  .deactivateAccountDialog .deactivateConsequenceIcon {
+    line-height: 1.265625rem !important;
+    margin-top: 0.1rem !important;
+  }
+
+  .deactivateAccountDialog .deactivateAckRow {
+    margin-top: 0.375rem !important;
+    padding: 0.5rem 0.5rem 0.125rem !important;
+  }
+
+  .deactivateAccountDialog .deactivateAckLabel,
+  .deactivateAccountDialog .deactivateAckLabel .sapMLabelTextWrapper,
+  .deactivateAccountDialog .deactivateAckLabel bdi {
+    font-size: 0.9375rem !important;
+    line-height: 1.35 !important;
   }
 }
 
@@ -8374,4 +8465,115 @@ text-transform: none !important;
     min-width: 0 !important;
     max-width: 100% !important;
   }
+}
+
+/* ================= PROFILE HEADER ACTIONS POPOVER =================
+   Compact menu-style popover for the My Account header. Kept as a plain
+   sap.m.Popover (not a Menu/MenuButton) so it never expands to a
+   full-screen dialog on phones. */
+.profileMenuPopover.sapMPopover {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22) !important;
+  max-width: calc(100vw - 2rem) !important;
+}
+
+.profileMenuPopover .sapMPopoverCont {
+  border-radius: 12px !important;
+  max-height: none !important;
+}
+
+/* Both menus share this rule set. The 4-class specificity matches the generic
+   fixed-width popover rule earlier in this file, so neither is forced to 250px
+   and each sizes to its own longest visible action. */
+.sapMPopover.profileMenuPopover:not(.sapMComboBoxBasePicker) .sapMPopoverCont,
+.sapMPopover.profileAvatarPopover:not(.sapMComboBoxBasePicker) .sapMPopoverCont {
+  width: max-content !important;
+  max-width: calc(100vw - 2rem) !important;
+  border-radius: 12px !important;
+  max-height: none !important;
+  box-sizing: border-box;
+}
+
+/* Identical list framing for the header menu and the avatar menu. */
+.profileMenuPopover .sapMList,
+.profileAvatarPopover .sapMList {
+  background: transparent !important;
+  width: max-content !important;
+  max-width: 100%;
+  padding: 0.375rem !important;
+  box-sizing: border-box;
+}
+
+/* Teal menu row, mirroring .myUnifiedBtn. Applied per row with a style class
+   so it never depends on an ancestor selector. */
+.sapMLIB.profileMenuTint {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  border-bottom: none !important;
+  border-radius: 6px !important;
+  height: 1.5rem !important;
+  min-height: 1.5rem !important;
+  padding: 0 0.35rem !important;
+  box-sizing: border-box;
+}
+
+.sapMLIB.profileMenuTint + .sapMLIB {
+  margin-top: 0.375rem !important;
+}
+
+/* Interactive states must not change row geometry. A border or outline added
+   on tap would change the content-sized width and visibly resize the popover. */
+.sapMLIB.profileMenuTint:hover,
+.sapMLIB.profileMenuTint:focus,
+.sapMLIB.profileMenuTint:active,
+.sapMLIB.profileMenuTint.sapMLIBActive,
+.sapMLIB.profileMenuTint.sapMLIBHoverable:hover,
+.sapMLIB.profileMenuTint.sapMLIBFocusable:focus {
+  border: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Hover feedback only where hover exists. On touch screens a sticky :hover
+   kept the tapped row in a different state, which looked like the menu was
+   re-adjusting. Press feedback still comes from :active below. */
+@media (hover: hover) {
+  .sapMLIB.profileMenuTint:hover {
+    background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
+  }
+}
+
+.sapMLIB.profileMenuTint.sapMLIBActive,
+.sapMLIB.profileMenuTint:active {
+  background: linear-gradient(135deg, #1fb7c5, #0f99a6) !important;
+}
+
+/* Keep labels and icons white through hover, focus and press instead of the
+   theme's link color. */
+.sapMLIB.profileMenuTint .sapMSLITitleOnly,
+.sapMLIB.profileMenuTint.sapMLIBHoverable:hover .sapMSLITitleOnly,
+.sapMLIB.profileMenuTint:focus .sapMSLITitleOnly,
+.sapMLIB.profileMenuTint:active .sapMSLITitleOnly,
+.sapMLIB.profileMenuTint.sapMLIBActive .sapMSLITitleOnly {
+  color: #ffffff !important;
+  font-size: 0.9375rem !important;
+  padding-inline-end: 0.5rem !important;
+}
+
+.sapMLIB.profileMenuTint .sapMSLIImgIcon,
+.sapMLIB.profileMenuTint.sapMLIBHoverable:hover .sapMSLIImgIcon,
+.sapMLIB.profileMenuTint:active .sapMSLIImgIcon,
+.sapMLIB.profileMenuTint.sapMLIBActive .sapMSLIImgIcon {
+  color: #ffffff !important;
+  width: 1.25rem !important;
+  height: 1.5rem !important;
+  line-height: 1.5rem !important;
+  font-size: 1rem !important;
+  /* Reset UI5's negative inset for the narrower icon slot. */
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0.375rem !important;
+}
+
+/* Space between the hamburger icon and the "Save" label in the header
+   button. Only applies while a text is rendered (icon + text mode). */
+.profileMenuHeaderBtn .sapMBtnIcon + .sapMBtnContent {
+  margin-left: 0.4rem !important;
 }
