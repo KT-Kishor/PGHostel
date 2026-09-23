@@ -65,6 +65,7 @@ sap.ui.define([
                 Address: "",
                 CurrentDocType: "",
                 Status: "",
+                AdminComment: "",
                 Documents: [],
                 UploadEnabled: false,
                 DocTypeEnabled: true
@@ -135,6 +136,7 @@ sap.ui.define([
                     State: oData[0].State,
                     City: oData[0].City,
                     Status: oData[0].Status,
+                    AdminComment: oData[0].AdminComment || "",
                     DateOfBirth: this.Formatter.DateFormat(oData[0].DateOfBirth) || "",
                     Documents: (oData[0].Documents || []).map(doc => ({
                         FileName: doc.FileName,
@@ -175,7 +177,28 @@ sap.ui.define([
                 MessageToast.show(this.i18nModel.getText("vendorLoadError"));
             }
         },
-
+        _loadVendorDocuments: async function(sUserID) {
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
+                    UserID: sUserID,
+                    _: Date.now() // cache-buster: force fresh documents
+                });
+                const oData = (oResponse.data || [])[0] || {};
+                const aDocuments = (oData.Documents || []).map(doc => ({
+                    FileName: doc.FileName,
+                    DocumentType: doc.DocumentType,
+                    size: doc.File ? atob(doc.File).length : 0,
+                    File: doc.File,
+                    FileType: doc.FileType,
+                    DocumentID: doc.DocumentID
+                }));
+                const oModel = this.getView().getModel("AdminSignupModel");
+                oModel.setProperty("/Documents", aDocuments);
+                oModel.setProperty("/CurrentDocType", "");
+            } catch (err) {
+                MessageToast.show(this.i18nModel.getText("vendorLoadError"));
+            }
+        },
         onAdminFileSelect: async function(oEvent) {
             const oFile = oEvent.getParameter("files")[0];
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -214,8 +237,7 @@ sap.ui.define([
                 };
 
                 await this.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
-                await this._loadVendorDetails(oModel.getProperty("/UserID"));
-                oModel.setProperty("/CurrentDocType", "");
+                await this._loadVendorDocuments(oModel.getProperty("/UserID"));
                 this.byId("MV_id_adminFileUploader").clear();
                 MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
             } catch (err) {
@@ -379,7 +401,7 @@ sap.ui.define([
                     payload.data.Type = oLoginRow.Type || "";
                 }
                 this.getBusyDialog()
-                await this.ajaxUpdateWithJQuery("HM_ActiveDeactive", payload);
+                await this.ajaxUpdateWithJQuery("HM_Login", payload);
                 await this._loadVendorDetails(oData.UserID);
                 this.closeBusyDialog()
                 MessageToast.show(this.i18nModel.getText("vendorSuccess"));
@@ -389,6 +411,40 @@ sap.ui.define([
                 return false;
             } finally {
                 this.closeBusyDialog()
+            }
+        },
+
+        onResendMailPress: async function() {
+            try {
+                this.getBusyDialog();
+                const oData = this.getView().getModel("AdminSignupModel").getData();
+                const payload = {
+                    data: {
+                        UserID: oData.UserID,
+                        UserName: oData.VendorName,
+                        EmailID: oData.Email,
+                        Gender: oData.Gender,
+                        STDCode: oData.STDCode,
+                        MobileNo: oData.Mobile,
+                        Address: oData.Address,
+                        Country: oData.Country,
+                        State: oData.State,
+                        City: oData.City,
+                        DateOfBirth: oData.DateOfBirth ? oData.DateOfBirth.split("/").reverse().join("-") : "",
+                        Status: oData.Status,
+                        AdminComment: oData.AdminComment || "",
+                        flag: "ResendMail"
+                    },
+                    filters: {
+                        UserID: oData.UserID
+                    }
+                };
+                await this.ajaxUpdateWithJQuery("HM_Login", payload);
+                MessageToast.show(this.i18nModel.getText("resendMailSuccess"));
+            } catch (err) {
+                MessageToast.show(err.message || this.i18nModel.getText("Updatefailed"));
+            } finally {
+                this.closeBusyDialog();
             }
         },
 
@@ -428,7 +484,7 @@ sap.ui.define([
                                     UserID: sUserID
                                 }
                             });
-                            await this._loadVendorDetails(sUserID); // refresh attachment list
+                            await this._loadVendorDocuments(sUserID); // refresh attachment list
                             sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                             fnResetSelection();
                         } catch (err) {
@@ -1185,11 +1241,10 @@ sap.ui.define([
                         oPayload
                     );
 
-                    await that._loadVendorDetails(
+                    await that._loadVendorDocuments(
                         oAdminModel.getProperty("/UserID")
                     );
 
-                    oAdminModel.setProperty("/CurrentDocType", "");
                     oFileUploader.clear();
 
                 } catch (err) {

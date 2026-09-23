@@ -46,6 +46,14 @@
 											<m:ToolbarSpacer />
 											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
                                                 press="onEditOrSavePress"/>
+											<m:Button
+                                                id="MV_id_ResendMailButton"
+                                                class="myUnifiedBtn"
+                                                text="{i18n>resendMail}"
+                                                tooltip="{i18n>resendMail}"
+                                                press="onResendMailPress"
+                                                enabled="{= !${editable>/Edit} &amp;&amp; (${AdminSignupModel>/Status} === 'Approved' || ${AdminSignupModel>/Status} === 'Send Back') }"
+                                            />
 										</m:Toolbar>
 									</f:toolbar>
 									<f:content>

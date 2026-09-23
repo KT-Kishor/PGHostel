@@ -348,6 +348,28 @@ sap.ui.define([
                 this.closeBusyDialog()
             }
         },
+        _loadVendorDocuments: async function (sUserID) {
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_LoginReadCall", {
+                    UserID: sUserID,
+                    _: Date.now() // cache-buster: force fresh documents
+                });
+                const oData = (oResponse.data || [])[0] || {};
+                const aDocuments = (oData.Documents || []).map(doc => ({
+                    FileName: doc.FileName,
+                    DocumentType: doc.DocumentType,
+                    size: doc.File ? atob(doc.File).length : 0,
+                    File: doc.File,
+                    FileType: doc.FileType,
+                    DocumentID: doc.DocumentID
+                }));
+                const oModel = this.getView().getModel("AdminSignupModel");
+                oModel.setProperty("/Documents", aDocuments);
+                oModel.setProperty("/CurrentDocType", "");
+            } catch (err) {
+                MessageToast.show(this.i18nModel.getText("vendorLoadError"));
+            }
+        },
 
         onAdminFileSelect: async function (oEvent) {
             const oFile = oEvent.getParameter("files")[0];
@@ -386,8 +408,7 @@ sap.ui.define([
                 };
 
                 await this.ajaxCreateWithJQuery("HM_CustomerDocument", oPayload);
-                await this._loadVendorDetails(oModel.getProperty("/UserID"));
-                oModel.setProperty("/CurrentDocType", "");
+                await this._loadVendorDocuments(oModel.getProperty("/UserID"));
                 this.byId("V_id_adminFileUploader").clear();
                 MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
             } catch (err) {
@@ -567,7 +588,7 @@ sap.ui.define([
                                 UserID: sUserID
                             }
                         });
-                        await this._loadVendorDetails(sUserID); // refresh attachment list
+                        await this._loadVendorDocuments(sUserID); // refresh attachment list
                         sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                         fnResetSelection();
                     } catch (err) {
@@ -1199,11 +1220,10 @@ sap.ui.define([
                         oPayload
                     );
 
-                    await that._loadVendorDetails(
+                    await that._loadVendorDocuments(
                         oAdminModel.getProperty("/UserID")
                     );
 
-                    oAdminModel.setProperty("/CurrentDocType", "");
                     oFileUploader.clear();
 
                 } catch (err) {
