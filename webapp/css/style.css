@@ -1953,12 +1953,59 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 }
 
 .squareVideo {
-  width: 100%;
-  max-width: 300px;
-  max-height: 300px;
-  border: 2px solid #000;
-  border-radius: 5px;
-  object-fit: cover;
+  /* A definite width is required: with width: 100% the dialog had no content
+     size until the camera stream started, so it opened small and grew. */
+  width: 420px;
+  max-width: 100%;
+  /* Square 1:1 preview. The camera is requested square, so contain shows the
+     whole frame without cropping; any leftover space is letterboxed. */
+  aspect-ratio: 1 / 1;
+  height: auto;
+  object-fit: contain;
+  background-color: #ffffff;
+  display: block;
+  border: 2px solid #fff;
+  border-radius: 10px;
+}
+
+/* Profile photo viewer. The dialog is sized by the photo itself, so the
+   image sits edge to edge with no side margins. */
+.previewPhotoDialog.sapMDialog {
+  /* UI5 gives dialogs min-width: 20rem, which left dead space beside a
+     narrower photo. */
+  min-width: 0 !important;
+  max-width: calc(100vw - 2rem) !important;
+}
+
+.previewPhotoDialog .sapMDialogSection {
+  min-width: 0 !important;
+}
+
+.previewPhotoDialog .sapMDialogScrollCont {
+  padding: 0 !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+
+/* The real <img> carries the photo's own aspect ratio; the dialog wraps it. */
+.previewPhotoImg {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 24rem;
+  max-height: 24rem;
+  /* Reserve space while the image decodes so the dialog does not pop. */
+  min-width: 6rem;
+  min-height: 6rem;
+  margin: 0 auto;
+  background-color: #f5f6f7;
+}
+
+@media (max-width: 600px) {
+  .previewPhotoImg {
+    max-width: calc(100vw - 4rem);
+    max-height: calc(100dvh - 12rem);
+  }
 }
 
 .custom-flexbox {

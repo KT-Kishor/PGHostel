@@ -589,6 +589,17 @@ sap.ui.define([
          * while this stays a compact popover on every device.
          */
         onPressProfileMenu: function (oEvent) {
+            const oProfileModel = this.getView().getModel("profileData");
+
+            // In edit mode the header button doubles as the Save button, so
+            // there is no menu to open; the icon returns to the menu once
+            // saving flips /isEditMode back to false.
+            if (oProfileModel && oProfileModel.getProperty("/isEditMode")) {
+                this._closeProfileMenu();
+                this.onEditSaveProfile();
+                return;
+            }
+
             const oAnchor = oEvent.getSource();
 
             if (this._oProfileMenuPopover) {
@@ -656,27 +667,34 @@ sap.ui.define([
 
             oProfileModel.setProperty("/photo", sPhoto);
             if (!this._oProfilePreviewDialog) {
-                this._oProfilePreviewImage = new sap.m.Image({
+                // A raw <img> is used instead of sap.m.Image: sap.m.Image renders
+                // a span with a background image, so it never takes the photo's
+                // own size and the dialog ended up wider than the photo.
+                this._oProfilePreviewImage = new sap.ui.core.HTML({
                     id: this.getView().createId("previewProfileImage"),
-                    width: "320px",
-                    height: "220px",
-                    src: ""
+                    content: ""
                 }).addStyleClass("previewPhotoContain");
 
                 this._oProfilePreviewDialog = new sap.m.Dialog({
                     title: "Profile Photo",
-                    contentWidth: "300px",
-                    contentHeight: "220px",
+                    // Let the image define both dimensions so the dialog matches
+                    // the photo's aspect ratio exactly.
+                    contentWidth: "auto",
+                    contentHeight: "auto",
                     verticalScrolling: false,
                     content: this._oProfilePreviewImage,
                     beginButton: new sap.m.Button({
                         text: "Close",
                         press: () => this._oProfilePreviewDialog.close()
                     }).addStyleClass("myUnifiedBtn")
-                })
+                }).addStyleClass("previewPhotoDialog");
                 this.getView().addDependent(this._oProfilePreviewDialog);
             }
-            this._oProfilePreviewImage.setSrc(sPhoto);
+
+            // Data URLs contain no quotes or markup, so they are safe to inline.
+            this._oProfilePreviewImage.setContent(
+                "<img class='previewPhotoImg' src='" + sPhoto + "' alt='' />"
+            );
             this._oProfilePreviewDialog.open();
         },
 
@@ -866,7 +884,9 @@ sap.ui.define([
                 });
             }
 
-            // Always create a new Camera instance when starting
+            // Always create a new Camera instance when starting.
+            // A square capture size keeps the 1:1 preview free of cropping;
+            // the camera returns the closest supported resolution.
             this.camera = new Camera(oVideo, {
                 onFrame: async () => {
                     await this.selfieSegmentation.send({
@@ -874,7 +894,7 @@ sap.ui.define([
                     });
                 },
                 width: 640,
-                height: 480,
+                height: 640,
             });
             this.camera.start();
         },
@@ -902,20 +922,37 @@ sap.ui.define([
             const oCanvas = document.createElement("canvas");
             const oContext = oCanvas.getContext("2d");
 
-            oCanvas.width = oVideo.videoWidth;
-            oCanvas.height = oVideo.videoHeight;
+            // Centre-crop the frame to a square. The camera may return 4:3, and
+            // keeping the full frame stored dead white space beside the subject
+            // (visible as side margins in the preview and the avatar).
+            const iFrameWidth = oVideo.videoWidth;
+            const iFrameHeight = oVideo.videoHeight;
+            const iSide = Math.min(iFrameWidth, iFrameHeight);
+            const iSourceX = (iFrameWidth - iSide) / 2;
+            const iSourceY = (iFrameHeight - iSide) / 2;
+
+            oCanvas.width = iSide;
+            oCanvas.height = iSide;
 
             oContext.fillStyle = "white";
-            oContext.fillRect(0, 0, oCanvas.width, oCanvas.height);
+            oContext.fillRect(0, 0, iSide, iSide);
 
-            oContext.drawImage(oVideo, 0, 0, oCanvas.width, oCanvas.height);
+            oContext.drawImage(
+                oVideo,
+                iSourceX, iSourceY, iSide, iSide,
+                0, 0, iSide, iSide
+            );
 
             const mask = this.latestSegmentation.segmentationMask;
             oContext.globalCompositeOperation = "destination-in";
-            oContext.drawImage(mask, 0, 0, oCanvas.width, oCanvas.height);
+            oContext.drawImage(
+                mask,
+                iSourceX, iSourceY, iSide, iSide,
+                0, 0, iSide, iSide
+            );
             oContext.globalCompositeOperation = "destination-over";
             oContext.fillStyle = "white";
-            oContext.fillRect(0, 0, oCanvas.width, oCanvas.height);
+            oContext.fillRect(0, 0, iSide, iSide);
             oContext.globalCompositeOperation = "source-over";
 
             var base64Image = oCanvas.toDataURL("image/png");

@@ -22,20 +22,20 @@
                 press="onProfileMenuEdit"
             />
             <StandardListItem
-                title="{i18n>deactivateAccount}"
-                icon="sap-icon://decline"
-                type="Active"
-                class="profileMenuTint"
-                visible="{= !${profileData>/isEditMode} }"
-                press="onProfileMenuDeactivate"
-            />
-            <StandardListItem
                 title="{i18n>requestSupport}"
                 icon="sap-icon://headset"
                 type="Active"
                 class="profileMenuTint"
                 visible="{= !${profileData>/isEditMode} }"
                 press="onProfileMenuSupport"
+            />
+            <StandardListItem
+                title="{i18n>deactivateAccount}"
+                icon="sap-icon://decline"
+                type="Active"
+                class="profileMenuTint"
+                visible="{= !${profileData>/isEditMode} }"
+                press="onProfileMenuDeactivate"
             />
             <StandardListItem
                 title="{i18n>logout}"

@@ -34,9 +34,9 @@
                 <contentRight>
                     <Button
                         id="id_profileMenuBtn"
-                        icon="sap-icon://menu2"
+                        icon="{= ${profileData>/isEditMode} ? 'sap-icon://save' : 'sap-icon://menu2' }"
                         text="{= ${profileData>/isEditMode} ? ${i18n>save} : '' }"
-                        tooltip="{i18n>profileOptions}"
+                        tooltip="{= ${profileData>/isEditMode} ? ${i18n>save} : ${i18n>profileOptions} }"
                         class="myUnifiedBtn profileMenuHeaderBtn"
                         press="onPressProfileMenu"
                     />
