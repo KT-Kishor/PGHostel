@@ -72,12 +72,12 @@
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${SupportModel>/}.length})"/>
 						<ToolbarSpacer />
-						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
-                        press="SP_resolve" class="myUnifiedBtn"/>
-						<Button text="{i18n>Assign}" tooltip="{i18n>Assign}"
-                        press="SP_assign" class="myUnifiedBtn"/>
 						<Button text="{i18n>askCustomer}" tooltip="{i18n>askCustomer}"
                         press="SP_askCustomer" class="myUnifiedBtn"/>
+						<Button text="{i18n>Assign}" tooltip="{i18n>Assign}"
+                        press="SP_assign" class="myUnifiedBtn"/>
+						<Button text="{i18n>Resolve}" tooltip="{i18n>resolve}"
+                        press="SP_resolve" class="myUnifiedBtn"/>
 						<Button text="{i18n>download}"  
                         tooltip="{i18n>downloadBranchData}" press="S_onDownload"
                         class="myUnifiedBtn"
