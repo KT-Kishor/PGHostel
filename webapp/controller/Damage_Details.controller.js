@@ -499,7 +499,7 @@ _calculateTotalCost: function (oInput) {
             // Get Cost of current row
             var fCost =
                 parseFloat(
-                    oModel.getProperty(sPath + "/Cost")
+                    oModel.getProperty(sPath + "/TotalCost")
                 ) || 0;
 
             var fRecoverCost =
