@@ -740,7 +740,16 @@ sap.ui.define([
             this._oAvatarMenuPopover.openBy(oEvent.getSource());
         },
 
+        _closeAvatarMenu: function () {
+            const oPopover = this._oAvatarMenuPopover;
+            if (oPopover && oPopover.isOpen()) {
+                oPopover.close();
+            }
+        },
+
         onTakePhoto: function () {
+            this._closeAvatarMenu();
+
             if (!this.oCameraDialog) {
                 sap.ui.core.Fragment.load({
                     name: "sap.ui.com.project1.fragment.SelfieCam",
@@ -760,6 +769,8 @@ sap.ui.define([
         },
 
         onUploadPhoto: function () {
+            this._closeAvatarMenu();
+
             const uploader = this.byId("id_fileUploaderAvatar1");
             if (!uploader) return;
 
@@ -846,6 +857,8 @@ sap.ui.define([
         },
 
         onRemovePhoto: async function () {
+            this._closeAvatarMenu();
+
             const oModel = this.getView().getModel("profileData");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const initials = oModel.getProperty("/initials");
