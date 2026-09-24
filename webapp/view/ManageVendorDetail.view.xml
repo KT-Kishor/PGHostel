@@ -52,7 +52,7 @@
                                                 text="{i18n>resendMail}"
                                                 tooltip="{i18n>resendMail}"
                                                 press="onResendMailPress"
-                                                enabled="{= !${editable>/Edit} &amp;&amp; (${AdminSignupModel>/Status} === 'Approved' || ${AdminSignupModel>/Status} === 'Send Back') }"
+                                                enabled="{= !${editable>/Edit} &amp;&amp; (${AdminSignupModel>/Status} === 'Approved' || ${AdminSignupModel>/Status} === 'Send Back' || ${AdminSignupModel>/Status} === 'Inactive') }"
                                             />
 										</m:Toolbar>
 									</f:toolbar>
