@@ -4667,7 +4667,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
 .customLinkWhiteBg.sapMLnk:active,
 .customLinkWhiteBg.sapMLnk:visited,
 .customLinkWhiteBg.sapMLnk:hover {
-  color: #000000 !important;
+  color:  #14aab7 !important;
   background-color: white !important;
   outline: none !important;
   box-shadow: none !important;

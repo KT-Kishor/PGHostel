@@ -3176,7 +3176,7 @@ sap.ui.define([
                     if (companyImage && companyImage.trim() !== "") {
                         const imgData = "data:image/png;base64," + companyImage;
                         // Adjust Y position so image appears below the branch name
-                        doc.addImage(imgData, "PNG", margin, headerMargin + 2, 40, 40);
+                        doc.addImage(imgData, "PNG", margin, headerMargin + 4, 35, 35);
                     }
 
                     // Invoice Details
@@ -3852,10 +3852,10 @@ sap.ui.define([
                     // }
 
                     //  COMPANY IMAGE BELOW BRANCH NAME 
-                    let imageY = branchNameY + 2;
+                    let imageY = branchNameY + 4;
                     if (companyImage && companyImage.trim() !== "") {
                         const imgData = "data:image/png;base64," + companyImage;
-                        doc.addImage(imgData, "PNG", margin, imageY, 40, 40);
+                        doc.addImage(imgData, "PNG", margin, imageY, 35, 35);
                     }
 
                     //  INVOICE DETAILS (below image) 
@@ -4204,7 +4204,7 @@ sap.ui.define([
 
                         if (companyImage && companyImage.trim() !== "") {
                             const imgData = "data:image/png;base64," + companyImage;
-                            doc.addImage(imgData, "PNG", margin, 28, 40, 40);
+                            doc.addImage(imgData, "PNG", margin, 28, 35, 35);
                         }
 
                         //  INVOICE DETAILS 

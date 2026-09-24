@@ -5070,43 +5070,448 @@ sap.m.MessageBox.confirm(
                 return;
             }
 
-            if (facilitiesNotFullBooking.length > 0 && this.continue === true) {
+              if (facilitiesNotFullBooking.length > 0 && this.continue === true) {
 
-                var that = this
+    var that = this;
+
+    const facilityNames = [
+        ...new Set(
+            facilitiesNotFullBooking
+                .map(item => item.FacilityName || item.Name || "Facility")
+                .filter(Boolean)
+        )
+    ].join(", ");
+
+  
+    sap.m.MessageBox.information(
+        `These facilities are not available for all days of the booking period:\n\n${facilityNames}\n\nDo you want to extend these facilities to the complete booking period?`,
+        {
+            actions: [
+                "Extend Days",
+                "OK"
+            ],
+
+            emphasizedAction: "Extend Days",
+            styleClass: "myUnifiedBtn",
+
+            onClose: function (oAction) {
+
+                if (oAction === "Extend Days") {
+
+    // ---------------------------------------------------------
+    // Booking Start Date and End Date
+    // ---------------------------------------------------------
+    let bookingStartDate = that._parseDate(Bookingdata.StartDate);
+    let bookingEndDate = that._parseDate(Bookingdata.EndDate);
+
+    if (!bookingStartDate || !bookingEndDate) {
+        sap.m.MessageToast.show("Invalid Start Date or End Date");
+        return;
+    }
+
+    // Start Date cannot be greater than End Date
+    if (bookingStartDate > bookingEndDate) {
+        sap.m.MessageToast.show(
+            "Start Date cannot be greater than End Date"
+        );
+        return;
+    }
 
 
-                const facilityNames = [
-                    ...new Set(
-                        facilitiesNotFullBooking
-                            .map(item => item.FacilityName || item.Name || "Facility")
-                            .filter(Boolean)
-                    )
-                ].join(", ");
+    // ---------------------------------------------------------
+    // Facility Items
+    // ---------------------------------------------------------
+    let facilityItems = CustomerData.AllSelectedFacilities || [];
 
-                sap.m.MessageBox.information(
-                    `These facilities are not available for all days of the booking period:\n\n${facilityNames}`,
-                    {
-                        actions: [
-                            "OK"
-                        ],
-
-                        emphasizedAction: "Continue",
-                        styleClass: "myUnifiedBtn",
-                        onClose: function (oAction) {
-
-                            if (oAction === "OK") {
-                                // Continue your remaining code here
-                                that.continue = false
-                                that.onSaveBooking1();
+    let totalFacilityPrice = 0;
 
 
-                            }
-                        }
-                    }
-                );
 
-                return;
+    let diffTime = bookingEndDate - bookingStartDate;
+
+ 
+
+     let diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+
+
+    facilityItems.forEach(item => {
+
+        let oSelectedFacility = aFacilities.find(f =>
+            f.FacilityName === item.FacilityName
+        );
+
+        let unit = (item.UnitText || "").toLowerCase();
+
+        let price = Number(item.Price || 0);
+
+        let quantity = Number(item.quantity || 1);
+
+        let total = 0;
+
+
+     
+
+        item.StartDate = Bookingdata.StartDate;
+        item.EndDate = Bookingdata.EndDate;
+
+
+        if (unit === "per day") {
+
+            total =
+                quantity *
+                diffDays *
+                price;
+
+            item.TotalDays = diffDays;
+
+        }
+
+        else if (unit === "per hour") {
+
+            let totalHour =
+                Number(item.TotalHour || 0);
+
+            total =
+                quantity *
+                totalHour *
+                price *
+                diffDays;
+
+            item.TotalDays = diffDays;
+
+        }
+
+
+
+        else if (unit === "per month") {
+
+            let startYear =
+                bookingStartDate.getFullYear();
+
+            let startMonth =
+                bookingStartDate.getMonth();
+
+            let startDay =
+                bookingStartDate.getDate();
+
+
+            let endYear =
+                bookingEndDate.getFullYear();
+
+            let endMonth =
+                bookingEndDate.getMonth();
+
+            let endDay =
+                bookingEndDate.getDate();
+
+
+            let months =
+                (endYear - startYear) * 12 +
+                (endMonth - startMonth);
+
+
+            // Include current month when end day
+            // reaches or passes start day
+            if (endDay >= startDay) {
+                months++;
             }
+
+
+            months = Math.max(1, months);
+
+
+            total =
+                quantity *
+                months *
+                price;
+
+
+            item.TotalMonths = months;
+
+        }
+
+
+        // =====================================================
+        // PER YEAR
+        // =====================================================
+
+        else if (unit === "per year") {
+
+            let startYear =
+                bookingStartDate.getFullYear();
+
+            let startMonth =
+                bookingStartDate.getMonth();
+
+            let startDay =
+                bookingStartDate.getDate();
+
+
+            let endYear =
+                bookingEndDate.getFullYear();
+
+            let endMonth =
+                bookingEndDate.getMonth();
+
+            let endDay =
+                bookingEndDate.getDate();
+
+
+            let years =
+                endYear - startYear;
+
+
+            if (
+                endMonth > startMonth ||
+                (
+                    endMonth === startMonth &&
+                    endDay >= startDay
+                )
+            ) {
+                years++;
+            }
+
+
+            years = Math.max(1, years);
+
+
+            total =
+                quantity *
+                years *
+                price;
+
+
+            item.TotalYears = years;
+
+        }
+
+
+        // =====================================================
+        // UNIT PRICE / PACKAGE PRICE
+        // =====================================================
+
+        else if (
+            unit === "unit price" ||
+            unit === "package price"
+        ) {
+
+            // Entire Booking
+            if (
+                item.FacilityChargeType === "Entire Booking"
+            ) {
+
+                total = price;
+
+            } else {
+
+                // PERSON_QTY
+                if (
+                    oSelectedFacility?.MinimumQty &&
+                    item.SelectionMode === "PERSON_QTY"
+                ) {
+
+                    total =
+                        price *
+                        diffDays;
+
+                }
+
+                // QTY
+                else if (
+                    oSelectedFacility?.SelectionMode === "QTY" &&
+                    oSelectedFacility?.UnitPrice !== "0"
+                ) {
+
+                    total =
+                        price *
+                        quantity;
+
+                }
+
+                // Normal calculation
+                else {
+
+                    total =
+                        price *
+                        quantity *
+                        diffDays;
+                }
+            }
+        }
+
+
+        // =====================================================
+        // COUPON DISCOUNT
+        // =====================================================
+
+        let couponDiscount =
+            Number(item.CouponDiscount || 0);
+
+
+        item.TotalAmount =
+            Math.max(
+                0,
+                total - couponDiscount
+            );
+
+
+        totalFacilityPrice +=
+            Number(item.TotalAmount || 0);
+
+    });
+
+
+    // =========================================================
+    // Update Facility Total
+    // =========================================================
+
+    CustomerData.TotalFacilityPrice =
+        totalFacilityPrice;
+
+
+    // =========================================================
+    // Base Amount
+    // =========================================================
+
+    let rentPrice =
+        Number(CustomerData.RentPrice || 0);
+
+    let discount =
+        Number(CustomerData.Discount || 0);
+
+
+    let baseAmount =
+        rentPrice +
+        totalFacilityPrice -
+        discount;
+
+
+    baseAmount = Math.max(0, baseAmount);
+
+
+    // =========================================================
+    // GST
+    // =========================================================
+
+    let gstRate =
+        Number(CustomerData.GSTValue || 0);
+
+
+    if (CustomerData.GSTType === "CGST/SGST") {
+
+        let totalGST =
+            baseAmount *
+            gstRate /
+            100;
+
+        let halfGST =
+            totalGST / 2;
+
+
+        CustomerData.CGST =
+            halfGST;
+
+        CustomerData.SGST =
+            halfGST;
+
+        CustomerData.IGST =
+            0;
+
+
+        CustomerData.GrandTotal =
+            baseAmount +
+            totalGST;
+
+    }
+
+    else if (CustomerData.GSTType === "IGST") {
+
+        let igst =
+            baseAmount *
+            gstRate /
+            100;
+
+
+        CustomerData.IGST =
+            igst;
+
+        CustomerData.CGST =
+            0;
+
+        CustomerData.SGST =
+            0;
+
+
+        CustomerData.GrandTotal =
+            baseAmount +
+            igst;
+
+    }
+
+    else {
+
+        CustomerData.CGST = 0;
+        CustomerData.SGST = 0;
+        CustomerData.IGST = 0;
+
+        CustomerData.GrandTotal =
+            baseAmount;
+    }
+
+
+    // =========================================================
+    // Due Amount
+    // =========================================================
+
+    let paymentPaid =
+        Number(CustomerData.PaymentPaid || 0);
+
+
+    CustomerData.DueAmount =
+        CustomerData.GrandTotal -
+        paymentPaid;
+
+
+    // =========================================================
+    // Assign Facilities Back
+    // =========================================================
+
+    CustomerData.AllSelectedFacilities =
+        facilityItems;
+
+
+    // =========================================================
+    // Refresh Model
+    // =========================================================
+
+    that.getView()
+        .getModel("CustomerData")
+        .refresh(true);
+
+
+        that.continue = false;
+
+
+
+    // =========================================================
+    // Save
+    // =========================================================
+
+    that.onSaveBooking1();
+} else if (oAction === "OK") {
+
+                    // Continue without changing facility dates
+                    that.continue = false;
+
+                    that.onSaveBooking1();
+                }
+            }
+        }
+    );
+
+    return;
+}
 
 
             var aDraftData = this.getView().getModel("DraftModel") ? this.getView().getModel("DraftModel").getData() : "";

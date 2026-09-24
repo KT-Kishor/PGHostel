@@ -907,60 +907,54 @@ _calculateTotalCost: function (oInput) {
                 const branchMaxWidth = pageWidth - (margin * 2) - titleWidth - 10;
 
                 // Branch name wrapping
-                let branchNameLines = [];
+            let branchNameLines = [];
 
-                if (branchName && branchName.trim() !== "") {
+if (branchName && branchName.trim() !== "") {
 
-                    branchNameLines = doc.splitTextToSize(
-                        branchName,
-                        branchMaxWidth
-                    );
+    branchNameLines = doc.splitTextToSize(
+        branchName,
+        branchMaxWidth
+    );
 
-                    doc.text(
-                        branchNameLines,
-                        margin,
-                        currentY,
-                        {
-                            align: "left",
-                            lineHeightFactor: 1.2
-                        }
-                    );
-                }
+    doc.text(
+        branchNameLines,
+        margin,
+        currentY,
+        {
+            align: "left",
+            lineHeightFactor: 1.2
+        }
+    );
+}
 
-                // Right side title
-                doc.text(
-                    documentTitle,
-                    pageWidth - margin,
-                    currentY,
-                    {
-                        align: "right"
-                    }
-                );
+// Right side title
+doc.text(
+    documentTitle,
+    pageWidth - margin,
+    currentY,
+    {
+        align: "right"
+    }
+);
 
-                // ================= LOGO =================
+// ================= LOGO =================
 
-                let logoY = 17;
+// Calculate logo position AFTER branch name
+let logoY = currentY + (branchNameLines.length * 6) + 3;
 
-                // ONLY add margin when branch name is wrapped
-                if (branchNameLines.length > 1) {
+if (companyImage && companyImage.trim() !== "") {
 
-                    // Extra margin based on number of wrapped lines
-                    logoY = 17 + ((branchNameLines.length - 1) * 8) + 5;
-                }
+    const imgData = "data:image/png;base64," + companyImage;
 
-                if (companyImage && companyImage.trim() !== "") {
-
-                    const imgData = "data:image/png;base64," + companyImage;
-
-                    doc.addImage(
-                        imgData,
-                        "PNG",
-                        margin,
-                        logoY,
-                        40,
-                        40
-                    );
-                }
+    doc.addImage(
+        imgData,
+        "PNG",
+        margin,
+        logoY,
+        35,
+        30
+    );
+}
 
                 // ================= NEXT CONTENT =================
 

@@ -14,7 +14,7 @@
                 alignItems="Center">
 
                 <core:HTML
-                    content="&lt;div class='footer-marquee'&gt;
+                    content="&lt;div class='footer-marquee myUnifiedBtn'&gt;
                         &lt;a href='https://www.kalpavrikshatechnologies.com/'
                         class='footer-text'
                         target='_blank'&gt;
