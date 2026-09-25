@@ -13,14 +13,14 @@
     <m:Page
         navButtonPress="BI_onButtonPress"
         showNavButton="true"
-        title="{i18n>bedDetails}"
+        title="{i18n>bedDetails}" class="myUnifiedBtn"
     >
-        <m:headerContent>
+        <!-- <m:headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
             />
-        </m:headerContent>
+        </m:headerContent> -->
         <ObjectPageLayout id="ObjectPageLayout">
             <sections>
                 <ObjectPageSection
@@ -258,8 +258,8 @@
                                             <!-- Placeholder Box (visible only when no image) -->
                                             <m:VBox
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
-                                                width="120px"
-                                                height="120px"
+                                                width="150px"
+                                                height="130px"
                                                 alignItems="Center"
                                                 justifyContent="Center"
                                                 class="placeholderBox"
@@ -268,10 +268,10 @@
                                                     id="fileUploader"
                                                     icon="sap-icon://add"
                                                     width="120px"
-                                                    style="Transparent"
                                                     tooltip="{i18n>addImage}"
                                                     placeholder=" "
                                                     buttonOnly="true"
+                                                    class="myUnifiedBtn"
                                                     fileType="jpg,jpeg,png"
                                                     sameFilenameAllowed="true"
                                                     visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
@@ -285,6 +285,7 @@
                                                 press=".onDeleteImage"
                                                 tooltip="{i18n>deleteImage}"
                                                 width="100%"
+                                                class="myUnifiedBtn"
                                             />
                                         </m:VBox>
                                     </m:HBox>

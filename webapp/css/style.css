@@ -624,6 +624,24 @@
   stroke: none !important;
 }
 
+/* Teal checkboxes in every MultiComboBox dropdown (global), including the
+   "Select All" row. The picker items render their own .sapMCb checkbox. */
+.sapMMultiComboBoxItem .sapMCbBg,
+.sapMMultiComboBoxSelectAll .sapMCbBg {
+  border-color: #008b96 !important;
+}
+
+.sapMMultiComboBoxItem .sapMCbBg.sapMCbMarkChecked,
+.sapMMultiComboBoxSelectAll .sapMCbBg.sapMCbMarkChecked {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.sapMMultiComboBoxItem .sapMCbBg.sapMCbMarkChecked::before,
+.sapMMultiComboBoxSelectAll .sapMCbBg.sapMCbMarkChecked::before {
+  color: #ffffff !important;
+}
+
 /* Teal TimePicker field (apply to the TimePicker control) */
 .tealTimePicker .sapMInputBaseContentWrapper {
   border-color: #008b96 !important;
@@ -1429,15 +1447,16 @@
 
 .placeholderBox {
   margin-top: 8px;
-  border: 2px solid black;
+  border: 2px dotted #008b96;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  background: #008c9619 !important;
 }
 
 .placeholderBox:hover {
-  background-color: #f4f4f4;
-  border-color: #000000;
+  background-color: rgba(0, 139, 150, 0.08);
+  border-color: #008b96 !important;
 }
 
 /* text style*/
@@ -1523,7 +1542,7 @@
 }
 
 .placeholderBox {
-  border: 2px solid black;
+  border: 2px dotted #008b96;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -1531,7 +1550,7 @@
 
 .placeholderBox:hover {
   background-color: #f4f4f4;
-  border-color: #000000;
+  border-color: #006470 !important;
 }
 
 .facilityNoImageText {

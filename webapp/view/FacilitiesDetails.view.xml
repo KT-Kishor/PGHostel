@@ -13,10 +13,8 @@
 	xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
 	xmlns:u="sap.ui.unified">
-	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>facilityDetails}">
-		<m:headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</m:headerContent>
+	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>facilityDetails}"  class="myUnifiedBtn"> 
+		
 		<ObjectPageLayout id="FD_id_ObjectPageLayout">
 			<sections>
 				<ObjectPageSection titleUppercase="false" id="FD_id_OrderHeaderSection1" title="{i18n>facilityInformation}">
@@ -139,8 +137,8 @@
                         visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                         selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'Entire Booking' ? 1 : -1) }" editable="{editable>/Edit}">
 											<m:buttons>
-												<m:RadioButton text="Daily" />
-												<m:RadioButton text="Entire Booking" />
+												<m:RadioButton text="Daily" class="tealRadioBtn"/>
+												<m:RadioButton text="Entire Booking" class="tealRadioBtn"/>
 											</m:buttons>
 										</m:RadioButtonGroup>
 										<m:Label
@@ -170,7 +168,7 @@
                                             editable="{editable>/Edit}"
                                             liveChange="onPriceChange"
                                             valueStateText="{i18n>enterUnitPrice}"
-                                               visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
+                                            visible="{= (${FacilitiesModel>/SelectionMode} !== 'PERSON_QTY')  &amp;&amp; ( ${FacilitiesModel>/Type} === 'Laundry Service' || ${FacilitiesModel>/Type} === 'Ironing Service' ) }"
                                         />
 										<m:Label
                                             text="{i18n>hourlyPrice}"
@@ -318,7 +316,7 @@
 											<!-- Placeholder Box (visible only when no image) -->
 											<m:VBox
                                                 visible="{= ${DisplayImagesModel>isPlaceholder} === true &amp;&amp; ${editable>/Edit} === true }"
-                                                width="120px"
+                                                width="150px"
                                                 height="120px"
                                                 alignItems="Center"
                                                 justifyContent="Center"
@@ -327,9 +325,9 @@
 												<u:FileUploader
                                                     icon="sap-icon://add"
                                                     width="120px"
-                                                    style="Transparent"
                                                     tooltip="{i18n>addImage}"
                                                     placeholder=" "
+                                                    class="myUnifiedBtn"
                                                     buttonOnly="true"
                                                     fileType="jpg,jpeg,png"
                                                     sameFilenameAllowed="true"
@@ -344,6 +342,7 @@
                                                 press=".onDeleteImage"
                                                 tooltip="{i18n>deleteImage}"
                                                 width="100%"
+                                                 class="myUnifiedBtn"
                                             />
 										</m:VBox>
 									</m:HBox>

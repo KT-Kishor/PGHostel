@@ -97,8 +97,8 @@
 				<Label text="Billing Frequency" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY }" required="true"/>
 				<RadioButtonGroup id="id_PeriodSelect" columns="2" select=".onPeriodTypeSelect" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY'}" selectedIndex="{= ${FacilitiesModel>/FacilityChargeType} === 'Daily' ? 0 : (${FacilitiesModel>/FacilityChargeType} === 'Entire Booking' ? 1 : -1) }">
 					<buttons >
-						<RadioButton text="Daily" />
-						<RadioButton text="Entire Booking" />
+						<RadioButton text="Daily" class="tealRadioBtn"/>
+						<RadioButton text="Entire Booking" class="tealRadioBtn"/>
 					</buttons>
 				</RadioButtonGroup>
 				<Label
@@ -285,6 +285,7 @@
 									visible="{= !${UploaderData>isProcessing} }"
 									text="{UploaderData>filename}"
 									press="onPreviewFacilityFile"
+                                    class="tealTextLink"
 								/>
 							</HBox>
 							<Text text="{UploaderData>fileType}" />

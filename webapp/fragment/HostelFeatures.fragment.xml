@@ -62,6 +62,7 @@
                             iconFirst="true"
                             buttonText="Upload Images"
                             multiple="true"
+							class="myUnifiedBtn"
                             uploadOnChange="false"
                             tooltip="{i18n>allowedSize}"/>
 					</HBox>

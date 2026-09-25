@@ -88,9 +88,9 @@
 					valueStateText="{i18n>adminBookingCustomerTypeValueStateText}"
 					selectedIndex="{AdminBookingModel>/CustomerTypeIndex}"
 					select="onAdminBookingCustomerTypeChange">
-					<RadioButton text="{i18n>adminBookingNewCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
-					<RadioButton text="{i18n>adminBookingExistingCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
-					<RadioButton text="{i18n>adminBookingSelfBooking}"/>
+					<RadioButton class="tealRadioBtn" text="{i18n>adminBookingNewCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
+					<RadioButton class="tealRadioBtn" text="{i18n>adminBookingExistingCustomer}" visible="{= ${LoginModel>/Role} !== 'Housekeeping' }"/>
+					<RadioButton class="tealRadioBtn" text="{i18n>adminBookingSelfBooking}"/>
 				</RadioButtonGroup>
 
 			</f:content>

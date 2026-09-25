@@ -80,7 +80,7 @@
 							<Text text="{HostelFeatures>FacilityName}" />
 							<Text text="{HostelFeatures>Type}" />
 							<ExpandableText text="{HostelFeatures>Description}" maxCharacters="100"/>
-							<Button text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }"/>
+							<Link text="{i18n>view}" press="HF_viewroom" visible="{= !!${HostelFeatures>Photo1} }" class="tealTextLink" />
 						</cells>
 					</ColumnListItem>
 				</items>

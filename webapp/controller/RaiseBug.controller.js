@@ -476,7 +476,9 @@ sap.ui.define([
                     });
                 }
                 if (aImages.length === 0) {
-                    sap.m.MessageBox.information("No images uploaded.");
+                    sap.m.MessageBox.information("No images uploaded.", {
+                        styleClass: "myUnifiedBtn"
+                    });
                     return;
                 }
 
@@ -821,7 +823,7 @@ sap.ui.define([
                             press: function () {
                                 that._oCommentDialog.close();
                             }
-                        })
+                        }).addStyleClass("myUnifiedBtn"),
                     });
 
                     that.getView().addDependent(that._oCommentDialog);
