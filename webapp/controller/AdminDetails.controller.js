@@ -4362,7 +4362,33 @@ sap.m.MessageBox.confirm(
 
                 if (startNotMatching || endNotMatching) {
 
-                if ((item.UnitText || "").toLowerCase() === "per month" || (item.UnitText || "").toLowerCase() === "per year") {
+            if ((item.UnitText || "").toLowerCase() === "per month") {
+
+    // Helper function to safely align day while respecting month-end bounds
+    const alignDateDay = function (targetDate, referenceDate) {
+        const refDay = referenceDate.getDate();
+        const refLastDay = new Date(referenceDate.getFullYear(), referenceDate.getMonth() + 1, 0).getDate();
+        const isRefLastDay = (refDay === refLastDay);
+
+        const targetYear = targetDate.getFullYear();
+        const targetMonth = targetDate.getMonth();
+        const targetLastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+        // If reference is last day of its month, snap to target's last day; otherwise cap at target's last day
+        const safeDay = isRefLastDay ? targetLastDay : Math.min(refDay, targetLastDay);
+
+        return new Date(targetYear, targetMonth, safeDay);
+    };
+
+    // Change facility start & end dates safely
+    facilityStart = alignDateDay(facilityStart, bookingStartDate);
+    facilityEnd = alignDateDay(facilityEnd, bookingEndDate);
+
+    // Update the item
+    item.StartDate = this.Formatter.formatDate(facilityStart);
+    item.EndDate = this.Formatter.formatDate(facilityEnd);
+}
+ if ((item.UnitText || "").toLowerCase() === "per year") {
 
     // Change facility start day to booking start day
     facilityStart.setDate(bookingStartDate.getDate());
