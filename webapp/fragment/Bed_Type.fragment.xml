@@ -255,6 +255,7 @@
                     tooltip="Delete"
                     press="onTokenDelete"
                     enabled="{= !${UploaderData>isProcessing} }"
+                    class="myUnifiedBtn"
                 />
                         </cells>
                     </ColumnListItem>

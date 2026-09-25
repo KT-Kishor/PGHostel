@@ -41,7 +41,7 @@
                     tooltip="{i18n>CapsIGNIN}"
                     id="signinvisible"
                     type="Transparent"
-                    class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signin' ? 'active' : 'inactive'} "
+                    class="switch-toggle-btn"
                     press="onSwitchToSignIn"
                     visible="{= ${LoginViewModel>/authFlow} !== 'signin' }"
                 />
@@ -50,7 +50,7 @@
                     text="{i18n>CapsIGNUP}"
                     tooltip="{i18n>CapsIGNUP}"
                     type="Transparent"
-                    class="switch-toggle-btn {= ${LoginViewModel>/authFlow} === 'signup' ? 'active' : 'inactive'} "
+                    class="switch-toggle-btn"
                     press="onSwitchToSignUp"
                     visible="{= ${LoginViewModel>/authFlow} !== 'signup' }"
                 />
@@ -113,6 +113,7 @@
                             text="{LoginViewModel>/otpButtonText}"
                             enabled="{LoginViewModel>/canResendOTP}"
                             visible="{= ${LoginViewModel>/loginMode} === 'otp' }"
+                            class="tealTextBtn"
                             press="onPressOTP"
                         />
                     </FlexBox>
@@ -161,6 +162,7 @@
                         text="{i18n>setForgotPassword}"
                         tooltip="{i18n>setForgotPassword}"
                         type="Transparent"
+                        class="tealTextBtn"
                         press="onForgotPassword"
                         visible="{= ${LoginViewModel>/isOTPAllowed} }"
                     />
@@ -297,6 +299,7 @@
                     tooltip="{i18n>MSgeneratePassword}"
                     type="Transparent"
                     icon="sap-icon://refresh"
+                    class="tealTextBtn"
                     press="SM_onGenerateForgotPassword"
                 />
             </HBox>
@@ -334,6 +337,7 @@
                 text="{i18n>backtoLogin}"
                 tooltip="{i18n>backtoLogin}"
                 type="Transparent"
+                class="tealTextBtn"
                 press="onBackToLogin"
             />
         </HBox>
@@ -676,6 +680,7 @@
                                             tooltip="{i18n>MSgeneratePassword}"
                                             type="Transparent"
                                             icon="sap-icon://refresh"
+                                            class="tealTextBtn"
                                             press="SM_onGeneratePassword"
                                         />
                                     </HBox>

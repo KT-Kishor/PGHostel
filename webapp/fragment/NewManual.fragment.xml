@@ -39,7 +39,8 @@
 
             <Button
                 text="{i18n>close}"
-                press="onCloseVideoDialog" />
+                press="onCloseVideoDialog"
+                class="myUnifiedBtn"/>
 
         </endButton>
 

@@ -345,7 +345,8 @@
                         buttonText="Upload Logo"
                         multiple="false"
                         uploadOnChange="false"
-                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"      
+                        tooltip="Only JPG, PNG, or PDF files under 1MB allowed"   
+                        class="myUnifiedBtn"   
                     />
 				</HBox>
 				<Table
@@ -404,6 +405,7 @@
                     tooltip="Delete"
                     press="onTokenDelete"
                     enabled="{= !${UploaderData>isProcessing} }"
+                    class="myUnifiedBtn"
                 />
             </cells>
         </ColumnListItem>
@@ -412,7 +414,7 @@
 			</VBox>
 			<!-- RIGHT SIDE (IMAGE) -->
 			<VBox width="48%">
-				<HBox justifyContent="End" class="sapUiSmallMarginBottom">
+				<HBox justifyContent="End" class="sapUiSmallMarginBottom sapUiSmallMarginEnd">
 					<u:FileUploader
                         id="BD_id_FileUploader1"
                         typeMissmatch="onFileTypeMissmatch"
@@ -425,7 +427,7 @@
                         multiple="false"
                         uploadOnChange="false"
                         tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
-                        class="sapUiSmallMarginEnd"
+                        class="myUnifiedBtn"
                     />
 				</HBox>
                 <Table
@@ -484,6 +486,7 @@
                     tooltip="Delete"
                     press="onTokenImageDelete"
                     enabled="{= !${UploaderData>isProcessing} }"
+                    class="myUnifiedBtn"
                 />
             </cells>
         </ColumnListItem>

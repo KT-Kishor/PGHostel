@@ -375,6 +375,7 @@ filterSecondaryValues="true"
                             uploadOnChange="false"
                             change="onAdminFileSelect"
                             fileType="jpg,jpeg,png,pdf"
+                              class="myUnifiedBtn"
                         />
                     </VBox>
                 </OverflowToolbar>
@@ -419,6 +420,7 @@ filterSecondaryValues="true"
                     visible="{= ${AdminSignupModel>isProcessing} === true }"
                 />
                 <Link
+                    class="tealTextLink"
                     visible="{= !${AdminSignupModel>isProcessing} }"
                     wrapping="true"
                     text="{AdminSignupModel>FileName}"
@@ -440,6 +442,7 @@ filterSecondaryValues="true"
                 icon="sap-icon://delete"
                 press="onAdminDeleteDoc"
                 enabled="{= !${AdminSignupModel>isProcessing} }"
+                class="myUnifiedBtn"
             />
         </cells>
     </ColumnListItem>

@@ -60,7 +60,7 @@
                 icon="sap-icon://overflow"
                 type="Transparent"
                 press="onFooterMenuPress"
-                class="mobileFooterMenu _link" />
+                class="mobileFooterMenu _link myUnifiedBtn" />
 
         </OverflowToolbar>
 

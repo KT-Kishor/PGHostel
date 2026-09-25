@@ -55,7 +55,7 @@
                 tooltip="{i18n>requestSupport}"
                 icon="sap-icon://headset"
                 text="Request Support"
-                class="contact-support-btn contact-support-btn-style"
+                class="contact-support-btn contact-support-btn-style myUnifiedBtn"
                 visible="false"
             />
         </VBox>

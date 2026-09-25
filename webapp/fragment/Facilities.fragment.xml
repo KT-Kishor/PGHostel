@@ -293,6 +293,7 @@
                                 icon="sap-icon://delete"
                                 press="onTokenDelete"
                                 enabled="{= !${UploaderData>isProcessing} }"
+                                class="myUnifiedBtn"
                             />
 						</cells>
 					</ColumnListItem>

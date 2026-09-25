@@ -523,19 +523,24 @@
   transition: background 0.2s, color 0.2s;
   box-shadow: none !important;
   margin: 0 0.2px;
-  padding: 0.8rem 2.2rem;
-  min-width: 160px;
+  padding: 0.8rem 1.5rem;
+  min-width: auto;
   border: none;
 }
 
-.switch-toggle-btn.active {
-  background: linear-gradient(90deg, #2596ff 0, #1669e6 100%);
-  color: #fff !important;
+.switch-toggle-btn .sapMBtnContent,
+.switch-toggle-btn .sapMBtnContent bdi,
+.switch-toggle-btn .sapMBtnText {
+  color: #008b96 !important;
 }
 
-.switch-toggle-btn.inactive {
-  background: transparent;
-  color: #333 !important;
+.switch-toggle-btn:hover .sapMBtnContent,
+.switch-toggle-btn:hover .sapMBtnContent bdi,
+.switch-toggle-btn:active .sapMBtnContent,
+.switch-toggle-btn:active .sapMBtnContent bdi,
+.switch-toggle-btn.sapMBtnActive .sapMBtnContent,
+.switch-toggle-btn.sapMBtnActive .sapMBtnContent bdi {
+  color: #006d75 !important;
 }
 
 .loginOptionsRow {
@@ -4045,6 +4050,54 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   flex: 0 0 auto;
   margin-right: 0.5rem;
   color: #008b96 !important;
+}
+
+.tealTextLink,
+.tealTextLink .sapMLnk,
+.tealTextLink .sapMLnkText {
+  color: #008b96 !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tealTextLink:hover,
+.tealTextLink:focus,
+.tealTextLink:active,
+.tealTextLink.sapMLnkActive,
+.tealTextLink.sapMLnkActive .sapMLnkText {
+  color: #006d75 !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+}
+
+.tealTextLink::selection,
+.tealTextLink *::selection {
+  color: #008b96 !important;
+  background: transparent !important;
+}
+
+.tealTextBtn .sapMBtnContent,
+.tealTextBtn .sapMBtnContent bdi,
+.tealTextBtn .sapMBtnText {
+  color: #008b96 !important;
+}
+
+.tealTextBtn .sapMBtnIcon,
+.tealTextBtn .sapMBtnIcon::before,
+.tealTextBtn .sapUiIcon {
+  color: #008b96 !important;
+}
+
+.tealTextBtn:hover .sapMBtnContent,
+.tealTextBtn:hover .sapMBtnContent bdi,
+.tealTextBtn:active .sapMBtnContent,
+.tealTextBtn:focus .sapMBtnContent,
+.tealTextBtn.sapMBtnActive .sapMBtnContent,
+.tealTextBtn:hover .sapMBtnIcon,
+.tealTextBtn:active .sapMBtnIcon,
+.tealTextBtn:focus .sapMBtnIcon {
+  color: #006d75 !important;
 }
 
 .sapMFlexBox.AddressInline {
