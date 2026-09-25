@@ -284,13 +284,13 @@ items="{PaymentMode>/}"
                         <Button
                             text="{i18n>submit}"
                             tooltip="{i18n>submit}"
-                            class="sendMail"
+                            class="sendMail myUnifiedBtn"
                             press="onChangePaymentRecived"
                         />
                         <Button
                             text="{i18n>close}"
                             tooltip="{i18n>close}"
-                            class=""
+                            class="myUnifiedBtn"
                             press="onPressInvClose"
                         />
                     </HBox>

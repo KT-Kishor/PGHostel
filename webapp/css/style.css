@@ -642,6 +642,25 @@
   color: #ffffff !important;
 }
 
+/* Teal standalone CheckBox (apply .tealCheckBox to the CheckBox control). */
+.tealCheckBox .sapMCbBg {
+  border-color: #008b96 !important;
+}
+
+.tealCheckBox .sapMCbBg.sapMCbMarkChecked {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.tealCheckBox .sapMCbBg.sapMCbMarkChecked::before {
+  color: #ffffff !important;
+}
+
+.tealCheckBox:hover .sapMCbBg,
+.tealCheckBox.sapMCb:focus .sapMCbBg {
+  border-color: #006d75 !important;
+}
+
 /* Teal TimePicker field (apply to the TimePicker control) */
 .tealTimePicker .sapMInputBaseContentWrapper {
   border-color: #008b96 !important;

@@ -11,14 +11,14 @@
         title="{i18n>invoiceDetails}"
         showNavButton="true"
         navButtonPress="onNavBack"
-        id="CID_id_MyPageId"
+        id="CID_id_MyPageId" class="myUnifiedBtn"
     >
         <m:headerContent>
             <m:Button
                 press="onHome"
                 icon="sap-icon://log"
                 tooltip="{i18n>logoutTooltip}"
-                type="Transparent"
+                class="myUnifiedBtn"
             />
         </m:headerContent>
         <!-- <m:ScrollContainer > -->
@@ -355,6 +355,7 @@
                                         <m:CheckBox
                                             text="{i18n>cgst}"
                                             id="CID_id_CheckboxCGST"
+                                            class="tealCheckBox"
                                             selected="{SelectedCustomerModel>/CGSTSelected}"
                                             select="CI_onSelectCGST"
                                             editable="{visiablityPlay>/editable}"
@@ -363,6 +364,7 @@
                                         <m:CheckBox
                                             text="{i18n>igst}"
                                             id="CDI_id_CheckboxIGST"
+                                            class="tealCheckBox"
                                             selected="{SelectedCustomerModel>/IGSTSelected}"
                                             select="CI_onSelectIGST"
                                             editable="{visiablityPlay>/editable}"
