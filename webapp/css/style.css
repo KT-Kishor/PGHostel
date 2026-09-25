@@ -547,6 +547,26 @@
   gap: 0.5rem;
 }
 
+.tealRadioBtn .sapMRbBOut {
+  stroke: #008b96 !important;
+}
+
+.tealRadioBtn:hover .sapMRbBOut,
+.tealRadioBtn.sapMRbHoverable:hover .sapMRbBOut,
+.tealRadioBtn:focus .sapMRbBOut {
+  stroke: #006d75 !important;
+}
+
+.tealRadioBtn.sapMRbSel .sapMRbBInn {
+  fill: #008b96 !important;
+}
+
+.tealRadioBtn .sapMLabel,
+.tealRadioBtn .sapMRbBLabel,
+.tealRadioBtn .sapMLabelTextWrapper {
+  color: #000000 !important;
+}
+
 .resendOtpBtn {
   white-space: nowrap;
   /* prevent ugly multi-line text */

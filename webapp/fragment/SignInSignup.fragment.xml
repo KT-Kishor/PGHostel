@@ -97,6 +97,7 @@
                         <RadioButton
                             text="{i18n>password}"
                             groupName="loginType"
+                            class="tealRadioBtn"
                             selected="{= ${LoginViewModel>/loginMode} === 'password' }"
                             select="onSelectLoginMode"
                             visible="{= ${LoginViewModel>/isOTPAllowed} }"
@@ -104,6 +105,7 @@
                         <RadioButton
                             text="{i18n>otp}"
                             groupName="loginType"
+                            class="tealRadioBtn"
                             selected="{= ${LoginViewModel>/loginMode} === 'otp' }"
                             select="onSelectLoginMode"
                         />
