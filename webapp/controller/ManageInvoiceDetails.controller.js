@@ -873,19 +873,34 @@ sap.ui.define([
                 if (unit === "per day") {
                     baseDuration = diffDays + (diffDays === 1 ? " Day" : " Days");
                 } else if (unit === "per month") {
+    const startDay = start.getDate();
+    const startMonthLastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+    const isStartLastDay = (startDay === startMonthLastDay);
 
-                    let months =
-                        (end.getFullYear() - start.getFullYear()) * 12 +
-                        (end.getMonth() - start.getMonth());
+    const endDay = end.getDate();
+    const endMonthLastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+    const isEndLastDay = (endDay === endMonthLastDay);
 
-                    if (end.getDate() > start.getDate()) {
-                        months += 1;
-                    }
+    let months =
+        (end.getFullYear() - start.getFullYear()) * 12 +
+        (end.getMonth() - start.getMonth());
 
-                    months = Math.max(months, 1);
+    // If both dates are on the last day of their respective months (e.g., Sept 30 to Oct 31),
+    // it's an exact full-month cycle, so no extra adjustment is needed.
+    if (!(isStartLastDay && isEndLastDay)) {
+        if (endDay > startDay) {
+            // Crossed past the start day into a partial month -> count extra month
+            months += 1;
+        } else if (endDay < startDay && !isEndLastDay) {
+            // Hasn't reached the start day yet -> subtract 1 incomplete month
+            months -= 1;
+        }
+    }
 
-                    baseDuration = months + (months === 1 ? " Month" : " Months");
-                } else if (unit === "per year") {
+    months = Math.max(months, 1);
+
+    baseDuration = months + (months === 1 ? " Month" : " Months");
+} else if (unit === "per year") {
 
                     let years =
                         end.getFullYear() - start.getFullYear();
@@ -921,20 +936,35 @@ sap.ui.define([
                         return diffDays + (diffDays === 1 ? " Day" : " Days");
                     }
 
-                    if (unit === "per month") {
+                   if (unit === "per month") {
+    const startDay = start.getDate();
+    const startMonthLastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+    const isStartLastDay = (startDay === startMonthLastDay);
 
-                        let months =
-                            (end.getFullYear() - start.getFullYear()) * 12 +
-                            (end.getMonth() - start.getMonth());
+    const endDay = end.getDate();
+    const endMonthLastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+    const isEndLastDay = (endDay === endMonthLastDay);
 
-                        if (end.getDate() > start.getDate()) {
-                            months += 1;
-                        }
+    let months =
+        (end.getFullYear() - start.getFullYear()) * 12 +
+        (end.getMonth() - start.getMonth());
 
-                        months = Math.max(months, 1);
+    // If both dates are on the last day of their respective months (e.g., Sept 30 -> Oct 31),
+    // it is an exact full-month cycle and needs no day adjustment.
+    if (!(isStartLastDay && isEndLastDay)) {
+        if (endDay > startDay) {
+            // Crossed the start day into a partial month -> add 1 month
+            months += 1;
+        } else if (endDay < startDay && !isEndLastDay) {
+            // Has not reached the target start day yet -> subtract 1 incomplete month
+            months -= 1;
+        }
+    }
 
-                        return months + (months === 1 ? " Month" : " Months");
-                    }
+    months = Math.max(months, 1);
+
+    return months + (months === 1 ? " Month" : " Months");
+}
 
                     if (unit === "per year") {
 
@@ -5494,20 +5524,28 @@ sap.ui.define([
 
 
             // TOTAL MONTHS
-            _calculateTotalMonths: function (startDate, endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
+           _calculateTotalMonths: function (startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-                let months =
-                    (end.getFullYear() - start.getFullYear()) * 12 +
-                    (end.getMonth() - start.getMonth());
+    const startDay = start.getDate();
+    const endDay = end.getDate();
 
-                if (end.getDate() > start.getDate()) {
-                    months += 1;
-                }
+    // Check if end date falls on the last day of its month
+    const endMonthLastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+    const isEndLastDay = (endDay === endMonthLastDay);
 
-                return Math.max(months, 1);
-            },
+    let months =
+        (end.getFullYear() - start.getFullYear()) * 12 +
+        (end.getMonth() - start.getMonth());
+
+    // Only subtract if the end day hasn't reached the start day yet AND it's not the month's last day
+    if (endDay < startDay && !isEndLastDay) {
+        months -= 1;
+    }
+
+    return Math.max(months, 1);
+},
 
 
             // DAYS

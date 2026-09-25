@@ -1498,18 +1498,26 @@ onChekout: function () {
 
 
             if (sUnit === "Per Month" || sUnit === "monthly") {
+const startDay = oStart.getDate();
+const startMonth = oStart.getMonth();
+const startYear = oStart.getFullYear();
 
-                const startDay = oStart.getDate();
-                const targetMonth = oStart.getMonth() + iCount;
-                const targetYear = oStart.getFullYear();
+const targetMonth = startMonth + iCount;
+const targetYear = startYear;
 
-                // Last day of target month
-                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+// 1. Check if start date is the last day of its month
+const startMonthLastDay = new Date(startYear, startMonth + 1, 0).getDate();
+const isStartLastDay = (startDay === startMonthLastDay);
 
-                // Use same day if available, otherwise last day
-                const endDay = Math.min(startDay, lastDay);
+// 2. Get the last day of target month (JS auto-handles year roll over if targetMonth > 11)
+const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
 
-                oEnd = new Date(targetYear, targetMonth, endDay);
+// 3. Snap to target month's last day if start was on the last day; otherwise cap at target month's last day
+const endDay = isStartLastDay ? lastDay : Math.min(startDay, lastDay);
+
+oEnd = new Date(targetYear, targetMonth, endDay);
+
+                
 
                  
               sEndDate=this.Formatter.formatDate(oEnd).split('/').reverse().join('-')
@@ -1609,16 +1617,26 @@ onChekout: function () {
 
             if (sUnit === "Per Month") {
 
-                const targetMonth = oStart.getMonth() + iCount;
-                const targetYear = oStart.getFullYear();
+                const startDay = oStart.getDate();
+const startMonth = oStart.getMonth();
+const startYear = oStart.getFullYear();
 
-                // Last day of target month
-                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+// Check if the original start date is the last day of its month
+const startMonthLastDay = new Date(startYear, startMonth + 1, 0).getDate();
+const isStartLastDay = (startDay === startMonthLastDay);
 
-                // Use same day if available, otherwise last day
-                const endDay = Math.min(startDay, lastDay);
+// Calculate raw month and adjust target year/month for roll-over (> 11)
+const rawTargetMonth = startMonth + iCount;
+const targetYear = startYear + Math.floor(rawTargetMonth / 12);
+const targetMonth = (rawTargetMonth % 12 + 12) % 12;
 
-                oEnd = new Date(targetYear, targetMonth, endDay);
+// Last day of target month
+const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+// Use target last day if start was last day, otherwise cap at last day
+const endDay = isStartLastDay ? lastDay : Math.min(startDay, lastDay);
+
+oEnd = new Date(targetYear, targetMonth, endDay);
 
             } else if (sUnit === "Per Year") {
 
@@ -1801,23 +1819,34 @@ onChekout: function () {
             }
 
             if (oPayload.UnitText === "Per Month" || oPayload.UnitText === "Per Year") {
-                var oStartDate = new Date(oPayload.StartDate.includes("/") ? oPayload.StartDate.split("/").reverse().join("-") : oPayload.StartDate);
-                var oBookingStartDate = oCustomerData.minStartDate;
-                var oBookingEndDate = oCustomerData.minEndDate;
+            var oStartDate = new Date(oPayload.StartDate.includes("/") ? oPayload.StartDate.split("/").reverse().join("-") : oPayload.StartDate);
+var oBookingStartDate = new Date(oCustomerData.minStartDate);
+var oBookingEndDate = new Date(oCustomerData.minEndDate);
 
-                oStartDate.setHours(0, 0, 0, 0);
-                oBookingStartDate.setHours(0, 0, 0, 0);
-                oBookingEndDate.setHours(0, 0, 0, 0);
+oStartDate.setHours(0, 0, 0, 0);
+oBookingStartDate.setHours(0, 0, 0, 0);
+oBookingEndDate.setHours(0, 0, 0, 0);
 
-                var bookingStartDay = oBookingStartDate.getDate();
-                var selectedStartDay = oStartDate.getDate();
+var bookingStartDay = oBookingStartDate.getDate();
+var selectedStartDay = oStartDate.getDate();
 
-                if (selectedStartDay !== bookingStartDay) {
-                    sap.m.MessageToast.show(
-                        "Please select the monthly start date based on the booking start date."
-                    );
-                    return;
-                }
+// Check if booking start date was the last day of its month
+var bookingLastDay = new Date(oBookingStartDate.getFullYear(), oBookingStartDate.getMonth() + 1, 0).getDate();
+var isBookingLastDay = (bookingStartDay === bookingLastDay);
+
+// Check if selected start date is the last day of its month
+var selectedLastDay = new Date(oStartDate.getFullYear(), oStartDate.getMonth() + 1, 0).getDate();
+var isSelectedLastDay = (selectedStartDay === selectedLastDay);
+
+// Valid if exact day matches OR both dates fall on the last day of their respective months
+var isValidDay = (selectedStartDay === bookingStartDay) || (isBookingLastDay && isSelectedLastDay);
+
+if (!isValidDay) {
+    sap.m.MessageToast.show(
+        "Please select the monthly start date based on the booking start date."
+    );
+    return;
+}
             }
 
             if (oPayload.CouponDiscount === "" && oPayload.CouponCode) {
@@ -2445,18 +2474,22 @@ onChekout: function () {
             // MONTHLY CALCULATION
             if (sUnit === "monthly" || sUnit === "Per Month") {
 
-                var startDay = oStart.getDate();
+               var startDay = oStart.getDate();
 
-                var targetMonth = oStart.getMonth() + duration;
-                var targetYear = oStart.getFullYear();
+var targetMonth = oStart.getMonth() + duration;
+var targetYear = oStart.getFullYear();
 
-                // Last day of target month
-                var lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+// Check if the start date is the last day of its month
+var startMonthLastDay = new Date(oStart.getFullYear(), oStart.getMonth() + 1, 0).getDate();
+var isStartLastDay = (startDay === startMonthLastDay);
 
-                // Use same day if exists, else last day
-                var endDay = Math.min(startDay, lastDay);
+// Last day of target month
+var targetMonthLastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
 
-                oEnd = new Date(targetYear, targetMonth, endDay);
+// If start date was the last day, snap to target month's last day; otherwise, cap at target month's last day
+var endDay = isStartLastDay ? targetMonthLastDay : Math.min(startDay, targetMonthLastDay);
+
+oEnd = new Date(targetYear, targetMonth, endDay);
 
                 var diffMonths = duration;
 
@@ -2601,16 +2634,26 @@ onChekout: function () {
 
             if (sUnit === "monthly" || sUnit === "Per Month") {
 
-                const targetMonth = oStart.getMonth() + iCount;
-                const targetYear = oStart.getFullYear();
+            const startDay = oStart.getDate();
+const startMonth = oStart.getMonth();
+const startYear = oStart.getFullYear();
 
-                // Last day of target month
-                const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+const targetMonth = startMonth + iCount;
+const targetYear = startYear;
 
-                // Same day if available, otherwise last day
-                const endDay = Math.min(startDay, lastDay);
+// Check if start date is the last day of its month
+const startMonthLastDay = new Date(startYear, startMonth + 1, 0).getDate();
+const isStartLastDay = (startDay === startMonthLastDay);
 
-                oEnd = new Date(targetYear, targetMonth, endDay);
+// Last day of target month
+const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+// Last day if start was last day, otherwise cap at target month's last day
+const endDay = isStartLastDay ? lastDay : Math.min(startDay, lastDay);
+
+oEnd = new Date(targetYear, targetMonth, endDay);
+
+                
 
                 oCustomerData.setProperty("/RentPrice", iCount * originalRent);
 
@@ -2762,14 +2805,22 @@ onChekout: function () {
                 var Duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
                 if (oSelectedData.UnitText === "Per Month") {
-                    var iMonths =
-                        (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
-                        (oEnd.getMonth() - oStart.getMonth());
+                   var startDay = oStart.getDate();
+var endDay = oEnd.getDate();
+var endMonthLastDay = new Date(oEnd.getFullYear(), oEnd.getMonth() + 1, 0).getDate();
+var isEndLastDay = (endDay === endMonthLastDay);
 
-                    // Optional: include partial month logic
-                    if (oEnd.getDate() > oStart.getDate()) {
-                        iMonths += 1;
-                    }
+var iMonths =
+    (oEnd.getFullYear() - oStart.getFullYear()) * 12 +
+    (oEnd.getMonth() - oStart.getMonth());
+
+// If we haven't reached the same calendar day in the target month (and it's not the last day of that month)
+// then the month cycle isn't complete yet, so subtract 1.
+if (endDay < startDay && !isEndLastDay) {
+    iMonths -= 1;
+}``
+
+iMonths = Math.max(iMonths, 1);
                 } else if (oSelectedData.UnitText === "Per Year") {
                     var iMonths =
                         (oEnd.getFullYear() - oStart.getFullYear());

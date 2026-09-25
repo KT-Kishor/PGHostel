@@ -15,7 +15,8 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function (oEvent) {
-            var LoginFUnction = await this.commonLoginFunction("ManageVendor");
+            
+            var LoginFUnction = await this.commonLoginFunction("TilePage");
             if (!LoginFUnction) return;
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             this.getView().byId("SP_id_RaisedBy").setSelectedKey("")
