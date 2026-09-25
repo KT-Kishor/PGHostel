@@ -21,7 +21,6 @@
            
             <Table
                 id="MA_id_ManageadsTable"
-                class="tealTableRadio"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
                 width="auto"

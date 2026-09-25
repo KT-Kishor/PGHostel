@@ -34,7 +34,7 @@
 					</fb:FilterGroupItem>
 				</fb:filterGroupItems>
 			</fb:FilterBar>
-			<Table id="id_MD_Table" class="tealTableCheckbox" mode="MultiSelect" sticky="ColumnHeaders,HeaderToolbar" growing="true" busyIndicatorDelay="0"
+			<Table id="id_MD_Table" mode="MultiSelect" sticky="ColumnHeaders,HeaderToolbar" growing="true" busyIndicatorDelay="0"
                 growingThreshold="100" alternateRowColors="true" selectionChange="MC_onTableSelectionChange"
                 items="{ path: 'mainModel>/', templateShareable: false, sorter: { path: 'Status', descending: false, group: true }, groupHeaderFactory: '.getGroupHeader' }" updateFinished="onTableUpdateFinished">
 				<headerToolbar>

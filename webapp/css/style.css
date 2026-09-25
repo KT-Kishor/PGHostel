@@ -567,43 +567,61 @@
   color: #000000 !important;
 }
 
-/* Teal selection radio inside single-select tables. The table renders its
-   own selection radio, so the class must sit on the Table (or a wrapper) and
-   target the generated .sapMRb in the selection column. This colours both
-   the outer ring and the inner dot. */
-.tealTableRadio .sapMListTblSelCol .sapMRbBOut {
+/* Teal selection radio inside single-select tables (global). The table
+   renders its own selection radio, so this targets the generated .sapMRb in
+   the selection column directly, colouring the outer ring and the inner dot. */
+.sapMListTblSelCol .sapMRbBOut {
   stroke: #008b96 !important;
 }
 
-.tealTableRadio .sapMListTblSelCol .sapMRb:not(.sapMRbDis):hover .sapMRbBOut,
-.tealTableRadio .sapMListTblSelCol .sapMRb:focus .sapMRbBOut {
+.sapMListTblSelCol .sapMRb:not(.sapMRbDis):hover .sapMRbBOut,
+.sapMListTblSelCol .sapMRb:focus .sapMRbBOut {
   stroke: #006d75 !important;
 }
 
-.tealTableRadio .sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBOut {
+.sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBOut {
   stroke: #008b96 !important;
 }
 
-.tealTableRadio .sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBInn {
+.sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBInn {
   fill: #008b96 !important;
   stroke: none !important;
 }
 
-/* Teal selection checkbox inside multi-select tables (apply to the Table).
-   The table renders its own selection checkbox, so the class targets the
-   generated .sapMCb in the selection column, including the header's
-   select-all checkbox. Colours the box border and the checked fill. */
-.tealTableCheckbox .sapMListTblSelCol .sapMCbBg {
+/* Teal selection checkbox inside multi-select tables (global), including the
+   header's select-all checkbox. Colours the box border and the checked fill. */
+.sapMListTblSelCol .sapMCbBg {
   border-color: #008b96 !important;
 }
 
-.tealTableCheckbox .sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked {
+.sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked {
   background-color: #008b96 !important;
   border-color: #008b96 !important;
 }
 
-.tealTableCheckbox .sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked::before {
+.sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked::before {
   color: #ffffff !important;
+}
+
+/* Teal "Primary" radio inside the occupants / family members table. This is a
+   regular RadioButton in a cell (not the table selection column), so it is
+   scoped by the table's own class. Covers both Booking and EditBooking. */
+.familyMembersTable .sapMRbBOut {
+  stroke: #008b96 !important;
+}
+
+.familyMembersTable .sapMRb:not(.sapMRbDis):hover .sapMRbBOut,
+.familyMembersTable .sapMRb:focus .sapMRbBOut {
+  stroke: #006d75 !important;
+}
+
+.familyMembersTable .sapMRb.sapMRbSel .sapMRbBOut {
+  stroke: #008b96 !important;
+}
+
+.familyMembersTable .sapMRb.sapMRbSel .sapMRbBInn {
+  fill: #008b96 !important;
+  stroke: none !important;
 }
 
 /* Teal TimePicker field (apply to the TimePicker control) */
@@ -721,19 +739,111 @@
   border-color: #008b96 !important;
 }
 
-.sapMTimePickerDropDown .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
+.sapMTimePickerDropDown .sapMSegB .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
   background-color: #008b96 !important;
   border-color: #008b96 !important;
   color: #ffffff !important;
 }
 
-.sapMTimePickerDropDown .sapMSegBBtn.sapMSegBBtnSel:hover .sapMSegBBtnInner {
+.sapMTimePickerDropDown .sapMSegB .sapMSegBBtn.sapMSegBBtnSel:hover .sapMSegBBtnInner {
   background-color: #00a0ab !important;
   border-color: #00a0ab !important;
   color: #ffffff !important;
 }
 
 .sapMTimePickerDropDown .sapMSegBBtn:focus .sapMSegBBtnInner {
+  outline-color: #008b96 !important;
+}
+
+/* Teal DatePicker calendar popup (universal). Every DatePicker popup carries
+   the root class .sapMRPCalendar, so this covers all of them without adding
+   any class in the views. */
+.sapMRPCalendar .sapUiCalHead > button,
+.sapMRPCalendar .sapUiCalCancel,
+.sapMRPCalendar .sapUiCalHeadText {
+  color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapUiCalHead > button:hover,
+.sapMRPCalendar .sapUiCalHead > button:focus,
+.sapMRPCalendar .sapUiCalCancel:hover,
+.sapMRPCalendar .sapUiCalCancel:focus {
+  color: #008b96 !important;
+  background-color: rgba(0, 139, 150, 0.1) !important;
+}
+
+.sapMRPCalendar .sapUiCalHead > button:active,
+.sapMRPCalendar .sapUiCalHead > button:active > .sapUiCalHeadBAddText {
+  color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapUiCalItem.sapUiCalItemSel,
+.sapMRPCalendar .sapUiCalItem.sapUiCalItemSelBetween {
+  background-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapUiCalItem.sapUiCalItemSel > .sapUiCalItemText,
+.sapMRPCalendar .sapUiCalItem.sapUiCalItemSel > .sapUiCalDayName,
+.sapMRPCalendar .sapUiCalItem.sapUiCalItemSel > .sapUiCalItemSecText {
+  color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapUiCalItemNow > .sapUiCalItemText {
+  border-color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapUiCalItemNow.sapUiCalItemSel > .sapUiCalItemText {
+  border-color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSel,
+.sapMRPCalendar .sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSel,
+.sapMRPCalendar .sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSelBetween,
+.sapMRPCalendar .sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSelBetween {
+  outline-color: #008b96 !important;
+  background: rgba(0, 139, 150, 0.12) !important;
+  color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapUiCalItem:focus > .sapUiCalItemText {
+  outline-color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapMSegB .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapMSegB .sapMSegBBtn .sapMSegBBtnInner {
+  color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapMBtnInner.sapMBtnEmphasized {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapMBtnInner.sapMBtnEmphasized .sapMBtnContent,
+.sapMRPCalendar .sapMBtnInner.sapMBtnEmphasized .sapMBtnIcon {
+  color: #ffffff !important;
+}
+
+.sapMRPCalendar .sapMBtnInner.sapMBtnEmphasized.sapMBtnActive,
+.sapMRPCalendar .sapMBtn:hover > .sapMBtnHoverable.sapMBtnEmphasized:not(.sapMBtnActive) {
+  background-color: #00a0ab !important;
+  border-color: #00a0ab !important;
+}
+
+.sapMRPCalendar .sapMBtn:focus > .sapMBtnInner.sapMFocusable::before,
+.sapMRPCalendar .sapMBtn:focus > .sapMBtnInner.sapMFocusable::after {
+  border-color: #008b96 !important;
+}
+
+.sapMRPCalendar .sapMBtnInner.sapMFocusable {
   outline-color: #008b96 !important;
 }
 
@@ -1635,6 +1745,29 @@
 
 .expandableAmenityText .sapMLnk {
   color: #000 !important;
+}
+
+/* ExpandableText "Show more" / "Show less" toggle (universal) */
+.sapMExText .sapMLnk {
+  color: #008b96 !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sapMExText .sapMLnk:hover,
+.sapMExText .sapMLnk:focus,
+.sapMExText .sapMLnk:active,
+.sapMExText .sapMLnk.sapMLnkActive {
+  color: #006d75 !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+}
+
+.sapMExText .sapMLnk::selection,
+.sapMExText .sapMLnk *::selection {
+  color: #008b96 !important;
+  background: transparent !important;
 }
 
 @media (max-width: 1024px) {
