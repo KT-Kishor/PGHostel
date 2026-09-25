@@ -106,6 +106,7 @@
                                     text="{MP_SupportImages>name}"
                                     tooltip="{i18n>clickToPreview}"
                                     press="onMPSupportImagePress"
+                                    class="tealTextLink"
                                     visible="{= ${MP_SupportImages>source} !== 'processing' }"
                                 />
                                 <Text
@@ -114,9 +115,10 @@
                                     visible="{= ${MP_SupportImages>source} === 'processing' }"
                                 />
                                 <Button
-                                    icon="sap-icon://decline"
+                                    icon="sap-icon://delete"
                                     type="Transparent"
                                     tooltip="Remove"
+                                    class="myUnifiedBtn"
                                     press="onMPSupportImageRemove"
                                     visible="{= ${MP_SupportImages>source} !== 'processing' }"
                                 />
@@ -134,6 +136,7 @@
                             buttonText="Upload Images"
                             multiple="true"
                             uploadOnChange="false"
+                            class="myUnifiedBtn"
                         />
                     </HBox>
                 </VBox>

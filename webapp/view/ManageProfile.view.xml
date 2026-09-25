@@ -547,6 +547,7 @@
                         <Link
                             text="{i18n>view}"
                             press="HF_viewimage"
+                            class="tealTextLink"
                         />
                         <Button
                             icon="sap-icon://edit"
@@ -737,6 +738,7 @@
                             press="onPressComplaintRow"
                             tooltip="Edit Complaint"
                             visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"
+                            class="myUnifiedBtn"
                         />
                     </cells>
                 </ColumnListItem>
@@ -935,6 +937,7 @@
                             text="{i18n>view}"
                             tooltip="View Support Images"
                             press="onPressSupportImageView"
+                            class="tealTextLink"
                         />
                         <Button
                             icon="sap-icon://edit"
@@ -942,6 +945,7 @@
                             press="onPressSupportRow"
                             tooltip="Edit Support Request"
                             visible="{path: 'profileData>Status', formatter: '.Formatter.canEditSupport'}"
+                            class="myUnifiedBtn"
                         />
                     </cells>
                 </ColumnListItem>

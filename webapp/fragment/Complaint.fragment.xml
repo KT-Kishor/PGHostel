@@ -154,6 +154,7 @@
                                         uploadOnChange="false"
                                         fileType="jpg,jpeg,png"
                                         change="onComplaintFileChange"
+                                        class="myUnifiedBtn"
                                     />
 								</OverflowToolbar>
 							</headerToolbar>
@@ -189,6 +190,7 @@
                                                 press="onComplaintPreviewDoc"
                                                 tooltip="{path:'complaintTemp>', formatter:'.Formatter.fileTooltip'}"
                                                 wrapping="true"
+                                                class="tealTextLink"
                                             />
 										</HBox>
 										<Text

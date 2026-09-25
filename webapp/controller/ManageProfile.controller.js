@@ -4596,9 +4596,8 @@ sap.ui.define([
                         content: [oHtml],
                         beginButton: new sap.m.Button({
                             text: "Close",
-                            addstyleClass: "myUnifiedBtn",
                             press: () => this._oComplaintPreviewDialog.close()
-                        }),
+                        }).addStyleClass("myUnifiedBtn"),
                         afterClose: () => {
                             this._oComplaintPreviewDialog.destroy();
                             this._oComplaintPreviewDialog = null;
