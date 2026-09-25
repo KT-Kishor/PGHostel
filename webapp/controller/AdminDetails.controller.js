@@ -4258,8 +4258,246 @@ sap.m.MessageBox.confirm(
             }
             Bookingdata.EndDate = (Bookingdata.EndDate).includes("/") ? Bookingdata.EndDate : Bookingdata.EndDate.split('-').reverse().join('/')
             var BookingdataEndDate = (Bookingdata.EndDate).includes("/") ? this._parseDate(Bookingdata.EndDate) : Bookingdata.EndDate
+const facilityItems = CustomerData.AllSelectedFacilities || [];
 
-            const facilityItems = CustomerData.AllSelectedFacilities || [];
+const duplicateFacilityIDs = [];
+const duplicateItems = [];
+const keptItems = [];
+
+
+function getDateValue(value) {
+
+    if (!value) {
+        return null;
+    }
+
+    if (value instanceof Date) {
+        return new Date(
+            value.getFullYear(),
+            value.getMonth(),
+            value.getDate()
+        );
+    }
+
+    const valueString = String(value).trim();
+
+    // DD/MM/YYYY
+    if (valueString.includes("/")) {
+
+        const parts = valueString.split("/");
+
+        if (parts.length === 3) {
+
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+
+            return new Date(year, month, day);
+        }
+    }
+
+    // YYYY-MM-DD
+    if (valueString.includes("-")) {
+
+        const parts = valueString.split("-");
+
+        if (parts.length >= 3) {
+
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+
+            return new Date(year, month, day);
+        }
+    }
+
+    const date = new Date(valueString);
+
+    if (isNaN(date.getTime())) {
+        return null;
+    }
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+}
+
+
+function isDateOverlap(start1, end1, start2, end2) {
+
+    return (
+        start1 <= end2 &&
+        start2 <= end1
+    );
+}
+
+
+facilityItems.forEach(item => {
+
+    const facilityName = (item.FacilityName || "")
+        .trim()
+        .toLowerCase();
+
+    const memberName = (item.MemberName || "")
+        .trim()
+        .toLowerCase();
+
+    const startDate = getDateValue(item.StartDate);
+    const endDate = getDateValue(item.EndDate);
+
+
+    // If required information is missing,
+    // don't treat it as duplicate
+    if (
+        !facilityName ||
+        !startDate ||
+        !endDate
+    ) {
+
+        keptItems.push(item);
+        return;
+    }
+
+
+    let isDuplicate = false;
+
+
+    // --------------------------------------------------
+    // Compare with already kept records
+    // --------------------------------------------------
+
+    for (let i = 0; i < keptItems.length; i++) {
+
+        const existingItem = keptItems[i];
+
+        const existingFacilityName =
+            (existingItem.FacilityName || "")
+                .trim()
+                .toLowerCase();
+
+        const existingMemberName =
+            (existingItem.MemberName || "")
+                .trim()
+                .toLowerCase();
+
+        const existingStartDate =
+            getDateValue(existingItem.StartDate);
+
+        const existingEndDate =
+            getDateValue(existingItem.EndDate);
+
+
+        // Same facility + same member
+        if (
+            facilityName === existingFacilityName &&
+            memberName === existingMemberName &&
+            existingStartDate &&
+            existingEndDate
+        ) {
+
+            // Check date overlap
+            if (
+                isDateOverlap(
+                    startDate,
+                    endDate,
+                    existingStartDate,
+                    existingEndDate
+                )
+            ) {
+
+                isDuplicate = true;
+
+                break;
+            }
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Duplicate
+    // --------------------------------------------------
+
+    if (isDuplicate) {
+
+        duplicateItems.push(item);
+
+        if (item.FacilityID) {
+            duplicateFacilityIDs.push(item.FacilityID);
+        }
+
+    } else {
+
+        // Keep first non-overlapping record
+        keptItems.push(item);
+    }
+
+});
+
+
+// --------------------------------------------------
+// Delete duplicate records from backend
+// HM_BookingFacilityItems
+// --------------------------------------------------
+
+if (duplicateFacilityIDs.length > 0) {
+
+    try {
+
+        await this.ajaxDeleteWithJQuery(
+            "HM_BookingFacilityItems",
+            {
+                filters: {
+                    FacilityID: duplicateFacilityIDs
+                }
+            }
+        );
+
+        console.log(
+            "Deleted duplicate FacilityIDs:",
+            duplicateFacilityIDs
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting duplicate facility items:",
+            error
+        );
+
+        sap.m.MessageBox.error(
+            "Error while deleting duplicate facility records."
+        );
+
+        return;
+    }
+}
+
+
+// --------------------------------------------------
+// Update CustomerData.AllSelectedFacilities
+// --------------------------------------------------
+
+CustomerData.AllSelectedFacilities = keptItems;
+
+
+// --------------------------------------------------
+// Debug
+// --------------------------------------------------
+
+console.log(
+    "Duplicate Items:",
+    duplicateItems
+);
+
+console.log(
+    "Remaining Facilities:",
+    CustomerData.AllSelectedFacilities
+);
+
+
+            
 
             const documents = CustomerData.Documents || [];
 
@@ -4340,6 +4578,8 @@ sap.m.MessageBox.confirm(
    const facilityOutsideBooking =
     facilityEnd.getTime() < bookingStartDate.getTime() ||
     facilityStart.getTime() > bookingEndDate.getTime();
+
+    
 
 
                 // Store only facilities having invalid dates
