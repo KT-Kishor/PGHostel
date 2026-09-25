@@ -828,6 +828,56 @@
   outline-color: #008b96 !important;
 }
 
+/* Year/month picker values (DatePicker, DateRangePicker, Calendar) use the
+   blue link colour by default. Make them teal everywhere so the year grid
+   matches the app accent used by .sapMRPCalendar. Years/months disabled by
+   minDate/maxDate keep the default muted colour. */
+.sapUiCalYearPicker .sapUiCalItem:not(.sapUiCalItemDsbl),
+.sapUiCalYearPicker .sapUiCalItem:not(.sapUiCalItemDsbl) > .sapUiCalItemText,
+.sapUiCalYearPicker .sapUiCalItem:not(.sapUiCalItemDsbl) > .sapUiCalItemSecText,
+.sapUiCalMonthPicker .sapUiCalItem:not(.sapUiCalItemDsbl),
+.sapUiCalMonthPicker .sapUiCalItem:not(.sapUiCalItemDsbl) > .sapUiCalItemText,
+.sapUiCalMonthPicker .sapUiCalItem:not(.sapUiCalItemDsbl) > .sapUiCalItemSecText {
+  color: #008b96 !important;
+}
+
+.sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSel,
+.sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSelBetween,
+.sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSel > .sapUiCalItemText,
+.sapUiCalYearPicker .sapUiCalItem.sapUiCalItemSelBetween > .sapUiCalItemText,
+.sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSel,
+.sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSelBetween,
+.sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSel > .sapUiCalItemText,
+.sapUiCalMonthPicker .sapUiCalItem.sapUiCalItemSelBetween > .sapUiCalItemText {
+  color: #008b96 !important;
+  outline-color: #008b96 !important;
+}
+
+/* Day numbers in every calendar grid (DatePicker, DateRangePicker, Calendar)
+   render in the default text colour. Make them teal to match the year/month
+   pickers, and keep the selected/highlighted day readable in white on the
+   app accent. Days disabled by minDate/maxDate keep the default muted
+   colour. */
+.sapUiCalItem:not(.sapUiCalItemDsbl) > .sapUiCalItemText {
+  color: #008b96 !important;
+}
+
+.sapUiCalItem.sapUiCalItemSel,
+.sapUiCalItem.sapUiCalItemSelBetween {
+  background-color: #008b96 !important;
+}
+
+.sapUiCalItem.sapUiCalItemSel > .sapUiCalItemText,
+.sapUiCalItem.sapUiCalItemSelBetween > .sapUiCalItemText,
+.sapUiCalItem.sapUiCalItemSel > .sapUiCalItemSecText,
+.sapUiCalItem.sapUiCalItemSel > .sapUiCalDayName {
+  color: #ffffff !important;
+}
+
+.sapUiCalItem.sapUiCalItemNow > .sapUiCalItemText {
+  border-color: #008b96 !important;
+}
+
 .sapMRPCalendar .sapMSegB .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
   background-color: #008b96 !important;
   border-color: #008b96 !important;

@@ -524,6 +524,7 @@ this.getView().getModel("BedModel").setData(uniqueData);
                         icon: sap.m.MessageBox.Icon.Information,
                         title: this.i18nModel.getText("Information"),
                         actions: [sap.m.MessageBox.Action.OK],
+                        styleClass: "myUnifiedBtn",
                         onClose: function (oAction) {
                             if (oAction === sap.m.MessageBox.Action.OK) {
                                 this.byId("idPOTable").removeSelections(true);
@@ -562,6 +563,7 @@ this.getView().getModel("BedModel").setData(uniqueData);
                         icon: sap.m.MessageBox.Icon.Information,
                         title: this.i18nModel.getText("Information"),
                         actions: [sap.m.MessageBox.Action.OK],
+                        styleClass: "myUnifiedBtn",
                         onClose: function (oAction) {
                             if (oAction === sap.m.MessageBox.Action.OK) {
                                 this.byId("idPOTable").removeSelections(true);
@@ -586,6 +588,7 @@ this.getView().getModel("BedModel").setData(uniqueData);
                         icon: sap.m.MessageBox.Icon.Information,
                         title: this.i18nModel.getText("Information"),
                         actions: [sap.m.MessageBox.Action.OK],
+                        styleClass: "myUnifiedBtn",
                         onClose: function (oAction) {
                             if (oAction === sap.m.MessageBox.Action.OK) {
                                 this.byId("idPOTable").removeSelections(true);
@@ -619,7 +622,10 @@ try {
     sap.m.MessageBox.error(
         err?.responseJSON?.message || 
         err?.message || 
-        "Something went wrong"
+        "Something went wrong",
+        {
+            styleClass: "myUnifiedBtn"
+        }
     );
     this.closeBusyDialog()
     return;
@@ -907,7 +913,7 @@ if (this.data.Status === "Assigned") {
 
             if (!selected) {
                 sap.m.MessageToast.show(
-                    this.i18nModel.getText("pleaseSelectRecordtoAssignRoom")
+                    this.i18nModel.getText("pleaseSelectRecordtoAssignRoom"), addStyleClass("myUnifiedBtn"),
                 );
                 return;
             }
@@ -1685,7 +1691,10 @@ onsendreminder: async function () {
         console.error("Error while sending payment reminder:", error);
 
         sap.m.MessageBox.error(
-            "Failed to send payment reminder. Please try again."
+            "Failed to send payment reminder. Please try again.",
+            {
+                styleClass: "myUnifiedBtn"
+            }
         );
     }
 },

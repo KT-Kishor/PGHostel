@@ -60,8 +60,8 @@
                     visible="{Visiblemodel>/Visible}"
                   >
                                 <buttons>
-                                    <RadioButton text="Yes" />
-                                    <RadioButton text="No" />
+                                    <RadioButton text="Yes" class="tealRadioBtn"/>
+                                    <RadioButton text="No" class="tealRadioBtn"/>
                                 </buttons>
                             </RadioButtonGroup> 
 
