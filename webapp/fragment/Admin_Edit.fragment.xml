@@ -114,8 +114,8 @@
                         editable="false"
                           >
                                 <buttons>
-                                    <RadioButton text="Daily" />
-                                    <RadioButton text="Entire Booking" />
+                                    <RadioButton text="Daily" class="tealRadioBtn"/>
+                                    <RadioButton text="Entire Booking" class="tealRadioBtn"/>
                                 </buttons>
                             </RadioButtonGroup> 
 

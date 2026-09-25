@@ -24,6 +24,7 @@
                     <Button
                         icon="sap-icon://decline"
                         press="onCloseDialog"
+                        class="myUnifiedBtn"
                     />
                 </contentRight>
             </Bar>

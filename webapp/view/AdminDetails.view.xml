@@ -334,7 +334,7 @@
                 >
                     <Table
                         id="Ad_id_idFacilityRoomTableDetails1"
-                        class="sapUiSmallMarginTop"
+                        class="sapUiSmallMarginTop myUnifiedBtn"
                         items="{path: 'CustomerData>/Documents'}"
                         mode="{= ${VisibleModel>/visible} &amp;&amp;
     !(${CustomerData>/Status} === 'Assigned' &amp;&amp;
@@ -430,6 +430,7 @@
                                         select="onPrimaryOccupantRadioSelect"
                                         enabled="{VisibleModel>/visible}"
                                         visible="{= ${CustomerData>/Documents}.length > 1 }"
+                                        class="tealRadioBtn"
                                     />
                                     <Text text="{CustomerData>MemberName}" />
 
@@ -449,7 +450,7 @@
                                     <Link
                                         text="{= ${CustomerData>FileName} ? ${CustomerData>FileName} : 'No Document' }"
                                         enabled="{= !!${CustomerData>FileName} }"
-                                        press="onFileNameLinkPress"
+                                        press="onFileNameLinkPress" class="tealTextLink"
                                     />
                                 </cells>
                             </ColumnListItem>
@@ -747,9 +748,9 @@
                             value="{Bookingmodel>/CouponCode}"
                             placeholder="{i18n>enterCoupon}"
                             width="150px"
-                            class="sapUiTinyMarginEnd"
+                            class="sapUiTinyMarginEnd myUnifiedBtn tealValueHelpIcon"
                             showValueHelp="true"
-                            valueHelpIconSrc="sap-icon://decline"
+                            valueHelpIconSrc="sap-icon://delete"
                             valueHelpRequest="oncancelCoupon"
                             liveChange="onCouponLiveChange"
                         />

@@ -662,6 +662,21 @@
   border-color: #008b96 !important;
 }
 
+/* Teal value-help / embedded icon inside an Input (apply to the Input
+   control, e.g. the coupon clear icon: valueHelpIconSrc="sap-icon://delete"). */
+.tealValueHelpIcon .sapMInputBaseIcon,
+.tealValueHelpIcon .sapMInputBaseIconContainer .sapUiIcon,
+.tealValueHelpIcon .sapMInputBaseIconContent,
+.tealValueHelpIcon .sapMInputBaseIcon::before {
+  color: #008b96 !important;
+}
+
+.tealValueHelpIcon .sapMInputBaseIcon:hover,
+.tealValueHelpIcon .sapMInputBaseIcon:focus,
+.tealValueHelpIcon .sapMInputBaseIcon:active {
+  color: #006d75 !important;
+}
+
 /* Teal accents in the TimePicker clock popup. The popup is rendered in the
    static popup area, so it is scoped by its own root class
    .sapMTimePickerDropDown (applies to every TimePicker clock popup). */
