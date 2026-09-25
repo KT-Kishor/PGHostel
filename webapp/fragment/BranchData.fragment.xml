@@ -219,6 +219,7 @@
                 />
 				<TimePicker
                     id="BD_id_CheckInTime"
+                    class="tealTimePickaaaer"
                     value="{MDmodel>/CheckinTime}"
                     change="onCheckInTimeChange"
                     displayFormat="hh a"
@@ -387,6 +388,7 @@
                         visible="{= !${UploaderData>isProcessing} }"
                         text="{UploaderData>filename}"
                         press="onPreviewLogoFile"
+                        class="tealTextLink"
                     />
                 </HBox>
 
@@ -468,6 +470,7 @@
                         visible="{= !${UploaderData>isProcessing} }"
                         text="{UploaderData>filename}"
                         press="onPreviewImageFile"
+                        class="tealTextLink"
                     />
                 </HBox>
 

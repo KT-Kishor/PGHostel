@@ -21,6 +21,7 @@
            
             <Table
                 id="MA_id_ManageadsTable"
+                class="tealTableRadio"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
                 width="auto"
@@ -75,9 +76,9 @@
                 <items>
                     <ColumnListItem>
                         <cells>
-                            <Link text="{NewAdsModel>URL}" href="{NewAdsModel>URL}" target="_blank"/>
+                            <Link text="{NewAdsModel>URL}" href="{NewAdsModel>URL}" target="_blank" class="tealTextLink" />
                            
-                            <Button text="{i18n>view}" press="MA_viewAd" visible="{= !!${NewAdsModel>Photo1} }"/>
+                            <Link text="{i18n>view}" press="MA_viewAd" visible="{= !!${NewAdsModel>Photo1} }" class="tealTextLink" />
                         </cells>
                     </ColumnListItem>
                 </items>

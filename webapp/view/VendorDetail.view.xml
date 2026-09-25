@@ -349,6 +349,7 @@
                                                             press="onAdminPreviewDoc"
                                                             width="100%"
                                                             wrapping="true"
+                                                            class="tealTextLink"
                                                         />
 													</m:VBox>
 													<m:Text

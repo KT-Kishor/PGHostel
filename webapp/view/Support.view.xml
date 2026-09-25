@@ -61,6 +61,7 @@
 				</fb:filterGroupItems>
 			</fb:FilterBar>
 			<Table id="idSupportTable"
+				class="tealTableRadio"
                 sticky="ColumnHeaders,HeaderToolbar"
                 mode="SingleSelectLeft"
                 width="auto"
@@ -135,7 +136,7 @@
 							<!-- <ObjectStatus inverted="false" text="{SupportModel>Status}"
                             state="{ path: 'SupportModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${SupportModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${SupportModel>ResolvedDate} === null ? '' : ${path: 'SupportModel>ResolvedDate', formatter: '.Formatter.formatDate'}}"/>
-							<Button text="{i18n>view}" press="HF_viewroom"/>
+							<Link text="{i18n>view}" press="HF_viewroom" class="tealTextLink"/>
 						</cells>
 					</ColumnListItem>
 				</items>

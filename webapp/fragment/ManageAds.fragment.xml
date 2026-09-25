@@ -59,7 +59,8 @@
                             buttonText="Upload Images"
                             multiple="true"
                             uploadOnChange="false"
-                            tooltip="{i18n>allowedSize}"/>
+                            tooltip="{i18n>allowedSize}"
+							class="myUnifiedBtn" />
 					</HBox>
 					<!-- Tokenizer -->
 					<HBox width="75%">

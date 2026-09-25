@@ -13,10 +13,7 @@
 	xmlns:core="sap.ui.core"
     busyIndicatorDelay="0"
 	xmlns:u="sap.ui.unified">
-	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>MVDtitle}" >
-		<m:headerContent>
-			<core:Fragment fragmentName="sap.ui.com.project1.fragment.Header" type="XML"/>
-		</m:headerContent>
+	<m:Page navButtonPress="BI_onButtonPress" showNavButton="true" title="{i18n>MVDtitle}" class="myUnifiedBtn">
 		<ObjectPageLayout id="MV_id_ObjectPageLayout">
 			<sections>
 				<ObjectPageSection titleUppercase="false" id="MV_id_OrderHeaderSection1"
@@ -351,6 +348,7 @@
                                                             press="onAdminPreviewDoc"
                                                             width="100%"
                                                             wrapping="true"
+                                                            class="tealTextLink"
                                                         />
 													</m:VBox>
 													<m:Text

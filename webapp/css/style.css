@@ -567,6 +567,176 @@
   color: #000000 !important;
 }
 
+/* Teal selection radio inside single-select tables. The table renders its
+   own selection radio, so the class must sit on the Table (or a wrapper) and
+   target the generated .sapMRb in the selection column. This colours both
+   the outer ring and the inner dot. */
+.tealTableRadio .sapMListTblSelCol .sapMRbBOut {
+  stroke: #008b96 !important;
+}
+
+.tealTableRadio .sapMListTblSelCol .sapMRb:not(.sapMRbDis):hover .sapMRbBOut,
+.tealTableRadio .sapMListTblSelCol .sapMRb:focus .sapMRbBOut {
+  stroke: #006d75 !important;
+}
+
+.tealTableRadio .sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBOut {
+  stroke: #008b96 !important;
+}
+
+.tealTableRadio .sapMListTblSelCol .sapMRb.sapMRbSel .sapMRbBInn {
+  fill: #008b96 !important;
+  stroke: none !important;
+}
+
+/* Teal selection checkbox inside multi-select tables (apply to the Table).
+   The table renders its own selection checkbox, so the class targets the
+   generated .sapMCb in the selection column, including the header's
+   select-all checkbox. Colours the box border and the checked fill. */
+.tealTableCheckbox .sapMListTblSelCol .sapMCbBg {
+  border-color: #008b96 !important;
+}
+
+.tealTableCheckbox .sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.tealTableCheckbox .sapMListTblSelCol .sapMCbBg.sapMCbMarkChecked::before {
+  color: #ffffff !important;
+}
+
+/* Teal TimePicker field (apply to the TimePicker control) */
+.tealTimePicker .sapMInputBaseContentWrapper {
+  border-color: #008b96 !important;
+  border-bottom-color: #008b96 !important;
+}
+
+.tealTimePicker .sapMInputBaseInner {
+  color: #008b96 !important;
+}
+
+.tealTimePicker .sapMInputBaseIcon,
+.tealTimePicker .sapMInputBaseIconContainer .sapUiIcon {
+  color: #008b96 !important;
+}
+
+.tealTimePicker.sapMFocus .sapMInputBaseContentWrapper::before,
+.tealTimePicker.sapMFocus .sapMInputBaseContentWrapper::after {
+  border-color: #008b96 !important;
+}
+
+/* Teal accents in the TimePicker clock popup. The popup is rendered in the
+   static popup area, so it is scoped by its own root class
+   .sapMTimePickerDropDown (applies to every TimePicker clock popup). */
+.sapMTimePickerDropDown .sapMTPCNumber.sapMTPCSelected {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMTPCNumber.sapMTPCNumberHover:not(.sapMTPCSelected) {
+  background-color: rgba(0, 139, 150, 0.12) !important;
+}
+
+.sapMTimePickerDropDown .sapMTPCMarker {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMTPCDial::before {
+  color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMTPCDot,
+.sapMTimePickerDropDown .sapMTPCMidDot {
+  background-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMBtnInner.sapMBtnEmphasized {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMBtnInner.sapMBtnEmphasized .sapMBtnContent,
+.sapMTimePickerDropDown .sapMBtnInner.sapMBtnEmphasized .sapMBtnIcon {
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMBtn:hover > .sapMBtnHoverable.sapMBtnEmphasized:not(.sapMBtnActive) {
+  background-color: #00a0ab !important;
+  border-color: #00a0ab !important;
+}
+
+.sapMTimePickerDropDown .sapMBtnInner.sapMBtnEmphasized.sapMBtnActive {
+  background-color: #00737b !important;
+  border-color: #00737b !important;
+}
+
+/* Hour/minute spin-button and Cancel text inside the clock popup */
+.sapMTimePickerDropDown .sapMBtnInner {
+  color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMToggleBtnPressed,
+.sapMTimePickerDropDown .sapMBtnInner.sapMToggleBtnPressed {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMToggleBtnPressed .sapMBtnContent,
+.sapMTimePickerDropDown .sapMBtnInner.sapMToggleBtnPressed .sapMBtnContent {
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMBtn:focus > .sapMBtnInner.sapMFocusable,
+.sapMTimePickerDropDown .sapMBtnInner.sapMFocusable:focus {
+  outline-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMBtn:focus > .sapMBtnInner.sapMFocusable::after,
+.sapMTimePickerDropDown .sapMBtnInner.sapMFocusable:focus::after {
+  border-color: #008b96 !important;
+}
+
+/* Focus ring + AM/PM segmented switch inside the clock popup */
+.sapMTimePickerDropDown .sapMBtn:focus > .sapMBtnInner.sapMFocusable::before {
+  border-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMSegB {
+  border-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMSegB .sapMSegBBtn .sapMSegBBtnInner {
+  color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.sapMTimePickerDropDown .sapMSegBBtn.sapMSegBBtnSel .sapMSegBBtnInner {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMSegBBtn.sapMSegBBtnSel:hover .sapMSegBBtnInner {
+  background-color: #00a0ab !important;
+  border-color: #00a0ab !important;
+  color: #ffffff !important;
+}
+
+.sapMTimePickerDropDown .sapMSegBBtn:focus .sapMSegBBtnInner {
+  outline-color: #008b96 !important;
+}
+
 .resendOtpBtn {
   white-space: nowrap;
   /* prevent ugly multi-line text */
