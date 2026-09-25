@@ -617,6 +617,7 @@
                                     state="{HostelModel>/IsBusinessTravel}"
                                     change="onBusinessTravelToggle"
                                     enabled="{BookingView>/showBusinessTravelOption}"
+                                    class="tealSwitch"
                                 />
                             </HBox>
 

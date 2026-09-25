@@ -1452,14 +1452,14 @@
 .unifiedCardText {
   font-size: 14px;
   line-height: 1.35;
-  color: #0070c9;
+  color: #008b96;
   margin-top: 6px;
 }
 
 .amenityDesc {
   font-size: 14px;
   line-height: 1.35;
-  color: #0070c9 !important;
+  color: #008b96 !important;
   margin-top: 6px;
 }
 
@@ -4136,7 +4136,15 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   white-space: normal;
   transition: background-color 0.2s;
 }
-
+.underlineLink:hover,
+.underlineLink:focus,
+.underlineLink:active,
+.underlineLink.sapMLnkActive,
+.underlineLink.sapMLnkActive .sapMLnkText {
+  color: white !important;
+  background-color: transparent !important;
+  text-decoration: underline;
+}
 .AddressTextLarge.sapMLnk:focus,
 .AddressTextLarge.sapMLnk:active,
 .AddressTextLarge.sapMLnk.sapMLnkFocus {
@@ -5459,6 +5467,13 @@ width: 44px !important;
   display: flex;
   align-items: center;
 }
+
+/* .bookingHeaderBar,
+.bookingHeaderBar.sapMIBar {
+  background-color: #008b96 !important;
+  background-image: none !important;
+  border-bottom: none !important;
+} */
 
 .sapMPage .sapMPageHeader:not(.sapMIBar-CTX) .sapMIBar-CTX, .sapMPageWithSubHeader .sapMPageSubHeader:not(.sapMIBar-CTX) .sapMIBar-CTX {
     position: relative;
@@ -7272,6 +7287,65 @@ html, body {
 .facilityBreakdownBtn .sapMBtnIcon,
 .facilityBreakdownBtn .sapMBtnContent {
   color: white !important;
+}
+
+/* Document upload info popover: teal header (title bar) with white title */
+.documentInfoPopover .sapMPopoverHeader,
+.documentInfoPopover .sapMPopoverHeader .sapMIBar,
+.documentInfoPopover .sapMPopoverHeader .sapMTB,
+.documentInfoPopover .sapMPopoverHeader .sapMTBNewFlex,
+.documentInfoPopover .sapMPopoverHeader .sapMHeader-CTX {
+  background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+  color: #ffffff !important;
+}
+
+.documentInfoPopover .sapMPopoverHeader .sapMTitle,
+.documentInfoPopover .sapMPopoverHeader .sapMTitleText,
+.documentInfoPopover .sapMPopoverHeader .sapMBtnIcon,
+.documentInfoPopover .sapMPopoverHeader .sapMTB .sapMTitle {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+.documentInfoPopover .sapMPopoverArr::after {
+  background: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+/* Phone: ResponsivePopover renders as a dialog */
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup,
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMIBar,
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMTB,
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMHeader-CTX {
+  background: #008b96 !important;
+}
+
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMTitle,
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMTitleText,
+.documentInfoPopover.sapMDialog .sapMDialogTitleGroup .sapMBtnIcon {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* GST toggle switch: teal track when ON */
+.tealSwitch .sapMSwt.sapMSwtOn:not(.sapMSwtAcceptReject) {
+  background-color: #008b96 !important;
+  border-color: #008b96 !important;
+}
+
+.tealSwitch .sapMSwt.sapMSwtHoverable.sapMSwtOn:not(.sapMSwtAcceptReject):hover {
+  background-color: #00a0ab !important;
+  border-color: #00a0ab !important;
+}
+
+.tealSwitch .sapMSwt.sapMSwtOn:not(.sapMSwtAcceptReject):active {
+  background-color: #00737b !important;
+  border-color: #00737b !important;
+}
+
+.tealSwitch .sapMSwt.sapMSwtOn .sapMSwtText,
+.tealSwitch .sapMSwt.sapMSwtOn .sapMSwtLabel {
+  color: #008b96 !important;
 }
 
 /* Signup panel two-column FlexBox layout */

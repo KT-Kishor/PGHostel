@@ -67,9 +67,9 @@
                     selectedIndex="0"
                     class="paymentTypeGroup"
                 >
-                    <RadioButton text="{i18n>payatcheckintime}" />
-                    <!-- <RadioButton text="{i18n>uPI}" /> -->
-                    <!-- <RadioButton text="{i18n>creditDebitCard}" /> -->
+                    <RadioButton text="{i18n>payatcheckintime}"  class="tealRadioBtn"/>
+                    <!-- <RadioButton text="{i18n>uPI}"  class="tealRadioBtn"/> -->
+                    <!-- <RadioButton text="{i18n>creditDebitCard}"  class="tealRadioBtn" /> -->
                 </RadioButtonGroup>
 
                 <!-- MAIN GRID -->

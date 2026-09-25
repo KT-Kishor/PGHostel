@@ -101,7 +101,7 @@
             text="{BranchModel>/EmailID}"
             href="{= 'mailto:' + ${BranchModel>/EmailID} }"
             wrapping="true"
-            class="vrHeaderValueLink"
+            class="vrHeaderValueLink tealTextLink"
         />
     </HBox>
     <HBox
@@ -117,7 +117,7 @@
             text="{BranchModel>/STD} {BranchModel>/Contact}"
             href="{= 'tel:' + ${BranchModel>/Contact} }"
             wrapping="true"
-            class="vrHeaderValueLink"
+            class="vrHeaderValueLink tealTextLink"
         />
     </HBox>
     <HBox
@@ -132,7 +132,7 @@
         />
         <Text
             text="{BranchModel>/GSTIN}"
-            class="vrHeaderValueText"
+            class="vrHeaderValueText tealTextLink"
         />
     </HBox>
 </VBox>
@@ -145,7 +145,7 @@
 										href="{BranchModel>/GeoLocation}"
 										target="_blank"
 										wrapping="true"
-										class="vrHeaderValueLink" />
+										class="vrHeaderValueLink tealTextLink" />
 								</HBox>
 								<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow vrRatingRow">
 									<Label text="User Rating:" design="Bold" class="vrHeaderLabel" />

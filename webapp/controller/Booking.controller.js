@@ -1882,7 +1882,6 @@
                     content: [
                         this._oFacilityRemoveButton = new sap.m.Button({
                             text: "Remove",
-                            type: "Transparent",
                             visible: false,
                             enabled: "{FacilitySelection>/editModeEnabled}",
                             press: this.onFacilityDialogRemove.bind(this)
@@ -4432,7 +4431,7 @@
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
-                }).addStyleClass("facilityBreakdownBtn");
+                }).addStyleClass("facilityBreakdownBtn documentInfoPopover");
 
                 if (sap.ui.Device.system.phone) {
                     this._oDocumentInfoPopover.setContentHeight(null);

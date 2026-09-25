@@ -2,7 +2,8 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <Bar design="Header" class="removeHeaderBorder">
+    <Bar design="Header" class="removeHeaderBorder bookingHeaderBar">
+    <!-- this class for header teal color bookingHeaderBar -->
         <contentLeft>
             <Button
                 icon="sap-icon://nav-back"
