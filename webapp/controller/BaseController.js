@@ -952,12 +952,16 @@ sap.ui.define([
         // If already logged in and opening Login Page
         if (value === "Booking") return true;
 
-        if (isLoggedIn === "true" && value === "LoginPage" || value === "TilePage" || value === "ManageProfile") {
+        if (isLoggedIn === "true" && value === "LoginPage" || value === "TilePage" || value === "ManageProfile" || value === "SupportDetails") {
           if (value === "ManageProfile") {
             this.getRouter().navTo("RouteManageProfile");
+          } else if(value === "SupportDetails" && user.Role !== "Customer") {
+            this.getRouter().navTo("RouteSupportDetails");
+
           } else if (user.Role === "Customer") {
             this.getRouter().navTo("RouteHostel");
-          } else {
+          }
+          else {
             this.getRouter().navTo("TilePage");
           }
           return true;
