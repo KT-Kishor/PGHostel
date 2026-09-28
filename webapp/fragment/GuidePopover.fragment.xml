@@ -42,7 +42,7 @@
             <Bar class="tourGuideFooter">
                 <contentLeft>
                     <Button
-                        text="Skip Tour"
+                        text="{i18n>skipTour}"
                         class="myUnifiedBtn"
                         press="onSkipTour"
                         visible="{= !${guideModel>/isLast} }" />

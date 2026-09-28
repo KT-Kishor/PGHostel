@@ -55,38 +55,38 @@
                 >
                     <core:ListItem
                             key="Government-issued Identity Proof"
-                            text="Government-issued Identity Proof"
+                            text="{i18n>governmentIssuedIdentity}"
                         />
                         <core:ListItem
                             key="Property Ownership Authorisation Proof"
-                            text="Property Ownership Authorisation Proof"
+                            text="{i18n>propertyOwnership}"
                         />
                         <core:ListItem
                             key="Company Registration Certificate"
-                            text="Company Registration Certificate"
+                            text="{i18n>companyRegistration}"
                         />
                         <core:ListItem
                             key="Trade Licence"
-                            text="Trade Licence"
+                            text="{i18n>tradeLicence}"
                         />
                         <!-- <core:ListItem key="Resume" text="Resume"/> -->
                         <core:ListItem
                             key="PG Registration"
-                            text="PG Registration"
+                            text="{i18n>pgRegistration}"
                         />
                         <core:ListItem
                             key="GST Registration Certificate"
-                            text="GST Registration Certificate"
+                            text="{i18n>gstRegistration}"
                         />
                         <core:ListItem
                             key="Bank Account Details"
-                            text="Bank Account Details" />
+                            text="{i18n>bankAccountDetails}" />
                         <core:ListItem
                             key="Organization PAN "
-                            text="Organization PAN " />
+                            text="{i18n>organizationPan}" />
                         <core:ListItem
                             key="Others"
-                            text="Others" />
+                            text="{i18n>others}" />
                 </ComboBox>
                 <Label
                     text="{i18n>uploadDocument}"

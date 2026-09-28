@@ -4,7 +4,7 @@
 
     <Dialog
         id="previewDialog"
-        title="Document Preview"
+        title="{i18n>documentPreview}"
         draggable="true"
         resizable="true"
         stretchOnPhone="true"
@@ -32,13 +32,13 @@
 
         <beginButton>
             <Button
-                text="Download"
+                text="{i18n>download}"
                 press=".onDownloadPreview" class="myUnifiedBtn"/>
         </beginButton>
 
         <endButton>
             <Button
-                text="Close"
+                text="{i18n>close}"
                 press=".onClosePreview" class="myUnifiedBtn"/>
         </endButton>
 
