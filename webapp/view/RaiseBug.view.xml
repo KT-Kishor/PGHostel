@@ -101,6 +101,9 @@
 					<OverflowToolbar>
 						<Title text="{i18n>Support} ({= ${RaiseBugModel>/}.length})"/>
 						<ToolbarSpacer />
+							<Button id="idassignButton" text="{i18n>Assign}" tooltip="{i18n>assignBug}"
+                        press="RB_assign" class="myUnifiedBtn"
+                        visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
 							<Button id="ideditButton" text="{i18n>Edit}" tooltip="{i18n>Edit}"
                         press="RB_edit" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
@@ -123,14 +126,11 @@
 					<Column demandPopin="true" minScreenWidth="Tablet" width="25%">
 						<Text text="{i18n>bugdetails}" tooltip="{i18n>bugdetails}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>RaisedBy}" tooltip="{i18n>RaisedBy}"/>
+					<Column demandPopin="true" minScreenWidth="Tablet" width="16rem">
+						<Text text="{i18n>raisedByEmailDate}" tooltip="{i18n>raisedByEmailDate}"/>
 					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="{i18n>Email}" tooltip="{i18n>Email}"/>
-					</Column>
-					<Column demandPopin="true" minScreenWidth="Tablet" width="7rem">
-						<Text text="{i18n>Createddate}" tooltip="{i18n>Createddate}"/>
+					<Column demandPopin="true" minScreenWidth="Tablet" width="16rem">
+						<Text text="{i18n>assignedToNameDate}" tooltip="{i18n>assignedToNameDate}"/>
 					</Column>
 					<!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="{i18n>Status}" tooltip="{i18n>Status}"/></Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet" width="7rem">
@@ -151,9 +151,16 @@
 							<!-- <Text text="{SupportModel>IssueName}" /> -->
 							<Text text="{RaiseBugModel>AppName}" />
 							<ExpandableText text="{RaiseBugModel>BugDescription}" maxCharacters="100"/>
-							<Text text="{RaiseBugModel>RaisedBy}" />
-							<Text text="{RaiseBugModel>Email}" />
-							<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
+							<VBox renderType="Bare">
+								<Text text="{RaiseBugModel>RaisedBy}"/>
+								<Text text="{RaiseBugModel>Email}"/>
+								<Text text="{path:'RaiseBugModel>CreatedDate',formatter: '.Formatter.formatDate'}"/>
+							</VBox>
+							<VBox renderType="Bare">
+								<Text text="{RaiseBugModel>AssignedName}"/>
+								<Text text="{RaiseBugModel>AssignedTo}"/>
+								<Text text="{path:'RaiseBugModel>AssignedDate', formatter: '.Formatter.formatResolvedDate'}"/>
+							</VBox>
 							<!-- <ObjectStatus inverted="false" text="{RaiseBugModel>Status}"
                             state="{ path: 'RaiseBugModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="sapUiTinyMarginBottom"/> -->
 							<Text text="{= ${RaiseBugModel>ResolvedDate} === '1899-11-30T00:00:00.000Z' || ${RaiseBugModel>ResolvedDate} === null ? '' : ${path: 'RaiseBugModel>ResolvedDate', formatter: '.Formatter.formatDateString'}}"/>
