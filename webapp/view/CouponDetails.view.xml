@@ -148,9 +148,9 @@
                         <Button
                             id="btnShareCoupon"
                             class="myUnifiedBtn"
-                            text="Share Coupon"
+                            text="{i18n>CDShareCoupons}"
                             icon="sap-icon://action"
-                            tooltip="Share Coupon"
+                            tooltip="{i18n>CDShareCoupons}"
                             press="onShareCouponPress"
                             visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"
                         />

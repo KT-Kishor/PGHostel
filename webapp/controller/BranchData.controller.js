@@ -607,7 +607,7 @@ _setDefaultCountryIndiaBranch: function() {
                 return;
             }
             if (oMobile.getValueState() === "Error") {
-                sap.m.MessageToast.show("Please enter a valid mobile number");
+                sap.m.MessageToast.show(this.i18nModel.getText("validmobilenumber"));
                 return;
             }
 
@@ -621,7 +621,7 @@ _setDefaultCountryIndiaBranch: function() {
             }
             if (oCurrency.getValueState() === "Error") {
                 oCurrency.focus();
-                sap.m.MessageToast.show("Please select a valid currency");
+                sap.m.MessageToast.show(this.i18nModel.getText("validcurrency"));
                 return;
             }
 
@@ -662,9 +662,9 @@ _setDefaultCountryIndiaBranch: function() {
             if (!validCity) {
                 const oCityCombo = sap.ui.getCore().byId(oView.createId("MC_id_City"));
                 oCityCombo.setValueState("Error");
-                oCityCombo.setValueStateText("Please select a valid city from dropdown");
+                oCityCombo.setValueStateText(this.i18nModel.getText("validcity"));
                 oCityCombo.focus();
-                sap.m.MessageToast.show("Please select a valid city from dropdown");
+                sap.m.MessageToast.show(this.i18nModel.getText("validcity"));
                 return;
             }
 
@@ -688,9 +688,9 @@ _setDefaultCountryIndiaBranch: function() {
             // Zero or negative validation
             if (isNaN(fValue) || fValue <= 0) {
                 oStartingPrice.setValueState("Error");
-                oStartingPrice.setValueStateText("Starting price must be greater than 0");
+                oStartingPrice.setValueStateText(this.i18nModel.getText("Startingprice"));
                 oStartingPrice.focus();
-                MessageToast.show("Starting price must be greater than 0");
+                MessageToast.show(this.i18nModel.getText("Startingprice"));
                 return;
             }
 
@@ -704,7 +704,7 @@ _setDefaultCountryIndiaBranch: function() {
             }
 
             if (!this._hasHomeImageForSave()) {
-                sap.m.MessageToast.show("Please upload Home image");
+                sap.m.MessageToast.show(this.i18nModel.getText("PHomeimage"));
                 return;
             }
 
@@ -867,7 +867,7 @@ _setDefaultCountryIndiaBranch: function() {
             if (sRawValue !== sValue) {
                 oInput.setValue(sValue);
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Spaces are not allowed in Geo location");
+                oInput.setValueStateText("SpacesarenotallowedinGeolocation");
                 return;
             }
 
@@ -917,7 +917,7 @@ _setDefaultCountryIndiaBranch: function() {
             // Agar user 'e', 'E' ya '.' type kare toh error dikhane ke liye
             if (/[eE.]/.test(sValue)) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Decimals and exponential values are not allowed");
+                oField.setValueStateText(this.i18nModel.getText("Decimalsandexponentialvaluesarenotallowed"));
             }
 
             sValue = sValue.replace(/[^0-9]/g, "").slice(0, 3);
@@ -930,13 +930,13 @@ _setDefaultCountryIndiaBranch: function() {
 
             if (!sValue) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Hours cannot be empty");
+                oField.setValueStateText(this.i18nModel.getText("Hourscannotbeempty"));
                 return false;
             }
 
             if (parseInt(sValue, 10) < 0) {
                 oField.setValueState("Error");
-                oField.setValueStateText("Hours cannot be negative");
+                oField.setValueStateText(this.i18nModel.getText("Hourscannotbenegative"));
                 return false;
             }
 
@@ -962,7 +962,7 @@ _setDefaultCountryIndiaBranch: function() {
             if (sValue.startsWith(".")) {
                 oInput.setValue("");
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Penalty cannot start with dot");
+                oInput.setValueStateText(this.i18nModel.getText("Penaltycannotstartwithdot"));
                 return;
             }
 
@@ -982,7 +982,7 @@ _setDefaultCountryIndiaBranch: function() {
             }
             if (parseFloat(sValue) < 0) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Penalty cannot be negative");
+                oInput.setValueStateText(this.i18nModel.getText("Penaltycannotbenegative"));
                 return;
             }
 
@@ -997,7 +997,7 @@ _setDefaultCountryIndiaBranch: function() {
             if (sValue.startsWith(".")) {
                 oInput.setValue("");
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Starting price cannot start with dot");
+                oInput.setValueStateText(this.i18nModel.getText("Startingpricecannotstartwithdot"));
                 return;
             }
 
@@ -1017,7 +1017,7 @@ _setDefaultCountryIndiaBranch: function() {
             }
             if (parseFloat(sValue) < 0) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Price cannot be negative");
+                oInput.setValueStateText(this.i18nModel.getText("Pricecannotbenegative"));
                 return;
             }
 
@@ -1120,15 +1120,11 @@ _setDefaultCountryIndiaBranch: function() {
                 }
             });
             if (aSelectedItems.length === 1 && aAssignedBranches.length === 1) {
-                sap.m.MessageBox.warning(
-                    "Cannot delete! Selected branch is already assigned."
-                );
+                sap.m.MessageBox.warning(this.i18nModel.getText("CannotdeleteSelectedbranchisalreadyassigned"));
                 return;
             }
             if (aDeletableBranches.length === 0) {
-                sap.m.MessageBox.warning(
-                    "All selected branches are already assigned and cannot be deleted."
-                );
+                sap.m.MessageBox.warning(this.i18nModel.getText("Allselectedbranchesarealreadyassignedandcannotbedeleted"));
                 return;
             }
             var sBranchIds = aDeletableBranches.map(b => b.branchId).join(", ");
@@ -1738,19 +1734,19 @@ _setDefaultCountryIndiaBranch: function() {
 
             if (!sSTD) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Please select ISD code first");
+                oInput.setValueStateText(this.i18nModel.getText("PleaseselectISDcodefirst"));
                 return;
             }
             if (sSTD === "+91") {
                 if (sValue.length !== 10) {
                     oInput.setValueState("Error");
-                    oInput.setValueStateText("Indian mobile number must be exactly 10 digits");
+                    oInput.setValueStateText(this.i18nModel.getText("Indianmobilenumbermustbeexactly10digits"));
                     return;
                 }
             } else {
                 if (sValue.length < 4) {
                     oInput.setValueState("Error");
-                    oInput.setValueStateText("Mobile number must be at least 4 digits");
+                    oInput.setValueStateText(this.i18nModel.getText("Mobilenumbermustbeatleast4digits"));
                     return;
                 }
 
@@ -1883,7 +1879,7 @@ _setDefaultCountryIndiaBranch: function() {
                     oVisModel.setProperty("/Logo", base64);
                 }
 
-                sap.m.MessageToast.show("File uploaded successfully");
+                sap.m.MessageToast.show(this.i18nModel.getText("uploadSuccessfull"));
             } catch (err) {
                 this._removeLogoProcessingRow(sTempId);
                 sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
@@ -1958,7 +1954,7 @@ _setDefaultCountryIndiaBranch: function() {
                     isProcessing: false
                 }]);
 
-                sap.m.MessageToast.show("Image uploaded successfully");
+                sap.m.MessageToast.show(this.i18nModel.getText("Imageuploadsuccessfully"));
             } catch (err) {
                 this._removeImageProcessingRow(sTempId);
                 sap.m.MessageToast.show(err.message || "Compression failed. Please try a smaller file.");
@@ -1971,7 +1967,7 @@ _setDefaultCountryIndiaBranch: function() {
         onPreviewLogoFile: async function (oEvent) {
             const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
             if (!oData || !oData.base64) {
-                sap.m.MessageToast.show("No file available");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nofileavailable"));
                 return;
             }
             this._openFilePreview(oData.base64, oData.filename, oData.fileType);
@@ -1980,7 +1976,7 @@ _setDefaultCountryIndiaBranch: function() {
         onPreviewImageFile: async function (oEvent) {
             const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
             if (!oData || !oData.base64) {
-                sap.m.MessageToast.show("No file available");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nofileavailable"));
                 return;
             }
             this._openFilePreview(oData.base64, oData.filename, oData.fileType);
@@ -2072,7 +2068,7 @@ _setDefaultCountryIndiaBranch: function() {
                 }.bind(this);
 
                 oImg.onerror = function () {
-                    sap.m.MessageToast.show("Unable to preview image.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("previewimage"));
                 };
 
                 oImg.src = sImageSrc;
@@ -2109,12 +2105,12 @@ _setDefaultCountryIndiaBranch: function() {
                 return;
             }
 
-            sap.m.MessageToast.show("Preview not supported.");
+            sap.m.MessageToast.show(this.i18nModel.getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-                sap.m.MessageToast.show("No file available for download.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nofileavailablefordownload"));
                 return;
             }
 
@@ -2240,12 +2236,15 @@ _setDefaultCountryIndiaBranch: function() {
         _loadAndPreviewBranchImage: async function(oEvent, sImageType) {
             var oContext = oEvent.getSource().getBindingContext("mainModel");
             var oData = oContext && oContext.getObject();
-            var sMissingMessage = sImageType === "Logo" ? "No logo found for this branch" : "No home image found for this branch";
+           
+            var sMissingMessage = sImageType === "Logo"
+    ? this.i18nModel.getText("Nologofoundforthisbranch")
+    : this.i18nModel.getText("Nohomeimagefoundforthisbranch");
 
-            if (!oData || !oData.BranchID) {
-                sap.m.MessageToast.show(sMissingMessage);
-                return;
-            }
+                   if (!oData || !oData.BranchID) {
+                      sap.m.MessageToast.show(sMissingMessage);
+                         return;
+                         }
 
             var sCacheKey = oData.BranchID + "|" + sImageType;
             var oCachedImage = this._mBranchImageCache && this._mBranchImageCache[sCacheKey];
@@ -2351,8 +2350,8 @@ _setDefaultCountryIndiaBranch: function() {
 
             if (!oData.Photo1 || !oData.Photo1.length) {
                 sap.m.MessageBox.information(
-                    "No logo is uploaded.", {
-                        title: "Information",
+                   this.i18nModel.getText("Nologoisuploaded"), {
+                        title: this.i18nModel.getText("Information"),
                         styleClass: "myUnifiedBtn"
                     }
                 );
@@ -2452,7 +2451,7 @@ _setDefaultCountryIndiaBranch: function() {
             const numValue = parseFloat(filteredValue);
             if (filteredValue && (numValue < 0 || numValue > 100)) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Tax percentage must be between 0 and 100");
+                oInput.setValueStateText(this.i18nModel.getText("Taxpercentagemustbebetween0and100"));
             } else {
                 oInput.setValueState("None");
                 oInput.setValueStateText("");

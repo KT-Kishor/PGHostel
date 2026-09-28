@@ -95,15 +95,15 @@
                                             />
 										</m:ComboBox>
 										<m:Label
-                                            text="Selection Mode"
+                                            text="{i18n>selectionMode}"
                                             required="true"
                                         />
 										<m:ComboBox
                                             id="id_SelectionMode"
                                             selectedKey="{FacilitiesModel>/SelectionMode}"
                                             items="{SelectionModeModel>/}"
-                                            placeholder="Select selection mode"
-                                            valueStateText="Select selection mode"
+                                            placeholder="{i18n>Selectselectionmode}"
+                                            valueStateText="{i18n>Selectselectionmode}"
                                             change="onSelectionModeChange"
                                             editable="{editable>/Edit}"
                                         >
@@ -113,21 +113,21 @@
                                             />
 										</m:ComboBox>
 										<m:Label
-                    text="Maximum Quantity"
+                    text="{i18n>minimumQuantity}"
                     required="true"
                 />
 										<m:Input
                     id="ideditMinimumQuantity"
                     value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter Maximum Quantity"
-                    valueStateText="Enter Maximum Quantity"
+                    placeholder="{i18n>EnterMaximumQuantity}"
+                    valueStateText="{i18n>EnterMaximumQuantity}"
                     editable="{editable>/Edit}"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="2"
                 />
 										<m:Label 
-                        text="Billing Frequency" 
+                        text="{i18n>facilityChargeType}" 
                         visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }" 
                         required="true"/>
 										<m:RadioButtonGroup 
@@ -142,14 +142,14 @@
 											</m:buttons>
 										</m:RadioButtonGroup>
 										<m:Label
-                    text="Minimum Price"
+                    text="{i18n>minimumPrice}"
                     required="true" visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                 />
 										<m:Input
                     id="ideditMinimumPrice"
                     value="{FacilitiesModel>/MinimumPrice}"
-                    placeholder="Enter Minimum Price"
-                    valueStateText="Enter Minimum Price"
+                    placeholder="{i18n>EnterMinimumPrice}"
+                    valueStateText="{i18n>EnterMinimumPrice}"
                     editable="{editable>/Edit}"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
@@ -262,7 +262,7 @@
                                         visible="{=${editable>/Edit}}"
                                     >
 										<m:MessageStrip
-                                            text="Only JPG, JPEG and PNG image formats are allowed."
+                                            text="{i18n>JPEGandPNGformatsareallowed}"
                                             type="Warning"
                                             showIcon="true"
                                             class="sapUiSmallMarginBottom"
@@ -274,7 +274,7 @@
 										visible="{= !${editable>/Edit} &amp;&amp; (!${DisplayImagesModel>/DisplayImages} || ${DisplayImagesModel>/DisplayImages}.length === 0) }"
 									>
 										<m:Text
-											text="No image uploaded."
+											text="{i18n>Noimageuploaded}"
 											class="facilityNoImageText sapUiSmallMargin"
 										/>
 									</m:HBox>

@@ -153,10 +153,10 @@
                                         <m:Input
                                             id="id_DepositAmount"
                                             value="{BedImageModel>/Deposit}"
-                                            placeholder="Enter deposit amount"
+                                            placeholder="{i18n>Enterdepositamount}"
                                             liveChange="onNumber"
                                             maxLength="7"
-                                            valueStateText="Enter Deposit Amount"
+                                            valueStateText="{i18n>Enterdepositamount}"
                                             editable="{editable>/Edit}"
                                         />
                                         <m:Label
@@ -213,7 +213,7 @@
                                         visible="{=${editable>/Edit}}"
                                     >
                                         <m:MessageStrip
-                                            text="Only JPG, JPEG and PNG image formats are allowed."
+                                            text="{i18n>JPEGandPNGformatsareallowed}"
                                             type="Warning"
                                             showIcon="true"
                                             class="sapUiSmallMarginBottom"

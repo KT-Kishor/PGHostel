@@ -900,7 +900,7 @@ sap.ui.define([
 
             const oAttachment = oCtx.getObject();
             if (!oAttachment || !oAttachment.content) {
-                sap.m.MessageToast.show("No image found");
+                sap.m.MessageToast.show(this.i18nModel.getText("Noimagefound"));
                 return;
             }
 
@@ -974,19 +974,19 @@ sap.ui.define([
                     oDialog.open();
                 }.bind(this);
                 oImg.onerror = function() {
-                    sap.m.MessageToast.show("Unable to preview image.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("previewimage"));
                 };
                 oImg.src = sImageSrc;
                 return;
             }
 
             this.onDownloadPreview();
-            sap.m.MessageToast.show("Preview not supported.");
+            sap.m.MessageToast.show(this.i18nModel.getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function() {
             if (!this._sPreviewBase64) {
-                sap.m.MessageToast.show("No file available for download.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nofileavailablefordownload"));
                 return;
             }
             let sDownloadUrl = "";
@@ -994,7 +994,7 @@ sap.ui.define([
                 sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
             }
             if (!sDownloadUrl) {
-                sap.m.MessageToast.show("Download not supported.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Downloadnotsupported"));
                 return;
             }
             const oLink = document.createElement("a");

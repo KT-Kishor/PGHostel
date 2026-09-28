@@ -28,8 +28,8 @@
                     items="{BranchModel>/}"
                     change="onbranchChange"
                     showSecondaryValues="true"
-                    placeholder="Select Property Name"
-                    valueStateText="Select Property Name"
+                    placeholder="{i18n>SelectPropertyName}"
+                    valueStateText="{i18n>SelectPropertyName}"
                    
                 >
                     <core:ListItem
@@ -114,8 +114,8 @@
                 <Input
                     id="BD_id_DepositAmount"
                     value="{BedModel>/Deposit}"
-                    placeholder="Enter deposit amount"
-                    valueStateText="Enter Deposit Amount"
+                    placeholder="{i18n>Enterdepositamount}"
+                    valueStateText="{i18n>Enterdepositamount}"
                     maxLength="7"
                     liveChange="onNoOfPersonInputLiveChange"
                 

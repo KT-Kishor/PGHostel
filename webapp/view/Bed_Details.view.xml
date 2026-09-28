@@ -180,8 +180,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="Deposit Amount"
-                            tooltip="Deposit Amount"
+                            text="{i18n>depositAmount}"
+                            tooltip="{i18n>depositAmount}"
                         />
                     </Column>
                     <Column

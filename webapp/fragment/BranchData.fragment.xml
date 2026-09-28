@@ -76,10 +76,10 @@
 				<Input
                     id="BD_idLandmark"
                     value="{MDmodel>/LandMark}"
-                    placeholder="Enter landmark"
+                    placeholder="{i18n>Enterlandmark}"
                     maxLength="60"
                     liveChange="onLandmarkInputLiveChange"
-                    valueStateText="Enter Landmark"
+                    valueStateText="{i18n>Enterlandmark}"
                 />
 				<Label
                     text="{i18n>MapLink}"
@@ -225,7 +225,7 @@
                     displayFormat="hh a"
                     placeholder="e.g. 10 AM"
                     valueFormat="hh a"
-                    valueStateText="Please select Check-In Time"
+                    valueStateText="{i18n>Pcheckin}"
                 />
 				<Label
                     text="{i18n>bdCheckouttime}"
@@ -238,7 +238,7 @@
                     displayFormat="hh a"
                     valueFormat="hh a"
                     placeholder="e.g. 10 AM"
-                    valueStateText="Please select Check-Out Time"
+                    valueStateText="{i18n>Pcheckout}"
                 />
 				<Label
                     text="{i18n>currency}"
@@ -322,7 +322,7 @@
 			</f:content>
 		</f:SimpleForm>
 		<MessageStrip 
-                    text="For LOGO and Homepage Only JPEG, JPG and PNG images are allowed"
+                    text="{i18n>DocumentMessage}"
                     type="Warning"
                     showIcon="true"
                     visible="{= !${editableModel>/isEdit}}"
@@ -343,10 +343,10 @@
                         buttonOnly="true"
                         sameFilenameAllowed="true"
                         iconFirst="true"
-                        buttonText="Upload Logo"
+                        buttonText="{i18n>UploadLogo}"
                         multiple="false"
                         uploadOnChange="false"
-                        tooltip="Only JPG, PNG, or PDF files under 1MB allowed"   
+                        tooltip="{i18n>DocumentType}"   
                         class="myUnifiedBtn"   
                     />
 				</HBox>
@@ -369,7 +369,7 @@
         </Column>
 
         <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet" >
-            <Text text="Action" />
+            <Text text="{i18n>Action}" />
         </Column>
     </columns>
 
@@ -425,10 +425,10 @@
                         buttonOnly="true"
                         sameFilenameAllowed="true"
                         iconFirst="true"
-                        buttonText="Upload Home Image"
+                        buttonText="{i18n>UploadHomeImage}"
                         multiple="false"
                         uploadOnChange="false"
-                        tooltip="Only JPG, PNG, or PDF files under 5MB allowed"
+                        tooltip="{i18n>allowedSize}"
                         class="myUnifiedBtn"
                     />
 				</HBox>
@@ -451,7 +451,7 @@
         </Column>
 
         <Column hAlign="Center" demandPopin="true" minScreenWidth="Tablet" >
-            <Text text="Action" />
+            <Text text="{i18n>Action}" />
         </Column>
     </columns>
 
