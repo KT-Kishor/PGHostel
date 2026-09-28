@@ -84,9 +84,9 @@ sap.ui.define([
                 this.getView().addStyleClass("blur-background");
 
                 MessageBox.information(
-                    "Please verify with OTP to access your details.",
+                    this.getView().getModel("i18n").getResourceBundle().getText("verifyOtpAccess"),
                     {
-                        title: "Verification Required",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("verificationRequired"),
                         styleClass: "myUnifiedBtn",
                         actions: [MessageBox.Action.OK],
                         emphasizedAction: MessageBox.Action.OK,
@@ -419,7 +419,7 @@ sap.ui.define([
         },
 
          onFileSizeExceeds: function () {
-            sap.m.MessageToast.show("File size exceeds the 400 KB limit. Please upload a smaller file.");
+            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileSizeExceeds_fb8b"));
         },
 
         BI_onEditButtonPress: function () {
@@ -470,9 +470,9 @@ sap.ui.define([
         BT_onsavebuttonpress: async function () {
             const bConfirm = await new Promise((resolve) => {
                 sap.m.MessageBox.confirm(
-                    "Are you sure you want to Submit?", {
+                    this.getView().getModel("i18n").getResourceBundle().getText("sureSubmit"), {
                     icon: sap.m.MessageBox.Icon.WARNING,
-                    title: "Confirm Submission",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("confirmSubmission"),
                     actions: [
                         sap.m.MessageBox.Action.YES,
                         sap.m.MessageBox.Action.NO
@@ -537,7 +537,7 @@ sap.ui.define([
                 await this._loadVendorDetails(oData.UserID);
                 MessageBox.show(this.i18nModel.getText("vendorUpdateSuccess"), {
                     icon: sap.m.MessageBox.Icon.SUCCESS,
-                    title: "Success",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("success"),
                     actions: [sap.m.MessageBox.Action.OK],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
                     styleClass: "myUnifiedBtn",
@@ -592,7 +592,7 @@ sap.ui.define([
                         sap.m.MessageToast.show(this.i18nModel.getText("docdeletedSuccess"));
                         fnResetSelection();
                     } catch (err) {
-                        sap.m.MessageToast.show(err.message || "Delete failed");
+                        sap.m.MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("deleteFailed"));
                     } finally {
                         this.closeBusyDialog()  
                     }
@@ -678,7 +678,7 @@ sap.ui.define([
             const oDoc = oEvent.getSource().getBindingContext("AdminSignupModel").getObject();
 
             if (!oDoc || !oDoc.File) {
-                sap.m.MessageBox.error("No document found");
+                sap.m.MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                 return;
             }
 
@@ -830,7 +830,7 @@ sap.ui.define([
                     oLink.click();
                     document.body.removeChild(oLink);
 
-                    MessageToast.show("File downloaded successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileDownloaded"));
                     return;
             }
 
@@ -870,7 +870,7 @@ sap.ui.define([
 
             this.onDownloadPreview();
 
-            MessageToast.show("Preview not supported.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function() {
@@ -878,7 +878,7 @@ sap.ui.define([
             if (!this._sPreviewBase64) {
 
                 MessageToast.show(
-                    "No file available for download."
+                    this.getView().getModel("i18n").getResourceBundle().getText("Nofileavailablefordownload")
                 );
 
                 return;
@@ -897,7 +897,7 @@ sap.ui.define([
             }
 
             if (!sDownloadUrl) {
-                MessageToast.show("Download not supported.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Downloadnotsupported"));
                 return;
             }
 
@@ -1166,7 +1166,7 @@ sap.ui.define([
 
             if (bIsPdf && oFile.size > (400 * 1024)) {
                 sap.m.MessageToast.show(
-                    "PDF file size should not exceed 400 KB."
+                    this.getView().getModel("i18n").getResourceBundle().getText("pdfFileSize")
                 );
                 oFileUploader.clear();
                 return;
@@ -1324,8 +1324,8 @@ sap.ui.define([
             // 2. Must match the email tied to this verification link
             if (!this._sVendorEmail || sEmail.toLowerCase() !== this._sVendorEmail.toLowerCase()) {
                 oEmailIDCtrl.setValueState("Error");
-                oEmailIDCtrl.setValueStateText("Entered email does not match the email associated with this link.");
-                MessageToast.show("Entered email does not match the email associated with this link.");
+                oEmailIDCtrl.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enteredEmailNot"));
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enteredEmailNot"));
                 return;
             }
             oEmailIDCtrl.setValueState("None");
@@ -1402,8 +1402,8 @@ sap.ui.define([
             // 2. Must match the email tied to this verification link
             if (!this._sVendorEmail || sEmail.toLowerCase() !== this._sVendorEmail.toLowerCase()) {
                 ctrlEmailId.setValueState("Error");
-                ctrlEmailId.setValueStateText("Entered email does not match the email associated with this link.");
-                MessageToast.show("Entered email does not match the email associated with this link.");
+                ctrlEmailId.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enteredEmailNot"));
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enteredEmailNot"));
                 return;
             }
             ctrlEmailId.setValueState("None");
@@ -1430,7 +1430,7 @@ sap.ui.define([
             try {
                 const isValid = await this._verifyOTPWithBackend(sOTP);
                 if (!isValid) {
-                    MessageToast.show("Incorrect OTP");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("incorrectOTP"));
                     return;
                 }
 
@@ -1439,7 +1439,7 @@ sap.ui.define([
 
                 // Security: the verified user must match the vendor this link belongs to
                 if (!user?.UserID || user.UserID !== this.sUserID) {
-                    MessageToast.show("This verification link does not belong to the entered email.");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("verificationLinkNot"));
                     return;
                 }
 
@@ -1451,7 +1451,7 @@ sap.ui.define([
                 ctrlOTP?.setValueState("None");
                 this._resetOtpState();
 
-                MessageToast.show("Login Successful");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("loginSuccessful_"));
 
                 this.getView().removeStyleClass("blur-background");
                 if (oFragment) {
@@ -1464,7 +1464,7 @@ sap.ui.define([
                     await this._loadVendorPage();
                 }
             } catch (err) {
-                MessageToast.show(err.message || "Invalid Credentials, Please try again");
+                MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("invalidCredentialsTry"));
             } finally {
                 if (!bResumed) {
                     this.closeBusyDialog();

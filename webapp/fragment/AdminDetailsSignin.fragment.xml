@@ -15,7 +15,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="Login" />
+                    <Title text="{i18n>loginLog}" />
                 </contentMiddle>
                 <contentRight>
                     <Button
@@ -94,7 +94,7 @@
 
             <!-- Sign In Button -->
             <Button
-                text="Continue"
+                text="{i18n>continue}"
                 class="myUnifiedBtn"
                 width="100px"
                 press="onSignIn"
