@@ -98,6 +98,7 @@
             fileType="jpg,jpeg,png"
             change="onSupportrequestChange"
             buttonOnly="true"
+			class="myUnifiedBtn"
             iconFirst="true"
             buttonText="Upload Images"
             multiple="true"
@@ -108,7 +109,7 @@
     <List
         id="RB_id_TokenList1"
         width="100%"
-        class="sapUiSmallMarginTop"
+        class="sapUiSmallMarginTop myUnifiedBtn"
         items="{tokenModel>/tokens}"
         mode="Delete"
         delete="onTokenDelete">

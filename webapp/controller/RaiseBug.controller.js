@@ -61,14 +61,16 @@ sap.ui.define([
             this._loadAllFilterData()
         },
 
-        // SuperAdmin and Admin+Vendor are the only users allowed to change the
+        // SuperAdmin, Admin+Vendor and DevEmployee are allowed to change the
         // "Raised By" filter freely. Everyone else is locked to their own
         // logged-in identity (email + name) so they only see their own bugs.
         _isPrivilegedBugFilterUser: function () {
             var oLoginModel = this.getView().getModel("LoginModel");
             var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
             var sType = oLoginModel ? oLoginModel.getProperty("/Type") : "";
-            return sRole === "SuperAdmin" || (sRole === "Admin" && sType === "Vendor");
+            return sRole === "SuperAdmin" ||
+                (sRole === "Admin" && sType === "Vendor") ||
+                sRole === "DevEmployee";
         },
 
         _applyRaisedByLock: function () {
@@ -206,7 +208,8 @@ sap.ui.define([
 
         // SuperAdmin: date range only (no email). Admin + Vendor: the staff
         // emails resolved for the assigned branch codes, plus the date range.
-        // Other roles: logged-in user's EmailID from HM_Login, never dates.
+        // DevEmployee: only the bugs assigned to them (AssignedTo). Other
+        // roles: logged-in user's EmailID from HM_Login, never dates.
         _getRoleBasedBugFilters: function (bIncludeDates) {
             var oLoginModel = this.getView().getModel("LoginModel");
             var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
@@ -219,6 +222,14 @@ sap.ui.define([
                 oFilters.Email = this._vendorEmails;
                 if (bIncludeDates) {
                     Object.assign(oFilters, this._getDateRangeFilters());
+                }
+                return oFilters;
+            }
+
+            // DevEmployee: show only the bugs assigned to the logged-in user.
+            if (sRole === "DevEmployee") {
+                if (sEmail) {
+                    oFilters.AssignedTo = sEmail;
                 }
                 return oFilters;
             }

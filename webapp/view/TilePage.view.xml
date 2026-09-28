@@ -89,6 +89,17 @@
 							<ImageContent src="sap-icon://manager-insight"/>
 						</TileContent>
 					</GenericTile>
+					<GenericTile
+                    id="idRaiseBugDevTile"
+                    visible="{= ${LoginModel>/Role} === 'DevEmployee' }"
+                    class="sapUiTinyMargin glassTile"
+                    header="{i18n>BugDetails}"
+                    press="TileV_onpressBugRaiseVendor"
+                >
+						<TileContent unit="{i18n>managebugs}">
+							<ImageContent src="sap-icon://alert"/>
+						</TileContent>
+					</GenericTile>
             </FlexBox>
             </VBox>
 
@@ -187,7 +198,7 @@
 					</GenericTile>
 					<GenericTile
                     id="idRaiseBug"
-                    visible="true"
+                    visible="{= ${LoginModel>/Role} !== 'DevEmployee' }"
                     class="sapUiTinyMargin glassTile"
                     header="{i18n>BugDetails}"
                     press="TileV_onpressBugRaiseVendor"
