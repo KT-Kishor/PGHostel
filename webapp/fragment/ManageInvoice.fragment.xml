@@ -277,6 +277,7 @@ items="{PaymentMode>/}"
                     width="100%"
                 >
                     <HBox
+                        class="invFooterBtns"
                         justifyContent="End"
                         width="100%"
                         visible="{visiablityPlay>/Form}"

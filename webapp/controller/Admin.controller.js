@@ -1767,9 +1767,18 @@ onsendreminder: async function () {
                 this.getView().createId("roomAvailabilityStartDate"),
                 this.getView().createId("roomAvailabilityEndDate")
             ]);
+
+            // Prefill defaults: first branch, its first bed type, and a
+            // Start = today / End = today + 3 days date range.
+            this._applyRoomAvailabilityDefaults();
             this._setRoomAvailabilityDateLimits();
 
             this.RoomAvailabilityDialog.open();
+
+            // Auto-trigger the initial load with the prefilled filters.
+            if (this.getView().getModel("RoomAvailabilityFilter").getProperty("/BranchCode")) {
+                this.onLoadRoomAvailability();
+            }
         },
 
         _setRoomAvailabilityDateLimits: function () {
@@ -1793,8 +1802,16 @@ onsendreminder: async function () {
 
         onRoomAvailabilityBranchChange: function (oEvent) {
             var sBranchCode = oEvent.getSource().getSelectedKey();
-            var aRooms = this._getRoomRecords();
-            var aTypes = aRooms
+            var aTypes = this._getRoomAvailabilityTypes(sBranchCode);
+
+            this.getView().getModel("RoomAvailabilityFilter").setProperty("/BedTypeName", "");
+            this.getView().getModel("RoomAvailabilityTypes").setData(aTypes);
+            this.getView().getModel("RoomAvailabilityModel").setData([]);
+            this.getView().getModel("RoomAvailabilitySummaryModel").setData([]);
+        },
+
+        _getRoomAvailabilityTypes: function (sBranchCode) {
+            return this._getRoomRecords()
                 .filter(function (oRoom) { return !sBranchCode || oRoom.BranchCode === sBranchCode; })
                 .reduce(function (aResult, oRoom) {
                     if (oRoom.BedTypeName && !aResult.some(function (oType) { return oType.BedTypeName === oRoom.BedTypeName; })) {
@@ -1803,11 +1820,37 @@ onsendreminder: async function () {
                     return aResult;
                 }, [])
                 .sort(function (a, b) { return a.BedTypeName.localeCompare(b.BedTypeName); });
+        },
 
-            this.getView().getModel("RoomAvailabilityFilter").setProperty("/BedTypeName", "");
+        _formatRoomAvailabilityDate: function (oDate) {
+            var sMonth = String(oDate.getMonth() + 1).padStart(2, "0");
+            var sDay = String(oDate.getDate()).padStart(2, "0");
+            return oDate.getFullYear() + "-" + sMonth + "-" + sDay;
+        },
+
+        _applyRoomAvailabilityDefaults: function () {
+            var oFilterModel = this.getView().getModel("RoomAvailabilityFilter");
+            var aBranches = this.getView().getModel("BranchModel")?.getData() || [];
+
+            var oStartDate = new Date();
+            oStartDate.setHours(0, 0, 0, 0);
+
+            var oEndDate = new Date(oStartDate);
+            oEndDate.setDate(oEndDate.getDate() + 3);
+
+            oFilterModel.setProperty("/StartDate", this._formatRoomAvailabilityDate(oStartDate));
+            oFilterModel.setProperty("/EndDate", this._formatRoomAvailabilityDate(oEndDate));
+
+            if (!aBranches.length) {
+                return;
+            }
+
+            var sBranchCode = aBranches[0].BranchID;
+            oFilterModel.setProperty("/BranchCode", sBranchCode);
+
+            var aTypes = this._getRoomAvailabilityTypes(sBranchCode);
             this.getView().getModel("RoomAvailabilityTypes").setData(aTypes);
-            this.getView().getModel("RoomAvailabilityModel").setData([]);
-            this.getView().getModel("RoomAvailabilitySummaryModel").setData([]);
+            oFilterModel.setProperty("/BedTypeName", aTypes.length ? aTypes[0].BedTypeName : "");
         },
 
         onRoomAvailabilityTabSelect: function (oEvent) {

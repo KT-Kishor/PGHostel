@@ -964,13 +964,21 @@ sap.ui.define([
             }
 
             this.getBusyDialog();
+
+            // A bug that is already Assigned must keep that status when it is
+            // edited/saved; only Open and Customer Action bugs move to
+            // "Customer Action" on submit.
+            var sSubmitStatus = String(Data.Status || "").trim().toLowerCase() === "assigned"
+                ? "Assigned"
+                : "Customer Action";
+
             this.ajaxCreateWithJQuery("sendmailtoCustomer",
                 {
                     "BugID": Data.BugID,
                     "Email": Data.Email,
                     "Name": Data.RaisedBy,
                     "Comment": this.byId("RB_id_comments").getValue(),
-                    "Status": "Customer Action",
+                    "Status": sSubmitStatus,
                     "CommentedBy": this.getView().getModel("LoginModel").getData().EmployeeName,
                     "CommentDateTime": new Date().toISOString(),
                     "ApplicationName": "HM_Raisebug"

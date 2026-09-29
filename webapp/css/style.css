@@ -2313,6 +2313,13 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   margin: 0 !important;
 }
 
+.invFooterBtns {
+  gap: 0.75rem;
+}
+.invFooterBtns .myUnifiedBtn.sapMBtn {
+  margin: 0 !important;
+}
+
 /* MenuButton with .myUnifiedBtn renders taller than a plain Button because its
    gradient .sapMBtnInner stretches to the full wrapper height (arrow included).
    Constrain it to the plain button's height/radius so they match in the footer. */

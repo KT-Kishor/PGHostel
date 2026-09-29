@@ -312,7 +312,7 @@
                             <Table
                                 items="{BookingView>/FamilyMembers}"
                                 noDataText="No members selected"
-                                class="familyMembersTable"
+                                class="familyMembersTable tealTableRadio"
                             >
                                 <columns>
                                     <Column
