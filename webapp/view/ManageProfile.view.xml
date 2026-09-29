@@ -28,7 +28,7 @@
                 <contentMiddle>
                     <Title
                         text="{i18n>myAccount}"
-                        level="H4"
+                        level="H4" class="sapUiTinyMarginTop"
                     />
                 </contentMiddle>
                 <contentRight>

@@ -9189,6 +9189,6 @@ text-transform: none !important;
   margin-left: 0.4rem !important;
 }
 
-.sapUiSizeCompact .sapMPage.sapMPageWithHeader>section {
+.sapUiSizeCompact .sapMPage.sapMPageWithHeader:not(.defaultBGBlur)>section {
   top: 45px;
 }
