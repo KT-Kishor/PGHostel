@@ -8,17 +8,13 @@
     xmlns:f="sap.ui.layout.form"
 >
     <m:Page
-        title="Manage Damage Details"
-        showNavButton="true"
-        navButtonPress="onNavBack"
         id="CID_id_MyPage"
+        showHeader="true"
     >
         <m:headerContent>
-            <m:Button
-                press="onHome"
-                icon="sap-icon://log"
-                tooltip="{i18n>logoutTooltip}"
-                type="Transparent"
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
             />
         </m:headerContent>
         <!-- <m:ScrollContainer > -->

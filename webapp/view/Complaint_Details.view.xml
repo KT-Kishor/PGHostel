@@ -112,7 +112,7 @@
                                       || ${ComplaintModel>ResolutionDate}.toString().startsWith('1899-11-30')
                                           ? ''
                                      : ${path: 'ComplaintModel>ResolutionDate', formatter: '.Formatter.formatDate'}}" />
-                            <Link text="{i18n>view}" press="CD_viewimage" />
+                            <Link text="{i18n>view}" press="CD_viewimage" class="tealTextLink"/>
                             <ExpandableText text="{ComplaintModel>Comment}" />
                         </cells>
                     </ColumnListItem>
