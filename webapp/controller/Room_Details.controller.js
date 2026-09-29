@@ -243,7 +243,113 @@ sap.ui.define([
                     );
                 });
         },
+   HM_Active: function () {
 
+    var oTable = this.byId("id_ARD_Table");
+    var aSelectedItems = oTable.getSelectedItems();
+
+    if (aSelectedItems.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectatLeastOneRecord")
+        );
+        return;
+    }
+
+    // Store selected room data
+    this.aSelectedRooms = aSelectedItems.map(function (oItem) {
+        return oItem.getBindingContext("RoomDetailsModel").getObject();
+    });
+
+    var oView = this.getView();
+
+    if (!this.RD_Dialog) {
+        this.RD_Dialog = sap.ui.xmlfragment(
+            oView.getId(),
+            "sap.ui.com.project1.fragment.Activeinactive",
+            this
+        );
+
+        oView.addDependent(this.RD_Dialog);
+    }
+
+    // Clear previous selection
+    this.byId("idActinact").setSelectedKey("").setValueState("None");
+
+    this.RD_Dialog.open();
+},
+onComboBoxChange:function(oEvent){
+            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
+},
+AI_onCancelButtonPress:function(){
+    this.RD_Dialog.close();
+
+},
+AI_onsavebuttonpress: async function () {
+
+    var oComboBox = this.byId("idActinact");
+    var sStatus = oComboBox.getSelectedKey();
+
+    if(! utils._LCstrictValidationComboBox(this.getView().byId("idActinact"), "ID")){
+         sap.m.MessageToast.show(this.i18nModel.getText("pleaseFillallRequiredFieldsCorrectlybeforeSaving"));
+         return;
+    }
+
+   
+    oComboBox.setValueState("None");
+
+    var aSelectedRooms = this.aSelectedRooms || [];
+
+    if (aSelectedRooms.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectatLeastOneRecord")
+        );
+        return;
+    }
+
+    try {
+var oBody = {
+    data: aSelectedRooms.map(function (oRoom) {
+        return {
+            data: {
+                Status: sStatus
+            },
+            filters: {
+                RoomNo: oRoom.RoomNo,
+                BranchCode: oRoom.BranchCode
+            }
+        };
+    })
+};
+
+
+        this.getBusyDialog()
+        await this.ajaxUpdateWithJQuery("HM_Rooms",oBody);
+        this.closeBusyDialog()
+
+        sap.m.MessageToast.show(
+            "Room status updated successfully"
+        );
+
+        this.RD_Dialog.close();
+
+        this.byId("id_ARD_Table").removeSelections(true);
+
+        this.getView()
+            .getModel("RoomDetailsModel")
+            .refresh(true);
+
+        this.aSelectedRooms = [];
+
+    } catch (oError) {
+
+        console.error("Room update failed:", oError);
+
+        sap.m.MessageBox.error(
+            "Failed to update room status"
+        );
+    }
+},
         HM_AddRoom: function (oEvent) {
             var oView = this.getView();
             this.byId("id_ARD_Table").removeSelections();
@@ -809,7 +915,7 @@ if (Payload._isEditing) {
 
     await this.ajaxUpdateWithJQuery("HM_Rooms", oBody);
 }else {
-
+                  Payload.Status="Active"
                     const oBody = {
                         data: Payload
                     };
@@ -1012,6 +1118,7 @@ if (Payload._isEditing) {
             if (sBranchCode) {
                 filters.BranchCode = sBranchCode.split('-')[0];
             }
+            
 
             if (!bBusyAlreadyOpen) {
                 this.getBusyDialog();

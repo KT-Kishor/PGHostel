@@ -5405,7 +5405,7 @@ console.log(
         {
             actions: [
                 "Extend Days",
-                "OK"
+                "Continue"
             ],
 
             emphasizedAction: "Extend Days",
@@ -5816,7 +5816,7 @@ console.log(
     // =========================================================
 
     that.onSaveBooking1();
-} else if (oAction === "OK") {
+} else if (oAction === "Continue") {
 
                     // Continue without changing facility dates
                     that.continue = false;

@@ -135,7 +135,9 @@
                                 selectedKey="{Bookingmodel>/BedTypeName}"
                                 selectionChange="onRoomBedChange"
                                 valueStateText="{i18n>selectRoomType}"
+                                editable="{= ${CustomerData>/Status} === 'Confirmed' }"
                                 width="55%"
+                                
                             >
                                 <core:ListItem
                                     key="{Availablebeds>BedTypeName}"
@@ -180,7 +182,7 @@
                                 visible="{VisibleModel>/visible}"
                                 valueStateText="{i18n>selectPaymentType}"
                                 change="onChange"
-                                editable="{= ${LoginModel>/Role} !== 'Customer' }"
+                                editable="{= ${LoginModel>/Role} !== 'Customer' &amp;&amp; ${CustomerData>/Status} === 'Confirmed'}"
                             >
                                 <core:ListItem
                                     key="daily"
@@ -223,6 +225,7 @@
                                 change="onBookingEditDateChange"
                                 valueStateText="{i18n>selectStartDate}"
                                 width="55%"
+                                editable="{= ${CustomerData>/Status} === 'Confirmed' }"
                             />
 
                             <!-- Month/Year Select -->

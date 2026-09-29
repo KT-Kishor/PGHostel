@@ -95,6 +95,12 @@
 					<OverflowToolbar>
 						<Title text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"/>
 						<ToolbarSpacer />
+                        <Button
+                            text="{i18n>Activeinactive}"
+                            press="HM_Active"
+                            tooltip="{i18n>Activeinactive}"
+                            class="myUnifiedBtn"
+                            visible="{= ${LoginModel>/Role} !== 'Front Office Employee' }"/>
                         	<Button
                             text="{i18n>createRoom}"
                             press="HM_AddRoom"
@@ -148,6 +154,9 @@
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>yearPrice}" tooltip="{i18n>yearPrice}"/>
 					</Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="{i18n>Mode}" tooltip="{i18n>Mode}"/>
+					</Column>
 				</columns>
 				<items>
 					<ColumnListItem>
@@ -161,6 +170,8 @@
 							formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{parts: ['RoomDetailsModel>YearPrice','RoomDetailsModel>Currency'],
 							formatter: '.Formatter.formatPrice'}"/>
+							<Text text="{RoomDetailsModel>Status}" />
+
 						</cells>
 					</ColumnListItem>
 				</items>

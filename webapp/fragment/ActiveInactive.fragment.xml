@@ -1,0 +1,77 @@
+<c:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        id="Activeinactive"
+        type="Message"
+        class="sapUiContentPadding"
+        contentWidth="28rem"
+        contentHeight="auto"
+    >
+        <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>manageactiveDetails}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
+
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="4"
+            labelSpanL="3"
+            labelSpanM="4"
+            labelSpanS="12"
+            columnsXL="2"
+            columnsL="2"
+            columnsM="1"
+        >
+            <f:content>
+                <Label
+                    text="{i18n>Activeinactive}"
+                    required="true"
+                />
+                <ComboBox
+                    id="idActinact"
+                    placeholder="{i18n>selectact}"
+                    change="onComboBoxChange"
+                    valueStateText="{i18n>selectact}"
+                >
+                    <core:Item
+                        key="Active"
+                        text="Active"
+                    />
+                      <core:Item
+                        key="Inactive"
+                        text="Inactive"
+                    />
+                </ComboBox>
+
+               
+            </f:content>
+        </f:SimpleForm>
+        <beginButton>
+            <Button
+                text="{i18n>save}"
+                tooltip="{i18n>save}"
+                press="AI_onsavebuttonpress"
+                id="AI_id_saveButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                text="{i18n>CancelButton}"
+                tooltip="{i18n>CancelButton}"
+                press="AI_onCancelButtonPress"
+                id="AI_id_CancelButton"
+                class="marginRight myUnifiedBtn"
+            />
+        </endButton>
+    </Dialog>
+</c:FragmentDefinition>
