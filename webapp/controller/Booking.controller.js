@@ -1740,7 +1740,7 @@
                                                         },
                                                         select: this.onFacilityPersonSelect.bind(this),
                                                         enabled: "{FacilitySelection>/editModeEnabled}"
-                                                    }),
+                                                    }).addStyleClass("tealCheckBox"),
                                                     new sap.m.Text({
                                                         text: "{FacilitySelection>name}"
                                                     }).addStyleClass("sapUiTinyMarginEnd"),
@@ -1827,7 +1827,7 @@
                                                         selected: "{FacilitySelection>selected}",
                                                         select: this.onFacilityPersonSelect.bind(this),
                                                         enabled: "{FacilitySelection>/editModeEnabled}"
-                                                    }),
+                                                    }).addStyleClass("tealCheckBox"),
 
                                                     new sap.m.Text({
                                                         text: "{FacilitySelection>personName}",
