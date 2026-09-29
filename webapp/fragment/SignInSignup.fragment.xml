@@ -218,8 +218,10 @@
                 <Button
                     id="btnFPNext"
                     text="{LoginViewModel>/otpButtonText}"
+                    tooltip="{LoginViewModel>/otpButtonText}"
                     press="onValidateUser"
-                    visible="{= ${LoginViewModel>/forgotStep} &lt;= 2 &amp;&amp; ${LoginViewModel>/canResendOTP} }"
+                    enabled="{LoginViewModel>/canResendOTP}"
+                    visible="{= ${LoginViewModel>/forgotStep} === 1 }"
                     class="myUnifiedBtn sapUiSmallMarginTop"
                 />
                 <!-- <Button id="btnFPNext" text="Send OTP" press="onValidateUser" visible="{= ${LoginViewModel>/forgotStep} &lt;= 2 }" class="myUnifiedBtn sapUiSmallMarginTop"/> -->
@@ -244,7 +246,16 @@
                 valueStateText="{i18n>pleaseenteravalidOTP}"
                 visible="{= ${LoginViewModel>/forgotStep} === 2 }"
             />
-            <HBox justifyContent="End">
+            <HBox justifyContent="SpaceBetween">
+                <Button
+                    id="btnFPResendOTP"
+                    text="{LoginViewModel>/otpButtonText}"
+                    tooltip="{LoginViewModel>/otpButtonText}"
+                    press="onValidateUser"
+                    enabled="{LoginViewModel>/canResendOTP}"
+                    visible="{= ${LoginViewModel>/forgotStep} === 2 }"
+                    class="myUnifiedBtn sapUiSmallMarginTop"
+                />
                 <Button
                     id="btnOtpVerify"
                     text="{i18n>verifyOTP}"
