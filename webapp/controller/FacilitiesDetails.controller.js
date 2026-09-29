@@ -331,7 +331,7 @@ sap.ui.define([
 
             const bFileNameDuplicate = aRealImages.some(img => img.originalName === oFile.name);
             if (bFileNameDuplicate) {
-                MessageToast.show(`"${oFile.name}" is already Added.`);
+                MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [oFile.name]));
                 return;
             }
 
@@ -359,7 +359,7 @@ sap.ui.define([
                         this._removeProcessingRow(sTempId);
                     }
                 } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    MessageToast.show("Only images can be compressed. File exceeds 1 MB.");
+                    MessageToast.show(this.i18nModel.getText("OnlyimagescanbecompressedFileexceeds1MB"));
                     return;
                 }
 

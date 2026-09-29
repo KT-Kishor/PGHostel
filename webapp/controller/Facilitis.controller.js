@@ -362,7 +362,7 @@ sap.ui.define([
                     if (oRadioGroup) {
                         oRadioGroup.setValueState("Error");
                     }
-                    MessageToast.show("Please select Daily or Entire Booking facility Type.");
+                    MessageToast.show(this.i18nModel.getText("PleaseselectDailyorEntireBookingfacilityType"));
                     return;
                 } else {
                     if (oRadioGroup) {
@@ -718,7 +718,7 @@ sap.ui.define([
                 for (const oFile of aSelectedFiles) {
                     const bIsDuplicate = aAttachments.some(att => att.filename === oFile.name);
                     if (bIsDuplicate) {
-                        MessageToast.show("\"" + oFile.name + "\" is already uploaded.");
+                        MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [oFile.name]));
                         continue;
                     }
 
@@ -805,7 +805,7 @@ sap.ui.define([
         onPreviewFacilityFile: async function (oEvent) {
             const oData = oEvent.getSource().getBindingContext("UploaderData")?.getObject();
             if (!oData || !oData.content) {
-                MessageToast.show("No file available");
+                MessageToast.show(this.i18nModel.getText("Nofileavailable"));
                 return;
             }
             this._openFilePreview(oData.content, oData.filename, oData.fileType);
@@ -897,7 +897,7 @@ sap.ui.define([
                 }.bind(this);
 
                 oImg.onerror = function () {
-                    MessageToast.show("Unable to preview image.");
+                    MessageToast.show(this.i18nModel.getText("previewimage"));
                 };
 
                 oImg.src = sImageSrc;
@@ -934,12 +934,12 @@ sap.ui.define([
                 return;
             }
 
-            MessageToast.show("Preview not supported.");
+            MessageToast.show(this.i18nModel.getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-                MessageToast.show("No file available for download.");
+                MessageToast.show(this.i18nModel.getText("Nofileavailablefordownload"));
                 return;
             }
 
@@ -1028,9 +1028,9 @@ sap.ui.define([
             }).join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the selected facilities: ${sNames}?`, {
+                this.i18nModel.getText("confirmDeleteFacilities",[sNames]), {
                 icon: sap.m.MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
+                title: "{i18n>msgBoxConfirm}",
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 emphasizedAction: sap.m.MessageBox.Action.NO,
                 styleClass: "myUnifiedBtn",

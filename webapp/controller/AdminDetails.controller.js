@@ -5170,7 +5170,7 @@ console.log(
 
           for (let i = 0; i < facilityItems.length; i++) {
     const item = facilityItems[i];
-
+            
     const facilityEnd = this._parseDate(item.EndDate);
 
     if (facilityEnd.getTime() !== bookingEndDate.getTime()) {

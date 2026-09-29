@@ -668,9 +668,9 @@ var sOriginalRoomNo = this.RoomNo;
 if (!Payload._isEditing && !Payload._isRoomEditing) {
 
     if (oExistingRoom) {
-        sap.m.MessageToast.show(
-            "Room No '" + Payload.RoomNo + "' Already Exists"
-        );
+     sap.m.MessageToast.show(
+    this.i18nModel.getText("roomNoAlreadyExists", [Payload.RoomNo])
+);
 
         var oMatch = aRoomDetails.find(item =>
             item.BedTypeName === Payload.BedTypeName &&
@@ -696,9 +696,12 @@ if (Payload._isRoomEditing) {
         Payload.RoomNo !== sOriginalRoomNo &&
         oExistingRoom
     ) {
-        sap.m.MessageToast.show(
-            "Room No '" + Payload.RoomNo + "' Already Exists"
-        );
+      sap.m.MessageToast.show(
+  this.i18nModel.getText(
+        "roomNoAlreadyExists",
+        [Payload.RoomNo]
+    )
+);
         return;
     }
 
@@ -717,10 +720,14 @@ if (Payload._isEditing) {
         Payload.RoomNo !== sOriginalRoomNo &&
         oExistingRoom
     ) {
-        sap.m.MessageToast.show(
-            "Room No '" + Payload.RoomNo + "' Already Exists"
-        );
+          sap.m.MessageToast.show(
+  this.i18nModel.getText(
+        "roomNoAlreadyExists",
+        [Payload.RoomNo]
+    )
+);
         return;
+    
     }
 }
                 if (Payload.Price <= 0 && Payload.MonthPrice <= 0 && Payload.YearPrice <= 0) {
@@ -865,8 +872,7 @@ if (Payload._isEditing) {
 
             // Single selection & assigned → stop
             if (aSelectedItems.length === 1 && aAssignedRooms.length === 1) {
-                sap.m.MessageBox.warning(
-                    "Cannot delete! Selected room is already assigned.",
+                sap.m.MessageBox.warning(this.i18nModel.getText("pleaseSelectatLeastOneRecordtoDelete"),
                     {
                         styleClass: "myUnifiedBtn"
                     }
@@ -876,8 +882,7 @@ if (Payload._isEditing) {
 
             // All selected rooms are assigned
             if (aDeletableRooms.length === 0) {
-                sap.m.MessageBox.warning(
-                    "All selected rooms are already assigned and cannot be deleted.",
+                sap.m.MessageBox.warning(this.i18nModel.getText("Allselectedroomsarealreadyassignedandcannotbedeleted"),
                     {
                         styleClass: "myUnifiedBtn"
                     }
@@ -890,15 +895,15 @@ if (Payload._isEditing) {
                 .map(room => room.roomNo)
                 .join(", ");
             var sAssignedRoomNos = aAssignedRooms.map(room => room).join(", ");
-            let sMessage = `Are you sure you want to delete the following room(s): ${sRoomNos}?`;
+            let sMessage = this.i18nModel.getText("confirmDeleteRooms", [sRoomNos]);
 
             if (aAssignedRooms && aAssignedRooms.length > 0) {
-                sMessage += `\nThese rooms cannot be deleted because they are currently assigned to: ${sAssignedRoomNos}.`;
+                sMessage += "\n" + this.i18nModel.getText("roomsCannotBeDeleted",[sAssignedRoomNos]);
             }
             sap.m.MessageBox.confirm(
                 sMessage,
                 {
-                    title: "Confirm Deletion",
+                    title: "{i18n>msgBoxConfirm}",
                     icon: sap.m.MessageBox.Icon.WARNING,
                     actions: [
                         sap.m.MessageBox.Action.OK,

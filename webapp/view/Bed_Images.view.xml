@@ -52,7 +52,7 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Branch Name"
+                                            text="{i18n>BranchName}"
                         
                                         />
                                         <m:ComboBox
@@ -147,7 +147,7 @@
                                             editable="{editable>/Edit}"
                                         />
                                         <m:Label
-                                            text="Deposit Amount"
+                                            text="{i18n>depositAmount}"
                                             required="true"
                                         />
                                         <m:Input

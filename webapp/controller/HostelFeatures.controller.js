@@ -314,7 +314,7 @@ sap.ui.define([
                         this.closeBusyDialog();
                     }
                 } else if (fileSizeMB > MAX_SIZE_MB && !isImage) {
-                    sap.m.MessageToast.show("File exceeds 1 MB. Please choose a smaller file.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Fileexceeds1MBPleasechooseasmallerfile"));
                     if (oFileUploader) oFileUploader.clear();
                     return;
                 }
@@ -578,7 +578,7 @@ sap.ui.define([
             }).join(", ");
 
             MessageBox.confirm(
-                `Are you sure you want to Delete the Selected Amenities: ${sNames}?`, {
+                this.i18nModel.getText("confirmDeleteAmenities", [sNames]),{
                 icon: MessageBox.Icon.WARNING,
                 title: "Confirm Deletion",
                 actions: [MessageBox.Action.YES, MessageBox.Action.NO],
@@ -648,8 +648,8 @@ sap.ui.define([
 
             if (!oData.Photo1 || !oData.Photo1.length) {
                 sap.m.MessageBox.information(
-                    "No image is uploaded.", {
-                    title: "Information",
+                  this.i18nModel.getText("Noimageisuploaded"), {
+                    title: "{i18n>Information}",
                     styleClass: "myUnifiedBtn"
                 }
                 );

@@ -400,7 +400,7 @@ sap.ui.define([
 
             const sCouponText = aCouponCodes.join(", ");
             MessageBox.confirm(
-                `Are you sure you want to delete the following ${sLabel}?\n\n ${sLabel}: ${sCouponText}`, {
+                   this.i18nModel.getText("confirmDeleteCoupon",[sLabel, sCouponText]), {
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
@@ -720,7 +720,7 @@ sap.ui.define([
                         //  Block if new end date is smaller than any existing
                         if (bInvalidEndDate) {
                             this.closeBusyDialog();
-                            MessageBox.error("Coupon end date must be greater than existing coupon end date");
+                            MessageBox.error(this.i18nModel.getText("Couponenddatemustbegreaterthanexistingcouponenddate"));
                             return;
                         }
 
@@ -733,7 +733,7 @@ sap.ui.define([
 
                         if (bActiveExists) {
                             this.closeBusyDialog();
-                            MessageBox.error("Coupon code already exists");
+                            MessageBox.error(this.i18nModel.getText("Couponcodealreadyexists"));
                             return;
                         }
 
@@ -1550,7 +1550,7 @@ sap.ui.define([
                             //  Copy link
                             createItem("image/Link.png", "Copy Coupon Details", () => {
                                 navigator.clipboard.writeText(sMessage);
-                                sap.m.MessageToast.show("Coupon Details copied");
+                                sap.m.MessageToast.show(this.i18nModel.getText("CouponDetailscopied"));
                                 this._oSharePopover.close();
                             })
                         ]

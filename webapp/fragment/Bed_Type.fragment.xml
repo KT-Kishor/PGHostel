@@ -163,7 +163,7 @@
         
             <!-- Informational Message Strip -->
             <MessageStrip
-                text="Please add at least one image. Only JPG, JPEG, or PNG files up to 1 MB are allowed."
+                text="{i18n>PleaseaddatleastoneimageOnlyJPGJPEGorPNGfilesupareallowed}"
                 showIcon="true"
                 type="Warning"
                 class="sapUiSmallMargin"
@@ -182,7 +182,7 @@
                     multiple="true"
                     sameFilenameAllowed="false"
                     buttonOnly="true"
-                    buttonText="Upload Images"
+                    buttonText="{i18n>UploadImages}"
                     change="onFacilityFileChange"
                     class="myUnifiedBtn"
                 />

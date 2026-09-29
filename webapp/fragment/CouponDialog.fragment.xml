@@ -216,8 +216,8 @@
         <beginButton>
             <Button
                 class="myUnifiedBtn"
-                text="{= ${CouponView>/DialogMode} === 'Add' ? 'Create Coupon' : 'Update Coupon'}"
-                tooltip="{= ${CouponView>/DialogMode} === 'Add' ? 'Create Coupon' : 'Update Coupon'}"
+                text="{= ${CouponView>/DialogMode} === 'Add' ? ${i18n>createCoupon} : ${i18n>updateCoupon} }"
+                tooltip="{= ${CouponView>/DialogMode} === 'Add' ? ${i18n>createCoupon} : ${i18n>updateCoupon} }"
                 press="onSaveCoupon"
             />
         </beginButton>

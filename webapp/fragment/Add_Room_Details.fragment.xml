@@ -38,10 +38,10 @@
                 />
                 <ComboBox
                     id="idRoomType12"
-                    placeholder="Select Property Name"
+                    placeholder="{i18n>SelectPropertyName}"
                     selectedKey="{RoomModel>/BranchCode}"
                     selectionChange=".onBranchChange"
-                    valueStateText="Select Property Name"
+                    valueStateText="{i18n>SelectPropertyName}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     editable="{= !${RoomModel>/_isEditing} &amp;&amp; !${RoomModel>/_isRoomEditing} }"

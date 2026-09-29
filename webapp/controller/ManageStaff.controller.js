@@ -535,9 +535,9 @@ sap.ui.define([
             }
 
             MessageBox.confirm(
-                `Are you sure you want to delete the Staff record: ${sName}?`, {
+                this.i18nModel.getText("confirmDeleteStaff", [sName]), {
                     icon: MessageBox.Icon.WARNING,
-                    title: "Confirm Deletion",
+                    title: "{i18n>msgBoxConfirm}",
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
                     styleClass: "myUnifiedBtn",
