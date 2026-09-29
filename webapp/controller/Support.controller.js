@@ -214,10 +214,10 @@ sap.ui.define([
                     await this.CD_read();
                     this.SP_Dialog.close();
                 }).catch((oError) => {
-                    MessageToast.show("Error while updating support request");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorWhileUpdating"));
                 }).finally(() => {
                     this.closeBusyDialog();
-                    MessageToast.show("Support Request Updated Successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("supportRequestUpdated"));
                 });
             } else {
                 sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
@@ -589,7 +589,7 @@ sap.ui.define([
                     this.closeBusyDialog();
 
                     if (!oData.data || oData.data.length === 0) {
-                        sap.m.MessageBox.information("No data found");
+                        sap.m.MessageBox.information(this.getView().getModel("i18n").getResourceBundle().getText("noDataFound"));
                         return;
                     }
                     const record = oData.data[0];
@@ -614,7 +614,7 @@ sap.ui.define([
                         });
                     }
                     if (aImages.length === 0) {
-                        sap.m.MessageBox.information("No images uploaded.");
+                        sap.m.MessageBox.information(this.getView().getModel("i18n").getResourceBundle().getText("noImagesUploaded"));
                         return;
                     }
                     // Convert Base64 images
@@ -643,7 +643,7 @@ sap.ui.define([
                 })
                 .catch((err) => {
                     this.closeBusyDialog();
-                    sap.m.MessageBox.error("Failed to load images");
+                    sap.m.MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("failedLoadImages"));
                 });
         },
 

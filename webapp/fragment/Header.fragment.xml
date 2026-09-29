@@ -2,7 +2,7 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
 >
-    <Bar design="Header" class="removeHeaderBorder">
+    <Bar>
         <contentLeft>
             <Button
                 icon="sap-icon://nav-back"
@@ -12,7 +12,6 @@
             <Image
                 src="./image/SVLogo.png"
                 height="2.5rem"
-                class="logoFix"
                 press="onNavBack"
             />
         </contentLeft>

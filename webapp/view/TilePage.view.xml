@@ -12,7 +12,7 @@
 			<Text
                 id="idWelcomeUser"
                 text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }"
-                class="boldBlueText sapUiLargeMarginBegin"
+                class="boldBlueText sapUiSmallMarginBegin"
             />
 			<ToolbarSpacer />
 			<!-- <Button
