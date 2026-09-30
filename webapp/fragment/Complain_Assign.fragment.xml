@@ -41,7 +41,7 @@
                     valueStateText="{i18n>SelectAssignedTo}"
                     width="100%"
                     change=".onNoOfPersonInputLiveChange"
-                    placeholder="Enter Assigned To"
+                    placeholder="{i18n>enterAssigned}"
 
                 >
                     <core:Item
@@ -60,9 +60,9 @@
                     value="{CDModel>/EstimatedDate}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
-                    placeholder="Select Estimated Date"
+                    placeholder="{i18n>selectEstimatedDate}"
                     change="onNoOfPersonInputLiveChange"
-                    valueStateText="Select Estimate Date"
+                    valueStateText="{i18n>selectEstimateDate}"
                 />
 
                 <Label
@@ -86,7 +86,7 @@
                     id="CD_id_Comments"
                     value=""
                     maxLength="200"
-                    placeholder="Enter Comments"
+                    placeholder="{i18n>enterComments_2760}"
                     liveChange="onCommentsLiveChange"
                     valueStateText="{i18n>pleaseEnterComments}"
                 />

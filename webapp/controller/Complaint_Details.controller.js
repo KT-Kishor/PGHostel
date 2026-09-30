@@ -334,9 +334,9 @@ sap.ui.define([
 
             if (!oData.File || !oData.File.length) {
                 sap.m.MessageBox.information(
-                    "No Image is uploaded.",
+                    this.getView().getModel("i18n").getResourceBundle().getText("noImageUploaded"),
                     {
-                        title: "Information",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("Information"),
                         styleClass: "myUnifiedBtn"
                     }
                 );
