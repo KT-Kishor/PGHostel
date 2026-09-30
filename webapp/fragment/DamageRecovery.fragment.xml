@@ -5,7 +5,7 @@
     xmlns:form="sap.ui.layout.form">
     <Dialog
         id="DT_id_DamageRecoverDialog"
-        title="Recover Damage"
+        title="{i18n>ReturnDamage}"
         contentWidth="500px"
         stretch="false"
         afterClose="onDialogAfterClose">
@@ -29,50 +29,50 @@
                 singleContainerFullSize="false">
 
                 <!-- Customer ID -->
-                <Label text="Booking ID"/>
+                <Label text="{i18n>bookingID}"/>
                 <Text text="{DamageModel>/BookingID}"/>
                 <!-- Customer Name -->
-                <Label text="Customer Name"/>
+                <Label text="{i18n>customerName}"/>
                 <Text text="{DamageModel>/CustomerName}"/>
                 <!-- Damage Amount -->
-                <Label text="Damage Amount"/>
+                <Label text="{i18n>damageAmount}"/>
                 <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
               
                 <!-- Return Amount -->
-                <Label text="Actual Cost"/>
+                <Label text="{i18n>actualcost}"/>
                 <Text text="{parts:[{path:'DamageModel>/TotalCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
                
                 <!-- Return Amount -->
-                <Label text="Recover Amount" />
+                <Label text="{i18n>recoverAmount}" />
                 <Text text="{parts:[{path:'DamageModel>/RecoverCost'},{path:'DamageModel>/Currency'}],formatter:'.Formatter.formatCurrency'}"/>
 
                 <!-- Return Mode -->
-                <Label text="Payment Mode" required="true"/>
+                <Label text="{i18n>paymentMode}" required="true"/>
                 <ComboBox
                     id="DT_id_ReturnMode"
                     selectedKey="{DamageModel>/ReturnDamageMode}"
-                    placeholder="Select return mode"
-                    change="_onReturnModeChange" valueStateText="Select return mode" items="{PaymentMode>/}">
+                    placeholder="{i18n>selectReturnMode}"
+                    change="_onReturnModeChange" valueStateText="{i18n>selectReturnMode}" items="{PaymentMode>/}">
                     <core:ListItem key="{PaymentMode>Mode}" text="{PaymentMode>Mode}"/>
                    
                 </ComboBox>
 
                 <!-- Transaction ID -->
-                <Label text="Transaction ID/ Person Name"/>
+                <Label text="{i18n>transactionIdPerson}"/>
                 <Input
                     id="DT_id_ReturnTransactionID"
                     value="{DamageModel>/ReturnDamageTransactionID}"
-                    placeholder="Enter transaction / person name"
-                    liveChange="_validateTransactionID" valueStateText="Enter transaction / person name"   enabled="{DamageModel>/ReturnTransactionEnabled}" />
+                    placeholder="{i18n>enterTransactionPerson}"
+                    liveChange="_validateTransactionID" valueStateText="{i18n>enterTransactionPerson}"   enabled="{DamageModel>/ReturnTransactionEnabled}" />
 
                 <!-- Returning Employee -->
-                <Label text="Returning To"/>
+                <Label text="{i18n>returning_801c}"/>
                 <Text text="{LoginModel>/EmployeeName}"/>
             </form:SimpleForm>
         </content>
         <buttons>
-            <Button text="Recover Damage" press="onSaveReturn" class="marginRight myUnifiedBtn"/>
-            <Button text="Cancel" press="onDialogClose" class="marginRight myUnifiedBtn"/>
+            <Button text="{i18n>ReturnDamage}" press="onSaveReturn" class="marginRight myUnifiedBtn"/>
+            <Button text="{i18n>actionCancel}" press="onDialogClose" class="marginRight myUnifiedBtn"/>
         </buttons>
     </Dialog>
 </core:FragmentDefinition>

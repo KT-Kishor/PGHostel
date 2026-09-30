@@ -207,7 +207,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (oData.Status === "Damage Claimed") {
-                MessageToast.show("Damage has already been Claimed");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageAlreadyClaimed"));
                 return;
             }
 
@@ -307,7 +307,7 @@ sap.ui.define([
                     };
 
                     await this.ajaxUpdateWithJQuery("HM_Damage", oPayload);
-                    MessageToast.show("Damage details updated successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageDetailsUpdated"));
 
                 }
                 // ================= CREATE =================
@@ -317,13 +317,13 @@ sap.ui.define([
                     };
 
                     await this.ajaxCreateWithJQuery("HM_Damage", oPayload);
-                    MessageToast.show("Damage details added successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageDetailsAdded"));
                 }
 
                 await this.Onsearch("true");
                 this.AR_Dialog.close();
             } catch (err) {
-                MessageToast.show(err.responseText || "Failed to save damage.");
+                MessageToast.show(err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("failedSaveDamage"));
             } finally {
                 this.closeBusyDialog()
             }
@@ -381,9 +381,9 @@ sap.ui.define([
             }).join(", ");
 
             sap.m.MessageBox.confirm(
-                `Are you sure you want to delete the selected damages: ${sNames}?`, {
+                this.getView().getModel("i18n").getResourceBundle().getText("sureDeleteSelected_c23e", [sNames]), {
                 icon: sap.m.MessageBox.Icon.WARNING,
-                title: "Confirm Deletion",
+                title: this.getView().getModel("i18n").getResourceBundle().getText("msgBoxConfirm"),
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 emphasizedAction: sap.m.MessageBox.Action.NO,
                 styleClass: "myUnifiedBtn",
@@ -413,7 +413,7 @@ sap.ui.define([
                         that.Onsearch("true");
                     } catch (err) {
                         console.error(err);
-                        MessageToast.show(err.message || err.responseText || "Delete failed");
+                        MessageToast.show(err.message || err.responseText || that.getView().getModel("i18n").getResourceBundle().getText("deleteFailed"));
                     } finally {
                         that.closeBusyDialog()
                         oTable.removeSelections(true);
@@ -562,7 +562,7 @@ sap.ui.define([
                 fileName: "Damage_Report.xlsx",
                 worker: false
             };
-            MessageToast.show("Downloading Damage Report...");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("downloadingDamageReport"));
             var oSheet = new Spreadsheet(oSettings);
             oSheet.build().finally(function () {
                 oSheet.destroy();
@@ -600,11 +600,11 @@ sap.ui.define([
             var oSelected = oTable.getSelectedItems();
 
             if (!oSelected || oSelected.length === 0) {
-                MessageToast.show("Please select a record");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectRecord"));
                 return;
             }
             if (oSelected.length > 1) {
-                MessageToast.show("Select only one row");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectOnlyOne"));
                 return;
             }
 
@@ -613,7 +613,7 @@ sap.ui.define([
             var oData = oContext.getObject();
 
             if (oData.Status === "Damage Claimed") {
-                MessageToast.show("Damage has already been Claimed");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageAlreadyClaimed"));
                 return;
             }
 
@@ -701,9 +701,9 @@ sap.ui.define([
     // Return mode is mandatory
     if (!sReturnMode) {
         oModeInput.setValueState("Error");
-        oModeInput.setValueStateText("Please select return mode");
+        oModeInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("selectReturnMode_97f3"));
 
-        MessageToast.show("Select return mode");
+        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectReturnMode"));
 
         return;
     } else {
@@ -797,7 +797,7 @@ sap.ui.define([
             );
         }
         MessageToast.show(
-            "Damage claimed successfully"
+            this.getView().getModel("i18n").getResourceBundle().getText("damageClaimed")
         );
 
         this._oReturnDialog.close();
@@ -812,7 +812,7 @@ sap.ui.define([
     } catch (e) {
 
         MessageToast.show(
-            e.message || "Failed to claim damage"
+            e.message || this.getView().getModel("i18n").getResourceBundle().getText("failedClaimDamage")
         );
 
     } finally {
@@ -845,7 +845,7 @@ sap.ui.define([
 
             if (!amount || amount < 0 || amount > max) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("1 to " + max);
+                oInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("to", [max]));
                 return false;
             }
 
@@ -910,12 +910,12 @@ sap.ui.define([
                 var oSelected = oTable.getSelectedItems();
 
                 if (!oSelected || oSelected.length === 0) {
-                    MessageToast.show("Please select a damage record");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectDamageRecord"));
                     return;
                 }
 
                 if (oSelected.length > 1) {
-                    MessageToast.show("Select only one row");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectOnlyOne"));
                     return;
                 }
 
@@ -924,7 +924,7 @@ sap.ui.define([
 
                 // ===== Status Check =====
                 if (oData.Status !== "Damage Claimed") {
-                    MessageToast.show("Receipt can be generated only for Damage Claimed status");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("receiptCanGenerated"));
                     return;
                 }
 

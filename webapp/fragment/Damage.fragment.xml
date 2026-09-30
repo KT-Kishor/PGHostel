@@ -30,72 +30,72 @@
             singleContainerFullSize="false">
 			<f:content>
 				<!-- Booking ID -->
-				<Label text="Booking ID" required="true"/>
+				<Label text="{i18n>bookingID}" required="true"/>
 				<ComboBox id="HD_id_BookingID" width="100%" change="onChangeAddCustomer"
                     items="{CustomerModel>/}" showSecondaryValues="true" editable="{DamageModel>/BookingIDEditable}" selectedKey="{DamageModel>/BookingID}" valueStateText="{i18n>bookingIDValueState}">
 					<core:ListItem key="{CustomerModel>BookingID}" text="{CustomerModel>BookingID}"
                 additionalText="{CustomerModel>CustomerName}"/>
 				</ComboBox>
 				<!-- Customer Name -->
-				<Label text="Customer Name" />
+				<Label text="{i18n>customerName}" />
 				<Input id="HR_id_CustomerName"
                     value="{DamageModel>/CustomerName}"
-                    placeholder="Enter customer name" editable="false"
+                    placeholder="{i18n>enterCustomerName}" editable="false"
                 />
                 <!-- Customer Email -->
-                <Label text="Customer Email" />
+                <Label text="{i18n>customerEmail}" />
                 <Input id="HD_id_CustomerEmail"
                     value="{DamageModel>/CustomerEmail}"
-                    placeholder="Enter customer email" editable="false"
+                    placeholder="{i18n>enterCustomerEmail}" editable="false"
                 />
 				<!-- Room Number -->
-				<Label text="Room No" />
+				<Label text="{i18n>roomNo}" />
 				<Input id="HD_id_RoomNo"
                     value="{DamageModel>/RoomNo}"
-                    placeholder="Enter room number" editable="false"
+                    placeholder="{i18n>enterRoomNumber}" editable="false"
                 />
 				<!-- Bed Type Name -->
-				<Label text="Bed Type Name" />
+				<Label text="{i18n>bedTypeName}" />
 				<Input id="HD_id_BedTypeName"
                     value="{DamageModel>/BedTypeName}"
-                    placeholder="Enter bed type" editable="false"
+                    placeholder="{i18n>enterBedType}" editable="false"
                 />
 				<!-- Branch Code -->
-				<Label text="Branch Code" />
+				<Label text="{i18n>branchCode}" />
 				<Input id="HD_id_BranchCode"
                     value="{DamageModel>/BranchCode}"
-                    placeholder="Enter branch code" editable="false"
+                    placeholder="{i18n>enterBranchCode}" editable="false"
                 />
                 <!-- Type  -->
-                <Label text="Type" />
+                <Label text="{i18n>type}" />
                 <ComboBox  id="HD_id_Type" value="{DamageModel>/Type}" change="onchangeType"
-                valueStateText="{i18n>selectType}" placeholder="Select Type">
-                    <core:Item key="Damage" text="Damage"/>
-                    <core:Item key="Missing" text="Missing"/>
+                valueStateText="{i18n>selectType}" placeholder="{i18n>selectType_206c}">
+                    <core:Item key="Damage" text="{i18n>damage}"/>
+                    <core:Item key="Missing" text="{i18n>missing}"/>
                  </ComboBox>
 				<!-- Item Name -->
-				<Label text="Item Name" required="true"/>
+				<Label text="{i18n>ItemName}" required="true"/>
 				<Input id="HD_id_ItemName"
                     value="{DamageModel>/ItemName}"
-                    placeholder="Enter damaged item name" maxLength="50"
+                    placeholder="{i18n>enterDamagedItem}" maxLength="50"
                     valueStateText="{i18n>itemValueState}"
                     liveChange="onLiveChangeItemName"
                 />
 				<!-- Description -->
-				<Label text="Description" required="true"/>
+				<Label text="{i18n>description}" required="true"/>
 				<TextArea id="HD_id_Description"
                     value="{DamageModel>/Description}"
                     rows="2"
                     maxLength="200"
                     width="100%"
-                    placeholder="Enter damage description"
+                    placeholder="{i18n>enterDamageDescription}"
                     valueStateText="{i18n>descriptionValueState}" liveChange="onLiveChangeDescription"
                 />
 				<!-- Cost -->
-				<Label text="Cost" required="true"/>
+				<Label text="{i18n>cost}" required="true"/>
 				<Input id="HD_id_Cost"
                     value="{DamageModel>/Cost}" maxLength="10"
-                    placeholder="Enter estimated cost"
+                    placeholder="{i18n>enterEstimatedCost}"
                     valueStateText="{i18n>costValueState}"
                     width="100%" liveChange="onLiveChangeCost"
                 />
@@ -103,7 +103,7 @@
                 <Label text="{i18n>currency}"/>
                 <Input id="HD_id_Currency" value="{DamageModel>/Currency}" editable="false"></Input>
 				<!-- Date -->
-				<Label text="Date" required="true"/>
+				<Label text="{i18n>date}" required="true"/>
 				<DatePicker id="HD_id_DamageDate"
                     value="{DamageModel>/Date}"
                     displayFormat="dd/MM/yyyy"
@@ -112,7 +112,7 @@
                     width="100%" change="onChangeDamageDate"
                 />
 				<!-- Status -->
-				<Label text="Status"/>
+				<Label text="{i18n>status}"/>
                 <Input value="{DamageModel>/Status}" editable="false" id="HD_id_Status"></Input>
 			</f:content>
 		</f:SimpleForm>

@@ -73,11 +73,11 @@
                                 showClearIcon="true">
                                 <core:ListItem
                                     key="Damage Raised"
-                                    text="Damage Raised"
+                                    text="{i18n>damageRaised}"
                                 />
 								  <core:ListItem
                                     key="Damage Claimed"
-                                    text="Damage Claimed"
+                                    text="{i18n>damageClaimed_fe51}"
                                 />
 							</ComboBox>
 						</fb:control>
@@ -95,8 +95,8 @@
 						<Title text="{i18n>damagelist} ({= ${Damage>/}.length})"/>
 						<ToolbarSpacer />
 						<Button
-                            text="Create Damage"
-                            tooltip="Create Damage"
+                            text="{i18n>createDamage_a4cb}"
+                            tooltip="{i18n>createDamage_a4cb}"
                             press="HM_GenearteDamage"
                             class="myUnifiedBtn"
                              />
@@ -128,7 +128,7 @@
 					</Column>
 					
 					<Column minScreenWidth="Tablet" demandPopin="true">
-						<Text text="Total Cost" tooltip="Total Cost"/>
+						<Text text="{i18n>totalcost}" tooltip="{i18n>totalcost}"/>
 					</Column>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Text text="{i18n>recovercost}" tooltip="{i18n>recovercost}"/>

@@ -43,7 +43,7 @@
                                 items="{BranchModel>/}"
                                 showClearIcon="true"
                                 filterSecondaryValues="true"
-                                placeholder="Select Branch ID / Name"
+                                placeholder="{i18n>selectBranchId}"
                                 showSecondaryValues="true"
                             >
                                 <core:ListItem
@@ -65,7 +65,7 @@
                                 id="P_id_BookingID"
                                 filterSecondaryValues="true"
                                 showSecondaryValues="true"
-                                placeholder="Select Booking ID / Customer Name"
+                                placeholder="{i18n>selectBookingId}"
                                 items="{path:'BookingFilterModel>/', sorter:{path:'BookingID', descending:false}}"
                                 showClearIcon="true"
                             >
