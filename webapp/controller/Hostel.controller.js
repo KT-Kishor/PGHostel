@@ -434,7 +434,7 @@ sap.ui.define([
             otpCtrl?.setEnabled(false);
             otpCtrl?.setValueState("None");
 
-            MessageToast.show("OTP expired. Please resend OTP.");
+            MessageToast.show(this.i18nModel.getText("expiredPleaseresendOTP"));
         },
 
         onUserlivechange: function (oEvent) {
@@ -1537,13 +1537,17 @@ sap.ui.define([
 
                 const sUsername = data.fullname.trim();
                 const Salutation = C("signUpSalutation").getSelectedItem().getText();
-                const sSuccessMsg = "Thank you " + Salutation + " " + sUsername + ", for registration.\n\n" +
-                    "Your account has been created successfully";
+             
 
+
+const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
+    Salutation,
+    sUsername
+]);
                 const sPassword = data.password;
                 const oCtrl = this; // 👈 REQUIRED
                 MessageBox.success(sSuccessMsg, {
-                    title: "Success",
+                    title: this.i18nModel.getText("success"),
                     contentWidth: "500px",
                     styleClass: "myUnifiedBtn",
                     onClose: () => {
@@ -1605,7 +1609,7 @@ sap.ui.define([
                     })();
 
                 MessageBox.error(sMsg, {
-                    title: "Registration Failed"
+                    title: this.i18nModel.getText("RegistrationFailed")
                 });
             } finally {
                 this.closeBusyDialog();
@@ -3104,8 +3108,8 @@ sap.ui.define([
                     filters: oFilters
                 });
 
-                MessageBox.success("Password updated successfully", {
-                    title: "Success",
+                MessageBox.success(this.i18nModel.getText("Passwordupdatedsuccessfully"), {
+                    title: this.i18nModel.getText("success"),
                     styleClass: "myUnifiedBtn",
                     onClose: () => {
                         // fully clean values
@@ -3495,7 +3499,7 @@ sap.ui.define([
 
             if (file.size > iMaxSizeBytes) {
                 if (typeof imageCompression === "undefined") {
-                    MessageToast.show("Compression library not available.");
+                    MessageToast.show(this.i18nModel.getText("Compressionlibrarynotavailable"));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -3517,7 +3521,7 @@ sap.ui.define([
                 }
 
                 if (processedFile.size > iMaxSizeBytes) {
-                    MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                    MessageToast.show(this.i18nModel.getText("fileCompressionFailed", [file.name]));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -4406,25 +4410,28 @@ sap.ui.define([
                 const sSalutation = $C("adminSalutation")?.getSelectedItem()?.getText() || "";
                 // console.log(sUsername, sSalutation);
 
-                MessageBox.success(
-                    "Thank you " + sSalutation + " " + sUsername + ", for signing up.\n\n" +
-                    "The team will review all submitted details and documents.\n\n" +
-                    "Once verification is finished, an email will be shared along with the user credentials.\n\n" +
-                    "Please check your inbox (or spam folder) for further updates.",
-                    {
-                        title: "Registration Submitted Successfully",
-                        contentWidth: "500px",
-                        emphasizedAction: MessageBox.Action.OK,
-                        styleClass: "myUnifiedBtn",
-                        onClose: () => {
-                            this._oAdminSignup.close();
-                        }
-                    }
-                );
+
+const sSuccessMsg = this.i18nModel.getText("registrationSubmittedMessage", [
+    sSalutation,
+    sUsername
+]);
+
+MessageBox.success(
+    sSuccessMsg,
+    {
+        title: oBundle.getText("registrationSubmittedTitle"),
+        contentWidth: "500px",
+        emphasizedAction: MessageBox.Action.OK,
+        styleClass: "myUnifiedBtn",
+        onClose: () => {
+            this._oAdminSignup.close();
+        }
+    }
+);
 
             } catch (err) {
                 console.error("Admin signup error:", err);
-                let sErrorMessage = "Registration failed. Please try again later.";
+                let sErrorMessage = this.i18nModel.getText("RegistrationfailedPleasetryagainlater");
 
                 if (err?.responseJSON?.message) {
                     sErrorMessage = err.responseJSON.message;
@@ -4448,7 +4455,7 @@ sap.ui.define([
                 }
 
                 MessageBox.error(sErrorMessage, {
-                    title: "Registration Failed"
+                    title:this.i18nModel.getText("RegistrationFailed")
                 });
 
             } finally {

@@ -32,7 +32,7 @@
                 <fb:filterGroupItems>
                     <fb:FilterGroupItem
                         name="Name"
-                        label="Branch Name"
+                        label="{i18n>BranchName}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -40,7 +40,7 @@
                             <MultiComboBox
                                 id="id_DD_branch"
                                 items="{branchModel>/}"
-                                placeholder="select branch"
+                                placeholder="{i18n>selectbranch}"
                                 showSecondaryValues="true"
                                 width="100%"
                             >
@@ -95,7 +95,7 @@
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="Damaged Items"
+                                text="{i18n>DamagedItems}"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -180,7 +180,7 @@
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="Current Month Daily Damages"
+                                text="{i18n>CurrentMonthDailyDamages}"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -271,7 +271,7 @@
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="Damage Status"
+                                text="{i18n>DamageStatus}"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"
@@ -373,7 +373,7 @@
                     <f:header>
                         <Toolbar class="customdashboard">
                             <Title
-                                text="Damage Type"
+                                text="{i18n>DamageType}"
                                 level="H5"
                                 wrapping="true"
                                 class="Dashboardtitle"

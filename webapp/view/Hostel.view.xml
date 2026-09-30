@@ -233,14 +233,14 @@
                                                             </fb:FilterGroupItem>
                                                             <fb:FilterGroupItem
                                                                 name="Property Name"
-                                                                label="Property Name"
+                                                                label="{i18n>sheetBranchName}"
                                                                 groupName="Group1"
                                                                 visibleInFilterBar="true"
                                                             >
                                                                 <fb:control>
                                                                     <ComboBox
                                                                         id="id_Roomtype"
-                                                                        placeholder="Select branch name"
+                                                                        placeholder="{i18n>SelectBranchname}"
                                                                         showClearIcon="true"
                                                                         busyIndicatorDelay="0"
                                                                         items="{AreaModel>/}"
@@ -399,8 +399,8 @@
                                                                         alignItems="Center"
                                                                     >
                                                                         <Link
-                                                                            text="View Rooms"
-                                                                            tooltip="View Rooms"
+                                                                            text="{i18n>ViewRooms}"
+                                                                            tooltip="{i18n>ViewRooms}"
                                                                             press="viewRooms"
                                                                             class="btnViewDetails"
                                                                         />

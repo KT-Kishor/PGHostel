@@ -19,23 +19,23 @@
 				<!-- Filter Bar -->
 				<fb:FilterBar id="CD_FilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange"   showFilterConfiguration="false" class="filterBarTheme">
 					<fb:filterGroupItems>
-						<fb:FilterGroupItem name="Branch" label="Branch" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Branch" label="{i18n>branch}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<MultiComboBox id="CD_branchFilter" width="400px" placeholder="Select Branch" items="{path: 'Branchmodel>/'}" selectionChange="onBranchChange">
+								<MultiComboBox id="CD_branchFilter" width="400px" placeholder="{i18n>selectbranch}" items="{path: 'Branchmodel>/'}" selectionChange="onBranchChange">
 									<items>
 										<core:Item key="{Branchmodel>BranchID}" text="{Branchmodel>Name}" />
 									</items>
 								</MultiComboBox>
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="ComplainDate" label="Date Range" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="ComplainDate" label="{i18n>DateRange}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
 								<DateRangeSelection id="CD_complain_Date" valueFormat="dd/MM/yyyy" displayFormat="dd/MM/yyyy" change="onFilterChange" />
 							</fb:control>
 						</fb:FilterGroupItem>
 
 						<fb:FilterGroupItem name="Complainpermonth"
-    label="Daily Complain date"
+    label="{i18n>DailyComplaindate}"
     groupName="Group1"
     visibleInFilterBar="true">
 
@@ -48,9 +48,9 @@
     </fb:control>
 
 </fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Staff" label="Assigned Staff" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Staff" label="{i18n>AssignedStaff}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="Select Assigned Staff"  items="{path: 'AssignedStaffModel>/'}">
+							<ComboBox id="CD_assignedStaffFilter" width="400px" placeholder="{i18n>SelectAssignedStaff}"  items="{path: 'AssignedStaffModel>/'}">
 									<items>
 										<core:Item key="{AssignedStaffModel>AssignedBy}" text="{AssignedStaffModel>AssignedBy}" />
 									</items>
@@ -59,7 +59,7 @@
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<ComboBox id="CD_statusFilter" width="400px" placeholder="Select Status" >
+								<ComboBox id="CD_statusFilter" width="400px" placeholder="{i18n>SelectStatus}" >
 									<items>
 										<core:Item key="Open" text="Open" />
 										<core:Item key="In Progress" text="In Progress" />
@@ -77,7 +77,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-                                <Title text="Complain Status Distribution" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
+                                <Title text="{i18n>ComplainStatusDistribution}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
 									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart" />
 									<!-- <Button icon="sap-icon://bar-chart" press="	" tooltip="Bar Chart" /> -->
@@ -123,7 +123,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Current Month Complain Trend" level="H5"
+									<Title text="{i18n>CurrentMonthComplainTrend}" level="H5"
 									
                                   wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
@@ -195,7 +195,7 @@ selectData="onTotalInvoiceValueSelect">
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Daily Complain Trend" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<Title text="{i18n>DailyComplainTrend}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<!-- <Button icon="sap-icon://vertical-bar-chart" press="IN_onPressDailyPie" tooltip="Vertical Chart" /> -->
 									<Button icon="sap-icon://bar-chart" press="IN_onPressDailyBar" tooltip="Bar Chart" />
@@ -255,7 +255,7 @@ selectData="onDailyComplainSelect">
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Total Complain Trend" 
+									<Title text="{i18n>TotalComplainTrend}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart" />

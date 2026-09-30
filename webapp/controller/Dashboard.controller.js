@@ -27,7 +27,7 @@ sap.ui.define([
                 this.byId("D_id_year").setValue(String(iYear));
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin) {
-                    return MessageToast.show("Login data not found");
+                    return MessageToast.show(this.i18nModel.getText("Logindatanotfound"));
                 }
                 if (oLogin.Role === "SuperAdmin") {
                     this._aUserBranches = ["ALL"];
@@ -36,7 +36,7 @@ sap.ui.define([
                     this._aUserBranches = oLogin.BranchCode.split(",").map(b => b.trim());
                 }
                 else {
-                    return MessageToast.show("Login branch not found");
+                    return MessageToast.show(this.i18nModel.getText("Logindatanotfound"));
                 }
                 await this._loadCustomers();
                 await this._loadUserBranches();
@@ -597,12 +597,12 @@ sap.ui.define([
                         this._aUserBranches.includes(b)
                     );
                     if (aBranchesToUse.length === 0) {
-                        MessageToast.show("Unauthorized branch selected");
+                        MessageToast.show(this.i18nModel.getText("Unauthorizedbranchselected"));
                         return;
                     }
                 }
                 if (!aBranchesToUse.length) {
-                    MessageToast.show("No authorized branches found");
+                    MessageToast.show(this.i18nModel.getText("Noauthorizedbranchesfound"));
                     return;
                 }
                 const sYear = this.byId("D_id_year").getValue();

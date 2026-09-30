@@ -22,7 +22,7 @@ sap.ui.define([
                 this._ViewDatePickersReadOnly(["id_DD_year", "id_DD_Date"], this.getView());
                 const oLogin = this.getOwnerComponent().getModel("LoginModel")?.getData();
                 if (!oLogin) {
-                    return MessageToast.show("Login data not found");
+                    return MessageToast.show(this.i18nModel.getText("Logindatanotfound"));
                 }
                 if (oLogin.Role === "SuperAdmin") {
                     this._aUserBranches = ["ALL"];
@@ -31,7 +31,7 @@ sap.ui.define([
                     this._aUserBranches = oLogin.BranchCode.split(",").map(b => b.trim());
                 }
                 else {
-                    return MessageToast.show("Login branch not found");
+                    return MessageToast.show(this.i18nModel.getText("Logindatanotfound"));
                 }
                 await this._loadUserBranches();
                 this._setDefaultDates();
@@ -83,7 +83,7 @@ sap.ui.define([
                             this._aUserBranches.includes(b)
                         );
                     if (aBranchesToUse.length === 0) {
-                        sap.m.MessageToast.show("Unauthorized branch selected");
+                        sap.m.MessageToast.show(this.i18nModel.getText("Unauthorizedbranchselected"));
                         return;
                     }
                 }
@@ -152,7 +152,7 @@ sap.ui.define([
                 this.closeBusyDialog()
             } catch (err) {
                 this.closeBusyDialog()
-                sap.m.MessageToast.show("Dashboard load failed");
+                sap.m.MessageToast.show(this.i18nModel.getText("Dashboardloadfailed"));
             } finally {
                 this.closeBusyDialog()
             }

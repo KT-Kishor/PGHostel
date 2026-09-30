@@ -54,12 +54,12 @@
                     class="sapUiSmallMarginTop"
                 >
                     <Title
-                        text="Booking Dashboard"
+                        text="{i18n>bookingDashboard}"
                         level="H3"
                     />
 
                     <Button
-                        text="Filters"
+                        text="{i18n>Filters}"
                         class="myUnifiedBtn"
                         icon="sap-icon://filter"
                         press="onClickFilterBar"
@@ -80,7 +80,7 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="Name"
-                            label="Branch Name"
+                            label="{i18n>BranchName}"
                             groupName="Group"
                             visibleInFilterBar="true"
                         >
@@ -88,7 +88,7 @@
                                 <MultiComboBox
                                     id="D_id_BranchCode"
                                     items="{branchModel>/}"
-                                    placeholder="select branch"
+                                    placeholder="{i18n>selectbranch}"
                                     showSecondaryValues="true"
                                     width="100%"
                                 >

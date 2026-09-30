@@ -54,7 +54,7 @@
                 press="onSupportRequest"
                 tooltip="{i18n>requestSupport}"
                 icon="sap-icon://headset"
-                text="Request Support"
+                text="{i18n>RequestSupport}"
                 class="contact-support-btn contact-support-btn-style myUnifiedBtn"
                 visible="false"
             />
