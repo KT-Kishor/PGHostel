@@ -75,11 +75,11 @@
                                             selectedKey="{AdminSignupModel>/Salutation}"
                                             editable="{editable>/Edit}"
                                             change="onAdminChangeSalutation"
-                                            placeholder="{i18n>mr_1a3d}"
+                                            placeholder="{i18n>mr_}"
                                             valueStateText="{i18n>MVDsalutation}"
                                         >
                                             <core:Item key="" text="{i18n>selectGender_6159}"/>
-											<core:ListItem key="Mr." text="{i18n>mr_1a3d}"/>
+											<core:ListItem key="Mr." text="{i18n>mr_}"/>
 											<core:ListItem key="Ms." text="{i18n>ms}"/>
 											<core:ListItem key="Mrs." text="{i18n>mrs}"/>
 											<core:ListItem key="Dr." text="{i18n>dr}"/>

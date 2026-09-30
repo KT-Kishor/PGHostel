@@ -60,13 +60,13 @@
                                             selectedKey="{AdminSignupModel>/Salutation}"
                                             editable="{editable>/Edit}"
                                             change="onAdminChangeSalutation"
-                                            placeholder="Mr."
+                                            placeholder="{i18n>mr_}"
                                             valueStateText="{i18n>MVDsalutation}">
-                                            <core:Item key="" text="Select Gender"/>
-											<core:ListItem key="Mr." text="Mr."/>
-											<core:ListItem key="Ms." text="Ms."/>
-											<core:ListItem key="Mrs." text="Mrs."/>
-											<core:ListItem key="Dr." text="Dr."/>
+                                            <core:Item key="" text="{i18n>selectGender_6159}"/>
+											<core:ListItem key="Mr." text="{i18n>mr_}"/>
+											<core:ListItem key="Ms." text="{i18n>ms}"/>
+											<core:ListItem key="Mrs." text="{i18n>mrs}"/>
+											<core:ListItem key="Dr." text="{i18n>dr}"/>
 										</m:ComboBox>
 										<m:Input
                                             value="{AdminSignupModel>/VendorName}"
@@ -104,15 +104,15 @@
                                         >
 											<core:Item
                                                 key="Male"
-                                                text="Male"
+                                                text="{i18n>male}"
                                             />
 											<core:Item
                                                 key="Female"
-                                                text="Female"
+                                                text="{i18n>female}"
                                             />
 											<core:Item
                                                 key="Other"
-                                                text="Other"
+                                                text="{i18n>other}"
                                             />
 										</m:Select>
 										<m:Label
@@ -215,7 +215,7 @@
 										<m:ComboBox
                                             selectedKey="{AdminSignupModel>/STDCode}"
                                             change="ADMIN_onChangeSTD"
-                                            placeholder="ISD"
+                                            placeholder="{i18n>iSD}"
                                             showSecondaryValues="true"
                                             valueStateText="{i18n>MSselectCode}"
                                             width="100%"

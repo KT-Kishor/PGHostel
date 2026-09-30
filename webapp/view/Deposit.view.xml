@@ -150,7 +150,7 @@
                                 id="DfStatus"
                                 width="100%"
                                 placeholder="{i18n>selectStatus}"
-                                valueStateText="Select status"
+                                valueStateText="{i18n>selectStatus}"
                             >
                                 <core:Item
                                     key=""
