@@ -2647,7 +2647,7 @@ sap.ui.define([
 
                 const isValid = isMandatoryValid && isCurrencyValid;
                 if (!this.ResivedAmount) {
-                    MessageToast.show(this.i18nModel.getText("Receiving amount cannot exceed the due amount"));
+                    MessageToast.show(this.i18nModel.getText("receivingAmountCannot"));
                     return;
                 }
                 if (!isValid) {

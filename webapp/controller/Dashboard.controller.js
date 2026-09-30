@@ -66,7 +66,7 @@ sap.ui.define([
                 // sap.ui.core.BusyIndicator.hide();
                 this.closeBusyDialog();
             } catch (err) {
-                MessageToast.show(this.i18nModel.getText("Failed to load dashboard data"));
+                MessageToast.show(this.i18nModel.getText("failedLoadDashboard"));
                 // sap.ui.core.BusyIndicator.hide();
                 // this.closeBusyDialog();
             }

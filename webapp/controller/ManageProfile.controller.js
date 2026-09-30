@@ -2290,7 +2290,7 @@ sap.ui.define([
                 this._existingFileData = null;
                 sap.m.MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
             }).catch(() => {
-                sap.m.MessageToast.show(this.i18nModel.getText("Error Uploading Documents"));
+                sap.m.MessageToast.show(this.i18nModel.getText("errorUploadingDocuments"));
             });
         },
 

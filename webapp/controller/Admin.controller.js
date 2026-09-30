@@ -583,7 +583,7 @@ this.getView().getModel("BedModel").setData(uniqueData);
 
             if (oStartDate.getTime() > oToday.getTime() && this.data.Status === "Confirmed") {
                 sap.m.MessageBox.show(
-                    this.i18nModel.getText("Room cannot be assigned for a future date"),
+                    this.i18nModel.getText("roomCannotAssigned"),
                     {
                         icon: sap.m.MessageBox.Icon.Information,
                         title: this.i18nModel.getText("Information"),

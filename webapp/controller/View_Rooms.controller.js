@@ -1470,7 +1470,7 @@ sap.ui.define([
                 sap.ui.getCore().setModel(oUserModel, "LoginModel");
                 this.getOwnerComponent().getModel("UIModel").setProperty("/isLoggedIn", true);
 
-                MessageToast.show(this.i18nModel.getText("Login Successful"));
+                MessageToast.show(this.i18nModel.getText("loginSuccessful_"));
 
                 // Reset login fields
                 $C("signInEmail").setValue("");
