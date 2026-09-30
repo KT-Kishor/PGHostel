@@ -54,7 +54,7 @@
                                 >
                                     <f:content>
                                         <m:Label
-                                            text="Booking ID"
+                                            text="{i18n>bookingID}"
                                             required="true"
                                         />
                                         <m:ComboBox
@@ -73,43 +73,43 @@
                                             />
                                         </m:ComboBox>
                                         <!-- Customer Name -->
-                                        <m:Label text="Customer Name" />
+                                        <m:Label text="{i18n>customerName}" />
                                         <m:Input
                                             id="HR_id_CustomerName1"
                                             value="{DamageModel>/CustomerName}"
-                                            placeholder="Enter customer name"
+                                            placeholder="{i18n>enterCustomerName}"
                                             editable="false"
                                         />
                                         <!-- Customer Email -->
-                                        <m:Label text="Customer Email" />
+                                        <m:Label text="{i18n>customerEmail}" />
                                         <m:Input
                                             id="HD_id_CustomerEmail1"
                                             value="{DamageModel>/CustomerEmail}"
-                                            placeholder="Enter customer email"
+                                            placeholder="{i18n>enterCustomerEmail}"
                                             editable="false"
                                         />
                                         <!-- Room Number -->
-                                        <m:Label text="Room No" />
+                                        <m:Label text="{i18n>roomNo}" />
                                         <m:Input
                                             id="HD_id_RoomNo1"
                                             value="{DamageModel>/RoomNo}"
-                                            placeholder="Enter room number"
+                                            placeholder="{i18n>enterRoomNumber}"
                                             editable="false"
                                         />
                                         <!-- Bed Type Name -->
-                                        <m:Label text="Bed Type Name" />
+                                        <m:Label text="{i18n>bedTypeName}" />
                                         <m:Input
                                             id="HD_id_BedTypeName1"
                                             value="{DamageModel>/BedTypeName}"
-                                            placeholder="Enter bed type"
+                                            placeholder="{i18n>enterBedType}"
                                             editable="false"
                                         />
                                         <!-- Branch Code -->
-                                        <m:Label text="Branch Code" />
+                                        <m:Label text="{i18n>branchCode}" />
                                         <m:Input
                                             id="HD_id_BranchCode1"
                                             value="{DamageModel>/BranchCode}"
-                                            placeholder="Enter branch code"
+                                            placeholder="{i18n>enterBranchCode}"
                                             editable="false"
                                         />
                                         <m:Label text="{i18n>currency}" />
@@ -120,7 +120,7 @@
                                         />
                                         <!-- Date -->
                                         <m:Label
-                                            text="Date"
+                                            text="{i18n>date}"
                                             required="true"
                                         />
                                         <m:DatePicker
@@ -136,7 +136,7 @@
 
                                         />
                                         <!-- Status -->
-                                        <m:Label text="Status" />
+                                        <m:Label text="{i18n>status}" />
                                         <m:Input
                                             value="{DamageModel>/Status}"
                                             editable="false"
@@ -162,16 +162,16 @@
                                                 <m:Title text="{i18n>InvoiceItemDetails} ({= ${ManageInvoiceItemModel>/ManageInvoiceItem}.length })" />
                                                 <m:ToolbarSpacer />
                                                 <m:Button
-                                                    text="Add"
-                                                    tooltip="Add"
+                                                    text="{i18n>MSadd}"
+                                                    tooltip="{i18n>MSadd}"
                                                     class="myUnifiedBtn"
                                                     press="DM_onPressAddDamageItems"
                                                     visible="{VisibleModel>/visible}"
 
                                                 />
                                                 <m:Button
-                                                    text="Delete"
-                                                    tooltip="Delete"
+                                                    text="{i18n>MSdelete}"
+                                                    tooltip="{i18n>MSdelete}"
                                                     class="myUnifiedBtn"
                                                     press="DM_onPressDelete"
                                                     visible="{VisibleModel>/visible}"
@@ -190,8 +190,8 @@
                                             </m:Column>
                                             <m:Column minScreenWidth="Tablet">
                                                 <m:Text
-                                                    text="Item Name"
-                                                    tooltip="Item Name"
+                                                    text="{i18n>ItemName}"
+                                                    tooltip="{i18n>ItemName}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -199,8 +199,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="Type"
-                                                    tooltip="Type"
+                                                    text="{i18n>type}"
+                                                    tooltip="{i18n>type}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -208,8 +208,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="Quantity"
-                                                    tooltip="Quantity"
+                                                    text="{i18n>quantity}"
+                                                    tooltip="{i18n>quantity}"
                                                 />
                                             </m:Column>
                                            
@@ -227,8 +227,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="Total Cost"
-                                                    tooltip="Total Cost"
+                                                    text="{i18n>totalcost}"
+                                                    tooltip="{i18n>totalcost}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -246,8 +246,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="Description"
-                                                    tooltip="Description"
+                                                    text="{i18n>description}"
+                                                    tooltip="{i18n>description}"
                                                 />
                                             </m:Column>
                                         </m:columns>
@@ -270,11 +270,11 @@
                                                     <m:ComboBox selectedKey="{DamageModel>Type}"  editable="{VisibleModel>/visible}">
                                                         <core:Item
                                                             key="Damage"
-                                                            text="Damage"
+                                                            text="{i18n>damage}"
                                                         />
                                                         <core:Item
                                                             key="Missing"
-                                                            text="Missing"
+                                                            text="{i18n>missing}"
                                                         />
                                                     </m:ComboBox>
                                                 </m:cells>
@@ -326,7 +326,7 @@
                                             <!-- Sub Total (Non-Taxable) -->
                                             <m:HBox justifyContent="SpaceBetween">
                                                 <m:Label
-                                                    text="Total Cost :"
+                                                    text="{i18n>totalCost_1c2a}"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
@@ -348,7 +348,7 @@
                                             <!-- Sub Total (Non-Taxable) -->
                                             <m:HBox justifyContent="SpaceBetween">
                                                 <m:Label
-                                                    text="Paid Amount :"
+                                                    text="{i18n>paidAmount_8cad}"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
@@ -370,7 +370,7 @@
                                             <!-- Sub Total (Non-Taxable) -->
                                             <m:HBox justifyContent="SpaceBetween">
                                                 <m:Label
-                                                    text="Due Amount :"
+                                                    text="{i18n>dueAmount}"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
@@ -428,13 +428,13 @@
                     />
                     <m:Button
                     id="idEditButton"
-                        text="Edit"
+                        text="{i18n>MSedit}"
                         press="DM_onPressEdit"
                         class="sendMail myUnifiedBtn"
                           visible="{= !${VisibleModel>/visible} }"
                     />
                     <m:Button
-                        text="Generate PDF"
+                        text="{i18n>GeneratePDF}"
                         press="DM_onPressGeneratePDF"
                         class="sendMail myUnifiedBtn"
                         visible="{= !${VisibleModel>/visible} }"

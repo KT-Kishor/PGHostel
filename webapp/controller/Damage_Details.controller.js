@@ -178,7 +178,7 @@ sap.ui.define([
             if (aSelectedItems.length === 0) {
 
                 sap.m.MessageToast.show(
-                    "Please select at least one item"
+                    this.getView().getModel("i18n").getResourceBundle().getText("selectLeastOne")
                 );
 
                 return;
@@ -315,7 +315,7 @@ sap.ui.define([
 
 
                     sap.m.MessageToast.show(
-                        "Selected Item(s) Deleted"
+                        that.getView().getModel("i18n").getResourceBundle().getText("selectedItemS")
                     );
 
 
@@ -328,7 +328,7 @@ sap.ui.define([
                     console.error(err);
 
                     sap.m.MessageToast.show(
-                        "Error while deleting"
+                        that.getView().getModel("i18n").getResourceBundle().getText("errorWhileDeleting")
                     );
                 }
             };
@@ -341,9 +341,9 @@ sap.ui.define([
             if (hasSavedItem) {
 
                 sap.m.MessageBox.confirm(
-                    "Are you sure you want to delete selected item(s)?",
+                    this.getView().getModel("i18n").getResourceBundle().getText("sureDeleteSelected_66c8"),
                     {
-                        title: "Confirm Deletion",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("msgBoxConfirm"),
 
                         styleClass: "myUnifiedBtn",
 
@@ -515,11 +515,11 @@ _calculateTotalCost: function (oInput) {
                 oInput.setValueState("Error");
 
                 oInput.setValueStateText(
-                    "Recover amount cannot be greater than Cost"
+                    this.getView().getModel("i18n").getResourceBundle().getText("recoverAmountCannot")
                 );
 
                 MessageToast.show(
-                    "Recover amount cannot be greater than Cost"
+                    this.getView().getModel("i18n").getResourceBundle().getText("recoverAmountCannot")
                 );
 
                 // Clear invalid value
@@ -612,7 +612,7 @@ _calculateTotalCost: function (oInput) {
                 }
             }
             if (oData.Items.length === 0) {
-                sap.m.MessageBox.error("Please add at least one damage item",
+                sap.m.MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("addLeastOne"),
                     {
                         styleClass: "myUnifiedBtn"
                     }
@@ -644,8 +644,7 @@ _calculateTotalCost: function (oInput) {
                         if (oCell.getValueState() === sap.ui.core.ValueState.Error) {
 
                             sap.m.MessageBox.error(
-                                "Row " + (j + 1) +
-                                " : Recover amount cannot be greater than Cost",
+                                this.getView().getModel("i18n").getResourceBundle().getText("rowRecoverAmount", [j + 1]),
                                 {
                                     styleClass: "myUnifiedBtn"
                                 }
@@ -684,8 +683,7 @@ _calculateTotalCost: function (oInput) {
                 // If any field missing → show one message and stop
                 if (aMissingFields.length > 0) {
                     sap.m.MessageBox.error(
-                        "Row " + (i + 1) + " : Please fill required field(s): " +
-                        aMissingFields.join(", "),
+                        this.getView().getModel("i18n").getResourceBundle().getText("rowFillRequired", [i + 1, aMissingFields.join(", ")]),
                         {
                             styleClass: "myUnifiedBtn"
                         }
@@ -768,14 +766,14 @@ _calculateTotalCost: function (oInput) {
                 this.ajaxUpdateWithJQuery("HM_Damage", Payload)
                     .then(() => {
                         this.closeBusyDialog()
-                        sap.m.MessageToast.show("Damage Updated Successfully");
+                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageUpdated"));
                         this.OnSearch();
                         this.getView().getModel("VisibleModel")
                             .setProperty("/visible", false);
                     })
                     .catch(err => {
                         this.closeBusyDialog()
-                        sap.m.MessageToast.show("Error while updating");
+                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorWhileUpdating_ab30"));
                         console.error(err);
                     });
 
@@ -788,12 +786,12 @@ _calculateTotalCost: function (oInput) {
                         this.getView().getModel("VisibleModel").setProperty("/visible", false);
                         this.getView().byId("HD_id_BookingID1").setEditable(false);
                         sap.m.MessageBox.confirm(
-                            "Damage Created Successfully",
+                            this.getView().getModel("i18n").getResourceBundle().getText("damageCreated"),
                             {
-                                title: "Confirmation",
+                                title: this.getView().getModel("i18n").getResourceBundle().getText("confirmation_8552"),
                                 actions: [
                                     sap.m.MessageBox.Action.OK,
-                                    "GeneratePDF"
+                                    this.getView().getModel("i18n").getResourceBundle().getText("generatepdf")
                                 ],
                                 // emphasizedAction: sap.m.MessageBox.Action.OK,
                                 styleClass: "myUnifiedBtn",
@@ -813,7 +811,7 @@ _calculateTotalCost: function (oInput) {
                     })
                     .catch(err => {
                         this.closeBusyDialog()
-                        sap.m.MessageToast.show("Error while saving");
+                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorWhileSaving"));
                         console.error(err);
                     });
             }
