@@ -265,7 +265,7 @@ sap.ui.define([
     if (!this.RD_Dialog) {
         this.RD_Dialog = sap.ui.xmlfragment(
             oView.getId(),
-            "sap.ui.com.project1.fragment.Activeinactive",
+            "sap.ui.com.project1.fragment.ActiveInactive",
             this
         );
 
@@ -325,7 +325,6 @@ var oBody = {
 
         this.getBusyDialog()
         await this.ajaxUpdateWithJQuery("HM_Rooms",oBody);
-        this.closeBusyDialog()
 
         sap.m.MessageToast.show(
             "Room status updated successfully"
@@ -338,6 +337,7 @@ var oBody = {
         this.getView()
             .getModel("RoomDetailsModel")
             .refresh(true);
+         await this.Onsearch("true");
 
         this.aSelectedRooms = [];
 

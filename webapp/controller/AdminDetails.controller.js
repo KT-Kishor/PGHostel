@@ -259,7 +259,7 @@ onChekout: function () {
     var data = this.getView().getModel("CustomerData").getData();
 
     sap.m.MessageBox.confirm(
-        "Please verify that all invoices and payments are completed correctly before proceeding with checkout. Do you want to continue?",
+       this.i18nModel.getText("VerfifyCheckout"),
         {
             actions: [
                 sap.m.MessageBox.Action.OK,
@@ -1482,7 +1482,7 @@ onChekout: function () {
             sap.ui.getCore().byId("editStartDate").setMinDate(new Date(Bookingstartdate))
 
             if (sEndDate &&sStartDate && sEndDate <= sStartDate && (sUnit !== "Per Month" && sUnit !== "Per Year" && sUnit !== "monthly" && sUnit !== "yearly")) {
-                    sap.m.MessageToast.show("Please select a valid date");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectavaliddate"));
                     oModel.setProperty("/EndDate", "");
                     if (sUnit === "Unit Price") {
                         oModel.setProperty("/UnitText", sUnit);
@@ -1571,7 +1571,7 @@ oEnd = new Date(targetYear, targetMonth, endDay);
                
                 if (sStartDate !== "" && sEndDate !== "") {
                 if (sEndDate < sStartDate && (sUnit === "Per Month" || sUnit === "Per Year" || sUnit === "monthly" || sUnit === "yearly")) {
-                    sap.m.MessageToast.show("Please select a valid date");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectavaliddate"));
                     oModel.setProperty("/EndDate", "");
                     if (sUnit === "Unit Price") {
                         oModel.setProperty("/UnitText", sUnit);
@@ -1715,7 +1715,7 @@ oEnd = new Date(targetYear, targetMonth, endDay);
 
                 oCoupon.MinOrderValue = Number(oCoupon.MinOrderValue)
                 if (oCoupon.MinOrderValue > subtotal) {
-                    sap.m.MessageToast.show("Coupon not Applicable for Below Minimum Value" + ' ' + oCoupon.MinOrderValue);
+                    sap.m.MessageToast.show(this.i18nModel.getText("couponNotApplicable", [oCoupon.MinOrderValue]));
                     return;
                 }
             }
@@ -1842,9 +1842,7 @@ var isSelectedLastDay = (selectedStartDay === selectedLastDay);
 var isValidDay = (selectedStartDay === bookingStartDay) || (isBookingLastDay && isSelectedLastDay);
 
 if (!isValidDay) {
-    sap.m.MessageToast.show(
-        "Please select the monthly start date based on the booking start date."
-    );
+    sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectthemonthlystartdatebasedonthebookingstartdate"));
     return;
 }
             }
@@ -2456,7 +2454,7 @@ if (!isValidDay) {
 
  
 
-    MessageBox.error("This booking dates have fully booked, Please select another date.");
+    MessageBox.error(this.i18nModel.getText("Bookingfull"));
      this.Date=false
      this.closeBusyDialog()
     return;
@@ -2581,7 +2579,7 @@ oEnd = new Date(targetYear, targetMonth, endDay);
 
  
 
-    MessageBox.error("This booking dates have fully booked, Please select another date.");
+    MessageBox.error(this.i18nModel.getText("Bookingfull"));
      this.Date=false
      this.closeBusyDialog()
     return;
@@ -3035,7 +3033,7 @@ iMonths = Math.max(iMonths, 1);
 
             if (sFacilityID) {
                 sap.m.MessageBox.confirm(
-                    "Are you sure you want to Delete this Facility?", {
+                    this.i18nModel.getText("AreyousureyouwanttoDeletethisFacility"), {
                     title: "Confirm Delete",
                     actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                     styleClass: "myUnifiedBtn",
@@ -3433,7 +3431,7 @@ iMonths = Math.max(iMonths, 1);
 
  
 
-    MessageBox.error("This booking dates have fully booked, Please select another date.");
+    MessageBox.error( this.i18nModel.getText("Bookingfull"),);
      this.Date=false
      this.closeBusyDialog()
     return;
@@ -3983,7 +3981,7 @@ iMonths = Math.max(iMonths, 1);
             var that = this;
 
             sap.m.MessageBox.confirm(
-                "Are you sure you want to confirm this room booking?", {
+                 this.i18nModel.getText("Areyousureyouwanttoconfirmthisroombooking"), {
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 emphasizedAction: sap.m.MessageBox.Action.YES,
                 styleClass: "myUnifiedBtn",
@@ -4112,7 +4110,7 @@ iMonths = Math.max(iMonths, 1);
         onSaveBooking: async function () {
 
             if(this.Date===false){
-            sap.m.MessageBox.error("This Booking date have fully booked, Please select another date.");
+            sap.m.MessageBox.error(this.i18nModel.getText("Areyousureyouwanttoconfirmthisroombooking"),);
                 return;
             }
             this.call = false
@@ -4129,7 +4127,7 @@ iMonths = Math.max(iMonths, 1);
             );
 
             if (validMemberIds.size === 0) {
-                sap.m.MessageToast.show("Please select at least one member");
+                sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectatleastonemember"));
                 return;
             }
 
@@ -4139,7 +4137,7 @@ iMonths = Math.max(iMonths, 1);
                 );
 
                 if (!hasPrimaryMember) {
-                    sap.m.MessageToast.show("Please select a primary member.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectaprimarymember"));
                     return;
                 }
             }
@@ -4160,7 +4158,7 @@ if (toDelete.length === 0) {
 }
 
 sap.m.MessageBox.confirm(
-    "Some facilities are assigned to different members. Do you want to delete those facilities?",
+    this.i18nModel.getText("SomefacilitiesareassignedtodifferentmembersDoyouwanttodeletethosefacilities"),
     {
         actions: [
             sap.m.MessageBox.Action.YES,
@@ -4521,7 +4519,7 @@ console.log(
 
             if (paymentMap[unit] === "Per Day") {
                 if (facilityItems.some(item => item.UnitText === "Per Month" || item.UnitText === "Per Year")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Monthly or Yearly payment plans when your booking is on a Per Day payment plan.", {
+                    sap.m.MessageBox.error(this.i18nModel.getText("Perdayplan"), {
                         styleClass: "myUnifiedBtn"
                     });
                     return; //  stop save
@@ -4529,7 +4527,7 @@ console.log(
             }
             if (paymentMap[unit] === "Per Month") {
                 if (facilityItems.some(item => item.UnitText === "Per Year")) {
-                    sap.m.MessageBox.error("You cannot select facilities with Yearly payment plans when your booking is on a Per Month payment plan.", {
+                    sap.m.MessageBox.error(this.i18nModel.getText("Permonthplan"), {
                         styleClass: "myUnifiedBtn"
                     });
                     return; //  stop save
@@ -4651,30 +4649,40 @@ console.log(
 
                 let that = this;
 
-                sap.m.MessageBox.show(
-                    "The following facilities have dates outside the booking period:\n\n" +
-                     invalidFacilities
-            .map(x => {
+             const sFacilities = invalidFacilities
+    .map(x => {
 
-                let message = `• ${x.item.FacilityName}`;
+        let message = `• ${x.item.FacilityName}`;
 
-                const unit = (x.item.UnitText || "").toLowerCase();
+        const unit = (x.item.UnitText || "").toLowerCase();
 
-                  if (unit === "per month" || unit === "per year" || x.item.FacilityChargeType === "Entire Booking") {
-                    message += " - This will cover fully booking period";
-                }else{
-                    message += " - This will not cover fully booking period";
-                }
+        if (
+            unit === "per month" ||
+            unit === "per year" ||
+            x.item.FacilityChargeType === "Entire Booking"
+        ) {
+            message += this.i18nModel.getText(
+                "facilityCoversBookingPeriod"
+            );
+        } else {
+            message += this.i18nModel.getText(
+                "facilityDoesNotCoverBookingPeriod"
+            );
+        }
 
-                return message;
-            })
-            .join("\n") +
-        "\n\nDo you want to auto-adjust the invalid dates to match the booking period?",
+        return message;
+    })
+    .join("\n");
+    sap.m.MessageBox.show(
+    this.i18nModel.getText(
+        "facilitiesOutsideBookingPeriod",
+        [sFacilities]
+    ),
 
                     {
                         icon: sap.m.MessageBox.Icon.WARNING,
-                        title: "Date Mismatch",
-                        actions: ["Change", "Cancel"],
+                        title:this.i18nModel.getText("Date Mismatch") ,
+                        actions: [this.i18nModel.getText("actionChange"),this.i18nModel.getText("actionCancel")]
                         emphasizedAction: "Change",
                         styleClass: "myUnifiedBtn",
 
@@ -4691,9 +4699,7 @@ console.log(
                             // Safety check
                             if (bookingEnd < bookingStart) {
 
-                                sap.m.MessageToast.show(
-                                    "End date cannot be before start date"
-                                );
+                                sap.m.MessageToast.show(this.i18nModel.getText("endDateCannotbeforeStartDate"));
 
                                 return;
                             }
@@ -5161,7 +5167,7 @@ console.log(
             var unit = Bookingdata.UnitText ? Bookingdata.UnitText.trim().toLowerCase() : "";
 
             if (CustomerData.OrginalRentPrice === 0 || CustomerData.OrginalRentPrice === "0.00") {
-                sap.m.MessageToast.show("We do not offer a Payment (" + paymentMap[unit] + ") plan in our Hostel.");
+                sap.m.MessageToast.show(this.i18nModel.getText("paymentPlanNotOffered", [paymentMap[unit]]));
                 return;
             }
             const customerEndDate = this._parseDate(CustomerData.EndDate);
@@ -5181,12 +5187,17 @@ console.log(
 
                 var that = this;
                   const facilityNames = [...new Set(facilitiesNotMatchingBookingEnd)];
+const sFacilityNames = facilityNames
+    .map(name => "• " + name)
+    .join("\n");
 
-                sap.m.MessageBox.confirm(
-                    "Would you like to extend your facility duration until the end of your booking? Kindly update this in your facility.\n\n" +
-                  facilityNames.map(name => "• " + name).join("\n"),
+sap.m.MessageBox.confirm(
+    this.i18nModel.getText(
+        "extendFacilityDuration",
+        [sFacilityNames]
+    ),
                   {
-                    title: "Upgrade Required",
+                    title: this.i18nModel.getText("UpgradeRequired"),
                     actions: ["Extend Now", "Maybe Later"],
                     emphasizedAction: sap.m.MessageBox.Action.OK,
                     styleClass: "myUnifiedBtn",
@@ -5199,7 +5210,7 @@ console.log(
 
 
                             if (!bookingEndDate) {
-                                sap.m.MessageToast.show("Invalid End Date");
+                                sap.m.MessageToast.show(this.i18nModel.getText("InvalidEndDate"));
                                 return;
                             }
 
@@ -5401,7 +5412,8 @@ console.log(
 
   
     sap.m.MessageBox.information(
-        `These facilities are not available for all days of the booking period:\n\n${facilityNames}\n\nDo you want to extend these facilities to the complete booking period?`,
+            this.i18nModel.getText("facilitiesNotAvailableAllDays",[facilityNames]
+    ),
         {
             actions: [
                 "Extend Days",
@@ -5422,15 +5434,13 @@ console.log(
     let bookingEndDate = that._parseDate(Bookingdata.EndDate);
 
     if (!bookingStartDate || !bookingEndDate) {
-        sap.m.MessageToast.show("Invalid Start Date or End Date");
+        sap.m.MessageToast.show(this.i18nModel.getText("InvalidStartDateorEndDate"));
         return;
     }
 
     // Start Date cannot be greater than End Date
     if (bookingStartDate > bookingEndDate) {
-        sap.m.MessageToast.show(
-            "Start Date cannot be greater than End Date"
-        );
+        sap.m.MessageToast.show(this.i18nModel.getText("StartDatecannotbegreaterthanEndDate"));
         return;
     }
 
@@ -6070,7 +6080,7 @@ console.log(
             var that = this;
 
             sap.m.MessageBox.confirm(
-                "Are you sure you want to cancel this Booking?", {
+                this.i18nModel.getText("AreyousureyouwanttocancelthisBooking"), {
                 title: "Confirm Cancellation",
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
@@ -6195,7 +6205,7 @@ console.log(
 
             aDocs.find((item) => {
                 if (item.DocumentType?.replace(/\s+/g, '').toLowerCase() === DocumentType?.replace(/\s+/g, '').toLowerCase()) {
-                    sap.m.MessageToast.show("Document of type '" + DocumentType + "' is Already Uploaded.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("documentAlreadyUploaded", [DocumentType]));
                     oFileUploader.clear();
                     return;
                 }
@@ -6215,7 +6225,7 @@ console.log(
 
             aFiles.forEach(file => {
                 if (file.size > MAX_SIZE) {
-                    sap.m.MessageToast.show("File " + file.name + " Exceeds 2 MB Limit.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fileExceedsLimit", [file.name]));
                     return; // skip this file
                 }
                 var reader = new FileReader();
@@ -6225,7 +6235,7 @@ console.log(
                     var isDuplicate = aDocs.some(doc => doc.FileName === file.name);
 
                     if (isDuplicate) {
-                        sap.m.MessageToast.show("File '" + file.name + "' is Already Uploaded.");
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileAlreadyUploaded", [file.name]));
                         return;
                     }
                     // Push new document into table array
@@ -6395,7 +6405,7 @@ console.log(
                 ?.getObject();
 
             if (!oDoc || !(oDoc.FileContent || oDoc.File)) {
-                sap.m.MessageToast.show("No document found");
+                sap.m.MessageToast.show(this.i18nModel.getText("nodocfound"));
                 return;
             }
 
@@ -6560,7 +6570,7 @@ console.log(
                     oLink.click();
                     document.body.removeChild(oLink);
 
-                    MessageToast.show("File downloaded successfully");
+                    MessageToast.show(this.i18nModel.getText("fileDownloaded"));
                     return;
                 }
 
@@ -6599,14 +6609,14 @@ console.log(
                 return;
             }
             this.onDownloadPreview();
-            sap.m.MessageToast.show("Preview not supported");
+            sap.m.MessageToast.show(this.i18nModel.getText("Previewnotsupported"));
         },
         onDownloadPreview: function () {
 
             if (!this._sPreviewBase64) {
 
                 MessageToast.show(
-                    "No file available for download."
+                    this.i18nModel.getText("Nofileavailablefordownload")
                 );
 
                 return;
@@ -6625,7 +6635,7 @@ console.log(
             }
 
             if (!sDownloadUrl) {
-                MessageToast.show("Download not supported.");
+                MessageToast.show(this.i18nModel.getText("Downloadnotsupported"));
                 return;
             }
 
@@ -6724,13 +6734,13 @@ console.log(
 
                 // Expiry validation
                 if (this._isCouponExpired(oCoupon.EndDate)) {
-                    sap.m.MessageToast.show("Coupon is expired");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Couponisexpired"));
                     return;
                 }
 
                 // Not started validation
                 if (this._isCouponNotStarted(oCoupon.StartDate)) {
-                    sap.m.MessageToast.show("Coupon is not active yet");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Couponisnotactiveyet"));
                     return;
                 }
 
@@ -6764,8 +6774,7 @@ console.log(
                 // Minimum order validation
                 if (subtotal < Number(oCoupon.MinOrderValue || 0)) {
                     sap.m.MessageToast.show(
-                        "Coupon not Applicable for Below Minimum Value " +
-                        oCoupon.MinOrderValue
+                    this.i18nModel.getText("couponMinimumValue", [oCoupon.MinOrderValue])
                     );
                     return;
                 }
@@ -7037,14 +7046,14 @@ console.log(
 
                 // Expiry validation
                 if (this._isCouponExpired(oCoupon.EndDate)) {
-                    sap.m.MessageToast.show("Coupon is expired");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Couponisexpired"));
                     return;
                 }
 
                 // Not started validation
                 if (this._isCouponNotStarted(oCoupon.StartDate)) {
                     sap.m.MessageToast.show(
-                        "Coupon is not active yet"
+                     this.i18nModel.getText("Couponisnotactiveyet")
                     );
                     return;
                 }
@@ -7118,8 +7127,7 @@ console.log(
                 ) {
 
                     sap.m.MessageToast.show(
-                        "Coupon not Applicable for Below Minimum Value " +
-                        oCoupon.MinOrderValue
+                   this.i18nModel.getText("couponBelowMinimum", [oCoupon.MinOrderValue])
                     );
 
                     return;
@@ -7548,7 +7556,7 @@ console.log(
                 await this.AD_onSearch();
 
                 MessageToast.show(
-                    "Customer GST Details Saved Successfully"
+                    this.i18nModel.getText("CustomerGSTDetailsSavedSuccessfully")
                 );
 
                 this.GST_Dialog.close();
@@ -10001,7 +10009,7 @@ console.log(
 
             const sDocType = oModel.getProperty("/NewMemberDraft/Documents/0/DocumentType");
             if (!sDocType) {
-                sap.m.MessageToast.show("Please select document type first");
+                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                 if (oUploader) oUploader.clear();
                 return;
             }
@@ -10010,7 +10018,7 @@ console.log(
             const sExt = sFileName.includes(".") ? sFileName.split(".").pop().toLowerCase() : "";
             const bAllowedExt = ["jpg", "jpeg", "png", "webp", "pdf"].includes(sExt);
             if (!bAllowedExt) {
-                sap.m.MessageToast.show("Only PDF, JPG, JPEG, PNG, WEBP allowed");
+                sap.m.MessageToast.show(this.i18nModel.getText("OnlyPDFJPGJPEGPNGWEBPallowed"));
                 if (oUploader) oUploader.clear();
                 return;
             }
@@ -10039,12 +10047,12 @@ console.log(
                     this.closeBusyDialog();
 
                     if (processedFile.size > iMaxSizeBytes) {
-                        sap.m.MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileCompressionFailed", [file.name]));
                         this._removeProcessingRow(sTempId);
                         return;
                     }
                 } else if (file.size > iMaxSizeBytes && !isImage) {
-                    sap.m.MessageToast.show(file.name + " exceeds the 400 KB size limit.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fileExceeds400KB", [file.name]));
                     if (oUploader) oUploader.clear();
                     this._removeProcessingRow(sTempId);
                     return;
@@ -10145,7 +10153,7 @@ console.log(
 
                 if (oMember.Documents[0].DocumentType) {
                     if (oMember.Documents[0].File === "") {
-                        MessageToast.show("Please upload a document")
+                        MessageToast.show(this.i18nModel.getText("Pleaseuploadadocument"))
                         return
                     }
                 }
@@ -10387,7 +10395,7 @@ console.log(
                     ?.getObject();
 
                 if (!oDraft?.MemberID) {
-                    MessageToast.show("No document available");
+                    MessageToast.show(this.i18nModel.getText("Nodocumentavailable"));
                     return;
                 }
 
@@ -10395,7 +10403,7 @@ console.log(
                 try {
                     const oDocument = await this._fetchMemberDocument(oDraft.MemberID);
                     if (!oDocument.File) {
-                        MessageToast.show("No document available");
+                        MessageToast.show(this.i18nModel.getText("Nodocumentavailable"));
                         return;
                     }
                     this._previewDocument(oDocument);
@@ -10412,7 +10420,7 @@ console.log(
             const oDocument = oDraft?.Documents?.[0];
 
             if (!oDocument?.File) {
-                sap.m.MessageToast.show("No document available");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nodocumentavailable"));
                 return;
             }
 
@@ -10498,7 +10506,7 @@ console.log(
             if (!sRawSource) {
 
                 sap.m.MessageToast.show(
-                    "No document to preview."
+                    this.i18nModel.getText("Nodocumenttopreview")
                 );
 
                 return;
@@ -10819,7 +10827,7 @@ console.log(
                     oLink.click();
                     document.body.removeChild(oLink);
 
-                    MessageToast.show("File downloaded successfully");
+                    MessageToast.show(this.i18nModel.getText("fileDownloaded"));
                     return;
                 }
 
@@ -10859,7 +10867,7 @@ console.log(
             }
             this.onDownloadPreview();
             sap.m.MessageToast.show(
-                "Unsupported document format."
+               this.i18nModel.getText("Unsupporteddocumentformat")
             );
         },
         onUploadDocumentFile: async function () {
@@ -10961,7 +10969,7 @@ console.log(
             if (iSelectedCount > iCustomerCount) {
 
                 sap.m.MessageToast.show(
-                    "You can select only " + iCustomerCount + " members"
+                    this.i18nModel.getText("maxMembersSelection", [iCustomerCount])
                 );
 
                 // Unselect latest selected row
@@ -11003,7 +11011,7 @@ console.log(
             var aSelectedItems = oTable.getSelectedItems();
 
             if (!aSelectedItems || aSelectedItems.length === 0) {
-                sap.m.MessageToast.show("Please select at least one member");
+                sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectatleastonemember"));
                 return;
             }
 
@@ -11098,7 +11106,7 @@ console.log(
 
             this.UD_Dialog.close();
 
-            sap.m.MessageToast.show("Selected member added successfully");
+            sap.m.MessageToast.show(this.i18nModel.getText("Selectedmemberaddedsuccessfully"));
         },
 
         onGenerateInvoice: function (oEvent) {

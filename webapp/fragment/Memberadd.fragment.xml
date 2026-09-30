@@ -17,7 +17,7 @@
          <customHeader>
             <Bar class="barheader">
                 <contentLeft>
-                    <Title text="{= ${viewModel>/mode} === 'CREATE' ? 'Add Member' : 'Update Member' }"
+                    <Title  text="{=${viewModel>/mode} === 'CREATE'? ${i18n>AddMember}: ${i18n>UpdateMember}}"
                     class="sapUiSmallMarginBegin"
                 />
                 </contentLeft>
@@ -46,14 +46,14 @@
                 <HBox width="100%">
                     <VBox width="35%">
                         <Label
-                            text="Salutation"
+                            text="{i18n>MSsalutation}"
                             required="true"
                         />
                          <ComboBox
                             id="AD_idSelect"
                             selectedKey="{BookingView>/NewMemberDraft/Salutation}"
-                            placeholder="Select salutation"
-                            valueStateText="Please select salutation"
+                            placeholder="{i18n>MVDsalutation}"
+                            valueStateText="{i18n>MVDsalutation}"
                             change="onNewMemberSalutationChange" editable="{= ${BookingView>/NewMemberDraft/Relation} !== 'Self' }"
                         >
                             <core:Item
@@ -80,7 +80,7 @@
                         class="sapUiTinyMarginBegin"
                     >
                         <Label
-                            text="Full Name"
+                            text="{i18n>fullname}"
                             required="true"
                         />
                         <Input

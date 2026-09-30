@@ -357,8 +357,8 @@
                                 />
                                 <ToolbarSpacer />
                                 <Button
-                                    text="{i18n>Manage Member}"
-                                    tooltip="{i18n>Manage Member}"
+                                    text="{i18n>ManageMember}"
+                                    tooltip="{i18n>ManageMember}"
                                     press="onUploadDocumentFile"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
@@ -790,7 +790,7 @@
                     <!-- Sub Total -->
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="Sub Total:"
+                            text="{i18n>SubTotal}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -811,7 +811,7 @@
                         visible="{= ${CustomerData>/CGST} > 0 }"
                     >
                         <Label
-                            text="{= 'CGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                            text="{= ${i18n>cgs} + ' (' + ${CustomerData>/GSTValue} + '%):' }"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -832,7 +832,7 @@
                         visible="{= ${CustomerData>/SGST} > 0 }"
                     >
                         <Label
-                            text="{= 'SGST (' + ${CustomerData>/GSTValue} + '%):'}"
+                            text="{= ${i18n>sgst} + ' (' + ${CustomerData>/GSTValue} + '%):' }"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -853,10 +853,10 @@
                         visible="{= ${CustomerData>/IGST} > 0 }"
                     >
                         <Label
-                            text="{=
+                  text="{=
     ${CustomerData>/GSTLabel} === 'Tax'
-        ? 'Tax Amount (' + ${CustomerData>/GSTValue} + '%):'
-        : 'IGST (' + ${CustomerData>/GSTValue} + '%):'
+        ? ${i18n>taxAmount} + ' (' + ${CustomerData>/GSTValue} + '%):'
+        : ${i18n>igst} + ' (' + ${CustomerData>/GSTValue} + '%):'
 }"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
@@ -876,7 +876,7 @@
                     <!-- Grand Total -->
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="Grand Total:"
+                            text="{i18n>GrandTotal}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -894,7 +894,7 @@
                     </HBox>
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="Security Deposit:"
+                            text="{i18n>securitydeposit}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -912,7 +912,7 @@
                     <!-- Paid -->
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="Paid Amount:"
+                            text="{i18n>PaidAmount}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -933,7 +933,7 @@
                         visible="{= ${CustomerData>/RefundPaymentpaid} > 0 }"
                     >
                         <Label
-                            text="Refund credited:"
+                            text="{i18n>Refundcredited}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -951,7 +951,11 @@
                     <!-- Due Amount -->
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="{= ${CustomerData>/DueAmount} >= 0 ? 'Due Amount:' : 'Refund Amount:'}"
+                            text="{=
+    ${CustomerData>/DueAmount} >= 0
+        ? ${i18n>invoiceDueAmount}
+        : ${i18n>refundAmount}
+}"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text
@@ -1021,15 +1025,15 @@
                     <!-- Confirm -->
                     <Button
                         id="btnGenerateInvoice"
-                        text="Generate Invoice"
+                        text="{i18n>InvoiceAddBtn}"
                         class="myUnifiedBtn"
                         press="onGenerateInvoice"
                         visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"
                     />
 
                     <Button
-                        text="Confirm Booking"
-                        tooltip="Confirm Booking"
+                        text="{i18n>ConfirmBooking}"
+                        tooltip="{i18n>ConfirmBooking}"
                         press="HM_ConfirmRoom"
                         class="myUnifiedBtn"
                         visible="{= ${CustomerData>/Status} === 'New' || ${CustomerData>/Status} === 'Rejected' || ${CustomerData>/Status} === 'Cancelled'}"
@@ -1037,17 +1041,17 @@
 
                     <!-- Reject -->
                     <Button
-                        text="Reject Booking"
-                        tooltip="Reject Booking"
+                        text="{i18n>RejectBooking}"
+                        tooltip="{i18n>RejectBooking}"
                         press="HM_RejectRoom"
                         class="myUnifiedBtn"
                         visible="{= ${CustomerData>/Status} === 'New' }"
                     />
                     <!-- Refund Amount -->
                     <Button
-                        text="ADD Customer GST"
+                        text="{i18n>ADDCustomerGST}"
                         id="idGST"
-                        tooltip="GST Setup"
+                        tooltip="{i18n>ADDCustomerGST}"
                         press="onGSTBooking"
                         visible="{= !${VisibleModel>/visible} &amp;&amp;  !!${CustomerData>/GSTIN}  &amp;&amp;((${LoginModel>/Role} === 'Admin') || ${LoginModel>/Role} === 'SuperAdmin'  || ${LoginModel>/Role} === 'Branch Manager'  || ${LoginModel>/Role} === 'Front Office Employee') &amp;&amp; ${CustomerData>/Status} !== 'Cancelled'  &amp;&amp; ${CustomerData>/Status} !== 'Completed' &amp;&amp; ${CustomerData>/Status} !== 'New'  &amp;&amp; ${CustomerData>/Status} !== 'Rejected' }"
                         class="myUnifiedBtn"
@@ -1099,9 +1103,9 @@
                     />
 
                     <Button
-                        text="Submit"
+                        text="{i18n>submit}"
                         id="idsave"
-                        tooltip="Submit"
+                        tooltip="{i18n>submit}"
                         press="onSaveBooking"
                         visible="{VisibleModel>/visible}"
                         class="myUnifiedBtn"

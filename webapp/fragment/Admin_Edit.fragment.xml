@@ -55,7 +55,7 @@
                 </ComboBox>
 
                   <Label
-                    text="Name"
+                    text="{i18n>name}"
                     required="true"
                 />
                 <ComboBox

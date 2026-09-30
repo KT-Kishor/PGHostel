@@ -32,7 +32,7 @@
             >
 <fb:filterGroupItems>
 					<fb:FilterGroupItem
-                        name="propertyName"
+                        name="{i18n>propertyName}"
                         label="{i18n>propertyName}"
                         groupName="Group"
                         visibleInFilterBar="true"
@@ -82,7 +82,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Customer Name"
-                        label="Customer Name"
+                        label="{i18n>customerName}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -147,7 +147,7 @@
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="StartDate"
-                        label="Start - End Date"
+                        label="{i18n>StartEndDate}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -164,7 +164,7 @@
                 <fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Date"
-                        label="Date"
+                        label="{i18n>date}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
@@ -180,7 +180,7 @@
                  <fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Bed Type"
-                        label="Bed Type"
+                        label="{i18n>bedType}"
                         groupName="Group"
                         visibleInFilterBar="true"
                     >
