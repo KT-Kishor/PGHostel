@@ -19,32 +19,32 @@
 				<!-- Filter Bar -->
 				<fb:FilterBar id="dashboardFilterBar" useToolbar="false" clear="onClearFilters" showClearOnFB="true" search="onFilterChange" class="filterBarTheme" >
 					<fb:filterGroupItems>
-						<fb:FilterGroupItem name="Branch" label="Branch" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Branch" label="{i18n>CDBranch}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<MultiComboBox id="branchFilter" width="400px" placeholder="Select Branch" items="{path: 'Branchmodel>/'}" selectionChange="onFilterChange">
+								<MultiComboBox id="branchFilter" width="400px" placeholder="{i18n>selectBranch_ae4f}" items="{path: 'Branchmodel>/'}" selectionChange="onFilterChange">
 									<items>
 										<core:Item key="{Branchmodel>BranchID}" text="{Branchmodel>Name}" />
 									</items>
 								</MultiComboBox>
-							</fb:control>
+							</fb:control>	
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Customer" label="Customer" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Customer" label="{i18n>customer}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<MultiComboBox id="customerFilter" width="400px" placeholder="Select customer" items="{path: 'customers>/'}" selectionChange="onFilterChange">
+								<MultiComboBox id="customerFilter" width="400px" placeholder="{i18n>selectCustomer}" items="{path: 'customers>/'}" selectionChange="onFilterChange">
 									<items>
 										<core:Item key="{customers>key}" text="{customers>text}" />
 									</items>
 								</MultiComboBox>
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="InvoiceDate" label="Invoice Date" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="InvoiceDate" label="{i18n>invoiceDate}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
 								<DateRangeSelection id="DashI_id_Date" valueFormat="MM/dd/yyyy" displayFormat="MM/dd/yyyy" change="onDateRangeselection" />
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Year" label="Financial Year" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Year" label="{i18n>financialYear}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
-								<DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="Select year" change="onchangeFY" />
+								<DatePicker id="yearFilter" displayFormat="yyyy" valueFormat="yyyy" placeholder="{i18n>selectYear}" change="onchangeFY" />
 							</fb:control>
 						</fb:FilterGroupItem>
 					</fb:filterGroupItems>
@@ -58,9 +58,9 @@
 								<Toolbar class="customdashboard">
 									<Title text="Invoice Status Distribution {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
-									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="Pie Chart" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="Bar Chart" />
-									<Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="Donut Chart" />
+									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChart}" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChart}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
@@ -96,9 +96,9 @@
 								<Toolbar class="customdashboard">
 									<Title text="Monthly Invoice Trend {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="Vertical Chart" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="Bar Chart" />
-									<Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="Line Chart" />
+									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalChart}" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChart}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
@@ -135,8 +135,8 @@
 									<Title text="Invoice Value by Customer {headerModel>/filterSuffix}" level="H5"
 									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="Vertical Chart" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressCustomerBar" tooltip="Bar Chart" />
+									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="{i18n>verticalChart}" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressCustomerBar" tooltip="{i18n>barChart}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
@@ -173,8 +173,8 @@
 									<Title text="Yearly Invoice Trend {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="Bar Chart" />
-									<Button icon="sap-icon://line-chart" press="IN_onPressYearlyLine" tooltip="Line Chart" />
+									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressYearlyLine" tooltip="{i18n>lineChart}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
@@ -219,9 +219,9 @@
 									text="Payment Breakdown {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="Bar Chart" />
-									<Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="Stacked Horizontal" />
-									<Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="Grouped Horizontal" />
+									<Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://vertical-stacked-chart" press="onPressPaymentStackedColumn" tooltip="{i18n>stackedHorizontal}" />
+									<Button icon="sap-icon://horizontal-stacked-chart" press="onPressPaymentStackedBar" tooltip="{i18n>groupedHorizontal}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
