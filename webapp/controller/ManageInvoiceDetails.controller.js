@@ -1444,7 +1444,7 @@ sap.ui.define([
                     this.onChangeConversionRate();
 
                 } catch (oError) {
-                    sap.m.MessageToast.show("Unable to calculate invoice totals. Please check the invoice items and tax settings.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Unabletocalculateinvoicetotals"));
                 }
             },
 
@@ -1706,7 +1706,12 @@ sap.ui.define([
                     const item = aItemsRaw[i];
                     if (!item.Particulars) {
                         this.getBusyDialog();
-                        sap.m.MessageBox.error(`Please Fill all Mandatory Fields (Particulars) in Item Row ${i + 1}`);
+                        sap.m.MessageBox.error(
+    this.i18nModel.getText(
+        "mandatoryParticulars",
+        [i + 1]
+    )
+);
                         return false;
                     }
                 }
@@ -1800,13 +1805,14 @@ sap.ui.define([
 
                     // If blank line item exists
                     if (iBlankItemIndex !== -1) {
-                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                        return MessageToast.show(this.i18nModel.getText("blankLineItem",[iBlankItemIndex + 1]
+    ));
                     }
 
                     // CHECK WHETHER AT LEAST ONE LINE ITEM EXISTS
 
                     if (!Array.isArray(aInvoiceItems) || aInvoiceItems.length === 0) {
-                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                        return MessageToast.show(this.i18nModel.getText("itemisblank"));
                     }
 
                     const bConversionRateValid = oModel.Currency !== "INR" ? utils._LCvalidateAmount(this.byId("CID_id_ConversionRate"), "ID") : true;
@@ -1835,7 +1841,7 @@ sap.ui.define([
                         if (!oCGSTCheckbox.getSelected() && !oIGSTCheckbox.getSelected()) {
                             oCGSTCheckbox.setValueState("Error");
                             oIGSTCheckbox.setValueState("Error");
-                            oCGSTCheckbox.setValueStateText("Please select CGST");
+                            oCGSTCheckbox.setValueStateText(this.i18nModel.getText("PleaseselectCGST"));
                             bIsValidTwo = false;
                         } else {
                             oCGSTCheckbox.setValueState("None");
@@ -2150,12 +2156,14 @@ sap.ui.define([
 
                     // Show Sr. No. of blank line item
                     if (iBlankItemIndex !== -1) {
-                        return MessageToast.show(`Sr. No. ${iBlankItemIndex + 1}: Line item is blank`);
+                        return MessageToast.show   (this.i18nModel.getText("blankLineItem",[iBlankItemIndex + 1]
+    ));;
+                     
                     }
 
                     // No line items
                     if (!Array.isArray(aItems) || aItems.length === 0) {
-                        return MessageToast.show("Sr. No. 1: Line item is blank");
+                        return MessageToast.show(this.i18nModel.getText("itemisblank"));
                     }
 
                     const bIsValid = bCustomerValid && bInvoiceDateValid && bInvoiceDescValid && bMobileValid && bEmailValid;
@@ -2328,7 +2336,7 @@ sap.ui.define([
                     }
                     else if (totalPaid >= totalAmount || balanceAmount === 0) {
                         if (status !== "Payment Received") {
-                            MessageToast.show("Invoice is fully paid. Status must be Payment Received.");
+                            MessageToast.show(this.i18nModel.getText("Invoiceisfullypaid"));
                             oSelectedModel.setProperty("/Status", "Payment Received");
                             oSource.setValue("Payment Received");
                             status = "Payment Received";
@@ -2647,7 +2655,7 @@ sap.ui.define([
 
                 const isValid = isMandatoryValid && isCurrencyValid;
                 if (!this.ResivedAmount) {
-                    MessageToast.show(this.i18nModel.getText("Receiving amount cannot exceed the due amount"));
+                    MessageToast.show(this.i18nModel.getText(this.i18nModel.getText("exceedthedueamount")));
                     return;
                 }
                 if (!isValid) {
@@ -3712,7 +3720,7 @@ sap.ui.define([
                     const aSelectedItems = oTable.getSelectedItems();
 
                     if (!aSelectedItems.length) {
-                        MessageToast.show("Select at least one invoice item before printing");
+                        MessageToast.show(this.i18nModel.getText("oneinvoiceitembeforeprinting"));
                         return;
                     }
                     this.getBusyDialog();
@@ -4170,7 +4178,7 @@ sap.ui.define([
 
                     const invoices = response.data || [];
                     if (!invoices.length) {
-                        MessageToast.show("No data found");
+                        MessageToast.show(this.i18nModel.getText("noDataFound"));
                         return;
                     }
 
@@ -4900,10 +4908,10 @@ sap.ui.define([
                         // Automatically updates status to 'Payment Partially' and opens the ManageInvoice fragment
 
                         if (oModelData.Status === "Submitted") {
-                            MessageToast.show("Invoice items are refreshed");
+                            MessageToast.show(this.i18nModel.getText("Invoiceitemsarerefreshed"));
                             this.onChangeInvoiceStatus("Submitted");
                         } else if (balanceAmount > 0) {
-                            MessageToast.show("New line items added. Opening payment screen...");
+                            MessageToast.show(this.i18nModel.getText("addedOpeningpaymentscreen"));
                             this.onChangeInvoiceStatus("Payment Partially");
 
                         }
@@ -5662,9 +5670,7 @@ sap.ui.define([
                     if (!startDate || !endDate) {
 
                         oSource.setValueState("Error");
-                        oSource.setValueStateText(
-                            "Please enter valid dates."
-                        );
+                        oSource.setValueStateText(this.i18nModel.getText("Pleaseentervaliddates"));
 
                         oModel.setProperty(
                             sPath + "/DurationText",
@@ -5683,9 +5689,7 @@ sap.ui.define([
                     if (startDate > endDate) {
 
                         oSource.setValueState("Error");
-                        oSource.setValueStateText(
-                            "End Date cannot be earlier than Start Date."
-                        );
+                        oSource.setValueStateText(this.i18nModel.getText("EndDatecannotbeearlierthanStartDate"));
 
                         oModel.setProperty(
                             sPath + "/DurationText",
@@ -5733,9 +5737,7 @@ sap.ui.define([
                 if (isNaN(grossPrice) || grossPrice < 0) {
 
                     oSource.setValueState("Error");
-                    oSource.setValueStateText(
-                        "Gross Price must be a valid amount."
-                    );
+                    oSource.setValueStateText(this.i18nModel.getText("GrossPricemustbeavalidamount"));
 
                     return;
                 }

@@ -131,7 +131,7 @@
                                             id="CID_id_Custmer"
                                             value="{SelectedCustomerModel>/CustomerName}"
                                             editable="{visiablityPlay>/editable}"
-                                            valueStateText="Enter the name"
+                                            valueStateText="{i18n>Enterthename}"
                                             liveChange="CID_ValidateCommonFields"
                                             maxLength="60"
                                         />
@@ -381,7 +381,7 @@
                                             editable="{visiablityPlay>/editable}"
                                             maxLength="10"
                                             visible="{= ${SelectedCustomerModel>/GST} ? true : false }"
-                                            valueStateText="Enter Tax Percentage"
+                                            valueStateText="{i18n>EnterTaxPercentage}"
                                         />
                                         <m:Label text="{i18n>address}" />
                                         <m:TextArea
@@ -629,7 +629,7 @@
                                                 demandPopin="true"
                                                 width="8rem"
                                             >
-                                                <m:Text text="Duration" />
+                                                <m:Text text="{i18n>duration}" />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"
@@ -819,7 +819,7 @@
                                                 visible="{= ${SelectedCustomerModel>/CouponDiscountValue} > 0 }"
                                             >
                                                 <m:Label
-                                                    text="{= 'Discount'
+                                                    text="{=  ${i18n>discount}
                                                             + (${SelectedCustomerModel>/CouponCode} ? ' (' + ${SelectedCustomerModel>/CouponCode} + ')' : '')
                                                             + ' :' }"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
@@ -1107,7 +1107,11 @@
                 || ${visiablityPlay>/effRole} === 'Front Office Employee'
             )
         }"
-                            text="{= ${visiablityPlay>/editable} ? 'Save' : 'Edit'}"
+                           text="{=
+    ${visiablityPlay>/editable}
+        ? ${i18n>save}
+        : ${i18n>MSedit}
+}"
                             press="CID_onPressEdit"
                             class="sendMail myUnifiedBtn"
                         />

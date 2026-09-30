@@ -96,7 +96,7 @@
                 </HBox>
                 <!-- DOB -->
                 <Label
-                    text="Date of Birth"
+                    text="{i18n>MVDDOB}"
                     required="true"
                 />
                 <DatePicker
@@ -114,7 +114,7 @@
 
                 <!-- Gender -->
                 <Label
-                    text="Gender"
+                    text="{i18n>MVgender}"
                     required="true"
                 />
                  <ComboBox
@@ -142,7 +142,7 @@
                 
                 <!-- Relationship -->
                 <Label
-                    text="Relationship"
+                    text="{i18n>Relationship}"
                     required="true"
                 />
                   <ComboBox
@@ -266,7 +266,7 @@
                     />
 
                     <Button
-                        text="Remove"
+                        text="{i18n>Remove}"
                         icon="sap-icon://delete"
                         press="onRemoveButtonPress"
                         class="myUnifiedBtn"
@@ -278,14 +278,14 @@
         </content>
         <beginButton>
             <Button
-                text="Save"
+                text="{i18n>save}"
                 press="onSaveNewMember"
                 class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
+                text="{i18n>CancelButton}"
                 press="onCloseNewMemberDialog"
                 class="myUnifiedBtn"
             />

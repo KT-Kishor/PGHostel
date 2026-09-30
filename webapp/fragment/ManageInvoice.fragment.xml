@@ -31,14 +31,14 @@
             >
                 <f:content>
                  <Label
-                    text="Payment Mode"
+                    text="{i18n>PaymentMode}"
                     required="true"
                 />
                 <ComboBox
                     id="idInvoicePaymentMode"
-                    placeholder="Select payment mode"
+                    placeholder="{i18n>Selectpaymentmode}"
                     selectedKey="{PaymentModel>/PaymentType}"
-                    valueStateText="Select payment mode"
+                    valueStateText="{i18n>Selectpaymentmode}"
                     change="onPaymentModeChange"
 items="{PaymentMode>/}"
                 >

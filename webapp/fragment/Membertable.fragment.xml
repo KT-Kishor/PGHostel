@@ -13,10 +13,10 @@
     >
         <customHeader>
             <OverflowToolbar>
-                <Title text="Select Members" />
+                <Title text="{i18n>SelectMembers}" />
                 <ToolbarSpacer />
                 <Button
-                    text="Add New Member"
+                    text="{i18n>AddNewMember}"
                     icon="sap-icon://add"
                     press="onAddNewMemberFromDialog"
                     class="myUnifiedBtn"
@@ -28,7 +28,7 @@
             <VBox class="sapUiSmallMargin">
                 <SearchField
                     width="100%"
-                    placeholder="Search by name / relationship"
+                    placeholder="{i18n>Searchbynamerelationship}"
                     liveChange="onMemberSearch"
                     class="sapUiTinyMarginBottom"
                 />
@@ -37,7 +37,7 @@
                     id="abmemberSelectTable"
                     mode="MultiSelect"
                     items="{BookingView>/Members}"
-                    noDataText="No saved members available"
+                    noDataText="{i18n>Nosavedmembersavailable}"
                     growing="true"
                     growingScrollToLoad="true"
                     updateFinished="onMemberDialogTableUpdateFinished"
@@ -45,32 +45,32 @@
                 >
                     <columns>
                         <Column>
-                            <Text text="Full Name" />
+                            <Text text="{i18n>fullname}" />
                         </Column>
                         <Column
                             minScreenWidth="Tablet"
                             demandPopin="true"
                         >
-                            <Text text="Age" />
+                            <Text text="{i18n>age}" />
                         </Column>
                         <Column
                             minScreenWidth="Tablet"
                             demandPopin="true"
                         >
-                            <Text text="Gender" />
+                            <Text text="{i18n>MVgender}" />
                         </Column>
                         <Column
                             minScreenWidth="Tablet"
                             demandPopin="true"
                         >
-                            <Text text="Relationship" />
+                            <Text text="{i18n>Relationship}" />
                         </Column>
                         <!-- <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column> -->
                         <Column
                             minScreenWidth="Desktop"
                             demandPopin="true"
                         >
-                            <Text text="Document" />
+                            <Text text="{i18n>document}" />
                         </Column>
                         <Column width="5rem">
                             <Text text="" />
@@ -110,14 +110,14 @@
 
         <beginButton>
             <Button
-                text="Add Selected"
+                text="{i18n>AddSelected}"
                 press="onConfirmMemberSelection"
                 class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
+                text="{i18n>CancelButton}"
                 press="onCloseMemberSelectionDialog"
                 class="myUnifiedBtn"
             />
