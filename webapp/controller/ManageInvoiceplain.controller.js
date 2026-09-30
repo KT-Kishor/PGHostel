@@ -430,7 +430,7 @@ sap.ui.define(
                     };
                 });
                 if (oModelData.length === 0) {
-                    MessageToast.show("No invoices available to download");
+                    MessageToast.show(this.i18nModel.getText("Noinvoicesavailabletodownload"));
                     return;
                 }
                 const aCols = [{
