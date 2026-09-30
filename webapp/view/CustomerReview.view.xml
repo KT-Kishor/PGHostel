@@ -20,7 +20,7 @@
         <content>
             <VBox class="sapUiSmallMargin">
                 <Title
-                    text="Customer's Review"
+                    text="{i18n>customerSReview}"
                     level="H3"
                     class="sapUiTinyMarginBottom"
                 />
@@ -46,7 +46,7 @@
                                     items="{BranchFilterModel>/}"
                                     showClearIcon="true"
                                     filterSecondaryValues="true"
-                                    placeholder="Select Branch ID / Name"
+                                    placeholder="{i18n>selectBranchId}"
                                     showSecondaryValues="true"
                                 >
                                     <core:ListItem
@@ -61,7 +61,7 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="FeedbackDate"
-                            label="Feedback Date"
+                            label="{i18n>feedbackDate}"
                             groupName="Group"
                             visibleInFilterBar="true"
                         >
@@ -78,7 +78,7 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="Rating"
-                            label="Rating"
+                            label="{i18n>rating}"
                             groupName="Group"
                             visibleInFilterBar="true"
                         >
@@ -89,23 +89,23 @@
                                 >
                                     <core:Item
                                         key="1"
-                                        text="1 Star"
+                                        text="{i18n>star1}"
                                     />
                                     <core:Item
                                         key="2"
-                                        text="2 Stars"
+                                        text="{i18n>stars2}"
                                     />
                                     <core:Item
                                         key="3"
-                                        text="3 Stars"
+                                        text="{i18n>stars3}"
                                     />
                                     <core:Item
                                         key="4"
-                                        text="4 Stars"
+                                        text="{i18n>stars4}"
                                     />
                                     <core:Item
                                         key="5"
-                                        text="5 Stars"
+                                        text="{i18n>stars5}"
                                     />
                                 </MultiComboBox>
                             </fb:control>
@@ -114,7 +114,7 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem
                             name="sort"
-                            label="Sort By"
+                            label="{i18n>sort}"
                             groupName="Group"
                             visibleInFilterBar="true"
                         >
@@ -125,19 +125,19 @@
                                 >
                                     <core:Item
                                         key="1"
-                                        text="Highest to Lowest Rating"
+                                        text="{i18n>highestLowestRating}"
                                     />
                                     <core:Item
                                         key="2"
-                                        text="Lowest to Highest Rating"
+                                        text="{i18n>lowestHighestRating}"
                                     />
                                     <core:Item
                                         key="3"
-                                        text="Latest Date"
+                                        text="{i18n>latestDate}"
                                     />
                                     <core:Item
                                         key="4"
-                                        text="Oldest Date"
+                                        text="{i18n>oldestDate}"
                                     />
                                 </ComboBox>
                             </fb:control>

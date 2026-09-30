@@ -32,7 +32,7 @@ sap.ui.define([
                 this._loadBranchFilter();
                 await this._loadCustomerReviews();
             } catch (e) {
-                MessageToast.show("Failed to load customer reviews");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("failedLoadCustomer"));
                 this._closeBusyDialog()
             }
         },
@@ -158,7 +158,7 @@ sap.ui.define([
                 this._aAllFeedbacks = aFeedbacks.filter(Boolean);
                 this._applyFilters();
             } catch (e) {
-                MessageToast.show("Failed to load customer reviews");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("failedLoadCustomer"));
             } finally {
                 if (this._iReviewRequestId === iRequestId) {
                     this._closeBusyDialog()
