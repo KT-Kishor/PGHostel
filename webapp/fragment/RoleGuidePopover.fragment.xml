@@ -4,7 +4,7 @@
 >
     <Dialog
         id="roleGuideDialog"
-        title="Your Role &amp; Access"
+        title="{i18n>roleAccess}"
         contentWidth="420px"
         resizable="false"
         draggable="false"
@@ -49,7 +49,7 @@
 
             <!-- Access breakdown -->
             <Title
-                text="What you can do:"
+                text="{i18n>whatCan}"
                 level="H6"
                 class="sapUiTinyMarginBottom"
             />
@@ -89,7 +89,7 @@
 
         <beginButton>
             <Button
-                text="Start Tile Tour"
+                text="{i18n>startTileTour}"
                 press="onStartTileGuide"
                 class="myUnifiedBtn"
                 icon="sap-icon://play"
@@ -97,7 +97,7 @@
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
+                text="{i18n>actionCancel}"
                 press="onSkipRoleGuide"
                 class="myUnifiedBtn"
             />

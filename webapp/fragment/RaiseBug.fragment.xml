@@ -15,7 +15,7 @@
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
-					<Title text="Raise Bug"/>
+					<Title text="{i18n>raisebug}"/>
 				</contentMiddle>
 			</Bar>
 		</customHeader>
@@ -38,7 +38,6 @@
 				<Input
 					id="RB_id_"
 					placeholder="{i18n>enterissuename}"
-                    valueStateText="Enter Issue Name"
 					value="{SupportModel>/IssueName}"
                     liveChange="onIssuenamechanges"
 					maxLength="100"/> -->
@@ -48,7 +47,7 @@
 				<ComboBox
 					id="RB_id_appname"
                     valueStateText="{i18n>enterappname}"
-					placeholder="Select issue type"
+					placeholder="{i18n>selectIssueType}"
                     value="{RaiseBugModel>/AppName}"
                     change="onAppnamechanges"
                      items="{ApplicationName>/}">
@@ -62,8 +61,8 @@
 					id="RB_id_bugDescription"
 					rows="4"
                     liveChange="onBugdescriptionchnages"
-                    valueStateText="Please describe the issue"
-					placeholder="Enter bug description"
+                    valueStateText="{i18n>describeIssue}"
+					placeholder="{i18n>enterBugDescription}"
 					value="{RaiseBugModel>/BugDescription}"
 					maxLength="500"/>
 
@@ -74,7 +73,7 @@
                     liveChange="onBugRaisedby"
 					value="{RaiseBugModel>/RaisedBy}"
 					editable="false"
-					placeholder="Enter name"/>
+					placeholder="{i18n>enterName}"/>
 
 				<!-- Email -->
 				<Label text="{i18n>contactemail}" />
@@ -84,7 +83,7 @@
 					class="sapUiSmallMarginBottom"
 					editable="false"
 					value="{RaiseBugModel>/Email}"
-					placeholder="Enter email"/>
+					placeholder="{i18n>enterEmail}"/>
 
 				 <!-- Upload Image -->
 				<Label id="idAddImageLabel" text="{i18n>addImage}" />
@@ -100,7 +99,7 @@
             buttonOnly="true"
 			class="myUnifiedBtn"
             iconFirst="true"
-            buttonText="Upload Images"
+            buttonText="{i18n>UploadImages}"
             multiple="true"
             uploadOnChange="false"/>
     </HBox>
@@ -124,8 +123,8 @@
 					id="RB_id_comments"
 					rows="4"
                     liveChange="onCommentsChange"
-                    valueStateText="Enter the comments"
-					placeholder="Enter comments"
+                    valueStateText="{i18n>enterTheComments}"
+					placeholder="{i18n>enterComments}"
 					value="{RaiseBugModel>/Comments}"
 					maxLength="300"/>
 
@@ -136,11 +135,11 @@
 			<Toolbar>
 				<ToolbarSpacer/>
 				<Button
-					text="Submit"
+					text="{i18n>submit}"
 					press="onBugSubmit"
 					class="marginRight myUnifiedBtn"/>
 				<Button
-					text="Cancel"
+					text="{i18n>actionCancel}"
 					press="RB_onCancelButtonPress"
 					class="marginRight myUnifiedBtn"/>
 			</Toolbar>

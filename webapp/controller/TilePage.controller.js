@@ -447,7 +447,7 @@ sap.ui.define([
             var oLoginModel = oComponent.getModel("LoginModel");
 
             if (!oVisibilityModel || !oVisibilityModel.getData()) {
-                sap.m.MessageToast.show("Please wait, checking permissions...");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("waitCheckingPermissions"));
                 return;
             }
 
@@ -722,7 +722,7 @@ sap.ui.define([
         _launchTileSteps: function () {
             if (!this._aPendingTileSteps || !this._aPendingTileSteps.length) {
                 this._setStepsGuideButtonVisible(true);
-                sap.m.MessageToast.show("No tiles available for the guide.");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("noTilesAvailable"));
                 return;
             }
             this.initUniversalTour(this._aPendingTileSteps);
@@ -749,7 +749,7 @@ sap.ui.define([
 
             const totalAfterAdd = aAttachments.length + oFiles.length;
             if (totalAfterAdd > 3) {
-                sap.m.MessageToast.show("You can upload a maximum of 3 files only");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("canUploadMaxThree"));
                 oEvent.getSource().clear();
                 return;
             }
@@ -759,13 +759,13 @@ sap.ui.define([
 
                 const bDuplicate = aAttachments.some(file => file.originalFilename === oFile.name);
                 if (bDuplicate) {
-                    sap.m.MessageToast.show("File already uploaded");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileALRUploaded"));
                     oEvent.getSource().clear();
                     return;
                 }
 
                 if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-                    sap.m.MessageToast.show("Only JPG, JPEG, PNG allowed");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("onlyJpgJpeg"));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -831,7 +831,7 @@ sap.ui.define([
                 oUploaderData.setProperty("/attachments", aAttachments);
                 oTokenModel.setProperty("/tokens", aTokens);
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Failed to process image.");
+                sap.m.MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("failedProcessImage"));
             } finally {
                 this.closeBusyDialog();
                 oEvent.getSource().clear();
@@ -931,7 +931,7 @@ sap.ui.define([
             // }
 
             if (aAttachments.length > 3) {
-                MessageToast.show("You can upload maximum 3 images only.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("canUploadthree"));
                 return;
             }
 
@@ -952,7 +952,7 @@ sap.ui.define([
             this.getBusyDialog();
             await this.ajaxCreateWithJQuery("HM_Bug", payload);
             this.closeBusyDialog()
-            MessageToast.show("Bug submitted successfully");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bugSubmittedSuccessfully"));
 
           this.RB_onCancelButtonPress()
         },
@@ -1566,14 +1566,14 @@ sap.ui.define([
             var oRange = this._getAdminBookingDOBRange();
             if (!raw) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Date of birth is required");
+                oDatePicker.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("dateofBirthisRequired"));
                 oModel.setProperty("/NC/DateOfBirth", "");
                 return false;
             }
             raw.setHours(0, 0, 0, 0);
             if (raw < oRange.minDate || raw > oRange.maxDate) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Age must be between 0 and 100");
+                oDatePicker.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("ageBetween"));
                 oModel.setProperty("/NC/DateOfBirth", "");
                 return false;
             }
@@ -1701,14 +1701,14 @@ sap.ui.define([
             var oModel = this.getView().getModel("AdminBookingModel");
             if (!sValue) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("STD Code is required");
+                oSTD.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("stdCodeRequired"));
                 oModel.setProperty("/NC/STDCode", "");
                 return;
             }
             var STD_REGEX = /^\+[1-9][0-9]*$/;
             if (!STD_REGEX.test(sValue)) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("Must start with + and have no leading zero (e.g., +91)");
+                oSTD.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("startNoLeading"));
                 oModel.setProperty("/NC/STDCode", "");
             } else {
                 oSTD.setValueState("None");
@@ -2186,7 +2186,7 @@ sap.ui.define([
                 var oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
                 if (oResp && oResp.success === false) {
                     MessageBox.error(oResp.message || this.i18nModel.getText("adminBookingRegisterFailed"), {
-                        title: "Registration Failed",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"),
                         styleClass: "myUnifiedBtn"
                     });
                     return;
@@ -2201,7 +2201,7 @@ sap.ui.define([
                 var oUser = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
                 if (!oUser || !oUser.UserID) {
                     MessageBox.error(this.i18nModel.getText("adminBookingCustomerReadFailed"), {
-                        title: "Registration Failed",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"),
                         styleClass: "myUnifiedBtn"
                     });
                     return;
@@ -2216,7 +2216,7 @@ sap.ui.define([
             } catch (err) {
                 var sMsg = (err && err.responseJSON && err.responseJSON.message) ||
                     this.i18nModel.getText("adminBookingRegisterFailed");
-                MessageBox.error(sMsg, { title: "Registration Failed", styleClass: "myUnifiedBtn" });
+                MessageBox.error(sMsg, { title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"), styleClass: "myUnifiedBtn" });
             } finally {
                 this.closeBusyDialog();
             }

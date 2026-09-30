@@ -23,7 +23,7 @@
             /> -->
 			<Button
                 id="idMyBookingBtn"
-                text="My Bookings"
+                text="{i18n>tour_title_mybookings}"
                 press="onMyBookingsPress"
                 class="myUnifiedBtn sapUiTinyMarginEnd"
             />
@@ -249,7 +249,7 @@
                     id="id4roomTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiTinyMargin glassTile"
-                    header="Generate Invoice"
+                    header="{i18n>invoiceDetails}"
                     press="TileV_onpressManageInvoice"
                 >
                 
@@ -261,7 +261,7 @@
                     id="idinvoiceTile"
                     visible="{= ${TileVisibility>/ManageInvoice}!== 0?true:false }"
                     class="sapUiTinyMargin glassTile"
-                    header="Additional Invoice"
+                    header="{i18n>additionalInvoice}"
                     press="TileV_onpressInvoice"
                 >
 						<TileContent unit="{i18n>ManagecustomizedInvoice}">
@@ -390,7 +390,7 @@
 			<Button
             id="TP_StepsGuideBtn"
             visible="{tilePageView>/isStepsGuideVisible}"
-            text="Steps Guide"
+            text="{i18n>stepsGuide}"
             icon="sap-icon://learning-assistant"
             press="onStartGuide"
             class="guideButtonLarge myunifiedBtn"
@@ -421,7 +421,7 @@
         <ToolbarSpacer />
         <Button
                 id="AdminusermanualLink"
-                text="User Manual"
+                text="{i18n>userManualTitle}"
                 class="myUnifiedBtn"
                 press="onAdminUsermanualPress" />
 

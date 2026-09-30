@@ -134,11 +134,11 @@
 							id="AB_id_NC_Salutation"
 							selectedKey="{AdminBookingModel>/NC/Salutation}"
 							change="onAdminBookingNCSalutationChange"
-							placeholder="Mr.">
-							<c:ListItem key="Mr." text="Mr."/>
-							<c:ListItem key="Ms." text="Ms."/>
-							<c:ListItem key="Mrs." text="Mrs."/>
-							<c:ListItem key="Dr." text="Dr."/>
+							placeholder="{i18n>mr_}">
+							<c:ListItem key="Mr." text="{i18n>mr_}"/>
+							<c:ListItem key="Ms." text="{i18n>ms}"/>
+							<c:ListItem key="Mrs." text="{i18n>mrs}"/>
+							<c:ListItem key="Dr." text="{i18n>dr}"/>
 						</ComboBox>
 					</VBox>
 					<VBox width="65%" class="sapUiTinyMarginBegin">
@@ -171,10 +171,10 @@
 					id="AB_id_NC_Gender"
 					selectedKey="{AdminBookingModel>/NC/Gender}"
 					valueStateText="{i18n>pleaseselectGender}">
-					<c:Item key="" text="Select Gender"/>
-					<c:Item key="Male" text="Male"/>
-					<c:Item key="Female" text="Female"/>
-					<c:Item key="Other" text="Other"/>
+					<c:Item key="" text="{i18n>selectGender_6159}"/>
+					<c:Item key="Male" text="{i18n>male}"/>
+					<c:Item key="Female" text="{i18n>female}"/>
+					<c:Item key="Other" text="{i18n>other}"/>
 				</Select>
 
 				<c:Title text="{i18n>adminBookingNCContactDetails}"/>
@@ -234,7 +234,7 @@
 							id="AB_id_NC_STD"
 							value="{AdminBookingModel>/NC/STDCode}"
 							change="onAdminBookingNCSTDChange"
-							placeholder="ISD"
+							placeholder="{i18n>iSD}"
 							showSecondaryValues="true"
 							width="100%"
 							items="{path:'CountryModel>/', length:1000}"
