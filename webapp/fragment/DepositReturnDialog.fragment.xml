@@ -7,7 +7,7 @@
 >
     <Dialog
         id="depositReturnDialog"
-        title="Return Deposit"
+        title="{i18n>returnDeposit}"
         contentWidth="500px"
         stretch="false"
         afterClose="onDialogAfterClose"
@@ -33,21 +33,21 @@
                 singleContainerFullSize="false"
             >
                 <!-- Booking ID (Read-only) -->
-                <Label text="Booking ID" />
+                <Label text="{i18n>bookingID}" />
                 <Text
                     id="inBookingID"
                     text="{DepositView>/CurrentDeposit/BookingID}"
                 />
 
                 <!-- Customer Name (Read-only) -->
-                <Label text="Customer Name" />
+                <Label text="{i18n>customerName}" />
                 <Text
                     id="inCustomerName"
                     text="{DepositView>/CurrentDeposit/CustomerName}"
                 />
 
                 <!-- Deposit Amount (Read-only) -->
-                <Label text="Deposit Amount" />
+                <Label text="{i18n>depositAmount}" />
                 <Text
                     id="inDepositAmount"
                     text="{
@@ -60,7 +60,7 @@
                 />
 
                 <!-- Deposit Taken By (Read-only) -->
-                <Label text="Deposit Received By" />
+                <Label text="{i18n>depositReceived}" />
                 <Text
                     id="inDepositTakenBy"
                     text="{DepositView>/CurrentDeposit/DepositTakenBy}"
@@ -68,7 +68,7 @@
 
                 <!-- Return Amount -->
                 <Label
-                    text="Return Amount"
+                    text="{i18n>returnAmount}"
                     required="true"
                 />
                 <Input
@@ -76,7 +76,7 @@
                     value="{
                         path: 'DepositView>/CurrentDeposit/ReturnDepositAmount'
                     }"
-                    placeholder="Enter return amount"
+                    placeholder="{i18n>enterReturnAmount_dc9f}"
                     change="_validateReturnAmount"
                     liveChange="_validateReturnAmount"
                     maxLength="12"
@@ -84,23 +84,23 @@
 
                 <!-- Return Mode -->
                 <Label
-                    text="Return Mode"
+                    text="{i18n>returnMode}"
                     required="true"
                 />
 <ComboBox
     id="inReturnMode"
     selectedKey="{DepositView>/CurrentDeposit/ReturnDepositMode}"
-    placeholder="Select return mode"
+    placeholder="{i18n>selectReturnMode}"
     change="_onReturnModeChange"
-    valueStateText="Select a valid return mode"
+    valueStateText="{i18n>SelValid}"
 >
                     <core:Item
                         key="CASH"
-                        text="CASH"
+                        text="{i18n>cash}"
                     />
                     <core:Item
                         key="UPI"
-                        text="UPI"
+                        text="{i18n>uPI}"
                     />
              
 
@@ -108,21 +108,21 @@
 
                 <!-- Return Transaction ID -->
                 <Label
-                    text="Transaction ID"
+                    text="{i18n>invoiceTransactionID}"
                     required="false"
                 />
                 <Input
                     id="inReturnTransactionID"
                     value="{DepositView>/CurrentDeposit/ReturnDepositTransactionID}"
-                    placeholder="Enter transaction id"
+                    placeholder="{i18n>enterTransactionId}"
                     change="_validateTransactionID"
                     liveChange="_validateTransactionID"
-                    valueStateText="Transaction ID is required for non-cash transactions"
+                    valueStateText="{i18n>TRNTS}"
                     maxLength="30"
                 />
 
                 <!-- Return Deposit By (Auto-filled from login) -->
-                <Label text="Returning By" />
+                <Label text="{i18n>returning}" />
                 <Text
                     id="inReturnDepositBy"
                     text="{
@@ -134,13 +134,13 @@
 
         <buttons>
             <Button
-                text="Return Deposit"
+                text="{i18n>returnDeposit}"
                 class="myUnifiedBtn"
                 press="onSaveReturn"
             />
 
             <Button
-                text="Cancel"
+                text="{i18n>CancelButton}"
                 press="onDialogClose"
                 class="myUnifiedBtn"
             />

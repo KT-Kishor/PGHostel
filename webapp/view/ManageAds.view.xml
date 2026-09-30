@@ -60,13 +60,13 @@
                 <columns>
                     <Column demandPopin="true">
                         <Text
-                            text="URL"
-                            tooltip="URL"
+                            text="{i18n>URL}"
+                            tooltip="{i18n>URL}"
                         />
                     </Column>
                     <Column demandPopin="true">
                         <Text
-                            text="image"
+                            text="{i18n>image}"
                             tooltip="{i18n>image}"
                         />
                     </Column>

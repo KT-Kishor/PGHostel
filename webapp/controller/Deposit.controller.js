@@ -448,7 +448,7 @@ sap.ui.define([
                 sap.m.MessageBox.error(
                     err?.responseJSON?.message ||
                     err?.message ||
-                    "Failed to load deposit data."
+                    this.getView().getModel("i18n").getResourceBundle().getText("failedLoadDeposit")
                 );
             } finally {
                 this.closeBusyDialog()
@@ -570,7 +570,7 @@ sap.ui.define([
             var aSel = oTable.getSelectedItems();
 
             if (!aSel || aSel.length !== 1) {
-                MessageToast.show("Please select exactly one deposit to return.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectExactlyOne"));
                 return;
             }
 
@@ -580,7 +580,7 @@ sap.ui.define([
 
             // Check if deposit can be returned
             if (oData.Status === "Returned") {
-                MessageToast.show("This deposit has already been returned.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("depositAlreadyReturned"));
                 return;
             }
 
@@ -624,7 +624,7 @@ sap.ui.define([
                 : oData?.results || [];
 
             if (aData.length === 0) {
-                sap.m.MessageToast.show("No deposits available to download");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("noDepositsAvailable"));
                 return;
             }
 
@@ -717,7 +717,7 @@ sap.ui.define([
 
             // Validate return fields
             if (!this._validateReturnFields()) {
-                MessageToast.show("Please correct validation errors");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("correctValidationErrors"));
                 return;
             }
 
@@ -728,12 +728,12 @@ sap.ui.define([
 
             // SIMPLE: Just basic validation
             if (!userEnteredAmount || userEnteredAmount.trim() === "") {
-                MessageToast.show("Please enter return amount");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enterReturnAmount"));
                 return;
             }
 
             if (newReturnAmount < 0) {
-                MessageToast.show("Return amount cannot be negative");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("returnAmountCannot"));
                 return;
             }
 
@@ -742,7 +742,7 @@ sap.ui.define([
             const depositCurrency = oDeposit.DepositCurrency || "INR";
 
             if (newReturnAmount > depositAmount) {
-                MessageToast.show(`Return amount cannot exceed ${depositAmount.toFixed(2)}`);
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("returnAmountCannot_a7ac", [depositAmount.toFixed(2)]));
                 return;
             }
 
@@ -752,7 +752,7 @@ sap.ui.define([
             // Validate combobox using strict validation
             const isModeValid = this.utils._LCstrictValidationComboBox(oReturnModeInput, "ID");
             if (!isModeValid) {
-                MessageToast.show("Please select a valid return mode");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectValidReturn"));
                 return;
             }
 
@@ -766,7 +766,7 @@ sap.ui.define([
             if (returnMode !== "CASH" && oTransactionIDInput && oTransactionIDInput.getEnabled()) {
                 if (!transactionID || transactionID.trim() === "") {
                     oTransactionIDInput.setValueState("Error");
-                    MessageToast.show("Transaction ID is required for non-cash transactions");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("transactionIdRequired"));
                     return;
                 }
             }
@@ -807,7 +807,7 @@ sap.ui.define([
 
 
                 if (response && response.success) {
-                    MessageToast.show("Deposit returned successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("depositReturned"));
                 } else {
                     throw new Error(response?.message || "Update failed");
                 }
@@ -822,7 +822,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error in onSaveReturn:", err);
                 MessageBox.error(
-                    err?.responseJSON?.message || err.message || "Failed to process deposit return.",
+                    err?.responseJSON?.message || err.message || this.getView().getModel("i18n").getResourceBundle().getText("failedProcessDeposit"),
                     {
                         styleClass: "myUnifiedBtn"
                     }
@@ -843,7 +843,7 @@ sap.ui.define([
                 // Check if empty
                 if (!userEnteredAmount || userEnteredAmount.trim() === "") {
                     oReturnAmount.setValueState("Error");
-                    oReturnAmount.setValueStateText("Please enter return amount");
+                    oReturnAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterReturnAmount"));
                     return false; // Stop here
                 } else {
                     // Use validation utility for format
@@ -859,11 +859,11 @@ sap.ui.define([
 
                         if (newReturnAmount > depositAmount) {
                             oReturnAmount.setValueState("Error");
-                            oReturnAmount.setValueStateText(`Cannot exceed ${depositAmount.toFixed(2)}`);
+                            oReturnAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("cannotExceed", [depositAmount.toFixed(2)]));
                             return false; // Stop here
                         } else if (newReturnAmount < 0) {
                             oReturnAmount.setValueState("Error");
-                            oReturnAmount.setValueStateText("Amount cannot be negative");
+                            oReturnAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("amountCannotNegative"));
                             return false; // Stop here
                         } else {
                             oReturnAmount.setValueState("None");
@@ -916,7 +916,7 @@ sap.ui.define([
             // 1. If field is empty, show error
             if (!userEnteredAmount || userEnteredAmount.trim() === "") {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Please enter return amount");
+                oInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterReturnAmount"));
                 return false;
             }
 
@@ -929,11 +929,11 @@ sap.ui.define([
             // 3. Check amount range (0 to deposit amount)
             if (newReturnAmount > depositAmount) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(`Amount cannot exceed ${depositAmount.toFixed(2)}`);
+                oInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("amountCannotExceed", [depositAmount.toFixed(2)]));
                 return false;
             } else if (newReturnAmount < 0) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Amount cannot be negative");
+                oInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("amountCannotNegative"));
                 return false;
             } else {
                 oInput.setValueState("None");
@@ -1181,7 +1181,7 @@ sap.ui.define([
 
     // Validate selection
     if (aSelectedItems.length !== 1) {
-        sap.m.MessageToast.show("Please select exactly one deposit to edit");
+        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectExactlyOne_c6a9"));
         return;
     }
 
@@ -1248,7 +1248,7 @@ onSaveDeposit: async function () {
     var oSelectedItem = oTable.getSelectedItem();
 
     if (!oSelectedItem) {
-        MessageToast.show("Please select a record");
+        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectRecord"));
         return;
     }
  
@@ -1276,7 +1276,7 @@ onSaveDeposit: async function () {
     // 1. Deposit Date
     if (!oDepositDate.getDateValue()) {
         oDepositDate.setValueState("Error");
-        oDepositDate.setValueStateText("Enter deposit date");
+        oDepositDate.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterDepositDate"));
         bValid = false;
     } else {
         oDepositDate.setValueState("None");
@@ -1286,11 +1286,11 @@ onSaveDeposit: async function () {
     const sDepositAmount = (oDepositAmount.getValue() || "").trim();
     if (!sDepositAmount || parseFloat(sDepositAmount) <= 0) {
         oDepositAmount.setValueState("Error");
-        oDepositAmount.setValueStateText("Enter deposit amount");
+        oDepositAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("Enterdepositamount"));
         bValid = false;
     } else if (sDepositAmount.length > 10) {
         oDepositAmount.setValueState("Error");
-        oDepositAmount.setValueStateText("Deposit amount cannot exceed 10 digits");
+        oDepositAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("depositAmountCannot"));
         bValid = false;
     } else {
         oDepositAmount.setValueState("None");
@@ -1299,7 +1299,7 @@ onSaveDeposit: async function () {
     // 3. Deposit Mode
     if (!oDepositMode.getSelectedKey()) {
         oDepositMode.setValueState("Error");
-        oDepositMode.setValueStateText("Select deposit mode");
+        oDepositMode.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("selectDepositMode"));
         bValid = false;
     } else {
         oDepositMode.setValueState("None");
@@ -1308,7 +1308,7 @@ onSaveDeposit: async function () {
     // 4. Deposit Transaction ID - required only for UPI
     if (oDepositMode.getSelectedKey() === "UPI" && !(oDepositTxn.getValue() || "").trim()) {
         oDepositTxn.setValueState("Error");
-        oDepositTxn.setValueStateText("Enter transaction ID");
+        oDepositTxn.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterTransactionID"));
         bValid = false;
     } else {
         oDepositTxn.setValueState("None");
@@ -1318,7 +1318,7 @@ onSaveDeposit: async function () {
         // 5. Return Date
         if (!oReturnDate.getDateValue()) {
             oReturnDate.setValueState("Error");
-            oReturnDate.setValueStateText("Enter return date");
+            oReturnDate.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterReturnDate"));
             bValid = false;
         } else {
             oReturnDate.setValueState("None");
@@ -1328,11 +1328,11 @@ onSaveDeposit: async function () {
         const sReturnAmount = (oReturnAmount.getValue() || "").trim();
         if (!sReturnAmount || parseFloat(sReturnAmount) <= 0) {
             oReturnAmount.setValueState("Error");
-            oReturnAmount.setValueStateText("Enter return amount");
+            oReturnAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterReturnAmount_dc9f"));
             bValid = false;
         } else if (sReturnAmount.length > 10) {
             oReturnAmount.setValueState("Error");
-            oReturnAmount.setValueStateText("Return amount cannot exceed 10 digits");
+            oReturnAmount.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("returnAmountCannot_85a1"));
             bValid = false;
         } else {
             oReturnAmount.setValueState("None");
@@ -1341,7 +1341,7 @@ onSaveDeposit: async function () {
         // 7. Return Mode
         if (!oReturnMode.getSelectedKey()) {
             oReturnMode.setValueState("Error");
-            oReturnMode.setValueStateText("Select return mode");
+            oReturnMode.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("selectReturnMode"));
             bValid = false;
         } else {
             oReturnMode.setValueState("None");
@@ -1350,7 +1350,7 @@ onSaveDeposit: async function () {
         // 8. Return Transaction ID - required only for UPI
         if (oReturnMode.getSelectedKey() === "UPI" && !(oReturnTxn.getValue() || "").trim()) {
             oReturnTxn.setValueState("Error");
-            oReturnTxn.setValueStateText("Enter transaction ID");
+            oReturnTxn.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterTransactionID"));
             bValid = false;
         } else {
             oReturnTxn.setValueState("None");
@@ -1365,12 +1365,12 @@ onSaveDeposit: async function () {
     var sBookingID = oDeposit.BookingID;
 
     if (!sBookingID) {
-        MessageToast.show("Booking ID is required");
+        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingIdRequired"));
         return;
     }
     // Validate required fields
     if (!oDeposit.CustomerName || oDeposit.CustomerName.trim() === "") {
-        MessageToast.show("Customer name is required");
+        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("customerNameRequired"));
         return;
     }
 
@@ -1425,7 +1425,7 @@ onSaveDeposit: async function () {
         const response = await this.ajaxUpdateWithJQuery("HM_Deposit", apiPayload);
 
         if (response && response.success) {
-            MessageToast.show("Deposit updated successfully");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("depositUpdated"));
         } else {
             throw new Error(response?.message || "Update failed");
         }
@@ -1439,7 +1439,7 @@ onSaveDeposit: async function () {
     } catch (err) {
         console.error("Error in onSaveDeposit:", err);
           MessageBox.error(
-            err?.responseJSON?.message || err.message || "Failed to update deposit."
+            err?.responseJSON?.message || err.message || this.getView().getModel("i18n").getResourceBundle().getText("failedUpdateDeposit")
         );
     } finally {
         this.closeBusyDialog();

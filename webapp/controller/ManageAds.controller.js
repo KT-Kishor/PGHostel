@@ -194,7 +194,7 @@ sap.ui.define([
 
             // Final validation
             if (!bHasExistingImage && !bHasNewImage) {
-                MessageToast.show("Please upload at least 1 image.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("uploadLeastImage"));
                 return;
             }
 
@@ -243,7 +243,7 @@ sap.ui.define([
                 await this._loadAds();
 
             } catch (err) {
-                MessageToast.show(err.message || err.responseText || "An error occurred.");
+                MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorOccurred"));
                 this.closeBusyDialog()
             } finally {
                 this.closeBusyDialog();
@@ -280,7 +280,7 @@ sap.ui.define([
             for (const oFile of aFiles) {
                 const sExt = oFile.name.includes(".") ? oFile.name.split(".").pop().toLowerCase() : "";
                 if (!["jpg", "jpeg", "png"].includes(sExt)) {
-                    sap.m.MessageToast.show("Only JPG, JPEG, and PNG files are allowed.");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("onlyJpgJpeg"));
                     if (oFileUploader) oFileUploader.clear();
                     return;
                 }
@@ -292,14 +292,14 @@ sap.ui.define([
             let aTokens = oTokenModel.getProperty("/tokens") || [];
 
             if (aExistingPhotos.length + aFiles.length > 2) {
-                sap.m.MessageToast.show("You can upload maximum 2 photos only");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("canUploadMaximum"));
                 if (oFileUploader) oFileUploader.clear();
                 return;
             }
 
             for (const oFile of aFiles) {
                 if (aExistingPhotos.some(photo => photo.originalName === oFile.name)) {
-                    sap.m.MessageToast.show("File already uploaded: " + oFile.name);
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileAlreadyUploaded_9543", [oFile.name]));
                     if (oFileUploader) oFileUploader.clear();
                     return;
                 }
@@ -385,7 +385,7 @@ sap.ui.define([
 
             } catch (err) {
                 this.closeBusyDialog();
-                sap.m.MessageToast.show(err.message || "Failed to process image.");
+                sap.m.MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("failedProcessImage"));
             } finally {
                 this.closeBusyDialog();
                 if (oFileUploader) oFileUploader.clear();
@@ -440,9 +440,9 @@ sap.ui.define([
             }
 
             MessageBox.confirm(
-                "Are you sure you want to Delete the Selected data?", {
+                this.getView().getModel("i18n").getResourceBundle().getText("sureDeleteSelected"), {
                     icon: MessageBox.Icon.WARNING,
-                    title: "Confirm Deletion",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("msgBoxConfirm"),
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
                     styleClass: "myUnifiedBtn",
@@ -541,8 +541,8 @@ sap.ui.define([
             // No images
             if (aImages.length === 0) {
                 sap.m.MessageBox.information(
-                    "No image is uploaded.", {
-                        title: "Information",
+                    this.getView().getModel("i18n").getResourceBundle().getText("Noimageisuploaded"), {
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("Information"),
                         styleClass: "myUnifiedBtn"
                     }
                 );
