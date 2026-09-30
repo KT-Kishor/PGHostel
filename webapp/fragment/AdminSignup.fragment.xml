@@ -48,11 +48,11 @@
             singleContainerFullSize="false"
         >
             <f:content>
-                <core:Title text="Personal Details" />
+                <core:Title text="{i18n>adminBookingNCPersonalDetails}" />
 
                 <Label
                     required="true"
-                    text="Full Name"
+                    text="{i18n>fullname}"
                 />
                 <HBox
                     width="100%"
@@ -232,7 +232,7 @@
                 </ComboBox>
 
                 <Label
-                    text="Mobile No"
+                    text="{i18n>mobileNo}"
                     required="true"
                 />
                 <HBox width="100%">
@@ -241,7 +241,7 @@
 id="adminsignUpSTD" 
 value="{AdminSignupModel>/STDCode}" 
 change="ADMIN_onChangeSTD" 
-placeholder="ISD" 
+placeholder="{i18n>iSD}" 
 showSecondaryValues="true" 
 width="100%" 
 items="{path:'CountryModel>/', length:1000}" 

@@ -480,7 +480,7 @@
                                         text="Other"
                                     />
                                 </Select>
-<core:Title text="Contact Details" />
+<core:Title text="{i18n>adminBookingNCContactDetails}" />
 
 
 
@@ -647,7 +647,7 @@
                                     maxLength="120"
                                 />
 
-<core:Title text="Create Password" />
+<core:Title text="{i18n>CreatePassword}" />
 
 
 <MessageStrip
