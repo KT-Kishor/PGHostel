@@ -78,7 +78,7 @@ onViewDemo: function (oEvent) {
     var oContext = oEvent.getSource().getBindingContext("manual");
 
     if (!oContext) {
-        sap.m.MessageToast.show("Video information not found.");
+        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("videoInformationNot"));
         return;
     }
 
@@ -207,7 +207,7 @@ onVideoDialogClose: function () {
     var sFileName = oButton.data("pdfFile");
 
     if (!sFileName) {
-        MessageToast.show("PDF file is not configured");
+        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("pdfFileNot"));
         return;
     }
 
