@@ -1582,7 +1582,7 @@ sap.ui.define([
                 this._selectedFile = null;
                 this._restoreMemberDocumentData(oPreviousDocData, sTempId);
                 console.error(err);
-                sap.m.MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+                sap.m.MessageBox.error(err.message || this.getView().getModel("i18n").getResourceBundle().getText("compressionFailedTry"));
             } finally {
                 oFileUploader.clear();
                 this._showBusyOnUploader(false);
@@ -2723,7 +2723,7 @@ sap.ui.define([
                     this.getBusyDialog();
                     const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
                     if (!sUserID) {
-                        MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
+                        MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || this.getView().getModel("i18n").getResourceBundle().getText("UserIDnotfound"));
                         return;
                     }
 
@@ -2745,7 +2745,7 @@ sap.ui.define([
 
                     oModel.setProperty("/Payments", aPayments);
                 } catch (err) {
-                    sap.m.MessageToast.show(err.message || err.responseText || "Error loading payments");
+                    sap.m.MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingPayments"));
                 } finally {
                     this.closeBusyDialog();
                     // Update counts for table
@@ -2780,7 +2780,7 @@ sap.ui.define([
             try {
                 const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
                 if (!sUserID) {
-                    MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || "UserID not found.");
+                    MessageToast.show(this.i18nModel.getText("customerIDnotfoundforthisBooking") || this.getView().getModel("i18n").getResourceBundle().getText("UserIDnotfound"));
                     return;
                 }
 
@@ -2807,7 +2807,7 @@ sap.ui.define([
                 // is reset whenever the lightweight list is (re)loaded.
                 this._mMemberDocumentCache = {};
             } catch (err) {
-                sap.m.MessageToast.show(err.message || err.responseText || "Error loading members");
+                sap.m.MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingMembers"));
             } finally {
                 this._updateRowCount();
                 this.closeBusyDialog();
@@ -2968,7 +2968,7 @@ sap.ui.define([
                 oModel.setProperty("/bookings", aBookingData);
                 this._updateRowCount();
             } catch (err) {
-                MessageToast.show(err.message || "Error loading bookings");
+                MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingBookings"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -3031,7 +3031,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error loading complaints", err);
                 if (!bSilent) {
-                    MessageToast.show(err.message || err.responseText || "Error loading complaints");
+                    MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingComplaints"));
                 }
             } finally {
                 if (!bSilent) {
@@ -3176,7 +3176,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error loading damage", err);
                 if (!bSilent) {
-                    MessageToast.show(err?.message || err?.responseText || "Error loading damage");
+                    MessageToast.show(err?.message || err?.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingDamage"));
                 }
             } finally {
                 this.closeBusyDialog();
@@ -4499,7 +4499,7 @@ sap.ui.define([
                 oTempModel.setProperty("/FileType", "");
                 oTempModel.setProperty("/FileContent", "");
                 console.error(err);
-                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+                MessageBox.error(err.message || this.getView().getModel("i18n").getResourceBundle().getText("compressionFailedTry"));
             } finally {
                 oUploader.clear();
             }
@@ -4729,7 +4729,7 @@ sap.ui.define([
                 if (err.responseJSON) {
                     console.error("Server message:", err.responseJSON.message);
                 }
-                MessageToast.show(this.i18nModel.getText("errorSavingComplaint") || "Error saving complaint.");
+                MessageToast.show(this.i18nModel.getText("errorSavingComplaint") || this.getView().getModel("i18n").getResourceBundle().getText("errorSavingComplaint"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -4832,7 +4832,7 @@ sap.ui.define([
 
                         MessageToast.show(
                             err.responseText ||
-                            "Failed to Load Customer Data."
+                            this.getView().getModel("i18n").getResourceBundle().getText("failedLoadCustomer_MP")
                         );
                         this.closeBusyDialog()
                         reject(err);
@@ -4911,7 +4911,7 @@ sap.ui.define([
 
             if (!oRow || !oRow.MemberID) {
                 sap.m.MessageToast.show(
-                    this.i18nModel.getText("noDocumentFoundforthismember") || "No document available"
+                    this.i18nModel.getText("noDocumentFoundforthismember") || this.getView().getModel("i18n").getResourceBundle().getText("Nodocumentavailable")
                 );
                 return;
             }
@@ -4924,7 +4924,7 @@ sap.ui.define([
             try {
                 oData = await this._fetchMemberDocument(oRow.MemberID);
             } catch (err) {
-                sap.m.MessageToast.show(err.message || err.responseText || "No document found");
+                sap.m.MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                 return;
             } finally {
                 this.closeBusyDialog();
@@ -4932,7 +4932,7 @@ sap.ui.define([
 
             if (!oData || !oData.Attachment) {
                 sap.m.MessageToast.show(
-                    this.i18nModel.getText("noDocumentFoundforthismember") || "No document found"
+                    this.i18nModel.getText("noDocumentFoundforthismember") || this.getView().getModel("i18n").getResourceBundle().getText("nodocfound")
                 );
                 return;
             }
@@ -5445,14 +5445,14 @@ sap.ui.define([
                 aImages = await this._fetchSupportTicketImages(oTicket.TicketID);
             } catch (err) {
                 console.error("Error loading support images", err);
-                MessageToast.show(err?.message || err?.responseText || "Failed to load images");
+                MessageToast.show(err?.message || err?.responseText || this.getView().getModel("i18n").getResourceBundle().getText("failedLoadImages"));
                 return;
             } finally {
                 this.closeBusyDialog();
             }
 
             if (!aImages.length) {
-                MessageBox.information("No images uploaded.", {
+                MessageBox.information(this.getView().getModel("i18n").getResourceBundle().getText("noImagesUploaded"), {
                     styleClass: "myUnifiedBtn"
                 });
                 return;
@@ -5742,7 +5742,7 @@ sap.ui.define([
                 oImagesModel.setData(aImages.concat(aAdded));
             } catch (err) {
                 oImagesModel.setData(aImages);
-                MessageToast.show(err.message || "Failed to process image.");
+                MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("failedProcessImage"));
             } finally {
                 this._bSupportImageProcessing = false;
                 oEvent.getSource().clear();
@@ -6061,7 +6061,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error saving support request", err);
                 MessageToast.show(err?.message || err?.responseText ||
-                    (bIsEdit ? "Error while updating support request" : "Error while submitting support request"));
+                    (bIsEdit ? this.getView().getModel("i18n").getResourceBundle().getText("errorWhileUpdating") : this.getView().getModel("i18n").getResourceBundle().getText("errorWhileSubmitting")));
             } finally {
                 this.closeBusyDialog();
             }
@@ -6133,7 +6133,7 @@ sap.ui.define([
             } catch (err) {
                 console.error("Error loading support tickets", err);
                 if (!bSilent) {
-                    MessageToast.show(err?.message || err?.responseText || "Error loading support tickets");
+                    MessageToast.show(err?.message || err?.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingSupport"));
                 }
             } finally {
                 if (!bSilent) {

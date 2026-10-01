@@ -308,15 +308,15 @@
                         >
                             <core:Item
                                 key="Male"
-                                text="Male"
+                                text="{i18n>male}"
                             />
                             <core:Item
                                 key="Female"
-                                text="Female"
+                                text="{i18n>female}"
                             />
                             <core:Item
                                 key="Other"
-                                text="Other"
+                                text="{i18n>other}"
                             />
                         </ComboBox>
 
@@ -333,7 +333,7 @@
                             liveChange="MPonAddressChange"
                             growing="false"
                             width="100%"
-                            valueStateText="Enter the address"
+                            valueStateText="{i18n>enterAddress_MP}"
                         />
                     </f:content>
                 </f:SimpleForm>
@@ -424,7 +424,7 @@
             visible="{= ${profileData>/selectedTab} === 'Booking History' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No booking history found"
+            noDataText="{i18n>noBookingHistory}"
             items="{
                 path: 'profileData>/bookings',
                 sorter: [
@@ -502,7 +502,7 @@
             visible="{= ${profileData>/selectedTab} === 'Members' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No Member history found"
+            noDataText="{i18n>noMemberHistory}"
             items="{
                     path: 'profileData>/Members',
                    sorter: []
@@ -567,7 +567,7 @@
 
         <Table
             id="Id_PaymentTable1"
-            noDataText="No Payment history found"
+            noDataText="{i18n>noPaymentHistory}"
             visible="{= ${profileData>/selectedTab} === 'Payment' }"
             updateFinished="onTableUpdateFinished"
             items="{
@@ -637,7 +637,7 @@
             visible="{= ${profileData>/selectedTab} === 'Complaints' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No complaints history found"
+            noDataText="{i18n>noComplaintsHistory}"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -736,7 +736,7 @@
                             icon="sap-icon://edit"
                             type="Transparent"
                             press="onPressComplaintRow"
-                            tooltip="Edit Complaint"
+                            tooltip="{i18n>editComplaint}"
                             visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"
                             class="myUnifiedBtn"
                         />
@@ -748,7 +748,7 @@
             id="Id_DamageTable"
             visible="{= ${profileData>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
-            noDataText="No damage history found"
+            noDataText="{i18n>noDamageHistory}"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -838,7 +838,7 @@
             visible="{= ${profileData>/selectedTab} === 'Raised Support' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No raised support history found"
+            noDataText="{i18n>noRaisedSupport}"
             width="auto"
             items="{
                 path: 'profileData>/supportTickets',
@@ -861,7 +861,7 @@
                     demandPopin="true"
                     width="12rem"
                 >
-                    <Text text="Issue" />
+                    <Text text="{i18n>issue}" />
                 </Column>
                 <Column
                     demandPopin="true"
@@ -935,7 +935,7 @@
                         />
                         <Link
                             text="{i18n>view}"
-                            tooltip="View Support Images"
+                            tooltip="{i18n>viewSupportImages}"
                             press="onPressSupportImageView"
                             class="tealTextLink"
                         />
@@ -943,7 +943,7 @@
                             icon="sap-icon://edit"
                             type="Transparent"
                             press="onPressSupportRow"
-                            tooltip="Edit Support Request"
+                            tooltip="{i18n>editSupportRequest}"
                             visible="{path: 'profileData>Status', formatter: '.Formatter.canEditSupport'}"
                             class="myUnifiedBtn"
                         />

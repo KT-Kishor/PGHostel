@@ -41,7 +41,7 @@
                 <Input
                     id="MPSR_id_IssueName"
                     placeholder="{i18n>enterissuename}"
-                    valueStateText="Enter issue name"
+                    valueStateText="{i18n>enterissuename}"
                     value="{MP_SupportModel>/IssueName}"
                     liveChange="onMPSupportIssueNameChange"
                     maxLength="100"
@@ -55,7 +55,7 @@
                 <ComboBox
                     id="MPSR_id_IssueType"
                     valueStateText="{i18n>enterissuetype}"
-                    placeholder="Select issue type"
+                    placeholder="{i18n>selectIssueType}"
                     value="{MP_SupportModel>/IssueType}"
                     change="onMPSupportIssueTypeChange"
                     items="{SupportRequest>/}"
@@ -76,7 +76,7 @@
                     rows="4"
                     liveChange="onMPSupportDescriptionChange"
                     valueStateText="{i18n>enterdetails}"
-                    placeholder="Enter issue description"
+                    placeholder="{i18n>enterIssueDescription}"
                     value="{MP_SupportModel>/IssueDescription}"
                     maxLength="500"
                 />
@@ -117,7 +117,7 @@
                                 <Button
                                     icon="sap-icon://delete"
                                     type="Transparent"
-                                    tooltip="Remove"
+                                    tooltip="{i18n>Remove}"
                                     class="myUnifiedBtn"
                                     press="onMPSupportImageRemove"
                                     visible="{= ${MP_SupportImages>source} !== 'processing' }"
@@ -133,7 +133,7 @@
                             change="onMPSupportFileChange"
                             buttonOnly="true"
                             iconFirst="true"
-                            buttonText="Upload Images"
+                            buttonText="{i18n>UploadImages}"
                             multiple="true"
                             uploadOnChange="false"
                             class="myUnifiedBtn"
@@ -147,12 +147,12 @@
             <Toolbar>
                 <ToolbarSpacer />
                 <Button
-                    text="Submit"
+                    text="{i18n>submit}"
                     press="onMPSupportSubmit"
                     class="marginRight myUnifiedBtn"
                 />
                 <Button
-                    text="Cancel"
+                    text="{i18n>actionCancel}"
                     press="onMPSupportDialogCancel"
                     class="marginRight myUnifiedBtn"
                 />
