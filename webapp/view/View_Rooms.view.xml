@@ -139,7 +139,7 @@
 
 							<VBox class="sapUiSmallMarginBottom vrHeaderSection vrHeaderSectionSecondary">
 								<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow">
-									<Label text="Address:" design="Bold" class="vrHeaderLabel" />
+									<Label text="{i18n>RoomAddress}" design="Bold" class="vrHeaderLabel" />
 									<Link
 										text="{BranchModel>/Address}"
 										href="{BranchModel>/GeoLocation}"
@@ -148,7 +148,7 @@
 										class="vrHeaderValueLink tealTextLink" />
 								</HBox>
 								<HBox alignItems="Center" class="sapUiTinyMarginBottom vrHeaderFieldRow vrRatingRow">
-									<Label text="User Rating:" design="Bold" class="vrHeaderLabel" />
+									<Label text="{i18n>UserRating}" design="Bold" class="vrHeaderLabel" />
 									<HBox id="VR_id_RatingClickable" alignItems="Center" class="vrHeaderValueBox vrRatingClickable">
 										<RatingIndicator
 											value="{= Number(${VisibilityModel>/AverageRating}) || 0 }"

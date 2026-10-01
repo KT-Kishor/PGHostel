@@ -17,7 +17,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="Enquiry Form" />
+                    <Title text="{i18n>EnquiryForm}" />
                 </contentMiddle>
             </Bar>
         </customHeader>
@@ -42,7 +42,7 @@
                 />
                 <Label
                     required="true"
-                    text="Name"
+                    text="{i18n>adminBookingECName}"
                 />
                 <HBox
                     width="100%"
@@ -54,24 +54,24 @@
                             id="id_Salutation"
                             selectedKey="{EnquiryModel>/Salutation}"
                             change="onAdminChangeSalutation"
-                            placeholder="Mr./ Ms./ Dr."
+                            placeholder="{i18n>MrMsDr}"
                             valueStateText="{i18n>MVDsalutation}"
                         >
                             <core:ListItem
                                 key="Mr."
-                                text="Mr."
+                                text="{i18n>Mr}"
                             />
                             <core:ListItem
                                 key="Ms."
-                                text="Ms."
+                                text="{i18n>Ms}"
                             />
                             <core:ListItem
                                 key="Mrs."
-                                text="Mrs."
+                                text="{i18n>Mrs}"
                             />
                             <core:ListItem
                                 key="Dr."
-                                text="Dr."
+                                text="{i18n>Dr}"
                             />
                         </ComboBox>
                     </VBox>
@@ -90,7 +90,7 @@
                     </VBox>
                 </HBox>
                 <Label
-                    text="Mobile No"
+                    text="{i18n>adminBookingNCMobile}"
                     required="true"
                 />
                 <HBox width="100%">
@@ -99,12 +99,12 @@
                             id="id_enq_STD"
                             selectedKey="{EnquiryModel>/STDCode}"
                             change="ADMIN_onChangeSTD"
-                            placeholder="ISD"
+                            placeholder="{i18n>iSD}"
                             showSecondaryValues="true"
                             width="100%"
                             items="{path:'CountryModel>/', length:1000}"
                             filterSecondaryValues="true"
-                            valueStateText="Select ISD Code"
+                            valueStateText="{i18n>SelectISDCode}"
                         >
                             <core:ListItem
                                 key="{CountryModel>stdCode}"
@@ -122,9 +122,9 @@
                             value="{EnquiryModel>/Mobile}"
                             liveChange="ADMIN_onMobileLiveChange"
                             maxLength="18"
-                            placeholder="Enter mobile number"
+                            placeholder="{i18n>Entermobilenumber}"
                             width="100%"
-                            valueStateText="Enter valid mobile number"
+                            valueStateText="{i18n>MSmobileNoValueStateINT}"
                         />
                     </VBox>
                 </HBox>
@@ -142,7 +142,7 @@
                     valueStateText="{i18n>MSenterValidEmail}"
                 />
                 <Label
-                    text="Comments"
+                    text="{i18n>comments}"
                     required="true"
                 />
 
@@ -151,17 +151,17 @@
                     value="{EnquiryModel>/Comments}"
                     rows="7"
                     width="100%"
-                    placeholder="Enter comments"
+                    placeholder="{i18n>enterComments}"
                     maxLength="500"
-                    valueStateText="Enter comments"
+                    valueStateText="{i18n>enterComments}"
                     liveChange="onEnqCommentsChange"
                 />
             </f:content>
         </f:SimpleForm>
         <beginButton>
             <Button
-                text="Send"
-                tooltip="Send"
+                text="{i18n>send}"
+                tooltip="{i18n>send}"
                 press="E_onsavebuttonpress"
                 id="E_id_saveButton"
                 class="marginRight myUnifiedBtn"

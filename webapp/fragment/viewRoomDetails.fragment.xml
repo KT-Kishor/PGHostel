@@ -186,7 +186,7 @@
                             id="bookTile"
                             class="priceItem defaultTile bookNowTile"
                             frameType="OneByHalf"
-                            header="{= ${HostelModel>/Visible} ? 'Book Now' : 'Occupied' }"
+                            header="{= ${HostelModel>/Visible} ? ${i18n>adminBookingBookNow} : ${i18n>occupied} }"
                             state="Loaded"
                             press=".onConfirmBooking"
                         />
@@ -230,7 +230,7 @@
                                 />
                                 <Text
                                     class="unifiedCardText"
-                                    text="{        parts: [            'FacilityModel>Price',            'FacilityModel>Currency'        ],        formatter: '.Formatter.VRD_formatFacilityPrice'      }"
+                                    text="{parts: ['FacilityModel>Price','FacilityModel>Currency'],formatter: '.Formatter.VRD_formatFacilityPrice'}"
                                 />
                             </VBox>
                         </items>
