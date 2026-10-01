@@ -1684,12 +1684,12 @@
 
                                             if (iValue > 10000) {
                                                 oStepInput.setValue(10000);
-                                                sap.m.MessageToast.show("Maximum quantity allowed is 10,000");
+                                                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("maximumQuantityAllowed"));
                                             } else if (iValue < 1 || isNaN(iValue)) {
                                                 oStepInput.setValue(1);
-                                                sap.m.MessageToast.show("Minimum quantity must be 1");
+                                                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("minimumQuantityAllowed"));
                                             }
-                                        }
+                                        }.bind(this)
                                     }).addStyleClass("facilityQtyModeStepInput")
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
@@ -6005,7 +6005,7 @@
                 oModel.setProperty("/AppliedCouponData", oMatchedCoupon);
                 this._recalculateSummary();
 
-                let sMessage = "Coupon applied successfully";
+                let sMessage = this.getView().getModel("i18n").getResourceBundle().getText("couponAppliedSuccessfully");
                 if (oMatchedCoupon.Description) {
                     // sMessage += ": " + oMatchedCoupon.Description;
                 }
@@ -6211,9 +6211,9 @@
 
             var sRemovalReason = "";
             if (!oMatchedCoupon) {
-                sRemovalReason = "is no longer available";
+                sRemovalReason = this.getView().getModel("i18n").getResourceBundle().getText("couponNoLongerAvailable");
             } else if (Number(oMatchedCoupon.couponUsedCount || 0) >= Number(oMatchedCoupon.MaxUses || 0)) {
-                sRemovalReason = "has reached its maximum usage limit";
+                sRemovalReason = this.getView().getModel("i18n").getResourceBundle().getText("couponMaxUsageReached");
             }
 
             if (!sRemovalReason) {
@@ -6223,8 +6223,7 @@
             this._resetCouponState(false);
             this._recalculateSummary();
             this._showCouponInvalidMessage(
-                "The applied coupon '" + sAppliedCode + "' " + sRemovalReason +
-                " and has been removed from this booking. Please review the updated total before continuing."
+                this.getView().getModel("i18n").getResourceBundle().getText("couponRemovedMessage", [sAppliedCode, sRemovalReason])
             );
             return false;
         },
@@ -7186,11 +7185,11 @@
                     sErrorMessage = oError.message;
                 }
 
-                let sErrorTitle = "Error";
+                let sErrorTitle = this.getView().getModel("i18n").getResourceBundle().getText("bookingErrorTitle");
 
                 // Lowercase string ke saath lowercase match karo
                 if (sErrorMessage.toLowerCase().includes("this property are fully booked.")) {
-                    sErrorTitle = "No Rooms Available";
+                    sErrorTitle = this.getView().getModel("i18n").getResourceBundle().getText("noRoomsAvailable");
                 }
 
                 MessageBox.error(sErrorMessage, {
