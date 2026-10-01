@@ -42,7 +42,7 @@
 									<f:content>
 										<!-- Branch Code -->
 										<m:Label
-                                            text="Branch Name"
+                                            text="{i18n>BranchName}"
                                         />
 										<m:ComboBox
                                             id="FD_id_RoomType123"

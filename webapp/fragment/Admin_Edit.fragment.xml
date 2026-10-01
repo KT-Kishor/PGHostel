@@ -60,12 +60,12 @@
                 />
                 <ComboBox
                     id="editMembername"
-                    placeholder="Select Name"
+                    placeholder="{i18n>SelectName}"
                     items="{CustomerData>/AllMembers}"
                     value="{edit>/MemberName}"
                     change="onMemberNameChange"
                     width="100%"
-                    valueStateText="Please Select Name"
+                    valueStateText="{i18n>PleaseSelectName}"
                 >
                     <core:Item
                         key="{CustomerData>Name}"

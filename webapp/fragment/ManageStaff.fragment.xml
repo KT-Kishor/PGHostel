@@ -1,4 +1,4 @@
-6<core:FragmentDefinition
+<core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
 	xmlns:f="sap.ui.layout.form"
@@ -48,11 +48,11 @@
 					<layoutData>
 						<l:GridData span="XL3 L3 M3 S12"/>
 					</layoutData>
-					<core:ListItem key="Mr." text="Mr."/>
-					<core:ListItem key="Ms." text="Ms."/>
-					<core:ListItem key="Mrs." text="Mrs."/>
-					<core:ListItem key="Dr." text="Dr."/>
-					<core:ListItem key="Other." text="Other."/>
+					<core:ListItem key="Mr." text="{i18n>mr}"/>
+					<core:ListItem key="Ms." text="{i18n>ms}"/>
+					<core:ListItem key="Mrs." text="{i18n>mrs}"/>
+					<core:ListItem key="Dr." text="{i18n>dr}"/>
+					<core:ListItem key="Other." text="{i18n>other}"/>
 				</ComboBox>
 				<Input
                 id="MS_id_signUpName"
@@ -269,8 +269,8 @@
 			<Toolbar>
 				<ToolbarSpacer />
 				<Button
-                    text="Save"
-                    tooltip="Save"
+                    text="{i18n>save}"
+                    tooltip="{i18n>save}"
                     class="myUnifiedBtn"
                     press="onSignUp"
                 />

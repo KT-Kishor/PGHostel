@@ -620,8 +620,8 @@
                                                 width="7rem"
                                             >
                                                 <m:Text
-                                                    text="{i18n>Unit}"
-                                                    tooltip="{i18n>Unit}"
+                                                    text="{i18n>unit}"
+                                                    tooltip="{i18n>unit}"
                                                 />
                                             </m:Column>
                                             <m:Column

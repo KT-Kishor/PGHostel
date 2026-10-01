@@ -42,18 +42,18 @@
                 
               
                    <Label
-                    text="Deposit Amount"
+                    text="{i18n>depositAmount}"
                     visible="{Visiblemodel>/Visible}"
 
                 />
                 <Input
                     id="id_DepositAmount"
-                    placeholder="Enter deposit amount"
+                    placeholder="{i18n>Enterdepositamount}"
                     value="{HostelModel>/DepositAmount}"
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
-                    valueStateText="Enter deposit amount"
+                    valueStateText="{i18n>Enterdepositamount}"
                     editable="false"
                 />
                   <RadioButtonGroup id="roomTypeGroup1" columns="2" select=".onDepositTypeSelect" 
@@ -67,31 +67,31 @@
 
                  <Label
                  id="id_DepositTypeLabel"
-                    text="Actual Amount"
+                    text="{i18n>ActualAmount}"
                     required="true"
                     visible="{Visiblemodel>/Visible}"
                 />
                 <Input
                     id="id_ActualAmount"
-                    placeholder="Enter actual amount"
+                    placeholder="{i18n>Enteractualamount}"
                     value="{HostelModel>/ActualAmount}"
                     maxLength="6"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="ActualAmountLiveChange"
-                    valueStateText="Enter actual amount"
+                    valueStateText="{i18n>Enteractualamount}"
                 />
 
                    <Label
                    id="id_PaymentModeLabel"
-                    text="Payment Mode"
+                    text="{i18n>paymentMode}"
                     required="true"
                     visible="{Visiblemodel>/Visible}"
                 />
                 <ComboBox
                     id="idPaymentMode"
-                    placeholder="Select payment mode"
+                    placeholder="{i18n>Selectpaymentmode}"
                     selectedKey="{HostelModel>/PaymentMode}"
-                    valueStateText="Select payment mode"
+                    valueStateText="{i18n>Selectpaymentmode}"
                     change="onPaymentModeChange"
                     visible="{Visiblemodel>/Visible}"
                     items="{PaymentMode>/}"
@@ -109,17 +109,17 @@
 
                   <Label
                   id="id_TransactionIDLabel"
-                    text="Transaction / Person Name"
+                    text="{i18n>TransactionPersonName}"
                      required="true"
                     visible="{Visiblemodel>/Visible}"
                 />
                 <Input
                     id="id_TransactionID"
-                    placeholder="Enter transaction / person name"
+                    placeholder="{i18n>enterTransactionPerson}"
                     value="{HostelModel>/TransactionID}"
                     visible="{Visiblemodel>/Visible}"
                     liveChange="DepositAmountLiveChange"
-                    valueStateText="Enter Transaction / Person Name"
+                    valueStateText="{i18n>enterTransactionPerson}"
                     maxLength="20"
 
                 />
@@ -148,8 +148,8 @@
 
         <beginButton>
             <Button
-                text="Assign"
-                tooltip="Assign"
+                text="{i18n>Assign}"
+                tooltip="{i18n>Assign}"
                 press="ARNO_onsavebuttonpress"
                 id="HM_id_saveButton"
                 class="marginRight myUnifiedBtn"

@@ -38,11 +38,11 @@
                 />
                 <ComboBox
                     id="id_Branchname"
-                    placeholder="Select branch name"
+                    placeholder="{i18n>Selectbranchname}"
                     items="{BranchModel>/}"
                     selectionChange="onbranchChange"
                     width="100%"
-                    valueStateText="Please select the branch"
+                    valueStateText="{i18n>Selectbranchname}"
                 >
                     <core:Item
                         key="{BranchModel>BranchID}"
@@ -55,34 +55,34 @@
                 />
                 <ComboBox
                     id="id_Type"
-                    placeholder="Select type"
+                    placeholder="{i18n>selectType}"
                     selectionChange="ontypeChange"
                     width="100%"
-                    valueStateText="Please select type"
+                    valueStateText="{i18n>selectType}"
                 >
                     <core:Item
                         key="Per Month"
-                        text="Per Month"
+                        text="{i18n>perMonth}"
                     />
                     <core:Item
                         key="Per Year"
-                        text="Per Year"
+                        text="{i18n>perYear}"
                     />
                 </ComboBox>
 
                 <Label
                     id="id_Label"
-                    text="{i18n>Month}"
+                    text="{i18n>dashMonth}"
                     required="true"
                 />
 
                 <ComboBox
                     id="id_month"
-                    placeholder="Select month"
+                    placeholder="{i18n>Selectmonth}"
                     items="{MonthModel>/}"
                     selectionChange="onmonthChange"
                     width="100%"
-                    valueStateText="Please select month"
+                    valueStateText="{i18n>Pleaseselectmonth}"
                 >
                     <core:Item
                         key="{MonthModel>Key}"
@@ -98,7 +98,7 @@
                    id="idYearDatePicker"
                     displayFormat="yyyy"
                     valueFormat="yyyy"
-                    placeholder="Select Year"
+                    placeholder="{i18n>SelectYear}"
                     change="onYearDatePickerChange"
                     valueStateText="Please select year"
                 />
@@ -106,16 +106,16 @@
         </f:SimpleForm>
         <beginButton>
             <Button
-                text="Send"
-                tooltip="Send"
+                text="{i18n>send}"
+                tooltip="{i18n>send}"
                 press=".onsendreminder"
                 class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
-                tooltip="Cancel"
+                text="{i18n>adminBookingCancel}"
+                tooltip="{i18n>adminBookingCancel}"
                 press="onEditDialogClose"
                 class="myUnifiedBtn"
             />

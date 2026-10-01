@@ -253,8 +253,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="{i18n>Date}"
-                            tooltip="{i18n>Date}"
+                            text="{i18n>date}"
+                            tooltip="{i18n>date}"
                         />
                     </Column>
                     <!-- <Column

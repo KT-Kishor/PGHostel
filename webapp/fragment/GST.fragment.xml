@@ -14,7 +14,7 @@
         <customHeader>
             <Bar class="barheader">
                 <contentMiddle>
-                    <Title text="Manage GST" />
+                    <Title text="{i18n>ManageGST}" />
                 </contentMiddle>
             </Bar>
         </customHeader>
@@ -72,44 +72,44 @@
                     </buttons>
                 </RadioButtonGroup> -->
                 <Label
-                    text="Cusomer GSTIN"
+                    text="{i18n>CusomerGSTIN}"
                     required="true"
                 />
                 <Input
                     id="idGSTNumber"
                     value="{GSTModel>/CustomerGSTIN}"
-                    placeholder="Enter GST number"
+                    placeholder="{i18n>EnterGSTnumber}"
                     maxLength="15"
                     liveChange="onGSTInputLiveChange"
-                    valueStateText="Please enter a valid GST Number"
+                    valueStateText="{i18n>PleaseenteravalidGSTNumber}"
                 />
 
                 <Label
-                    text="Company Name"
+                    text="{i18n>CompanyName}"
                     required="true"
                 />
                 <Input
                     id="idCompanyName"
                     value="{GSTModel>/CustCompanyName}"
-                    placeholder="Enter company name (minimum 3 characters)"
+                    placeholder="{i18n>Entercompanynameminimumcharacters}"
                     change="onchangeCompanyname"
                     liveChange="onchangeCompanyname"
-                    valueStateText="Please enter a valid company name"
+                    valueStateText="{i18n>Pleaseenteravalidcompanyname}"
                     showValueStateMessage="true"
                     maxLength="100"
                 />
 
                 <Label
-                    text="Company Address"
+                    text="{i18n>CompanyAddress}"
                     required="true"
                 />
                 <TextArea
                     value="{GSTModel>/CustCompanyAddress}"
-                    placeholder="Enter complete company address"
+                    placeholder="{i18n>Entercompletecompanyaddress}"
                     rows="3"
                     change="onchangeConpanyAddress"
                     liveChange="onchangeConpanyAddress"
-                    valueStateText="Please enter a valid company address (minimum 10 characters)"
+                    valueStateText="{i18n>Pleaseenteravalidcompanyaddressminimumcharacters}"
                     showValueStateMessage="true"
                     id="idCompanyAddress"
                     maxLength="500"

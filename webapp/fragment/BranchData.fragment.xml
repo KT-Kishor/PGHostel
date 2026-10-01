@@ -223,7 +223,7 @@
                     value="{MDmodel>/CheckinTime}"
                     change="onCheckInTimeChange"
                     displayFormat="hh a"
-                    placeholder="e.g. 10 AM"
+                    placeholder="{i18n>eg10AM}"
                     valueFormat="hh a"
                     valueStateText="{i18n>Pcheckin}"
                 />
@@ -237,7 +237,7 @@
                     change="onCheckOutTimeChange"
                     displayFormat="hh a"
                     valueFormat="hh a"
-                    placeholder="e.g. 10 AM"
+                    placeholder="{i18n>eg10AM}"
                     valueStateText="{i18n>Pcheckout}"
                 />
 				<Label
@@ -274,7 +274,7 @@
                 />
 				<Label
                  id="Bd_id_Mode_Label"
-                    text="Mode"
+                    text="{i18n>mode}"
                     required="true"
                 />
 				<Select
@@ -287,11 +287,11 @@
                 >
 					<core:Item
                         key="Active"
-                        text="Active"
+                        text="{i18n>Active}"
                     />
 					<core:Item
                         key="Inactive"
-                        text="Inactive"
+                        text="{i18n>Inactive}"
                     />
 				</Select>
 

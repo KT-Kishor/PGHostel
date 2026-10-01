@@ -166,7 +166,7 @@
                     valueStateText="{i18n>MSenterValidEmail}"
                 />
 
-                <core:Title text="Contact Details" />
+                <core:Title text="{i18n>adminBookingNCContactDetails}" />
                 <Label
                     text="{i18n>MVDcountry}"
                     required="true"

@@ -22,12 +22,12 @@
                 />
 				<ComboBox
                     id="idRoomType123"
-                    placeholder="Select property name"
+                    placeholder="{i18n>placeSelectBranchCode}"
                     selectedKey="{FacilitiesModel>/BranchCode}"
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     change=".onFacilitybranchChange"
-                    valueStateText="Select property name"
+                    valueStateText="{i18n>selectPropertyName}"
                 >
 					<core:ListItem
                         key="{BranchModel>BranchID}"
@@ -65,15 +65,15 @@
                     />
 				</ComboBox>
 				<Label
-                    text="Selection Mode"
+                    text="{i18n>selectionMode}"
                     required="true"
                 />
 				<ComboBox
                     id="idSelectionMode"
                     selectedKey="{FacilitiesModel>/SelectionMode}"
                     items="{SelectionModeModel>/}"
-                    placeholder="Select selection mode"
-                    valueStateText="Select selection mode"
+                    placeholder="{i18n>Selectselectionmode}"
+                    valueStateText="{i18n>Selectselectionmode}"
                     change="onSelectionModeChange"
                 >
 					<core:Item
@@ -82,14 +82,14 @@
                     />
 				</ComboBox>
 				<Label
-                    text="Maximum Quantity"
+                    text="{i18n>EnterMaximumQuantity}"
                     required="true"
                 />
 				<Input
                     id="idMinimumQuantity"
                     value="{FacilitiesModel>/MinimumQty}"
-                    placeholder="Enter maximum quantity"
-                    valueStateText="Enter maximum quantity"
+                    placeholder="{i18n>EnterMaximumQuantity}"
+                    valueStateText="{i18n>EnterMaximumQuantity}"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="2"
@@ -102,14 +102,14 @@
 					</buttons>
 				</RadioButtonGroup>
 				<Label
-                    text="Minimum Price"
+                    text="{i18n>EnterMinimumPrice}"
                     required="true"
                 />
 				<Input
                     id="idMinimumPrice"
                     value="{FacilitiesModel>/MinimumPrice}"
-                    placeholder="Enter minimum price"
-                    valueStateText="Enter minimum price"
+                    placeholder="{i18n>EnterMinimumPrice}"
+                    valueStateText="{i18n>EnterMinimumPrice}"
                     liveChange="onPriceChange"
                     visible="{= ${FacilitiesModel>/SelectionMode} === 'PERSON_QTY' }"
                     maxLength="10"

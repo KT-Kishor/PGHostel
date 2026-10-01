@@ -61,7 +61,7 @@
 						<Text text="{i18n>MSbranchCode}" tooltip="{i18n>MSbranchCode}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-						<Text text="Property Type / GSTIN" tooltip="Property Type / GSTIN"/>
+						<Text text="{i18n>PropertyTypeGSTIN}" tooltip="{i18n>PropertyTypeGSTIN}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
 						<Text text="{i18n>startingPrice}" tooltip="{i18n>startingPrice}"/>
@@ -70,10 +70,10 @@
 						<Text text="{i18n>penalty}" tooltip="{i18n>penalty}"/>
 					</Column> -->
 					<Column demandPopin="true" minScreenWidth="Tablet">
-    					<Text text="Edit Before" tooltip="Edit Before"/>
+    					<Text text="{i18n>EditBefore}" tooltip="{i18n>EditBefore}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet">
-    					<Text text="Check IN / OUT" tooltip="Check IN / OUT"/>
+    					<Text text="{i18n>CheckINOUT}" tooltip="{i18n>CheckINOUT}"/>
 					</Column>
 					<Column demandPopin="true" minScreenWidth="Tablet" width="20%" hAlign="Center">
 						<Text text="{i18n>address}" tooltip="{i18n>address}" textAlign="Center" width="100%"/>

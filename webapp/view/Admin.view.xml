@@ -32,7 +32,7 @@
             >
 <fb:filterGroupItems>
 					<fb:FilterGroupItem
-                        name="{i18n>propertyName}"
+                        name="Property Name"
                         label="{i18n>propertyName}"
                         groupName="Group"
                         visibleInFilterBar="true"

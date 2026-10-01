@@ -104,10 +104,10 @@
 							<Button id="idassignButton" text="{i18n>Assign}" tooltip="{i18n>assignBug}"
                         press="RB_assign" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
-							<Button id="ideditButton" text="{i18n>Edit}" tooltip="{i18n>Edit}"
+							<Button id="ideditButton" text="{i18n>MSedit}" tooltip="{i18n>MSedit}"
                         press="RB_edit" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
-						<Button id="idresolveButton" text="{i18n>Resolve}" tooltip="{i18n>resolve}"
+						<Button id="idresolveButton" text="{i18n>resolved}" tooltip="{i18n>resolved}"
                         press="RB_resolve" class="myUnifiedBtn"
                         visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"/>
 						<Button text="{i18n>download}"  

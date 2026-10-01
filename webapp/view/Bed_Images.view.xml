@@ -202,7 +202,7 @@
                 <ObjectPageSection
                     titleUppercase="false"
                     id="purchaseOrderSection"
-                    title="Images"
+                    title="{i18n>images}"
                 >
                     <subSections>
                         <ObjectPageSubSection id="POO_Purchaseordersection">

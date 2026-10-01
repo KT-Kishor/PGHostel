@@ -41,7 +41,7 @@
 										<m:Toolbar>
 											<m:Title text="{i18n>MVDtitle}" />
 											<m:ToolbarSpacer />
-											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? 'Save' : 'Edit' }"
+											<m:Button class="myUnifiedBtn" text="{= ${editable>/Edit} ? ${i18n>save} : ${i18n>MSedit} }"
                                                 press="onEditOrSavePress"/>
 											<m:Button
                                                 id="MV_id_ResendMailButton"

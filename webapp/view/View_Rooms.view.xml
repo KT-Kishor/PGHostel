@@ -191,7 +191,7 @@
 											<fb:filterGroupItems>
 												<fb:FilterGroupItem
 													name="StartDate"
-													label="Check-in Date"
+													label="{i18n>CheckinDate}"
 													groupName="Group1"
 													visibleInFilterBar="true"
 												>
@@ -209,7 +209,7 @@
 												</fb:FilterGroupItem>
 												<fb:FilterGroupItem
 													name="EndDate"
-													label="Check-out Date"
+													label="{i18n>CheckoutDate}"
 													groupName="Group1"
 													visibleInFilterBar="true"
 												>

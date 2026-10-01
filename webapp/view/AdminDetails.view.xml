@@ -97,7 +97,7 @@
             </content>
             <VBox class="sapUiMediumMarginBottom">
                 <Panel
-                    headerText="{= 'Booking Information - ' + ${CustomerData>/BookingID} }"
+                    headerText="{= ${i18n>bookingInformationheader} + ' ' + ${CustomerData>/BookingID} }"
                     expandable="false"
                     class="customPanelHeader"
                 >
@@ -374,7 +374,7 @@
                                 width="6rem"
                                 visible="{= ${CustomerData>/Documents}.length > 1 }"
                             >
-                                <Text text="Primary" />
+                                <Text text="{i18n>Primary}" />
                             </Column>
                             <Column demandPopin="true">
                                 <Text
@@ -396,8 +396,8 @@
                                 minScreenWidth="Tablet"
                             >
                                 <Text
-                                    text="{i18n>Gender}"
-                                    tooltip="{i18n>Gender}"
+                                    text="{i18n>adminBookingECGender}"
+                                    tooltip="{i18n>adminBookingECGender}"
                                 />
                             </Column>
                             <Column
@@ -419,8 +419,8 @@
 
                             <Column demandPopin="true">
                                 <Text
-                                    text="{i18n>Document}"
-                                    tooltip="{i18n>Document}"
+                                    text="{i18n>document}"
+                                    tooltip="{i18n>document}"
                                 />
                             </Column>
                         </columns>
@@ -546,8 +546,8 @@
                         demandPopin="true"
                     >
                         <Text
-                            text="Period"
-                            tooltip="Period"
+                            text="{i18n>Period}"
+                            tooltip="{i18n>Period}"
                         />
                     </Column>
                     <!-- <Column minScreenWidth="Tablet" demandPopin="true">
@@ -711,9 +711,9 @@
                     <!-- Discount -->
                     <HBox justifyContent="SpaceBetween">
                         <Label
-                            text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
-    ? 'Discount (' + ${CustomerData>/CouponCode} + '):'
-    : 'Discount:' }"
+                          text="{= ${CustomerData>/CouponCode} &amp;&amp; ${CustomerData>/CouponCode}.length > 0
+    ? ${i18n>discountWithCoupon}.replace('{0}', ${CustomerData>/CouponCode})
+    : ${i18n>discount} }"
                             class="totalColumnBold1 sapUiTinyMarginBottom rightAlignLabel"
                         />
                         <Text

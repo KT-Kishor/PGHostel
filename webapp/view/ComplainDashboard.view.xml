@@ -57,7 +57,7 @@
 								</ComboBox>
 							</fb:control>
 						</fb:FilterGroupItem>
-						<fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true">
+						<fb:FilterGroupItem name="Status" label="{i18n>resetPasswordCurrentStatus}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
 								<ComboBox id="CD_statusFilter" width="400px" placeholder="{i18n>SelectStatus}" >
 									<items>
