@@ -6,7 +6,7 @@
 >
     <Page
         id="idMyBookingsPage"
-        title="My Bookings"
+        title="{i18n>tour_title_mybookings}"
         showNavButton="true"
         navButtonPress="onNavBack"
         class="defaultBGBlur"
@@ -23,7 +23,7 @@
                 </contentLeft>
                 <contentMiddle>
                     <Title
-                        text="My Bookings"
+                        text="{i18n>tour_title_mybookings}"
                         level="H4"
                     />
                 </contentMiddle>
@@ -84,13 +84,13 @@
                 class="customActionBox"
             >
                 <Button
-                    text="Add Members"
+                    text="{i18n>addMembers}"
                     press="onPressAddMember"
                     class="myUnifiedBtn sapUiSmallMarginEnd"
                     visible="{= ${myBookings>/selectedTab} === 'Members' }"
                 />
                 <Button
-                    text="Raise Complaint"
+                    text="{i18n>raiseComplaint}"
                     press="onPressRaiseComplaint"
                     class="myUnifiedBtn sapUiSmallMarginEnd"
                     enabled="{myBookings>/hasAssignedBooking}"
@@ -109,7 +109,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Booking History' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No booking history found"
+            noDataText="{i18n>noBookingHistory}"
             items="{
                 path: 'myBookings>/bookings',
                 sorter: [
@@ -184,7 +184,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Members' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No members found"
+            noDataText="{i18n>noMembersFound}"
             items="{path: 'myBookings>/Members'}"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
@@ -219,11 +219,13 @@
                         <Link
                             text="{i18n>view}"
                             press="onViewMemberDocument"
+                            class="tealTextLink"
+                            
                         />
                         <Button
                             icon="sap-icon://edit"
                             type="Transparent"
-                            tooltip="Upload Document"
+                            tooltip="{i18n>uploadDocument}"
                             press="onEditMemberFromDialog"
                             class="myUnifiedBtn"
                         />
@@ -235,7 +237,7 @@
         <!-- ================= PAYMENT TABLE ================= -->
         <Table
             id="Id_PaymentTable1"
-            noDataText="No Payment history found"
+            noDataText="{i18n>noPaymentHistory}"
             visible="{= ${myBookings>/selectedTab} === 'Payment' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
@@ -308,7 +310,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Complaints' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No complaints history found"
+            noDataText="{i18n>noComplaintsHistory}"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -330,7 +332,7 @@
                     <Text text="{i18n>complainType}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Phone">
-                    <Text text="Branch" />
+                    <Text text="{i18n>CDBranch}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Desktop">
                     <Text text="{i18n>roomNo}" />
@@ -365,8 +367,9 @@
                             icon="sap-icon://edit"
                             type="Transparent"
                             press="onPressComplaintRow"
-                            tooltip="Edit Complaint"
+                            tooltip="{i18n>editComplaint}"
                             visible="{path: 'myBookings>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"
+                            class="myUnifiedBtn"
                         />
                     </cells>
                 </ColumnListItem>
@@ -379,7 +382,7 @@
             visible="{= ${myBookings>/selectedTab} === 'Damage' }"
             updateFinished="onTableUpdateFinished"
             busyIndicatorDelay="0"
-            noDataText="No damage history found"
+            noDataText="{i18n>noDamageHistory}"
             width="auto"
             class="sapUiSmallMargin customRoundedTable"
             items="{
@@ -389,37 +392,37 @@
         >
             <columns>
                 <Column demandPopin="true" minScreenWidth="Tablet">
-                    <Text text="Damage ID" />
+                    <Text text="{i18n>damageId}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Tablet">
-                    <Text text="Branch" />
+                    <Text text="{i18n>CDBranch}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Tablet">
-                    <Text text="Room No" />
+                    <Text text="{i18n>roomNo}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Tablet">
-                    <Text text="Item" />
+                    <Text text="{i18n>item}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Phone">
-                    <Text text="Type" />
+                    <Text text="{i18n>type}" />
                 </Column>
                 <Column demandPopin="true" minScreenWidth="Desktop">
-                    <Text text="Description" />
+                    <Text text="{i18n>description}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Qty" />
+                    <Text text="{i18n>qty}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Actual Cost" />
+                    <Text text="{i18n>actualcost}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Recover Cost" />
+                    <Text text="{i18n>recovercost}" />
                 </Column>
             </columns>
             <items>

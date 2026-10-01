@@ -41,7 +41,7 @@
                 >
                     <VBox width="35%">
                         <Label
-                            text="Salutation"
+                            text="{i18n>MSsalutation}"
                             required="true"
                         />
                     </VBox>
@@ -50,7 +50,7 @@
                         class="sapUiTinyMarginBegin"
                     >
                         <Label
-                            text="Full Name"
+                            text="{i18n>MVDname}"
                             required="true"
                         />
                     </VBox>
@@ -64,26 +64,26 @@
                         <ComboBox
                             id="idSelect"
                             selectedKey="{Member>/Salutation}"
-                            placeholder="Select salutation"
-                            valueStateText="Please select salutation"
+                            placeholder="{i18n>MVDsalutation}"
+                            valueStateText="{i18n>selectSalutation}"
                             change="onNewMemberSalutationChange" 
                             editable="{= ${Member>/Relation} !== 'Self' }"
                         >
                             <core:Item
                                 key="Mr."
-                                text="Mr."
+                                text="{i18n>mr_}"
                             />
                             <core:Item
                                 key="Ms."
-                                text="Ms."
+                                text="{i18n>ms}"
                             />
                             <core:Item
                                 key="Mrs."
-                                text="Mrs."
+                                text="{i18n>mrs}"
                             />
                             <core:Item
                                 key="Dr."
-                                text="Dr."
+                                text="{i18n>dr}"
                             />
                           
                         </ComboBox>
@@ -95,8 +95,8 @@
                         <Input
                             id="MM_id_MemberName"
                             value="{Member>/Name}"
-                            placeholder="Enter full name"
-                            valueStateText="Please enter a valid full name"
+                            placeholder="{i18n>enterFullName}"
+                            valueStateText="{i18n>enterValidFull}"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
                             maxLength="35" editable="{= ${Member>/Relation} !== 'Self' }"
@@ -104,90 +104,90 @@
                     </VBox>
                 </HBox>
                 <Label
-                    text="Date of Birth"
+                    text="{i18n>MVDDOB}"
                     required="true"
                 />
                 <DatePicker
                     id="MemberDOB"
                     value="{Member>/DateOfBirth}"
-                    placeholder="DD/MM/YYYY"
+                    placeholder="{i18n>ddMmYyyy}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="dd/MM/yyyy"
                     change="onNewMemberDOBChange"
-                    valueStateText="Age must be between 0 and 100 years" editable="{= ${Member>/Relation} !== 'Self' }"
+                    valueStateText="{i18n>agediff}" editable="{= ${Member>/Relation} !== 'Self' }"
                      initialFocusedDateValue="{controller>/focusedDate}"
                      minDate="{controller>/minDate}"
                     maxDate="{controller>/maxdate}"
                 />
                 <Label
-                    text="Gender"
+                    text="{i18n>MVgender}"
                     required="true"
                 />
                 <ComboBox
                     id="MemberGenderCombo"
                     selectedKey="{Member>/Gender}"
-                    placeholder="Select gender"
-                    valueStateText="Please select gender"
+                    placeholder="{i18n>selectGender}"
+                    valueStateText="{i18n>MB_selectGender}"
                     change="onNewMemberGenderChange" editable="{= ${Member>/Relation} !== 'Self' }"
                     enabled="{= ${Member>/Salutation} === 'Dr.' }"
 
                 >
                     <core:Item
                         key="Male"
-                        text="Male"
+                        text="{i18n>male}"
                     />
                     <core:Item
                         key="Female"
-                        text="Female"
+                        text="{i18n>female}"
                     />
                     <core:Item
                         key="Other"
-                        text="Other"
+                        text="{i18n>other}"
                     />
                 </ComboBox>
                 <Label
-                    text="Relationship"
+                    text="{i18n>Relationship}"
                     required="true"
                 />
                 <ComboBox
                     id="MemberRelationCombo"
                     selectedKey="{Member>/Relation}"
-                    placeholder="Select relationship"
-                    valueStateText="Please select relationship"
+                    placeholder="{i18n>selectRelationship}"
+                    valueStateText="{i18n>MB_selectRelationship}"
                     change="onNewMemberRelationChange" editable="{= ${Member>/Relation} !== 'Self' }"
                 >
                  
                     <core:Item
                         key="Spouse"
-                        text="Spouse"
+                        text="{i18n>spouse}"
                     />
                     <core:Item
                         key="Child"
-                        text="Child"
+                        text="{i18n>child}"
                     />
                     <core:Item
                         key="Father"
-                        text="Father"
+                        text="{i18n>father}"
                     />
                     <core:Item
                         key="Mother"
-                        text="Mother"
+                        text="{i18n>mother}"
                     />
                      <core:Item
                         key="Friend"
-                        text="Friend"
+                        text="{i18n>friend}"
                     />
                     <core:Item
                         key="Brother"
-                        text="Brother"
+                        text="{i18n>brother}"
                     />
                     <core:Item
                         key="Sister"
-                        text="Sister"
+                        text="{i18n>sister}"
                     />
                        <core:Item
                         key="Other"
-                        text="Other"
+                        text="{i18n>other}"
                     />
                 </ComboBox>
                 <Label
@@ -215,19 +215,19 @@
                     >
                         <core:Item
                             key="Aadhaar Card"
-                            text="Aadhaar Card"
+                            text="{i18n>aadhaarCard}"
                         />
                         <core:Item
                             key="Pan Card"
-                            text="Pan Card"
+                            text="{i18n>panCard}"
                         />
                         <core:Item
                             key="Driving License"
-                            text="Driving License"
+                            text="{i18n>drivingLicense}"
                         />
                         <core:Item
                             key="Passport"
-                            text="Passport"
+                            text="{i18n>passport}"
                         />
                     </ComboBox>
 
@@ -239,7 +239,7 @@
                         buttonOnly="true"
                         sameFilenameAllowed="true"
                         change="onFacilityFileChange"
-                        buttonText="Upload"
+                        buttonText="{i18n>MVDupload}"
                         fileType="pdf,jpg,jpeg,png,webp"
                         class="sapUiTinyMarginEnd myUnifiedBtn"
                     />
@@ -249,7 +249,7 @@
                         id="memberDocumentInfoIcon"
                         size="1rem"
                         press="onMemberDocumentInfoPress"
-                        tooltip="Upload info"
+                        tooltip="{i18n>uploadInfo}"
                         visible="{= !${Member>/DocumentName} }"
                         class="sapUiSmallMarginBegin"
                     />
@@ -269,7 +269,7 @@
                         />
 
                         <Button
-                            text="Remove"
+                            text="{i18n>Remove}"
                             icon="sap-icon://delete"
                             press="onDeleteMemberDocument"
                             class="myUnifiedBtn"

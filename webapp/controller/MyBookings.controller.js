@@ -114,7 +114,7 @@
             if (!sUserID) {
                 oModel.setProperty("/bookings", []);
                 oModel.setProperty("/bookingCount", 0);
-                MessageToast.show("User details not found");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("userDetailsNot"));
                 return;
             }
 
@@ -141,7 +141,7 @@
                 oModel.setProperty("/BranchCombo", []);
                 oModel.setProperty("/AsgnRoomNo", []);
                 oModel.setProperty("/hasAssignedBooking", false);
-                MessageToast.show(err.message || err.responseText || "Unable to load booking history");
+                MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("unableLoadBooking"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -154,7 +154,7 @@
             if (!sUserID) {
                 oModel.setProperty("/Members", []);
                 oModel.setProperty("/memberCount", 0);
-                MessageToast.show("User details not found");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("userDetailsNot"));
                 return;
             }
 
@@ -176,7 +176,7 @@
                 var aSelfMember = this._createSelfMemberRow(null);
                 oModel.setProperty("/Members", aSelfMember ? [aSelfMember] : []);
                 oModel.setProperty("/memberCount", aSelfMember ? 1 : 0);
-                MessageToast.show(err.message || err.responseText || "Unable to load member details");
+                MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("unableLoadMember"));
             } finally {
                 if (!bKeepBusyOpen) {
                     this.closeBusyDialog();
@@ -191,7 +191,7 @@
             if (!sUserID) {
                 oModel.setProperty("/Payments", []);
                 oModel.setProperty("/paymentCount", 0);
-                MessageToast.show("User details not found");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("userDetailsNot"));
                 return;
             }
 
@@ -218,7 +218,7 @@
             } catch (err) {
                 oModel.setProperty("/Payments", []);
                 oModel.setProperty("/paymentCount", 0);
-                MessageToast.show(err.message || err.responseText || "Unable to load payments");
+                MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("unableLoadPayments"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -229,7 +229,7 @@
             var oPayment = oContext && oContext.getObject();
 
             if (!oPayment || !oPayment.InvNo) {
-                MessageToast.show("Invoice number not found for this payment");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("invoiceNumberNot"));
                 return;
             }
 
@@ -720,7 +720,7 @@
             var oBookingData = oContext && oContext.getObject();
 
             if (!oBookingData || !oBookingData.BookingID) {
-                MessageToast.show("BookingID not found for this booking");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingidNotFound"));
                 return;
             }
 
@@ -737,7 +737,7 @@
             var oMember = oContext && oContext.getObject();
 
             if (!oMember || !oMember.MemberID) {
-                MessageToast.show("No document available");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nodocumentavailable"));
                 return;
             }
 
@@ -749,14 +749,14 @@
             try {
                 oDoc = await this._fetchMemberDocument(oMember.MemberID);
             } catch (err) {
-                MessageToast.show(err.message || err.responseText || "No document available");
+                MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("Nodocumentavailable"));
                 return;
             } finally {
                 this.closeBusyDialog();
             }
 
             if (!oDoc || !oDoc.Attachment) {
-                MessageToast.show("No document available");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nodocumentavailable"));
                 return;
             }
 
@@ -801,7 +801,7 @@
             var oData = oContext && oContext.getObject();
 
             if (!oData) {
-                MessageToast.show("Member details not found");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("memberDetailsNot"));
                 return;
             }
 
@@ -1075,14 +1075,14 @@
                 return;
             }
             if (!sDocType) {
-                MessageToast.show("Please select document type first");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("pleaseSelectDocumentTypeFirst"));
                 oFileUploader.clear();
                 return;
             }
 
             sExt = oFile.name && oFile.name.indexOf(".") > -1 ? oFile.name.split(".").pop().toLowerCase() : "";
             if (["jpg", "jpeg", "png", "webp", "pdf"].indexOf(sExt) < 0) {
-                MessageToast.show("Only PDF, JPG, JPEG, PNG, WEBP allowed");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("OnlyPDFJPGJPEGPNGWEBPallowed"));
                 oFileUploader.clear();
                 return;
             }
@@ -1095,7 +1095,7 @@
             // UPDATE mode is never lost to a rejected upload.
             if (oFile.size > nMaxSizeBytes && !bIsImage) {
                 this._selectedFile = null;
-                MessageToast.show("Please upload a file under 400 KB.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("uploadFileUnder"));
                 oFileUploader.clear();
                 return;
             }
@@ -1133,7 +1133,7 @@
 
                     if (oProcessedFile.size > nMaxSizeBytes) {
                         this._restoreMemberDocumentData(oPreviousDocData);
-                        MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileCompressionFailed", [oFile.name]));
                         oFileUploader.clear();
                         return;
                     }
@@ -1141,7 +1141,7 @@
             } catch (oError) {
                 this.closeBusyDialog();
                 this._restoreMemberDocumentData(oPreviousDocData);
-                MessageBox.error(oError.message || "Compression failed. Please try a smaller file.");
+                MessageBox.error(oError.message || this.getView().getModel("i18n").getResourceBundle().getText("compressionFailedTry"));
                 oFileUploader.clear();
                 return;
             }
@@ -1163,7 +1163,7 @@
             };
             oReader.onerror = function () {
                 this._restoreMemberDocumentData(oPreviousDocData);
-                MessageBox.error("Unable to read selected file.");
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("unableReadSelected"));
                 oFileUploader.clear();
             }.bind(this);
             oReader.readAsDataURL(oProcessedFile);
@@ -1190,7 +1190,7 @@
         },
 
         onMemberFileSizeExceed: function (oEvent) {
-            MessageToast.show((oEvent.getParameter("fileName") || "File") + " exceeds the 400 KB size limit.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileExceeds400KB", [oEvent.getParameter("fileName") || "File"]));
             oEvent.getSource().clear();
         },
 
@@ -1247,13 +1247,13 @@
                 //     oFileUploader.setValueStateText("Please upload a file for the selected document type");
                 // }
 
-                MessageToast.show("Please upload a file for the selected document type \"" + sDocumentType + "\".");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("uploadFileSelected", [sDocumentType]));
                 return false;
             }
 
             // File uploaded but no File Type selected -> block
             if (!sDocumentType && bHasFile) {
-                MessageToast.show("Please select document type");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectDocType"));
                 return false;
             }
 
@@ -1273,12 +1273,12 @@
                 utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberGenderCombo"), "ID") &&
                 (oMember.Relation === "Self" || utils._LCstrictValidationComboBox(this._getMemberDialogControl("MemberRelationCombo"), "ID")) &&
                 utils._LCstrictValidationComboBox(this._getMemberDialogControl("idDocumentType"), "ID"))) {
-                MessageToast.show("Please fill mandatory fields");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("MB_fillMandatoryFields"));
                 return;
             }
 
             if (!oMember.DocumentType) {
-                MessageToast.show("Please select document type");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectDocType"));
                 return;
             }
 
@@ -1289,7 +1289,7 @@
             }
 
             if (this._mode === "CREATE" && !oMember.Document) {
-                MessageToast.show("Please upload a document");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Pleaseuploadadocument"));
                 return;
             }
 
@@ -1360,10 +1360,10 @@
 
                 this._selectedFile = null;
                 this._existingFileData = null;
-                MessageToast.show("Document uploaded successfully");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("docUploadSuccess"));
                 await this._loadMembers(true);
             } catch (oError) {
-                MessageToast.show(oError.message || oError.responseText || "Error uploading documents");
+                MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("MB_errorUploadingDocum"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -1396,7 +1396,7 @@
             var sMimeType = String(oDoc.FileType || oDoc.MimeType || "").toLowerCase().trim();
 
             if (!sRawSource) {
-                MessageToast.show("No document to preview.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nodocumenttopreview"));
                 return;
             }
 
@@ -1410,7 +1410,7 @@
                 this._sPreviewMimeType = sMimeType;
                 this._sPreviewFileName = oDoc.FileName || oDoc.DocumentName || "Document Preview";
                 this.onDownloadPreview();
-                MessageToast.show("Unsupported document format. Download started if supported.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("unsupportedDocument"));
                 return;
             }
 
@@ -1469,8 +1469,8 @@
                 };
 
                 oNativeImg.onerror = function () {
-                    MessageToast.show("Unable to preview image.");
-                };
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("previewimage"));
+                }.bind(this);
 
                 oNativeImg.src = sImageSrc;
                 return;
@@ -1483,7 +1483,7 @@
                 try {
                     sByteChars = atob(sBase64);
                 } catch (oError) {
-                    MessageToast.show("PDF content is not valid base64.");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("pdfContentNot"));
                     return;
                 }
 
@@ -1499,7 +1499,7 @@
 
                 if (sap.ui.Device.system.phone) {
                     this.onDownloadPreview();
-                    MessageToast.show("File downloaded successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileDownloaded"));
                     return;
                 }
 
@@ -1581,7 +1581,7 @@
             var sDownloadUrl;
 
             if (!this._sPreviewBase64) {
-                MessageToast.show("No file available for download.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nofileavailablefordownload"));
                 return;
             }
 
@@ -1661,7 +1661,7 @@
                 oModel.setProperty("/complain", []);
                 oModel.setProperty("/complainCount", 0);
                 if (!bSilent) {
-                    MessageToast.show("User details not found");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("userDetailsNot"));
                 }
                 return;
             }
@@ -1708,7 +1708,7 @@
                 oModel.setProperty("/complain", []);
                 oModel.setProperty("/complainCount", 0);
                 if (!bSilent) {
-                    MessageToast.show(oError.message || oError.responseText || "Unable to load complaints");
+                    MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("unableLoadComplaints"));
                 }
             } finally {
                 if (!bSilent) {
@@ -1725,7 +1725,7 @@
                 oModel.setProperty("/damage", []);
                 oModel.setProperty("/damageCount", 0);
                 if (!bSilent) {
-                    MessageToast.show("User details not found");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("userDetailsNot"));
                 }
                 return;
             }
@@ -1844,7 +1844,7 @@
                 oModel.setProperty("/damage", []);
                 oModel.setProperty("/damageCount", 0);
                 if (!bSilent) {
-                    MessageToast.show(oError.message || oError.responseText || "Unable to load damage records");
+                    MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("unableLoadDamage"));
                 }
             } finally {
                 if (!bSilent) {
@@ -2069,7 +2069,7 @@
             this._setComplaintRoomComboData(sBranchCode, oComplaint && oComplaint.RoomNo || "");
 
             var fnOpen = function () {
-                this._oComplaintDialog.setTitle(oComplaint ? "Edit Complaint" : "Raise New Complaint");
+                this._oComplaintDialog.setTitle(oComplaint ? this.getView().getModel("i18n").getResourceBundle().getText("editComplaint") : this.getView().getModel("i18n").getResourceBundle().getText("raiseNewComplaint"));
                 this._oComplaintDialog.open();
                 this._resetComplaintValidationStates();
 
@@ -2241,7 +2241,7 @@
 
                 return aData;
             } catch (oError) {
-                MessageToast.show(oError.responseText || "Failed to load customer data");
+                MessageToast.show(oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("MB_failedLoadCustomer"));
                 throw oError;
             } finally {
                 this.closeBusyDialog();
@@ -2280,7 +2280,7 @@
                 return;
             }
             if (oFile.type && aAllowedTypes.indexOf(oFile.type) < 0) {
-                MessageToast.show("Only JPG, PNG & WEBP files are allowed.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("onlyJpgPng"));
                 oUploader.clear();
                 return;
             }
@@ -2299,7 +2299,7 @@
                     });
 
                     if (oProcessedFile.size > nMaxSizeBytes) {
-                        MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileCompressionFailed", [oFile.name]));
                         return;
                     }
                 }
@@ -2319,7 +2319,7 @@
                 oTempModel.setProperty("/FileType", oProcessedFile.type);
                 oTempModel.setProperty("/FileContent", sBase64);
             } catch (oError) {
-                MessageBox.error(oError.message || "Compression failed. Please try a smaller file.");
+                MessageBox.error(oError.message || this.getView().getModel("i18n").getResourceBundle().getText("compressionFailedTry"));
             } finally {
                 oUploader.clear();
             }
@@ -2358,7 +2358,7 @@
                 !utils._LCstrictValidationComboBox(oBooking, "ID") ||
                 !utils._LCvalidateMandatoryField(oType, "ID") ||
                 !utils._LCvalidateMandatoryField(oDescription, "ID")) {
-                MessageToast.show("Please fill all required fields.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fillAllRequired"));
                 return;
             }
 
@@ -2398,12 +2398,14 @@
                     await this.ajaxCreateWithJQuery("HM_Complaint", { data: oComplaintData });
                 }
                 this._oComplaintDialog.close();
-                MessageToast.show(oData.ComplaintID ? "Complaint updated successfully" : "Complaint saved successfully");
+                MessageToast.show(oData.ComplaintID
+                    ? this.getView().getModel("i18n").getResourceBundle().getText("complaintUpdatedSuccessfully")
+                    : this.getView().getModel("i18n").getResourceBundle().getText("complaintSavedSuccessfully"));
                 this.getView().getModel("myBookings").setProperty("/selectedTab", "Complaints");
                 this.byId("idMyBookingsTabHeader").setSelectedKey("Complaints");
                 await this._loadComplaints(true);
             } catch (oError) {
-                MessageToast.show(oError.message || oError.responseText || "Error saving complaint");
+                MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("MB_errorSavingComplain"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -2413,7 +2415,7 @@
             var oComplaint = oEvent.getSource().getBindingContext("myBookings").getObject();
             var sStatus = String(oComplaint.ComplaintStatus || "").trim().toLowerCase();
             if (["in progress", "resolved"].indexOf(sStatus) > -1) {
-                MessageToast.show("Complaints with status 'In Progress' or 'Resolved' cannot be edited");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("complaintsStatusProgress"));
                 return;
             }
             this._openComplaintDialog(oComplaint);
