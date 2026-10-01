@@ -190,7 +190,7 @@ sap.ui.define([
             var sBookingID = this.BookingID;
 
             if (!sBookingID) {
-                MessageBox.error("Booking ID is required for editing.");
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("bookingIdRequired_BKK"));
                 return;
             }
 
@@ -215,9 +215,9 @@ sap.ui.define([
                 this.getView().addStyleClass("blur-background");
 
                 MessageBox.information(
-                    "Please verify with OTP to access your booking.",
+                    this.getView().getModel("i18n").getResourceBundle().getText("verifyOtpAccess_BKK"),
                     {
-                        title: "Verification Required",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("verificationRequired"),
                         styleClass: "myUnifiedBtn",
                         actions: [MessageBox.Action.OK],
                         emphasizedAction: MessageBox.Action.OK,
@@ -476,11 +476,9 @@ sap.ui.define([
                     var sCheckInDisplay = sCheckInTime || "12:00 PM";
                     var iHoursWindow = this._iEditHoursWindow || 0;
                     MessageBox.warning(
-                        "Editing is no longer allowed as the check-in time is within " + iHoursWindow + " hours. " +
-                        "Check-in is at " + sCheckInDisplay + " on " + this._formatDateToDDMMYYYY(this._parseDate(sBookingStartDate)) + ".\n\n" +
-                        "For any changes, please contact " + (oHostelModel.getProperty("/Area") || "") + ".",
+                        this.getView().getModel("i18n").getResourceBundle().getText("editingNoLonger", [iHoursWindow, sCheckInDisplay, this._formatDateToDDMMYYYY(this._parseDate(sBookingStartDate)), oHostelModel.getProperty("/Area") || ""]),
                         {
-                            title: "Editing Not Available",
+                            title: this.getView().getModel("i18n").getResourceBundle().getText("editingNotAvailable"),
                             styleClass: "myUnifiedBtn",
                             contentWidth: "460px",
                             actions: [MessageBox.Action.OK]
@@ -493,9 +491,9 @@ sap.ui.define([
                 if (bIsAdminUpdatedYes) {
                     var sBranchName = oHostelModel.getProperty("/Area") || "";
                     MessageBox.warning(
-                        "This booking has been updated as per your request. To make any further changes, please contact " + sBranchName + ". \n\nThank you for your cooperation!\n",
+                        this.getView().getModel("i18n").getResourceBundle().getText("bookingUpdatedPer", [sBranchName]),
                         {
-                            title: "Booking Status Updated",
+                            title: this.getView().getModel("i18n").getResourceBundle().getText("bookingStatusUpdated"),
                             styleClass: "myUnifiedBtn",
                             contentWidth: "500px",
                             actions: [MessageBox.Action.OK]
@@ -505,7 +503,7 @@ sap.ui.define([
 
             } catch (oError) {
                 console.error("Edit booking load error:", oError);
-                MessageBox.error("Unable to load booking details for edit.");
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("unableLoadBooking_BKK"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -1828,17 +1826,12 @@ sap.ui.define([
             var oModel = this.getView().getModel("HostelModel");
 
             MessageBox.warning(
-                "You cannot continue this booking change because the " +
-                (oModel.getProperty("/BedType") || "selected room") +
-                " room is already booked for the selected dates (" +
-                oModel.getProperty("/StartDate") + " to " +
-                oModel.getProperty("/EndDate") +
-                "). Please try choosing different dates.",
+                this.getView().getModel("i18n").getResourceBundle().getText("cannotContinueBooking", [oModel.getProperty("/BedType") || "selected room", oModel.getProperty("/StartDate"), oModel.getProperty("/EndDate")]),
                 {
-                    title: "Room Not Available",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("roomNotAvailable"),
                     icon: MessageBox.Icon.WARNING,
-                    actions: ["Go Back", "Cancel"],
-                    emphasizedAction: "Go Back",
+                    actions: [this.getView().getModel("i18n").getResourceBundle().getText("BK_goBack_"), this.getView().getModel("i18n").getResourceBundle().getText("actionCancel")],
+                    emphasizedAction: this.getView().getModel("i18n").getResourceBundle().getText("BK_goBack_"),
                     styleClass: "myUnifiedBtn",
                     contentWidth: "420px",
                     onClose: function (sAction) {
@@ -1868,6 +1861,8 @@ sap.ui.define([
                 return Promise.resolve(true);
             }
 
+            var oI18n = this.getView().getModel("i18n").getResourceBundle();
+
             return new Promise(function (resolve) {
                 var sConfirmAction = "Confirm";
                 var sCancelAction = "Cancel";
@@ -1875,9 +1870,9 @@ sap.ui.define([
                     // "The stay duration have been modified, so the room status will be reverted from \"" +
                     // sOriginalStatus + "\" to \"New\". Our team will recheck room availability. Once the booking is confirmed, " +
                     // "you will be notified by email.",
-                    "Once you submit your booking, we’ll check availability and email you the updated booking status shortly.",
+                    oI18n.getText("confirmBookingChangesMessage"),
                     {
-                        title: "Confirm Booking Changes",
+                        title: oI18n.getText("confirmBookingChangesTitle"),
                         actions: [sConfirmAction, sCancelAction],
                         emphasizedAction: sConfirmAction,
                         styleClass: "myUnifiedBtn",
@@ -1958,9 +1953,9 @@ sap.ui.define([
 
         _showStaleBookingMessage: function () {
             MessageBox.warning(
-                "Booking status was updated while you were on this page. Syncing the latest details, please wait...",
+                this.getView().getModel("i18n").getResourceBundle().getText("bookingStatusUpdate_BKK"),
                 {
-                    title: "Booking Already Updated",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("bookingAlreadyUpdated"),
                     styleClass: "myUnifiedBtn",
                     contentWidth: "470px",
                     actions: [MessageBox.Action.OK],
@@ -2238,8 +2233,8 @@ sap.ui.define([
 
         _handleEditBookingSuccess: function (sMessage, mOptions) {
             mOptions = mOptions || {};
-            MessageBox.success(sMessage || "Booking updated successfully.", {
-                title: "Success",
+            MessageBox.success(sMessage || this.getView().getModel("i18n").getResourceBundle().getText("bookingUpdated"), {
+                title: this.getView().getModel("i18n").getResourceBundle().getText("success"),
                 styleClass: "myUnifiedBtn",
                 onClose: function () {
                     if (typeof mOptions.afterClose === "function") {
@@ -2456,11 +2451,11 @@ sap.ui.define([
                 : /^\d{2}\/\d{2}\/\d{4}$/.test(sPaymentDate);
 
             if (oTransactionField) {
-                oTransactionField.setValueStateText("Enter Transaction ID");
+                oTransactionField.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("enterTransactionId_eac2"));
             }
 
             if (oPaymentDateField) {
-                oPaymentDateField.setValueStateText("Select payment date");
+                oPaymentDateField.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("selectPaymentDate"));
             }
 
             if (oPaymentModel) {
@@ -2522,14 +2517,14 @@ sap.ui.define([
             );
 
             if (!isMandatoryValid) {
-                sap.m.MessageToast.show("Please fill mandatory booking details");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fillMandatoryBooking"));
                 return false;
             }
 
             if ((oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return !!oMember.Selected;
             }).length < 1) {
-                sap.m.MessageToast.show("Please select at least one member from the member list.");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK_KselectLeastOne_"));
                 return false;
             }
 
@@ -2540,7 +2535,7 @@ sap.ui.define([
 
             var sEmail = oModel.getProperty("/CustomerEmail")?.trim();
             if (!sEmail) {
-                sap.m.MessageToast.show("Please complete contact details before payment");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("completeContactDetails"));
                 return false;
             }
 
@@ -2552,12 +2547,12 @@ sap.ui.define([
                 );
 
                 if (!isGStvalidate) {
-                    sap.m.MessageToast.show("Please fill business GST details");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fillBusinessGst"));
                     return false;
                 }
 
                 if (!this._isValidGSTINValue(sCustomerGSTIN)) {
-                    sap.m.MessageToast.show("Please enter a valid GSTIN");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enterValidGstin"));
                     return false;
                 }
             }
@@ -2702,7 +2697,7 @@ sap.ui.define([
                 }
 
             } catch (oError) {
-                MessageBox.error("Unable to update booking: " + (oError.message || "Unknown error"));
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("unableUpdateBooking", [oError.message || "Unknown error"]));
             } finally {
                 this.closeBusyDialog();
             }
@@ -2719,7 +2714,7 @@ sap.ui.define([
                     this._setupPaymentDialog();
                     this._oPaymentDialog.open();
                 }.bind(this)).catch(function (oError) {
-                    MessageBox.error("Failed to load payment dialog: " + (oError.message || "Unknown error"));
+                    MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("failedLoadPayment", [oError.message || "Unknown error"]));
                 }.bind(this));
             } else {
                 this._setupPaymentDialog();
@@ -2807,7 +2802,7 @@ sap.ui.define([
                 if (aContentMiddle && aContentMiddle.length > 0) {
                     var oTitle = aContentMiddle[0];
                     if (oTitle && oTitle.setText) {
-                        oTitle.setText("Pay Additional Amount");
+                        oTitle.setText(this.getView().getModel("i18n").getResourceBundle().getText("payAdditionalAmount"));
                     }
                 }
             }
@@ -2854,7 +2849,7 @@ sap.ui.define([
                 var oPaymentData = oPaymentModel.getData();
 
                 if (!this._validateAdditionalPaymentFields()) {
-                    sap.m.MessageToast.show("Please complete payment verification details");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("completePayment"));
                     return;
                 }
 
@@ -2912,7 +2907,7 @@ sap.ui.define([
                     : "Payment successful and booking updated.");
 
             } catch (oError) {
-                MessageBox.error("Payment failed: " + (oError.message || "Unknown error"));
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("paymentFailed", [oError.message || "Unknown error"]));
             } finally {
                 this.closeBusyDialog();
             }
@@ -3952,9 +3947,9 @@ sap.ui.define([
             this._bCancelConfirmationOpen = true;
 
             MessageBox.confirm(
-                "Are you sure you want to cancel? All unsaved changes will be lost.",
+                this.getView().getModel("i18n").getResourceBundle().getText("sureCancelAll"),
                 {
-                    title: "Confirm Cancel",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("confirmCancel"),
 
                     styleClass: "myUnifiedBtn",
 
@@ -4047,8 +4042,8 @@ sap.ui.define([
             var oData = oHostelModel.getData();
 
             sap.m.MessageBox.confirm(
-                "Are you sure you want to Cancel this Booking?", {
-                title: "Confirm Cancellation",
+                this.getView().getModel("i18n").getResourceBundle().getText("sureCancelBooking"), {
+                title: this.getView().getModel("i18n").getResourceBundle().getText("confirmCancellation"),
                 icon: sap.m.MessageBox.Icon.WARNING,
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
                 styleClass: "myUnifiedBtn",
@@ -4484,8 +4479,8 @@ sap.ui.define([
             var bEditModeEnabled = oBookingView && oBookingView.getProperty("/editModeEnabled");
 
             var sMessage = bEditModeEnabled
-                ? "Do you really want to go back? All saved changes will be lost"
-                : "Do you want to go back?";
+                ? this.getView().getModel("i18n").getResourceBundle().getText("reallyGoBack")
+                : this.getView().getModel("i18n").getResourceBundle().getText("goBackConfirm");
 
             MessageBox.warning(
                 sMessage,
@@ -5348,7 +5343,7 @@ sap.ui.define([
                 const isValid = await this._verifyOTPWithBackend(sOTP);
 
                 if (!isValid) {
-                    sap.m.MessageToast.show("Incorrect OTP");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("incorrectOTP"));
                     return;
                 }
 
@@ -5375,7 +5370,7 @@ sap.ui.define([
                 ctrlEmailId?.setValueState("None");
                 ctrlOTP?.setValueState("None");
 
-                sap.m.MessageToast.show("Login Successful");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("loginSuccessful_"));
 
                 if (this._bPendingEditRoute) {
 
@@ -5390,7 +5385,7 @@ sap.ui.define([
                 }
 
             } catch (err) {
-                sap.m.MessageToast.show(err.message || "Invalid Credentials, Please try again");
+                sap.m.MessageToast.show(err.message || this.getView().getModel("i18n").getResourceBundle().getText("invalidCredentialsTry"));
             } finally {
                 if (oBusy) {
                     oBusy.close();
@@ -5454,8 +5449,8 @@ sap.ui.define([
                     },
                     filters: oFilters
                 });
-                MessageBox.success("Password Updated Successfully", {
-                    title: "Success",
+                MessageBox.success(this.getView().getModel("i18n").getResourceBundle().getText("passwordUpdated"), {
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("success"),
                     onClose: () => {
 
                         // fully clean values
@@ -5465,7 +5460,7 @@ sap.ui.define([
                         sap.ui.core.Fragment.byId(this.createId("LoginAlertDialog"), "authDialog")
                             .getCustomHeader()
                             .getContentMiddle()[0]
-                            .setText("Sign In");
+                            .setText(this.getView().getModel("i18n").getResourceBundle().getText("signIn"));
 
                         // switch flow back to signin
                         const vm = this.getView().getModel("LoginViewModel");
@@ -5479,7 +5474,7 @@ sap.ui.define([
                 });
 
             } catch (err) {
-                sap.m.MessageToast.show("Invalid credentials, please try again");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("invalidCredentialsPleasetryagain"));
             } finally {
                 this.closeBusyDialog() // ALWAYS stop
                 this._resetOtpState();
@@ -5685,7 +5680,7 @@ sap.ui.define([
                 this.closeBusyDialog()
 
                 // ✅ SMART ERROR HANDLING
-                sap.m.MessageToast.show("Invalid credentials, please try again");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("invalidCredentialsPleasetryagain"));
 
                 // if (err?.responseJSON?.message) {
                 //     errorMsg = err.responseJSON.message;
@@ -6173,7 +6168,7 @@ sap.ui.define([
             bookingStartDate.setHours(0, 0, 0, 0);
 
             if (!bookingStartDate) {
-                MessageToast.show("Please select the dates before checking coupons")
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectDatesBefore"))
                 return;
             }
 

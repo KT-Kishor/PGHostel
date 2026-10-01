@@ -97,7 +97,7 @@
                                         { path: 'ShowCouponDetails>Currency' }
                                     ],
                                     formatter: '.Formatter.formatDiscount'
-                                } OFF"
+                                } {i18n>off}"
                                 class="couponTitle"
                                 wrapping="true"
                             />

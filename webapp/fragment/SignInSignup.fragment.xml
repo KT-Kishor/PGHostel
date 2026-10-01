@@ -385,7 +385,7 @@
                             singleContainerFullSize="false"
                         >
                             <f:content>
-                                <core:Title text="Personal Details" />
+                                <core:Title text="{i18n>adminBookingNCPersonalDetails}" />
 
                                 <!-- Full Name -->
                                 <Label
@@ -407,19 +407,19 @@
                                         >
                                             <core:ListItem
                                                 key="Mr."
-                                                text="Mr."
+                                                text="{i18n>mr_}"
                                             />
                                             <core:ListItem
                                                 key="Ms."
-                                                text="Ms."
+                                                text="{i18n>ms}"
                                             />
                                             <core:ListItem
                                                 key="Mrs."
-                                                text="Mrs."
+                                                text="{i18n>mrs}"
                                             />
                                             <core:ListItem
                                                 key="Dr."
-                                                text="Dr."
+                                                text="{i18n>dr}"
                                             />
                                         </ComboBox>
                                     </VBox>
@@ -465,19 +465,19 @@
                                 >
                                     <core:Item
                                         key=""
-                                        text="Select Gender"
+                                        text="{i18n>selectGender_6159}"
                                     />
                                     <core:Item
                                         key="Male"
-                                        text="Male"
+                                        text="{i18n>male}"
                                     />
                                     <core:Item
                                         key="Female"
-                                        text="Female"
+                                        text="{i18n>female}"
                                     />
                                     <core:Item
                                         key="Other"
-                                        text="Other"
+                                        text="{i18n>other}"
                                     />
                                 </Select>
 <core:Title text="{i18n>adminBookingNCContactDetails}" />
