@@ -18,7 +18,7 @@
 				
 				<VBox class="umTitleBlock">
 					<Title text="User Manuals" level="H1" class="umTitle" />
-					<Text text="Short video walkthroughs and printable guides for every feature." class="umSubtitle" />
+					<Text text="{i18n>shortVideoWalkthroughs}" class="umSubtitle" />
 				</VBox>
 				<ToolbarSpacer />
 				<Button
@@ -26,11 +26,11 @@
 					type="Transparent"
 					class="umBackBtn myUnifiedBtn"
 					press="onBack"
-					tooltip="Go back" />
+					tooltip="{i18n>goBack}" />
 				<SearchField
 					id="topicSearch1"
 					width="260px"
-					placeholder="Search topics"
+					placeholder="{i18n>searchTopics}"
 					liveChange="onSearch"
 					class="umSearch" />
 			</Toolbar>
@@ -79,13 +79,13 @@
 </VBox>
 						<HBox class="umActions" justifyContent="End">
 							<Button
-								text="Video Guide"
+								text="{i18n>videoGuide}"
 								
 								type="Emphasized"
 								class="umBtnPrimary myUnifiedBtn"
 								press="onViewDemo" />
 							<Button 
-    text="Download Guide" 
+    text="{i18n>downloadGuide}" 
    
     type="Default" 
     class="umBtnGhost myUnifiedBtn" 
@@ -103,7 +103,7 @@
 					</VBox>
 				</FlexBox>
 
-				<Text id="emptyState1" text="No topics match that search" class="umEmpty" visible="false" />
+				<Text id="emptyState1" text="{i18n>noTopicsMatch}" class="umEmpty" visible="false" />
 
 			</VBox>
 		</content>

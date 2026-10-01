@@ -354,6 +354,12 @@ sap.ui.define([
             var oContext = selected.getBindingContext("RaiseBugModel");
             var Data = oContext.getObject();
 
+            // if(Data.Status === "Open") {
+            //     sap.m.MessageToast.show(this.i18nModel.getText("cannotResolveOpenBug"));
+            //     return;
+            // }
+
+
             if (Data.Status === "Resolved") {
                 sap.m.MessageToast.show(this.i18nModel.getText("alreadyResolved"));
                 return;

@@ -611,7 +611,7 @@ sap.ui.define([
                 this._applyRoomsVisibility(aAllRooms);
 
                 if (bAnyFailure) {
-                    MessageToast.show("Could not verify availability for some rooms.");
+                    MessageToast.show(this.i18nModel.getText("Couldnotverifyavailabilityforsomerooms"));
                 }
             } finally {
                 this.closeBusyDialog();
@@ -1354,7 +1354,7 @@ sap.ui.define([
             otpCtrl?.setEnabled(false);
             otpCtrl?.setValueState("None");
 
-            MessageToast.show("OTP expired. Please resend OTP.");
+            MessageToast.show(this.i18nModel.getText("expiredPleaseresendOTP"));
         },
          onSignIn: async function () {
             const vm = this.oViewModel;
@@ -1787,7 +1787,7 @@ sap.ui.define([
                 if (!oResp || oResp.success !== true) {
                     const sFailMsg = oResp?.message || this.i18nModel.getText("registrationFailedPleasetryagain");
                     return MessageBox.error(sFailMsg, {
-                        title: "Registration Failed",
+                        title: this.i18nModel.getText("RegistrationFailed"),
                         styleClass: "myUnifiedBtn",
                     });
                 }
@@ -1800,7 +1800,7 @@ sap.ui.define([
                 const sPassword = data.password;
                 const oCtrl = this; // 👈 REQUIRED
                 MessageBox.success(sSuccessMsg, {
-                    title: "Success",
+                    title: this.i18nModel.getText("success"),
                     contentWidth: "500px",
                     styleClass: "myUnifiedBtn",
                     onClose: () => {
@@ -1862,7 +1862,7 @@ sap.ui.define([
                     })();
 
                 MessageBox.error(sMsg, {
-                    title: "Registration Failed"
+                    title: this.i18nModel.getText("RegistrationFailed")
                 });
             } finally {
                 this.closeBusyDialog();
@@ -2035,7 +2035,7 @@ sap.ui.define([
 
             if (!STD_REGEX.test(sValue)) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("STD must start with + and contain only numbers (no leading zero)");
+                oSTD.setValueStateText(this.i18nModel.getText("STDPlusicon"));
 
                 oMobile.setValue("");
                 oMobile.setMaxLength(18);
@@ -2293,8 +2293,8 @@ sap.ui.define([
                     filters: oFilters
                 });
 
-                MessageBox.success("Password updated successfully", {
-                    title: "Success",
+                MessageBox.success(this.i18nModel.getText("Passwordupdatedsuccessfully"), {
+                    title: this.i18nModel.getText("success"),
                     styleClass: "myUnifiedBtn",
                     onClose: () => {
                         // fully clean values
@@ -2358,9 +2358,9 @@ sap.ui.define([
             if (!bLoggedIn) {
                 this._pendingBookingNav = true;
                 MessageBox.information(
-                    "Please log in to continue booking.",
+                    this.i18nModel.getText("Pleaselogintocontinuebooking"),
                     {
-                        title: "Login Required",
+                        title:this.i18nModel.getText("LoginRequired"),
                         styleClass: "myUnifiedBtn",
                         actions: [MessageBox.Action.OK],
                         emphasizedAction: MessageBox.Action.OK,
@@ -2910,14 +2910,14 @@ sap.ui.define([
         onAddressClick: function () {
             try {
                 let oHostelModel = this._oRoomDetailFragment ? this._oRoomDetailFragment.getModel("HostelModel") : this.oHostelModel;
-                if (!oHostelModel) return MessageToast.show("Location data not available.");
+                if (!oHostelModel) return MessageToast.show(this.i18nModel.getText("Locationdatanotavailable"));
                 const sGeoUrl = (oHostelModel.getProperty("/GeoLocation") || "").trim();
                 if (!sGeoUrl || sGeoUrl === "null" || sGeoUrl === "undefined") {
-                    return MessageToast.show("Geo Location is not available");
+                    return MessageToast.show(this.i18nModel.getText("GeoLocationisnotavailable"));
                 }
                 const urlPattern = /^https:\/\/[^ "]+(\.[a-z]{2,})/i;
                 if (!urlPattern.test(sGeoUrl)) {
-                    return MessageToast.show("Invalid Geo Location link");
+                    return MessageToast.show(this.i18nModel.getText("InvalidGeoLocationlink"));
                 }
 
                 window.open(sGeoUrl, "_blank");
@@ -3018,7 +3018,7 @@ sap.ui.define([
             }
             const isMobileValid = this._validateMobileNumber();
             if (!isMobileValid) {
-                sap.m.MessageToast.show("Enter valid mobile number");
+                sap.m.MessageToast.show(this.i18nModel.getText("mobileNoValueState"));
                 sap.m.MessageToast.show(this.i18nModel.getText("mandetoryFields"));
                 return;
             }
@@ -3039,9 +3039,9 @@ sap.ui.define([
 
                 });
                 sap.m.MessageBox.success(
-                    "Your enquiry has been submitted successfully.\n\nOur team will contact you soon.",
+                    this.i18nModel.getText("Yourenquiryhasbeensubmittedsuccessfullyteamwillcontactyousoon"),
                     {
-                        title: "Request Submitted",
+                        title: this.i18nModel.getText("RequestSubmitted"),
                         actions: [sap.m.MessageBox.Action.OK],
                         emphasizedAction: sap.m.MessageBox.Action.OK,
                         styleClass: "myUnifiedBtn",
@@ -3084,7 +3084,7 @@ sap.ui.define([
             // ISD mandatory
             if (!sSTD) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("Select ISD code");
+                oSTD.setValueStateText(this.i18nModel.getText("selectISDCode"));
                 return false;
             } else {
                 oSTD.setValueState("None");
@@ -3093,7 +3093,7 @@ sap.ui.define([
             // Mobile mandatory
             if (!sValue) {
                 oMobile.setValueState("Error");
-                oMobile.setValueStateText("Mobile number is required");
+                oMobile.setValueStateText(this.i18nModel.getText("Mobilenumberisrequired"));
                 return false;
             }
 
@@ -3102,12 +3102,12 @@ sap.ui.define([
 
                 if (sValue.length !== 10) {
                     oMobile.setValueState("Error");
-                    oMobile.setValueStateText("Indian mobile number must be exactly 10 digits");
+                    oMobile.setValueStateText(this.i18nModel.getText("Indianmobilenumbermustbeexactly10digits"));
                     return false;
                 }
                 if (sValue.startsWith("0")) {
                     oMobile.setValueState("Error");
-                    oMobile.setValueStateText("Indian mobile number cannot start with 0");
+                    oMobile.setValueStateText(this.i18nModel.getText("Indianmobilenumbercannotstartwith"));
                     return false;
                 }
 
@@ -3117,7 +3117,7 @@ sap.ui.define([
 
                 if (sValue.length < 4 || sValue.length > 18) {
                     oMobile.setValueState("Error");
-                    oMobile.setValueStateText("Mobile number must be between 4 and 18 digits");
+                    oMobile.setValueStateText(this.i18nModel.getText("Mobilenumbermustbebetweenanddigits"));
                     return false;
                 }
 
@@ -3140,7 +3140,7 @@ sap.ui.define([
 
             if (!sKey) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("Please select ISD code");
+                oSTD.setValueStateText(this.i18nModel.getText("PleaseselectISDcodefirst"));
                 return;
             }
 

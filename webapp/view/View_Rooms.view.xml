@@ -93,7 +93,7 @@
         class="sapUiTinyMarginBottom vrHeaderFieldRow"
     >
         <Label
-            text="Email:"
+            text="{i18n>RoomEmail}"
             design="Bold"
             class="vrHeaderLabel"
         />
@@ -109,7 +109,7 @@
         class="sapUiTinyMarginBottom vrHeaderFieldRow"
     >
         <Label
-            text="Contact:"
+            text="{i18n>RoomContact}"
             design="Bold"
             class="vrHeaderLabel"
         />
@@ -126,7 +126,7 @@
         visible="{= !!${BranchModel>/GSTIN} }"
     >
         <Label
-            text="GSTIN:"
+            text="{i18n>RoomGSTIN}"
             design="Bold"
             class="vrHeaderLabel"
         />
@@ -235,7 +235,7 @@
 						<uxap:ObjectPageSection
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }"
 							id="VR_id_ACSection"
-							title="AC Rooms"
+							title="{i18n>ACRooms}"
 							titleUppercase="false"
 							class="vrRoomContentSection">
 							<uxap:subSections>
@@ -300,7 +300,7 @@
 																alignItems="Center"
 																class="sapUiTinyMarginTop">
 										<Link
-											text="{= ${VisibilityModel>Visible} ? 'Book Room' : 'Occupied' }"
+											text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
 											enabled="{VisibilityModel>Visible}"
 																	press="onViewDetailsPress"
 																	class="pillActionBtn pillLeft" />
@@ -328,14 +328,14 @@
 						<!-- Non-AC Rooms Tab Section -->
 						<uxap:ObjectPageSection
 							id="VR_id_NonACSection"
-							title="Non-AC Rooms"
+							title="{i18n>NonACRooms}"
 							titleUppercase="false"
 							class="vrRoomContentSection"
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0 }">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
 									id="VR_id_NonACSubSection"
-									title="Non-AC Rooms"
+									title="{i18n>NonACRooms}"
 									visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}">
 									<uxap:blocks>
 										<VBox>
@@ -395,12 +395,12 @@
 																alignItems="Center"
 																class="sapUiTinyMarginTop">
 										<Link
-											text="{= ${VisibilityModel>Visible} ? 'Book Room' : 'Occupied' }"
+											text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
 											enabled="{VisibilityModel>Visible}"
 																	press="onViewDetailsPress"
 																	class="pillActionBtn pillLeft" />
 																<Link
-																	text="Enquiry"
+																	text="{i18n>enquiry}"
 																	press="onEnquiryPress"
 																	class="pillActionBtn pillRight" />
 															</HBox>

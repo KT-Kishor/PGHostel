@@ -29,20 +29,20 @@
             <!-- Desktop Terms -->
             <Link
                 id="usermanualLink"
-                text="User Manual"
+                text="{i18n>userManualTitle}"
                 class="_link desktopFooterItem sapUiTinyMarginEnd"
                 press="onUsermanualPress" />
                 
             <Link
                 id="desktopTermsLink"
-                text="Terms and Conditions"
+                text="{i18n>TermsandConditions}"
                 class="_link desktopFooterItem"
                 press="onPrivacyPolicyPress" />
 
             <!-- Desktop Vendor Registration -->
             <Button
                 id="desktopVendorButton"
-                text="Vendor Registration"
+                text="{i18n>adminVendorRegistration}"
                 tooltip="{i18n>adminVendorRegistration}"
                 press="onAdminSIGNUP"
                 class="fa-admin-btn desktopFooterItem" />

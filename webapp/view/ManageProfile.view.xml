@@ -150,19 +150,19 @@
                         >
                             <core:Item
                                 key="Mr."
-                                text="Mr."
+                                text="{i18n>mr_}"
                             />
                             <core:Item
                                 key="Ms."
-                                text="Ms."
+                                text="{i18n>ms}"
                             />
                             <core:Item
                                 key="Mrs."
-                                text="Mrs."
+                                text="{i18n>mrs}"
                             />
                             <core:Item
                                 key="Dr."
-                                text="Dr."
+                                text="{i18n>dr}"
                             />
                         </Select>
 
@@ -395,14 +395,14 @@
                 class="customActionBox"
             >
                 <Button
-                    text="Add Members"
+                    text="{i18n>AddMembers}"
                     press="onPressAddMember"
                     class="myUnifiedBtn sapUiSmallMarginEnd"
                     visible="{= ${profileData>/selectedTab} === 'Members' }"
                 />
 
                 <Button
-                    text="Raise Complaint"
+                    text="{i18n>RaiseComplaint}"
                     press="onPressRaiseComplaint"
                     class="myUnifiedBtn sapUiSmallMarginEnd"
                     enabled="{profileData>/hasAssignedBooking}"
@@ -552,7 +552,7 @@
                         <Button
                             icon="sap-icon://edit"
                             type="Transparent"
-                            tooltip="Upload Document"
+                            tooltip="{i18n>uploadDocuments}"
                             press="onEditMemberFromDialog"
                             class="myUnifiedBtn"
                         />
@@ -672,7 +672,7 @@
                     demandPopin="true"
                     minScreenWidth="Phone"
                 >
-                    <Text text="Branch" />
+                    <Text text="{i18n>branch}" />
                 </Column>
                 <Column
                     demandPopin="true"
@@ -764,52 +764,52 @@
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Damage ID" />
+                    <Text text="{i18n>damageID}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Branch" />
+                    <Text text="{i18n>branch}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Room No" />
+                    <Text text="{i18n>roomNo}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Item" />
+                    <Text text="{i18n>Item}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Phone"
                 >
-                    <Text text="Type" />
+                    <Text text="{i18n>type}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Desktop"
                 >
-                    <Text text="Description" />
+                    <Text text="{i18n>Description}" />
                 </Column>
                 <Column demandPopin="true">
-                    <Text text="Qty" />
+                    <Text text="{i18n>Qty}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Actual Cost" />
+                    <Text text="{i18n>actualcost}" />
                 </Column>
                 <Column
                     demandPopin="true"
                     minScreenWidth="Tablet"
                 >
-                    <Text text="Recover Cost" />
+                    <Text text="{i18n>recovercost}" />
                 </Column>
                 <!-- <Column demandPopin="true" minScreenWidth="Tablet"><Text text="Total Cost"/></Column> -->
             </columns>

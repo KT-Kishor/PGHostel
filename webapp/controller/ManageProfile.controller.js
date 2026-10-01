@@ -798,13 +798,13 @@ sap.ui.define([
 
             if (file.size > iMaxSizeBytes) {
                 if (!isImage) {
-                    sap.m.MessageToast.show("Please upload a file under 400 KB.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Pleaseuploadafileunder400KB"));
                     oEvent.getSource().clear();
                     return;
                 }
 
                 if (typeof imageCompression === "undefined") {
-                    sap.m.MessageToast.show("Compression library not available.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("Compressionlibrarynotavailable"));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -826,7 +826,7 @@ sap.ui.define([
                     processedFile = await imageCompression(file, options);
 
                     if (processedFile.size > iMaxSizeBytes) {
-                        sap.m.MessageToast.show(file.name + " could not be compressed below 400 KB.");
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileCompressionFailed", [file.name]));
                         oEvent.getSource().clear();
                         return;
                     }
@@ -1469,7 +1469,7 @@ sap.ui.define([
 
             if (!sDocType) {
                 sap.m.MessageToast.show(
-                    "Please select document type first"
+                    this.i18nModel.getText("pleaseSelectDocumentTypeFirst")
                 );
 
                 oFileUploader.clear();
@@ -1493,7 +1493,7 @@ sap.ui.define([
             if (!bAllowedExt) {
 
                 sap.m.MessageToast.show(
-                    "Only PDF, JPG, JPEG, PNG, WEBP allowed"
+                    this.i18nModel.getText("OnlyPDFJPGJPEGPNGWEBPallowed")
                 );
 
                 oFileUploader.clear();
@@ -1510,7 +1510,7 @@ sap.ui.define([
             // model's document fields first would let savepress pass the
             // document validation and save an edit with an empty document.
             if (oFile.size > iMaxSizeBytes && !isImage) {
-                sap.m.MessageToast.show("Please upload a file under 400 KB.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Pleaseuploadafileunder400KB"));
                 this._selectedFile = null;
                 oFileUploader.clear();
                 return;
@@ -1546,7 +1546,7 @@ sap.ui.define([
                     this.closeBusyDialog();
 
                     if (processedFile.size > iMaxSizeBytes) {
-                        sap.m.MessageToast.show(oFile.name + " could not be compressed below 400 KB.");
+                        sap.m.MessageToast.show(this.i18nModel.getText("fileCompressionFailed", [oFile.name]));
                         this._selectedFile = null;
                         this._restoreMemberDocumentData(oPreviousDocData, sTempId);
                         return;
@@ -1595,7 +1595,7 @@ sap.ui.define([
             const sFileName = oEvent.getParameter("fileName") || "File";
 
             sap.m.MessageToast.show(
-                sFileName + " exceeds the 400 KB size limit."
+               this.i18nModel.getText("fileExceeds400KB", [sFileName])
             );
 
             oEvent.getSource().clear();
@@ -1816,7 +1816,7 @@ sap.ui.define([
             ).trim();
 
             if (!sRawSource) {
-                sap.m.MessageToast.show("No document to preview.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nodocumenttopreview"));
                 return;
             }
 
@@ -1996,7 +1996,7 @@ sap.ui.define([
                 }.bind(this);
 
                 oNativeImg.onerror = function () {
-                    sap.m.MessageToast.show("Unable to preview image.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("previewimage"));
                 };
 
                 oNativeImg.src = sImageSrc;
@@ -2021,7 +2021,7 @@ sap.ui.define([
                         normalizedBase64Length: sBase64.length
                     });
 
-                    sap.m.MessageToast.show("PDF content is not valid base64.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst"));
                     return;
                 }
 
@@ -2054,7 +2054,7 @@ sap.ui.define([
                     oLink.click();
                     document.body.removeChild(oLink);
 
-                    sap.m.MessageToast.show("File downloaded successfully");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fileDownloaded"));
                     return;
                 }
 
@@ -2092,7 +2092,7 @@ sap.ui.define([
 
             // Unsupported preview, but still allow download fallback
             this.onDownloadPreview();
-            sap.m.MessageToast.show("Unsupported document format. Download started if supported.");
+            sap.m.MessageToast.show(this.i18nModel.getText("UnsupporteddocumentformatDownloadstartedifsupported"));
         },
         onDeleteMemberDocument: function () {
 
@@ -2153,8 +2153,7 @@ sap.ui.define([
                 // }
 
                 sap.m.MessageToast.show(
-                    "Please upload a file for the selected document type \"" +
-                    sDocumentType + "\"."
+                 this.i18nModel.getText("pleaseUploadFileForDocumentType", [sDocumentType])
                 );
 
                 return false;
@@ -2164,7 +2163,7 @@ sap.ui.define([
             if (!sDocumentType && bHasFile) {
 
                 sap.m.MessageToast.show(
-                    "Please select document type"
+                    this.i18nModel.getText("selectDocType")
                 );
 
                 return false;
@@ -2191,7 +2190,7 @@ sap.ui.define([
 
                 if (!oMember.DocumentType) {
                     sap.m.MessageToast.show(
-                        "Please select document type"
+                         this.i18nModel.getText("selectDocType")
                     );
                     return;
                 }
@@ -2207,7 +2206,7 @@ sap.ui.define([
                     !oMember.Document
                 ) {
                     sap.m.MessageToast.show(
-                        "Please upload a document"
+                         this.i18nModel.getText("Pleaseuploadadocument")
                     );
                     return;
                 }
@@ -2465,7 +2464,7 @@ sap.ui.define([
                 }
 
                 if (bMemberSyncFailed) {
-                    MessageToast.show("Profile updated, but member details could not be synced.");
+                    MessageToast.show(this.i18nModel.getText("Profileupdatedbutmemberdetailscouldnotbesynced"));
                 } else {
                     MessageToast.show(this.i18nModel.getText("profileUpdatedSuccessfully"));
                 }
@@ -2569,7 +2568,7 @@ sap.ui.define([
             var sBookingID = btoa(oBookingData.BookingID.toString());
 
             if (!sBookingID) {
-                sap.m.MessageToast.show("BookingID not found for this booking");
+                sap.m.MessageToast.show(this.i18nModel.getText("BookingIDnotfoundforthisbooking"));
                 return;
             }
 
@@ -2916,7 +2915,7 @@ sap.ui.define([
             const sUserID = oModel.getProperty("/UserID") || this._oLoggedInUser?.UserID || "";
 
             if (!sUserID) {
-                MessageToast.show("UserID not found.");
+                MessageToast.show(this.i18nModel.getText("UserIDnotfound"));
                 return;
             }
 
@@ -2981,7 +2980,7 @@ sap.ui.define([
 
             if (!sUserID) {
                 if (!bSilent) {
-                    MessageToast.show("UserID not found.");
+                    MessageToast.show(this.i18nModel.getText("UserIDnotfound"));
                 }
                 return;
             }
@@ -3048,7 +3047,7 @@ sap.ui.define([
 
             if (!sUserID) {
                 if (!bSilent) {
-                    MessageToast.show("UserID not found.");
+                    MessageToast.show(this.i18nModel.getText("UserIDnotfound"));
                 }
                 return;
             }
@@ -4418,7 +4417,7 @@ sap.ui.define([
                 "image/webp"
             ];
             if (file.type && !aAllowedMimeTypes.includes(file.type)) {
-                MessageToast.show("Only JPG, PNG & WEBP files are allowed.");
+                MessageToast.show(this.i18nModel.getText("OnlyJPGPNGWEBPfilesareallowed"));
                 oUploader.clear();
                 return;
             }
@@ -4542,7 +4541,7 @@ sap.ui.define([
 
             const oDoc = oEvent.getSource().getBindingContext("complaintTemp")?.getObject();
             if (!oDoc || !(oDoc.File || oDoc.Base64)) {
-                MessageToast.show("No document to preview.");
+                MessageToast.show(this.i18nModel.getText("Nodocumenttopreview"));
                 return;
             }
 
@@ -4613,7 +4612,7 @@ sap.ui.define([
                 return;
             }
 
-            MessageToast.show("Preview not supported for this file type.");
+            MessageToast.show(this.i18nModel.getText("Previewnotsupportedforthisfiletype"));
         },
         onSaveComplaint: async function () {
             const oView = this.getView();
@@ -4636,7 +4635,7 @@ sap.ui.define([
                 !utils._LCstrictValidationComboBox(oBookingID, "ID") ||
                 !utils._LCvalidateMandatoryField(oComplaintType, "ID") ||
                 !utils._LCvalidateMandatoryField(oDescription, "ID")) {
-                MessageToast.show("Please fill all required fields.");
+                MessageToast.show(this.i18nModel.getText("Pleasefillallrequiredfields"));
                 return;
             }
             const sUserID = this._oLoggedInUser.UserID;
@@ -4751,7 +4750,7 @@ sap.ui.define([
 
             if (aBlockedStatuses.includes(status)) {
                 MessageToast.show(
-                    "Complaints with status 'In Progress' or 'Resolved' cannot be edited"
+                    this.i18nModel.getText("ComplaintswithstatusInProgressResolvedcannotbeedited")
                 );
                 return;
             }
@@ -5031,7 +5030,7 @@ sap.ui.define([
                 }.bind(this);
 
                 oImg.onerror = function () {
-                    sap.m.MessageToast.show("Unable to preview image.");
+                    sap.m.MessageToast.show(this.i18nModel.getText("previewimage"));
                 };
 
                 oImg.src = sImageSrc;
@@ -5072,7 +5071,7 @@ sap.ui.define([
                     oLink.click();
                     document.body.removeChild(oLink);
 
-                    sap.m.MessageToast.show("File downloaded successfully");
+                    sap.m.MessageToast.show(this.i18nModel.getText("fileDownloaded"));
                     return;
                 }
 
@@ -5110,12 +5109,12 @@ sap.ui.define([
 
             // Unsupported preview, but try download
             this.onDownloadPreview();
-            sap.m.MessageToast.show("Preview not supported.");
+            sap.m.MessageToast.show(this.i18nModel.getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-                sap.m.MessageToast.show("No file available for download.");
+                sap.m.MessageToast.show(this.i18nModel.getText("Nofileavailablefordownload"));
                 return;
             }
 
@@ -5185,7 +5184,7 @@ sap.ui.define([
         },
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-                MessageToast.show("No file available for download.");
+                MessageToast.show(this.i18nModel.getText("Nofileavailablefordownload"));
 
                 return;
             }
@@ -5203,7 +5202,7 @@ sap.ui.define([
             }
 
             if (!sDownloadUrl) {
-                MessageToast.show("Download not supported.");
+                MessageToast.show(this.i18nModel.getText("Downloadnotsupported"));
                 return;
             }
 
@@ -5320,14 +5319,14 @@ sap.ui.define([
             const oTicket = oContext && oContext.getObject();
 
             if (!oTicket || !oTicket.TicketID) {
-                MessageToast.show("TicketID not found.");
+                MessageToast.show(this.i18nModel.getText("TicketIDnotfound"));
                 return;
             }
 
             const sStatus = (oTicket.Status || "").trim().toLowerCase();
 
             if (sStatus !== "open") {
-                MessageToast.show("Only open support requests can be edited");
+                MessageToast.show(this.i18nModel.getText("Onlyopensupportrequestscanbeedited"));
                 return;
             }
 
@@ -5434,7 +5433,7 @@ sap.ui.define([
             const oTicket = oEvent.getSource().getBindingContext("profileData")?.getObject();
 
             if (!oTicket || !oTicket.TicketID) {
-                MessageToast.show("TicketID not found.");
+                MessageToast.show(this.i18nModel.getText("TicketIDnotfound"));
                 return;
             }
 
@@ -5618,7 +5617,7 @@ sap.ui.define([
             // A previous batch is still being compressed: its attachments are not
             // in the list yet, so a second batch would overwrite it.
             if (this._bSupportImageProcessing) {
-                MessageToast.show("Please wait, images are still being processed.");
+                MessageToast.show(this.i18nModel.getText("Pleasewaitimagesarestillbeingprocessed"));
                 oEvent.getSource().clear();
                 return;
             }
@@ -5639,14 +5638,14 @@ sap.ui.define([
                 const iRemaining = 3 - aExisting.length;
 
                 if (aNew.length + oFiles.length > iRemaining) {
-                    MessageToast.show("Maximum 3 images allowed.");
+                    MessageToast.show(this.i18nModel.getText("Maximumimagesallowed"));
                     oEvent.getSource().clear();
                     return;
                 }
             } else {
                 const totalAfterAdd = aNew.length + oFiles.length;
                 if (totalAfterAdd > 3) {
-                    MessageToast.show("You can upload maximum 3 images only");
+                    MessageToast.show(this.i18nModel.getText("canUploadthree"));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -5657,13 +5656,13 @@ sap.ui.define([
 
                 const bDuplicate = aNew.some(image => image.originalFilename === oFile.name);
                 if (bDuplicate) {
-                    MessageToast.show("This file is already uploaded and cannot be uploaded again");
+                    MessageToast.show(this.i18nModel.getText("Thisfileisalreadyuploadedandcannotbeuploadedagain"));
                     oEvent.getSource().clear();
                     return;
                 }
 
                 if (!oFile.type.match(/^image\/(jpeg|jpg|png)$/)) {
-                    MessageToast.show(`"${oFile.name}" is not a valid image. Only JPG, JPEG, PNG allowed`);
+                    MessageToast.show(this.i18nModel.getText("invalidImageFile", [oFile.name]));
                     oEvent.getSource().clear();
                     return;
                 }
@@ -5773,7 +5772,7 @@ sap.ui.define([
             const oImage = oCtx && oCtx.getObject();
 
             if (!oImage || !oImage.content) {
-                MessageToast.show("Image not available for preview");
+                MessageToast.show(this.i18nModel.getText("Imagenotavailableforpreview"));
                 return;
             }
 
@@ -5794,7 +5793,7 @@ sap.ui.define([
             const aImages = (oImagesModel.getData() || []).filter(image => image.key !== sKey);
 
             oImagesModel.setData(aImages);
-            MessageToast.show("Image removed. Save the request to apply the change.");
+            MessageToast.show(this.i18nModel.getText("ImageremovedSavetherequesttoapplythechange"));
         },
 
         /**
@@ -5805,7 +5804,7 @@ sap.ui.define([
             const sBase64 = this._normalizeSupportBase64(oContent);
 
             if (!sBase64) {
-                MessageToast.show("Image not available for preview");
+                MessageToast.show(this.i18nModel.getText("Imagenotavailableforpreview"));
                 return;
             }
 
@@ -5883,7 +5882,7 @@ sap.ui.define([
             };
 
             oImg.onerror = function () {
-                MessageToast.show("Unable to preview image.");
+                MessageToast.show(this.i18nModel.getText("previewimage"));
             };
 
             oImg.src = sSrc;
@@ -5951,7 +5950,7 @@ sap.ui.define([
             const aListData = oView.getModel("MP_SupportImages").getData() || [];
 
             if (aListData.some(image => image.source === "processing")) {
-                MessageToast.show("Please wait, images are still being processed.");
+                MessageToast.show(this.i18nModel.getText("Pleasewaitimagesarestillbeingprocessed"));
                 return;
             }
 
@@ -6040,13 +6039,13 @@ sap.ui.define([
                         }
                     });
 
-                    MessageToast.show("Support request updated successfully");
+                    MessageToast.show(this.i18nModel.getText("Supportrequestupdatedsuccessfully"));
                 } else {
                     await this.ajaxCreateWithJQuery("HM_Support", {
                         data: data
                     });
 
-                    MessageToast.show("Support request submitted successfully");
+                    MessageToast.show(this.i18nModel.getText("Supportrequestsubmittedsuccessfully"));
                 }
 
                 this.onMPSupportDialogCancel();
@@ -6099,7 +6098,7 @@ sap.ui.define([
 
             if (!sEmail) {
                 if (!bSilent) {
-                    MessageToast.show("Email not found.");
+                    MessageToast.show(this.i18nModel.getText("Emailnotfound"));
                 }
                 return;
             }
