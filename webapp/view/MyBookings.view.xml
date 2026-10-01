@@ -24,7 +24,7 @@
                 <contentMiddle>
                     <Title
                         text="{i18n>tour_title_mybookings}"
-                        level="H4"
+                        level="H4" class="sapUiTinyMarginTop"
                     />
                 </contentMiddle>
                 <contentRight>

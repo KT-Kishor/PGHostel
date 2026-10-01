@@ -1078,6 +1078,7 @@ sap.ui.define([
             if (!oModel) return;
             // Re-resolve assigned branches on each open (handles re-login).
             this._sAdminBookingAssignedBranches = undefined;
+            this._sAdminBookingRoomsBranch = "";
             var oDOBRange = this._getAdminBookingDOBRange();
             oModel.setData({
                 Branches: oModel.getProperty("/Branches") || [],
@@ -1189,12 +1190,42 @@ sap.ui.define([
             }
         },
 
-        // Branch changed → load rooms belonging to that branch
+        // Branch changed → load rooms belonging to that branch.
+        // Bound to "change" (not "selectionChange"): UI5's ComboBox raises
+        // selectionChange from handleInputValidation, so it also fires while
+        // filtering, typing and arrowing up/down the dropdown — which ran the
+        // room lookup and its busy dialog on every keystroke. "change" fires
+        // only when the user commits (Enter or leaving the field).
         onAdminBookingBranchChange: async function (oEvent) {
             var oModel = this.getView().getModel("AdminBookingModel");
-            var oBranchCtrl = this.byId("AB_id_Branch");
-            var sBranchCode = oEvent.getParameter("selectedItem") ?
-                oEvent.getParameter("selectedItem").getKey() : "";
+            var oBranchCtrl = (oEvent && oEvent.getSource()) || this.byId("AB_id_Branch");
+            var sBranchCode = "";
+
+            // Resolve the committed value. A picked item (or one UI5 auto-picked
+            // from an exact typed match) exposes selectedItem; otherwise match the
+            // typed text locally so a hand-typed value still resolves.
+            var oSelected = oBranchCtrl && oBranchCtrl.getSelectedItem && oBranchCtrl.getSelectedItem();
+            if (oSelected && oSelected.getKey()) {
+                sBranchCode = oSelected.getKey();
+            } else if (oBranchCtrl) {
+                var sTyped = String(oBranchCtrl.getValue() || "").trim().toLowerCase();
+                if (sTyped) {
+                    var oMatch = (oBranchCtrl.getItems() || []).find(function (oItem) {
+                        return String(oItem.getText() || "").trim().toLowerCase() === sTyped ||
+                            String(oItem.getKey() || "").trim().toLowerCase() === sTyped;
+                    });
+                    if (oMatch) sBranchCode = oMatch.getKey();
+                }
+            }
+            if (oBranchCtrl && sBranchCode) oBranchCtrl.setSelectedKey(sBranchCode);
+
+            // "change" also fires when the field merely loses focus. If the same
+            // branch is still loaded, skip the reload so tabbing through the form
+            // does not wipe an already chosen room/plan.
+            if (sBranchCode && sBranchCode === oModel.getProperty("/BranchCode") &&
+                sBranchCode === this._sAdminBookingRoomsBranch) {
+                return;
+            }
 
             // Reset dependent fields
             oModel.setProperty("/BranchCode", sBranchCode);
@@ -1210,7 +1241,10 @@ sap.ui.define([
                 if (oCtrl && oCtrl.setValueState) oCtrl.setValueState("None");
             }.bind(this));
 
-            if (!sBranchCode) return;
+            if (!sBranchCode) {
+                this._sAdminBookingRoomsBranch = "";
+                return;
+            }
 
             try {
                 this.getBusyDialog();
@@ -1267,6 +1301,7 @@ sap.ui.define([
                 });
                 oModel.setProperty("/AllRooms", Object.values(oUnique));
                 oModel.setProperty("/Rooms", Object.values(oUnique));
+                this._sAdminBookingRoomsBranch = sBranchCode;
 
             // If the admin is in "Existing Customer" mode, changing branch must
             // clear only the selected customer. Existing customer lookup is global.

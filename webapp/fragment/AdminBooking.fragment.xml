@@ -41,7 +41,7 @@
 					valueStateText="{i18n>adminBookingBranchValueStateText}"
 					filterSecondaryValues="true"
 					items="{AdminBookingModel>/Branches}"
-					selectionChange="onAdminBookingBranchChange">
+					change="onAdminBookingBranchChange">
 					<c:ListItem key="{AdminBookingModel>BranchID}" text="{AdminBookingModel>BranchID} - {AdminBookingModel>Name}" additionalText="{AdminBookingModel>City}"/>
 				</ComboBox>
 
