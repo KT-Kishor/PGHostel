@@ -118,7 +118,7 @@
                             <Input
                                 id="idCardExpiry"
                                 maxLength="5"
-                                placeholder="MM/YY"
+                                placeholder="{i18n>mmYy}"
                             />
 
                             <Label text="{i18n>cVV}" />
@@ -177,7 +177,7 @@
                             placeholder="{i18n>enterTransactionID}"
                             liveChange="onTransactionIDChange"
                             value="{PaymentModel>/BankTransactionID}"
-                            valueStateText="Enter Transaction ID"
+                            valueStateText="{i18n>enterTransactionId_eac2}"
                             maxLength="25"
                         />
 

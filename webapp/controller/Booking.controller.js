@@ -552,10 +552,10 @@
                     // Open the URL in a new tab
                     window.open(oAdItem.url, "_blank");
                 } else {
-                    sap.m.MessageToast.show("Advertisement clicked");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("advertisementClicked"));
                 }
             } else {
-                sap.m.MessageToast.show("Advertisement clicked");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("advertisementClicked"));
             }
         },
 
@@ -1386,7 +1386,7 @@
             let iSinglePersonQty = 1;
 
             if (aPersonOptions.length < 1) {
-                MessageToast.show("Please select at least one occupant before choosing a facility.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK_selectLeastOne"));
                 return;
             }
 
@@ -2000,7 +2000,7 @@
             // }
 
             if (sSelectionMode === "PERSON" && aSelectedPersonIds.length === 0) {
-                sap.m.MessageToast.show("Please choose at least one person.");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("chooseLeastOne"));
                 return;
             }
 
@@ -2023,7 +2023,7 @@
                     : [];
 
                 if (aPersonQuantities.length === 0) {
-                    sap.m.MessageToast.show("Please choose at least one person.");
+                    sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("chooseLeastOne"));
                     return;
                 }
 
@@ -2920,7 +2920,7 @@
 
             // Show toast if primary changed from logged-in user to another person
             if (sPreviousPrimaryId === "SELF" && sNewPrimaryId && sNewPrimaryId !== "SELF" && sNewPrimaryName) {
-                MessageToast.show("Primary occupant changed to " + sNewPrimaryName + ". Booking will be created under this name.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("primaryOccupantChanged", [sNewPrimaryName]));
             }
 
             // Store current primary for next comparison
@@ -3119,7 +3119,7 @@
             const sEndDate = oHostelModel?.getProperty("/EndDate") || "";
 
             if (!String(sStartDate).trim() || !String(sEndDate).trim()) {
-                sap.m.MessageToast.show("Please select start date and end date from booking details before selecting occupants.");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK_selectStartDate"));
                 return;
             }
 
@@ -3163,7 +3163,7 @@
             const oPreviewData = oEvent.getSource().getBindingContext("BookingView")?.getObject();
 
             if (!oPreviewData || !oPreviewData.MemberID) {
-                sap.m.MessageToast.show("No document found");
+                sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                 return;
             }
 
@@ -3171,12 +3171,12 @@
             try {
                 const oDocument = await this._fetchMemberDocument(oPreviewData.MemberID);
                 if (!oDocument.File) {
-                    MessageToast.show("No document found");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                     return;
                 }
                 await this._openDocumentPreview(oDocument);
             } catch (oError) {
-                MessageToast.show(oError.message || oError.responseText || "No document found");
+                MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -3243,7 +3243,7 @@
             const iPreviouslySelected = aSelectedItems.length - aChangedItems.length;
             const iRemainingSlots = Math.max(iAllowedFamilyMembers - iPreviouslySelected, 0);
 
-            MessageToast.show("Selected room capacity does not allow more members.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectedRoomCapacity"));
             this._bAdjustingSelection = true;
             try {
                 // Keep only as many of the newly checked members as there is room for
@@ -3270,12 +3270,12 @@
             const iMaxPersons = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
             const iTotalPersons = aSelectedMembers.length;
             if (iTotalPersons > iMaxPersons) {
-                MessageToast.show("Selected room capacity does not allow more members.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("selectedRoomCapacity"));
                 return;
             }
 
             if (iTotalPersons < 1) {
-                MessageToast.show("Please select at least one member.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BKK_selectLeastOne"));
                 return;
             }
 
@@ -3289,9 +3289,9 @@
 
             if (bOccupantsChanged && this._hasSelectedFacilities()) {
                 MessageBox.confirm(
-                    "Changing the occupants will reset all selected facilities. Do you want to continue?",
+                    this.getView().getModel("i18n").getResourceBundle().getText("changingOccupantsReset"),
                     {
-                        title: "Confirm Occupant Change",
+                        title: this.getView().getModel("i18n").getResourceBundle().getText("confirmOccupantChange"),
                         icon: MessageBox.Icon.WARNING,
                         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                         emphasizedAction: MessageBox.Action.NO,
@@ -3378,7 +3378,7 @@
                 try {
                     oDocument = await this._fetchMemberDocument(oMember.MemberID);
                 } catch (oError) {
-                    MessageToast.show(oError.message || oError.responseText || "Unable to load member document");
+                    MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("BK_unableLoadMember"));
                     return;
                 } finally {
                     this.closeBusyDialog();
@@ -3472,7 +3472,7 @@
 
             const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType");
             if (!sDocType) {
-                MessageToast.show("Please select document type first");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("pleaseSelectDocumentTypeFirst"));
                 if (oFileUploader) oFileUploader.clear();
                 return;
             }
@@ -3554,7 +3554,7 @@
                 this.closeBusyDialog();
                 this._removeProcessingRow(sTempId);
                 console.error(err);
-                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+                MessageBox.error(err.message || this.getView().getModel("i18n").getResourceBundle().getText("compressionFailedTry"));
             } finally {
                 if (oFileUploader) oFileUploader.clear();
                 this._showBusyOnUploader(false);
@@ -3596,7 +3596,7 @@
 
         onNewMemberFileSizeExceed: function (oEvent) {
             const sFileName = oEvent.getParameter("fileName") || "File";
-            sap.m.MessageToast.show(sFileName + " exceeds the 400 KB size limit. Please choose a smaller file.");
+            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("exceedsKbSize", [sFileName]));
             oEvent.getSource().clear();
         },
 
@@ -3651,9 +3651,9 @@
             }
 
             if (bSavedDocument) {
-                MessageToast.show("Document will be deleted when you update the member.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("documentDeletedWhen"));
             } else {
-                MessageToast.show("Document removed.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK_documentRemoved_"));
             }
         },
 
@@ -3702,7 +3702,7 @@
 
             const sRawSource = String(oDoc?.File || oDoc?.Document || oDoc?.Attachment || "").trim();
             if (!sRawSource) {
-                MessageToast.show("No document to preview.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nodocumenttopreview"));
                 return;
             }
 
@@ -3791,7 +3791,7 @@
                     document.body.appendChild(oLink);
                     oLink.click();
                     document.body.removeChild(oLink);
-                    MessageToast.show("File downloaded successfully");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileDownloaded"));
                     return;
                 }
 
@@ -3805,12 +3805,12 @@
             }
 
             this.onDownloadPreview();
-            MessageToast.show("Preview not supported.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Previewnotsupported"));
         },
 
         onDownloadPreview: function () {
             if (!this._sPreviewBase64) {
-                MessageToast.show("No file available for download.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Nofileavailablefordownload"));
                 return;
             }
             let sDownloadUrl = "";
@@ -3820,7 +3820,7 @@
                 sDownloadUrl = "data:" + this._sPreviewMimeType + ";base64," + this._sPreviewBase64;
             }
             if (!sDownloadUrl) {
-                MessageToast.show("Download not supported.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Downloadnotsupported"));
                 return;
             }
             const oLink = document.createElement("a");
@@ -3901,7 +3901,7 @@
 
             if (selectedDate < minDate || selectedDate > maxDate) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Date must be within last 100 years");
+                oDatePicker.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("dateWithinLast"));
                 return false;
             }
 
@@ -3962,7 +3962,7 @@
                     const sDOBValue = oDOBPicker.getValue() || "";
                     if (!sDOBValue.trim()) {
                         oDOBPicker.setValueState("Error");
-                        oDOBPicker.setValueStateText("Date of Birth is required");
+                        oDOBPicker.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("dateBirthRequired"));
                         MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                         return;
                     }
@@ -3974,7 +3974,7 @@
 
                     if (selectedDate < minDate || selectedDate > maxDate) {
                         oDOBPicker.setValueState("Error");
-                        oDOBPicker.setValueStateText("Date must be within last 100 years");
+                        oDOBPicker.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("dateWithinLast"));
                         MessageToast.show(oResourceBundle.getText("mandatoryFieldsError"));
                         return;
                     }
@@ -4033,8 +4033,8 @@
             );
             if (sDocumentTypeValue && !bHasDocument) {
                 oDocumentTypeCombo.setValueState("Error");
-                oDocumentTypeCombo.setValueStateText("Please upload the selected document");
-                MessageToast.show("Please upload the selected document or clear the document type.");
+                oDocumentTypeCombo.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("uploadSelectedDocument"));
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK__uploadSelectedDocum"));
                 return;
             }
             oDocumentTypeCombo.setValueState("None");
@@ -4079,7 +4079,7 @@
 
             // Send member data to backend
             this._saveMemberToBackend(oDraft, bIsEditMode).then(() => {
-                MessageToast.show(bIsEditMode ? "Member updated successfully." : "Member added successfully.");
+                MessageToast.show(bIsEditMode ? this.getView().getModel("i18n").getResourceBundle().getText("memberUpdated") : this.getView().getModel("i18n").getResourceBundle().getText("memberAddedSuccessfully"));
                 this.onCloseNewMemberDialog();
                 this._syncMemberDialogSelections();
                 // Update UI after backend save
@@ -4088,7 +4088,7 @@
                 this._rebuildSelectedFacilities();
                 this._recalculateSummary();
             }).catch((oError) => {
-                MessageToast.show("Failed to save member. Please try again.", oError);
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("failedSaveMember"), oError);
             });
         },
 
@@ -4778,11 +4778,11 @@
         },
 
         _showDocumentUploadTypeError: function () {
-            MessageToast.show("Only PDF and image files are allowed.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("onlyPdfImage"));
         },
 
         _showDocumentUploadSizeError: function () {
-            MessageToast.show("Maximum file size allowed is 400 KB.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("maximumFileSize"));
         },
 
         onDocumentUploadTypeMismatch: function (oEvent) {
@@ -5492,9 +5492,9 @@
             oModel.setProperty("/SelectedPriceType", sPreviousPlan);
 
             MessageBox.confirm(
-                "Changing the room plan will reset all selected facilities. Do you want to continue?",
+                this.getView().getModel("i18n").getResourceBundle().getText("changingRoomPlan"),
                 {
-                    title: "Confirm Room Plan Change",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("confirmRoomPlan"),
                     icon: MessageBox.Icon.WARNING,
                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                     emphasizedAction: MessageBox.Action.NO,
@@ -5578,7 +5578,7 @@
             oToday.setHours(0, 0, 0, 0);
 
             if (sStartDate && (!oStartDate || oStartDate < oToday)) {
-                MessageToast.show("Start date cannot be before today");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("startDateCannot"));
                 oModel.setProperty("/StartDate", "");
                 oModel.setProperty("/EndDate", "");
                 this._updateEndDateMinDate(null);
@@ -5629,7 +5629,7 @@
             const oEndDate = this._parseDate(oModel.getProperty("/EndDate"));
 
             if (oModel.getProperty("/SelectedPriceType") === "Per Day" && oStartDate && oEndDate && oEndDate <= oStartDate) {
-                MessageToast.show("End date must be after start date");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("endDatemustbeafterStartDate"));
                 oModel.setProperty("/EndDate", "");
                 oModel.setProperty("/TotalDays", 0);
                 this._rebuildSelectedFacilities();
@@ -5784,15 +5784,12 @@
 
 
 
-                "We’re sorry, the " + this._formatBedTypeText()  + 
-                " room is already booked for (" +
-               oModel.getProperty("/StartDate") + " - " + oModel.getProperty("/EndDate") +
-                ")  Please try selecting different dates or room.",
+                this.getView().getModel("i18n").getResourceBundle().getText("reSorryRoom", [this._formatBedTypeText(), oModel.getProperty("/StartDate"), oModel.getProperty("/EndDate")]),
                 {
-                    title: "Room fully Booked",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("roomFullyBooked"),
                     icon: MessageBox.Icon.WARNING,
-                    actions: ["Go Back", "Cancel"],
-                    emphasizedAction: "Go Back",
+                    actions: [this.getView().getModel("i18n").getResourceBundle().getText("BK_goBack_"), this.getView().getModel("i18n").getResourceBundle().getText("actionCancel")],
+                    emphasizedAction: this.getView().getModel("i18n").getResourceBundle().getText("BK_goBack_"),
                     styleClass: "myUnifiedBtn",
                     contentWidth: "420px",
                     onClose: function (sAction) {
@@ -5833,9 +5830,9 @@
             if (!isNaN(iIndex) && iIndex > -1) {
                 if (this._hasSelectedFacilities()) {
                     MessageBox.confirm(
-                        "Deleting the occupant will reset all selected facilities. Do you want to continue?",
+                        this.getView().getModel("i18n").getResourceBundle().getText("deletingOccupantReset"),
                         {
-                            title: "Confirm Occupant Delete",
+                            title: this.getView().getModel("i18n").getResourceBundle().getText("confirmOccupantDelete"),
                             icon: MessageBox.Icon.WARNING,
                             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                             emphasizedAction: MessageBox.Action.NO,
@@ -5870,7 +5867,7 @@
             this._syncSelectedFacilityPersonsWithOccupants();
             this._rebuildSelectedFacilities();
             this._refreshCouponAndSummary({ checkDateWindow: false });
-            MessageToast.show("Occupant deleted.");
+            MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("occupantDeleted"));
         },
 
 
@@ -5905,12 +5902,12 @@
             let fDiscountAmount = 0;
 
             if (!sEnteredCode) {
-                MessageToast.show("Please enter coupon code");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BKK_enterCouponCode"));
                 return;
             }
 
             if (fCouponBaseAmount <= 0) {
-                MessageToast.show("Add dates and pricing details before applying coupon.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("addDatesPricing"));
                 return;
             }
 
@@ -5935,7 +5932,7 @@
 
                 if (!oMatchedCoupon) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("Invalid coupon code");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("invalidCouponCode"));
                     return;
                 }
 
@@ -5956,39 +5953,39 @@
                         sCouponErrorMessage = "This coupon has reached its maximum usage limit and can no longer be used.";
                     }
 
-                    MessageToast.show(sCouponErrorMessage || "This coupon cannot be applied to this booking");
+                    MessageToast.show(sCouponErrorMessage || this.getView().getModel("i18n").getResourceBundle().getText("couponCannotApplied"));
                     return;
                 }
 
                 if (String(oMatchedCoupon.BranchCode || "").trim() && String(oMatchedCoupon.BranchCode || "").trim() !== String(sBranchCode || "").trim()) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("This coupon is not valid for the selected branch.");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("couponNotValid"));
                     return;
                 }
 
                 if (this._isCouponExpired(oMatchedCoupon.EndDate)) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("Coupon is expired");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Couponisexpired"));
                     return;
                 }
 
                 if (this._isCouponNotStarted(oMatchedCoupon.StartDate)) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("Coupon is not active yet");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("Couponisnotactiveyet"));
                     return;
                 }
 
                 if (fCouponBaseAmount < Number(oMatchedCoupon.MinOrderValue || 0)) {
                     const fMinOrderValue = Number(oMatchedCoupon.MinOrderValue || 0);
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show(`Minimum order value ${this._formatAmountToTwoDecimals(fMinOrderValue)} is required to apply this coupon.`);
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("minimumOrderValue", [this._formatAmountToTwoDecimals(fMinOrderValue)]));
                     return;
                 }
 
                 var aCouponBookingDateReasons = this._getCouponBookingDateReasons(oMatchedCoupon);
                 if (aCouponBookingDateReasons.length > 0) {
                     oModel.setProperty("/CouponCode", "");
-                    MessageToast.show("This coupon is not valid for the booking date.");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BKK_couponNotValid"));
                     return;
                 }
 
@@ -6014,7 +6011,7 @@
                 }
                 MessageToast.show(sMessage);
             } catch (oError) {
-                MessageToast.show("Error applying coupon");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorApplyingCoupon"));
             } finally {
                 this.closeBusyDialog();
             }
@@ -6023,7 +6020,7 @@
         onRemoveCoupon: function () {
             this._resetCouponState(false);
             this._recalculateSummary();
-            sap.m.MessageToast.show("Coupon removed");
+            sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("couponRemoved"));
         },
 
         _resetCouponState: function (bKeepTypedValue) {
@@ -6068,7 +6065,7 @@
         _showCouponInvalidMessage: function (sMessage) {
             MessageBox.show(sMessage, {
                 icon: MessageBox.Icon.WARNING,
-                title: "Coupon Removed",
+                title: this.getView().getModel("i18n").getResourceBundle().getText("BK_couponRemoved_"),
                 actions: [MessageBox.Action.OK],
                 emphasizedAction: MessageBox.Action.OK,
                 contentWidth: "420px"
@@ -6208,7 +6205,7 @@
                 // Network/server error: block the flow. The user retries manually
                 // with the Continue / Update Booking button once the connection is
                 // stable.
-                MessageToast.show("Unable to verify coupon status due to a network error. Please try again.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("unableVerifyCoupon"));
                 return false;
             }
 
@@ -6982,7 +6979,7 @@
 
             )
             if (!isMandatoryValid) {
-                MessageToast.show("Please fill mandatory booking details");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fillMandatoryBooking"));
                 return false;
             }
 
@@ -6998,7 +6995,7 @@
             if ((oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return !!oMember.Selected;
             }).length < 1) {
-                MessageToast.show("Please select at least one member from the member list.");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BK_KselectLeastOne_"));
                 return false;
             }
 
@@ -7008,7 +7005,7 @@
             // }
 
             if (!oModel.getProperty("/CustomerEmail") || !oModel.getProperty("/MobileNo")) {
-                MessageToast.show("Please complete contact details before payment");
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("completeContactDetails"));
                 return false;
             }
 
@@ -7019,12 +7016,12 @@
                 )
 
                 if (!isGStvalidate) {
-                    MessageToast.show("Please fill business GST details");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fillBusinessGst"));
                     return false;
                 }
 
                 if (!this._isValidGSTINValue(sCustomerGSTIN)) {
-                    MessageToast.show("Please enter a valid GSTIN");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("enterValidGstin"));
                     return false;
                 }
             }
@@ -7081,7 +7078,7 @@
 
             if (!oInput.getValue()) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText("Select payment date");
+                oInput.setValueStateText(this.getView().getModel("i18n").getResourceBundle().getText("selectPaymentDate"));
                 return;
             }
 
@@ -7099,7 +7096,7 @@
                 );
 
                 if (!bValidPaymentFields) {
-                    MessageToast.show("Please complete payment verification details");
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("completePayment"));
                     return;
                 }
             }
@@ -7146,7 +7143,7 @@
                 }
 
                 MessageBox.success(sMessage, {
-                    title: "Booking Request Received",
+                    title: this.getView().getModel("i18n").getResourceBundle().getText("bookingRequestReceived"),
                     styleClass: "myUnifiedBtn",
                     contentWidth: "500px",
                     onClose: function () {
@@ -7905,7 +7902,7 @@
 
         onNavBack: function () {
             MessageBox.warning(
-                "Do you really want to go back? All saved changes will be lost",
+                this.getView().getModel("i18n").getResourceBundle().getText("reallyGoBack"),
                 {
                     actions: [MessageBox.Action.CANCEL, MessageBox.Action.OK],
                     emphasizedAction: MessageBox.Action.OK,

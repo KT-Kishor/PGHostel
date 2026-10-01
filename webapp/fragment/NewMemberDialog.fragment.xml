@@ -49,7 +49,7 @@
                 >
                     <VBox width="35%">
 <Label
-    text="Salutation"
+    text="{i18n>MSsalutation}"
     required="true"
 />
 
@@ -59,7 +59,7 @@
                         class="sapUiTinyMarginBegin"
                     >
                         <Label
-                            text="Full Name"
+                            text="{i18n>MVDname}"
                             required="true"
                         />
                     </VBox>
@@ -74,8 +74,8 @@
     id="newMemberSalutationCombo"
     selectedKey="{BookingView>/NewMemberDraft/Salutation}"
     items="{BookingView>/SalutationOptions}"
-    placeholder="e.g. Mr."
-    valueStateText="Please select salutation"
+    placeholder="{i18n>mr}"
+    valueStateText="{i18n>selectSalutation}"
     selectionChange="onNewMemberSalutationChange"
     change="onNewMemberSalutationChange"
     editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
@@ -94,8 +94,8 @@
                         <Input
                             id="newMemberNameInput"
                             value="{BookingView>/NewMemberDraft/Name}"
-                            placeholder="Enter full name"
-                            valueStateText="Please enter a valid full name"
+                            placeholder="{i18n>enterFullName}"
+                            valueStateText="{i18n>enterValidFull}"
                             liveChange="onNewMemberNameChange"
                             change="onNewMemberNameChange"
                             maxLength="35"
@@ -105,30 +105,30 @@
                 </HBox>
 
                 <Label
-                    text="Date of Birth"
+                    text="{i18n>MVDDOB}"
                     required="true"
                 />
                 <DatePicker
                     id="newMemberDOB"
                     value="{BookingView>/NewMemberDraft/Age}"
-                    placeholder="DD/MM/YYYY"
+                    placeholder="{i18n>ddMmYyyy}"
                     displayFormat="dd/MM/yyyy"
                     valueFormat="yyyy-MM-dd"
                     change="onNewMemberDOBChange"
-                    valueStateText="Age must be between 0 and 100 years"
+                    valueStateText="{i18n>agediff}"
                     editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
                 />
 
                 <Label
-                    text="Gender"
+                    text="{i18n>MVgender}"
                     required="true"
                 />
                 <ComboBox
                     id="newMemberGenderCombo"
                     selectedKey="{BookingView>/NewMemberDraft/Gender}"
                     items="{BookingView>/GenderOptions}"
-                    placeholder="Select gender"
-                    valueStateText="Please select gender"
+                    placeholder="{i18n>selectGender}"
+                    valueStateText="{i18n>MB_selectGender}"
                     selectionChange="onNewMemberGenderChange"
                     change="onNewMemberGenderChange"
                     editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
@@ -140,7 +140,7 @@
                 </ComboBox>
 
                 <Label
-                    text="Relationship"
+                    text="{i18n>Relationship}"
                     required="true"
                 />
                 <ComboBox
@@ -148,8 +148,8 @@
                     selectedKey="{BookingView>/NewMemberDraft/Relation}"
                     value="{BookingView>/NewMemberDraft/Relation}"
                     items="{BookingView>/RelationshipOptions}"
-                    placeholder="Select relationship"
-                    valueStateText="Please select relationship"
+                    placeholder="{i18n>selectRelationship}"
+                    valueStateText="{i18n>MB_selectRelationship}"
                     selectionChange="onNewMemberRelationChange"
                     change="onNewMemberRelationChange"
                     editable="{= ${BookingView>/NewMemberDraft/id} !== 'SELF' }"
@@ -160,7 +160,7 @@
                     />
                 </ComboBox>
 
-                <Label text="Upload Document" />
+                <Label text="{i18n>uploadDocument}" />
                 <HBox
                     width="100%"
                     fitContainer="true"
@@ -171,8 +171,8 @@
                         id="newMemberDocumentTypeCombo"
                         selectedKey="{BookingView>/NewMemberDraft/DocumentType}"
                         items="{BookingView>/DocumentTypeOptions}"
-                        placeholder="Select document type"
-                        valueStateText="Please select a valid document type"
+                        placeholder="{i18n>MVDdoc}"
+                        valueStateText="{i18n>selectValidDocument}"
                         selectionChange="onNewMemberDocumentTypeChange"
                         change="onNewMemberDocumentTypeChange"
                         width="{= ${device>/system/phone} ? '45%' : '100%'}"
@@ -192,7 +192,7 @@
                         buttonOnly="true"
                         sameFilenameAllowed="true"
                         change="onNewMemberDocumentChange"
-                        buttonText="Upload"
+                        buttonText="{i18n>MVDupload}"
                         fileType="pdf,jpg,jpeg,png,webp"
                         class="sapUiTinyMarginBegin sapUiTinyMarginEnd myUnifiedBtn"
                     />
@@ -203,7 +203,7 @@
                         color="#008b96"
                         hoverColor="#008b96"
                         press="onNewMemberDocumentInfoPress"
-                        tooltip="Upload info"
+                        tooltip="{i18n>uploadInfo}"
                         visible="{= !${BookingView>/NewMemberDraft/DocumentName} }"
                         class="sapUiSmallMarginBegin"
                     />
@@ -222,7 +222,7 @@
                             class="automatedEllipsis documentLink"
                         />
                         <Button
-                            text="Remove"
+                            text="{i18n>Remove}"
                             icon="sap-icon://delete"
                             press="onDeleteNewMemberDocument"
                             class="myUnifiedBtn"
@@ -241,7 +241,7 @@
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
+                text="{i18n>actionCancel}"
                 press="onCloseNewMemberDialog"
                 class="myUnifiedBtn"
             />

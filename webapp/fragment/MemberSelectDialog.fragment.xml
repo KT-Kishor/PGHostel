@@ -13,10 +13,10 @@
     >
         <customHeader>
             <OverflowToolbar class="memberDialogHeader">
-                <Title text="Select Members" />
+                <Title text="{i18n>SelectMembers}" />
                 <ToolbarSpacer />
                 <Button
-                    text="Add New Member"
+                    text="{i18n>AddNewMember}"
                     icon="sap-icon://add"
                     press="onAddNewMemberFromDialog"
                     class="myUnifiedBtn"
@@ -29,7 +29,7 @@
                 <SearchField
                     id="memberSearchField"
                     width="100%"
-                    placeholder="Search by name / relationship"
+                    placeholder="{i18n>Searchbynamerelationship}"
                     liveChange="onMemberSearch"
                     search="onMemberSearch"
                     class="sapUiTinyMarginBottom"
@@ -39,19 +39,19 @@
                     id="memberSelectTable"
                     mode="MultiSelect"
                     items="{BookingView>/MasterMembers}"
-                    noDataText="No saved members available"
+                    noDataText="{i18n>Nosavedmembersavailable}"
                     growing="true"
                     growingScrollToLoad="true"
                     updateFinished="onMemberDialogTableUpdateFinished"
                     selectionChange="onMemberSelectionChange"
                 >
                     <columns>
-                        <Column width="{= ${device>/system/phone} ? '50%' : 'auto'}"><Text text="Full Name" /></Column>
-                        <Column ><Text text="Age" /></Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="Gender" /></Column>
-                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Relationship" /></Column>
+                        <Column width="{= ${device>/system/phone} ? '50%' : 'auto'}"><Text text="{i18n>MVDname}" /></Column>
+                        <Column ><Text text="{i18n>age}" /></Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>MVgender}" /></Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>Relationship}" /></Column>
                         <!-- <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document Type" /></Column> -->
-                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="Document" /></Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>document}" /></Column>
 <Column
 >
 </Column>
@@ -66,14 +66,14 @@
                                 <!-- <Text text="{BookingView>DocumentType}"  emptyIndicatorMode="On"/> -->
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
-                                text="View"
+                                text="{i18n>view}"
                                 press="MS_viewimage"
                                 class="documentLink"
                             />
                                 <Button
                                     icon="sap-icon://edit"
                                     type="Transparent"
-                                    tooltip="Edit member"
+                                    tooltip="{i18n>editMember}"
                                     press="onEditMemberFromDialog"
                                     class="myUnifiedBtn"
                                 />
@@ -86,14 +86,14 @@
 
         <beginButton>
             <Button
-                text="Add Selected"
+                text="{i18n>AddSelected}"
                 press="onConfirmMemberSelection"
                 class="myUnifiedBtn"
             />
         </beginButton>
         <endButton>
             <Button
-                text="Cancel"
+                text="{i18n>actionCancel}"
                 press="onCloseMemberSelectionDialog"
                 class="myUnifiedBtn"
             />

@@ -32,7 +32,7 @@
                     </layoutData>
                     <!-- Booking Details Section -->
                     <Title
-                        text="Booking Details"
+                        text="{i18n>assignRooms}"
                         class="booking-section-header"
                         wrapping="true"
                     />
@@ -59,7 +59,7 @@
                             columnsM="1"
                             class="responsiveForm"
                         >
-<Label text="Property" />
+<Label text="{i18n>property}" />
 
                             <Input
                                 id="BookProperty_ID"
@@ -71,7 +71,7 @@
 
 
 
-<Label text="Room Type" />
+<Label text="{i18n>roomtype}" />
 
 
                             <Input
@@ -83,7 +83,7 @@
 
 
                             <Label
-                                text="Room Plan"
+                                text="{i18n>roomplan}"
                                 required="true"
                             />
                             <ComboBox
@@ -92,7 +92,7 @@
                                 items="{HostelModel>/AvailablePaymentMethods}"
                                 selectionChange="onRoomPlanChange"
                                 change="onRoomplane"
-                                valueStateText="Select Room plan"
+                                valueStateText="{i18n>selectRoomPlan}"
                             >
                                 <core:Item
                                     key="{HostelModel>key}"
@@ -100,7 +100,7 @@
                                 />
                             </ComboBox>
 
-                            <Label text="Rent Price" />
+                            <Label text="{i18n>rentPrice}" />
                             <Input
                                 value="{
                                     parts: [
@@ -113,7 +113,7 @@
                             />
 
                   
-                       <Label text="No. of Persons" />
+                       <Label text="{i18n>noPersons}" />
 <Input
     value="{= (${HostelModel>/PropertyType} === 'Hostel' || ${HostelModel>/PropertyType} === 'PG') ? 1 : ${HostelModel>/Capacity} }"
     editable="false"
@@ -125,7 +125,7 @@
                             /> -->
 
                             <Label
-                                text="Duration"
+                                text="{i18n>duration}"
                                 visible="{BookingView>/showDurationSelector}"
                             />
                             <ComboBox
@@ -136,7 +136,7 @@
                                 items="{BookingView>/DurationOptions}"
                                 visible="{BookingView>/showDurationSelector}"
                                 change="onDurationChange"
-                                valueStateText="Select Duration"
+                                valueStateText="{i18n>selectDuration}"
                             >
                                 <core:Item
                                     key="{BookingView>key}"
@@ -145,7 +145,7 @@
                             </ComboBox>
 
                             <Label
-                                text="Start Date"
+                                text="{i18n>startDate}"
                                 required="true"
                             />
                             <DatePicker
@@ -156,13 +156,13 @@
                                 minDate="{HostelModel>/TodayDate}"
                                 change="onStartDateChange"
                                 liveChange="onStartDateChange"
-                                valueStateText="Please select a valid start date (cannot be in the past)"
+                                valueStateText="{i18n>selectValidStart}"
                                 showValueStateMessage="true"
-                                placeholder="Select start date"
+                                placeholder="{i18n>selectStartDate}"
                             />
 
                             <Label
-                                text="End Date"
+                                text="{i18n>endDate}"
                                 required="{= ${HostelModel>/SelectedPriceType} === 'Per Day' }"
                             />
                             <DatePicker
@@ -172,11 +172,11 @@
                                 displayFormat="dd/MM/yyyy"
                                 minDate="{HostelModel>/EndDateMinDate}"
                                 editable="{BookingView>/endDateEditable}"
-                                valueStateText="End date must be after start date"
+                                valueStateText="{i18n>endDatemustbeafterStartDate}"
                                 change="onEndDateChange"
                                 liveChange="onEndDateChange"
                                 showValueStateMessage="true"
-                                placeholder="Select end date"
+                                placeholder="{i18n>selectEndDate}"
                             />
                             <!-- <Label
                                 text="Upload Document"
@@ -262,7 +262,7 @@
 
                     <!-- Guest Information Section -->
                     <Title
-                        text="Select Occupants"
+                        text="{i18n>selectOccupants}"
                         class="booking-section-header"
                         wrapping="true"
                     />
@@ -274,13 +274,13 @@
                             <Input
                                 id="memberValueHelpInput"
                                 value="{path: 'BookingView>/FamilyMembers', formatter: '.formatSelectedMembersSummary'}"
-                                placeholder="Click here to select or add members"
+                                placeholder="{i18n>clickSelectAdd}"
                                 showValueHelp="true"
                                 valueHelpOnly="true"
                                 valueHelpRequest="onMemberValueHelpRequest"
                             />
                             <MessageStrip
-                                text="You can change any occupant as the primary occupant; they will be the contact person"
+                                text="{i18n>canChangeAny}"
                                 type="Information"
                                 showIcon="true"
                                 showCloseButton="false"
@@ -311,7 +311,7 @@
 
                             <Table
                                 items="{BookingView>/FamilyMembers}"
-                                noDataText="No members selected"
+                                noDataText="{i18n>noMembersSelected}"
                                 class="familyMembersTable tealTableRadio"
                             >
                                 <columns>
@@ -320,28 +320,28 @@
                                             width="6rem"
                                         visible="{BookingView>/showFamilySection}"
                                     >
-                                        <Text text="Primary" />
+                                        <Text text="{i18n>primary}" />
                                     </Column>
 
                                     <Column id="nameColumn" width="{= ${device>/system/phone} ? '48%' : 'auto'}">
-                                        <Text text="Full Name" />
+                                        <Text text="{i18n>MVDname}" />
                                     </Column>
                                     <Column
                                        
                                     >
-                                        <Text text="Age" />
+                                        <Text text="{i18n>age}" />
                                     </Column>
                                     <Column
                                         minScreenWidth="Tablet"
                                         demandPopin="true"
                                     >
-                                        <Text text="Gender" />
+                                        <Text text="{i18n>MVgender}" />
                                     </Column>
                                     <Column
                                         minScreenWidth="Tablet"
                                         demandPopin="true"
                                       >
-                                        <Text text="Relationship" />
+                                        <Text text="{i18n>Relationship}" />
                                     </Column>
                                     <!-- <Column minScreenWidth="Tablet" demandPopin="true">
                                             <Text text="Document Type" />
@@ -401,7 +401,7 @@
                                                 </HBox> -->
                                             <Button
                                                 icon="sap-icon://delete"
-                                                tooltip="Remove member"
+                                                tooltip="{i18n>removeMember}"
                                                 press="onDeleteFamilyMemberRow"
                                                 class="myUnifiedBtn"
                                             />
@@ -414,7 +414,7 @@
 
                     <!-- Facilities Section -->
                     <Title
-                        text="Facilities"
+                        text="{i18n>facilities}"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${FacilityModel>/Facilities}.length > 0 }"
@@ -426,7 +426,7 @@
                     >
                         <VBox class="sapUiTinyMargin">
                             <MessageStrip
-                                text="Add only the facilities you need. Person-wise quantity facilities also let you choose whether they apply once for the booking or daily."
+                                text="{i18n>addOnlyFacilities}"
                                 type="Information"
                                 showIcon="true"
                                 showCloseButton="false"
@@ -489,7 +489,7 @@
                     </layoutData>
                     <!-- Advertisement Carousel Section -->
                     <Title
-                        text="Advertisements"
+                        text="{i18n>advertisements}"
                         class="booking-section-header"
                         wrapping="true"
                         visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
@@ -526,7 +526,7 @@
 
                     <!-- Coupon Section -->
                     <Title
-                        text="Have a Coupon?"
+                        text="{i18n>coupon}"
                         class="booking-section-header"
                         wrapping="true"
                     />
@@ -552,7 +552,7 @@
                             > -->
                             <Input
                     value="{HostelModel>/CouponCode}"
-                                placeholder="Enter coupon code"
+                                placeholder="{i18n>enterCouponCode}"
                                 liveChange="onCouponLiveChange"
                                 class="sapUiSmallMarginEnd couponInput"
                                 width="100%"
@@ -570,7 +570,7 @@
                                 </layoutData>
                             </Input>
                             <Button
-                                text="Apply Coupon"
+                                text="{i18n>applyCoupon}"
                                 press="onApplyCoupon"
                                 class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
                                 visible="{= !${HostelModel>/AppliedCouponCode} }"
@@ -583,7 +583,7 @@
                                 </layoutData>
                             </Button>
                             <Button
-                                text="Remove"
+                                text="{i18n>Remove}"
                                 press="onRemoveCoupon"
                                 class="myUnifiedBtn couponButton sapUiTinyMarginBegin"
                                 visible="{= !!${HostelModel>/AppliedCouponCode} }"
@@ -597,7 +597,7 @@
 
                     <!-- Payment Summary Section -->
                     <Title
-                        text="Pricing Details"
+                        text="{i18n>pricingDetails}"
                         class="booking-section-header"
                         wrapping="true"
                     />
@@ -612,7 +612,7 @@
                                 visible="{= ${BookingView>/showBusinessTravelOption} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                             >
-                                <Text text="GST Details(optional)" />
+                                <Text text="{i18n>gstDetailsOptional}" />
                                 <Switch
                                     state="{HostelModel>/IsBusinessTravel}"
                                     change="onBusinessTravelToggle"
@@ -623,14 +623,14 @@
 
                             <Label
                                 required="true"
-                                text="GSTIN"
+                                text="{i18n>gstNo}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                             />
                             <Input
                                 id="BookGst_ID"
                                 value="{HostelModel>/CustomerGSTIN}"
-                                placeholder="Enter GSTIN"
+                                placeholder="{i18n>enterGstin}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 liveChange="onGSTINLiveChange"
                                 change="onGSTINChange"
@@ -642,40 +642,40 @@
 
                             <Label
                                 required="true"
-                                text="Company Name"
+                                text="{i18n>companyName}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="required-field-label sapUiTinyMarginBottom"
                             />
                             <Input
                                 id="BookCompanyname_ID"
                                 value="{HostelModel>/CompanyName}"
-                                placeholder="Enter company name"
+                                placeholder="{i18n>enterCompanyName}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="sapUiTinyMarginBottom"
                                 width="100%"
                                 change="onchangeCompanyname"
                                 liveChange="onchangeCompanyname"
-                                valueStateText="Please enter a valid company name"
+                                valueStateText="{i18n>enterValidCompany}"
                                 showValueStateMessage="true"
                                 maxLength="100"
                             />
 
                             <Label
                                 required="true"
-                                text="Company Address"
+                                text="{i18n>companyAddress}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 class="required-field-label sapUiTinyMarginBottom"
                             />
                             <TextArea
                                 value="{HostelModel>/CompanyAddress}"
-                                placeholder="Enter complete company address"
+                                placeholder="{i18n>enterCompleteCompany}"
                                 visible="{= ${BookingView>/showBusinessGSTSection} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
                                 rows="3"
                                 class="sapUiTinyMarginBottom"
                                 width="100%"
                                 change="onchangeConpanyAddress"
                                 liveChange="onchangeConpanyAddress"
-                                valueStateText="Please enter a valid company address"
+                                valueStateText="{i18n>BK_enterValidCompany}"
                                 showValueStateMessage="true"
                                 id="BookconpanyAddress_ID"
                                 maxLength="500"
@@ -707,7 +707,7 @@
                                     <Column width="53%">
                                         <header>
 <Title
-    text="Item"
+    text="{i18n>Item}"
     level="H6"
 />
 
@@ -733,7 +733,7 @@
                                                 class="sapUiTinyMarginTop sapUiTinyMarginBottom"
                                             >
                                                 <Title
-                                                    text="Room"
+                                                    text="{i18n>room}"
                                                     level="H6"
                                                 />
                                                 <Text
@@ -775,7 +775,7 @@
                                                 wrap="NoWrap"
                                             >
 <Title
-    text="Facilities"
+    text="{i18n>facilities}"
     level='H6'
 />
 
@@ -786,7 +786,7 @@
                                                     color="#1a5f6b"
                                                     hoverColor="DarkBlue"
                                                     press="onFacilitiesBreakdownPress"
-                                                    tooltip="View facilities breakdown"
+                                                    tooltip="{i18n>viewFacilitiesBreakdown}"
                                                     class="sapUiTinyMarginBegin"
                                                 />
                                             </HBox>
@@ -814,7 +814,7 @@
                                     >
                                         <cells>
                                             <Title
-                                                text="Gross Sub Total"
+                                                text="{i18n>grossSubTotal}"
                                                 level="H6"
                                             />
                                             <HBox
@@ -846,7 +846,7 @@
             wrap="NoWrap"
         >
             <Title
-                text="Facility Offer Discounts"
+                text="{i18n>facilityOfferDiscounts}"
                 level="H6"
                 class="sapUiStrongText"
             />
@@ -857,7 +857,7 @@
                 color="#1a5f6b"
                 hoverColor="DarkBlue"
                 press="onFacilityDiscountInfoPress"
-                tooltip="View discount breakdown"
+                tooltip="{i18n>viewDiscountBreakdown}"
                 class="sapUiTinyMarginBegin"
             />
         </HBox>
@@ -886,7 +886,7 @@
                                     >
                                         <cells>
                                             <Title
-                                                text="Sub Total"
+                                                text="{i18n>BK_subTotal}"
                                                 level="H6"
                                             />
                                             <HBox
@@ -941,7 +941,7 @@
                                     >
                                         <cells>
                                             <Title
-                                                text="Discounted Total"
+                                                text="{i18n>discountedTotal}"
                                                 level="H6"
                                             />
                                             <HBox
@@ -1013,7 +1013,7 @@
                                     >
                                         <cells>
                                             <Title
-                                                text="Grand Total"
+                                                text="{i18n>BK_grandTotal}"
                                                 level="H3"
                                                 titleStyle="H3"
                                             />
@@ -1075,7 +1075,7 @@
             </contentLeft>
 				<contentRight>
                 <Button
-                    text="Continue"
+                    text="{i18n>continue}"
                     class="myUnifiedBtn"
                     press="onContinueBooking"
                 />
