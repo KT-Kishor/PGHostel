@@ -56,7 +56,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Invoice Status Distribution {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
+									<Title text="{i18n>invoiceStatus_Pay} {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
 									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChart}" />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChart}" />
@@ -94,7 +94,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Monthly Invoice Trend {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
+									<Title text="{i18n>monthlyInvoiceTrend} {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalChart}" />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChart}" />
@@ -132,7 +132,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Invoice Value by Customer {headerModel>/filterSuffix}" level="H5"
+									<Title text="{i18n>invoiceValueByCustomer} {headerModel>/filterSuffix}" level="H5"
 									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="{i18n>verticalChart}" />
@@ -170,7 +170,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="Yearly Invoice Trend {headerModel>/filterSuffix}" 
+									<Title text="{i18n>yearlyInvoiceTrend} {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChart}" />
@@ -216,7 +216,7 @@
 							<f:header>
 								<Toolbar class="customdashboard">
 									<Title 
-									text="Payment Breakdown {headerModel>/filterSuffix}" 
+									text="{i18n>paymentBreakdown} {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://bar-chart" press="onPressPaymentGroupedBar" tooltip="{i18n>barChart}" />
