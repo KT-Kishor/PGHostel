@@ -11,7 +11,7 @@
 		<headerContent>
 			<Text
                 id="idWelcomeUser"
-                text="{= 'Welcome ' + ${LoginModel>/EmployeeName} }"
+                text="{= ${i18n>welcomeUser} + ' ' + ${LoginModel>/EmployeeName} }"
                 class="boldBlueText sapUiSmallMarginBegin"
             />
 			<ToolbarSpacer />
@@ -419,10 +419,10 @@
         </items>
         </FlexBox>
         <ToolbarSpacer />
-         <!-- <Button
+         <Button
     text="{i18n>Language}"
     press=".onLanguagePress" 
-     class="myUnifiedBtn"/> -->
+     class="myUnifiedBtn"/>
         <Button
                 id="AdminusermanualLink"
                 text="{i18n>userManualTitle}"
