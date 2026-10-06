@@ -214,7 +214,7 @@
 		</content>
 		<beginButton>
 			<Button
-                text="{= ${complaintTemp>/isEditMode} ? 'Update' : 'Submit' }"
+                text="{= ${complaintTemp>/isEditMode} ? ${i18n>update} : ${i18n>submit} }"
                 class="myUnifiedBtn"
                 press="onSaveComplaint"
             />

@@ -2175,7 +2175,64 @@ sap.ui.define([
 
             return true;
         },
+onLanguagePress: function (oEvent) {
+    if (!this._oLanguagePopover) {
+        this._oLanguagePopover = new sap.m.Popover({
+            title: this.getView().getModel("i18n").getResourceBundle().getText("Language"),
+            placement: sap.m.PlacementType.Bottom,
+            content: [
+                new sap.m.List({
+                    items: [
+                        new sap.m.StandardListItem({
+                            title: "English",
+                            type: "Active",
+                            press: this.onLanguageSelect.bind(this)
+                        }),
+                        new sap.m.StandardListItem({
+                            title: "ಕನ್ನಡ",
+                            type: "Active",
+                            press: this.onLanguageSelect.bind(this)
+                        }),
+                        new sap.m.StandardListItem({
+                            title: "हिन्दी",
+                            type: "Active",
+                            press: this.onLanguageSelect.bind(this)
+                        })
+                    ]
+                })
+            ]
+        });
 
+        this.getView().addDependent(this._oLanguagePopover);
+    }
+
+    this._oLanguagePopover.openBy(oEvent.getSource());
+},
+
+onLanguageSelect: function (oEvent) {
+
+    var sLanguage = oEvent.getSource().getTitle();
+
+    var oLocaleMap = {
+        "English": "en",
+        "ಕನ್ನಡ": "kan",
+        "हिन्दी": "hi"
+    };
+
+    var sLocale = oLocaleMap[sLanguage];
+
+  if (sLocale) {
+        sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+        localStorage.setItem("selectedLanguage", sLocale);
+    }
+
+         
+
+    if (this._oLanguagePopover) {
+        this._oLanguagePopover.close();
+    }
+},
         savepress: function () {
 
             var oMember = this.getView().getModel("Member").getData();

@@ -32,6 +32,11 @@
                     />
                 </contentMiddle>
                 <contentRight>
+                <Button
+    icon="sap-icon://globe"
+    text="{i18n>Language}"
+    press=".onLanguagePress" />
+    
                     <Button
                         id="id_profileMenuBtn"
                         icon="{= ${profileData>/isEditMode} ? 'sap-icon://save' : 'sap-icon://customer' }"
@@ -362,28 +367,31 @@
                 <items>
                     <IconTabFilter
                         key="Booking History"
-                        text="{= ${profileData>/bookingCount} > 0 ? 'Booking History (' + ${profileData>/bookingCount} + ')' : 'Booking History' }"
+                        text="{= ${profileData>/bookingCount} > 0 
+    ? ${i18n>bookingHistory} + ' (' + ${profileData>/bookingCount} + ')' 
+    : ${i18n>bookingHistory} }"
+                        
                     />
                     <IconTabFilter
                         key="Members"
-                        text="{= ${profileData>/memberCount} > 0 ? 'Members (' + ${profileData>/memberCount} + ')' : 'Members' }"
+                        text="{= ${profileData>/memberCount} > 0 ? ${i18n>Members} + ' (' + ${profileData>/memberCount} + ')' : ${i18n>Members}  }"
                     />
 
                     <IconTabFilter
                         key="Payment"
-                        text="{= ${profileData>/paymentCount} > 0 ? 'Payment (' + ${profileData>/paymentCount} + ')' : 'Payment' }"
+                        text="{= ${profileData>/paymentCount} > 0 ? ${i18n>Payment} + ' (' + ${profileData>/paymentCount} + ')' : ${i18n>Payment} }"
                     />
                     <IconTabFilter
                         key="Complaints"
-                        text="{= ${profileData>/complainCount} > 0 ? 'Complaints (' + ${profileData>/complainCount} + ')' : 'Complaints' }"
+                        text="{= ${profileData>/complainCount} > 0 ? ${i18n>Complaints} + ' (' + ${profileData>/complainCount} + ')' : ${i18n>Complaints} }"
                     />
                     <IconTabFilter
                         key="Damage"
-                        text="{= ${profileData>/damageCount} > 0 ? 'Damage (' + ${profileData>/damageCount} + ')' : 'Damage' }"
+                        text="{= ${profileData>/damageCount} > 0 ? ${i18n>damage} + ' (' + ${profileData>/damageCount} + ')' : ${i18n>damage} }"
                     />
                     <IconTabFilter
                         key="Raised Support"
-                        text="{= ${profileData>/supportCount} > 0 ? 'Support Ticket (' + ${profileData>/supportCount} + ')' : 'Support Ticket' }"
+                        text="{= ${profileData>/supportCount} > 0 ? ${i18n>SupportTicket} + ' (' + ${profileData>/supportCount} + ')' : ${i18n>SupportTicket} }"
                     />
                 </items>
             </IconTabHeader>

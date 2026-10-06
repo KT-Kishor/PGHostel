@@ -305,7 +305,7 @@
 																	press="onViewDetailsPress"
 																	class="pillActionBtn pillLeft" />
 																<Link
-																	text="Enquiry"
+																	text="{i18n>enquiry}"
 																	press="onEnquiryPress"
 																	class="pillActionBtn pillRight" />
 															</HBox>

@@ -51,6 +51,9 @@ sap.ui.define([
             }
         },
         _onRouteMatched: async function (oEvent) {
+            const sLocale = localStorage.getItem("selectedLanguage") || "en";
+            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const oCoreLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oLoggedUser = oCoreLoginModel?.getData?.() || {};
