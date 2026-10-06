@@ -15,7 +15,7 @@
 		<customHeader>
 			<Bar class="barheader">
 				<contentMiddle>
-					<Title text="Support Request"/>
+					<Title text="{i18n>SupportRequest}"/>
 				</contentMiddle>
 			</Bar>
 		</customHeader>

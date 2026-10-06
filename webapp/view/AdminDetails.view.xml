@@ -14,7 +14,7 @@
     >
         <headerContent>
             <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
+                fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
             />
         </headerContent>

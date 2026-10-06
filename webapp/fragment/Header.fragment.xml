@@ -7,7 +7,7 @@
             <Button
                 icon="sap-icon://nav-back"
                 press="onNavBack"
-                class="myUnifiedBtn"
+                class="myPowerButton"
             />
             <Image
                 src="./image/SVLogo.png"
@@ -19,7 +19,7 @@
             <Button
                 icon="sap-icon://log"
                 press=".onHome"
-                class="myUnifiedBtn"
+                class="myPowerButton"
             />
         </contentRight>
     </Bar>

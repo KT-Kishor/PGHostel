@@ -887,7 +887,7 @@
             </contentLeft>
 				<contentRight>
                 <Button
-                    text="{= ${BookingView>/editModeEnabled} ? 'Update Booking' : 'Edit Booking' }"
+                    text="{= ${BookingView>/editModeEnabled} ? ${i18n>UpdateBooking} : ${i18n>EditBooking} }"
                     class="myUnifiedBtn"
                     press="onToggleEditUpdate"
                     visible="{= ${BookingView>/showEditButton} || ${BookingView>/editModeEnabled} }"

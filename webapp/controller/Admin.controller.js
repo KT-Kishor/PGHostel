@@ -2029,6 +2029,10 @@ onsendreminder: async function () {
                                 var iAssigned = parseInt(oSummary.assigned, 10) || 0;
                                 var iCompleted = parseInt(oSummary.completed, 10) || 0;
                                 var iCapacity = parseInt(oSummary.totalCapacity, 10) || 0;
+                                var totalRooms = parseInt(oSummary.totalRooms, 10) || 0;
+
+                                var iInactiveRooms = parseInt(oSummary.InactiveRooms, 10) || 0;
+
                                 var iBooked = parseInt(oSummary.bookedCount, 10);
                                 if (isNaN(iBooked)) {
                                     iBooked = iNew + iConfirmed + iAssigned;
@@ -2045,6 +2049,8 @@ onsendreminder: async function () {
                                     BedTypeName: oSummary.BedType || sName,
                                     TotalCapacity: iCapacity,
                                     NewCount: iNew,
+                                    totalRooms: totalRooms,
+                                    InactiveRooms: iInactiveRooms,
                                     ConfirmedCount: iConfirmed,
                                     AssignedCount: iAssigned,
                                     CompletedCount: iCompleted,

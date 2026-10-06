@@ -2178,7 +2178,7 @@ sap.ui.define([
 onLanguagePress: function (oEvent) {
     if (!this._oLanguagePopover) {
         this._oLanguagePopover = new sap.m.Popover({
-            title: this.getView().getModel("i18n").getResourceBundle().getText("Language"),
+            title: this.getView().getModel("i18n").getResourceBundle().getText("Choose Language"),
             placement: sap.m.PlacementType.Bottom,
             content: [
                 new sap.m.List({

@@ -276,6 +276,11 @@
                             </Column>
                             <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>totalCapacity}" />
+                                
+                            </Column>
+                                <Column demandPopin="true" hAlign="Center">
+                                <Text text="{i18n>NonActiveCapacity}" />
+                                
                             </Column>
                             <Column demandPopin="true" hAlign="Center">
                                 <Text text="{i18n>newBookings}" />
@@ -305,6 +310,7 @@
                                 <cells>
                                     <Text text="{RoomAvailabilitySummaryModel>BedTypeName}" />
                                     <Text text="{RoomAvailabilitySummaryModel>TotalCapacity}" />
+                                    <Text text="{RoomAvailabilitySummaryModel>InactiveRooms}" />
                                     <Text text="{RoomAvailabilitySummaryModel>NewCount}" />
                                     <Text text="{RoomAvailabilitySummaryModel>ConfirmedCount}" />
                                     <Text text="{RoomAvailabilitySummaryModel>AssignedCount}" />

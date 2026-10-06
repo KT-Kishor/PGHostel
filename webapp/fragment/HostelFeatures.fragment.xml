@@ -60,7 +60,7 @@
                             buttonOnly="true"
                             sameFilenameAllowed="true"
                             iconFirst="true"
-                            buttonText="Upload Images"
+                            buttonText="{i18n>UploadImages}"
                             multiple="true"
 							class="myUnifiedBtn"
                             uploadOnChange="false"

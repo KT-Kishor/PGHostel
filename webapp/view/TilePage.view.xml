@@ -32,7 +32,7 @@
                 press="Tile_onLogPress"
                 tooltip="{i18n>logoutTooltip}"
                 icon="sap-icon://log"
-                class="myUnifiedBtn sapUiTinyMarginEnd"
+                class="myPowerButton sapUiTinyMarginEnd"
             />
 		</headerContent>
 		<content>
@@ -419,6 +419,10 @@
         </items>
         </FlexBox>
         <ToolbarSpacer />
+         <!-- <Button
+    text="{i18n>Language}"
+    press=".onLanguagePress" 
+     class="myUnifiedBtn"/> -->
         <Button
                 id="AdminusermanualLink"
                 text="{i18n>userManualTitle}"

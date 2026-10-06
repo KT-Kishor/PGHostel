@@ -160,7 +160,10 @@ sap.ui.define([
             });
 
             var formattedValue = oCurrencyFormat.format(Number(price), currency);
-            return "Starting At " + formattedValue;
+               var oBundle = this.getView().getModel("i18n").getResourceBundle();
+             var sStartingAt = oBundle.getText("StartingAt");
+
+    return sStartingAt + " " + formattedValue;
         },
 
       formatCurrency: function (value, code) {

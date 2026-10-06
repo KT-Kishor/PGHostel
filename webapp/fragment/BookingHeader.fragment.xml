@@ -8,7 +8,7 @@
             <Button
                 icon="sap-icon://nav-back"
                 press="onNavBack"
-                class="myUnifiedBtn"
+                class="myPowerButton"
             />
             <Image
                 src="./image/SVLogo.png"

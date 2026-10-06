@@ -5,10 +5,16 @@
 	xmlns:u="sap.ui.unified"
 >
 	<Dialog
-        title="{i18n>raiseNewComplaint}"
         contentWidth="450px"
         afterClose="onCloseComplaintDialog"
     >
+       <customHeader>
+            <Bar class="barheader">
+                <contentMiddle>
+                    <Title text="{i18n>raiseNewComplaint}" />
+                </contentMiddle>
+            </Bar>
+        </customHeader>
 		<content>
 			<f:SimpleForm
                 editable="true"

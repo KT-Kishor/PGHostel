@@ -3945,6 +3945,25 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
+
+.myPowerButton .sapMBtnInner {
+    width: 28px !important;
+    height: 26px !important;
+
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border-radius: 8px !important;
+    border: none !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.myPowerButton .sapMBtnIcon {
+    color: white !important;
+    margin-top: 0px !important;
+}
+
 .myUnifiedBtn:hover .sapMBtnInner,
 .guideButtonLarge:hover .sapMBtnInner {
   background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
@@ -3991,6 +4010,7 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   color: #e7eaed;
   vertical-align: middle;
 }
+
 
 /* .Homepage {
   background-image: url("../image/BedHostel.png");

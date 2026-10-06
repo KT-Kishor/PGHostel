@@ -56,23 +56,23 @@
                 <items>
                     <IconTabFilter
                         key="Booking History"
-                        text="{= ${myBookings>/bookingCount} > 0 ? 'Booking History (' + ${myBookings>/bookingCount} + ')' : 'Booking History' }"
+                        text="{= ${myBookings>/bookingCount} > 0 ? ${i18n>bookingHistory} +' (' + ${myBookings>/bookingCount} + ')' : ${i18n>bookingHistory} }"
                     />
                     <IconTabFilter
                         key="Members"
-                        text="{= ${myBookings>/memberCount} > 0 ? 'Members (' + ${myBookings>/memberCount} + ')' : 'Members' }"
+                        text="{= ${myBookings>/memberCount} > 0 ? ${i18n>members} +' (' + ${myBookings>/memberCount} + ')' : ${i18n>members} }"
                     />
                     <IconTabFilter
                         key="Payment"
-                        text="{= ${myBookings>/paymentCount} > 0 ? 'Payment (' + ${myBookings>/paymentCount} + ')' : 'Payment' }"
+                        text="{= ${myBookings>/paymentCount} > 0 ? ${i18n>payment} +' (' + ${myBookings>/paymentCount} + ')' : ${i18n>payment} }"
                     />
                     <IconTabFilter
                         key="Complaints"
-                        text="{= ${myBookings>/complainCount} > 0 ? 'Complaints (' + ${myBookings>/complainCount} + ')' : 'Complaints' }"
+                        text="{= ${myBookings>/complainCount} > 0 ? ${i18n>complaints} +' (' + ${myBookings>/complainCount} + ')' : ${i18n>complaints} }"
                     />
                     <IconTabFilter
                         key="Damage"
-                        text="{= ${myBookings>/damageCount} > 0 ? 'Damage (' + ${myBookings>/damageCount} + ')' : 'Damage' }"
+                        text="{= ${myBookings>/damageCount} > 0 ? ${i18n>damage} +' (' + ${myBookings>/damageCount} + ')' : ${i18n>damage} }"
                     />
                 </items>
             </IconTabHeader>
