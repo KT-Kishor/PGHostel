@@ -2218,7 +2218,7 @@ onLanguageSelect: function (oEvent) {
 
     var oLocaleMap = {
         "English": "en",
-        "ಕನ್ನಡ": "kan",
+        "ಕನ್ನಡ": "kn",
         "हिन्दी": "hi"
     };
 
