@@ -54,29 +54,25 @@
 							],
 							formatter: '.isCardVisible'
 						}">
-
-						<HBox class="umCardHead" alignItems="Center">
-							<core:Icon src="{manual>icon}" class="umIcon" />
-							<VBox class="umCardHeadText">
-								<Title text="{manual>title}" level="H2" class="umCardTitle" />
-								<Text text="{manual>meta}" class="umMeta" />
-							</VBox>
-						</HBox>
+		<HBox class="umCardHead" alignItems="Center">
+        <core:Icon src="{manual>icon}" class="umIcon" />
+        <VBox class="umCardHeadText">
+            <!-- Fetch translated Title -->
+            <Title text="{path: 'manual>titleKey', formatter: '.Formatter.getI18nText'}" level="H2" class="umCardTitle" />
+            <!-- Fetch translated Meta text -->
+            <Text text="{path: 'manual>metaKey', formatter: '.Formatter.getI18nText'}" class="umMeta" />
+        </VBox>
+    </HBox>
 <VBox class="umDescriptionBox">
-
-    <Text
-        text="{
+        <!-- Fetch translated Description with expanded state -->
+        <Text text="{
             parts: [
-                { path: 'manual>description' },
+                { path: 'manual>descKey' },
                 { path: 'manual>expanded' }
-            ]
-          
-        }"
-        class="umDesc" />
-
-   
-
-</VBox>
+            ],
+            formatter: '.Formatter.getI18nDescription'
+        }" class="umDesc" />
+    </VBox>
 						<HBox class="umActions" justifyContent="End">
 							<Button
 								text="{i18n>videoGuide}"
