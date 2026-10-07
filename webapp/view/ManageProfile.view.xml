@@ -35,6 +35,7 @@
                 <Button
     icon="sap-icon://globe"
     text="{i18n>Language}"
+    class="languageButton"
     press=".onLanguagePress" />
     
                     <Button

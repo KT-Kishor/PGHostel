@@ -1039,7 +1039,8 @@ if (this.data.Status === "Assigned") {
                     RoomNo: selectedRoomNo,
                     CustomerName: ID.CustomerName,
                     MemberID: ID.MemberID,
-                    Status: "Assigned"
+                    Status: "Assigned",
+                    LoginName: oExistingModel.UserName,
                 };
 
                 oBody = {
@@ -1067,9 +1068,10 @@ if (this.data.Status === "Assigned") {
                     STDCode: oExistingModel.STDCode,
                     MobileNo: oExistingModel.MobileNo,
                     AdminEmail: oExistingModel.EmailID,
-                    Status: "Assigned"
-                };
+                    Status: "Assigned",
+                    LoginName: oExistingModel.UserName,
 
+                };
                 oBody = {
                     data: Payload,
                     filters: {
@@ -1088,7 +1090,8 @@ if (this.data.Status === "Assigned") {
                     STDCode: oExistingModel.STDCode,
                     MobileNo: oExistingModel.MobileNo,
                     AdminEmail: oExistingModel.EmailID,
-                    Status: "Assigned"
+                    Status: "Assigned",
+                    LoginName: oExistingModel.UserName,
                 };
 
                 oBody = {

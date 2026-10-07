@@ -567,6 +567,29 @@ sap.ui.define([
 
             return oDateFormat.format(oDate);
         },
+        formatDateTime: function (sDate) {
+    if (!sDate) {
+        return "";
+    }
+
+    var oDate = new Date(sDate);
+
+    if (isNaN(oDate.getTime())) {
+        return "";
+    }
+
+    var day = String(oDate.getDate()).padStart(2, "0");
+    var month = String(oDate.getMonth() + 1).padStart(2, "0");
+    var year = oDate.getFullYear();
+
+    var time = oDate.toLocaleTimeString("en-IN", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+    });
+
+    return day + "/" + month + "/" + year + " " + time;
+},
         getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
 
             if (!sType) {

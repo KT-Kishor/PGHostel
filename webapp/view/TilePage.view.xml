@@ -21,12 +21,7 @@
                 tooltip="{i18n>homeTooltip}"
                 icon="sap-icon://home"
             /> -->
-			<Button
-                id="idMyBookingBtn"
-                text="{i18n>tour_title_mybookings}"
-                press="onMyBookingsPress"
-                class="myUnifiedBtn sapUiTinyMarginEnd"
-            />
+		
 			<Button
                 id="idLogBtn"
                 press="Tile_onLogPress"
@@ -419,6 +414,12 @@
         </items>
         </FlexBox>
         <ToolbarSpacer />
+        	<Button
+                id="idMyBookingBtn"
+                text="{i18n>tour_title_mybookings}"
+                press="onMyBookingsPress"
+                class="myUnifiedBtn sapUiTinyMarginEnd"
+            />
          <Button
     text="{i18n>Language}"
     press=".onLanguagePress" 

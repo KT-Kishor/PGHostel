@@ -3958,7 +3958,9 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     align-items: center !important;
     justify-content: center !important;
 }
-
+.languageButton .sapMBtnIcon {
+    margin-right: 4px !important;
+}
 .myPowerButton .sapMBtnIcon {
     color: white !important;
     margin-top: 0px !important;

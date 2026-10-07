@@ -2648,7 +2648,7 @@ sap.ui.define([
                     // Case 1: Pay at check-in (offline) - update directly with filters
                     this._prepareEditUpdatePayments(oPayloadData.data[0], []);
                     var oPayload = this._buildEditUpdatePayload(oPayloadData.data, sBookingID);
-
+                    oPayload.data[0].LoginName =this.getOwnerComponent().getModel("LoginModel").getData().UserName || ""
                     await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
                     await this._deleteRemovedFacilityItems(aDeletedFacilityIds);
 
@@ -2669,6 +2669,7 @@ sap.ui.define([
 
                         // Update booking with filters first
                         var oPayload = this._buildEditUpdatePayload(oPayloadData.data, sBookingID);
+                        oPayload.data[0].LoginName =this.getOwnerComponent().getModel("LoginModel").getData().UserName || ""
                         await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
                         await this._deleteRemovedFacilityItems(aDeletedFacilityIds);
 

@@ -1,0 +1,98 @@
+<mvc:View
+	controllerName="sap.ui.com.project1.controller.BookingHistory"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:core="sap.ui.core"
+
+	displayBlock="true"
+	height="100%"
+	busyIndicatorDelay="0"
+>
+	<Page      
+       navButtonPress="onNavBack"
+        showNavButton="true"
+        title="{i18n>bookingHistory}" class="myPowerButton">
+
+
+	<Table 
+    id="id_BookingHistoryTable"
+    sticky="ColumnHeaders,HeaderToolbar"
+    width="auto"
+    busyIndicatorDelay="0"
+    growing="true"
+    growingThreshold="20"
+    growingScrollToLoad="true"
+    items="{BookingModel>/}"
+>
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="{i18n>bookingHistory} ({= ${BookingModel>/}.length})" />
+					
+					</OverflowToolbar>
+				</headerToolbar>
+				<columns>
+                	<Column demandPopin="true">
+						<Text
+                            text="{i18n>bookingid}"
+                            tooltip="{i18n>bookingid}"
+                        />
+					</Column>
+					<Column demandPopin="true">
+						<Text
+                            text="{i18n>createdby}"
+                            tooltip="{i18n>createdby}"
+                        />
+					</Column>
+					<Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+						<Text
+                            text="{i18n>DateTime}"
+                            tooltip="{i18n>DateTime}"
+                        />
+					</Column>
+					<Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+						<Text
+                            text="{i18n>details}"
+                            tooltip="{i18n>details}"
+                        />
+					</Column>
+					<Column
+                        demandPopin="true"
+                        minScreenWidth="Tablet"
+                    >
+						<Text
+                            text="{i18n>status}"
+                            tooltip="{i18n>status}"
+                        />
+					</Column>
+					
+				</columns>
+				<items>
+					<ColumnListItem
+                    >
+						<cells>
+							<Text text="{BookingModel>BookingID}" />
+                        
+							<Text text="{BookingModel>Name}" />
+							<Text text="{path: 'BookingModel>Date', formatter: '.Formatter.formatDateTime'}" />
+							<Text text="{BookingModel>Comment}" />
+                            <ObjectStatus
+                                inverted="false"
+                                text="{BookingModel>Status}"
+                                state="{ path: 'BookingModel>Status', formatter: '.Formatter.formatObjectStatus'}"
+                                class="sapUiTinyMarginBottom"
+                            />
+					
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+	</Page>
+
+</mvc:View>

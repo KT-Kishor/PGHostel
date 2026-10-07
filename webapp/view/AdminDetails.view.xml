@@ -1030,6 +1030,13 @@
                         press="onGenerateInvoice"
                         visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"
                     />
+                    
+                    <Button
+                        text="{i18n>bookingHistory}"
+                        tooltip="{i18n>bookingHistory}"
+                        press="onPressBookingHistory"
+                        class="myUnifiedBtn"
+                    />
 
                     <Button
                         text="{i18n>ConfirmBooking}"

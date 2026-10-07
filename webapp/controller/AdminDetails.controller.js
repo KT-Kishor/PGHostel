@@ -202,6 +202,15 @@ sap.ui.define([
             }
 
         },
+        onPressBookingHistory: function () {
+               var sBookingID = this.getView()
+        .getModel("CustomerData")
+        .getProperty("/BookingID");
+            this.getOwnerComponent().getRouter().navTo("RouteBookingHistory",{
+                sPath:encodeURIComponent(sBookingID),
+                BranchCode:this.getView().getModel("CustomerData").getProperty("/BranchCode")
+            });
+        },
 
         valuestate: function () {
             this.getView().byId("Ad_id_RoomType").setValueState("None")
@@ -340,7 +349,8 @@ onChekout: function () {
                 "PropertySTD": oCustomerModel.PropertySTD || "",
                 "PropertyMobileNo": oCustomerModel.PropertyMobileNo || "",
                 "PropertyEmail": oCustomerModel.PropertyEmail || "",
-                "PropertyType": oCustomerModel.PropertyType || ""
+                "PropertyType": oCustomerModel.PropertyType || "",
+                "LoginName": this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
             };
 
             // Merge both
@@ -3964,6 +3974,7 @@ iMonths = Math.max(iMonths, 1);
                 PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
                 Currency: ID.Currency || "",
+                LoginName: this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
                 pdfAttachment: {
                     fileName: "BookingVoucher.pdf",
                     mimeType: "application/pdf",
@@ -4058,6 +4069,7 @@ iMonths = Math.max(iMonths, 1);
                 PropertyEmail: ID.PropertyEmail || "",
                 PropertyType: ID.PropertyType,
                 Currency: ID.Currency || "",
+                LoginName: this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
                 "pdfAttachment": {
                     "fileName": "BookingVoucher.pdf",
                     "mimeType": "application/pdf",
@@ -5891,6 +5903,7 @@ sap.m.MessageBox.confirm(
                 "PropertyMobileNo": CustomerData.PropertyMobileNo,
                 "PropertyEmail": CustomerData.PropertyEmail,
                 "EditedSections": editedSections,
+                "LoginName": this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
                 "pdfAttachment": {
                     "fileName": "BookingVoucher.pdf",
                     "mimeType": "application/pdf",
@@ -6076,6 +6089,7 @@ sap.m.MessageBox.confirm(
 
         onPressCancelBooking: async function (oEvent) {
             var oHostelModel = this.getView().getModel("CustomerData");
+            var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
             var oData = oHostelModel.getData();
             var that = this;
 
@@ -6150,6 +6164,7 @@ sap.m.MessageBox.confirm(
                             PropertyMobileNo: oData.PropertyMobileNo || "",
                             PropertyEmail: oData.PropertyEmail || "",
                             PropertyType: oData.PropertyType,
+                            LoginName: oLoginModel.UserName || "",
                             "pdfAttachment": {
                                 "fileName": "BookingVoucher.pdf",
                                 "mimeType": "application/pdf",

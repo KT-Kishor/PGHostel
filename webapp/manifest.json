@@ -215,6 +215,13 @@
             "Targetcustomdetailsinvoice"
           ]
         },
+          {
+          "name": "RouteBookingHistory",
+          "pattern": "BookingHistory/{sPath}/{BranchCode}",
+          "target": [
+            "TargetBookingHistory"
+          ]
+        },
         {
           "name": "RouteAdmin",
           "pattern": "Admin/{sPath}",
@@ -803,6 +810,13 @@
           "clearControlAggregation": false,
           "viewName": "ManageInvoiceplaindetails",
           "viewId": "ManageInvoiceplaindetails"
+        },
+        "TargetBookingHistory": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "BookingHistory",
+          "viewId": "BookingHistory"
         },
         "targetDamage": {
           "viewType": "XML",
