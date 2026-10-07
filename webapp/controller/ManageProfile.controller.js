@@ -125,6 +125,7 @@ sap.ui.define([
                 oProfileModel.setProperty("/isLoading", true);
                 this._setProfileLoading(true);
             }
+
             this._originalProfileData = null;
 
             // HM_Login identity used for support tickets is re-read per visit.
@@ -138,6 +139,8 @@ sap.ui.define([
             await this.commonLoginFunction("ManageProfile");
             await this.ManageData();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+           this.getView().byId("id_languageBtn").setText(this.i18nModel.getText("Language"));
+
             var model = new JSONModel({});
             this.getView().setModel(model, "Member")
         },
@@ -2225,6 +2228,7 @@ onLanguageSelect: function (oEvent) {
         sap.ui.getCore().getConfiguration().setLanguage(sLocale);
 
         localStorage.setItem("selectedLanguage", sLocale);
+        this.getView().byId("id_languageBtn").setText(sLanguage);
     }
 
          

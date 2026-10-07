@@ -418,7 +418,7 @@
                 id="idMyBookingBtn"
                 text="{i18n>tour_title_mybookings}"
                 press="onMyBookingsPress"
-                class="myUnifiedBtn sapUiTinyMarginEnd"
+                class="myUnifiedBtn"
             />
          <Button
     text="{i18n>Language}"
