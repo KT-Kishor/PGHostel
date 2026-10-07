@@ -567,6 +567,25 @@ sap.ui.define([
 
             return oDateFormat.format(oDate);
         },
+        getI18nText: function (sKey) {
+            if (!sKey) {
+                return "";
+            }
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+            return oResourceBundle.getText(sKey);
+        },
+
+        /**
+         * Resolves the translated description key based on expanded state.
+         */
+      getI18nDescription: function (sDescKey) {
+    if (!sDescKey) {
+        return "";
+    }
+    
+    var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+    return oResourceBundle.getText(sDescKey);
+},
         formatDateTime: function (sDate) {
     if (!sDate) {
         return "";

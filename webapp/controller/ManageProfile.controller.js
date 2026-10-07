@@ -2229,6 +2229,16 @@ onLanguageSelect: function (oEvent) {
 
         localStorage.setItem("selectedLanguage", sLocale);
         this.getView().byId("id_languageBtn").setText(sLanguage);
+               var oResourceModel = new sap.ui.model.resource.ResourceModel({
+        bundleName: "sap.ui.com.project1.i18n.i18n",
+        bundleLocale: sLocale
+    });
+
+    // Set new model on view
+    this.getView().setModel(oResourceModel, "i18n");
+
+    // Refresh bindings
+    this.getView().getModel("i18n").refresh(true);
     }
 
          

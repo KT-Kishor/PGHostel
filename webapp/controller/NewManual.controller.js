@@ -6,11 +6,14 @@ sap.ui.define([
 	"sap/m/Dialog",
 	"sap/m/Button",
 	"sap/m/MessageToast",
-    "sap/ui/core/Fragment"
-], function (BaseController, JSONModel, Filter, FilterOperator, Dialog, Button,  MessageToast, Fragment) {
+    "sap/ui/core/Fragment",
+    "../model/formatter",
+
+], function (BaseController, JSONModel, Filter, FilterOperator, Dialog, Button,  MessageToast, Fragment,Formatter) {
 	"use strict";
 
 	return BaseController.extend("sap.ui.com.project1.controller.NewManual", {
+        Formatter: Formatter,
 
 		onInit: function () {
              this.getOwnerComponent().getRouter().getRoute("RouteNewManual").attachMatched(this._onRouteMatched, this);
