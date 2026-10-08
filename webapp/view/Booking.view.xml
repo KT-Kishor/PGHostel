@@ -41,7 +41,7 @@
                         class="customBookingPanel booking-panel-enhanced panelbracket"
                     >
                         <MessageStrip
-                            text="CheckIn Time : {HostelModel>/CheckInTime}     ; CheckOut Time : {HostelModel>/CheckOutTime}"
+                            text="{i18n>checkinTime}  {HostelModel>/CheckInTime}  {i18n>checkoutTime}  {HostelModel>/CheckOutTime}"
                             showIcon="true"
                             showCloseButton="false"
                             class="sapUiTinyMarginBottom"
@@ -1042,7 +1042,7 @@
                             </Table>
 
                             <MessageStrip
-                                text="{= 'Security deposit to be paid at check-in: ' + ${path: 'HostelModel>/Deposit', formatter: '.Formatter.fromatNumber'} + ' ' + ${HostelModel>/DepositCurrency}}"
+                                text="{= ${i18n>Securitydeposittobepaidatcheckin} + ': ' + ${path: 'HostelModel>/Deposit', formatter: '.Formatter.fromatNumber'} + ' ' + ${HostelModel>/DepositCurrency} }"
                                 type="Success"
                                 showIcon="true"
                                 showCloseButton="false"

@@ -92,7 +92,7 @@
                 >
 					<core:Item
                         key=""
-                        text="Select Gender"
+                        text="{i18n>selectGender_6159}"
                     />
 					<core:Item
                         key="Male"

@@ -18,7 +18,7 @@
                         &lt;a href='https://www.kalpavrikshatechnologies.com/'
                         class='footer-text'
                         target='_blank'&gt;
-                        Developed by Kalpavriksha Technologies
+                        {i18n&gt;devlopby}
                         &lt;/a&gt;
                         &lt;/div&gt;" />
 

@@ -3994,10 +3994,13 @@ iMonths = Math.max(iMonths, 1);
             sap.m.MessageBox.confirm(
                  this.i18nModel.getText("Areyousureyouwanttoconfirmthisroombooking"), {
                 actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                emphasizedAction: sap.m.MessageBox.Action.YES,
+                   actions: [
+            that.i18nModel.getText("YesButton"),
+            that.i18nModel.getText("NoButton")
+        ],
                 styleClass: "myUnifiedBtn",
                 onClose: async function (oAction) {
-                    if (oAction === sap.m.MessageBox.Action.YES) {
+                    if (oAction === that.i18nModel.getText("YesButton")) {
                         that.getBusyDialog();
                         await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
                         that.getView().getModel("CustomerData").setProperty("/Status", "Confirmed")

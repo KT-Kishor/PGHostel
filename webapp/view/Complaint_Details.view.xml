@@ -82,7 +82,7 @@
                         <Text text="{i18n>ResolutionDate}" tooltip="{i18n>ResolutionDate}" />
                     </Column>
                     <Column demandPopin="true">
-                        <Text text="{i18n>Image}" tooltip="{i18n>Image}" />
+                        <Text text="{i18n>image}" tooltip="{i18n>image}" />
                     </Column>
                     <Column demandPopin="true">
                         <Text text="{i18n>comments}" tooltip="{i18n>comments}" />

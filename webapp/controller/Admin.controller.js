@@ -1124,18 +1124,18 @@ if (this.data.Status === "Assigned") {
 
 
                     sap.m.MessageBox.confirm(
-                        "Are you sure you want to proceed to the invoice?",
+                        this.i18nModel.getText("Areyousureyouwanttoproceedtotheinvoice"),
                         {
                             title: "Confirm Navigation",
                             icon: sap.m.MessageBox.Icon.INFORMATION,
-                            actions: [
-                                sap.m.MessageBox.Action.OK,
-                                sap.m.MessageBox.Action.CANCEL,
-                            ],
+                           actions: [
+            this.i18nModel.getText("YesButton"),
+            this.i18nModel.getText("NoButton")
+        ],
 
                             styleClass: "myUnifiedBtn",
                             onClose: (sAction) => {
-                                if (sAction === sap.m.MessageBox.Action.OK) {
+                                if (sAction === this.i18nModel.getText("YesButton")) {
                                     this.getOwnerComponent()
                                         .getRouter()
                                         .navTo("RouteManageInvoiceDetails", {

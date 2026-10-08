@@ -7126,16 +7126,23 @@
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
                 // let sMessage = "Booking created successfully.";
-                let sMessage = "Thank you! Your booking request has been received.\n\n" +
-                    "We are checking room availability, and the confirmation status will be emailed to you shortly";
+               var oResourceBundle = this.getView()
+    .getModel("i18n")
+    .getResourceBundle();
 
-                oHostelModel.setProperty("/BookingPayload", oPayload);
+var sMessage =
+    oResourceBundle.getText("bookingRequestReceived") +
+    "\n\n" +
+    oResourceBundle.getText("bookingAvailabilityChecking");
 
-                if (aBookingDetails.length) {
-                    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
-                        return "Booking Reference No: " + oItem.BookingID;
-                    }).join("\n");
-                }
+oHostelModel.setProperty("/BookingPayload", oPayload);
+
+if (aBookingDetails.length) {
+    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
+        return oResourceBundle.getText("bookingReferenceNo") +
+            ": " + oItem.BookingID;
+    }).join("\n");
+}
 
                 if (this._oPaymentDialog) {
                     this._oPaymentDialog.close();

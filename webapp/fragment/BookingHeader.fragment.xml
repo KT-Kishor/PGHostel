@@ -22,7 +22,7 @@
                 id="headerHomeBtn"
                 icon="sap-icon://home"
                 press="onHome"
-                class="myUnifiedBtn"
+                class="myPowerButton"
             />
         </contentRight>
     </Bar>

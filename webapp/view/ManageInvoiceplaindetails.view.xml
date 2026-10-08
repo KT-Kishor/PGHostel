@@ -568,8 +568,8 @@
                                                 demandPopin="true"
                                             >
                                                 <m:Text
-                                                    text="{i18n>SAC}"
-                                                    tooltip="{i18n>SAC}"
+                                                    text="{i18n>sac}"
+                                                    tooltip="{i18n>sac}"
                                                 />
                                             </m:Column>
                                             <m:Column
@@ -830,7 +830,7 @@
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }"
                                             >
                                                 <m:Label
-                                                    text="{i18n>CGST} ({SelectedCustomerModel>/Value}%) :"
+                                                    text="{i18n>cgs} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
@@ -845,7 +845,7 @@
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'CGST/SGST' }"
                                             >
                                                 <m:Label
-                                                    text="{i18n>SGST} ({SelectedCustomerModel>/Value}%) :"
+                                                    text="{i18n>sgst} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text
@@ -860,7 +860,7 @@
                                                 visible="{= ${FilteredSOWModel>/Currency} === 'INR' &amp;&amp; ${SelectedCustomerModel>/Type} === 'IGST' }"
                                             >
                                                 <m:Label
-                                                    text="{i18n>IGST} ({SelectedCustomerModel>/Value}%) :"
+                                                    text="{i18n>igst} ({SelectedCustomerModel>/Value}%) :"
                                                     class="boldBlackText sapUiTinyMarginBottom rightAlignLabel"
                                                 />
                                                 <m:Text

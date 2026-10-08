@@ -1879,7 +1879,7 @@ sap.ui.define([
                                 text: that.i18nModel.getText("invoiceCreatemsg")
                             }),
                             beginButton: new sap.m.Button({
-                                text: "OK",
+                                text: this.i18nModel.getText("invoiceok"),
                                 type: "Transparent",
                                 class: "myUnifiedBtn",
                                 press: function () {
@@ -1890,7 +1890,7 @@ sap.ui.define([
                                 }
                             }),
                             endButton: new sap.m.Button({
-                                text: "Generate PDF",
+                                text: this.i18nModel.getText("generatePdf"),
                                 type: "Transparent",
                                 class: "myUnifiedBtn",
                                 press: async () => {

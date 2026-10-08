@@ -243,8 +243,8 @@ sap.ui.define([
             if (aFiltered.length === 0) {
                 this._showIllustration(
                     sap.m.IllustratedMessageType.NoData,
-                    "No Reviews Found",
-                    "There are no customer reviews available."
+                    this.i18nModel.getText("NoReviewsFound"),
+                    this.i18nModel.getText("Therearenocustomerreviewsavailable")
 
                 )
                 return;

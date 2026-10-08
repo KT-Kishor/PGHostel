@@ -456,7 +456,13 @@ sap.ui.define([
 
             var formattedPrice = oFormat.format(Number(price));
 
-            var result = "Starting At - " + formattedPrice;
+               var oBundle = this.getView()
+        .getModel("i18n")
+        .getResourceBundle();
+
+              var sStartingAt = oBundle.getText("StartingAt");
+
+              var result = sStartingAt + " - " + formattedPrice;
             if (currency) {
                 result += " " + currency;
             }
