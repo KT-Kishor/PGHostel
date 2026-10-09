@@ -18,7 +18,7 @@
                 press="onHome"
                 icon="sap-icon://log"
                 tooltip="{i18n>logoutTooltip}"
-                class="myUnifiedBtn"
+                class="myPowerButton"
             />
         </m:headerContent>
         <!-- <m:ScrollContainer > -->
@@ -1130,14 +1130,14 @@
                 )
             )
         }"
-                            text="{i18n>GeneratePDF}"
-                            tooltip="{i18n>GeneratePDF}"
+                            text="{i18n>generatePdf}"
+                            tooltip="{i18n>generatePdf}"
                             class="myUnifiedBtn"
                         >
                             <m:menu>
                                 <m:Menu>
                                     <m:MenuItem
-                                        text="{i18n>GeneratePDF}"
+                                        text="{i18n>generatePdf}"
                                         press="CID_onPressGeneratePdf"
                                         visible="{=
                                     (
