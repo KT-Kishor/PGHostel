@@ -240,6 +240,8 @@
                 });
         },
         _getBookingViewInitialData: function () {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+
             return {
                 PropertyTypes: [],
                 DurationOptions: this._buildKeyTextList(11),
@@ -297,8 +299,8 @@
                     PendingDeletedDocumentIDs: [],
                     IsEditMode: false
                 },
-                NewMemberDialogTitle: "Add New Member",
-                NewMemberDialogSaveText: "Save Member",
+                NewMemberDialogTitle: oBundle.getText("AddNewMember"),
+                NewMemberDialogSaveText: oBundle.getText("saveMember"),
                 FamilyMembers: []
             };
         },
@@ -682,7 +684,8 @@
         },
 
         _getPrimaryGuestName: function () {
-            return this.getView().getModel("HostelModel").getProperty("/FullName") || "Primary Guest";
+            return this.getView().getModel("HostelModel").getProperty("/FullName") ||
+                this.getView().getModel("i18n").getResourceBundle().getText("primaryGuest");
         },
 
         _getOccupantOptions: function () {
@@ -741,14 +744,15 @@
         },
 
         _getFacilitySelectionModeLabel: function (sSelectionMode) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const mLabels = {
-                SINGLE: "Per room",
-                QTY: "Quantity based",
-                PERSON: "Person selection",
-                PERSON_QTY: "Person with quantity"
+                SINGLE: oBundle.getText("facilityPerRoom"),
+                QTY: oBundle.getText("facilityQuantityBased"),
+                PERSON: oBundle.getText("facilityPersonSelection"),
+                PERSON_QTY: oBundle.getText("facilityPersonWithQuantity")
             };
 
-            return mLabels[sSelectionMode] || "Per room";
+            return mLabels[sSelectionMode] || oBundle.getText("facilityPerRoom");
         },
 
         _isFacilityPersonSelectable: function (sSelectionMode) {
@@ -775,16 +779,17 @@
             return this._getFacilitySelectionMode(oFacility) === "PERSON_QTY";
         },
         _getFacilityRateUnitText: function (sPriceType) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const mUnitLabels = {
-                "Package Price": "Package",
-                "Unit Price": "Unit",
-                "Per Hour": "Hour",
-                "Per Day": "Day",
-                "Per Month": "Month",
-                "Per Year": "Year"
+                "Package Price": oBundle.getText("facilityUnitPackage"),
+                "Unit Price": oBundle.getText("facilityUnitUnit"),
+                "Per Hour": oBundle.getText("facilityUnitHour"),
+                "Per Day": oBundle.getText("facilityUnitDay"),
+                "Per Month": oBundle.getText("facilityUnitMonth"),
+                "Per Year": oBundle.getText("facilityUnitYear")
             };
 
-            return mUnitLabels[sPriceType] || "Unit";
+            return mUnitLabels[sPriceType] || oBundle.getText("facilityUnitUnit");
         },
 
         _formatAmountToTwoDecimals: function (vValue, sCurrency) {
@@ -803,11 +808,38 @@
         },
 
         _formatFacilityUnitCount: function (iCount, sUnit) {
-            return iCount + " " + sUnit + (Math.abs(this._toNumber(iCount)) === 1 ? "" : "s");
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            const bPlural = Math.abs(this._toNumber(iCount)) !== 1;
+            const mUnitKeys = {
+                "Unit": ["facilityUnitUnit", "facilityUnitUnitPlural"],
+                "person": ["facilityUnitPerson", "facilityUnitPersonPlural"],
+                "Day": ["facilityUnitDay", "facilityUnitDayPlural"],
+                "Month": ["facilityUnitMonth", "facilityUnitMonthPlural"],
+                "Year": ["facilityUnitYear", "facilityUnitYearPlural"],
+                "Hour": ["facilityUnitHour", "facilityUnitHourPlural"],
+                "Hr": ["facilityUnitHourShort", "facilityUnitHourShortPlural"]
+            };
+            const aKeys = mUnitKeys[sUnit];
+
+            if (aKeys) {
+                return iCount + " " + oBundle.getText(bPlural ? aKeys[1] : aKeys[0]);
+            }
+
+            // Fall back to the legacy behaviour for any unmapped unit token.
+            return iCount + " " + sUnit + (bPlural ? "s" : "");
         },
 
         _formatFacilityPeriodCount: function (iCount, sPriceType) {
-            return this._formatFacilityUnitCount(iCount, this._getFacilityRateUnitText(sPriceType));
+            const mPeriodTokens = {
+                "Package Price": "Unit",
+                "Unit Price": "Unit",
+                "Per Hour": "Hour",
+                "Per Day": "Day",
+                "Per Month": "Month",
+                "Per Year": "Year"
+            };
+
+            return this._formatFacilityUnitCount(iCount, mPeriodTokens[sPriceType] || "Unit");
         },
 
         _getFacilityChargeableDayCount: function () {
@@ -958,6 +990,7 @@
         },
 
         _setFacilitySelectionSummary: function (oFacility) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const aParts = [];
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
             const iPersonCount = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds.length : 0;
@@ -980,15 +1013,15 @@
             }
 
             if (this._supportsFacilityChargeType(sSelectionMode)) {
-                aParts.push("Charge: " + this._getFacilityChargeTypeLabel(this._getFacilityChargeType(oFacility)));
+                aParts.push(oBundle.getText("facilityChargeValue", [this._getFacilityChargeTypeLabel(this._getFacilityChargeType(oFacility))]));
             }
 
             if (sSelectionMode === "PERSON" && iPersonCount > 0) {
-                aParts.push("For: " + aSelectedPersonNames.join(", "));
+                aParts.push(oBundle.getText("facilityForValue", [aSelectedPersonNames.join(", ")]));
             }
 
             if (sSelectionMode === "QTY") {
-                aParts.push("Qty " + (parseInt(oFacility.Quantity, 10) || 1));
+                aParts.push(oBundle.getText("facilityQtyValue", [String(parseInt(oFacility.Quantity, 10) || 1)]));
             }
 
             if (sSelectionMode === "PERSON_QTY") {
@@ -999,7 +1032,7 @@
                 });
 
                 if (aBreakdown.length > 0) {
-                    aParts.push("Breakdown: " + aBreakdown.join(", "));
+                    aParts.push(oBundle.getText("facilityBreakdownValue", [aBreakdown.join(", ")]));
                 }
             }
 
@@ -1029,10 +1062,11 @@
         },
 
         _getFacilityCardDetailText: function (oFacility) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
 
             if (!oFacility.Selected) {
-                return "Customize this facility for your booking.";
+                return oBundle.getText("facilityCustomizeText");
             }
 
             if (sSelectionMode === "PERSON") {
@@ -1044,18 +1078,20 @@
                     return oPerson ? oPerson.name : sPersonId;
                 }.bind(this)).filter(Boolean);
 
-                return aSelectedPersonNames.length ? "For: " + aSelectedPersonNames.join(", ") : "Added to this booking";
+                return aSelectedPersonNames.length
+                    ? oBundle.getText("facilityForValue", [aSelectedPersonNames.join(", ")])
+                    : oBundle.getText("facilityAddedToBooking");
             }
 
             if (sSelectionMode === "QTY") {
-                return "Quantity: " + Math.max(parseInt(oFacility.Quantity, 10) || 1, 1);
+                return oBundle.getText("facilityQuantityValue", [String(Math.max(parseInt(oFacility.Quantity, 10) || 1, 1))]);
             }
 
             if (sSelectionMode === "PERSON_QTY") {
                 const aBreakdown = (oFacility.PersonQuantities || []).filter(function (oLine) {
                     return (parseInt(oLine.qty, 10) || 0) > 0;
                 }).map(function (oLine) {
-                    return (oLine.personName || oLine.personId || "Guest") + " x" + (parseInt(oLine.qty, 10) || 0);
+                    return (oLine.personName || oLine.personId || oBundle.getText("facilityGuest")) + " x" + (parseInt(oLine.qty, 10) || 0);
                 });
                 const sChargeType = this._getFacilityChargeTypeLabel(this._getFacilityChargeType(oFacility));
 
@@ -1066,7 +1102,7 @@
                 return sChargeType;
             }
 
-            return "Added to this booking";
+            return oBundle.getText("facilityAddedToBooking");
         },
 
         _getFacilityCardSummaryText: function (oFacility) {
@@ -1137,11 +1173,15 @@
                 return "";
             }
 
-            return "Total: " + this._formatAmountToTwoDecimals(this._getFacilityCardTotalAmount(oFacility)) + " " + (oFacility.Currency || "INR");
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            return oBundle.getText("facilityTotalValue", [
+                this._formatAmountToTwoDecimals(this._getFacilityCardTotalAmount(oFacility)) + " " + (oFacility.Currency || "INR")
+            ]);
         },
 
         _getFacilityCardActionText: function (oFacility) {
-            return oFacility.Selected ? "Tap to update" : "Tap to add";
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            return oBundle.getText(oFacility.Selected ? "facilityTapToUpdate" : "facilityTapToAdd");
         },
 
         _loadFacilities: async function () {
@@ -1549,6 +1589,11 @@
             }
 
             const fnFormatAmount = this._formatAmountToTwoDecimals.bind(this);
+            // Resolve the bundle at call time so a language switch is picked up
+            // even though this dialog is cached on the controller.
+            const fnFacilityText = function (sKey, aArgs) {
+                return this.getView().getModel("i18n").getResourceBundle().getText(sKey, aArgs);
+            }.bind(this);
 
             const oDialog = new ResponsivePopover({
                 contentWidth: sap.ui.Device.system.phone ? "95vw" : "30rem",
@@ -1573,7 +1618,7 @@
                                 alignItems: "Start",
                                 items: [
                                     new sap.m.Text({
-                                        text: "Price",
+                                        text: fnFacilityText("facilityPriceLabel"),
                                         wrapping: true
                                     }).addStyleClass("sapMTextBold sapUiTinyMarginEnd"),
                                     new sap.m.Text({
@@ -1613,12 +1658,15 @@
                                                 const sNormalizedChargeType = String(sChargeType || "").trim().toUpperCase();
 
                                                 const sChargeLabel = sNormalizedChargeType === "DAILY"
-                                                    ? "per day"
-                                                    : "once for the entire booking";
+                                                    ? fnFacilityText("facilityChargePerDay")
+                                                    : fnFacilityText("facilityChargeOnceEntireBooking");
 
-                                                return "Package: " + iQty + " item(s) for " +
-                                                    fnFormatAmount(fPrice) + " " + (sCurrency || "INR") +
-                                                    " per selected person, charged " + sChargeLabel + ".";
+                                                return fnFacilityText("facilityPackageInfo", [
+                                                    String(iQty),
+                                                    fnFormatAmount(fPrice),
+                                                    (sCurrency || "INR"),
+                                                    sChargeLabel
+                                                ]);
                                             }
                                         },
                                         type: "Information",
@@ -1643,7 +1691,7 @@
                                 },
                                 items: [
                                     new sap.m.Text({
-                                        text: "Applicable"
+                                        text: fnFacilityText("facilityApplicable")
                                     }).addStyleClass("sapMTextBold sapUiTinyMarginEnd"),
 
                                     new sap.m.Text({
@@ -1651,8 +1699,8 @@
                                             path: "FacilitySelection>/facilityChargeType",
                                             formatter: function (sChargeType) {
                                                 return String(sChargeType || "").toUpperCase() === "DAILY"
-                                                    ? "Daily"
-                                                    : "Once per booking";
+                                                    ? fnFacilityText("facilityChargeDaily")
+                                                    : fnFacilityText("facilityOncePerBooking");
                                             }
                                         }
                                     })
@@ -1669,7 +1717,7 @@
                                 },
                                 items: [
                                     new sap.m.Label({
-                                        text: "Quantity",
+                                        text: fnFacilityText("facilityQuantityLabel"),
                                         design: "Bold"
                                     }).addStyleClass("sapUiTinyMarginEnd"),
                                     new sap.m.StepInput({
@@ -1706,7 +1754,7 @@
                                 },
                                 items: [
                                     new sap.m.Label({
-                                        text: "Select Person(s)",
+                                        text: fnFacilityText("facilitySelectPersons"),
                                         design: "Bold"
                                     }).addStyleClass("sapUiTinyMarginBottom"),
 
@@ -1718,12 +1766,12 @@
                                             new sap.m.Column({
                                                 width: sap.ui.Device.system.phone ? "4rem" : "3.2rem",
                                                 header: new sap.m.Text({
-                                                    text: "Pick",
+                                                    text: fnFacilityText("facilityPick"),
                                                     wrapping: false
                                                 }).addStyleClass("sapUiTinyMarginEnd"),
                                             }),
                                             new sap.m.Column({
-                                                header: new sap.m.Text({ text: "Person" }).addStyleClass("sapUiTinyMarginEnd"),
+                                                header: new sap.m.Text({ text: fnFacilityText("facilityPerson") }).addStyleClass("sapUiTinyMarginEnd"),
                                             })
                                         ],
                                         items: {
@@ -1766,7 +1814,7 @@
                                         text: {
                                             path: "FacilitySelection>/primaryGuestName",
                                             formatter: function (sPrimaryGuestName) {
-                                                return "Facility will be applied to " + (sPrimaryGuestName || "Primary Guest");
+                                                return fnFacilityText("facilityAppliedTo", [sPrimaryGuestName || fnFacilityText("primaryGuest")]);
                                             }
                                         },
                                         type: "Information",
@@ -1800,20 +1848,20 @@
                                             new sap.m.Column({
                                                 width: "4rem",
                                                 header: new sap.m.Text({
-                                                    text: "Pick"
+                                                    text: fnFacilityText("facilityPick")
                                                 })
                                             }),
                                             new sap.m.Column({
                                                 width: "60%",
                                                 header: new sap.m.Text({
-                                                    text: "Person"
+                                                    text: fnFacilityText("facilityPerson")
                                                 })
                                             }),
                                             new sap.m.Column({
                                                 width: "7rem",
                                                 hAlign: "End",
                                                 header: new sap.m.Text({
-                                                    text: "Qty",
+                                                    text: fnFacilityText("Qty"),
                                                     textAlign: "End",
                                                     width: "100%"
                                                 })
@@ -1867,7 +1915,7 @@
                                         text: {
                                             path: "FacilitySelection>/primaryGuestName",
                                             formatter: function (sPrimaryGuestName) {
-                                                return "Facility will be applied to " + (sPrimaryGuestName || "Primary Guest");
+                                                return fnFacilityText("facilityAppliedTo", [sPrimaryGuestName || fnFacilityText("primaryGuest")]);
                                             }
                                         },
                                         level: "H6",
@@ -1881,20 +1929,20 @@
                 footer: new sap.m.Toolbar({
                     content: [
                         this._oFacilityRemoveButton = new sap.m.Button({
-                            text: "Remove",
+                            text: fnFacilityText("Remove"),
                             visible: false,
                             enabled: "{FacilitySelection>/editModeEnabled}",
                             press: this.onFacilityDialogRemove.bind(this)
                         }).addStyleClass("myUnifiedBtn"),
                         new sap.m.ToolbarSpacer(),
                         new sap.m.Button({
-                            text: "Cancel",
+                            text: fnFacilityText("actionCancel"),
                             press: function () {
                                 oDialog.close();
                             }
                         }).addStyleClass("myUnifiedBtn"),
                         this._oFacilityConfirmButton = new sap.m.Button({
-                            text: "Confirm",
+                            text: fnFacilityText("confirmation"),
                             type: "Emphasized",
                             enabled: "{FacilitySelection>/editModeEnabled}",
                             press: this.onFacilityDialogConfirm.bind(this)
@@ -1950,9 +1998,10 @@
         },
 
         _getFacilityChargeTypeLabel: function (sChargeType) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             return this._normalizeFacilityChargeType(sChargeType) === "DAILY"
-                ? "Daily"
-                : "Entire booking";
+                ? oBundle.getText("facilityChargeDaily")
+                : oBundle.getText("facilityChargeEntireBooking");
         },
         onFacilityDialogConfirm: function (oEvent) {
             const oDialog = this._oFacilityDialog;
@@ -2125,6 +2174,7 @@
             const oModel = this.getView().getModel("HostelModel");
             const oFacilityModel = this.getView().getModel("FacilityModel");
             const oUnits = this._getBookingUnits();
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
 
             const aOccupants = this._getOccupantOptions ? this._getOccupantOptions() : [];
 
@@ -2190,7 +2240,7 @@
                         } else {
                             // Qty is only a factor worth showing when more than one,
                             // otherwise "Qty 1 x" is noise.
-                            sBreakdown = (iQty > 1 ? "Qty " + iQty + " x " : "") +
+                            sBreakdown = (iQty > 1 ? oBundle.getText("facilityQtyValue", [String(iQty)]) + " x " : "") +
                                 this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                                 " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
                         }
@@ -2207,7 +2257,7 @@
                         fTotal = fPrice * fPeriodMultiplier * iPersonCount;
                         // Person count is only a factor worth showing when more than one
                         // person is selected, otherwise "1 person(s) x" is noise.
-                        sBreakdown = "For: " + aNames.join(", ") + " | " +
+                        sBreakdown = oBundle.getText("facilityForValue", [aNames.join(", ")]) + " | " +
                             (iPersonCount > 1 ? this._formatFacilityUnitCount(iPersonCount, "person") + " x " : "") +
                             this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                             " x " + this._formatFacilityPeriodCount(fPeriodMultiplier, sPriceType);
@@ -2245,12 +2295,12 @@
 
                         if (sFacilityChargeType === "DAILY") {
                             fTotal = fPackagePrice * iSelectedPersonCount * iChargeableDayCount;
-                            sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
+                            sBreakdown = oBundle.getText("facilityForValue", [aNames.join(", ")]) + " | " + sPersonFactor +
                                 this._formatAmountToTwoDecimals(fPackagePrice) + " " + sCurrency +
                                 " x " + this._formatFacilityUnitCount(iChargeableDayCount, "Day");
                         } else {
                             fTotal = fPackagePrice * iSelectedPersonCount;
-                            sBreakdown = "For: " + aNames.join(", ") + " | " + sPersonFactor +
+                            sBreakdown = oBundle.getText("facilityForValue", [aNames.join(", ")]) + " | " + sPersonFactor +
                                 this._formatAmountToTwoDecimals(fPackagePrice) + " " + sCurrency;
                             // With one person the package price already IS the total, so the
                             // popover's trailing "= total" would just repeat it.
@@ -3340,8 +3390,8 @@
             const oDialog = await this._getNewMemberDialog();
 
             oBookingView.setProperty("/NewMemberDraft", oDraft);
-            oBookingView.setProperty("/NewMemberDialogTitle", "Add New Member");
-            oBookingView.setProperty("/NewMemberDialogSaveText", "Save Member");
+            oBookingView.setProperty("/NewMemberDialogTitle", this.getView().getModel("i18n").getResourceBundle().getText("AddNewMember"));
+            oBookingView.setProperty("/NewMemberDialogSaveText", this.getView().getModel("i18n").getResourceBundle().getText("saveMember"));
             oBookingView.refresh(true);
 
             // Configure date picker for DOB
@@ -3392,8 +3442,8 @@
             ), {
                 IsEditMode: true,
             }));
-            oBookingView.setProperty("/NewMemberDialogTitle", "Edit Member");
-            oBookingView.setProperty("/NewMemberDialogSaveText", "Update Member");
+            oBookingView.setProperty("/NewMemberDialogTitle", this.getView().getModel("i18n").getResourceBundle().getText("editMember"));
+            oBookingView.setProperty("/NewMemberDialogSaveText", this.getView().getModel("i18n").getResourceBundle().getText("UpdateMember"));
             oBookingView.refresh(true);
 
             // Configure date picker for DOB
@@ -3440,8 +3490,8 @@
             const oFileUploader = this.byId("newMemberFileUploader");
 
             oBookingView.setProperty("/NewMemberDraft", this._createMemberDraft());
-            oBookingView.setProperty("/NewMemberDialogTitle", "Add New Member");
-            oBookingView.setProperty("/NewMemberDialogSaveText", "Save Member");
+            oBookingView.setProperty("/NewMemberDialogTitle", this.getView().getModel("i18n").getResourceBundle().getText("AddNewMember"));
+            oBookingView.setProperty("/NewMemberDialogSaveText", this.getView().getModel("i18n").getResourceBundle().getText("saveMember"));
             oBookingView.refresh(true);
 
             [
@@ -4400,7 +4450,7 @@
 
         formatSelectedMembersCount: function (aMembers) {
             const iCount = Array.isArray(aMembers) ? aMembers.length : 0;
-            return iCount + " member(s) selected";
+            return this.getView().getModel("i18n").getResourceBundle().getText("membersSelectedCount", [String(iCount)]);
         },
 
         formatPrimaryOccupantName: function (aMembers) {
@@ -4418,16 +4468,18 @@
         },
 
         _getDocumentInfoPopover: function () {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
+
             if (!this._oDocumentInfoPopover) {
                 this._oDocumentInfoPopover = new ResponsivePopover({
                     showHeader: true,
                     showCloseButton: true,
-                    title: "Document Upload Info",
+                    title: oBundle.getText("documentUploadInfoTitle"),
                     placement: "Bottom",
                     contentWidth: sap.ui.Device.system.phone ? "95vw" : "18rem",
                     content: [
                         new Text({
-                            text: "Choose a document & upload clear image or PDF up to 400 KB",
+                            text: oBundle.getText("documentUploadInfoText"),
                             wrapping: true
                         }).addStyleClass("sapUiSmallMargin")
                     ]
@@ -4439,6 +4491,14 @@
                 }
 
                 this.getView().addDependent(this._oDocumentInfoPopover);
+            }
+
+            // Refresh localized strings each call so a language switch applies
+            // even though this popover is cached.
+            this._oDocumentInfoPopover.setTitle(oBundle.getText("documentUploadInfoTitle"));
+            var aDocInfoContent = this._oDocumentInfoPopover.getContent();
+            if (aDocInfoContent && aDocInfoContent[0] && aDocInfoContent[0].setText) {
+                aDocInfoContent[0].setText(oBundle.getText("documentUploadInfoText"));
             }
 
             return this._oDocumentInfoPopover;
@@ -4657,10 +4717,11 @@
 
         _getFacilitiesBreakdownPopover: function () {
             var that = this;
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
             if (!this._oFacilitiesBreakdownPopover) {
                 this._oFacilitiesBreakdownPopover = new ResponsivePopover({
                     showHeader: true,
-                    title: "Facilities Breakdown",
+                    title: oBundle.getText("facilitiesBreakdownTitle"),
                     placement: "Bottom",
                     contentWidth: sap.ui.Device.system.phone ? "95vw" : "28rem",
                     content: [
@@ -4680,13 +4741,14 @@
                                                     { path: "HostelModel>FacilityChargeType" }
                                                 ],
                                                 formatter: function (sName, sBreakdown, fTotal, sCurrency, sSelectionMode, sChargeType) {
-                                                    var sResult = sName || "Facility";
+                                                    var oBundle = that.getView().getModel("i18n").getResourceBundle();
+                                                    var sResult = sName || oBundle.getText("facilityLabel");
                                                     // PERSON_QTY = package pricing: show whether the package is
                                                     // charged Per Day or once for the Entire Booking.
                                                     if (that._supportsFacilityChargeType(sSelectionMode)) {
                                                         sResult += " (" + (that._normalizeFacilityChargeType(sChargeType) === "DAILY"
-                                                            ? "Per Day"
-                                                            : "Entire Booking") + ")";
+                                                            ? oBundle.getText("facilityPerDay")
+                                                            : oBundle.getText("facilityEntireBooking")) + ")";
                                                     }
                                                     if (sBreakdown) {
                                                         sResult += ": " + sBreakdown;
@@ -4718,6 +4780,10 @@
 
                 this.getView().addDependent(this._oFacilitiesBreakdownPopover);
             }
+
+            // Refresh the localized title each call so a language switch applies
+            // even though this popover is cached.
+            this._oFacilitiesBreakdownPopover.setTitle(oBundle.getText("facilitiesBreakdownTitle"));
 
             return this._oFacilitiesBreakdownPopover;
         },
@@ -4934,7 +5000,7 @@
 
             if (!aFacilities.length) {
                 oContainer.addItem(new sap.m.Text({
-                    text: "No facilities available for the selected room plan."
+                    text: this.getView().getModel("i18n").getResourceBundle().getText("facilityNoFacilities")
                 }).addStyleClass("sapUiSmallMarginTop"));
                 this._updateFacilityNavButtons(aFacilities);
                 return;
@@ -4971,7 +5037,7 @@
                                 new sap.m.HBox({
                                     visible: !!oFacility.Selected,
                                     items: [
-                                        new sap.m.Text({ text: "Added" })
+                                        new sap.m.Text({ text: that.getView().getModel("i18n").getResourceBundle().getText("facilityAdded") })
                                     ]
                                 }).addStyleClass("selectedBadge"),
                                 new sap.m.Image({
@@ -5947,10 +6013,10 @@
                     var sCouponErrorMessage;
                     if (bHasOriginalCoupon) {
                         // 1. The entered code is not the coupon this booking was created with.
-                        sCouponErrorMessage = "This coupon is not the coupon linked to this booking, so it cannot be applied.";
+                        sCouponErrorMessage = this.getView().getModel("i18n").getResourceBundle().getText("couponNotLinkedToBooking");
                     } else {
                         // 2. The coupon's usage count from HM_CouponBookingCount has reached its MaxUses.
-                        sCouponErrorMessage = "This coupon has reached its maximum usage limit and can no longer be used.";
+                        sCouponErrorMessage = this.getView().getModel("i18n").getResourceBundle().getText("couponUsageLimitExhausted");
                     }
 
                     MessageToast.show(sCouponErrorMessage || this.getView().getModel("i18n").getResourceBundle().getText("couponCannotApplied"));

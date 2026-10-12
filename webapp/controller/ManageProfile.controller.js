@@ -679,7 +679,7 @@ sap.ui.define([
                 }).addStyleClass("previewPhotoContain");
 
                 this._oProfilePreviewDialog = new sap.m.Dialog({
-                    title: "Profile Photo",
+                    title: this.i18nModel.getText("profilePhoto"),
                     // Let the image define both dimensions so the dialog matches
                     // the photo's aspect ratio exactly.
                     contentWidth: "auto",
@@ -687,11 +687,21 @@ sap.ui.define([
                     verticalScrolling: false,
                     content: this._oProfilePreviewImage,
                     beginButton: new sap.m.Button({
-                        text: "Close",
+                        text: this.i18nModel.getText("close"),
                         press: () => this._oProfilePreviewDialog.close()
                     }).addStyleClass("myUnifiedBtn")
                 }).addStyleClass("previewPhotoDialog");
                 this.getView().addDependent(this._oProfilePreviewDialog);
+            }
+
+            // Refresh localized strings every open so a language switch
+            // while the dialog is already cached still takes effect.
+            if (this._oProfilePreviewDialog) {
+                this._oProfilePreviewDialog.setTitle(this.i18nModel.getText("profilePhoto"));
+                const oBeginBtn = this._oProfilePreviewDialog.getBeginButton();
+                if (oBeginBtn) {
+                    oBeginBtn.setText(this.i18nModel.getText("close"));
+                }
             }
 
             // Data URLs contain no quotes or markup, so they are safe to inline.
@@ -717,19 +727,19 @@ sap.ui.define([
                         mode: "None",
                         items: [
                             new sap.m.StandardListItem({
-                                title: "Take Photo",
+                                title: "{i18n>takePhoto}",
                                 icon: "sap-icon://add-photo",
                                 type: "Active",
                                 press: this.onTakePhoto.bind(this)
                             }).addStyleClass("profileMenuTint"),
                             new sap.m.StandardListItem({
-                                title: "Upload from Gallery",
+                                title: "{i18n>uploadFromGallery}",
                                 icon: "sap-icon://image-viewer",
                                 type: "Active",
                                 press: this.onUploadPhoto.bind(this)
                             }).addStyleClass("profileMenuTint"),
                             new sap.m.StandardListItem({
-                                title: "Remove Photo",
+                                title: "{i18n>removePhoto}",
                                 icon: "sap-icon://delete",
                                 type: "Active",
                                 press: this.onRemovePhoto.bind(this)
@@ -2224,22 +2234,26 @@ onLanguageSelect: function (oEvent) {
 
     var sLocale = oLocaleMap[sLanguage];
 
-  if (sLocale) {
+if (sLocale) {
         sap.ui.getCore().getConfiguration().setLanguage(sLocale);
 
         localStorage.setItem("selectedLanguage", sLocale);
         this.getView().byId("id_languageBtn").setText(sLanguage);
                var oResourceModel = new sap.ui.model.resource.ResourceModel({
-        bundleName: "sap.ui.com.project1.i18n.i18n",
-        bundleLocale: sLocale
-    });
+         bundleName: "sap.ui.com.project1.i18n.i18n",
+         bundleLocale: sLocale
+     });
 
-    // Set new model on view
-    this.getView().setModel(oResourceModel, "i18n");
+     // Set new model on view
+     this.getView().setModel(oResourceModel, "i18n");
 
-    // Refresh bindings
-    this.getView().getModel("i18n").refresh(true);
-    }
+     // Refresh bindings
+     this.getView().getModel("i18n").refresh(true);
+
+     // Re-capture the bundle so this.i18nModel.getText(...) calls
+     // (used everywhere outside XML bindings) use the new locale too.
+     this.i18nModel = oResourceModel.getResourceBundle();
+     }
 
          
 

@@ -298,7 +298,7 @@
                                 visible="{BookingView>/showFamilySection}"
                             >
                                 <Text
-                                    text="Primary occupant (Contact Person): {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
+                                    text="{i18n>primaryOccupantContact} {path: 'BookingView>/FamilyMembers', formatter: '.formatPrimaryOccupantName'}"
                                     class="sapUiSmallMarginBottom"
                                     visible="{= ${BookingView>/FamilyMembers}.length > 0 }"
                                 />

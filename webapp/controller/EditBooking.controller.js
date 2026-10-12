@@ -1179,6 +1179,7 @@ sap.ui.define([
          * @returns {string} Breakdown text string
          */
         _buildFacilityPeriodBreakdown: function (oCalcItem, iQty) {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
             var sPriceType = oCalcItem.UnitText || "Unit Price";
             var sUnitKey = sPriceType.toUpperCase().replace(/[^A-Z0-9]/g, "");
             var oCalcStart = this._parseDate(oCalcItem.StartDate);
@@ -1208,7 +1209,7 @@ sap.ui.define([
             }
 
             // Qty is only a factor worth showing when more than one, otherwise "Qty 1 x" is noise.
-            return (iQty > 1 ? "Qty " + iQty + " x " : "") +
+            return (iQty > 1 ? oBundle.getText("facilityQtyValue", [String(iQty)]) + " x " : "") +
                 this._formatAmountToTwoDecimals(fPrice) + " " + sCurrency +
                 (sPeriodPart ? " x " + sPeriodPart : "");
         },
@@ -1864,8 +1865,8 @@ sap.ui.define([
             var oI18n = this.getView().getModel("i18n").getResourceBundle();
 
             return new Promise(function (resolve) {
-                var sConfirmAction = "Confirm";
-                var sCancelAction = "Cancel";
+                var sConfirmAction = oI18n.getText("confirmation");
+                var sCancelAction = oI18n.getText("actionCancel");
                 MessageBox.confirm(
                     // "The stay duration have been modified, so the room status will be reverted from \"" +
                     // sOriginalStatus + "\" to \"New\". Our team will recheck room availability. Once the booking is confirmed, " +
@@ -3539,7 +3540,8 @@ sap.ui.define([
             }
 
             return aFacilities.map(function (oFacility) {
-                var sName = oFacility.DisplayFacilityName || oFacility.FacilityName || "Facility";
+                var sName = oFacility.DisplayFacilityName || oFacility.FacilityName ||
+                    this.getView().getModel("i18n").getResourceBundle().getText("facilityLabel");
                 var sBreakdown = oFacility.BreakdownText || "";
                 var sTotal = oFacility.TotalAmount !== undefined && oFacility.TotalAmount !== null
                     ? " = " + this._formatAmountToTwoDecimals(oFacility.TotalAmount) + " " + (oFacility.Currency || "")
@@ -4212,6 +4214,7 @@ sap.ui.define([
          * Each item: { personName, tag, dateRange, math, subtotal }
          */
         _buildFacilityCalcBreakdown: function (oFacility) {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
             var oCurrencyModel = this.getView().getModel("HostelModel");
             var sFallbackCurrency = (oCurrencyModel ? oCurrencyModel.getProperty("/Currency") : "") || "INR";
 
@@ -4261,7 +4264,7 @@ sap.ui.define([
 
             var sDateRange = "";
             if (sFacStart && sFacEnd) {
-                sDateRange = fnFormatDateShort(sFacStart) + " To " + fnFormatDateShort(sFacEnd);
+                sDateRange = fnFormatDateShort(sFacStart) + " " + oBundle.getText("facilityDateTo") + " " + fnFormatDateShort(sFacEnd);
             } else if (sFacStart) {
                 sDateRange = fnFormatDateShort(sFacStart);
             } else if (sFacEnd) {
@@ -4283,7 +4286,7 @@ sap.ui.define([
                     oPerPersonResult.personBreakdown.forEach(function (oPerson) {
                         var sPersonDateRange = "";
                         if (oPerson.startDate && oPerson.endDate) {
-                            sPersonDateRange = fnFormatDateShort(oPerson.startDate) + " To " + fnFormatDateShort(oPerson.endDate);
+                            sPersonDateRange = fnFormatDateShort(oPerson.startDate) + " " + oBundle.getText("facilityDateTo") + " " + fnFormatDateShort(oPerson.endDate);
                         } else if (oPerson.startDate) {
                             sPersonDateRange = fnFormatDateShort(oPerson.startDate);
                         } else if (oPerson.endDate) {
@@ -4366,11 +4369,11 @@ sap.ui.define([
                 // Qty is only a factor worth showing when more than one, and never when
                 // it was already folded into the unit count above.
                 if (iQuantity > 1 && !bUnitPriceFold) {
-                    sMath += " × " + iQuantity + " Qty";
+                    sMath += " × " + oBundle.getText("facilityQtyValue", [String(iQuantity)]);
                 }
 
                 // For SINGLE/QTY, use facility name as the personName and tag
-                var sDisplayName = sFacilityTag || "Facility";
+                var sDisplayName = sFacilityTag || oBundle.getText("facilityLabel");
                 aItems.push({
                     personName: sDisplayName,
                     tag: sSelectionMode === "QTY" ? "×" + iQuantity : "",
@@ -4395,6 +4398,11 @@ sap.ui.define([
          */
         _getFacilitySelectionDialog: function () {
             var oDialog = sap.ui.com.project1.controller.Booking.prototype._getFacilitySelectionDialog.call(this);
+            // Resolve the bundle at call time so a language switch is picked up
+            // even though the injected breakdown section is built only once.
+            var fnFacilityText = function (sKey, aArgs) {
+                return this.getView().getModel("i18n").getResourceBundle().getText(sKey, aArgs);
+            }.bind(this);
 
             // Inject the breakdown section only once
             if (!this._bFacilityBreakdownInjected && oDialog) {
@@ -4413,7 +4421,7 @@ sap.ui.define([
                                 items: [
                                     // Section header
                                     new sap.m.Text({
-                                        text: "Calculation"
+                                        text: fnFacilityText("facilityCalculation")
                                     }).addStyleClass("calcSectionHeader"),
                                     // Person/item rows
                                     new sap.m.List({
@@ -4439,7 +4447,12 @@ sap.ui.define([
                                                                         size: "0.875rem"
                                                                     }).addStyleClass("calcDateIcon"),
                                                                     new sap.m.Text({
-                                                                        text: "{= 'From ' + ${FacilitySelection>dateRange} }"
+                                                                        text: {
+                                                                            path: "FacilitySelection>dateRange",
+                                                                            formatter: function (sDateRange) {
+                                                                                return fnFacilityText("facilityFromPrefix", [sDateRange]);
+                                                                            }
+                                                                        }
                                                                     }).addStyleClass("calcDateRange")
                                                                 ]
                                                             }),
@@ -4534,6 +4547,7 @@ sap.ui.define([
             const booking = data.Booking?.[0] || {};
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
+            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             let filter = { BranchID: [booking.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter);
@@ -4936,7 +4950,7 @@ sap.ui.define([
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(14);
                 doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
-                doc.text("FACILITY DETAILS", 15, currentY);
+                doc.text(oResourceBundle.getText("facilityDetailsHeader"), 15, currentY);
 
                 doc.setDrawColor(ACCENT_COLOR[0], ACCENT_COLOR[1], ACCENT_COLOR[2]);
                 doc.setLineWidth(0.8);
@@ -4956,30 +4970,30 @@ sap.ui.define([
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
                         if (sUnitText === "Unit Price") {
-                            sUnitText = `${sUnitText} (${item.Quantity || 1} Qty)`;
+                            sUnitText = `${sUnitText} (${oResourceBundle.getText("facilityQtyValue", [String(item.Quantity || 1)])})`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
-                                this.qty = `(${item.Quantity || 1} Qty / Entire Booking)`
+                                this.qty = oResourceBundle.getText("facilityQtyPerEntireBooking", [String(item.Quantity || 1)]);
                                 sUnitText = `${sUnitText}`;
                             } else {
                                 const dailyQty = Number(item.Quantity) || 1;
                                 const totalQty = dailyQty * diffDays;
-                                this.qty = `(${dailyQty} Qty / day)`
-                                sUnitText = `${sUnitText}\n(${diffDays} days)`;
+                                this.qty = oResourceBundle.getText("facilityQtyPerDay", [String(dailyQty)]);
+                                sUnitText = `${sUnitText}\n(${this._formatFacilityUnitCount(diffDays, "Day")})`;
                             }
                         }
                         else if (sUnitText === "Per Day") {
-                            sUnitText = `${sUnitText} (${diffDays} Days)`;
+                            sUnitText = `${sUnitText} (${this._formatFacilityUnitCount(diffDays, "Day")})`;
                         } else if (sUnitText === "Per Month") {
                             const months =
                                 (endDate.getFullYear() - startDate.getFullYear()) * 12 +
                                 (endDate.getMonth() - startDate.getMonth());
 
-                            sUnitText = `${sUnitText}\n(${months} Month${months > 1 ? "s" : ""})`;
+                            sUnitText = `${sUnitText}\n(${this._formatFacilityUnitCount(months, "Month")})`;
                         } else if (sUnitText === "Per Year") {
                             const years = endDate.getFullYear() - startDate.getFullYear();
 
-                            sUnitText = `${sUnitText}\n(${years} Year${years > 1 ? "s" : ""})`;
+                            sUnitText = `${sUnitText}\n(${this._formatFacilityUnitCount(years, "Year")})`;
                         }
                     }
 
@@ -4990,7 +5004,7 @@ sap.ui.define([
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
+                            ? `${item.FacilityName}\n(${oResourceBundle.getText("facilityMemberPrefix", [item.MemberName])})${showQty ? `\n${this.qty}` : ""}`
                             : (item.FacilityName || "-"),
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
