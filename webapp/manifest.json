@@ -222,6 +222,13 @@
             "TargetBookingHistory"
           ]
         },
+          {
+          "name": "RouteHealthinsurance",
+          "pattern": "Healthinsurance/{sPath}",
+          "target": [
+            "TargetHealthinsurance"
+          ]
+        },
         {
           "name": "RouteAdmin",
           "pattern": "Admin/{sPath}",
@@ -817,6 +824,13 @@
           "clearControlAggregation": false,
           "viewName": "BookingHistory",
           "viewId": "BookingHistory"
+        },
+         "TargetHealthinsurance": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewName": "Healthinsurance",
+          "viewId": "Healthinsurance"
         },
         "targetDamage": {
           "viewType": "XML",
