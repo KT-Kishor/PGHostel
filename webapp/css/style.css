@@ -7420,6 +7420,13 @@ html, body {
     padding: 0rem !important;
 }
 
+/*    (container-sap.ui.com.project1---View_Rooms--...), so match by suffix, and
+   fall back to hiding any section tab that has no text label. */
+.vrObjectPageLayout [id$="VR_id_DateFilterSection-anchor"],
+.vrObjectPageLayout .sapMITBHead > [id$="-anchor"]:not(:has(.sapMITBText)) {
+    display: none !important;
+}
+
 .roomsBgLayout .vrRoomContentSection {
     padding-top: 0.01rem !important;
 }
