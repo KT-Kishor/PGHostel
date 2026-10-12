@@ -8134,6 +8134,26 @@ text-transform: none !important;
   font-weight: 550;
 }
 
+/* Unified typography for the footer text links and Vendor Registration button */
+.footer-shell .footerActionLink.sapMLnk,
+.footer-shell .footerActionLink .sapMLnkText,
+.footer-shell .footerActionLink bdi,
+.footer-shell .fa-admin-btn .sapMBtnContent,
+.footer-shell .fa-admin-btn .sapMBtnContent bdi,
+.footer-shell .fa-admin-btn .sapMBtnContent span {
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+}
+
+.footer-shell .footerActionLink.sapMLnk,
+.footer-shell .footerActionLink .sapMLnkText,
+.footer-shell .footerActionLink bdi {
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
 .termsDialog .sapMTitle,
 .termsDialog .sapMBtnInner .sapMBtnIcon {
     color: #ffffff;

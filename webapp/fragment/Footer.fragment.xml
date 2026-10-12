@@ -30,13 +30,13 @@
             <Link
                 id="usermanualLink"
                 text="{i18n>userManualTitle}"
-                class="_link desktopFooterItem sapUiTinyMarginEnd"
+                class="_link footerActionLink desktopFooterItem sapUiTinyMarginEnd"
                 press="onUsermanualPress" />
                 
             <Link
                 id="desktopTermsLink"
                 text="{i18n>TermsandConditions}"
-                class="_link desktopFooterItem"
+                class="_link footerActionLink desktopFooterItem"
                 press="onPrivacyPolicyPress" />
 
             <!-- Desktop Vendor Registration -->
