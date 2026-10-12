@@ -1,0 +1,60 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified">
+    
+    <Dialog
+        id="travellerDialog"
+        title="{path: '/currentTravellerIndex', formatter: '.formatDialogTitle'}"
+        contentWidth="400px"
+        stretch="false">
+        
+        <VBox class="sapUiSmallMargin">
+            <Label text="Full Name" required="true"/>
+            <Input 
+                value="{/currentTraveller/name}" 
+                placeholder="Enter full name"/>
+
+            <Label text="Passport Number" required="true" class="sapUiTinyMarginTop"/>
+            <Input 
+                value="{/currentTraveller/passportNo}" 
+                placeholder="Enter passport number"/>
+
+            <Label text="Date of Birth" required="true" class="sapUiTinyMarginTop"/>
+            <DatePicker 
+                value="{/currentTraveller/dob}" 
+                valueFormat="yyyy-MM-dd" 
+                displayFormat="medium"
+                placeholder="Select date of birth"/>
+
+            <Label text="Passport Expiry Date" required="true" class="sapUiTinyMarginTop"/>
+            <DatePicker 
+                value="{/currentTraveller/passportExpiry}" 
+                valueFormat="yyyy-MM-dd" 
+                displayFormat="medium"
+                placeholder="Select expiry date"/>
+
+            <Label text="Passport Attachment" class="sapUiTinyMarginTop"/>
+            <u:FileUploader
+                id="passportUploader"
+                width="100%"
+                placeholder="Choose passport document/image"
+                uploadOnChange="false"
+                change="onFileSelected"/>
+        </VBox>
+
+        <beginButton>
+            <!-- Dynamic button text based on whether it is the final member -->
+            <Button
+                text="{= ${/currentTravellerIndex} === ${/totalTravellers} ? 'Submit' : 'Next'}"
+                type="Emphasized"
+                press="onNextTraveller"/>
+        </beginButton>
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCancelDialog"/>
+        </endButton>
+
+    </Dialog>
+</core:FragmentDefinition>

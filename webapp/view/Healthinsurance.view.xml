@@ -1,0 +1,411 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Healthinsurance"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:uxap="sap.uxap"
+    displayBlock="true"
+>
+    <uxap:ObjectPageLayout
+        id="insuranceObjectPage"
+        showTitleInHeaderContent="true"
+        useIconTabBar="false"
+        showAnchorBar="true"
+        showFooter="true"
+        upperCaseAnchorBar="false"
+    >
+        <uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle>
+                <uxap:expandedHeading>
+                    <Title
+                        text="Insurance Application"
+                        level="H1"
+                    />
+                </uxap:expandedHeading>
+                <uxap:snappedHeading>
+                    <Title
+                        text="Insurance Application"
+                        level="H2"
+                    />
+                </uxap:snappedHeading>
+            </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
+
+        <!-- HEALTH INSURANCE -->
+        <uxap:sections>
+            <uxap:ObjectPageSection
+                id="personalInfoSection"
+                title="Personal Information"
+                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
+            >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection title="">
+                        <uxap:blocks>
+                            <!-- Your existing Personal Information SimpleForm -->
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ColumnLayout"
+                                columnsXL="2"
+                                columnsL="2"
+                                columnsM="1"
+                                labelSpanXL="3"
+                                labelSpanL="3"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                singleContainerFullSize="false"
+                                class="sapUiMediumMarginBottom sapUiSmallMarginTop"
+                            >
+                                <f:content>
+                                    <Label
+                                        text="Full Name"
+                                        required="true"
+                                    />
+                                    <Input
+                                        id="Id_fullName"
+                                        value="{HealthInsuranceModel>/fullName}"
+                                        placeholder="Enter full name"
+                                        maxLength="100"
+                                        liveChange="onInputChange"
+                                        valueStateText="Enter the name"
+                                    />
+
+                                    <Label
+                                        text="Email Address"
+                                        required="true"
+                                    />
+                                    <Input
+                                        id="Id_email"
+                                        type="Email"
+                                        value="{HealthInsuranceModel>/email}"
+                                        placeholder="Enter email address"
+                                        liveChange="onEmailliveChange"
+                                        valueStateText="Enter the mail"
+                                    />
+
+                                    <Label
+                                        text="Mobile Number"
+                                        required="true"
+                                    />
+                                    <Input
+                                        id="ID_mobileNumber"
+                                        type="Tel"
+                                        value="{HealthInsuranceModel>/mobileNumber}"
+                                        maxLength="10"
+                                        placeholder="10-digit mobile number"
+                                        liveChange="onInputMobileChange"
+                                        valueStateText="Enter the mobile number"
+                                    />
+
+                                    <Label
+                                        text="Insurance Plan"
+                                        required="true"
+                                    />
+                                    <ComboBox
+                                        id="insurancePlan"
+                                        selectedKey="{HealthInsuranceModel>/insurancePlan}"
+                                        placeholder="Select insurance plan"
+                                        change="onInsurancePlanChange"
+                                        valueStateText="Select the insurence plan"
+                                    >
+                                        <core:Item
+                                            key="Individual"
+                                            text="Individual Health Insurance"
+                                        />
+                                        <core:Item
+                                            key="Family"
+                                            text="Family Health Insurance"
+                                        />
+                                    </ComboBox>
+
+                                    <Label
+                                        text="Do you have any previous diseases?"
+                                        required="true"
+                                    />
+                                    <TextArea
+                                        id="ID_diseases"
+                                        value="{HealthInsuranceModel>/diseases}"
+                                        placeholder="Enter you have any previous diseases"
+                                        valueStateText="Enter you have any previous diseases"
+                                    />
+
+                                    <Label
+                                        text="Weight"
+                                        required="true"
+                                    />
+
+                                    <Input
+                                        id="ID_Weight"
+                                        value="{HealthInsuranceModel>/Weight}"
+                                        maxLength="3"
+                                        placeholder="Enter your Weight in kgs"
+                                        liveChange="onInputMobileChange"
+                                        valueStateText="Enter your Weight in kgs"
+                                    />
+
+                                    <Label
+                                        text="Blood Group"
+                                        required="true"
+                                    />
+                                    <ComboBox
+                                        id="ID_BloodGroup"
+                                        selectedKey="{HealthInsuranceModel>/BloodGroup}"
+                                        placeholder="Select Blood Group"
+                                        change="onBloodGroupChange"
+                                        valueStateText="Please select a blood group"
+                                        width="100%"
+                                    >
+                                        <core:Item
+                                            key="A+"
+                                            text="A+"
+                                        />
+                                        <core:Item
+                                            key="A-"
+                                            text="A-"
+                                        />
+                                        <core:Item
+                                            key="B+"
+                                            text="B+"
+                                        />
+                                        <core:Item
+                                            key="B-"
+                                            text="B-"
+                                        />
+                                        <core:Item
+                                            key="AB+"
+                                            text="AB+"
+                                        />
+                                        <core:Item
+                                            key="AB-"
+                                            text="AB-"
+                                        />
+                                        <core:Item
+                                            key="O+"
+                                            text="O+"
+                                        />
+                                        <core:Item
+                                            key="O-"
+                                            text="O-"
+                                        />
+                                    </ComboBox>
+                                </f:content>
+                            </f:SimpleForm>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+
+            <!-- Section 2: Member Information -->
+            <uxap:ObjectPageSection
+                id="memberInfoSection"
+                title="Member Information"
+                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
+            >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection title="">
+                        <uxap:blocks>
+                            <!-- Keep your existing Member Information content here -->
+                            <VBox class="sapUiMediumMarginBottom">
+                                <HBox
+                                    alignItems="Center"
+                                    justifyContent="SpaceBetween"
+                                    class="sapUiSmallMarginBottom"
+                                >
+                                    <VBox>
+                                        <Title
+                                            text="Member Details"
+                                            level="H4"
+                                        />
+                                        <Text
+                                            text="Add date of birth for each insured member."
+                                        />
+                                    </VBox>
+
+                                    <ObjectStatus
+                                        text="Required"
+                                        state="Information"
+                                    />
+                                </HBox>
+
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMarginBottom"
+                                >
+                                    <core:Icon
+                                        src="sap-icon://group"
+                                        size="1.5rem"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+
+                                    <VBox>
+                                        <Label text="Number of Members" />
+                                        <StepInput
+                                            id="memberCount"
+                                            min="1"
+                                            max="6"
+                                            value="1"
+                                            step="1"
+                                            change="onMemberCountChange"
+                                            width="10rem"
+                                        />
+                                    </VBox>
+                                </HBox>
+
+                                <VBox
+                                    id="memberDobContainer"
+                                    width="100%"
+                                    class="memberDobContainer"
+                                />
+                            </VBox>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+
+            <!-- TRAVEL INSURANCE -->
+            <uxap:ObjectPageSection
+                title="Travel Insurance"
+                visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
+            >
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection title="Trip Information">
+                        <uxap:blocks>
+                            <f:SimpleForm
+                                editable="true"
+                                layout="ColumnLayout"
+                                columnsXL="2"
+                                columnsL="2"
+                                columnsM="1"
+                                labelSpanXL="3"
+                                labelSpanL="3"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                singleContainerFullSize="false"
+                                class="sapUiMediumMarginBottom sapUiSmallMarginTop"
+                            >
+                                <f:content>
+                                    <Label
+                                        text="Travel Type"
+                                        required="true"
+                                    />
+                                    <ComboBox
+                                        id="idtype"
+                                        selectedKey="{HealthInsuranceModel>/insurancePlan}"
+                                        placeholder="Select travel type"
+                                        change="onInsurancePlanChange"
+                                        valueStateText="Select insurence type"
+                                    >
+                                        <core:Item
+                                            key="International Trip"
+                                            text="International Trip"
+                                        />
+                                        <core:Item
+                                            key="Student Travel"
+                                            text="Student Travel"
+                                        />
+                                    </ComboBox>
+
+                                    <Label
+                                        text="Destination"
+                                        required="true"
+                                    />
+                                    <ComboBox
+                                        id="id_Destination"
+                                        selectedKey="{HealthInsuranceModel>/destination}"
+                                        placeholder="Select destination"
+                                        items="{path:'CountryModel>/', length:1000}"
+                                        change="onInsurancePlanChange"
+                                        valueStateText="Select Destination"
+                                    >
+                                        <core:ListItem
+                                            key="{CountryModel>countryName}"
+                                            text="{CountryModel>countryName}"
+                                        />
+                                    </ComboBox>
+                                    <Label text="Number of Travellers" />
+                                    <StepInput
+                                        id="memberCount1"
+                                        min="1"
+                                        max="10"
+                                        value="{HealthInsuranceModel>/totalTravellers}"
+                                        step="1"
+                                        change="onTravellerCountChange"
+                                    />
+                                    <Label
+                                        text="Start Date"
+                                        required="true"
+                                    />
+                                    <DatePicker
+                                        id="id_startDate"
+                                        value="{HealthInsuranceModel>/startDate}"
+                                        displayFormat="dd/MM/yyyy"
+                                        valueFormat="yyyy-MM-dd"
+                                        placeholder="Select start date"
+                                        valueStateText="Select start date"
+                                        change="onDateChange"
+                                    />
+
+                                    <Label
+                                        text="End Date"
+                                        required="true"
+                                    />
+                                    <DatePicker
+                                        id="id_endDate"
+                                        value="{HealthInsuranceModel>/endDate}"
+                                        displayFormat="dd/MM/yyyy"
+                                        valueFormat="yyyy-MM-dd"
+                                        placeholder="Select end date"
+                                        valueStateText="Select end date"
+                                        change="onDateChange"
+                                    />
+
+                                    <!-- Traveller forms are added here by the controller -->
+                                </f:content>
+                            </f:SimpleForm>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+
+        <!-- FOOTER -->
+        <uxap:footer>
+            <OverflowToolbar class="footerBtnBarInsurance">
+                <Image
+                    src="../image/TransparentKTlogo.png"
+                    width="30px"
+                    height="30px"
+                />
+
+                <Link
+                    text="{i18n>devlopby}"
+                    href="https://kalpavrikshatechnologies.com/"
+                    target="_blank"
+                    class="customLinkWhiteBg"
+                />
+
+                <ToolbarSpacer />
+
+                <Button
+                    text="Cancel"
+                    press="onCancelPress"
+                    class="myUnifiedBtn"
+                />
+
+                <Button
+                    text="Submit"
+                    class="myUnifiedBtn"
+                    press="onSubmitPress"
+                    visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
+                />
+
+                <Button
+                    text="Submit"
+                    class="myUnifiedBtn"
+                    press="onhealthSubmitPress"
+                    visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
+                />
+            </OverflowToolbar>
+        </uxap:footer>
+    </uxap:ObjectPageLayout>
+</mvc:View>
