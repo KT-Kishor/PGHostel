@@ -6,6 +6,8 @@
     xmlns:core="sap.ui.core"
     xmlns:uxap="sap.uxap"
     displayBlock="true"
+    xmlns:u="sap.ui.unified"
+    xmlns:m="sap.m"
 >
     <uxap:ObjectPageLayout
         id="insuranceObjectPage"
@@ -19,13 +21,13 @@
             <uxap:ObjectPageDynamicHeaderTitle>
                 <uxap:expandedHeading>
                     <Title
-                        text="Insurance Application"
+                        text="{i18n>InsuranceApplication}"
                         level="H1"
                     />
                 </uxap:expandedHeading>
                 <uxap:snappedHeading>
                     <Title
-                        text="Insurance Application"
+                        text="I{i18n>InsuranceApplication}"
                         level="H2"
                     />
                 </uxap:snappedHeading>
@@ -36,7 +38,7 @@
         <uxap:sections>
             <uxap:ObjectPageSection
                 id="personalInfoSection"
-                title="Personal Information"
+                title="{i18n>personalInformation}"
                 visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
             >
                 <uxap:subSections>
@@ -58,33 +60,33 @@
                             >
                                 <f:content>
                                     <Label
-                                        text="Full Name"
+                                        text="{i18n>adminBookingNCFullName}"
                                         required="true"
                                     />
                                     <Input
                                         id="Id_fullName"
                                         value="{HealthInsuranceModel>/fullName}"
-                                        placeholder="Enter full name"
+                                        placeholder="{i18n>enterFullName}"
                                         maxLength="100"
                                         liveChange="onInputChange"
-                                        valueStateText="Enter the name"
+                                        valueStateText="{i18n>enterFullName}"
                                     />
 
                                     <Label
-                                        text="Email Address"
+                                        text="{i18n>emailId}"
                                         required="true"
                                     />
                                     <Input
                                         id="Id_email"
                                         type="Email"
                                         value="{HealthInsuranceModel>/email}"
-                                        placeholder="Enter email address"
+                                        placeholder="{i18n>enterEmailId}"
                                         liveChange="onEmailliveChange"
                                         valueStateText="Enter the mail"
                                     />
 
                                     <Label
-                                        text="Mobile Number"
+                                        text="{i18n>mobileNo}"
                                         required="true"
                                     />
                                     <Input
@@ -92,45 +94,47 @@
                                         type="Tel"
                                         value="{HealthInsuranceModel>/mobileNumber}"
                                         maxLength="10"
-                                        placeholder="10-digit mobile number"
+                                        placeholder="{i18n>Enterthemobilenumber}"
                                         liveChange="onInputMobileChange"
-                                        valueStateText="Enter the mobile number"
+                                        valueStateText="{i18n>Enterthemobilenumber}"
                                     />
 
                                     <Label
-                                        text="Insurance Plan"
+                                        text="{i18n>InsurancePlan}"
                                         required="true"
                                     />
                                     <ComboBox
                                         id="insurancePlan"
                                         selectedKey="{HealthInsuranceModel>/insurancePlan}"
-                                        placeholder="Select insurance plan"
+                                        placeholder="{i18n>Selectinsuranceplan}"
                                         change="onInsurancePlanChange"
-                                        valueStateText="Select the insurence plan"
+                                        valueStateText="{i18n>Selectinsuranceplan}"
                                     >
                                         <core:Item
                                             key="Individual"
-                                            text="Individual Health Insurance"
+                                            text="{i18n>IndividualHealthInsurance}"
                                         />
                                         <core:Item
                                             key="Family"
-                                            text="Family Health Insurance"
+                                            text="{i18n>FamilyHealthInsurance}"
                                         />
                                     </ComboBox>
 
                                     <Label
-                                        text="Do you have any previous diseases?"
+                                        text="{i18n>Doyouhaveanypreviousdiseases}"
                                         required="true"
                                     />
                                     <TextArea
                                         id="ID_diseases"
                                         value="{HealthInsuranceModel>/diseases}"
-                                        placeholder="Enter you have any previous diseases"
-                                        valueStateText="Enter you have any previous diseases"
+                                        placeholder="{i18n>Enteryouhaveanypreviousdiseases}"
+                                        valueStateText="{i18n>Enteryouhaveanypreviousdiseases}"
+                                        liveChange="onInputChange"
+                                        maxLength="200"
                                     />
 
                                     <Label
-                                        text="Weight"
+                                        text="{i18n>Weight}"
                                         required="true"
                                     />
 
@@ -138,21 +142,21 @@
                                         id="ID_Weight"
                                         value="{HealthInsuranceModel>/Weight}"
                                         maxLength="3"
-                                        placeholder="Enter your Weight in kgs"
+                                        placeholder="{i18n>EnteryourWeightinkgs}"
                                         liveChange="onInputMobileChange"
-                                        valueStateText="Enter your Weight in kgs"
+                                        valueStateText="{i18n>EnteryourWeightinkgs}"
                                     />
 
                                     <Label
-                                        text="Blood Group"
+                                        text="{i18n>BloodGroup}"
                                         required="true"
                                     />
                                     <ComboBox
                                         id="ID_BloodGroup"
                                         selectedKey="{HealthInsuranceModel>/BloodGroup}"
-                                        placeholder="Select Blood Group"
+                                        placeholder="{i18n>SelectBloodGroup}"
                                         change="onBloodGroupChange"
-                                        valueStateText="Please select a blood group"
+                                        valueStateText="{i18n>SelectBloodGroup}"
                                         width="100%"
                                     >
                                         <core:Item
@@ -198,7 +202,7 @@
             <!-- Section 2: Member Information -->
             <uxap:ObjectPageSection
                 id="memberInfoSection"
-                title="Member Information"
+                title="{i18n>MemberInformation}"
                 visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
             >
                 <uxap:subSections>
@@ -213,43 +217,45 @@
                                 >
                                     <VBox>
                                         <Title
-                                            text="Member Details"
+                                            text="{i18n>documentDetails}"
                                             level="H4"
                                         />
                                         <Text
-                                            text="Add date of birth for each insured member."
+                                            text="{i18n>Adddateofbirthforeachinsuredmember}"
                                         />
                                     </VBox>
 
                                     <ObjectStatus
-                                        text="Required"
+                                        text="{i18n>Required}"
                                         state="Information"
                                     />
                                 </HBox>
 
-                                <HBox
-                                    alignItems="Center"
-                                    class="sapUiSmallMarginBottom"
-                                >
-                                    <core:Icon
-                                        src="sap-icon://group"
-                                        size="1.5rem"
-                                        class="sapUiTinyMarginEnd"
-                                    />
+                          <FlexBox
+    alignItems="Center"
+    wrap="Wrap"
+    width="100%"
+    class="sapUiSmallMarginBottom memberCountRow">
 
-                                    <VBox>
-                                        <Label text="Number of Members" />
-                                        <StepInput
-                                            id="memberCount"
-                                            min="1"
-                                            max="6"
-                                            value="1"
-                                            step="1"
-                                            change="onMemberCountChange"
-                                            width="10rem"
-                                        />
-                                    </VBox>
-                                </HBox>
+    <core:Icon
+        src="sap-icon://group"
+        size="1.5rem"
+        />
+
+    <Label
+        text="{i18n>NumberofMembers}"
+         class="memberlabel"/>
+
+    <StepInput
+        id="memberCount"
+        min="1"
+        max="6"
+        value="1"
+        step="1"
+        change="onMemberCountChange"
+        width="8rem" />
+
+</FlexBox>
 
                                 <VBox
                                     id="memberDobContainer"
@@ -259,16 +265,83 @@
                             </VBox>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
+                      
                 </uxap:subSections>
+            </uxap:ObjectPageSection>
+    <uxap:ObjectPageSection
+                title="{i18n>documentinfo}"
+                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
+            >
+                <uxap:subSections>
+             <uxap:ObjectPageSubSection>
+        <uxap:blocks>
+            <VBox
+                width="100%">
+
+                <MessageStrip
+                    text="For your Insurence, please provide your Aadhaar card details and upload a copy of your Aadhaar card for verification."
+                    type="Information"
+                    showIcon="true"
+                    showCloseButton="false"
+                    class="sapUiSmallMarginBottom" />
+           
+             
+
+<VBox width="100%" class="aadhaarUploadContainer">
+    <HBox
+        width="100%"
+        alignItems="Center"
+        class="aadhaarAttachmentRow">
+
+        <Label
+            text="{i18n>AadhaarCardAttachment}"
+            labelFor="aadhaarUploader"
+            class="aadhaarAttachmentLabel" />
+
+        <u:FileUploader
+            id="aadhaarUploader"
+            name="aadhaarCard"
+            fileType="pdf,png,jpg,jpeg"
+            mimeType="application/pdf,image/png,image/jpeg"
+            maximumFileSize="5"
+            placeholder="{i18n>ChooseAadhaarcarddocument}"
+            buttonText="Browse"
+            width="100%"
+            multiple="true"
+            change="onAadhaarAttachmentChange">
+
+            <u:layoutData>
+                <m:FlexItemData growFactor="0.5" />
+            </u:layoutData>
+        </u:FileUploader>
+    </HBox>
+
+    <!-- Selected files appear below, each with its own Remove button -->
+    <VBox
+        id="aadhaarUploadedFiles"
+        width="100%"
+        class="sapUiSmallMarginTop" />
+</VBox>
+
+
+
+                <Text
+                    text="Accepted formats: PDF, JPG, JPEG, PNG. Maximum size: 5 MB."
+                    class="sapUiTinyMarginTop sapUiSmallMarginBottom" />
+
+            </VBox>
+        </uxap:blocks>
+    </uxap:ObjectPageSubSection>
+         </uxap:subSections>
             </uxap:ObjectPageSection>
 
             <!-- TRAVEL INSURANCE -->
             <uxap:ObjectPageSection
-                title="Travel Insurance"
+                title="{i18n>TravelInsurance}"
                 visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
             >
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="Trip Information">
+                    <uxap:ObjectPageSubSection title="{i18n>TripInformation}">
                         <uxap:blocks>
                             <f:SimpleForm
                                 editable="true"
@@ -285,44 +358,44 @@
                             >
                                 <f:content>
                                     <Label
-                                        text="Travel Type"
+                                        text="{i18n>TravelType}"
                                         required="true"
                                     />
                                     <ComboBox
                                         id="idtype"
                                         selectedKey="{HealthInsuranceModel>/insurancePlan}"
-                                        placeholder="Select travel type"
+                                        placeholder="{i18n>Selecttraveltype}"
                                         change="onInsurancePlanChange"
-                                        valueStateText="Select insurence type"
+                                        valueStateText="{i18n>Selecttraveltype}"
                                     >
                                         <core:Item
                                             key="International Trip"
-                                            text="International Trip"
+                                            text="{i18n>InternationalTrip}"
                                         />
                                         <core:Item
                                             key="Student Travel"
-                                            text="Student Travel"
+                                            text="{i18n>StudentTravel}"
                                         />
                                     </ComboBox>
 
                                     <Label
-                                        text="Destination"
+                                        text="{i18n>Destination}"
                                         required="true"
                                     />
                                     <ComboBox
                                         id="id_Destination"
                                         selectedKey="{HealthInsuranceModel>/destination}"
-                                        placeholder="Select destination"
+                                        placeholder="{i18n>Selectdestination}"
                                         items="{path:'CountryModel>/', length:1000}"
                                         change="onInsurancePlanChange"
-                                        valueStateText="Select Destination"
+                                        valueStateText="{i18n>Selectdestination}"
                                     >
                                         <core:ListItem
                                             key="{CountryModel>countryName}"
                                             text="{CountryModel>countryName}"
                                         />
                                     </ComboBox>
-                                    <Label text="Number of Travellers" />
+                                    <Label text="{i18n>NumberofTravellers}" />
                                     <StepInput
                                         id="memberCount1"
                                         min="1"
@@ -332,7 +405,7 @@
                                         change="onTravellerCountChange"
                                     />
                                     <Label
-                                        text="Start Date"
+                                        text="{i18n>startDate}"
                                         required="true"
                                     />
                                     <DatePicker
@@ -340,13 +413,13 @@
                                         value="{HealthInsuranceModel>/startDate}"
                                         displayFormat="dd/MM/yyyy"
                                         valueFormat="yyyy-MM-dd"
-                                        placeholder="Select start date"
-                                        valueStateText="Select start date"
+                                        placeholder="{i18n>selectStartDate}"
+                                        valueStateText="{i18n>selectStartDate}"
                                         change="onDateChange"
                                     />
 
                                     <Label
-                                        text="End Date"
+                                        text="{i18n>endDate}"
                                         required="true"
                                     />
                                     <DatePicker
@@ -354,8 +427,8 @@
                                         value="{HealthInsuranceModel>/endDate}"
                                         displayFormat="dd/MM/yyyy"
                                         valueFormat="yyyy-MM-dd"
-                                        placeholder="Select end date"
-                                        valueStateText="Select end date"
+                                        placeholder="{i18n>selectEndDate}"
+                                        valueStateText="{i18n>selectEndDate}"
                                         change="onDateChange"
                                     />
 
@@ -387,20 +460,20 @@
                 <ToolbarSpacer />
 
                 <Button
-                    text="Cancel"
+                    text="{i18n>CancelButton}"
                     press="onCancelPress"
                     class="myUnifiedBtn"
                 />
 
                 <Button
-                    text="Submit"
+                    text="{i18n>submit}"
                     class="myUnifiedBtn"
                     press="onSubmitPress"
                     visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
                 />
 
                 <Button
-                    text="Submit"
+                    text="{i18n>submit}"
                     class="myUnifiedBtn"
                     press="onhealthSubmitPress"
                     visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"

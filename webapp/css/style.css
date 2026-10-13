@@ -9241,3 +9241,79 @@ text-transform: none !important;
 .sapUiSizeCompact .sapMPage.sapMPageWithHeader:not(.defaultBGBlur)>section {
   top: 45px;
 }
+.memberDobItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    min-width: 0;
+    margin-bottom: 0.75rem;
+}
+
+.memberDobItem .sapMFlexItem {
+    min-width: 0;
+}
+
+.memberDobItem .sapMFlexItem:last-child {
+    flex: 1 1 0;
+}
+
+@media screen and (max-width: 767px) {
+    .memberDobItem {
+        width: 100% !important;
+    }
+}
+.memberCountRow {
+    gap: 0.5rem;
+    box-sizing: border-box;
+}
+
+.memberlabel{
+  margin-top: 5px
+}
+
+@media screen and (max-width: 480px) {
+    .memberCountRow {
+        align-items: center;
+    }
+
+    .memberCountLabel {
+        flex: 1 1 150px;
+    }
+}
+
+.aadhaarAttachmentRow {
+    gap: 0.3rem;
+    box-sizing: border-box;
+}
+
+.aadhaarAttachmentLabel {
+    width: 12rem;
+    flex: 0 0 12rem;
+    margin-top: 5px;
+}
+
+.aadhaarAttachmentRow .sapUiFup {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+/* Mobile: label above uploader */
+@media (max-width: 600px) {
+    .aadhaarAttachmentRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+
+    .aadhaarAttachmentLabel {
+        width: 100%;
+        flex: none;
+    }
+
+    .aadhaarAttachmentRow .sapUiFup {
+        width: 100% !important;
+        flex: none;
+    }
+}

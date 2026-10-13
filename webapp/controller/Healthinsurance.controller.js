@@ -16,6 +16,17 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteHealthinsurance").attachMatched(this._onRouteMatched, this);
         },
 		_onRouteMatched: function (oEvent) {
+          this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
+const sLocale = localStorage.getItem("selectedLanguage") || "en";
+
+sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+// Refresh the i18n resource bundle
+this.getView().getModel("i18n").refresh(true);
+
+this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
 			var oData = {
                 totalTravellers: 1,
                 currentTravellerIndex: 1,
@@ -90,7 +101,7 @@ onhealthSubmitPress: async function () {
 
         if (!oDatePicker || !oDatePicker.getValue()) {
             sap.m.MessageBox.error(
-                "Please select DOB for Person " + i
+                 this.i18nModel.getText("dobRequired", [i])
             );
             return;
         }
@@ -112,7 +123,7 @@ onhealthSubmitPress: async function () {
 			this.closeBusyDialog();
 		
     sap.m.MessageBox.information(
-    "Your health insurance information has been successfully submitted to the StayVriksha team.\nOur team will review your application and process it accordingly.",
+    this.i18nModel.getText("healthInsuranceSubmitSuccess"),
     {
         title: "Application Submitted",
         onClose: function (sAction) {
@@ -179,12 +190,15 @@ onDateChange: function (oEvent) {
         oEndDatePicker.setValueState("None");
     }
 },
-  onEmailliveChange: function (oEvent) {
+        onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
         },
 		onInputMobileChange: function (oEvent) {
             utils.onNumber(oEvent);
 		},
+        onBloodGroupChange:function (oEvent){
+          utils._LCstrictValidationComboBox(oEvent);
+        },
 		onInsurancePlanChange: function (oEvent) {
     utils._LCstrictValidationComboBox(oEvent);
 
@@ -228,17 +242,14 @@ onMemberCountChange: function (oEvent) {
     var oView = this.getView();
     var oContainer = oView.byId("memberDobContainer");
     var oPlanComboBox = oView.byId("insurancePlan");
-
-    var sPlan = oPlanComboBox.getSelectedKey();
     var oMemberCount = oView.byId("memberCount");
 
+    var oBundle = oView.getModel("i18n").getResourceBundle();
+    var sPlan = oPlanComboBox.getSelectedKey();
     var iCount;
 
     if (sPlan === "Individual") {
         iCount = 1;
-        if (oMemberCount) {
-            oMemberCount.setValue(1);
-        }
     } else {
         iCount = oEvent
             ? (parseInt(oEvent.getParameter("value"), 10) || 1)
@@ -247,43 +258,57 @@ onMemberCountChange: function (oEvent) {
         iCount = Math.max(1, Math.min(6, iCount));
     }
 
+    if (oMemberCount) {
+        oMemberCount.setValue(iCount);
+    }
+
     oContainer.destroyItems();
 
     for (var i = 1; i <= iCount; i += 2) {
         var aRowItems = [];
 
         for (var j = i; j <= Math.min(i + 1, iCount); j++) {
+            var oLabel = new sap.m.Label({
+                text: oBundle.getText("PersonDOB", [j]),
+                required: true,
+                wrapping: false,
+                width: "7.9rem",
+                layoutData: new sap.m.FlexItemData({
+                    shrinkFactor: 0
+                })
+            });
+
             var oDatePicker = new sap.m.DatePicker(
                 this.createId("memberDob" + j),
                 {
-                    placeholder: "Select date of birth",
+                    placeholder: oBundle.getText("SelectDOB"),
                     displayFormat: "dd/MM/yyyy",
                     valueFormat: "yyyy-MM-dd",
-                    width: "100%"
+                    width: "100%",
+                    layoutData: new sap.m.FlexItemData({
+                        growFactor: 1,
+                        shrinkFactor: 1
+                    })
                 }
             );
 
             aRowItems.push(
-                new sap.m.VBox({
+                new sap.m.HBox({
                     width: "49%",
-                    items: [
-                        new sap.m.Label({
-                            text: "Person " + j + " - DOB",
-                            required: true
-                        }),
-                        oDatePicker
-                    ]
+                    alignItems: "Center",
+                    items: [oLabel, oDatePicker]
                 }).addStyleClass("memberDobItem")
             );
         }
 
         oContainer.addItem(
-            new sap.m.HBox({
-                width: "100%",
+            new sap.m.FlexBox({
+                width: "80%",
+                wrap: "Wrap",
                 justifyContent: "SpaceBetween",
-                alignItems: "Start",
+                alignItems: "Center",
                 items: aRowItems
-            }).addStyleClass("sapUiSmallMarginBottom")
+            }).addStyleClass("sapUiSmallMarginBottom sapUiMediumMarginBegin")
         );
     }
 },
@@ -393,16 +418,21 @@ onSubmitPress: async function () {
         parseInt(oHealthData.totalTravellers, 10) || 1;
 
     // 3. Check that all traveller records exist
-    if (aTravellersData.length < iTotalTravellers) {
-        sap.m.MessageBox.warning(
-            "Please enter details for all " +
-            iTotalTravellers + " travellers.",
-            {
-                title: "Missing Traveller Details"
-            }
-        );
-        return;
-    }
+// 3. Check that all traveller records exist
+if (aTravellersData.length < iTotalTravellers) {
+    sap.m.MessageBox.warning(
+        this.i18nModel.getText(
+            "missingTravellerDetails",
+            [iTotalTravellers]
+        ),
+        {
+            title: this.i18nModel.getText(
+                "missingTravellerDetailsTitle"
+            )
+        }
+    );
+    return;
+}
 
     // 4. Validate each traveller
     for (var i = 0; i < iTotalTravellers; i++) {
@@ -468,17 +498,20 @@ if (!bHasAttachment) {
 }
 
         // Show all missing fields for this traveller
-        if (aMissingFields.length > 0) {
-            sap.m.MessageBox.warning(
-                "Please fill the following fields for Traveller " +
-                iTravellerNo + ":\n\n• " +
-                aMissingFields.join("\n• "),
-                {
-                    title: "Missing Traveller Details"
-                }
-            );
-            return;
+    if (aMissingFields.length > 0) {
+    sap.m.MessageBox.warning(
+        this.i18nModel.getText("missingTravellerFieldsMessage", [
+            iTravellerNo,
+            aMissingFields.join("\n• ")
+        ]),
+        {
+            title: this.i18nModel.getText(
+                "missingTravellerFieldsTitle"
+            )
         }
+    );
+    return;
+}
     }
 
     // 5. Prepare complete payload
@@ -508,11 +541,10 @@ if (!bHasAttachment) {
         });
 
     sap.m.MessageBox.information(
-    "Your travel insurance information has been successfully " +
-    "submitted to the StayVriksha team.\n\n" +
-    "Our team will review your application and process it accordingly.",
+ 
+       this.i18nModel.getText("travelInsuranceSubmitSuccess"),
     {
-        title: "Application Submitted",
+        title: this.i18nModel.getText("applicationSubmittedTitle"),
         onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
                 this.getOwnerComponent()
@@ -539,10 +571,10 @@ if (!bHasAttachment) {
     }
 },
 onCancelPress:function(){
-    sap.m.MessageBox.information(
-    "Are you sure want to exit the page",
+    sap.m.MessageBox.information(   
+    this.i18nModel.getText("Areyousurewanttoexitthepage"),
     {
-        title: "Cancellation",
+        title: this.i18nModel.getText("confirmCancellation"),
         onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
                 this.getOwnerComponent()
@@ -589,10 +621,7 @@ onFileSelected: function (oEvent) {
 
         oModel.setProperty("/passportAttachments", aAttachments);
 
-        sap.m.MessageToast.show(
-            "Passport attached for Traveller " +
-            (iTravellerIndex + 1)
-        );
+    
     };
 
     oReader.onerror = function () {
@@ -603,16 +632,133 @@ onFileSelected: function (oEvent) {
 },
 
 
+onAadhaarAttachmentChange: function (oEvent) {
+    var oView = this.getView();
+    var oModel = oView.getModel("HealthInsuranceModel");
+    var aFiles = Array.from(oEvent.getParameter("files") || []);
+    var aAttachments = oModel.getProperty("/aadhaarAttachments") || [];
+    var oFileList = oView.byId("aadhaarUploadedFiles");
+    var that = this;
 
+    if (!aFiles.length) {
+        return;
+    }
+
+    aFiles.forEach(function (oFile) {
+        // Avoid adding the same file twice
+        var bExists = aAttachments.some(function (oItem) {
+            return oItem.fileName === oFile.name &&
+                oItem.fileSize === oFile.size;
+        });
+
+        if (bExists) {
+            return;
+        }
+
+        if (oFile.size > 5 * 1024 * 1024) {
+            sap.m.MessageBox.error(
+                oFile.name + " exceeds the 5 MB limit."
+            );
+            return;
+        }
+
+        var oReader = new FileReader();
+
+        oReader.onload = function (oLoadEvent) {
+            var sBase64 = oLoadEvent.target.result.split(",")[1];
+
+            var oAttachment = {
+                id: Date.now() + "_" + Math.random().toString(36).slice(2),
+                fileName: oFile.name,
+                mimeType: oFile.type,
+                fileSize: oFile.size,
+                content: sBase64
+            };
+
+            aAttachments.push(oAttachment);
+            oModel.setProperty("/aadhaarAttachments", aAttachments);
+
+            // Create a row for this file
+            var oRow = new sap.m.HBox({
+                width: "100%",
+                alignItems: "Center",
+                gap:"6px",
+                items: [
+                    new sap.m.HBox({
+                        alignItems: "Center",
+                        items: [
+                            new sap.ui.core.Icon({
+                                src: "sap-icon://attachment"
+                            }).addStyleClass("sapUiTinyMarginEnd"),
+
+                            new sap.m.Text({
+                                text: oFile.name,
+                                wrapping: true
+                            })
+                        ]
+                    }),
+                    new sap.m.Button({
+                        text: "{i18n>Remove}",
+                        icon: "sap-icon://delete",
+                        type: "Reject",
+                        press: function () {
+                            that.onRemoveAadhaarAttachment(
+                                oAttachment.id
+                            );
+                        }
+                    })
+                ]
+            }).addStyleClass("sapUiTinyMarginBottom");
+
+            oRow.data("attachmentId", oAttachment.id);
+            oFileList.addItem(oRow);
+        };
+
+        oReader.onerror = function () {
+            sap.m.MessageBox.error(
+                "Unable to read " + oFile.name
+            );
+        };
+
+        oReader.readAsDataURL(oFile);
+    });
+
+    // Clear the native selection so the user can select more files later
+    oView.byId("aadhaarUploader").clear();
+},
+
+onRemoveAadhaarAttachment: function (sAttachmentId) {
+    var oView = this.getView();
+    var oModel = oView.getModel("HealthInsuranceModel");
+    var aAttachments = oModel.getProperty("/aadhaarAttachments") || [];
+    var oFileList = oView.byId("aadhaarUploadedFiles");
+
+    aAttachments = aAttachments.filter(function (oItem) {
+        return oItem.id !== sAttachmentId;
+    });
+
+    oModel.setProperty("/aadhaarAttachments", aAttachments);
+
+    // Remove only the selected file's row
+    oFileList.getItems().slice().forEach(function (oRow) {
+        if (oRow.data("attachmentId") === sAttachmentId) {
+            oFileList.removeItem(oRow);
+            oRow.destroy();
+        }
+    });
+},
 onTravellerCountChange: function (oEvent) {
-  var iCount = oEvent
-    ? (parseInt(oEvent.getParameter("value"), 10) || 1)
-    : 1;
+    var iCount = oEvent
+        ? (parseInt(oEvent.getParameter("value"), 10) || 1)
+        : 1;
     iCount = Math.max(1, Math.min(10, iCount));
 
     var oView = this.getView();
     var oPage = oView.byId("insuranceObjectPage");
     var oModel = oView.getModel("HealthInsuranceModel");
+    
+    // Get i18n resource bundle
+    var oBundle = oView.getModel("i18n").getResourceBundle();
 
     oModel.setProperty("/totalTravellers", iCount);
 
@@ -631,67 +777,73 @@ onTravellerCountChange: function (oEvent) {
         var oForm = new sap.ui.layout.form.SimpleForm({
             editable: true,
             layout: "ColumnLayout",
-             columnsXL:2,
-                                columnsL:2,
-                                columnsM:1,
-                                labelSpanXL:3,
-                                labelSpanL:3,
-                                labelSpanM:4,
-                                labelSpanS:12,
+            columnsXL: 2,
+            columnsL: 2,
+            columnsM: 1,
+            labelSpanXL: 3,
+            labelSpanL: 3,
+            labelSpanM: 4,
+            labelSpanS: 12,
             content: [
-                new sap.m.Label({ text: "Full Name", required: true }),
-                new sap.m.Input({
-                    value: "{HealthInsuranceModel>/travellers/" +
-                        (i - 1) + "/fullName}",
-                    placeholder: "Enter traveller name",
-                    maxLength:50
-                    
+                new sap.m.Label({ 
+                    text: oBundle.getText("fullname"), 
+                    required: true 
                 }),
-                   new sap.m.Label({ text: "Passport Number", required: true }),
                 new sap.m.Input({
-                    value: "{HealthInsuranceModel>/travellers/" +
-                        (i - 1) + "/passportNumber}",
-                    placeholder: "Enter passport number",
+                    value: "{HealthInsuranceModel>/travellers/" + (i - 1) + "/fullName}",
+                    placeholder: oBundle.getText("enterTravellerName"),
+                    maxLength: 50
+                }),
+                new sap.m.Label({ 
+                    text: oBundle.getText("passportNumber"), 
+                    required: true 
+                }),
+                new sap.m.Input({
+                    value: "{HealthInsuranceModel>/travellers/" + (i - 1) + "/passportNumber}",
+                    placeholder: oBundle.getText("enterPassportNumber"),
                     maxLength: 8
                 }),
-
-                new sap.m.Label({ text: "Date of Birth", required: true }),
-                new sap.m.DatePicker({
-                    value: "{HealthInsuranceModel>/travellers/" +
-                        (i - 1) + "/dateOfBirth}",
-                    valueFormat: "yyyy-MM-dd",
-                    displayFormat: "dd/MM/yyyy",
-                    placeholder: "Select date of birth"
+                new sap.m.Label({ 
+                    text: oBundle.getText("dateOfBirth"), 
+                    required: true 
                 }),
-                   new sap.m.Label({ text: "Passport Expiry Date", required: true }),
                 new sap.m.DatePicker({
-                    value: "{HealthInsuranceModel>/travellers/" +
-                        (i - 1) + "/passportExpiryDate}",
+                    value: "{HealthInsuranceModel>/travellers/" + (i - 1) + "/dateOfBirth}",
                     valueFormat: "yyyy-MM-dd",
                     displayFormat: "dd/MM/yyyy",
-                    placeholder: "Select passport expiry date"
+                    placeholder: oBundle.getText("selectDateOfBirth")
+                }),
+                new sap.m.Label({ 
+                    text: oBundle.getText("passportExpiryDate"), 
+                    required: true 
+                }),
+                new sap.m.DatePicker({
+                    value: "{HealthInsuranceModel>/travellers/" + (i - 1) + "/passportExpiryDate}",
+                    valueFormat: "yyyy-MM-dd",
+                    displayFormat: "dd/MM/yyyy",
+                    placeholder: oBundle.getText("selectPassportExpiryDate")
                 }),
                 new sap.m.Label({
-    text: "Passport Attachment",
-    required: true
-}),
-new sap.ui.unified.FileUploader({
-    id: "passportUploader" + i,
-    width: "100%",
-    placeholder: "Choose passport document/image",
-    uploadOnChange: false,
-    change: this.onFileSelected.bind(this)
-})
+                    text: oBundle.getText("passportAttachment"),
+                    required: true
+                }),
+                new sap.ui.unified.FileUploader({
+                    id: "passportUploader" + i,
+                    width: "100%",
+                    placeholder: oBundle.getText("choosePassportDoc"),
+                    uploadOnChange: false,
+                    change: this.onFileSelected.bind(this)
+                })
             ]
         });
 
         var oSubSection = new sap.uxap.ObjectPageSubSection({
-            title: "Traveller " + i + " Details",
+            title: oBundle.getText("travellerDetailsTitle", [i]),
             blocks: [oForm]
         });
 
         var oSection = new sap.uxap.ObjectPageSection({
-            title: "Traveller " + i,
+            title: oBundle.getText("travellerTitle", [i]),
             subSections: [oSubSection]
         });
 
@@ -703,7 +855,7 @@ new sap.ui.unified.FileUploader({
     var aTravellers = oModel.getProperty("/travellers") || [];
 
     while (aTravellers.length < iCount) {
-        aTravellers.push({ fullName: "", dateOfBirth: "" });
+        aTravellers.push({ fullName: "", passportNumber: "", dateOfBirth: "", passportExpiryDate: "" });
     }
 
     aTravellers = aTravellers.slice(0, iCount);
