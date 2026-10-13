@@ -98,7 +98,6 @@
                                 id="idHome"
                                 horizontal="false"
                                 vertical="true"
-                                height="100%"
                                 class="sapUiContentPadding Homepage sapUiTinyMargin"
                             >
                                 <l:Grid
@@ -134,6 +133,7 @@
                                         />
                                     </HBox>
                                 </l:Grid>
+                                
                             </ScrollContainer>
                             <Page
                                 id="idRooms"
@@ -446,7 +446,7 @@
                                                 >
                                                     <core:Fragment
                                                         id="roomsFooter"
-                                                        fragmentName="sap.ui.com.project1.fragment.Footer"
+                                                        fragmentName="sap.ui.com.project1.fragment.quicklinks"
                                                         type="XML"
                                                     />
                                                 </VBox>
@@ -461,30 +461,24 @@
                                 horizontal="false"
                                 vertical="true"
                                 height="100%"
-                                class="sapUiContentPadding contactScrollWrapper"
                             >
                                 <core:Fragment
                                     fragmentName="sap.ui.com.project1.fragment.ContactPage"
                                     type="XML"
                                 />
-                                <!-- <VBox height="1rem" /> -->
-                            </ScrollContainer>
-                            <ScrollContainer
-                                id="idAdddata"
-                                horizontal="false"
-                                vertical="true"
-                                height="100%"
-                                class="sapUiContentPadding career-background sapUiTinyMargin"
-                            />
-                        </pages>
-                    </NavContainer>
-                    <VBox visible="{FooterModel>/showGlobalFooter}" class="footer-shell">
+                                    <VBox visible="{FooterModel>/showGlobalFooter}" class="sapUiMediumMarginTop">
                         <core:Fragment
-                            id="globalFooter"
-                            fragmentName="sap.ui.com.project1.fragment.Footer"
+                            fragmentName="sap.ui.com.project1.fragment.quicklinks"
                             type="XML"
                         />
                     </VBox>
+                                <!-- <VBox height="1rem" /> -->
+                            </ScrollContainer>
+                            
+                     
+                        </pages>
+                    </NavContainer>
+               
                 </items>
             </VBox>
         </tnt:mainContents>

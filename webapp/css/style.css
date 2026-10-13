@@ -9317,3 +9317,252 @@ text-transform: none !important;
         flex: none;
     }
 }
+
+/* Desktop: label and input in the same row */
+.memberDobItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.memberDobItem > .sapMLabel {
+    flex-shrink: 0;
+}
+
+/* Mobile: label above input */
+@media screen and (max-width: 600px) {
+    .memberDobItem {
+        width: 100% !important;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+
+    .memberDobItem > .sapMLabel {
+        width: 100% !important;
+        white-space: normal;
+    }
+
+    .memberDobItem > .sapMInputBase {
+        width: 100% !important;
+    }
+}
+/* Overall footer */
+.svFooter {
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    overflow: hidden;
+    border-radius: 16px 16px 12px 12px;
+}
+
+/* Insurance banner */
+.svInsuranceBanner {
+    background: #e3f7fa;
+    color: #31596b;
+    padding: 26px 2.5%;
+    gap: 20px;
+    border-bottom: 5px solid #13d3df;
+}
+
+.svInsuranceTitle {
+    color: #008b96 !important;
+    font-weight: 700;
+}
+
+.svInsuranceButtons {
+    gap: 12px;
+}
+
+.svHealthButton,
+.svTravelButton {
+    height: 52px;
+    border-radius: 13px;
+    padding: 0 16px;
+    font-weight: 700;
+}
+
+.svHealthButton {
+    background: #12cbdc !important;
+    border-color: #12cbdc !important;
+    color: #003b46 !important;
+    box-shadow: 0 4px 12px #008b9630;
+}
+
+.svTravelButton {
+    background: #ffffff !important;
+    border: 2px solid #009eae !important;
+    color: #008b96 !important;
+}
+
+/* Main teal area */
+.svFooterMain {
+    background: linear-gradient(120deg, #08a4b0, #0094a0);
+    padding: 40px 2.5% 30px;
+    gap: 30px;
+    box-sizing: border-box;
+}
+
+.svFooterColumn {
+    gap: 13px;
+    min-width: 150px;
+    flex: 1 1 15%;
+}
+
+.svBrandColumn {
+    flex: 1.5 1 25%;
+    min-width: 240px;
+}
+
+.svContactColumn {
+    flex: 1.3 1 22%;
+    min-width: 220px;
+}
+
+.svFooterColumn .sapMTitle,
+.svFooterColumn .sapMText,
+.svFooterColumn .sapMLnk {
+    color: #ffffff !important;
+}
+
+.svFooterColumn .sapMTitle {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.svFooterColumn .sapMLnk {
+    text-decoration: none;
+}
+
+.svFooterColumn .sapMLnk:hover {
+    text-decoration: underline;
+}
+
+/* Brand logo */
+.svBrandLogo {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 12px;
+    gap: 10px;
+    width: fit-content;
+    margin-bottom: 5px;
+}
+
+.svBrandName {
+    font-size: 25px;
+    white-space: nowrap;
+}
+
+.svBrandDescription {
+    max-width: 350px;
+    line-height: 1.7;
+}
+
+/* Social buttons */
+.svSocialLinks {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin: 3px auto 0;
+}
+
+.svSocialLinks .sapMBtn {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.svSocialLinks .sapMBtnInner {
+    background: #ffffff25 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.svSocialLinks .sapUiIcon {
+    color: #ffffff !important;
+}
+/* Contact information */
+.svContactRow {
+    gap: 14px;
+}
+
+.svContactRow > .sapUiIcon {
+    margin-top: 4px;
+    color: #ffffff;
+}
+
+.svContactRow .sapMText,
+.svContactRow .sapMLnk {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* Copyright bar */
+.svFooterBottom {
+    background: #007f8b;
+    border-top: 1px solid #ffffff25;
+    padding: 18px 2.5%;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+.svLanguageSelector {
+    gap: 12px;
+}
+
+.svLanguageSelector > .sapUiIcon {
+    color: #ffffff;
+}
+
+.svLanguageSelector .sapMSlt {
+    background: #ffffff;
+    border-radius: 11px;
+}
+
+.svLanguageSelector .sapMSltLabel,
+.svLanguageSelector .sapMSltArrow {
+    color: #003b46;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .svInsuranceBanner {
+        padding: 22px 18px;
+        align-items: flex-start;
+    }
+
+    .svInsuranceButtons {
+        width: 100%;
+    }
+
+    .svInsuranceButtons .sapMBtn {
+        flex: 1 1 100%;
+    }
+
+    .svFooterMain {
+        padding: 28px 20px;
+        gap: 28px;
+    }
+
+    .svFooterColumn,
+    .svBrandColumn,
+    .svContactColumn {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .svFooterBottom {
+        padding: 20px;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+.bottomtextcolor{
+  color: white;
+}

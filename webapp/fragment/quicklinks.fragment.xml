@@ -1,0 +1,168 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout">
+
+    <VBox class="svFooter" width="100%">
+
+        <!-- Insurance Banner -->
+        <HBox
+            class="svInsuranceBanner"
+            alignItems="Center"
+            justifyContent="SpaceBetween"
+            wrap="Wrap">
+
+            <VBox class="svInsuranceText">
+                <Title
+                    text="Protect your health and your trips"
+                    level="H4"
+                    class="svInsuranceTitle"/>
+
+                <Text
+                    text="Insurance is offered by our licensed partners. StayVriksha is not an insurer."/>
+            </VBox>
+
+            <HBox
+                alignItems="Center"
+                wrap="Wrap"
+                class="svInsuranceButtons">
+
+                <Button
+                    text="Buy health insurance"
+                    icon="sap-icon://heart"
+                    press="onBuyHealthInsurance"
+                    class="myUnifiedBtn sizebtn"/>
+
+                <Button
+                    text="Buy travel insurance"
+                    icon="sap-icon://shield"
+                    press="onBuyTravelInsurance"
+                    class="myUnifiedBtn"/>
+            </HBox>
+        </HBox>
+
+        <!-- Main Footer -->
+        <HBox
+            class="svFooterMain"
+            width="100%"
+            wrap="Wrap"
+            justifyContent="SpaceBetween"
+            alignItems="Start">
+
+            <!-- Company Information -->
+            <VBox class="svFooterColumn svBrandColumn">
+                <HBox
+                    class="svBrandLogo"
+                    alignItems="Center">
+
+                    <core:Icon
+                        src="sap-icon://globe"
+                        size="2rem"
+                        color="#36a852"/>
+
+                    <FormattedText
+                        htmlText="&lt;strong&gt;&lt;span style='color:#ff8c18'&gt;Stay&lt;/span&gt;&lt;span style='color:#008b96'&gt;Vriksha&lt;/span&gt;&lt;/strong&gt;"
+                        class="svBrandName"/>
+                </HBox>
+
+                <Text
+                    text="Find hostels, hotels, PGs and apartments you can trust."
+                    class="svBrandDescription"/>
+
+                <Title text="Follow us" level="H5"/>
+
+                <HBox class="svSocialLinks" alignItems="Center">
+                    <Button icon="sap-icon://camera" type="Transparent"
+                        tooltip="Instagram" press=".onInstagram"/>
+                    <Button icon="sap-icon://facebook" type="Transparent"
+                        tooltip="Facebook" press=".onFacebook"/>
+                    <Button icon="sap-icon://discussion-2" type="Transparent"
+                        tooltip="WhatsApp" press=".onWhatsApp"/>
+                    <Button icon="sap-icon://video" type="Transparent"
+                        tooltip="YouTube" press=".onYouTube"/>
+                    <Button icon="sap-icon://person-placeholder" type="Transparent"
+                        tooltip="LinkedIn" press=".onLinkedIn"/>
+                </HBox>
+            </VBox>
+
+            <!-- Quick Links -->
+            <VBox class="svFooterColumn">
+                <Title text="Quick links" level="H5"/>
+                <Link text="Home" press="onfooterhometabselect"/>
+                <Link text="Rooms" press="onfootertabselect"/>
+                <Link text="Contact" press="onfootercontacttabselect"/>
+                <Link text="User Manual" press="onUsermanualPress"/>
+                <Link text="Vendor Registration" press="onAdminSIGNUP"/>
+            </VBox>
+
+            <!-- Policies -->
+            <VBox class="svFooterColumn">
+                <Title text="Policies" level="H5"/>
+                <Link text="Terms &amp; Conditions" press="onPrivacyPolicyPress"/>
+                <Link text="Privacy Policy" press=".onFooterPrivacy"/>
+                <Link text="Cancellation &amp; Refund" press=".onFooterCancellation"/>
+                <Link text="Vendor Policy" press=".onFooterVendorPolicy"/>
+                <Link text="Grievance Redressal" press=".onFooterGrievance"/>
+            </VBox>
+
+            <!-- Contact Information -->
+            <VBox class="svFooterColumn svContactColumn">
+                <Title text="Contact us" level="H5"/>
+
+                <HBox alignItems="Start" class="svContactRow">
+                    <core:Icon src="sap-icon://email" size="1rem"/>
+                    <VBox>
+                        <Text text="Email"/>
+                        <Link
+                            text="admin@stayvriksha.in"
+                            href="mailto:admin@stayvriksha.in"/>
+                    </VBox>
+                </HBox>
+
+                <HBox alignItems="Start" class="svContactRow">
+                    <core:Icon src="sap-icon://map" size="1rem"/>
+                    <VBox>
+                        <Text text="Address"/>
+                        <Text
+                            text="111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- Copyright Bar -->
+        <HBox
+            class="svFooterBottom"
+            alignItems="Center"
+            justifyContent="SpaceBetween"
+            wrap="Wrap">
+
+            <Text text="© 2026 StayVriksha. All rights reserved." class="bottomtextcolor"/>
+<!-- 
+            <FormattedText
+                htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
+                
+                <core:HTML
+                    content="&lt;div class='footer-marquee myUnifiedBtn'&gt;
+                        &lt;a href='https://www.kalpavrikshatechnologies.com/'
+                        class='footer-text'
+                        target='_blank'&gt;
+                        {i18n&gt;devlopby}
+                        &lt;/a&gt;
+                        &lt;/div&gt;" />
+
+            <HBox alignItems="Center" class="svLanguageSelector">
+                <core:Icon src="sap-icon://globe" size="1.5rem"/>
+                <Select
+                    selectedKey="en"
+                    width="7rem"
+                    change="onLanguagePress">
+                    <core:Item key="en" text="English"/>
+                    <core:Item key="kn" text="ಕನ್ನಡ"/>
+                    <core:Item key="hi" text="हिन्दी"/>
+                </Select>
+            </HBox>
+        </HBox>
+
+    </VBox>
+</core:FragmentDefinition>

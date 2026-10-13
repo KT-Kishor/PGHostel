@@ -260,6 +260,7 @@ sap.ui.define([
                     this.closeBusyDialog();
                 }.bind(this), 3000);
             }
+            
         },
         onAfterAnimate: function () {
             var oHome = this.byId("idHome");
@@ -971,14 +972,37 @@ sap.ui.define([
                 oNav.to(oPage);
             }
         },
+     onfootertabselect: function () {
+    var oTabHeader = this.getView().byId("mainTabHeader");
 
+    oTabHeader.setSelectedKey("idRooms");
+
+          this.key="idRooms"
+          this.onTabSelect()
+},
+  onfooterhometabselect: function () {
+    var oTabHeader = this.getView().byId("mainTabHeader");
+
+    oTabHeader.setSelectedKey("idHome");
+
+          this.key="idHome"
+          this.onTabSelect()
+},
+ onfootercontacttabselect: function () {
+    var oTabHeader = this.getView().byId("mainTabHeader");
+
+    oTabHeader.setSelectedKey("idContact");
+
+          this.key="idContact"
+          this.onTabSelect()
+},
         onTabSelect: async function (oEvent) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
             oVisibilityModel.setProperty("/Branches", {})
             oVisibilityModel.setProperty("/ShowViewMore", false);
 
-            const sKey = oEvent.getParameter("item").getKey();
+            const sKey = oEvent? oEvent.getParameter("item").getKey() :  this.key;
             this._navigateTo(sKey);
             const page = this.byId(sKey);
             if (page && page.scrollTo) page.scrollTo(0, 0);
@@ -5557,6 +5581,45 @@ onUsermanualPress: function () {
 
     this._oFooterMenu.openBy(oEvent.getSource());
 },
- 
+
+onLanguagePress: function (oEvent) {
+    var sLocale = oEvent.getSource().getSelectedKey();
+    var oView = this.getView();
+
+    // Save selected language
+    localStorage.setItem("selectedLanguage", sLocale);
+
+    // Update SAPUI5 language configuration
+    sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+    // Create the resource model for the selected language
+    var oResourceModel = new sap.ui.model.resource.ResourceModel({
+        bundleName: "sap.ui.com.project1.i18n.i18n",
+        bundleLocale: sLocale
+    });
+
+    // Set the updated i18n model
+    oView.setModel(oResourceModel, "i18n");
+
+    // Update the resource bundle used in controller methods
+    this.i18nModel = oResourceModel.getResourceBundle();
+
+    // Refresh UI bindings
+},
+onBuyHealthInsurance:function() {
+              var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteHealthinsurance",{
+                sPath:"Hostel"
+            });
+    
+},
+onBuyTravelInsurance:function() {
+              var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteHealthinsurance",{
+                sPath:"Travel"
+            });
+    
+}
+
     });
 });
