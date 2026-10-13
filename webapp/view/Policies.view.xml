@@ -1,0 +1,161 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Policies"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    height="100%">
+
+    <Page id="page"
+          showHeader="true"
+          enableScrolling="true"
+          class="policyPage">
+
+        <!-- ===== Top bar ===== -->
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.BookingHeader"
+                type="XML" />
+        </headerContent>
+
+        <content>
+            <VBox class="policyRoot" fitContainer="true">
+
+                <!-- =====================  BANNER  ===================== -->
+                <VBox class="bannerWrap">
+                    <VBox class="bannerIn">
+                        <!-- Breadcrumb: the first two steps navigate, the last
+                             one is the policy that is currently open. -->
+                        <HBox class="crumb" alignItems="Center" wrap="Wrap">
+                            <Link text="{i18n>home}"
+                                  class="crumbLink"
+                                  tooltip="{i18n>home}"
+                                  press=".onCrumbHome"/>
+                            <Text text="/" class="crumbSep"/>
+                            <Link text="{i18n>policiesTitle}"
+                                  class="crumbLink"
+                                  tooltip="{i18n>policiesTitle}"
+                                  press=".onCrumbPolicies"/>
+                            <Text text="/" class="crumbSep"/>
+                            <Text text="{policies>/currentTab}" class="crumbCurrent"/>
+                        </HBox>
+
+                        <Title text="{policies>/currentTitle}"
+                               level="H1"
+                               class="bannerTitle"/>
+
+                        <Text text="{policies>/currentSubtitle}"
+                              class="bannerSub"/>
+
+                        <HBox id="policyTabs" class="tabs" wrap="Wrap"
+                              items="{policies>/policies}">
+                            <Button text="{policies>tab}"
+                                    icon="{policies>icon}"
+                                    press=".onTabPress"
+                                    class="tabBtn myUnifiedBtn">
+                                <customData>
+                                    <core:CustomData key="policyId"
+                                                     value="{policies>id}"
+                                                     writeToDom="true"/>
+                                </customData>
+                            </Button>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- =====================  MAIN  ===================== -->
+                <HBox class="mainWrap" alignItems="Start">
+
+                    <!-- ======== TOC ======== -->
+                    <!-- A Panel gives the header and the expand/collapse arrow, so
+                         "On this page" appears once on every screen size. -->
+                    <VBox class="tocCol" id="tocCol">
+                        <Panel id="tocPanel"
+                               class="tocPanel"
+                               expandable="true"
+                               expanded="true"
+                               headerText="On this page"
+                               expand=".onTocToggle"
+                               collapse=".onTocToggle"
+                               width="100%">
+                            <VBox class="tocBody" id="tocBody">
+                                <VBox id="tocList" class="tocList"
+                                      items="{policies>/currentSections}">
+                                    <Link text="{policies>number}. {policies>title}"
+                                          class="tocLink _link"
+                                          press=".onTocPress">
+                                        <customData>
+                                            <core:CustomData key="target"
+                                                             value="{policies>id}"
+                                                             writeToDom="true"/>
+                                        </customData>
+                                    </Link>
+                                </VBox>
+                            </VBox>
+                        </Panel>
+                    </VBox>
+
+                    <!-- ======== DOC ======== -->
+                    <VBox class="docCol">
+                        <VBox class="docCard">
+
+                            <!-- Shown only on the printed page -->
+                            <VBox class="printHeader">
+                                <Title text="{policies>/currentTitle}"
+                                       level="H1"
+                                       class="printTitle"/>
+                                <Text text="{policies>/currentSubtitle}"
+                                      class="printSub"/>
+                            </VBox>
+
+                            <HBox class="docMeta" justifyContent="SpaceBetween"
+                                  alignItems="Center" wrap="Wrap">
+                                <HBox class="metaChips" wrap="Wrap">
+                                    <Text class="chip"
+                                          wrapping="true"
+                                          text="Last updated: {policies>/currentUpdated}"/>
+                                    <Text class="chip"
+                                          wrapping="true"
+                                          text="Applies to hotels, hostels, PGs, apartments &amp; rentals"/>
+                                </HBox>
+                                <Button text="Print"
+                                        press=".onPrint"
+                                        class="printBtn myUnifiedBtn"/>
+                            </HBox>
+
+                            <!-- Everything below is the rendered policy HTML -->
+                            <VBox id="docHtmlWrap" class="docHtml">
+                                <core:HTML id="docHtml"
+                                           preferDOM="false"
+                                           content="{policies>/currentHtml}"/>
+                            </VBox>
+
+                            <!-- Pager -->
+                            <HBox class="pager" justifyContent="SpaceBetween"
+                                  alignItems="Center">
+                                <Button text="{policies>/prevTab}"
+                                        press=".onPrev"
+                                        type="Transparent"
+                                        visible="{= !!${policies>/prevId}}"
+                                        class="pagerBtn tealTextBtn"/>
+                                <Button text="{policies>/nextTab}"
+                                        press=".onNext"
+                                        visible="{= !!${policies>/nextId}}"
+                                        class="pagerBtn myUnifiedBtn"/>
+                            </HBox>
+
+                        </VBox>
+                    </VBox>
+
+                </HBox>
+
+                <!-- =====================  FOOTER  ===================== -->
+                <VBox class="policyFooter">
+                    <core:Fragment
+                        fragmentName="sap.ui.com.project1.fragment.Footer"
+                        type="XML" />
+                </VBox>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

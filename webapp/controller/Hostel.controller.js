@@ -5548,6 +5548,57 @@ onUsermanualPress: function () {
         });
 },
 
+onPoliciesPress: function () {
+    this.getOwnerComponent()
+        .getRouter()
+        .navTo("RoutePolicies");
+},
+
+        /**
+         * Opens the policy whose id is carried by the pressed control, so one
+         * handler serves every policy link in the footer.
+         */
+        onPolicyLinkPress: function (oEvent) {
+            var sPolicyId = oEvent.getSource().data("policyId");
+
+            if (sPolicyId) {
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo("RoutePoliciesTab", { policyId: sPolicyId });
+            }
+        },
+
+        /**
+         * The footer menu entries for the individual policies. Each item carries
+         * its policy id in custom data, so the shared onPolicyLinkPress opens the
+         * matching tab. Labels come from the same i18n keys the desktop links use.
+         */
+        _policyMenuItems: function () {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
+            var aPolicies = [
+                { id: "terms", key: "policyLinkTerms", icon: "sap-icon://document-text" },
+                { id: "privacy", key: "policyLinkPrivacy", icon: "sap-icon://locked" },
+                { id: "refund", key: "policyLinkRefund", icon: "sap-icon://undo" },
+                { id: "vendor", key: "policyLinkVendor", icon: "sap-icon://home" },
+                { id: "grievance", key: "policyLinkGrievance", icon: "sap-icon://comment" }
+            ];
+
+            return aPolicies.map(function (oPolicy) {
+                var oItem = new sap.m.MenuItem({
+                    text: oBundle.getText(oPolicy.key),
+                    icon: oPolicy.icon,
+                    press: this.onPolicyLinkPress.bind(this)
+                });
+
+                oItem.addCustomData(new sap.ui.core.CustomData({
+                    key: "policyId",
+                    value: oPolicy.id
+                }));
+
+                return oItem;
+            }, this);
+        },
+
         // for 3dot on mobile device footer menu
       onFooterMenuPress: function (oEvent) {
 
@@ -5562,18 +5613,17 @@ onUsermanualPress: function () {
                     press: this.onUsermanualPress.bind(this)
                 }),
                 new sap.m.MenuItem({
-                    text: "Terms and Conditions",
-                    icon: "sap-icon://document-text",
-                    press: this.onPrivacyPolicyPress.bind(this)
-                }),
-
+                    text: "Policies",
+                    icon: "sap-icon://shield",
+                    press: this.onPoliciesPress.bind(this)
+                })
+            ].concat(this._policyMenuItems()).concat([
                 new sap.m.MenuItem({
                     text: "Vendor Registration",
                     icon: "sap-icon://employee",
                     press: this.onAdminSIGNUP.bind(this)
                 })
-
-            ]
+            ])
         });
 
         this.getView().addDependent(this._oFooterMenu);

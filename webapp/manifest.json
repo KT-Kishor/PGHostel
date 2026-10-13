@@ -528,6 +528,20 @@
           "target": [
             "targetNewManual"
           ]
+        },
+        {
+          "name": "RoutePolicies",
+          "pattern": "Policies",
+          "target": [
+            "targetPolicies"
+          ]
+        },
+        {
+          "name": "RoutePoliciesTab",
+          "pattern": "Policies/{policyId}",
+          "target": [
+            "targetPolicies"
+          ]
         }
       ],
       "targets": {
@@ -887,6 +901,13 @@
           "clearControlAggregation": false,
           "viewId": "NewManual",
           "viewName": "NewManual"
+        },
+         "targetPolicies": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Policies",
+          "viewName": "Policies"
         }
       }
     },

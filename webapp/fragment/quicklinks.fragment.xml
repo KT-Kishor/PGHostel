@@ -97,12 +97,50 @@
 
             <!-- Policies -->
             <VBox class="svFooterColumn">
-                <Title text="Policies" level="H5"/>
-                <Link text="Terms &amp; Conditions" press="onPrivacyPolicyPress"/>
-                <Link text="Privacy Policy" press=".onFooterPrivacy"/>
-                <Link text="Cancellation &amp; Refund" press=".onFooterCancellation"/>
-                <Link text="Vendor Policy" press=".onFooterVendorPolicy"/>
-                <Link text="Grievance Redressal" press=".onFooterGrievance"/>
+                <Link
+                    text="Policies"
+                    press="onPoliciesPress"
+                    class="svFooterColumnTitle"/>
+                <Link text="Terms &amp; Conditions" press="onPolicyLinkPress">
+                    <customData>
+                        <core:CustomData
+                            key="policyId"
+                            value="terms"
+                            writeToDom="true"/>
+                    </customData>
+                </Link>
+                <Link text="Privacy Policy" press="onPolicyLinkPress">
+                    <customData>
+                        <core:CustomData
+                            key="policyId"
+                            value="privacy"
+                            writeToDom="true"/>
+                    </customData>
+                </Link>
+                <Link text="Cancellation &amp; Refund" press="onPolicyLinkPress">
+                    <customData>
+                        <core:CustomData
+                            key="policyId"
+                            value="refund"
+                            writeToDom="true"/>
+                    </customData>
+                </Link>
+                <Link text="Vendor Policy" press="onPolicyLinkPress">
+                    <customData>
+                        <core:CustomData
+                            key="policyId"
+                            value="vendor"
+                            writeToDom="true"/>
+                    </customData>
+                </Link>
+                <Link text="Grievance Redressal" press="onPolicyLinkPress">
+                    <customData>
+                        <core:CustomData
+                            key="policyId"
+                            value="grievance"
+                            writeToDom="true"/>
+                    </customData>
+                </Link>
             </VBox>
 
             <!-- Contact Information -->

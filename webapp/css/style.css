@@ -1,4 +1,4 @@
-/* Premium Card Styling - Isse depth aayegi */
+﻿/* Premium Card Styling - Isse depth aayegi */
 .adPanel, .couponPanel {
     background: #ffffff !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
@@ -8141,7 +8141,9 @@ text-transform: none !important;
   font-weight: 550;
 }
 
-/* Unified typography for the footer text links and Vendor Registration button */
+/* Unified typography for the footer text links and Vendor Registration button.
+   The weight is kept at 500 for every item so a short label (e.g. "Policies")
+   does not read lighter than its longer neighbours. */
 .footer-shell .footerActionLink.sapMLnk,
 .footer-shell .footerActionLink .sapMLnkText,
 .footer-shell .footerActionLink bdi,
@@ -8150,7 +8152,7 @@ text-transform: none !important;
 .footer-shell .fa-admin-btn .sapMBtnContent span {
   font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
   font-size: 0.875rem !important;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   line-height: 1.5 !important;
 }
 
@@ -9431,6 +9433,16 @@ text-transform: none !important;
     margin-bottom: 5px;
 }
 
+/* The "Policies" column heading is itself a link to the Policies page, so it
+   keeps the title look instead of the plain link look. */
+.svFooterColumn .svFooterColumnTitle.sapMLnk {
+    font-weight: 700;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    text-decoration: none !important;
+}
+
 .svFooterColumn .sapMLnk {
     text-decoration: none;
 }
@@ -9565,4 +9577,791 @@ text-transform: none !important;
 }
 .bottomtextcolor{
   color: white;
+}
+
+
+/* ===== StayVriksha Policies page (added) ===== */
+/* ============================================================
+   StayVriksha â€” Policies page
+   Palette aligned with the project style.css:
+     #00b7c7 (light teal)   #008b96 (dark teal)   #007984 (deep teal)
+   ============================================================ */
+
+:root {
+    --sv-teal-1:    #00b7c7;
+    --sv-teal-2:    #008b96;
+    --sv-teal-dark: #007984;
+    --sv-cyan:      #00b7c7;
+    --sv-cyan-soft: #e4f5f7;
+    --sv-ink:       #0F2740;
+    --sv-muted:     #5A6D82;
+    --sv-paper:     #ffffff;
+    --sv-page:      #f2f6fa;
+    --sv-line:      #DCE6EF;
+    --sv-radius:    22px;
+    --sv-shadow:    0 4px 14px rgba(0, 110, 125, .18);
+}
+
+/* ---------- Page shell ---------- */
+.policyPage .sapMPageEnableScrolling {
+    background: var(--sv-page);
+}
+.policyRoot {
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+/* The header is the shared BookingHeader fragment, so UI5 positions the
+   scrolling area below it. No fixed offset is applied here: a hard-coded value
+   would no longer match the header's measured height. */
+
+.policyPage .policyFooter {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    flex-shrink: 0;
+    margin-top: 10px;
+}
+
+.policyPage .policyFooter .footer-shell {
+    margin-bottom: 0 !important;
+}
+
+/* On the Policies page the footer keeps only the developer credit and the
+   Instagram link, on desktop and mobile alike. */
+.policyPage .policyFooter .desktopFooterItem {
+    display: none !important;
+}
+/* The 3-dot menu only repeats what the page already offers (the policy tabs,
+   the index and the breadcrumb), so it is dropped here too. Without this the
+   button is shown once the footer switches to its <=600px layout, and its menu
+   lists User Manual / Policies / every policy link. */
+.policyPage .policyFooter .mobileFooterMenu {
+    display: none !important;
+}
+
+/* ---------- Header ---------- */
+.siteHeader {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #fff;
+    border-bottom: 1px solid var(--sv-line);
+}
+.headIn {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 10px 24px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.logo .logoMark { color: #2f9e44; }
+.logoText {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f28c1b !important;
+    margin-left: 6px;
+}
+.signinBtn .sapMBtnInner {
+    background: var(--sv-cyan) !important;
+    color: #003c44 !important;
+    border: 3px solid #0078c8 !important;
+    border-radius: 10px !important;
+    font-weight: 700;
+    box-shadow: var(--sv-shadow);
+}
+.signinBtn:hover .sapMBtnInner {
+    background: #00c4d6 !important;
+}
+.mainNav {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 6px;
+    gap: 30px;
+}
+.navLink.sapMLnk {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111 !important;
+    text-decoration: none !important;
+    padding: 8px 4px;
+    border-bottom: 3px solid transparent;
+}
+.navLink.sapMLnk:hover {
+    color: var(--sv-teal-1) !important;
+    border-color: var(--sv-teal-1);
+}
+
+/* ---------- Banner ---------- */
+.bannerWrap {
+    max-width: 100%;
+    margin: 6px 0 0;
+    padding: 0 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.bannerIn {
+    background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    border-radius: 14px;
+    padding: 22px 24px 20px;
+    color: #fff;
+    box-shadow: var(--sv-shadow);
+    width: 100%;
+    box-sizing: border-box;
+}
+.crumb,
+.crumb .sapMText {
+    font-size: 14px;
+    opacity: .9;
+    color: #fff !important;
+    margin-bottom: 4px;
+}
+/* Breadcrumb steps: the navigable ones look like plain text until hovered. */
+.crumb .crumbLink.sapMLnk,
+.crumb .crumbLink .sapMLnkText {
+    font-size: 14px;
+    color: #fff !important;
+    text-decoration: none !important;
+    line-height: 1.4;
+}
+.crumb .crumbLink.sapMLnk {
+    height: auto !important;
+    padding: 0 !important;
+}
+.crumb .crumbLink.sapMLnk:hover .sapMLnkText,
+.crumb .crumbLink.sapMLnk:focus .sapMLnkText {
+    text-decoration: underline !important;
+}
+/* The separator sits between the steps with even spacing on both sides. */
+.crumb .crumbSep {
+    color: #fff !important;
+    opacity: .7;
+    margin: 0 6px;
+}
+/* The open policy is the current step: not a link, and slightly stronger. */
+.crumb .crumbCurrent {
+    color: #fff !important;
+    font-weight: 600;
+}
+.bannerTitle.sapMTitle,
+.bannerTitle .sapMTitle {
+    color: #fff !important;
+    font-size: clamp(26px, 4vw, 38px) !important;
+    line-height: 1.2;
+    font-weight: 700;
+    text-shadow: none;
+}
+.bannerSub,
+.bannerSub .sapMText {
+    margin-top: 6px;
+    max-width: 62ch;
+    color: #fff !important;
+    opacity: .95;
+    font-size: 15px;
+}
+
+/* Tabs */
+.tabs {
+    margin-top: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+/* Tabs: the current one keeps the filled .myUnifiedBtn look, the others are
+   recessed to read as plain links on the banner. */
+.tabBtn .sapMBtnInner {
+    align-items: center;
+    border: 0 !important;
+}
+.tabBtn .sapMBtnIcon {
+    line-height: inherit;
+    align-self: center;
+}
+.tabBtn:not(.tabActive) .sapMBtnInner {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+.tabBtn:not(.tabActive) .sapMBtnContent,
+.tabBtn:not(.tabActive) .sapMBtnIcon {
+    color: #fff !important;
+    font-weight: 600;
+    text-shadow: none;
+}
+.tabBtn.tabActive .sapMBtnInner {
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25) !important;
+}
+
+/* ---------- Main layout ---------- */
+.mainWrap {
+    display: grid !important;
+    grid-template-columns: 290px minmax(0, 1fr);
+    gap: 11px;
+    align-items: start;
+    max-width: 100%;
+    margin: 8px 0 10px;
+    padding: 0 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ---------- TOC ---------- */
+.tocCol {
+    position: sticky;
+    /* Sticky offsets are relative to the page's scroll container, which already
+       starts below the header, so this is the gap under the header. Once the
+       banner scrolls away the index pins here, so the gap is kept tiny to match
+       the small margin it has while the banner is still visible. */
+    top: 8px;
+    align-self: start;
+    width: 100%;
+    min-height: 0;
+    /* The gap under the banner already comes from .mainWrap, so the column adds
+       none of its own: that keeps the index level with the document card. */
+    margin-top: 0;
+}
+.tocBody {
+    background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    padding: 0 12px 10px;
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* The index panel: teal header with an expand/collapse arrow, and a body that
+   scrolls inside the space left between the header area and the sticky footer.
+   The value below is a fallback; the controller refines it with the measured
+   space (see _fitToc). */
+.policyPage .tocPanel {
+    border: 3px solid var(--sv-cyan);
+    border-radius: var(--sv-radius);
+    overflow: hidden;
+    box-shadow: var(--sv-shadow);
+    /* Backstop for the rounded bottom corners: UI5 rounds the panel content to
+       the full outer radius while the 3px border takes a slice of it, so the
+       panel background shows through there. A teal background keeps those
+       corner pixels teal instead of exposing the page behind them. */
+    background: var(--sv-teal-2);
+}
+/* The content is rounded by UI5 to the panel's outer radius; matching it to the
+   inner radius keeps it flush against the border so no sliver appears at the
+   bottom corners. */
+.policyPage .tocPanel > .sapMPanelContent {
+    border-radius: 0 0 calc(var(--sv-radius) - 3px) calc(var(--sv-radius) - 3px) !important;
+}
+/* Panel header: the clickable bar is .sapMPanelWrappingDiv and it holds the
+   expand/collapse arrow. It is laid out as a row so the label stays left and
+   the arrow is pushed to the right edge. */
+.policyPage .tocPanel .sapMPanelWrappingDiv,
+.policyPage .tocPanel .sapMPanelWrappingDivExpanded,
+.policyPage .tocPanel .sapMPanelWrappingDivTb,
+.policyPage .tocPanel .sapMPanelHdr {
+    background: var(--sv-teal-1) !important;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 17px;
+    border-bottom: 0;
+}
+.policyPage .tocPanel .sapMPanelWrappingDiv {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.policyPage .tocPanel .sapMPanelWrappingDiv > .sapMPanelHdr {
+    flex: 1 1 auto;
+    min-width: 0;
+    /* The arrow is absolutely positioned, so clear the left indent UI5 applies
+       for it and reserve room on the right instead. */
+    margin-left: 0 !important;
+    /* UI5 removes the header indent on an expandable panel, which left the label
+       touching the border on small screens. The indent is set here instead, and
+       matches where the index entries start: 12px of list padding plus the 10px
+       inside each entry. */
+    padding-left: calc(12px + 10px) !important;
+    padding-right: 40px;
+}
+/* Arrow at the right end of the header. UI5 positions it absolutely for the
+   expandable panel, so it is moved by overriding that position. */
+.policyPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
+    left: auto !important;
+    right: 12px !important;
+    margin-right: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+}
+.policyPage .tocPanel .sapMPanelWrappingDiv .sapMTitle,
+.policyPage .tocPanel .sapMPanelWrappingDiv .sapMText,
+.policyPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon,
+.policyPage .tocPanel .sapMPanelHdr .sapUiIcon {
+    color: #fff !important;
+    font-weight: 700;
+}
+.policyPage .tocBody {
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* The panel scrolls internally to keep the current entry in view, but the
+       track is not shown: the active entry is centred automatically. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.policyPage .tocBody::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+.policyPage .tocPanel .sapMPanelContent {
+    background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    padding: 0;
+}
+/* The index is always expanded on desktop: the controller makes the Panel
+   non-expandable there, so no arrow is rendered and no space is reserved. */
+@media (min-width: 901px) {
+    .policyPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
+        display: none !important;
+    }
+    .policyPage .tocPanel .sapMPanelWrappingDiv {
+        cursor: default;
+    }
+}
+.tocList {
+    width: 100%;
+}
+/* Index entries: colours come from ._link (idle) and .tealTextLink (current) */
+.tocLink.sapMLnk {
+    display: block;
+    text-decoration: none !important;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 14.5px;
+    line-height: 1.35;
+    height: auto !important;
+}
+.tocLink.sapMLnk .sapMLnkText {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere;
+}
+/* Hover feedback is limited to pointers that really hover. On touch devices
+   :hover stays applied after a tap, which left the last tapped entry looking
+   highlighted after it was no longer the current one. */
+@media (hover: hover) and (pointer: fine) {
+    .tocLink.sapMLnk:hover {
+        background: rgba(255, 255, 255, .18);
+    }
+}
+.tocLink.sapMLnk.active {
+    background: #fff;
+    font-weight: 700;
+}
+
+/* Never show the UI5 focus highlight (the blue box), and never keep a fill
+   from focus/press: the active entry is the only filled one. This must not be
+   limited to fine pointers, otherwise touch devices fall back to the theme's
+   blue focus background. */
+.tocLink.sapMLnk:focus,
+.tocLink.sapMLnk:focus-visible,
+.tocLink.sapMLnk:focus-within,
+.tocLink.sapMLnk:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    -webkit-tap-highlight-color: transparent;
+}
+/* A real pointer gets a subtle fill while pressing or focusing. */
+@media (hover: hover) and (pointer: fine) {
+    .tocLink.sapMLnk:focus,
+    .tocLink.sapMLnk:focus-visible,
+    .tocLink.sapMLnk:active {
+        background: rgba(255, 255, 255, .18) !important;
+        background-color: rgba(255, 255, 255, .18) !important;
+    }
+}
+.tocLink.sapMLnk.active,
+.tocLink.sapMLnk.active:focus,
+.tocLink.sapMLnk.active:focus-visible,
+.tocLink.sapMLnk.active:focus-within,
+.tocLink.sapMLnk.active:active,
+.tocLink.sapMLnk.active:hover {
+    background: #fff !important;
+    background-color: #fff !important;
+    border-radius: 8px !important;
+}
+.tocLink.sapMLnk::selection,
+.tocLink.sapMLnk *::selection {
+    background: transparent;
+    color: inherit;
+}
+
+/* The Panel header is the only index header, so the arrow sits next to the
+   label on every screen size. */
+.policyPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon {
+    margin-right: 6px;
+}
+
+/* ---------- Document card ---------- */
+.docCol {
+    min-width: 0;
+    width: 100%;
+}
+.docCard {
+    background: var(--sv-paper);
+    border: 3px solid var(--sv-cyan);
+    border-radius: var(--sv-radius);
+    padding: clamp(12px, 1.2vw, 18px);
+    box-shadow: var(--sv-shadow);
+    width: 100%;
+    box-sizing: border-box;
+}
+.docMeta {
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.metaChips {
+    gap: 10px;
+    flex-wrap: wrap;
+    /* Lets the chips shrink with the card instead of overflowing its border. */
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.chip {
+    background: var(--sv-cyan-soft);
+    color: var(--sv-teal-dark) !important;
+    border-radius: 8px;
+    padding: 5px 13px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+    /* Text wraps to the next line when the card is narrower than the label
+       instead of running past its border. */
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+/* sap.m.Text keeps its own nowrap class unless wrapping is on, which would
+   outrank the rule above. */
+.chip.sapMTextNoWrap {
+    white-space: normal !important;
+}
+/* Print: colours come from .myUnifiedBtn */
+.printBtn .sapMBtnInner {
+    border: 0 !important;
+    border-radius: 10px !important;
+    font-weight: 700;
+}
+
+/* ---------- Rendered policy HTML ---------- */
+.docHtml { display: block; }
+
+.docHtml .glance {
+    background: var(--sv-cyan-soft);
+    border-left: 6px solid var(--sv-teal-1);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 0 0 28px;
+}
+.docHtml .glance h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    border: 0;
+    padding: 0;
+    color: var(--sv-teal-dark);
+    background: transparent;
+}
+.docHtml .glance ul {
+    margin: 6px 0 0;
+    padding-left: 20px;
+}
+.docHtml .glance li { margin: 4px 0; }
+
+.docHtml section { padding: 6px 0 4px; }
+
+.docHtml h2 {
+    font-size: 22px;
+    margin: 30px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--sv-line);
+    color: var(--sv-teal-dark);
+    line-height: 1.3;
+    scroll-margin-top: 24px;
+}
+.docHtml h2 .n {
+    display: inline-block;
+    min-width: 34px;
+    /* Same colour as the heading text: inherited from the h2 rule above, so a
+       section reads as one title ("1. Introduction and Acceptance"). */
+    color: inherit;
+}
+
+.docHtml p,
+.docHtml li {
+    max-width: 100%;
+    color: var(--sv-ink);
+    line-height: 1.65;
+    font-size: 16px;
+}
+.docHtml ul { padding-left: 22px; }
+.docHtml li { margin: 5px 0; }
+.docHtml li::marker { color: var(--sv-teal-1); }
+
+.docHtml a {
+    color: var(--sv-teal-dark);
+    text-decoration: none;
+}
+.docHtml a:hover { text-decoration: underline; }
+
+/* Definition list */
+.docHtml .def {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    border: 1px solid var(--sv-line);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+.docHtml .def dt,
+.docHtml .def dd {
+    margin: 0;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--sv-line);
+}
+.docHtml .def dt {
+    background: var(--sv-cyan-soft);
+    font-weight: 700;
+    color: var(--sv-teal-dark);
+}
+.docHtml .def dt:last-of-type,
+.docHtml .def dd:last-of-type { border-bottom: 0; }
+
+/* Contact card */
+.docHtml .contact-card {
+    margin-top: 28px;
+    background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    color: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+}
+.docHtml .contact-card h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    color: #fff;
+}
+.docHtml .contact-card a {
+    color: #fff;
+    font-weight: 700;
+}
+.docHtml .contact-card p {
+    margin: 3px 0;
+    color: #fff;
+    max-width: none;
+}
+
+/* ---------- Pager ---------- */
+.pager {
+    margin-top: 26px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+/* Pager: colours come from .tealTextBtn / .myUnifiedBtn */
+.pagerBtn .sapMBtnInner {
+    border-radius: 10px !important;
+    font-weight: 700;
+}
+
+/* ---------- Footer ---------- */
+.siteFooter {
+    max-width: 1280px;
+    margin: 0 auto 16px;
+    padding: 16px 24px;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+    background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    border-radius: 14px;
+    color: #fff;
+    gap: 14px;
+}
+.siteFooter > .sapMText { color: #fff !important; }
+.footLinks {
+    gap: 6px 18px;
+    flex-wrap: wrap;
+}
+.footLink.sapMLnk {
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none !important;
+}
+.footLink.sapMLnk:hover {
+    text-decoration: underline !important;
+    color: #fff !important;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 900px) {
+    .mainWrap {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+    }
+
+    .tocCol {
+        position: static;
+        top: auto;
+    }
+
+    .tocBody {
+        max-height: none;
+        padding: 0 0 12px;
+    }
+
+    /* Single column: the index sits in the page flow and expands fully, so the
+       capped, internally scrolling panel is disabled here. Overscroll must also
+       be released, otherwise a swipe over the index does not scroll the page. */
+    .policyPage .tocBody {
+        max-height: none;
+        overflow: visible;
+        overscroll-behavior: auto;
+        touch-action: auto;
+    }
+
+    .tocLink.sapMLnk { padding: 7px 12px; }
+
+    .docHtml .def {
+        grid-template-columns: 1fr;
+    }
+    .docHtml .def dt {
+        border-bottom: 0;
+        padding-bottom: 2px;
+    }
+
+    .navLink.sapMLnk { font-size: 16px; }
+    .bannerIn { padding: 14px 14px 12px; }
+    .docCard { padding: 10px 12px; }
+}
+
+/* Print-only heading, hidden on screen */
+.printHeader {
+    display: none;
+}
+
+/* ---------- Print ---------- */
+@media print {
+    /* Release the app's scroll container and its fixed-height ancestors so the
+       whole policy prints instead of only the part visible on screen. */
+    html,
+    body,
+    .sapUiBody,
+    .sapUiComponentContainer,
+    .sapMApp,
+    .sapMNav,
+    .sapMNavItem,
+    .sapUiView,
+    .sapUiXMLView,
+    .sapMNavContainer,
+    .sapMPage,
+    .policyPage,
+    .policyPage > section,
+    .policyPage .sapMPageEnableScrolling {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+    .policyRoot {
+        min-height: 0 !important;
+    }
+
+    /* Screen-only chrome */
+    .siteHeader,
+    .policyPage .sapMPageHeader,
+    .bannerWrap,
+    .tocCol,
+    .siteFooter,
+    .policyFooter,
+    .umTopbar,
+    .docMeta,
+    .pager,
+    .printBtn {
+        display: none !important;
+    }
+
+    .mainWrap {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+    }
+    .docCol {
+        width: 100% !important;
+    }
+    .docCard {
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    /* Printed heading above the document */
+    .printHeader {
+        display: block !important;
+        margin: 0 0 14px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--sv-teal-1);
+    }
+    .printTitle.sapMTitle,
+    .printTitle .sapMTitle {
+        font-size: 22pt !important;
+        color: var(--sv-teal-dark) !important;
+        font-weight: 700 !important;
+    }
+    .printSub.sapMText,
+    .printSub .sapMText {
+        font-size: 11pt !important;
+        color: #4a5568 !important;
+    }
+
+    /* Readable flow: keep headings with their text and avoid splitting blocks */
+    .docHtml {
+        display: block !important;
+    }
+    .docHtml .policyDoc {
+        display: block !important;
+    }
+    .docHtml section {
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+    .docHtml h2 {
+        break-after: avoid-page;
+        page-break-after: avoid;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    .docHtml .glance,
+    .docHtml .def,
+    .docHtml .contact-card {
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+    }
+    .docHtml p,
+    .docHtml li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    body,
+    .sapUiBody {
+        background: #fff !important;
+    }
 }
