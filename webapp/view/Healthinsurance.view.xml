@@ -9,6 +9,15 @@
     xmlns:u="sap.ui.unified"
     xmlns:m="sap.m"
 >
+		<Page
+			showHeader="true"
+			>
+                <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
     <uxap:ObjectPageLayout
         id="insuranceObjectPage"
         showTitleInHeaderContent="true"
@@ -16,6 +25,7 @@
         showAnchorBar="true"
         showFooter="true"
         upperCaseAnchorBar="false"
+
     >
         <uxap:headerTitle>
             <uxap:ObjectPageDynamicHeaderTitle>
@@ -461,7 +471,7 @@
 
                 <Button
                     text="{i18n>CancelButton}"
-                    press="onCancelPress"
+                    press="onNavBack"
                     class="myUnifiedBtn"
                 />
 
@@ -481,4 +491,6 @@
             </OverflowToolbar>
         </uxap:footer>
     </uxap:ObjectPageLayout>
+    		</Page>
+
 </mvc:View>

@@ -570,20 +570,25 @@ if (!bHasAttachment) {
         this.closeBusyDialog();
     }
 },
-onCancelPress:function(){
-    sap.m.MessageBox.information(   
-    this.i18nModel.getText("Areyousurewanttoexitthepage"),
-    {
-        title: this.i18nModel.getText("confirmCancellation"),
-        onClose: function (sAction) {
-            if (sAction === sap.m.MessageBox.Action.OK) {
-                this.getOwnerComponent()
-                    .getRouter()
-                    .navTo("RouteHostel");
-            }
-        }.bind(this)
-    }
-)
+onNavBack: function () {
+    sap.m.MessageBox.information(
+        this.i18nModel.getText("Areyousurewanttoexitthepage"),
+        {
+            title: this.i18nModel.getText("confirmCancellation"),
+            actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+            emphasizedAction: sap.m.MessageBox.Action.OK,
+
+            onClose: function (sAction) {
+                if (sAction === sap.m.MessageBox.Action.OK) {
+                    this.getOwnerComponent()
+                        .getRouter()
+                        .navTo("RouteHostel");
+                }
+            }.bind(this),
+
+            styleClass: "myUnifiedBtn  "
+        }
+    );
 },
 
 
@@ -751,6 +756,7 @@ onTravellerCountChange: function (oEvent) {
     var iCount = oEvent
         ? (parseInt(oEvent.getParameter("value"), 10) || 1)
         : 1;
+
     iCount = Math.max(1, Math.min(10, iCount));
 
     var oView = this.getView();
@@ -860,7 +866,21 @@ onTravellerCountChange: function (oEvent) {
 
     aTravellers = aTravellers.slice(0, iCount);
     oModel.setProperty("/travellers", aTravellers);
-}
+},
+  onHome: function () {
+            const oUser = this._oLoggedInUser;
+            const oUIModel = this.getOwnerComponent().getModel("UIModel");
+
+            if (oUser && oUser.UserID) {
+                oUIModel.setProperty("/isLoggedIn", true);
+            } else {
+                oUIModel.setProperty("/isLoggedIn", false);
+            }
+            var oRouter = this.getOwnerComponent().getRouter()
+            oRouter.navTo("RouteHostel")
+
+        },
+
 	
 
 		

@@ -31,13 +31,13 @@
                     text="Buy health insurance"
                     icon="sap-icon://heart"
                     press="onBuyHealthInsurance"
-                    class="myUnifiedBtn insuranceBuyBtn"/>
+                    class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
 
                 <Button
                     text="Buy travel insurance"
                     icon="sap-icon://shield"
                     press="onBuyTravelInsurance"
-                    class="myUnifiedBtn insuranceBuyBtn"/>
+                    class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
             </HBox>
         </HBox>
 
@@ -150,7 +150,7 @@
                 <Title text="Contact us" level="H5"/>
 
                 <HBox alignItems="Start" class="svContactRow">
-                    <core:Icon src="sap-icon://email" size="1rem"/>
+                    <core:Icon src="sap-icon://email" size="1rem" class="globecss"/>
                     <VBox>
                         <Text text="Email"/>
                         <Link
@@ -160,7 +160,7 @@
                 </HBox>
 
                 <HBox alignItems="Start" class="svContactRow">
-                    <core:Icon src="sap-icon://map" size="1rem"/>
+                    <core:Icon src="sap-icon://map" size="1rem" class="globecss"/>
                     <VBox>
                         <Text text="Address"/>
                         <Text
@@ -183,7 +183,7 @@
                 htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
                 
                 <core:HTML
-                    content="&lt;div class='footer-marquee myUnifiedBtn'&gt;
+                    content="&lt;div class='myUnifiedBtn'&gt;
                         &lt;a href='https://www.kalpavrikshatechnologies.com/'
                         class='footer-text'
                         target='_blank'&gt;
@@ -192,16 +192,19 @@
                         &lt;/div&gt;" />
 
             <HBox alignItems="Center" class="svLanguageSelector">
-                <core:Icon src="sap-icon://globe" size="1.5rem" />
-                <Select
+                <core:Icon src="sap-icon://globe" size="1.5rem" class="globecss"/>
+                <ComboBox
                     selectedKey="en"
                     width="7rem"
-                    change="onLanguagePress">
+                    change="onLanguagePress"
+                    class="comboBoxcss"
+                    >
                     <core:Item key="en" text="English"/>
                     <core:Item key="kn" text="ಕನ್ನಡ"/>
                     <core:Item key="hi" text="हिन्दी"/>
-                </Select>
+                </ComboBox>
             </HBox>
+            
         </HBox>
 
     </VBox>
