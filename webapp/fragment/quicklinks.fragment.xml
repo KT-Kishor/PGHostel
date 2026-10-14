@@ -14,12 +14,12 @@
 
             <VBox class="svInsuranceText">
                 <Title
-                    text="Protect your health and your trips"
+                    text="{i18n>Protectyourhealthandyourtrips}"
                     level="H4"
                     class="svInsuranceTitle"/>
 
                 <Text
-                    text="Insurance is offered by our licensed partners. StayVriksha is not an insurer."/>
+                    text="{i18n>InsuranceisofferedbyourlicensedpartnersStayVrikshaisnotaninsurer}"/>
             </VBox>
 
             <HBox
@@ -28,13 +28,13 @@
                 class="svInsuranceButtons">
 
                 <Button
-                    text="Buy health insurance"
+                    text="{i18n>Buyhealthinsurance}"
                     icon="sap-icon://heart"
                     press="onBuyHealthInsurance"
                     class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
 
                 <Button
-                    text="Buy travel insurance"
+                    text="{i18n>Buytravelinsurance}"
                     icon="sap-icon://shield"
                     press="onBuyTravelInsurance"
                     class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
@@ -61,17 +61,17 @@
         width="40px" 
         height="30px"
         class="svBrandIcon" />
-                    <FormattedText
-                        htmlText="&lt;strong&gt;&lt;span style='color:#ff8c18'&gt;Stay&lt;/span&gt;&lt;span style='color:#008b96'&gt;Vriksha&lt;/span&gt;&lt;/strong&gt;"
-                        class="svBrandName"/>
+                 <FormattedText
+    htmlText="{i18n>stayVrikshaBrand}"
+    class="svBrandName"/>
                         
                 </HBox>
 
                 <Text
-                    text="Find hostels, hotels, PGs and apartments you can trust."
+                    text="{i18n>FindhostelshotelsPGsandapartmentsyoucantrust}"
                     class="svBrandDescription"/>
 
-                <Title text="Follow us" level="H5"/>
+                <Title text="{i18n>Followus}" level="H5"/>
 
              <HBox
     renderType="Bare"
@@ -89,21 +89,21 @@
 
             <!-- Quick Links -->
             <VBox class="svFooterColumn">
-                <Title text="Quick links" level="H5"/>
-                <Link text="Home" press="onfooterhometabselect"/>
-                <Link text="Rooms" press="onfootertabselect"/>
-                <Link text="Contact" press="onfootercontacttabselect"/>
-                <Link text="User Manual" press="onUsermanualPress"/>
-                <Link text="Vendor Registration" press="onAdminSIGNUP"/>
+                <Title text="{i18n>Quicklinks}" level="H5"/>
+                <Link text="{i18n>tileHome}" press="onfooterhometabselect"/>
+                <Link text="{i18n>rooms}" press="onfootertabselect"/>
+                <Link text="{i18n>contact}" press="onfootercontacttabselect"/>
+                <Link text="{i18n>userManualTitle}" press="onUsermanualPress"/>
+                <Link text="{i18n>adminVendorRegistration}" press="onAdminSIGNUP"/>
             </VBox>
 
             <!-- Policies -->
             <VBox class="svFooterColumn">
                 <Link
-                    text="Policies"
+                    text="{i18n>policiesTitle}"
                     press="onPoliciesPress"
                     class="svFooterColumnTitle"/>
-                <Link text="Terms &amp; Conditions" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkTerms}" press="onPolicyLinkPress">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -111,7 +111,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="Privacy Policy" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkPrivacy}" press="onPolicyLinkPress">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -119,7 +119,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="Cancellation &amp; Refund" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkRefund}" press="onPolicyLinkPress">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -127,7 +127,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="Vendor Policy" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkVendor}" press="onPolicyLinkPress">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -135,7 +135,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="Grievance Redressal" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkGrievance}" press="onPolicyLinkPress">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -147,12 +147,12 @@
 
             <!-- Contact Information -->
             <VBox class="svFooterColumn svContactColumn">
-                <Title text="Contact us" level="H5"/>
+                <Title text="{i18n>Contactus}" level="H5"/>
 
                 <HBox alignItems="Start" class="svContactRow">
                     <core:Icon src="sap-icon://email" size="1rem" class="globecss"/>
                     <VBox>
-                        <Text text="Email"/>
+                        <Text text="{i18n>resetPasswordEmailFilter}"/>
                         <Link
                             text="admin@stayvriksha.in"
                             href="mailto:admin@stayvriksha.in"/>
@@ -162,9 +162,9 @@
                 <HBox alignItems="Start" class="svContactRow">
                     <core:Icon src="sap-icon://map" size="1rem" class="globecss"/>
                     <VBox>
-                        <Text text="Address"/>
+                        <Text text="{i18n>adminBookingECAddress}"/>
                         <Text
-                            text="111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102"/>
+                            text="{i18n>companyadrress}"/>
                     </VBox>
                 </HBox>
             </VBox>
@@ -177,7 +177,7 @@
             justifyContent="SpaceBetween"
             wrap="Wrap">
 
-            <Text text="© 2026 StayVriksha. All rights reserved." class="bottomtextcolor"/>
+            <Text text="{i18n>2026StayVriksharightsreserved}" class="bottomtextcolor"/>
 <!-- 
             <FormattedText
                 htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
@@ -194,7 +194,7 @@
             <HBox alignItems="Center" class="svLanguageSelector">
                 <core:Icon src="sap-icon://globe" size="1.5rem" class="globecss"/>
                 <ComboBox
-                    selectedKey="en"
+                    selectedKey="{langageModel>/key}"
                     width="7rem"
                     change="onLanguagePress"
                     class="comboBoxcss"

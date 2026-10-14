@@ -18,6 +18,7 @@ sap.ui.define([
         _isProfileRequested: false,
         Formatter: Formatter,
         onInit: function () {
+
             this.getView().setModel(new JSONModel({
                 showGlobalFooter: false,
                 showRoomsFooter: false,
@@ -112,6 +113,13 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+        const sLocale = localStorage.getItem("selectedLanguage") || "en";
+            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+             const oLanguageModel = new sap.ui.model.json.JSONModel({
+        key: sLocale
+    });
+
+    this.getView().setModel(oLanguageModel, "langageModel");
             var bBusyOnLoad = sessionStorage.getItem("hostelBusyOnLoad") === "true";
             sessionStorage.removeItem("hostelBusyOnLoad");
             if (bBusyOnLoad) {

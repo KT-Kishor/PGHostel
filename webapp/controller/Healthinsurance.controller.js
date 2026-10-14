@@ -571,22 +571,31 @@ if (!bHasAttachment) {
     }
 },
 onNavBack: function () {
+    var oBundle = this.getView()
+        .getModel("i18n")
+        .getResourceBundle();
+
+    var sOkButton = oBundle.getText("OkButton");
+    var sCancelButton = oBundle.getText("adminBookingCancel");
+
     sap.m.MessageBox.information(
-        this.i18nModel.getText("Areyousurewanttoexitthepage"),
+        oBundle.getText("Areyousurewanttoexitthepage"),
         {
-            title: this.i18nModel.getText("confirmCancellation"),
-            actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-            emphasizedAction: sap.m.MessageBox.Action.OK,
+            title: oBundle.getText("confirmCancellation"),
+
+            actions: [sOkButton, sCancelButton],
+
+            emphasizedAction: sOkButton,
 
             onClose: function (sAction) {
-                if (sAction === sap.m.MessageBox.Action.OK) {
+                if (sAction === sOkButton) {
                     this.getOwnerComponent()
                         .getRouter()
                         .navTo("RouteHostel");
                 }
             }.bind(this),
 
-            styleClass: "myUnifiedBtn  "
+            styleClass: "myUnifiedBtn"
         }
     );
 },
@@ -660,12 +669,17 @@ onAadhaarAttachmentChange: function (oEvent) {
             return;
         }
 
-        if (oFile.size > 5 * 1024 * 1024) {
-            sap.m.MessageBox.error(
-                oFile.name + " exceeds the 5 MB limit."
-            );
-            return;
-        }
+     if (oFile.size > 1 * 1024 * 1024) {
+    var oBundle = that.getView()
+        .getModel("i18n")
+        .getResourceBundle();
+
+    sap.m.MessageBox.error(
+        oBundle.getText("fileSizeLimitExceeded", [oFile.name])
+    );
+
+    return;
+}
 
         var oReader = new FileReader();
 

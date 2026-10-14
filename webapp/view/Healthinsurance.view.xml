@@ -289,7 +289,7 @@
                 width="100%">
 
                 <MessageStrip
-                    text="For your Insurence, please provide your Aadhaar card details and upload a copy of your Aadhaar card for verification."
+                    text="{i18n>healthinsurencemessagestrip}"
                     type="Information"
                     showIcon="true"
                     showCloseButton="false"
@@ -336,7 +336,7 @@
 
 
                 <Text
-                    text="Accepted formats: PDF, JPG, JPEG, PNG. Maximum size: 5 MB."
+                    text="{i18n>acceptedDocumentFormats}"
                     class="sapUiTinyMarginTop sapUiSmallMarginBottom" />
 
             </VBox>
