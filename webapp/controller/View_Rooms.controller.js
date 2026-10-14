@@ -3333,5 +3333,20 @@ sap.ui.define([
 
     // Refresh UI bindings
 },
+  onfooterhometabselect: function () {
+    this.getOwnerComponent()
+        .getRouter()
+        .navTo("RouteHostel");
+},
+       onfootertabselect: function () {
+            const sTabKey = "idRooms"
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+        },
+  onfootercontacttabselect: function () {
+            const sTabKey = "idContact"
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+        },
     });
 });
