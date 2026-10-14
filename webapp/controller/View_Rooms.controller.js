@@ -3348,5 +3348,20 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
             sessionStorage.setItem("homePageReturnTab", sTabKey);
         },
+        onPoliciesPress: function () {
+            this.getOwnerComponent()
+                .getRouter()
+                .navTo("RoutePolicies");
+        },
+
+        onPolicyLinkPress: function (oEvent) {
+            var sPolicyId = oEvent.getSource().data("policyId");
+
+            if (sPolicyId) {
+                this.getOwnerComponent()
+                    .getRouter()
+                    .navTo("RoutePoliciesTab", { policyId: sPolicyId });
+            }
+        },
     });
 });
