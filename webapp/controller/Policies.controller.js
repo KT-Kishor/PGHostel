@@ -40,6 +40,11 @@ sap.ui.define([
                 }
             }
 
+            // The language is chosen on another page, so it is applied before
+            // anything is rendered: the first policy must already come from the
+            // selected bundle.
+            this._applySelectedLanguage();
+
             var oModel = new JSONModel();
             oModel.loadData(
                 sap.ui.require.toUrl("sap/ui/com/project1/model/policies.json")
@@ -47,6 +52,11 @@ sap.ui.define([
             this.getView().setModel(oModel, "policies");
 
             oModel.attachRequestCompleted(function () {
+                // The file holds i18n keys, not text, so the key-based source is
+                // kept aside and the displayed copy is resolved from it, which
+                // lets the policy be translated again after a language change.
+                this._aPoliciesSource = oModel.getProperty("/policies") || [];
+                this._localizePolicies();
                 this._renderPolicy(this._sPendingPolicyId);
             }.bind(this));
 
@@ -80,16 +90,125 @@ sap.ui.define([
             var sId = oEvent.getParameter("arguments").policyId || "terms";
             this._sPendingPolicyId = sId;
 
-            var oModel = this.getView().getModel("policies");
-            if (oModel && (oModel.getProperty("/policies") || []).length) {
-                this._renderPolicy(sId);
+            // Routed views stay alive in the NavContainer, so this page does not
+            // run onInit again when it is reopened. The language may have been
+            // changed on another page in the meantime, so it is picked up here.
+            var bLanguageChanged = this._applySelectedLanguage();
+
+            // The JSON bundle is still loading on the very first match; the
+            // policy is rendered once the request completes.
+            if (!this._aPoliciesSource) {
+                return;
             }
+
+            if (bLanguageChanged || !this._bPoliciesLocalized) {
+                this._localizePolicies();
+            }
+
+            this._renderPolicy(sId);
         },
 
         _navToPolicy: function (sId) {
             if (sId) {
                 this.getRouter().navTo("RoutePoliciesTab", { policyId: sId });
             }
+        },
+
+        /**
+         * The language is selected on the account or footer menu and remembered
+         * in local storage. The core language is switched to it and the view's
+         * resource model is refreshed, so the tab labels, the headings and the
+         * policy body all follow the selection. The caller is told whether the
+         * language actually changed, because only then the policy text has to
+         * be translated again.
+         */
+        _applySelectedLanguage: function () {
+            var sLocale = localStorage.getItem("selectedLanguage") || "en";
+            var bChanged = sLocale !== this._sLocale;
+            this._sLocale = sLocale;
+
+            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+            // Refresh the i18n resource bundle. A resource model replaces its
+            // bundle when the language changes, so the bundle is read from the
+            // model again instead of keeping the one cached for the previous
+            // language.
+            var oI18nModel = this._getI18nModel();
+            if (oI18nModel) {
+                oI18nModel.refresh(true);
+                this.i18nModel = oI18nModel.getResourceBundle();
+            }
+
+            return bChanged;
+        },
+
+        /**
+         * The i18n resource model, looked up on the view first.
+         *
+         * On init the view is still being created and the component's models are
+         * only propagated to it once it is placed, so the view has none of them
+         * yet: the component model is used as a fallback there. Both are the
+         * same manifest model instance, so either one can be refreshed.
+         */
+        _getI18nModel: function () {
+            var oView = this.getView();
+            var oViewModel = oView && oView.getModel("i18n");
+            if (oViewModel) {
+                return oViewModel;
+            }
+
+            var oComponent = this.getOwnerComponent();
+            return oComponent ? oComponent.getModel("i18n") : null;
+        },
+
+        /**
+         * The resource bundle for the current language, or null while no i18n
+         * model can be reached yet.
+         */
+        _getI18nBundle: function () {
+            if (this.i18nModel) {
+                return this.i18nModel;
+            }
+
+            var oI18nModel = this._getI18nModel();
+            return oI18nModel ? oI18nModel.getResourceBundle() : null;
+        },
+
+        /**
+         * policies.json stores i18n keys instead of literal text, so every
+         * phrase — the tab labels, the headings and the policy body HTML — is
+         * translated in the resource bundles. The key-based source stays
+         * untouched and a resolved copy is written to the model, so the view
+         * bindings and the HTML builder keep working with plain text and the
+         * same data can be translated again for another language.
+         */
+        _localizePolicies: function () {
+            var oModel = this.getView().getModel("policies");
+            var oBundle = this._getI18nBundle();
+            if (!oModel || !oBundle) return;
+
+            var fnText = function (sKey) {
+                return typeof sKey === "string" && sKey ? oBundle.getText(sKey) : sKey;
+            };
+
+            var aPolicies = (this._aPoliciesSource || []).map(function (oPolicy) {
+                return Object.assign({}, oPolicy, {
+                    tab:      fnText(oPolicy.tab),
+                    title:    fnText(oPolicy.title),
+                    subtitle: fnText(oPolicy.subtitle),
+                    updated:  fnText(oPolicy.updated),
+                    keyPoints: (oPolicy.keyPoints || []).map(fnText),
+                    sections: (oPolicy.sections || []).map(function (oSection) {
+                        return Object.assign({}, oSection, {
+                            title: fnText(oSection.title),
+                            html:  fnText(oSection.html)
+                        });
+                    })
+                });
+            });
+
+            oModel.setProperty("/policies", aPolicies);
+            this._bPoliciesLocalized = true;
         },
 
         /* ------------------------------------------------------------
@@ -148,11 +267,14 @@ sap.ui.define([
 
         _buildHtml: function (aSections, oPolicy) {
             var s = "";
+            var oBundle = this._getI18nBundle();
 
             // Key points block
             var aKp = oPolicy.keyPoints || [];
             if (aKp.length) {
-                s += "<div class='glance'><h2>Key points</h2><ul>";
+                s += "<div class='glance'><h2>" +
+                     (oBundle ? oBundle.getText("policyKeyPoints") : "") +
+                     "</h2><ul>";
                 aKp.forEach(function (kp) { s += "<li>" + kp + "</li>"; });
                 s += "</ul></div>";
             }
@@ -760,7 +882,7 @@ sap.ui.define([
          * matching tab. Labels come from the same i18n keys the desktop links use.
          */
         _policyMenuItems: function () {
-            var oBundle = this.getView().getModel("i18n").getResourceBundle();
+            var oBundle = this._getI18nBundle();
             var aPolicies = [
                 { id: "terms", key: "policyLinkTerms", icon: "sap-icon://document-text" },
                 { id: "privacy", key: "policyLinkPrivacy", icon: "sap-icon://locked" },
@@ -771,7 +893,7 @@ sap.ui.define([
 
             return aPolicies.map(function (oPolicy) {
                 var oItem = new sap.m.MenuItem({
-                    text: oBundle.getText(oPolicy.key),
+                    text: oBundle ? oBundle.getText(oPolicy.key) : oPolicy.key,
                     icon: oPolicy.icon,
                     press: this.onPolicyLinkPress.bind(this)
                 });

@@ -2,261 +2,380 @@
     "policies": [
         {
             "id": "terms",
-            "tab": "Terms & Conditions",
+            "tab": "policyLinkTerms",
             "icon": "sap-icon://document-text",
-            "title": "Terms & Conditions",
-            "subtitle": "The rules for using StayVriksha, for guests and property partners.",
-            "updated": "[Insert date]",
+            "title": "policyTermsTitle",
+            "subtitle": "policyTermsSubtitle",
+            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
-                "StayVriksha is an intermediary marketplace; the accommodation contract is between the Customer and the Vendor.",
-                "A Booking is confirmed only when the Platform issues a confirmation after successful payment.",
-                "Each Vendor sets its own cancellation, refund, rescheduling and no-show policy for every Listing."
+                "policyTermsKp1",
+                "policyTermsKp2",
+                "policyTermsKp3"
             ],
             "sections": [
                 {
                     "id": "terms-1",
-                    "title": "Introduction and Acceptance",
-                    "html": "<p>These Terms and Conditions (“Terms”) govern access to and use of the website, mobile application, and related services (collectively, the “Platform”) operated by StayVriksha (“StayVriksha”, “we”, “us”, or “our”), a company/proprietorship organised under the laws of India, having its registered office at 111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102.</p><p>The Platform enables (a) owners, managers, or operators of hotels, paying-guest (PG) accommodations, hostels, service apartments, and rental properties (“Vendors”) to list their properties for booking, and (b) members of the public (“Customers”, “Users”, or “you”) to search, book, and pay for stays at such properties.</p><p>By registering as a Vendor, creating a Customer account, browsing the Platform, or making a booking, you agree to be bound by these Terms, our Privacy Policy, and any additional policies referenced herein. If you do not agree, you must not use the Platform.</p>"
+                    "title": "policyTerms1Title",
+                    "html": "policyTerms1Html"
                 },
                 {
                     "id": "terms-2",
-                    "title": "Definitions",
-                    "html": "<dl class='def'><dt>Listing</dt><dd>Any property, room, bed, or unit advertised by a Vendor on the Platform.</dd><dt>Booking</dt><dd>A confirmed reservation made by a Customer for a Listing through the Platform.</dd><dt>Vendor Content</dt><dd>All photographs, descriptions, pricing, availability, policies, and other information a Vendor uploads or provides.</dd><dt>Booking Amount</dt><dd>The total amount payable by a Customer for a Booking, inclusive of applicable taxes and platform fees.</dd><dt>Applicable Law</dt><dd>The laws of the Republic of India, including but not limited to the Information Technology Act, 2000, the Consumer Protection Act, 2019 and rules made thereunder, and applicable state Shops and Establishments, tourism, and municipal regulations.</dd></dl>"
+                    "title": "policyTerms2Title",
+                    "html": "policyTerms2Html"
                 },
                 {
                     "id": "terms-3",
-                    "title": "Role of StayVriksha — Intermediary Platform Only",
-                    "html": "<p>StayVriksha is an online marketplace and intermediary that connects Customers with Vendors. StayVriksha does not own, operate, manage, or control any hotel, PG, hostel, service apartment, or rental property listed on the Platform, and is not a party to the accommodation or hospitality contract formed between a Vendor and a Customer upon Booking confirmation.</p><p>StayVriksha functions as an “intermediary” within the meaning of Section 2(1)(w) of the Information Technology Act, 2000, and disclaims all liability for Vendor Content and for the performance, safety, legality, and quality of any Listing, to the fullest extent permitted by law.</p><p>Nothing on the Platform constitutes an endorsement, warranty, or guarantee by StayVriksha of any Vendor, Listing, or property.</p>"
+                    "title": "policyTerms3Title",
+                    "html": "policyTerms3Html"
                 },
                 {
                     "id": "terms-4",
-                    "title": "Vendor Registration and Eligibility",
-                    "html": "<p>To list a property, a Vendor must complete registration and provide accurate, current, and complete information, including:</p><ul><li>Valid government-issued identity and address proof of the owner/authorised signatory;</li><li>Proof of ownership, lease, or authorisation to operate and let out the property;</li><li>All licences, registrations, permits, and certificates required under Applicable Law to operate the property as a hotel, PG, hostel, service apartment, or rental accommodation (including, where applicable, trade licence, police/PG registration, fire safety NOC, GST registration, and municipal health/lodging permits);</li><li>Bank account and PAN/GST details for settlement of payments.</li></ul><p>StayVriksha may, at its sole discretion, verify, suspend, reject, or de-list any Vendor or Listing at any time, with or without notice, and is under no obligation to conduct background checks, and any verification StayVriksha does perform does not amount to a warranty of the Vendor’s compliance or fitness.</p>"
+                    "title": "policyTerms4Title",
+                    "html": "policyTerms4Html"
                 },
                 {
                     "id": "terms-5",
-                    "title": "Vendor Responsibilities — Vendor Bears Full Responsibility",
-                    "html": "<p>The Vendor is solely and fully responsible for the property, the Listing, and the stay experience of the Customer. Without limiting the foregoing, the Vendor shall be exclusively responsible for:</p><ul><li>The accuracy of all Listing information, including photographs, room descriptions, amenities, pricing, availability, and house rules;</li><li>Obtaining and maintaining all licences, permits, registrations, insurance, and approvals required by Applicable Law to operate the property;</li><li>The physical safety, security, hygiene, fire safety, and structural soundness of the property;</li><li>The conduct, background verification, and supervision of the Vendor’s staff, security personnel, and representatives;</li><li>Honouring confirmed Bookings at the price, dates, and terms shown on the Platform at the time of Booking;</li><li>Compliance with all applicable tax laws, including collection and deposit of GST or other statutory levies on the stay;</li><li>Any injury, illness, loss, theft, damage to property, or death occurring on or about the property, howsoever caused;</li><li>Resolution of disputes with Customers regarding the quality, condition, or suitability of the property;</li><li>Compliance with all local police, municipal, and tourism department reporting and guest-registration requirements.</li></ul><p>The Vendor acknowledges and agrees that StayVriksha bears no responsibility or liability whatsoever for any of the matters listed in this Section 5, and that all such liability rests solely with the Vendor.</p>"
+                    "title": "policyTerms5Title",
+                    "html": "policyTerms5Html"
                 },
                 {
                     "id": "terms-6",
-                    "title": "Bookings and Payments",
-                    "html": "<p><strong>Booking Confirmation.</strong> A Booking is confirmed only upon issuance of a confirmation by the Platform after successful payment. The Vendor agrees to honour every confirmed Booking at the price and terms displayed at the time of Booking, subject to the Vendor’s stated policies.</p><p><strong>Payment Collection.</strong> StayVriksha collects the Booking Amount from the Customer on behalf of the Vendor through the Platform’s designated payment gateway, acting solely as a limited collection agent of the Vendor for this purpose. Receipt of payment by StayVriksha shall be deemed receipt on behalf of the Vendor.</p><p><strong>Settlement and Commission.</strong> StayVriksha shall deduct its agreed commission/service fee from the Booking Amount and remit the balance to the Vendor’s registered bank account within the timeline specified in the Vendor Agreement (typically within 30 days of check-in/service completion, subject to no valid dispute or chargeback being pending).</p><p><strong>Taxes.</strong> All applicable taxes (including GST) on the accommodation/service are the Vendor’s responsibility to account for and remit to the appropriate authorities, unless otherwise required of StayVriksha under Applicable Law as a marketplace facilitator.</p><p><strong>Payment Failures and Fraud.</strong> StayVriksha is not liable for any delay, failure, or reversal of payment caused by the Customer’s bank, payment gateway, network issues, or fraudulent activity by any third party.</p>"
+                    "title": "policyTerms6Title",
+                    "html": "policyTerms6Html"
                 },
                 {
                     "id": "terms-7",
-                    "title": "Cancellation, Refund, and No-show Policy",
-                    "html": "<p>Each Vendor shall set out its own cancellation, refund, rescheduling, and no-show policy for each Listing, which shall be displayed to the Customer prior to Booking. By completing a Booking, the Customer agrees to be bound by the specific Vendor’s policy for that Listing.</p><p>StayVriksha’s role in processing any refund is limited to facilitating the return of funds already collected, in accordance with the Vendor’s stated policy and subject to the Vendor authorising or being liable for the refund. StayVriksha is not obligated to refund any amount already settled to a Vendor except by recovering it from the Vendor.</p><p>StayVriksha shall not be liable for a Vendor’s refusal or failure to honour its own cancellation or refund policy; such failure is a matter solely between the Customer and the Vendor, without prejudice to StayVriksha’s right to take action against the Vendor under Section 17.</p>"
+                    "title": "policyTerms7Title",
+                    "html": "policyTerms7Html"
                 },
                 {
                     "id": "terms-8",
-                    "title": "Vendor Indemnification",
-                    "html": "<p>The Vendor agrees to indemnify, defend, and hold harmless StayVriksha, its directors, officers, employees, and affiliates from and against any and all claims, demands, losses, damages, liabilities, costs, and expenses (including reasonable legal fees) arising out of or relating to:</p><ul><li>Any inaccurate, misleading, or unauthorised Listing information;</li><li>The Vendor’s failure to hold or maintain any required licence, permit, or registration;</li><li>Any injury, loss, death, theft, or damage occurring at or in connection with the property;</li><li>The Vendor’s breach of these Terms, Applicable Law, or any third-party right;</li><li>Any dispute between the Vendor and a Customer.</li></ul>"
+                    "title": "policyTerms8Title",
+                    "html": "policyTerms8Html"
                 },
                 {
                     "id": "terms-9",
-                    "title": "Customer Obligations",
-                    "html": "<p>Customers agree to:</p><ul><li>Provide accurate identification and Booking information;</li><li>Comply with the house rules, check-in/check-out timings, and policies of the Vendor whose property they book;</li><li>Behave lawfully and respectfully towards Vendors, staff, and other guests;</li><li>Be liable for any damage they personally cause to a property, payable directly to the Vendor;</li><li>Not use the Platform for any unlawful, fraudulent, or unauthorised purpose (including circumventing the Platform to book directly with a Vendor to avoid fees).</li></ul><p>The Customer agrees to indemnify StayVriksha against any loss arising from the Customer’s breach of this Section or any misuse of the Platform.</p>"
+                    "title": "policyTerms9Title",
+                    "html": "policyTerms9Html"
                 },
                 {
                     "id": "terms-10",
-                    "title": "Limitation of Liability",
-                    "html": "<p>The Platform and all Listings are provided on an “as is” and “as available” basis. StayVriksha makes no warranty, express or implied, as to the accuracy, quality, safety, legality, or fitness of any Listing or Vendor.</p><p>To the fullest extent permitted by Applicable Law, StayVriksha shall not be liable for any direct, indirect, incidental, special, or consequential damages, including but not limited to personal injury, death, property damage, loss of stay, or loss arising from Vendor default, arising out of or in connection with any Booking or use of the Platform.</p><p>Where any liability of StayVriksha cannot be excluded under Applicable Law, such liability shall, in aggregate, be limited to the platform fee/commission actually retained by StayVriksha in respect of the specific Booking giving rise to the claim.</p>"
+                    "title": "policyTerms10Title",
+                    "html": "policyTerms10Html"
                 },
                 {
                     "id": "terms-11",
-                    "title": "Reviews and Ratings",
-                    "html": "<p>Customers may submit honest reviews of their stay. StayVriksha may moderate, remove, or decline to publish reviews that are unlawful, defamatory, fraudulent, or in violation of these Terms, but is not obligated to verify every review and is not liable for the content of user-submitted reviews.</p>"
+                    "title": "policyTerms11Title",
+                    "html": "policyTerms11Html"
                 },
                 {
                     "id": "terms-12",
-                    "title": "Suspension and Termination",
-                    "html": "<p>StayVriksha may suspend, restrict, or terminate a Vendor’s or Customer’s access to the Platform, with or without notice, for breach of these Terms, fraudulent activity, repeated Customer complaints, failure to maintain required licences, or any conduct that StayVriksha reasonably believes is harmful to the Platform, other Users, or StayVriksha’s reputation.</p><p>Any amounts owed to the Vendor may be withheld pending investigation of a complaint, chargeback, or suspected fraud.</p>"
+                    "title": "policyTerms12Title",
+                    "html": "policyTerms12Html"
                 },
                 {
                     "id": "terms-13",
-                    "title": "Intellectual Property",
-                    "html": "<p>The Platform, its design, logos, trademarks, and underlying software are the exclusive property of StayVriksha or its licensors. Vendors grant StayVriksha a non-exclusive, royalty-free licence to use, reproduce, and display Vendor Content on the Platform and in its marketing for the purpose of operating and promoting the Platform.</p>"
+                    "title": "policyTerms13Title",
+                    "html": "policyTerms13Html"
                 },
                 {
                     "id": "terms-14",
-                    "title": "Data Privacy",
-                    "html": "<p>Personal data collected from Vendors and Customers is processed in accordance with StayVriksha’s <a href='#Policies/privacy'>Privacy Policy</a> and Applicable Law, including the Digital Personal Data Protection Act, 2023. By using the Platform, you consent to such processing.</p>"
+                    "title": "policyTerms14Title",
+                    "html": "policyTerms14Html"
                 },
                 {
                     "id": "terms-15",
-                    "title": "Force Majeure",
-                    "html": "<p>StayVriksha shall not be liable for any failure or delay in performance caused by events beyond its reasonable control, including natural disasters, pandemics, government orders, internet or payment gateway outages, strikes, or civil unrest.</p>"
+                    "title": "policyTerms15Title",
+                    "html": "policyTerms15Html"
                 },
                 {
                     "id": "terms-16",
-                    "title": "Governing Law and Dispute Resolution",
-                    "html": "<p>These Terms shall be governed by and construed in accordance with the laws of India.</p><p>Any dispute arising out of or in connection with these Terms shall first be attempted to be resolved amicably through the Grievance Redressal mechanism in Section 17. Failing amicable resolution within 30 days, the dispute shall be referred to and finally resolved by arbitration under the Arbitration and Conciliation Act, 1996, seated in Kalaburagi, with proceedings conducted in English before a sole arbitrator appointed by StayVriksha.</p><p>Subject to the above, the courts at Kalaburagi, Karnataka shall have exclusive jurisdiction.</p>"
+                    "title": "policyTerms16Title",
+                    "html": "policyTerms16Html"
                 },
                 {
                     "id": "terms-17",
-                    "title": "Grievance Redressal Officer",
-                    "html": "<p>In accordance with the Information Technology Act, 2000 and the Consumer Protection (E-Commerce) Rules, 2020, the details of the Grievance Officer are as follows:</p><div class='contact-card'><h3>Grievance Officer</h3><p><strong>Name:</strong> Grievance Team<br><strong>Designation:</strong> Grievance Officer<br><strong>Email:</strong> <a href='mailto:admin@stayvriksha.in'>admin@stayvriksha.in</a><br><strong>Address:</strong> 111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102</p><p><strong>Response Timeline:</strong> Acknowledgement within 48 hours; resolution within 30 days of receipt of complaint.</p></div>"
+                    "title": "policyTerms17Title",
+                    "html": "policyTerms17Html"
                 },
                 {
                     "id": "terms-18",
-                    "title": "Amendment",
-                    "html": "<p>StayVriksha may modify these Terms at any time by posting the revised Terms on the Platform with an updated “Last updated” date. Continued use of the Platform after such changes constitutes acceptance of the revised Terms.</p>"
+                    "title": "policyTerms18Title",
+                    "html": "policyTerms18Html"
                 },
                 {
                     "id": "terms-19",
-                    "title": "Severability and Entire Agreement",
-                    "html": "<p>If any provision of these Terms is held invalid or unenforceable, the remaining provisions shall continue in full force and effect. These Terms, together with the Privacy Policy and any Vendor Agreement, constitute the entire agreement between the parties in relation to their subject matter.</p>"
+                    "title": "policyTerms19Title",
+                    "html": "policyTerms19Html"
                 },
                 {
                     "id": "terms-20",
-                    "title": "Contact",
-                    "html": "<p>For any questions regarding these Terms, please contact:</p><div class='contact-card'><h3>StayVriksha</h3><p>Email: <a href='mailto:admin@stayvriksha.in'>admin@stayvriksha.in</a></p><p>Address: 111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102</p></div>"
+                    "title": "policyTerms20Title",
+                    "html": "policyTerms20Html"
                 }
             ]
         },
         {
             "id": "privacy",
-            "tab": "Privacy Policy",
+            "tab": "policyLinkPrivacy",
             "icon": "sap-icon://locked",
-            "title": "Privacy Policy",
-            "subtitle": "What we collect, why we collect it, and the choices you have.",
-            "updated": "[Insert date]",
-            "keyPoints": [
-                "We collect only the information needed to run the Platform and complete your stay.",
-                "You can request access, correction, or deletion of your personal data.",
-                "We never sell your personal information."
-            ],
+            "title": "policyPrivacyTitle",
+            "subtitle": "policyPrivacySubtitle",
+            "updated": "policyUpdatedPlaceholder",
             "sections": [
                 {
                     "id": "privacy-1",
-                    "title": "Information we collect",
-                    "html": "<p>We collect information you provide when you create an account, make a booking, register a property, or contact support. This may include your name, contact details, identity documents, and payment information.</p>"
+                    "title": "policyPrivacy1Title",
+                    "html": "policyPrivacy1Html"
                 },
                 {
                     "id": "privacy-2",
-                    "title": "How we use information",
-                    "html": "<p>Your information is used to provide and improve the Platform, process bookings and payments, comply with legal obligations, prevent fraud, and communicate with you.</p>"
+                    "title": "policyPrivacy2Title",
+                    "html": "policyPrivacy2Html"
                 },
                 {
                     "id": "privacy-3",
-                    "title": "Sharing of information",
-                    "html": "<p>We share information with Vendors as needed to fulfil your booking, with payment processors, and with authorities when required by law.</p>"
+                    "title": "policyPrivacy3Title",
+                    "html": "policyPrivacy3Html"
                 },
                 {
                     "id": "privacy-4",
-                    "title": "Your rights",
-                    "html": "<p>You may request access to, correction of, or deletion of your personal information, subject to legal requirements.</p>"
+                    "title": "policyPrivacy4Title",
+                    "html": "policyPrivacy4Html"
                 },
                 {
                     "id": "privacy-5",
-                    "title": "Contact us",
-                    "html": "<p>Email: <a href='mailto:admin@stayvriksha.in'>admin@stayvriksha.in</a></p>"
+                    "title": "policyPrivacy5Title",
+                    "html": "policyPrivacy5Html"
+                },
+                {
+                    "id": "privacy-6",
+                    "title": "policyPrivacy6Title",
+                    "html": "policyPrivacy6Html"
+                },
+                {
+                    "id": "privacy-7",
+                    "title": "policyPrivacy7Title",
+                    "html": "policyPrivacy7Html"
+                },
+                {
+                    "id": "privacy-8",
+                    "title": "policyPrivacy8Title",
+                    "html": "policyPrivacy8Html"
+                },
+                {
+                    "id": "privacy-9",
+                    "title": "policyPrivacy9Title",
+                    "html": "policyPrivacy9Html"
+                },
+                {
+                    "id": "privacy-10",
+                    "title": "policyPrivacy10Title",
+                    "html": "policyPrivacy10Html"
+                },
+                {
+                    "id": "privacy-11",
+                    "title": "policyPrivacy11Title",
+                    "html": "policyPrivacy11Html"
+                },
+                {
+                    "id": "privacy-12",
+                    "title": "policyPrivacy12Title",
+                    "html": "policyPrivacy12Html"
                 }
             ]
         },
         {
             "id": "refund",
-            "tab": "Cancellation & Refund",
+            "tab": "policyLinkRefund",
             "icon": "sap-icon://undo",
-            "title": "Cancellation & Refund Policy",
-            "subtitle": "How cancellations, no-shows, and refunds work for each property type.",
-            "updated": "[Insert date]",
-            "keyPoints": [
-                "The cancellation window depends on the property and is shown before payment.",
-                "Refunds are processed to the original payment method.",
-                "No-shows may be non-refundable depending on the listing."
-            ],
+            "title": "policyRefundTitle",
+            "subtitle": "policyRefundSubtitle",
+            "updated": "policyUpdatedPlaceholder",
             "sections": [
                 {
                     "id": "refund-1",
-                    "title": "Cancellation windows",
-                    "html": "<p>Each listing shows its own cancellation window before you pay. Free-cancellation periods, partial refunds, and non-refundable rates are set by the Vendor.</p>"
+                    "title": "policyRefund1Title",
+                    "html": "policyRefund1Html"
                 },
                 {
                     "id": "refund-2",
-                    "title": "How refunds are issued",
-                    "html": "<p>Approved refunds are processed to the original payment method within the timelines set by your bank or payment provider.</p>"
+                    "title": "policyRefund2Title",
+                    "html": "policyRefund2Html"
                 },
                 {
                     "id": "refund-3",
-                    "title": "No-shows",
-                    "html": "<p>Failing to check in on the arrival date may be treated as a no-show and may not be refundable, as stated on the listing.</p>"
+                    "title": "policyRefund3Title",
+                    "html": "policyRefund3Html"
                 },
                 {
                     "id": "refund-4",
-                    "title": "Exceptional cases",
-                    "html": "<p>In exceptional cases such as natural disasters or government restrictions, refunds may be offered under the applicable policy.</p>"
+                    "title": "policyRefund4Title",
+                    "html": "policyRefund4Html"
+                },
+                {
+                    "id": "refund-5",
+                    "title": "policyRefund5Title",
+                    "html": "policyRefund5Html"
+                },
+                {
+                    "id": "refund-6",
+                    "title": "policyRefund6Title",
+                    "html": "policyRefund6Html"
+                },
+                {
+                    "id": "refund-7",
+                    "title": "policyRefund7Title",
+                    "html": "policyRefund7Html"
+                },
+                {
+                    "id": "refund-8",
+                    "title": "policyRefund8Title",
+                    "html": "policyRefund8Html"
+                },
+                {
+                    "id": "refund-9",
+                    "title": "policyRefund9Title",
+                    "html": "policyRefund9Html"
+                },
+                {
+                    "id": "refund-10",
+                    "title": "policyRefund10Title",
+                    "html": "policyRefund10Html"
+                },
+                {
+                    "id": "refund-11",
+                    "title": "policyRefund11Title",
+                    "html": "policyRefund11Html"
+                },
+                {
+                    "id": "refund-12",
+                    "title": "policyRefund12Title",
+                    "html": "policyRefund12Html"
                 }
             ]
         },
         {
             "id": "vendor",
-            "tab": "Vendor Policy",
+            "tab": "policyLinkVendor",
             "icon": "sap-icon://home",
-            "title": "Vendor / Property Partner Policy",
-            "subtitle": "What property owners and managers agree to when listing with us.",
-            "updated": "[Insert date]",
+            "title": "policyVendorTitle",
+            "subtitle": "policyVendorSubtitle",
+            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
-                "Vendors are responsible for licences, safety, and hygiene.",
-                "Listing content must be accurate and up to date.",
-                "Confirmed bookings must be honoured as displayed."
+                "policyVendorKp1",
+                "policyVendorKp2"
             ],
             "sections": [
                 {
                     "id": "vendor-1",
-                    "title": "Listing accuracy",
-                    "html": "<p>Vendors must keep photos, location, amenities, room types, availability, and pricing up to date and accurate at all times.</p>"
+                    "title": "policyVendor1Title",
+                    "html": "policyVendor1Html"
                 },
                 {
                     "id": "vendor-2",
-                    "title": "Compliance",
-                    "html": "<p>Vendors must hold all required licences, permissions, and approvals, and comply with applicable safety, tax, and guest-registration laws.</p>"
+                    "title": "policyVendor2Title",
+                    "html": "policyVendor2Html"
                 },
                 {
                     "id": "vendor-3",
-                    "title": "Guest experience",
-                    "html": "<p>Vendors must honour confirmed bookings and provide the accommodation as described.</p>"
+                    "title": "policyVendor3Title",
+                    "html": "policyVendor3Html"
                 },
                 {
                     "id": "vendor-4",
-                    "title": "Settlements",
-                    "html": "<p>Payouts are made under the applicable Vendor Agreement, after deductions for applicable fees, taxes, and refunds.</p>"
+                    "title": "policyVendor4Title",
+                    "html": "policyVendor4Html"
+                },
+                {
+                    "id": "vendor-5",
+                    "title": "policyVendor5Title",
+                    "html": "policyVendor5Html"
+                },
+                {
+                    "id": "vendor-6",
+                    "title": "policyVendor6Title",
+                    "html": "policyVendor6Html"
+                },
+                {
+                    "id": "vendor-7",
+                    "title": "policyVendor7Title",
+                    "html": "policyVendor7Html"
+                },
+                {
+                    "id": "vendor-8",
+                    "title": "policyVendor8Title",
+                    "html": "policyVendor8Html"
+                },
+                {
+                    "id": "vendor-9",
+                    "title": "policyVendor9Title",
+                    "html": "policyVendor9Html"
+                },
+                {
+                    "id": "vendor-10",
+                    "title": "policyVendor10Title",
+                    "html": "policyVendor10Html"
+                },
+                {
+                    "id": "vendor-11",
+                    "title": "policyVendor11Title",
+                    "html": "policyVendor11Html"
+                },
+                {
+                    "id": "vendor-12",
+                    "title": "policyVendor12Title",
+                    "html": "policyVendor12Html"
+                },
+                {
+                    "id": "vendor-13",
+                    "title": "policyVendor13Title",
+                    "html": "policyVendor13Html"
+                },
+                {
+                    "id": "vendor-14",
+                    "title": "policyVendor14Title",
+                    "html": "policyVendor14Html"
+                },
+                {
+                    "id": "vendor-15",
+                    "title": "policyVendor15Title",
+                    "html": "policyVendor15Html"
                 }
             ]
         },
         {
             "id": "grievance",
-            "tab": "Grievance Redressal",
+            "tab": "policyLinkGrievance",
             "icon": "sap-icon://comment",
-            "title": "Grievance Redressal",
-            "subtitle": "Tell us when something goes wrong and how we will respond.",
-            "updated": "[Insert date]",
+            "title": "policyGrievanceTitle",
+            "subtitle": "policyGrievanceSubtitle",
+            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
-                "Complaints are acknowledged within the applicable legal timeline.",
-                "You can escalate to the Grievance Officer if unresolved.",
-                "We aim for an amicable resolution before formal escalation."
+                "policyGrievanceKp1",
+                "policyGrievanceKp2",
+                "policyGrievanceKp3"
             ],
             "sections": [
                 {
                     "id": "grievance-1",
-                    "title": "How to raise a complaint",
-                    "html": "<p>Write to <a href='mailto:admin@stayvriksha.in'>admin@stayvriksha.in</a> with your booking reference, a description of the issue, and any supporting documents.</p>"
+                    "title": "policyGrievance1Title",
+                    "html": "policyGrievance1Html"
                 },
                 {
                     "id": "grievance-2",
-                    "title": "Acknowledgement",
-                    "html": "<p>Complaints are acknowledged within the timelines required by applicable law.</p>"
+                    "title": "policyGrievance2Title",
+                    "html": "policyGrievance2Html"
                 },
                 {
                     "id": "grievance-3",
-                    "title": "Resolution",
-                    "html": "<p>We will work with you and the Vendor to reach a fair resolution. If you are not satisfied, you may escalate to the Grievance Officer.</p>"
+                    "title": "policyGrievance3Title",
+                    "html": "policyGrievance3Html"
                 },
                 {
                     "id": "grievance-4",
-                    "title": "Grievance Officer",
-                    "html": "<p><strong>Name:</strong> [Insert name]<br><strong>Email:</strong> <a href='mailto:admin@stayvriksha.in'>admin@stayvriksha.in</a><br><strong>Address:</strong> 111, Kalpavriksha Karekal Layout, Near Railway Bridge, Kalaburagi, Karnataka – 585102</p>"
+                    "title": "policyGrievance4Title",
+                    "html": "policyGrievance4Html"
                 }
             ]
         }

@@ -73,7 +73,7 @@
                                class="tocPanel"
                                expandable="true"
                                expanded="true"
-                               headerText="On this page"
+                               headerText="{i18n>policyOnThisPage}"
                                expand=".onTocToggle"
                                collapse=".onTocToggle"
                                width="100%">
@@ -112,12 +112,12 @@
                                 <HBox class="metaChips" wrap="Wrap">
                                     <Text class="chip"
                                           wrapping="true"
-                                          text="Last updated: {policies>/currentUpdated}"/>
+                                          text="{i18n>policyLastUpdated} {policies>/currentUpdated}"/>
                                     <Text class="chip"
                                           wrapping="true"
-                                          text="Applies to hotels, hostels, PGs, apartments &amp; rentals"/>
+                                          text="{i18n>policyAppliesTo}"/>
                                 </HBox>
-                                <Button text="Print"
+                                <Button text="{i18n>policyPrint}"
                                         press=".onPrint"
                                         class="printBtn myUnifiedBtn"/>
                             </HBox>
