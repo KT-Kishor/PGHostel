@@ -53,7 +53,11 @@ sap.ui.define([
         _onRouteMatched: async function (oEvent) {
             const sLocale = localStorage.getItem("selectedLanguage") || "en";
             sap.ui.getCore().getConfiguration().setLanguage(sLocale);
-
+               const oLanguageModel = new sap.ui.model.json.JSONModel({
+                       key: sLocale
+                      });
+            this.getView().setModel(oLanguageModel, "langageModel");
+    
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const oCoreLoginModel = sap.ui.getCore().getModel("LoginModel");
             const oLoggedUser = oCoreLoginModel?.getData?.() || {};
@@ -3305,5 +3309,29 @@ sap.ui.define([
 
             this._oFooterMenu.openBy(oEvent.getSource());
         },  
+        onLanguagePress: function (oEvent) {
+    var sLocale = oEvent.getSource().getSelectedKey();
+    var oView = this.getView();
+
+    // Save selected language
+    localStorage.setItem("selectedLanguage", sLocale);
+
+    // Update SAPUI5 language configuration
+    sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+    // Create the resource model for the selected language
+    var oResourceModel = new sap.ui.model.resource.ResourceModel({
+        bundleName: "sap.ui.com.project1.i18n.i18n",
+        bundleLocale: sLocale
+    });
+
+    // Set the updated i18n model
+    oView.setModel(oResourceModel, "i18n");
+
+    // Update the resource bundle used in controller methods
+    this.i18nModel = oResourceModel.getResourceBundle();
+
+    // Refresh UI bindings
+},
     });
 });

@@ -10626,7 +10626,7 @@ text-transform: none !important;
     margin-right: 0.5rem !important;
 }
 .globecss{
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .svLanguageSelector {
     display: flex;
@@ -10669,4 +10669,8 @@ text-transform: none !important;
     height: 1.5625rem;
     line-height: 1.625rem;
     color: black;
+}
+.treeLogoUp {
+    position: relative;
+    top: -1px;
 }

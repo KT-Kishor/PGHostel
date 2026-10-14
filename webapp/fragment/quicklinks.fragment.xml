@@ -181,8 +181,16 @@
 <!-- 
             <FormattedText
                 htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
-                
-                <core:HTML
+           <HBox >
+
+    <Image
+        src="../image/TreeLogo.png"
+        width="30px"
+        height="20px"
+            class="treeLogoUp"
+    />
+
+   <core:HTML
                     content="&lt;div class='myUnifiedBtn'&gt;
                         &lt;a href='https://www.kalpavrikshatechnologies.com/'
                         class='footer-text'
@@ -190,6 +198,8 @@
                         {i18n&gt;devlopby}
                         &lt;/a&gt;
                         &lt;/div&gt;" />
+
+</HBox>
 
             <HBox alignItems="Center" class="svLanguageSelector">
                 <core:Icon src="sap-icon://globe" size="1.5rem" class="globecss"/>

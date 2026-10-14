@@ -125,14 +125,15 @@ onhealthSubmitPress: async function () {
     sap.m.MessageBox.information(
     this.i18nModel.getText("healthInsuranceSubmitSuccess"),
     {
-        title: "Application Submitted",
+        title: "{i18n>applicationSubmittedTitle}",
         onClose: function (sAction) {
             if (sAction === sap.m.MessageBox.Action.OK) {
                 this.getOwnerComponent()
                     .getRouter()
                     .navTo("RouteHostel");
             }
-        }.bind(this)
+        }.bind(this),
+        styleClass: "myUnifiedBtn"
     }
 )
 
