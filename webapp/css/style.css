@@ -4129,16 +4129,19 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
   height: 100% !important;
 }
 
+/* The hero ScrollContainer (.Homepage) is the positioned ancestor here, so
+   anchoring the button to it instead of the viewport keeps it vertically
+   centred in the hero while scrolling away with the page - a viewport-fixed
+   button floated over the quicklinks footer added to the home page. */
 .exploreBtnWrapper {
-  position: relative;
-  top: 60%;
+  position: absolute;
+  top: 50%;
   left: 0;
   right: 0;
   transform: translateY(-50%);
   display: flex;
   justify-content: flex-end;
-  padding-right: 104px;
-  margin-top: 60px;
+  padding-right: 164px;
   z-index: 100;
   pointer-events: auto;
 }
@@ -4497,8 +4500,12 @@ background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
     position: relative !important;
   }
 
+  /* The responsive grid is content-box with a 0.5rem padding, so its 100% width
+     overflows 1rem to the right and the whole grid - and this wrapper - sits
+     0.5rem right of the viewport centre. Flex centring applies only half of a
+     margin, so -1rem on the button cancels the 0.5rem shift exactly. */
   .exploreBtn {
-    margin-left: -5% !important;
+    margin-left: -1rem !important;
   }
 }
 
@@ -7430,6 +7437,95 @@ html, body {
 
 .roomsBgLayout .vrRoomContentSection {
     padding-top: 0.01rem !important;
+}
+
+/* The quicklinks fragment is the last ObjectPage section in this view. Zero
+   every gutter UI5 puts around a section, sub-section, block container and
+   block so the footer holds no strip above or below it. The block margin also
+   covers the phone breakpoint's 1rem bottom margin on every ObjectPage block
+   (.sapUxAPObjectPageLayout-Std-Phone ... .sapUxAPBlockBase). */
+.vrFooterSection,
+.vrFooterSection .sapUxAPObjectPageSubSection,
+.vrFooterSection .sapUxAPBlockContainer,
+.vrFooterSection .sapUxAPBlockBase,
+.vrFooterSection .svFooter {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Drops the global 1rem `.footer-shell` margin-top strip that sat between the
+   room cards and the footer. */
+.vrFooterSection .footer-shell {
+    margin-top: 0 !important;
+}
+
+.vrFooterSection .sapUxAPObjectPageSectionHeader,
+.vrFooterSection .sapUxAPObjectPageSubSectionHeader {
+    display: none !important;
+}
+
+/* Round the footer's top corners while keeping the bottom flush with the page. */
+.vrFooterSection .svFooter {
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* UI5 wraps every ObjectPage block in the responsive grid, whose 0.5rem gutter
+   on the grid plus a 0.5rem margin on each grid cell inset the block by 1rem on
+   both sides. The cells are also sized with calc(100% - 1rem), so the width has
+   to be reset as well, otherwise the footer stays short on one side. */
+.vrFooterSection .sapUxAPBlockContainer > .sapUiRespGrid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+}
+
+.vrFooterSection .sapUxAPBlockContainer > .sapUiRespGrid > div {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* VSpace1 adds a 0.5rem bottom margin to every grid cell, which showed as a
+   strip under the footer inside the block container (464px block vs 456px
+   footer). Scoped to this view so other ObjectPage blocks keep their spacing. */
+.vrFooterSection .sapUiRespGrid.sapUiRespGridVSpace1 > div {
+    margin-bottom: 0rem;
+}
+
+/* UI5 appends a spacer after the last section so that any section can be
+   scrolled to the top of the scroll container. Since the footer is the last
+   section here, that spacer only showed up as a large blank area below it. */
+.vrObjectPageLayout .sapUxAPObjectPageScroll > [id$="-spacer"] {
+    display: none !important;
+}
+
+/* The scroll container is always viewport tall, so on a viewport taller than
+   the room list the footer used to float with blank space under it. Flex the
+   scroll content and let the section stack fill it, then push the footer to
+   the bottom so it stays flush in both cases. */
+.vrObjectPageLayout .sapUxAPObjectPageScroll {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100% !important;
+}
+
+.vrObjectPageLayout .sapUxAPObjectPageContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+}
+
+.vrFooterSection {
+    margin-top: auto !important;
 }
 
 /* Mobile only: narrow the date filter bar so its inset matches the room cards

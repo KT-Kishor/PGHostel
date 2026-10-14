@@ -13,8 +13,7 @@
 	<VBox height="100%">
 		<Page
 			showHeader="true"
-			enableScrolling="false"
-
+			enableScrolling="true"
 			class="RoomsPage roomsBgPage">
 <layoutData>
     <FlexItemData growFactor="1" />
@@ -444,41 +443,26 @@
 								</uxap:ObjectPageSubSection>
 							</uxap:subSections>
 						</uxap:ObjectPageSection>
-<!-- QUICK LINKS AFTER ALL ROOM SECTIONS -->
-<uxap:ObjectPageSection
-    id="VR_id_QuickLinksSection"
-    title=""
-    titleUppercase="false"
-    showTitle="false"
-    visible="{FooterModel>/showGlobalFooter}"
-    class="sapUiMediumMarginBottom">
-
-    <uxap:subSections>
-        <uxap:ObjectPageSubSection
-            id="VR_id_QuickLinksSubSection"
-            showTitle="false"
-            class="vrQuickLinksSubSection">
-
-            <uxap:blocks>
-                <VBox
-                    width="100%"
-                    class="footer-shell roomsQuickLinks">
-
-                    <core:Fragment
-                        fragmentName="sap.ui.com.project1.fragment.quicklinks"
-                        type="XML"/>
-
-                </VBox>
-            </uxap:blocks>
-
-        </uxap:ObjectPageSubSection>
-    </uxap:subSections>
-</uxap:ObjectPageSection>
+						<uxap:ObjectPageSection
+							id="VR_id_FooterSection"
+							title=""
+							titleUppercase="false"
+							class="vrFooterSection">
+							<uxap:subSections>
+								<uxap:ObjectPageSubSection id="VR_id_FooterSubSection">
+									<uxap:blocks>
+										<VBox class="footer-shell">
+											<core:Fragment
+												fragmentName="sap.ui.com.project1.fragment.quicklinks"
+												type="XML" />
+										</VBox>
+									</uxap:blocks>
+								</uxap:ObjectPageSubSection>
+							</uxap:subSections>
+						</uxap:ObjectPageSection>
 					</uxap:sections>
 				</uxap:ObjectPageLayout>
 			</content>
-		
 		</Page>
-	
 	</VBox>
 </mvc:View>
