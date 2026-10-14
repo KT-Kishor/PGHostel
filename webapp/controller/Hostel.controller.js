@@ -5659,7 +5659,7 @@ onLanguagePress: function (oEvent) {
 onBuyHealthInsurance:function() {
               var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteHealthinsurance",{
-                sPath:"Hostel"
+                sPath:"Health"
             });
     
 },

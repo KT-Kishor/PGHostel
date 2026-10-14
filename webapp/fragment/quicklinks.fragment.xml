@@ -31,13 +31,13 @@
                     text="Buy health insurance"
                     icon="sap-icon://heart"
                     press="onBuyHealthInsurance"
-                    class="myUnifiedBtn sizebtn"/>
+                    class="myUnifiedBtn insuranceBuyBtn"/>
 
                 <Button
                     text="Buy travel insurance"
                     icon="sap-icon://shield"
                     press="onBuyTravelInsurance"
-                    class="myUnifiedBtn"/>
+                    class="myUnifiedBtn insuranceBuyBtn"/>
             </HBox>
         </HBox>
 
@@ -55,14 +55,16 @@
                     class="svBrandLogo"
                     alignItems="Center">
 
-                    <core:Icon
-                        src="sap-icon://globe"
-                        size="2rem"
-                        color="#36a852"/>
-
+                  
+<Image
+        src="../image/Tree.png" 
+        width="40px" 
+        height="30px"
+        class="svBrandIcon" />
                     <FormattedText
                         htmlText="&lt;strong&gt;&lt;span style='color:#ff8c18'&gt;Stay&lt;/span&gt;&lt;span style='color:#008b96'&gt;Vriksha&lt;/span&gt;&lt;/strong&gt;"
                         class="svBrandName"/>
+                        
                 </HBox>
 
                 <Text
@@ -71,18 +73,18 @@
 
                 <Title text="Follow us" level="H5"/>
 
-                <HBox class="svSocialLinks" alignItems="Center">
-                    <Button icon="sap-icon://camera" type="Transparent"
-                        tooltip="Instagram" press=".onInstagram"/>
-                    <Button icon="sap-icon://facebook" type="Transparent"
-                        tooltip="Facebook" press=".onFacebook"/>
-                    <Button icon="sap-icon://discussion-2" type="Transparent"
-                        tooltip="WhatsApp" press=".onWhatsApp"/>
-                    <Button icon="sap-icon://video" type="Transparent"
-                        tooltip="YouTube" press=".onYouTube"/>
-                    <Button icon="sap-icon://person-placeholder" type="Transparent"
-                        tooltip="LinkedIn" press=".onLinkedIn"/>
-                </HBox>
+             <HBox
+    renderType="Bare"
+    class="svSocialLinks kvSocial"
+    alignItems="Center"
+    wrap="Wrap"
+>
+  <core:HTML content="&lt;a href='https://www.linkedin.com/company/kalpavriksha-technologies/' target='_blank' rel='noopener noreferrer' aria-label='LinkedIn'&gt;&lt;i class='fa-brands fa-linkedin-in'&gt;&lt;/i&gt;&lt;/a&gt;" />
+<core:HTML content="&lt;a href='https://www.youtube.com/@KalpavrikshaTechnologies' target='_blank' rel='noopener noreferrer' aria-label='YouTube'&gt;&lt;i class='fa-brands fa-youtube'&gt;&lt;/i&gt;&lt;/a&gt;" />
+<core:HTML content="&lt;a href='https://wa.me/919686145959?text=Hello%20Kalpavriksha%20Technologies' target='_blank' rel='noopener noreferrer' aria-label='WhatsApp'&gt;&lt;i class='fa-brands fa-whatsapp'&gt;&lt;/i&gt;&lt;/a&gt;" />
+<core:HTML content="&lt;a href='https://www.whatsapp.com/channel/0029Vb9zvuvHAdNa1W6yDX1u' target='_blank' rel='noopener noreferrer' aria-label='WhatsApp Channel'&gt;&lt;i class='fa-solid fa-bullhorn'&gt;&lt;/i&gt;&lt;/a&gt;" />
+<core:HTML content="&lt;a href='https://www.instagram.com/kalpavrikshatechnologies/' target='_blank' rel='noopener noreferrer' aria-label='Instagram'&gt;&lt;i class='fa-brands fa-instagram'&gt;&lt;/i&gt;&lt;/a&gt;" />
+</HBox>
             </VBox>
 
             <!-- Quick Links -->
@@ -190,7 +192,7 @@
                         &lt;/div&gt;" />
 
             <HBox alignItems="Center" class="svLanguageSelector">
-                <core:Icon src="sap-icon://globe" size="1.5rem"/>
+                <core:Icon src="sap-icon://globe" size="1.5rem" />
                 <Select
                     selectedKey="en"
                     width="7rem"

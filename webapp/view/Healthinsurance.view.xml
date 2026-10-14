@@ -27,7 +27,7 @@
                 </uxap:expandedHeading>
                 <uxap:snappedHeading>
                     <Title
-                        text="I{i18n>InsuranceApplication}"
+                        text="{i18n>InsuranceApplication}"
                         level="H2"
                     />
                 </uxap:snappedHeading>

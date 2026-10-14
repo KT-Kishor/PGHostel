@@ -160,8 +160,15 @@ sap.ui.define([
             });
 
             var formattedValue = oCurrencyFormat.format(Number(price), currency);
-               var oBundle = this.getView().getModel("i18n").getResourceBundle();
-             var sStartingAt = oBundle.getText("StartingAt");
+             var sLocale = localStorage.getItem("selectedLanguage") || "en";
+
+var oResourceModel = new sap.ui.model.resource.ResourceModel({
+    bundleName: "sap.ui.com.project1.i18n.i18n",
+    bundleLocale: sLocale
+});
+
+var oBundle = oResourceModel.getResourceBundle();
+var sStartingAt = oBundle.getText("StartingAt");
 
     return sStartingAt + " " + formattedValue;
         },

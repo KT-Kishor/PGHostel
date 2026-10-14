@@ -80,7 +80,6 @@
                 height="100%"
                 renderType="Bare"
                 justifyContent="Start"
-                class="  "
             >
                 <items>
                     <NavContainer
@@ -94,8 +93,13 @@
                             <FlexItemData growFactor="1" />
                         </layoutData>
                         <pages>
-                            <ScrollContainer
+                             <Page
                                 id="idHome"
+
+                                showHeader="false"
+                                enableScrolling="true"
+                            >
+                            <ScrollContainer
                                 horizontal="false"
                                 vertical="true"
                                 class="sapUiContentPadding Homepage sapUiTinyMargin"
@@ -135,6 +139,15 @@
                                 </l:Grid>
                                 
                             </ScrollContainer>
+                               <VBox
+                                                >
+                                                    <core:Fragment
+                                                        fragmentName="sap.ui.com.project1.fragment.quicklinks"
+                                                        type="XML"
+                                                    />
+                                                </VBox>
+                                                        </Page>
+
                             <Page
                                 id="idRooms"
                                 showHeader="false"
