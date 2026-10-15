@@ -127,7 +127,7 @@
                         class="AddressTextLarge"
                         wrapping="true"
                         press=".onAddressClick"
-                        tooltip="Open in Google Maps"
+                        tooltip="{i18n>openInGoogleMaps}"
                     />
                 </HBox>
                 <FlexBox

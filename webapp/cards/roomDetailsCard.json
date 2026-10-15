@@ -2,7 +2,8 @@
     "sap.app": {
         "id": "sap.ui.com.project1.cards.roomDetails",
         "type": "card",
-        "title": "Room Details"
+        "i18n": "../i18n/i18n.properties",
+        "title": "{{tileRoomDetails}}"
     },
     "sap.card": {
         "type": "Object",
@@ -25,13 +26,13 @@
                 {
                     "items": [
                         {
-                            "value": "Capacity: {HostelModel>/Capacity}",
+                            "value": "{i18n>capacityLabel} {HostelModel>/Capacity}",
                             "icon": {
                                 "src": "sap-icon://group"
                             }
                         },
                         {
-                            "value": "Room Type: {HostelModel>/ACType}",
+                            "value": "{i18n>roomTypeLabel} {HostelModel>/ACType}",
                             "icon": {
                                 "src": "sap-icon://temperature"
                             }
