@@ -255,6 +255,56 @@
     </HBox>
 </VBox>
 
+<VBox class="whyBookMainCard" width="100%">
+
+    <!-- Header Section -->
+    <FormattedText htmlText="Why Book With &lt;strong&gt;StayVriksha&lt;/strong&gt;?"  class="stayTypesTitle"/>
+    <Text text="Simple, clear and built around guests." class="stayTypesDescription"/>
+
+   
+
+    <!-- Responsive FlexBox Grid -->
+    <FlexBox width="100%" wrap="Wrap" justifyContent="Center" class="featuresFlexGrid">
+
+        <!-- Item 1: Easy Booking -->
+        <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
+            <core:Icon src="sap-icon://calendar" class="featureGridIcon"/>
+            <Title text="Easy Booking" level="H3" class="featureGridTitle"/>
+            <Text text="Search by city, property type and locality, compare rooms and book in a few taps." class="featureGridDesc" textAlign="Center"/>
+        </VBox>
+
+        <!-- Item 2: Transparent Prices -->
+        <VBox class="featureGridItem Transparenttext" alignItems="Center" justifyContent="Center" >
+            <core:Icon src="sap-icon://money-bills" class="featureGridIcon"/>
+            <Title text="Transparent Prices" level="H3" class="featureGridTitle"/>
+            <Text text="See the starting price up front. Taxes and platform charges are shown before you pay." class="featureGridDesc" textAlign="Center"/>
+        </VBox>
+
+        <!-- Item 3: Clear Refund Rules -->
+        <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
+            <core:Icon src="sap-icon://refresh" class="featureGridIcon"/>
+            <Title text="Clear Refund Rules" level="H3" class="featureGridTitle"/>
+            <Text text="Every listing shows its cancellation and refund policy before you confirm." class="featureGridDesc" textAlign="Center"/>
+        </VBox>
+
+        <!-- Item 4: Support That Helps -->
+        <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
+            <core:Icon src="sap-icon://headset" class="featureGridIcon"/>
+            <Title text="Support That Helps" level="H3" class="featureGridTitle"/>
+            <Text text="Raise a request any time and our team will help with bookings, issues and refunds." class="featureGridDesc" textAlign="Center"/>
+        </VBox>
+
+        <!-- Item 5: Deals & Coupons -->
+        <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
+            <core:Icon src="sap-icon://sales-order-item" class="featureGridIcon"/>
+            <Title text="Deals &amp; Coupons" level="H3" class="featureGridTitle"/>
+            <Text text="Apply coupons on hotels, hostels, PGs and apartments and save on your stay." class="featureGridDesc" textAlign="Center"/>
+        </VBox>
+
+    </FlexBox>
+
+</VBox>
+
                                <VBox class="sapUiTinyMarginTop">
                                                     <core:Fragment
                                                         fragmentName="sap.ui.com.project1.fragment.quicklinks"
