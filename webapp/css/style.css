@@ -9714,29 +9714,15 @@ text-transform: none !important;
    scrolling area below it. No fixed offset is applied here: a hard-coded value
    would no longer match the header's measured height. */
 
-.policyPage .policyFooter {
-    position: sticky;
-    bottom: 0;
-    z-index: 20;
+/* The quick links footer closes the page, so it is separated from the policy
+   card above it instead of sitting flush against it. */
+.policyPage .quickLinksWrap {
     flex-shrink: 0;
-    margin-top: 10px;
+    margin-top: 32px;
 }
 
-.policyPage .policyFooter .footer-shell {
+.policyPage .quickLinksWrap .svFooter {
     margin-bottom: 0 !important;
-}
-
-/* On the Policies page the footer keeps only the developer credit and the
-   Instagram link, on desktop and mobile alike. */
-.policyPage .policyFooter .desktopFooterItem {
-    display: none !important;
-}
-/* The 3-dot menu only repeats what the page already offers (the policy tabs,
-   the index and the breadcrumb), so it is dropped here too. Without this the
-   button is shown once the footer switches to its <=600px layout, and its menu
-   lists User Manual / Policies / every policy link. */
-.policyPage .policyFooter .mobileFooterMenu {
-    display: none !important;
 }
 
 /* ---------- Header ---------- */
@@ -10387,6 +10373,7 @@ text-transform: none !important;
     .tocCol,
     .siteFooter,
     .policyFooter,
+    .quickLinksWrap,
     .umTopbar,
     .docMeta,
     .pager,

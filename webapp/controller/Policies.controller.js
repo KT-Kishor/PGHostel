@@ -51,6 +51,12 @@ sap.ui.define([
             );
             this.getView().setModel(oModel, "policies");
 
+            // The language selector of the quick links footer binds to this
+            // model, so it opens on the language that is already stored.
+            this.getView().setModel(new JSONModel({
+                key: localStorage.getItem("selectedLanguage") || "en"
+            }), "langageModel");
+
             oModel.attachRequestCompleted(function () {
                 // The file holds i18n keys, not text, so the key-based source is
                 // kept aside and the displayed copy is resolved from it, which
@@ -95,6 +101,13 @@ sap.ui.define([
             // changed on another page in the meantime, so it is picked up here.
             var bLanguageChanged = this._applySelectedLanguage();
 
+            // The language may have been changed on another page, so the
+            // footer selector is put back on the stored value as well.
+            var oLanguageModel = this.getView().getModel("langageModel");
+            if (oLanguageModel) {
+                oLanguageModel.setProperty("/key", this._sLocale || "en");
+            }
+
             // The JSON bundle is still loading on the very first match; the
             // policy is rendered once the request completes.
             if (!this._aPoliciesSource) {
@@ -113,7 +126,30 @@ sap.ui.define([
                 this.getRouter().navTo("RoutePoliciesTab", { policyId: sId });
             }
         },
+        onLanguagePress: function (oEvent) {
+    var sLocale = oEvent.getSource().getSelectedKey();
+    var oView = this.getView();
 
+    // Save selected language
+    localStorage.setItem("selectedLanguage", sLocale);
+
+    // Update SAPUI5 language configuration
+    sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+    // Create the resource model for the selected language
+    var oResourceModel = new sap.ui.model.resource.ResourceModel({
+        bundleName: "sap.ui.com.project1.i18n.i18n",
+        bundleLocale: sLocale
+    });
+
+    // Set the updated i18n model
+    oView.setModel(oResourceModel, "i18n");
+
+    // Update the resource bundle used in controller methods
+    this.i18nModel = oResourceModel.getResourceBundle();
+
+    // Refresh UI bindings
+},
         /**
          * The language is selected on the account or footer menu and remembered
          * in local storage. The core language is switched to it and the view's
@@ -910,6 +946,58 @@ sap.ui.define([
         onAdminSIGNUP: function () {
             // Vendor registration dialog lives on the hostel page.
             this.getRouter().navTo("RouteHostel");
+        },
+
+        /**
+         * The quick links footer repeats the Hostel page tabs. That page reads
+         * the tab it should open from session storage when its route is
+         * matched, so the target tab is queued here before navigating to it.
+         */
+        _navToHostelTab: function (sTabKey) {
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+            this.getRouter().navTo("RouteHostel");
+        },
+
+        onfooterhometabselect: function () {
+            this._navToHostelTab("idHome");
+        },
+
+        onfootertabselect: function () {
+            this._navToHostelTab("idRooms");
+        },
+
+        onfootercontacttabselect: function () {
+            this._navToHostelTab("idContact");
+        },
+
+        onBuyHealthInsurance: function () {
+            this.getRouter().navTo("RouteHealthinsurance", { sPath: "Health" });
+        },
+
+        onBuyTravelInsurance: function () {
+            this.getRouter().navTo("RouteHealthinsurance", { sPath: "Travel" });
+        },
+
+        /**
+         * Language selector of the quick links footer. The choice is remembered,
+         * applied to the resource bundle, and the policy that is open is
+         * translated again so the whole page follows the new language.
+         */
+        onLanguagePress: function (oEvent) {
+            var sLocale = oEvent.getSource().getSelectedKey();
+
+            localStorage.setItem("selectedLanguage", sLocale);
+            this._applySelectedLanguage();
+
+            var oLanguageModel = this.getView().getModel("langageModel");
+            if (oLanguageModel) {
+                oLanguageModel.setProperty("/key", sLocale);
+            }
+
+            if (this._aPoliciesSource) {
+                this._localizePolicies();
+                this._renderPolicy(this._sPendingPolicyId);
+            }
         },
 
         /**

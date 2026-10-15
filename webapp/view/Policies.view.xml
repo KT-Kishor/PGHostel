@@ -148,10 +148,10 @@
 
                 </HBox>
 
-                <!-- =====================  FOOTER  ===================== -->
-                <VBox class="policyFooter">
+                <!-- =====================  QUICK LINKS  ===================== -->
+                <VBox class="quickLinksWrap">
                     <core:Fragment
-                        fragmentName="sap.ui.com.project1.fragment.Footer"
+                        fragmentName="sap.ui.com.project1.fragment.quicklinks"
                         type="XML" />
                 </VBox>
 
