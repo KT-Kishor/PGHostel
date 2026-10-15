@@ -8,7 +8,7 @@
     <Page id="page"
           showHeader="true"
           enableScrolling="true"
-          class="policyPage">
+          class="policyPage tocPage">
 
         <!-- ===== Top bar ===== -->
         <headerContent>

@@ -8469,6 +8469,45 @@ text-transform: none !important;
 	padding: 0 20px;
 }
 
+/* The bar is 64px tall (see the view), while UI5 reserves only its default
+   header height for the content: the scrolling area therefore started a few
+   pixels behind the bar, so the index panel lost its top edge while scrolling
+   and scrolled cards were cut early. The page is laid out as a column instead —
+   header in flow, content taking the rest and scrolling — so the scroll area
+   always begins exactly below the bar, whatever height it has on the current
+   density. This is the same skeleton the profile page uses for its fixed header. */
+.umPage.sapMPageWithHeader {
+	display: flex;
+	flex-direction: column;
+	/* A definite height is what bounds the content section, so the page itself
+	   scrolls instead of an ancestor container. */
+	height: 100%;
+	min-height: 0;
+}
+
+.umPage.sapMPageWithHeader > header.sapMPageHeader {
+	position: relative;
+	top: 0;
+	/* Sized by the toolbar it holds, so the 64px bar is not trimmed to the
+	   theme's default header height. */
+	height: auto;
+	flex: 0 0 auto;
+	z-index: 2;
+}
+
+/* The content section is the scrollport. Its offset is cleared because the
+   theme reserves the default header height for it, which is a few pixels short
+   of the 64px bar; in this column layout it starts right below the bar. */
+.umPage.sapMPageWithHeader > section.sapMPageEnableScrolling {
+	position: relative;
+	top: 0 !important;
+	bottom: auto;
+	height: auto;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+}
+
 .umBackBtn {
 	margin-right: 8px;
 }
@@ -8496,6 +8535,37 @@ text-transform: none !important;
 }
 
 /* ===== Layout ===== */
+/* The page body is only a full-width holder: the banner, the two-column area
+   and the footer below it each carry the same 6px gutters the policy page uses,
+   so every region starts and ends on the same line. */
+.umRoot {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* The regions of the page fill the width they are given: the index column, the
+   details column next to it, the cards inside it, and the quick links footer
+   under both. The details column carries no width cap of its own, otherwise the
+   cards stop short of the right edge. */
+.umRoot .tocCol,
+.umRoot .mainWrap > .umCol,
+.umRoot .umGrid,
+.umRoot .umCard,
+.umRoot .quickLinksWrap,
+.umRoot .quickLinksWrap > .svFooter {
+	width: 100%;
+	max-width: none;
+}
+
+.umRoot .mainWrap > .umCol {
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
 .umWrap {
 	max-width: 1300px;
 	margin: 18px auto;
@@ -8506,12 +8576,36 @@ text-transform: none !important;
 	gap: 18px;
 }
 
+/* A jump from the index has to stop below the top bar instead of hiding the
+   card head behind it. */
+.umPage .umCard {
+	scroll-margin-top: 16px;
+}
+
 .umEmpty {
 	display: block;
 	text-align: center;
 	padding: 60px 20px;
 	color: var(--um-ink-soft) !important;
 	font-size: 0.92rem !important;
+}
+
+/* ===== Quick links footer ===== */
+.umPage .quickLinksWrap {
+	flex-shrink: 0;
+	margin-top: 32px;
+}
+
+.umPage .quickLinksWrap .svFooter {
+	margin-bottom: 0 !important;
+}
+
+/* Shown inside the index panel while no topic matches the search */
+.umTocEmpty {
+	display: block;
+	padding: 12px 10px;
+	color: #fff !important;
+	font-size: 0.86rem !important;
 }
 
 /* ===== Card ===== */
@@ -9845,6 +9939,16 @@ text-transform: none !important;
     font-size: 15px;
 }
 
+/* The cap above is kept for the policy subtitles, which are full sentences of up
+   to four lines. The User Manual subtitle is one short sentence, and the cap is
+   script-dependent: `ch` is measured on the Latin "0", so the same character
+   count in a wider script (Kannada) needs far more room and wrapped even on a
+   wide desktop banner. Here it uses the width the banner offers instead. */
+.umPage .bannerSub,
+.umPage .bannerSub .sapMText {
+    max-width: 100%;
+}
+
 /* Tabs */
 .tabs {
     margin-top: 18px;
@@ -9917,7 +10021,7 @@ text-transform: none !important;
    scrolls inside the space left between the header area and the sticky footer.
    The value below is a fallback; the controller refines it with the measured
    space (see _fitToc). */
-.policyPage .tocPanel {
+.tocPage .tocPanel {
     border: 3px solid var(--sv-cyan);
     border-radius: var(--sv-radius);
     overflow: hidden;
@@ -9931,29 +10035,29 @@ text-transform: none !important;
 /* The content is rounded by UI5 to the panel's outer radius; matching it to the
    inner radius keeps it flush against the border so no sliver appears at the
    bottom corners. */
-.policyPage .tocPanel > .sapMPanelContent {
+.tocPage .tocPanel > .sapMPanelContent {
     border-radius: 0 0 calc(var(--sv-radius) - 3px) calc(var(--sv-radius) - 3px) !important;
 }
 /* Panel header: the clickable bar is .sapMPanelWrappingDiv and it holds the
    expand/collapse arrow. It is laid out as a row so the label stays left and
    the arrow is pushed to the right edge. */
-.policyPage .tocPanel .sapMPanelWrappingDiv,
-.policyPage .tocPanel .sapMPanelWrappingDivExpanded,
-.policyPage .tocPanel .sapMPanelWrappingDivTb,
-.policyPage .tocPanel .sapMPanelHdr {
+.tocPage .tocPanel .sapMPanelWrappingDiv,
+.tocPage .tocPanel .sapMPanelWrappingDivExpanded,
+.tocPage .tocPanel .sapMPanelWrappingDivTb,
+.tocPage .tocPanel .sapMPanelHdr {
     background: var(--sv-teal-1) !important;
     color: #fff !important;
     font-weight: 700;
     font-size: 17px;
     border-bottom: 0;
 }
-.policyPage .tocPanel .sapMPanelWrappingDiv {
+.tocPage .tocPanel .sapMPanelWrappingDiv {
     display: flex;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
 }
-.policyPage .tocPanel .sapMPanelWrappingDiv > .sapMPanelHdr {
+.tocPage .tocPanel .sapMPanelWrappingDiv > .sapMPanelHdr {
     flex: 1 1 auto;
     min-width: 0;
     /* The arrow is absolutely positioned, so clear the left indent UI5 applies
@@ -9968,21 +10072,21 @@ text-transform: none !important;
 }
 /* Arrow at the right end of the header. UI5 positions it absolutely for the
    expandable panel, so it is moved by overriding that position. */
-.policyPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
+.tocPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
     left: auto !important;
     right: 12px !important;
     margin-right: 0 !important;
     top: 50% !important;
     transform: translateY(-50%);
 }
-.policyPage .tocPanel .sapMPanelWrappingDiv .sapMTitle,
-.policyPage .tocPanel .sapMPanelWrappingDiv .sapMText,
-.policyPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon,
-.policyPage .tocPanel .sapMPanelHdr .sapUiIcon {
+.tocPage .tocPanel .sapMPanelWrappingDiv .sapMTitle,
+.tocPage .tocPanel .sapMPanelWrappingDiv .sapMText,
+.tocPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon,
+.tocPage .tocPanel .sapMPanelHdr .sapUiIcon {
     color: #fff !important;
     font-weight: 700;
 }
-.policyPage .tocBody {
+.tocPage .tocBody {
     max-height: calc(100vh - 220px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -9991,22 +10095,22 @@ text-transform: none !important;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
-.policyPage .tocBody::-webkit-scrollbar {
+.tocPage .tocBody::-webkit-scrollbar {
     width: 0;
     height: 0;
     display: none;
 }
-.policyPage .tocPanel .sapMPanelContent {
+.tocPage .tocPanel .sapMPanelContent {
     background: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
     padding: 0;
 }
 /* The index is always expanded on desktop: the controller makes the Panel
    non-expandable there, so no arrow is rendered and no space is reserved. */
 @media (min-width: 901px) {
-    .policyPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
+    .tocPage .tocPanel .sapMPanelWrappingDiv > .sapUiIcon {
         display: none !important;
     }
-    .policyPage .tocPanel .sapMPanelWrappingDiv {
+    .tocPage .tocPanel .sapMPanelWrappingDiv {
         cursor: default;
     }
 }
@@ -10084,7 +10188,7 @@ text-transform: none !important;
 
 /* The Panel header is the only index header, so the arrow sits next to the
    label on every screen size. */
-.policyPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon {
+.tocPage .tocPanel .sapMPanelWrappingDiv .sapUiIcon {
     margin-right: 6px;
 }
 
@@ -10306,7 +10410,7 @@ text-transform: none !important;
     /* Single column: the index sits in the page flow and expands fully, so the
        capped, internally scrolling panel is disabled here. Overscroll must also
        be released, otherwise a swipe over the index does not scroll the page. */
-    .policyPage .tocBody {
+    .tocPage .tocBody {
         max-height: none;
         overflow: visible;
         overscroll-behavior: auto;
@@ -10350,7 +10454,9 @@ text-transform: none !important;
     .sapMPage,
     .policyPage,
     .policyPage > section,
-    .policyPage .sapMPageEnableScrolling {
+    .umPage > section,
+    .policyPage .sapMPageEnableScrolling,
+    .umPage .sapMPageEnableScrolling {
         position: static !important;
         top: auto !important;
         right: auto !important;
@@ -10366,13 +10472,18 @@ text-transform: none !important;
         min-height: 0 !important;
     }
 
+    /* The page column skeleton is screen-only: released here so a printed
+       manual is not clipped to one viewport height. */
+    .umPage.sapMPageWithHeader {
+        display: block !important;
+    }
+
     /* Screen-only chrome */
     .siteHeader,
     .policyPage .sapMPageHeader,
     .bannerWrap,
     .tocCol,
     .siteFooter,
-    .policyFooter,
     .quickLinksWrap,
     .umTopbar,
     .docMeta,

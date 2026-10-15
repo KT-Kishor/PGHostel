@@ -582,8 +582,21 @@ sap.ui.define([
             var oPanelDom = oPanel && oPanel.getDomRef();
             if (!oScroller || !oColDom || !oPanelDom) return;
 
-            var oFooter = document.querySelector(".policyPage .policyFooter");
-            var iFooterTop = oFooter ? oFooter.getBoundingClientRect().top
+            // The footer that closes the page is the quick links block, so the
+            // index stops above it. It sits in the page flow rather than being
+            // pinned, so its measured top is only used while it is on screen and
+            // the viewport bottom is the bound otherwise.
+            //
+            // The lookup is scoped to this page's own DOM. Routed views stay alive
+            // in the NavContainer, so a document-wide query can return the footer
+            // of the other page that also has one; that page is hidden, its rect
+            // is all zeros, and the panel would clamp to its minimum height.
+            var oViewDom = this.getView().getDomRef();
+            var oFooter = oViewDom
+                ? oViewDom.querySelector(".quickLinksWrap")
+                : null;
+            var iFooterTop = oFooter
+                ? Math.min(oFooter.getBoundingClientRect().top, window.innerHeight)
                 : window.innerHeight;
 
             // The panel fills the space left above the sticky footer, so it grows
