@@ -103,11 +103,13 @@ sap.ui.define([
 
             // The language may have been changed on another page, so the
             // footer selector is put back on the stored value as well.
-            var oLanguageModel = this.getView().getModel("langageModel");
-            if (oLanguageModel) {
-                oLanguageModel.setProperty("/key", this._sLocale || "en");
-            }
+            const sLocale = localStorage.getItem("selectedLanguage") || "en";
+            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+            const oLanguageModel = new sap.ui.model.json.JSONModel({
+                key: sLocale
+            });
 
+            this.getView().setModel(oLanguageModel, "langageModel");
             // The JSON bundle is still loading on the very first match; the
             // policy is rendered once the request completes.
             if (!this._aPoliciesSource) {
@@ -126,30 +128,6 @@ sap.ui.define([
                 this.getRouter().navTo("RoutePoliciesTab", { policyId: sId });
             }
         },
-        onLanguagePress: function (oEvent) {
-    var sLocale = oEvent.getSource().getSelectedKey();
-    var oView = this.getView();
-
-    // Save selected language
-    localStorage.setItem("selectedLanguage", sLocale);
-
-    // Update SAPUI5 language configuration
-    sap.ui.getCore().getConfiguration().setLanguage(sLocale);
-
-    // Create the resource model for the selected language
-    var oResourceModel = new sap.ui.model.resource.ResourceModel({
-        bundleName: "sap.ui.com.project1.i18n.i18n",
-        bundleLocale: sLocale
-    });
-
-    // Set the updated i18n model
-    oView.setModel(oResourceModel, "i18n");
-
-    // Update the resource bundle used in controller methods
-    this.i18nModel = oResourceModel.getResourceBundle();
-
-    // Refresh UI bindings
-},
         /**
          * The language is selected on the account or footer menu and remembered
          * in local storage. The core language is switched to it and the view's
@@ -984,15 +962,29 @@ sap.ui.define([
          * translated again so the whole page follows the new language.
          */
         onLanguagePress: function (oEvent) {
+
             var sLocale = oEvent.getSource().getSelectedKey();
+            var oView = this.getView();
 
+            // Save selected language
             localStorage.setItem("selectedLanguage", sLocale);
-            this._applySelectedLanguage();
 
-            var oLanguageModel = this.getView().getModel("langageModel");
-            if (oLanguageModel) {
-                oLanguageModel.setProperty("/key", sLocale);
-            }
+            // Update SAPUI5 language configuration
+            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+            // Create the resource model for the selected language
+            var oResourceModel = new sap.ui.model.resource.ResourceModel({
+                bundleName: "sap.ui.com.project1.i18n.i18n",
+                bundleLocale: sLocale
+            });
+
+            // Set the updated i18n model
+            oView.setModel(oResourceModel, "i18n");
+
+            // Update the resource bundle used in controller methods
+            this.i18nModel = oResourceModel.getResourceBundle();
+
+            // Refresh UI bindings
 
             if (this._aPoliciesSource) {
                 this._localizePolicies();
