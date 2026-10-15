@@ -10,6 +10,28 @@ sap.ui.define([
     "sap/ui/core/Fragment"
 ], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment) {
     "use strict";
+    const STAYS = [
+        { id: "Hotels", badge: "Hotel", icon: "sap-icon://building",
+          blurb: "Comfortable stays for holidays, business trips and quick getaways, with rooms to suit different budgets.",
+          best: ["Travel", "Business trips", "Getaways", "Families"],
+          see: ["Room types and photos", "Facilities and amenities", "Starting price", "Cancellation policy"] },
+        { id: "Hostels", badge: "Hostel", icon: "sap-icon://group",
+          blurb: "Budget-friendly stays with beds in shared rooms, popular with students and solo travellers.",
+          best: ["Students", "Solo travellers", "Budget stays", "Short visits"],
+          see: ["Rooms and beds", "Facilities and amenities", "Starting price", "House rules and cancellation policy"] },
+        { id: "PG", badge: "PG", icon: "sap-icon://home",
+          blurb: "Paying guest accommodation with rooms and beds for people who need a place for longer.",
+          best: ["Students", "Working professionals", "Longer stays", "Relocating"],
+          see: ["Rooms and beds", "Amenities included", "Starting price and deposit details", "House rules"] },
+        { id: "Service Apartments", badge: "Service Apartments", icon: "sap-icon://addresses",
+          blurb: "Apartment-style stays with the comfort of home, ideal for families, groups and longer visits.",
+          best: ["Families", "Groups", "Longer visits", "Work trips"],
+          see: ["Apartment types", "Facilities and amenities", "Starting price", "Cancellation policy"] },
+        { id: "Rented Apartments", badge: "Rented Properties", icon: "sap-icon://key",
+          blurb: "Apartments available on rent when you need a home base rather than a short stay.",
+          best: ["Long-term stays", "Families", "Relocating", "Working professionals"],
+          see: ["Apartment details", "Amenities", "Rent and deposit details", "Rules and terms"] }
+    ];
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
     this._otpResendInterval = null;
@@ -113,6 +135,12 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+            var oViewModel = new JSONModel({
+                selectedId: "Hotels",
+                currentStay: STAYS[0],
+                staysList: STAYS
+            });
+            this.getView().setModel(oViewModel, "view");
         const sLocale = localStorage.getItem("selectedLanguage") || "en";
             sap.ui.getCore().getConfiguration().setLanguage(sLocale);
              const oLanguageModel = new sap.ui.model.json.JSONModel({
@@ -269,6 +297,51 @@ sap.ui.define([
                 }.bind(this), 3000);
             }
             
+        },
+   onStayTypePress: function (oEvent) {
+    var oButton = oEvent.getSource();
+    var sSelectedText = oButton.getText();
+
+    // 1. Find the selected stay details from your STAYS array
+    var oSelectedStay = STAYS.find(function(stay) {
+        return stay.id === sSelectedText;
+    });
+
+    if (oSelectedStay) {
+        var oModel = this.getView().getModel("view");
+        oModel.setProperty("/selectedId", sSelectedText);
+        oModel.setProperty("/currentStay", oSelectedStay);
+    }
+
+    // 2. Clear 'selected-stay-btn' class from ALL buttons first
+    var aButtons = [
+        this.byId("btnHotels"),
+        this.byId("btnHostels"),
+        this.byId("btnPG"),
+        this.byId("btnServiceApartments"),
+        this.byId("btnRentedApartments")
+    ];
+
+    aButtons.forEach(function(btn) {
+        if (btn) {
+            btn.removeStyleClass("selected-stay-btn");
+        }
+    });
+
+    // 3. Add 'selected-stay-btn' ONLY to the currently clicked button
+    oButton.addStyleClass("selected-stay-btn");
+},
+
+
+        onBrowseHotelsPress: function () {
+            // var sCurrentId = this.getView().getModel("view").getProperty("/selectedId");
+            // // Add your navigation or action logic here
+              var oTabHeader = this.getView().byId("mainTabHeader");
+
+        oTabHeader.setSelectedKey("idRooms");
+
+          this.key="idRooms"
+          this.onTabSelect()
         },
         onAfterAnimate: function () {
             var oHome = this.byId("idHome");

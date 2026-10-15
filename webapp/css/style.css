@@ -9554,7 +9554,7 @@ text-transform: none !important;
 .svInsuranceBanner {
     background: #e3f7fa;
     color: #31596b;
-    padding: 26px 2.5%;
+    padding: 14px 2.5%;
     gap: 20px;
     border-bottom: 5px solid #13d3df;
 }
@@ -10619,17 +10619,37 @@ text-transform: none !important;
     min-height: 52px;
     padding: 0 20px;
     border-radius: 10px;
+    color:  #006c75;
 }
 
 .insuranceBuyBtn .sapMBtnContent {
     line-height: 50px;
     font-size: 16px;
     font-weight: 600;
+
 }
 
 .insuranceBuyBtn .sapMBtnIcon {
     font-size: 1.25rem;
     line-height: 50px;
+    color:  #006c75;
+
+}
+/* Button hover */
+.traveltest:hover .sapMBtnIcon,
+.traveltest:hover .sapMBtnContent {
+    color: #006c75 !important;
+}
+
+/* Optional: button background and border */
+.traveltest:hover {
+    border-color: #006c75 !important;
+    border-radius: 10px;
+    
+
+}
+.traveltest{
+  margin-bottom: 14px;
 }
 
 /* Responsive size for mobile */
@@ -10775,4 +10795,476 @@ text-transform: none !important;
 }
 .imagelinkcss{
   margin-top: 10px;
+}
+.stayTypesMainCard {
+    padding: 3rem 2rem;
+    background-color: #f4fcfd;
+    border-radius: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+/* Title Styling */
+.stayTypesTitle {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    font-size: clamp(1.4rem, 4vw, 2rem) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.5rem !important;
+    overflow-wrap: anywhere;
+}
+
+/* Highlight only the word "stay" */
+.stayTypesTitle strong {
+    color: #008b96 !important;
+    font-weight: 800 !important;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .stayTypesTitle {
+        font-size: 1.6rem !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .stayTypesTitle {
+        font-size: 1.3rem !important;
+        line-height: 1.4 !important;
+        padding: 0 10px;
+    }
+}
+
+/* Description Styling */
+.stayTypesDescription {
+  display: flex;
+  justify-content: center;
+    text-align: center;
+    color: #4b5563 !important;
+    font-size: 1rem !important;
+    margin-bottom: 2.5rem !important;
+    margin-left: 20px;
+}
+
+/* Flexbox container spacing */
+.stayTypesFlex {
+    gap: 1.25rem;
+}
+
+/* Base Button Styling (Unselected state) */
+.stayTypeButton {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    color: #111827 !important;
+    font-weight: 600 !important;
+    height: auto !important;
+    min-width: 240px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Fix SAPUI5 Button Inner Structure for Top Icon & Bottom Text */
+.stayTypeButton .sapMBtnInner {
+    background: transparent !important;
+    border: 2px solid #008b96 !important;
+    border-radius: 16px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1.25rem 1rem !important;
+    height: auto !important;
+}
+
+/* Icon Styling inside Button */
+.stayTypeButton .sapMBtnIcon {
+    font-size: 1.75rem !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.75rem !important;
+    color: #00bcd4 !important; /* Teal icon color */
+    display: block !important;
+}
+
+/* Text Styling inside Button */
+.stayTypeButton .sapMBtnContent {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}
+
+/* Hover State */
+.stayTypeButton:hover {
+    border-color: #00bcd4 !important;
+    background-color: #ffffff !important;
+    color:  #999;
+
+}
+.stayTypeButton:hover .sapMBtnIcon {
+    color: #ffffff !important;
+}
+
+.stayTypeButton:hover .sapMBtnContent {
+    color: #ffffff !important;
+}
+
+.stayTypeButton:hover .sapMBtnInner {
+    background-color: #006c75 !important;
+    border-color: #006c75 !important;
+}
+
+/* Selected / Active State (Cyan Card look) */
+.stayTypeButton.selected-stay-btn,
+.stayTypeButton.sapMBtnActive {
+    background-color: #00bcd4 !important;
+    border-color: #00bcd4 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 188, 212, 0.3);
+}
+
+/* Change text and icon to white when selected */
+.stayTypeButton.selected-stay-btn .sapMBtnContent,
+.stayTypeButton.selected-stay-btn .sapMBtnIcon,
+.stayTypeButton.sapMBtnActive .sapMBtnContent,
+.stayTypeButton.sapMBtnActive .sapMBtnIcon {
+    color: #ffffff !important;
+}
+/* Container Layout */
+.stayDetailsContainer {
+    background-color: #e6f7f9;
+    border-radius: 20px;
+    padding: 2.5rem;
+    gap: 3rem;
+    margin-top: 1.5rem;
+}
+
+/* ================= LEFT PREVIEW CARD ================= */
+.hotelPreviewCard {
+    width: 280px;
+    min-width: 280px;
+    height: 340px;
+    background: linear-gradient(180deg, #1fa2b1 0%, #00a4b8 50%, #008796 100%);
+    border-radius: 20px;
+    padding: 1rem;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 164, 184, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Top Badge */
+.hotelCardBadge {
+    background: rgba(0, 50, 60, 0.4);
+    border-radius: 8px;
+    padding: 0.35rem 0.65rem;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.badgeIcon,
+.badgeText {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    margin-bottom: 2px;
+}
+
+/* Main Icon inside Card */
+.hotelCardIconWrapper {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.hotelCardMainIcon {
+    font-size: 4rem !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Skeleton Lines */
+.skeletonLineLong {
+    width: 140px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.skeletonLineShort {
+    width: 90px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+/* Price & Button inside Card */
+.hotelPriceText {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.viewRoomsButton {
+    background-color: #00d2e6 !important;
+    border-radius: 8px !important;
+    border: none !important;
+    width: 100%;
+}
+
+.viewRoomsButton .sapMBtnContent {
+    color: #004d56 !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+}
+
+/* ================= RIGHT CONTENT AREA ================= */
+.hotelDetailsContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.hotelDetailTitle {
+    color: #00798a !important;
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.hotelDetailSubtitle {
+    color: #4b5563 !important;
+    font-size: 1rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.sectionHeaderLabel {
+    color: #4b5563 !important;
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem !important;
+}
+
+/* Tags Styling */
+.tagsContainer {
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.stayTag {
+    background-color: #ffffff !important;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Checklist Styling */
+.featureList {
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+}
+
+.featureItem {
+    gap: 0.6rem;
+}
+
+.featureIcon {
+    background-color: #00b7c7;
+    color: #ffffff !important;
+    border-radius: 50%;
+    padding: 0.4rem;
+    font-size: 0.75rem !important;
+    width: 20px;
+    height: 20px;
+    box-sizing: content-box;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.featureText {
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+}
+.browscss {
+    width: 250px !important;
+}
+
+.browscss .sapMBtnInner {
+    width: 250px !important;
+    height: 55px !important;
+    border-radius: 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.browscss .sapMBtnContent {
+     font-size: 18px !important;
+    font-weight: 600 !important;
+    line-height: normal !important;
+    text-align: center !important;
+}
+
+.browscss .sapMBtnIcon {
+    line-height: normal !important;
+}
+/* Browse Hotels Main Button */
+.browseHotelsButton {
+    background-color: #00bcd4 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    width: fit-content !important;
+    padding: 0.4rem 1rem !important;
+}
+
+.browseHotelsButton .sapMBtnContent {
+    color: #003840 !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+}
+
+.browseHotelsButton:hover {
+    background-color: #00acc1 !important;
+}
+.skeletonLineLong {
+    width: 140px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.skeletonLineShort {
+    width: 90px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+/* Main container */
+.stayDetailsContainer {
+    display: flex !important;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 54px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Left card */
+.hotelPreviewCard {
+    flex: 0 0 280px;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Right content */
+.hotelDetailsContent {
+    flex: 1 1 0;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Keep tags within the available width */
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Prevent long text from overflowing */
+.hotelDetailTitle,
+.hotelDetailSubtitle,
+.featureText {
+    overflow-wrap: anywhere;
+}
+
+/* Mobile responsive layout */
+@media (max-width: 767px) {
+    .stayDetailsContainer {
+        flex-direction: column !important;
+        flex-wrap: wrap !important;
+        gap: 16px;
+        width: 100%;
+    }
+
+    .hotelPreviewCard,
+    .hotelDetailsContent {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hotelPreviewCard {
+        padding: 16px;
+    }
+
+    .hotelDetailsContent {
+        padding: 0 12px;
+    }
+
+    .browscss,
+    .browscss .sapMBtnInner {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .tagsContainer {
+        flex-wrap: wrap !important;
+    }
+}
+.stayTypesFlex {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 12px;
+}
+
+.stayTypeButton {
+    box-sizing: border-box;
+}
+
+/* Mobile: 2 buttons per row */
+@media (max-width: 600px) {
+    .stayTypesFlex {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+    }
+
+    .stayTypesFlex .stayTypeButton {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
+    .stayTypesFlex .stayTypeButton .sapMBtnInner {
+        width: 100% !important;
+        box-sizing: border-box;
+        white-space: normal !important;
+        min-height: 55px;
+        height: auto !important;
+    }
 }

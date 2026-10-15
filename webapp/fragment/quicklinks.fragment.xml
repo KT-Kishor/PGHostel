@@ -37,7 +37,7 @@
                     text="{i18n>Buytravelinsurance}"
                     icon="sap-icon://shield"
                     press="onBuyTravelInsurance"
-                    class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
+                    class="insuranceBuyBtn insuranceIconGap traveltest"/>
             </HBox>
         </HBox>
 
@@ -90,7 +90,7 @@
             <!-- Quick Links -->
             <VBox class="svFooterColumn">
                 <Title text="{i18n>Quicklinks}" level="H5"/>
-                <Link text="{i18n>tileHome}" press="onfooterhometabselect"/>
+                <Link text="{i18n>quickHome}" press="onfooterhometabselect"/>
                 <Link text="{i18n>rooms}" press="onfootertabselect"/>
                 <Link text="{i18n>contact}" press="onfootercontacttabselect"/>
                 <Link text="{i18n>userManualTitle}" press="onUsermanualPress"/>

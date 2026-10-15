@@ -139,8 +139,123 @@
                                 </l:Grid>
                                 
                             </ScrollContainer>
-                               <VBox
-                                                >
+                  
+                            
+<!-- Find the Right Stay - Single Card -->
+<VBox class="stayTypesMainCard" width="100%">
+
+  
+   <FormattedText
+    htmlText="Find the right &lt;strong&gt;stay&lt;/strong&gt; for you"
+    class="stayTypesTitle"/>
+
+    <Text
+        text="Hotels, hostels, PGs, service apartments and rented apartments, all in one place."
+        class="stayTypesDescription"/>
+
+   <FlexBox
+    width="100%"
+    wrap="Wrap"
+    justifyContent="SpaceAround"
+    alignItems="Center"
+    class="stayTypesFlex">
+
+    <Button
+        id="btnHotels"
+        text="Hotels"
+        icon="sap-icon://building"
+        press="onStayTypePress"
+        class="stayTypeButton selected-stay-btn myUnifiedBtn"/>
+
+    <Button
+        id="btnHostels"
+        text="Hostels"
+        icon="sap-icon://group"
+        press="onStayTypePress"
+        class="stayTypeButton myUnifiedBtn"/>
+
+    <Button
+        id="btnPG"
+        text="PG"
+        icon="sap-icon://home"
+        press="onStayTypePress"
+        class="stayTypeButton myUnifiedBtn"/>
+
+    <Button
+        id="btnServiceApartments"
+        text="Service Apartments"
+        icon="sap-icon://building"
+        press="onStayTypePress"
+        class="stayTypeButton myUnifiedBtn"/>
+
+    <Button
+        id="btnRentedApartments"
+        text="Rented Apartments"
+        icon="sap-icon://key"
+        press="onStayTypePress"
+        class="stayTypeButton myUnifiedBtn"/>
+
+</FlexBox>
+
+<!-- Lower Section Container -->
+<!-- Lower Section Container -->
+   <HBox  
+
+   width="100%" class="stayDetailsContainer" binding="{view>/currentStay}">
+
+        <!-- Left Graphic Card -->
+        <VBox class="hotelPreviewCard">
+            <!-- Top Badge -->
+            <HBox class="hotelCardBadge">
+                <core:Icon src="{view>icon}" class="badgeIcon"/>
+                <Text text="{view>badge}" class="badgeText"/>
+            </HBox>
+
+            <!-- Center Icon -->
+            <VBox class="hotelCardIconWrapper" justifyContent="Center" alignItems="Center">
+                <core:Icon src="{view>icon}" class="hotelCardMainIcon"/>
+            </VBox>
+
+            <!-- Bottom Graphic Area -->
+            <VBox class="hotelCardBottom" alignItems="Center" justifyContent="Center">
+                <VBox class="skeletonLineLong"/>
+                <VBox class="skeletonLineShort"/>
+
+                <Text text="Starting at INR —" class="hotelPriceText"/>
+
+                <Button text="View Rooms" class="myUnifiedBtn "/>
+            </VBox>
+        </VBox>
+
+        <!-- Right Content Area -->
+        <VBox class="hotelDetailsContent" width="100%">
+            <!-- Title & Subtitle -->
+            <Title text="{view>id}" level="H2" class="hotelDetailTitle"/>
+            <Text text="{view>blurb}" class="hotelDetailSubtitle"/>
+
+            <!-- BEST FOR Section -->
+            <Label text="BEST FOR" class="sectionHeaderLabel"/>
+            <HBox class="tagsContainer" items="{view>best}">
+                <Text text="{view>}" class="stayTag"/>
+            </HBox>
+
+            <!-- WHAT YOU'LL SEE Section -->
+            <Label text="WHAT YOU'LL SEE BEFORE YOU BOOK" class="sectionHeaderLabel"/>
+            <VBox class="featureList" items="{view>see}">
+                <HBox alignItems="Center" class="featureItem">
+                    <core:Icon src="sap-icon://accept" class="featureIcon"/>
+                    <Text text="{view>}" class="featureText"/>
+                </HBox>
+            </VBox>
+
+            <!-- Action Button -->
+            <Button text="Browse {view>id}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
+        </VBox>
+
+    </HBox>
+</VBox>
+
+                               <VBox class="sapUiTinyMarginTop">
                                                     <core:Fragment
                                                         fragmentName="sap.ui.com.project1.fragment.quicklinks"
                                                         type="XML"

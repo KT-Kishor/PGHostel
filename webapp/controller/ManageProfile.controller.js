@@ -118,6 +118,21 @@ sap.ui.define([
         },
 
         _onRouteMatched: async function () {
+           var sLanguage = localStorage.getItem("selectedLanguage") || "en";
+            sap.ui.getCore().getConfiguration().setLanguage(sLanguage);
+
+
+var oLocaleMap = {
+    "en": "English",
+    "kn": "ಕನ್ನಡ",
+    "hi": "हिन्दी",
+    "kan": "ಕನ್ನಡ",
+    "k-n": "ಕನ್ನಡ"
+};
+
+var sLanguageText = oLocaleMap[sLanguage] || "English";
+        this.getView().byId("id_languageBtn").setText(sLanguageText);
+
             var oProfileModel = this.getView().getModel("profileData");
             if (oProfileModel) {
                 oProfileModel.setProperty("/isEditMode", false);
@@ -139,7 +154,6 @@ sap.ui.define([
             await this.commonLoginFunction("ManageProfile");
             await this.ManageData();
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-           this.getView().byId("id_languageBtn").setText(this.i18nModel.getText("Language"));
 
             var model = new JSONModel({});
             this.getView().setModel(model, "Member")
