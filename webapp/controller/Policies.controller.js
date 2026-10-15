@@ -1012,6 +1012,21 @@ sap.ui.define([
                 that._fitToc();
                 that._updateActiveToc();
             }, 0);
-        }
+        },
+          onfooterhometabselect: function () {
+    this.getOwnerComponent()
+        .getRouter()
+        .navTo("RouteHostel");
+},
+       onfootertabselect: function () {
+            const sTabKey = "idRooms"
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+        },
+  onfootercontacttabselect: function () {
+            const sTabKey = "idContact"
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+            sessionStorage.setItem("homePageReturnTab", sTabKey);
+        },
     });
 });
