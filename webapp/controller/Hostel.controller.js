@@ -10,28 +10,7 @@ sap.ui.define([
     "sap/ui/core/Fragment"
 ], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment) {
     "use strict";
-    const STAYS = [
-        { id: "Hotels", badge: "Hotel", icon: "sap-icon://building",
-          blurb: "Comfortable stays for holidays, business trips and quick getaways, with rooms to suit different budgets.",
-          best: ["Travel", "Business trips", "Getaways", "Families"],
-          see: ["Room types and photos", "Facilities and amenities", "Starting price", "Cancellation policy"] },
-        { id: "Hostels", badge: "Hostel", icon: "sap-icon://group",
-          blurb: "Budget-friendly stays with beds in shared rooms, popular with students and solo travellers.",
-          best: ["Students", "Solo travellers", "Budget stays", "Short visits"],
-          see: ["Rooms and beds", "Facilities and amenities", "Starting price", "House rules and cancellation policy"] },
-        { id: "PG", badge: "PG", icon: "sap-icon://home",
-          blurb: "Paying guest accommodation with rooms and beds for people who need a place for longer.",
-          best: ["Students", "Working professionals", "Longer stays", "Relocating"],
-          see: ["Rooms and beds", "Amenities included", "Starting price and deposit details", "House rules"] },
-        { id: "Service Apartments", badge: "Service Apartments", icon: "sap-icon://building",
-          blurb: "Apartment-style stays with the comfort of home, ideal for families, groups and longer visits.",
-          best: ["Families", "Groups", "Longer visits", "Work trips"],
-          see: ["Apartment types", "Facilities and amenities", "Starting price", "Cancellation policy"] },
-        { id: "Rented Apartments", badge: "Rented Properties", icon: "sap-icon://key",
-          blurb: "Apartments available on rent when you need a home base rather than a short stay.",
-          best: ["Long-term stays", "Families", "Relocating", "Working professionals"],
-          see: ["Apartment details", "Amenities", "Rent and deposit details", "Rules and terms"] }
-    ];
+ 
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
     this._otpResendInterval = null;
@@ -171,14 +150,97 @@ sap.ui.define([
                 } catch (error) { }
             }, 1200); // 1 request per second (safe for Nominatim)
         },
+        _updateStaysData: function (oResourceBundle) {
+    var aStays = [
+        { 
+            id: "Hotels", 
+            badge: oResourceBundle.getText("stayHotels"), 
+            icon: "sap-icon://building",
+            blurb: oResourceBundle.getText("blurbHotels"),
+            best: [oResourceBundle.getText("tagTravel"), oResourceBundle.getText("tagBusinessTrips"), oResourceBundle.getText("tagGetaways"), oResourceBundle.getText("tagFamilies")],
+            see: [oResourceBundle.getText("seeRoomTypesAndPhotos"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeCancellationPolicy")] 
+        },
+        { 
+            id: "Hostels", 
+            badge: oResourceBundle.getText("stayHostels"), 
+            icon: "sap-icon://group",
+            blurb: oResourceBundle.getText("blurbHostels"),
+            best: [oResourceBundle.getText("tagStudents"), oResourceBundle.getText("tagSoloTravellers"), oResourceBundle.getText("tagBudgetStays"), oResourceBundle.getText("tagShortVisits")],
+            see: [oResourceBundle.getText("seeRoomsAndBeds"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeHouseRulesAndCancellationPolicy")] 
+        },
+        { 
+            id: "PG", 
+            badge: oResourceBundle.getText("stayPG"), 
+            icon: "sap-icon://home",
+            blurb: oResourceBundle.getText("blurbPG"),
+            best: [oResourceBundle.getText("tagStudents"), oResourceBundle.getText("tagWorkingProfessionals"), oResourceBundle.getText("tagLongerStays"), oResourceBundle.getText("tagRelocating")],
+            see: [oResourceBundle.getText("seeRoomsAndBeds"), oResourceBundle.getText("seeAmenitiesIncluded"), oResourceBundle.getText("seeStartingPriceAndDepositDetails"), oResourceBundle.getText("seeHouseRules")] 
+        },
+        { 
+            id: "Service Apartments", 
+            badge: oResourceBundle.getText("stayServiceApartments"), 
+            icon: "sap-icon://building",
+            blurb: oResourceBundle.getText("blurbServiceApartments"),
+            best: [oResourceBundle.getText("tagFamilies"), oResourceBundle.getText("tagGroups"), oResourceBundle.getText("tagLongerVisits"), oResourceBundle.getText("tagWorkTrips")],
+            see: [oResourceBundle.getText("seeApartmentTypes"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeCancellationPolicy")] 
+        },
+        { 
+            id: "Rented Apartments", 
+            badge: oResourceBundle.getText("stayRentedApartments"), 
+            icon: "sap-icon://key",
+            blurb: oResourceBundle.getText("blurbRentedApartments"),
+            best: [oResourceBundle.getText("tagLongTermStays"), oResourceBundle.getText("tagFamilies"), oResourceBundle.getText("tagRelocating"), oResourceBundle.getText("tagWorkingProfessionals")],
+            see: [oResourceBundle.getText("seeApartmentDetails"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeRentAndDepositDetails"), oResourceBundle.getText("seeRulesAndTerms")] 
+        }
+    ];
+
+    var oViewModel = this.getView().getModel("view");
+    if (oViewModel) {
+        // If model already exists, update its properties
+        oViewModel.setProperty("/staysList", aStays);
+        
+        // Also update the current selected stay to match the new language
+        var sCurrentSelectedId = oViewModel.getProperty("/selectedId") || "Hotels";
+        var oUpdatedCurrentStay = aStays.find(function(stay) {
+            return stay.id === sCurrentSelectedId;
+        });
+        oViewModel.setProperty("/currentStay", oUpdatedCurrentStay);
+    } else {
+        // Create the JSONModel for the first time if onRouteMatched is calling it
+        oViewModel = new JSONModel({
+            selectedId: "Hotels",
+            currentStay: aStays[0],
+            staysList: aStays
+        });
+        this.getView().setModel(oViewModel, "view");
+    }
+},
+_getResourceBundle: function () {
+    var sLocale = localStorage.getItem("selectedLanguage") || "en";
+
+    // Set core configuration language
+    sap.ui.getCore().getConfiguration().setLanguage(sLocale);
+
+    // Ensure the i18n model exists and uses the selected locale
+    var oI18nModel = this.getView().getModel("i18n");
+    
+    if (!oI18nModel || oI18nModel.getResourceBundle().sLocale !== sLocale) {
+        oI18nModel = new sap.ui.model.resource.ResourceModel({
+            bundleName: "sap.ui.com.project1.i18n.i18n", // Replace with your app namespace
+            bundleLocale: sLocale
+        });
+        this.getView().setModel(oI18nModel, "i18n");
+    }
+
+    return oI18nModel.getResourceBundle();
+},
 
         _onRouteMatched: async function () {
-            var oViewModel = new JSONModel({
-                selectedId: "Hotels",
-                currentStay: STAYS[0],
-                staysList: STAYS
-            });
-            this.getView().setModel(oViewModel, "view");
+         // Inside your Controller or Component initialization where i18n bundle is available:
+var oResourceBundle = this._getResourceBundle();
+
+this._updateStaysData(oResourceBundle);
+
         const sLocale = localStorage.getItem("selectedLanguage") || "en";
             sap.ui.getCore().getConfiguration().setLanguage(sLocale);
              const oLanguageModel = new sap.ui.model.json.JSONModel({
@@ -342,18 +404,21 @@ sap.ui.define([
             }
             
         },
-   onStayTypePress: function (oEvent) {
+  onStayTypePress: function (oEvent) {
     var oButton = oEvent.getSource();
-    var sSelectedText = oButton.getText();
+    // Retrieve the stable, non-translated ID from custom data
+    var sSelectedId = oButton.data("stayId"); 
 
-    // 1. Find the selected stay details from your STAYS array
-    var oSelectedStay = STAYS.find(function(stay) {
-        return stay.id === sSelectedText;
+    var oModel = this.getView().getModel("view");
+    var aStays = oModel.getProperty("/staysList");
+
+    // 1. Find the selected stay details from your dynamic array
+    var oSelectedStay = aStays.find(function(stay) {
+        return stay.id === sSelectedId;
     });
 
     if (oSelectedStay) {
-        var oModel = this.getView().getModel("view");
-        oModel.setProperty("/selectedId", sSelectedText);
+        oModel.setProperty("/selectedId", sSelectedId);
         oModel.setProperty("/currentStay", oSelectedStay);
     }
 
@@ -378,14 +443,32 @@ sap.ui.define([
 
 
         onBrowseHotelsPress: function () {
-            // var sCurrentId = this.getView().getModel("view").getProperty("/selectedId");
-            // // Add your navigation or action logic here
+            var sCurrentId = this.getView().getModel("view").getProperty("/selectedId");
+
+            if(sCurrentId==="Hostels"){
+                sCurrentId="Hostel"
+            }else if(sCurrentId==="Hotels"){
+                sCurrentId="Hotel"
+
+            }else if(sCurrentId==="Service Apartments"){
+                sCurrentId="Service Apartment"
+
+            }else if(sCurrentId==="Rented Apartments"){
+                sCurrentId="Rented Apartment"
+
+            }
+            // Add your navigation or action logic here
               var oTabHeader = this.getView().byId("mainTabHeader");
 
         oTabHeader.setSelectedKey("idRooms");
 
           this.key="idRooms"
+          this.PropertyType=sCurrentId
+          this.isInitialLoad=false
+          this.byId("id_PropertyType").setSelectedKeys([sCurrentId]);
+
           this.onTabSelect()
+
         },
         onAfterAnimate: function () {
             var oHome = this.byId("idHome");
@@ -2777,7 +2860,14 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 var oModelData = await this.Branch(filter);
 
                 this.closeBusyDialog()
+                 var type=this.PropertyType ?this.PropertyType :""
+
+                if(this.PropertyType){
+                this.isInitialLoad = false;
+                this.PropertyType=""
+                }else{
                 this.isInitialLoad = true;
+                }
                 this.isShowmore = false
 
 
@@ -2791,19 +2881,18 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 const aFilteredproperdata = data.filter(item => item.City === sCity);
 
 
-
-
-
-                if (aFiltered.length === 0 || sCity) {
-
-                    await this._loadFilteredData(sCity, "", "", "");
-                } else {
-                    await this._loadFilteredData(this.City, "", "", "");
-                }
-                const aUnique = aFiltered.filter((item, index, self) =>
+              const aUnique = aFiltered.filter((item, index, self) =>
                     index === self.findIndex(t => t.Name === item.Name)
                 );
                 this.getView().setModel(new JSONModel(aUnique), "AreaModel");
+
+                if (aFiltered.length === 0 || sCity) {
+
+                    await this._loadFilteredData(sCity, "", "", type);
+                } else {
+                    await this._loadFilteredData(this.City, "", "", type);
+                }
+            
 
                 this._populateUniqueFilterValues(aFilteredproperdata)
                 this._populateUniqueFilterValuesBranch(data)
@@ -6119,8 +6208,13 @@ onLanguagePress: function (oEvent) {
     // Set the updated i18n model
     oView.setModel(oResourceModel, "i18n");
 
+
+    // REBUILD THE STAYS ARRAY WITH THE NEW LANGUAGE BUNDLE
+
+
     // Update the resource bundle used in controller methods
     this.i18nModel = oResourceModel.getResourceBundle();
+    this._updateStaysData(this.i18nModel);
     this._vrRefreshTexts();
 
     // Refresh UI bindings

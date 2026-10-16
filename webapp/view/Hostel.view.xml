@@ -161,55 +161,72 @@
         text="{i18n>Allstays}"
         class="stayTypesDescription"/>
 
-   <FlexBox
+ <FlexBox
     width="100%"
     wrap="Wrap"
     justifyContent="SpaceAround"
     alignItems="Center"
     class="stayTypesFlex">
 
-
-        <Button
-   id="btnHotels"
+    <!-- 1. Hotels Button -->
+    <Button
+        id="btnHotels"
         text="{i18n>cardHotels}"
         icon="sap-icon://building"
         press="onStayTypePress"
         class="stayTypeButton selected-stay-btn myUnifiedBtn">
+        <customData>
+            <core:CustomData key="stayId" value="Hotels"/>
+        </customData>
+    </Button>
 
-    <customData>
-        <core:CustomData
-            key="stayId"
-            value="Hotels"/>
-    </customData>
-</Button>
-
-    <Button
+    <!-- 2. Hostels Button (Fixed stayId value) -->
+    <Button 
         id="btnHostels"
         text="{i18n>cardhostels}"
         icon="sap-icon://group"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn"/>
+        class="stayTypeButton myUnifiedBtn">
+        <customData>
+            <core:CustomData key="stayId" value="Hostels" />
+        </customData>
+    </Button>
 
+    <!-- 3. PG Button (Added missing customData) -->
     <Button
         id="btnPG"
         text="{i18n>CardPG}"
         icon="sap-icon://home"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn"/>
+        class="stayTypeButton myUnifiedBtn">
+        <customData>
+            <core:CustomData key="stayId" value="PG" />
+        </customData>
+    </Button>
 
+    <!-- 4. Service Apartments Button (Added missing customData) -->
     <Button
         id="btnServiceApartments"
         text="{i18n>cardServiceApartments}"
         icon="sap-icon://building"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn"/>
+        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn">
+        <customData>
+            <core:CustomData key="stayId" value="Service Apartments" />
+        </customData>
+    </Button>
 
+    <!-- 5. Rented Apartments Button (Added missing customData) -->
     <Button
         id="btnRentedApartments"
         text="{i18n>cardRentedApartments}"
         icon="sap-icon://key"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn"/>
+        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn">
+        <customData>
+            <core:CustomData key="stayId" value="Rented Apartments" />
+        </customData>
+    </Button>
 
 </FlexBox>
 
@@ -246,7 +263,7 @@
         <!-- Right Content Area -->
         <VBox class="hotelDetailsContent" width="100%">
             <!-- Title & Subtitle -->
-            <Title text="{view>id}" level="H2" class="hotelDetailTitle"/>
+            <Title text="{view>badge}" level="H2" class="hotelDetailTitle"/>
             <Text text="{view>blurb}" class="hotelDetailSubtitle"/>
 
             <!-- BEST FOR Section -->
@@ -265,7 +282,7 @@
             </VBox>
 
             <!-- Action Button -->
-            <Button text="{i18n>Browse} {view>id}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
+            <Button text="{i18n>Browse} {view>badge}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
         </VBox>
 
     </HBox>

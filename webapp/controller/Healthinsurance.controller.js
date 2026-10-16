@@ -16,6 +16,13 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteHealthinsurance").attachMatched(this._onRouteMatched, this);
         },
 		_onRouteMatched: function (oEvent) {
+
+    this.getView().findAggregatedObjects(true, function (oControl) {
+        if (oControl.setValueState &&
+            typeof oControl.setValueState === "function") {
+            oControl.setValueState("None");
+        }
+    });
           this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
 
 const sLocale = localStorage.getItem("selectedLanguage") || "en";
@@ -48,6 +55,9 @@ this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 sPath: sPath,
 });
             this.getView().setModel(oModel,"HealthInsuranceModel");
+            var oModel = this.getView().getModel("HealthInsuranceModel");
+
+             oModel.setProperty("/minDate", new Date());
 			    var oStepInput = this.byId("memberCount");
 
     this.onMemberCountChange({
@@ -150,6 +160,7 @@ onDateChange: function (oEvent) {
     var sStartDate = oStartDatePicker.getValue();
     var sEndDate = oEndDatePicker.getValue();
 
+
     // Read the selected start date
     var oStartDate = oStartDatePicker.getDateValue();
 
@@ -190,6 +201,7 @@ onDateChange: function (oEvent) {
     } else {
         oEndDatePicker.setValueState("None");
     }
+
 },
         onEmailliveChange: function (oEvent) {
             utils._LCvalidateEmail(oEvent);
@@ -199,6 +211,11 @@ onDateChange: function (oEvent) {
 		},
         onBloodGroupChange:function (oEvent){
           utils._LCstrictValidationComboBox(oEvent);
+        },
+          onDestinationChange:function (oEvent){
+               var oInput = oEvent.getSource();
+            utils._LCstrictValidationMultiComboBox(oEvent);
+            if (oInput.getValue() === "") oInput.setValueState("None");
         },
 		onInsurancePlanChange: function (oEvent) {
     utils._LCstrictValidationComboBox(oEvent);
@@ -387,7 +404,7 @@ onSubmitPress: async function () {
         !utils._LCstrictValidationComboBox(
             oView.byId("idtype"), "ID"
         ) ||
-        !utils._LCstrictValidationComboBox(
+        !utils._LCstrictValidationMultiComboBox(
             oView.byId("id_Destination"), "ID"
         ) ||
         !utils._LCvalidateMandatoryField(
@@ -518,7 +535,7 @@ if (!bHasAttachment) {
     // 5. Prepare complete payload
     var oCompletePayload = {
         type: oHealthData.insurancePlan,
-        destination: oView.byId("id_Destination").getSelectedKey(),
+        destination: oView.byId("id_Destination").getSelectedKeys(),
         startDate: oHealthData.startDate,
         endDate: oHealthData.endDate,
         totalTravellers: iTotalTravellers,
@@ -805,6 +822,7 @@ onTravellerCountChange: function (oEvent) {
             labelSpanL: 3,
             labelSpanM: 4,
             labelSpanS: 12,
+            visible:"{= ${HealthInsuranceModel>/sPath} !== 'Health' }",
             content: [
                 new sap.m.Label({ 
                     text: oBundle.getText("fullname"), 
@@ -832,7 +850,8 @@ onTravellerCountChange: function (oEvent) {
                     value: "{HealthInsuranceModel>/travellers/" + (i - 1) + "/dateOfBirth}",
                     valueFormat: "yyyy-MM-dd",
                     displayFormat: "dd/MM/yyyy",
-                    placeholder: oBundle.getText("selectDateOfBirth")
+                    placeholder: oBundle.getText("selectDateOfBirth"),
+                    maxDate:"{HealthInsuranceModel>/minDate}"
                 }),
                 new sap.m.Label({ 
                     text: oBundle.getText("passportExpiryDate"), 

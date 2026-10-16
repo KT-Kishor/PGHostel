@@ -392,19 +392,19 @@
                                         text="{i18n>Destination}"
                                         required="true"
                                     />
-                                    <ComboBox
+                                    <MultiComboBox
                                         id="id_Destination"
-                                        selectedKey="{HealthInsuranceModel>/destination}"
+                                        selectedKeys="{HealthInsuranceModel>/destination}"
                                         placeholder="{i18n>Selectdestination}"
                                         items="{path:'CountryModel>/', length:1000}"
-                                        change="onInsurancePlanChange"
+                                        change="onDestinationChange"
                                         valueStateText="{i18n>Selectdestination}"
                                     >
                                         <core:ListItem
                                             key="{CountryModel>countryName}"
                                             text="{CountryModel>countryName}"
                                         />
-                                    </ComboBox>
+                                    </MultiComboBox>
                                     <Label text="{i18n>NumberofTravellers}" />
                                     <StepInput
                                         id="memberCount1"
@@ -421,6 +421,7 @@
                                     <DatePicker
                                         id="id_startDate"
                                         value="{HealthInsuranceModel>/startDate}"
+                                        minDate="{HealthInsuranceModel>/minDate}"
                                         displayFormat="dd/MM/yyyy"
                                         valueFormat="yyyy-MM-dd"
                                         placeholder="{i18n>selectStartDate}"
